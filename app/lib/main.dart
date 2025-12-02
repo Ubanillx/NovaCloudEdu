@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:tdesign_flutter/tdesign_flutter.dart';
-import 'widgets/widgets.dart';
 
 void main() {
   runApp(const MyApp());
@@ -18,134 +19,138 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
       ),
-      home: const ComponentShowcase(),
+      home: const HomePage(),
     );
   }
 }
 
-class ComponentShowcase extends StatefulWidget {
-  const ComponentShowcase({super.key});
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
 
   @override
-  State<ComponentShowcase> createState() => _ComponentShowcaseState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _ComponentShowcaseState extends State<ComponentShowcase> {
-  bool _isLoading = false;
-  final _inputController = TextEditingController();
+class _HomePageState extends State<HomePage> {
+  int _currentIndex = 0;
+
+  final List<Widget> _pages = const [
+    Center(child: Text('首页')),
+    Center(child: Text('课程')),
+    Center(child: Text('圈子')),
+    Center(child: Text('对话')),
+    Center(child: Text('我的')),
+  ];
+
+  final List<_TabItem> _tabs = const [
+    _TabItem(label: '首页', icon: 'lib/assests/fonts/icons/主页.svg'),
+    _TabItem(label: '课程', icon: 'lib/assests/fonts/icons/课程.svg'),
+    _TabItem(label: '圈子', icon: 'lib/assests/fonts/icons/圈子.svg'),
+    _TabItem(label: '对话', icon: 'lib/assests/fonts/icons/对话.svg'),
+    _TabItem(label: '我的', icon: 'lib/assests/fonts/icons/我的.svg'),
+  ];
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: TDNavBar(title: '组件展示', screenAdaptation: false),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          _buildSection('按钮组件', [
-            PrimaryButton(
-              text: '主要按钮',
-              onTap: () => AppToast.success(context, '点击了主要按钮'),
-            ),
-            const SizedBox(height: 12),
-            SecondaryButton(
-              text: '次要按钮',
-              onTap: () => AppToast.show(context, '点击了次要按钮'),
-            ),
-            const SizedBox(height: 12),
-            DangerButton(
-              text: '危险按钮',
-              onTap: () => AppToast.warning(context, '这是危险操作'),
-            ),
-            const SizedBox(height: 12),
-            PrimaryButton(
-              text: _isLoading ? '加载中...' : '加载状态按钮',
-              isLoading: _isLoading,
-              onTap: () async {
-                setState(() => _isLoading = true);
-                await Future.delayed(const Duration(seconds: 2));
-                setState(() => _isLoading = false);
-              },
-            ),
-          ]),
-          _buildSection('输入组件', [
-            AppInput(
-              label: '用户名',
-              placeholder: '请输入用户名',
-              controller: _inputController,
-            ),
-            const SizedBox(height: 12),
-            const SearchInput(placeholder: '搜索课程'),
-          ]),
-          _buildSection('对话框', [
-            PrimaryButton(
-              text: '确认对话框',
-              onTap: () async {
-                final result = await showConfirmDialog(
-                  context,
-                  title: '确认操作',
-                  content: '您确定要执行此操作吗？',
-                );
-                if (result == true && context.mounted) {
-                  AppToast.success(context, '已确认');
-                }
-              },
-            ),
-            const SizedBox(height: 12),
-            SecondaryButton(
-              text: '提示对话框',
-              onTap: () =>
-                  showAppAlertDialog(context, title: '提示', content: '这是一条提示信息'),
-            ),
-          ]),
-          _buildSection('卡片组件', [
-            AppCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  TDText('课程卡片', font: TDTheme.of(context).fontTitleLarge),
-                  const SizedBox(height: 8),
-                  TDText(
-                    '这是一个使用 TDesign 风格的卡片组件',
-                    textColor: TDTheme.of(context).fontGyColor2,
-                  ),
-                ],
-              ),
-              onTap: () => AppToast.show(context, '点击了卡片'),
-            ),
-            ListItemCard(
-              title: '列表项',
-              subtitle: '带箭头的列表项',
-              leftIcon: TDIcons.user,
-              onTap: () => AppToast.show(context, '点击了列表项'),
-            ),
-          ]),
-          _buildSection('加载组件', [
-            const SizedBox(height: 80, child: LoadingWidget(message: '加载中...')),
-          ]),
-          _buildSection('空状态', [
-            const SizedBox(height: 200, child: EmptyWidget(message: '暂无课程数据')),
-          ]),
-        ],
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+        statusBarBrightness: Brightness.light,
+      ),
+      child: Scaffold(
+        body: _pages[_currentIndex],
+        bottomNavigationBar: _AnimatedBottomBar(
+          currentIndex: _currentIndex,
+          tabs: _tabs,
+          onTap: (index) => setState(() => _currentIndex = index),
+        ),
       ),
     );
   }
+}
 
-  Widget _buildSection(String title, List<Widget> children) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          child: TDText(
-            title,
-            font: TDTheme.of(context).fontTitleLarge,
-            fontWeight: FontWeight.bold,
+class _TabItem {
+  final String label;
+  final String icon;
+
+  const _TabItem({required this.label, required this.icon});
+}
+
+class _AnimatedBottomBar extends StatelessWidget {
+  final int currentIndex;
+  final List<_TabItem> tabs;
+  final ValueChanged<int> onTap;
+
+  const _AnimatedBottomBar({
+    required this.currentIndex,
+    required this.tabs,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, -2),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        child: SizedBox(
+          height: 56,
+          child: Row(
+            children: List.generate(tabs.length, (index) {
+              final isSelected = index == currentIndex;
+              return Expanded(
+                child: GestureDetector(
+                  onTap: () => onTap(index),
+                  behavior: HitTestBehavior.opaque,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      AnimatedScale(
+                        scale: isSelected ? 1.1 : 1.0,
+                        duration: const Duration(milliseconds: 200),
+                        child: SvgPicture.asset(
+                          tabs[index].icon,
+                          width: 24,
+                          height: 24,
+                          colorFilter: isSelected
+                              ? null
+                              : const ColorFilter.mode(
+                                  Colors.grey,
+                                  BlendMode.srcIn,
+                                ),
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      AnimatedDefaultTextStyle(
+                        duration: const Duration(milliseconds: 200),
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: isSelected
+                              ? TDTheme.of(context).brandColor7
+                              : Colors.grey,
+                          fontWeight: isSelected
+                              ? FontWeight.w600
+                              : FontWeight.normal,
+                        ),
+                        child: Text(tabs[index].label),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }),
           ),
         ),
-        ...children,
-        const SizedBox(height: 8),
-        const TDDivider(),
-      ],
+      ),
     );
   }
 }
