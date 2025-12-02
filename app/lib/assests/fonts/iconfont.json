@@ -1,0 +1,163 @@
+{
+  "id": "4857642",
+  "name": "smart-class",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "29474507",
+      "name": "我的1",
+      "font_class": "wode1",
+      "unicode": "e68f",
+      "unicode_decimal": 59023
+    },
+    {
+      "icon_id": "11901171",
+      "name": "圈子 (1)",
+      "font_class": "quanzi",
+      "unicode": "e600",
+      "unicode_decimal": 58880
+    },
+    {
+      "icon_id": "14026599",
+      "name": "加号按钮",
+      "font_class": "jiahaoanniu_jiahaoanniu",
+      "unicode": "e611",
+      "unicode_decimal": 58897
+    },
+    {
+      "icon_id": "3864645",
+      "name": "主页",
+      "font_class": "zhuye",
+      "unicode": "e640",
+      "unicode_decimal": 58944
+    },
+    {
+      "icon_id": "13856689",
+      "name": "对话",
+      "font_class": "duihua",
+      "unicode": "e6ba",
+      "unicode_decimal": 59066
+    },
+    {
+      "icon_id": "24111670",
+      "name": "课程",
+      "font_class": "kecheng",
+      "unicode": "fb3e",
+      "unicode_decimal": 64318
+    },
+    {
+      "icon_id": "39152126",
+      "name": "044_视频课程",
+      "font_class": "a-044_shipinkecheng",
+      "unicode": "e6e9",
+      "unicode_decimal": 59113
+    },
+    {
+      "icon_id": "3864737",
+      "name": "搜索",
+      "font_class": "sousuo",
+      "unicode": "e63f",
+      "unicode_decimal": 58943
+    },
+    {
+      "icon_id": "41930527",
+      "name": "推荐",
+      "font_class": "tuijian",
+      "unicode": "e6bb",
+      "unicode_decimal": 59067
+    },
+    {
+      "icon_id": "1505565",
+      "name": "历史",
+      "font_class": "lishi",
+      "unicode": "e606",
+      "unicode_decimal": 58886
+    },
+    {
+      "icon_id": "3719473",
+      "name": "地理",
+      "font_class": "dili-",
+      "unicode": "e602",
+      "unicode_decimal": 58882
+    },
+    {
+      "icon_id": "3833178",
+      "name": "化学",
+      "font_class": "huaxue",
+      "unicode": "e603",
+      "unicode_decimal": 58883
+    },
+    {
+      "icon_id": "3865679",
+      "name": "英语",
+      "font_class": "yingyu",
+      "unicode": "e607",
+      "unicode_decimal": 58887
+    },
+    {
+      "icon_id": "3865681",
+      "name": "政治",
+      "font_class": "zhengzhi",
+      "unicode": "e608",
+      "unicode_decimal": 58888
+    },
+    {
+      "icon_id": "3904078",
+      "name": "数学",
+      "font_class": "shuxue",
+      "unicode": "e60b",
+      "unicode_decimal": 58891
+    },
+    {
+      "icon_id": "4073936",
+      "name": "语文",
+      "font_class": "yuwen",
+      "unicode": "e604",
+      "unicode_decimal": 58884
+    },
+    {
+      "icon_id": "4082189",
+      "name": "物理1",
+      "font_class": "wuli",
+      "unicode": "e696",
+      "unicode_decimal": 59030
+    },
+    {
+      "icon_id": "6195881",
+      "name": "公式公告",
+      "font_class": "gongshigonggao",
+      "unicode": "e63e",
+      "unicode_decimal": 58942
+    },
+    {
+      "icon_id": "9935223",
+      "name": "英语",
+      "font_class": "yingyu1",
+      "unicode": "e605",
+      "unicode_decimal": 58885
+    },
+    {
+      "icon_id": "24732571",
+      "name": "文章",
+      "font_class": "wenzhang",
+      "unicode": "ecb3",
+      "unicode_decimal": 60595
+    },
+    {
+      "icon_id": "31123031",
+      "name": "生物",
+      "font_class": "shengwu",
+      "unicode": "e601",
+      "unicode_decimal": 58881
+    },
+    {
+      "icon_id": "39594835",
+      "name": "人工智能",
+      "font_class": "rengongzhinengjiqiren",
+      "unicode": "e646",
+      "unicode_decimal": 58950
+    }
+  ]
+}
