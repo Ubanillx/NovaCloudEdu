@@ -3,3 +3,37 @@ spring:
     name: backend
   profiles:
     active: dev
+
+# JWT 配置
+jwt:
+  secret: ${JWT_SECRET:NovaCloudEduSecretKey123456789012345678901234567890}
+  expiration: ${JWT_EXPIRATION:86400000}  # 24小时
+
+# MyBatis-Plus 配置
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      logic-delete-field: isDelete
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+# 日志配置
+logging:
+  level:
+    com.novacloudedu.backend: debug
+
+# SpringDoc OpenAPI 配置
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
