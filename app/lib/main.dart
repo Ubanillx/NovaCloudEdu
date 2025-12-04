@@ -3,6 +3,13 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:tdesign_flutter/tdesign_flutter.dart';
 
+// 导入5个页面
+import 'features/home/pages/home_page.dart';
+import 'features/course/pages/course_page.dart';
+import 'features/circle/pages/circle_page.dart';
+import 'features/chat/pages/chat_page.dart';
+import 'features/profile/pages/profile_page.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -19,27 +26,27 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
       ),
-      home: const HomePage(),
+      home: const MainPage(),
     );
   }
 }
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class MainPage extends StatefulWidget {
+  const MainPage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<MainPage> createState() => _MainPageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _MainPageState extends State<MainPage> {
   int _currentIndex = 0;
 
   final List<Widget> _pages = const [
-    Center(child: Text('首页')),
-    Center(child: Text('课程')),
-    Center(child: Text('圈子')),
-    Center(child: Text('对话')),
-    Center(child: Text('我的')),
+    HomePage(),
+    CoursePage(),
+    CirclePage(),
+    ChatPage(),
+    ProfilePage(),
   ];
 
   final List<_TabItem> _tabs = const [
