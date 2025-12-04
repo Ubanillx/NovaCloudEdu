@@ -22,9 +22,9 @@ public class OpenApiConfig {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("NovaCloudEdu API 文档")
+                        .title("NovaCloudEdu API")
                         .version("1.0.0")
-                        .description("NovaCloudEdu 智慧教育平台后端 API 接口文档")
+                        .description("NovaCloudEdu Smart Education Platform Backend API")
                         .license(new License()
                                 .name("Apache 2.0")
                                 .url("https://www.apache.org/licenses/LICENSE-2.0")))
@@ -36,6 +36,6 @@ public class OpenApiConfig {
                                         .type(SecurityScheme.Type.HTTP)
                                         .scheme("bearer")
                                         .bearerFormat("JWT")
-                                        .description("请输入 JWT Token（不需要 Bearer 前缀）")));
+                                        .description("Enter JWT Token (without Bearer prefix)")));
     }
 }

@@ -6,6 +6,7 @@ import com.novacloudedu.backend.infrastructure.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -34,6 +35,7 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+    private final Environment environment;
 
     /**
      * 白名单路径 - 无需认证
@@ -43,16 +45,27 @@ public class SecurityConfig {
             "/api/auth/login",
             "/api/auth/send-code",
             "/api/health",
-            "/error",
-            // Swagger 相关
+            "/error"
+    };
+
+    /**
+     * Swagger 相关路径 - 仅开发环境放开
+     */
+    private static final String[] SWAGGER_WHITE_LIST = {
             "/swagger-ui/**",
+            "/swagger-ui.html",
             "/v3/api-docs/**",
+            "/v3/api-docs",
+            "/v3/api-docs.json",
+            "/v3/api-docs.yaml",
             "/swagger-resources/**",
             "/webjars/**"
     };
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        boolean isDevProfile = Arrays.asList(environment.getActiveProfiles()).contains("dev");
+        
         http
                 // 禁用 CSRF（使用 JWT 不需要）
                 .csrf(AbstractHttpConfigurer::disable)
@@ -66,10 +79,14 @@ public class SecurityConfig {
                         .accessDeniedHandler(jwtAccessDeniedHandler)
                 )
                 // 配置请求授权
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(WHITE_LIST).permitAll()
-                        .anyRequest().authenticated()
-                )
+                .authorizeHttpRequests(auth -> {
+                    auth.requestMatchers(WHITE_LIST).permitAll();
+                    if (isDevProfile) {
+                        // 开发环境：放开 Swagger 文档和 JSON
+                        auth.requestMatchers(SWAGGER_WHITE_LIST).permitAll();
+                    }
+                    auth.anyRequest().authenticated();
+                })
                 // 添加 JWT 过滤器
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
