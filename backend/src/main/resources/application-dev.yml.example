@@ -1,0 +1,29 @@
+# 开发环境配置示例
+# 复制此文件为 application-dev.yml 并填写实际配置
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/novacloudedu
+    username: your_username
+    password: your_password
+    driver-class-name: org.postgresql.Driver
+  
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: 
+      database: 0
+
+# JWT 配置（可选，会覆盖 application.yml 中的默认值）
+jwt:
+  secret: YourSecretKeyHereAtLeast32CharactersLong
+  expiration: 86400000  # 24小时（毫秒）
+
+# 短信服务配置
+sms:
+  url: https://push.spug.cc/sms/your_sms_key
+  query-url: https://push.spug.cc/request/query
+  token: your_sms_token
+  app-name: 智云星课平台
+  expire-minutes: 5  # 验证码有效期（分钟）
