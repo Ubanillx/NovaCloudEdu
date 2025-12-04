@@ -38,6 +38,19 @@ dependencies:
   # TDesign Flutter 组件库
   tdesign_flutter: ^0.2.6
   flutter_svg: ^2.2.3
+  openapi_generator_annotations: ^6.1.0
+  dio: ^5.9.0
+  json_annotation: ^4.9.0
+  built_value: ^8.9.0
+  built_collection: ^5.1.1
+  one_of: ^1.5.0
+  one_of_serializer: ^1.5.0
+  
+  # 生成的 API 客户端
+  nova_api:
+    path: ./lib/api/generated
+  flutter_client_sse: ^2.0.3
+  web_socket_channel: ^3.0.3
 
 dev_dependencies:
   flutter_test:
@@ -49,6 +62,11 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
+
+  # OpenAPI Generator
+  openapi_generator: ^6.1.0
+  build_runner: ^2.4.0
+  json_serializable: ^6.8.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
