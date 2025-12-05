@@ -77,13 +77,26 @@ public class UserRepositoryImpl implements UserRepository {
     public UserPage findByCondition(UserQueryCondition condition) {
         LambdaQueryWrapper<UserPO> wrapper = new LambdaQueryWrapper<>();
         
-        // 模糊查询条件
-        if (StringUtils.hasText(condition.userName())) {
-            wrapper.like(UserPO::getUserName, condition.userName());
+        // 用户名和账号相同时，使用 OR 关系搜索（关键词搜索场景）
+        boolean hasUserName = StringUtils.hasText(condition.userName());
+        boolean hasUserAccount = StringUtils.hasText(condition.userAccount());
+        
+        if (hasUserName && hasUserAccount && condition.userName().equals(condition.userAccount())) {
+            // 关键词搜索：用户名 OR 账号
+            String keyword = condition.userName();
+            wrapper.and(w -> w.like(UserPO::getUserName, keyword)
+                    .or()
+                    .like(UserPO::getUserAccount, keyword));
+        } else {
+            // 分别搜索（管理后台精确筛选场景）
+            if (hasUserName) {
+                wrapper.like(UserPO::getUserName, condition.userName());
+            }
+            if (hasUserAccount) {
+                wrapper.like(UserPO::getUserAccount, condition.userAccount());
+            }
         }
-        if (StringUtils.hasText(condition.userAccount())) {
-            wrapper.like(UserPO::getUserAccount, condition.userAccount());
-        }
+        
         if (StringUtils.hasText(condition.userPhone())) {
             wrapper.like(UserPO::getUserPhone, condition.userPhone());
         }

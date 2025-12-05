@@ -21,7 +21,15 @@ public enum ErrorCode {
     // 用户相关错误码
     USER_ACCOUNT_EXIST(40200, "账号已存在"),
     USER_PASSWORD_ERROR(40201, "密码错误"),
-    USER_NOT_EXIST(40202, "用户不存在");
+    USER_NOT_EXIST(40202, "用户不存在"),
+
+    // 好友相关错误码
+    FRIEND_REQUEST_EXIST(40310, "已有待处理的好友申请"),
+    FRIEND_REQUEST_NOT_FOUND(40311, "好友申请不存在"),
+    FRIEND_REQUEST_HANDLED(40312, "该申请已被处理"),
+    ALREADY_FRIENDS(40313, "已经是好友关系"),
+    FRIEND_NOT_FOUND(40314, "好友关系不存在"),
+    CANNOT_ADD_SELF(40315, "不能添加自己为好友");
 
     /**
      * 状态码
