@@ -45,7 +45,11 @@ public class SecurityConfig {
             "/api/auth/login",
             "/api/auth/send-code",
             "/api/health",
-            "/error"
+            "/error",
+            "/ws/**",       // WebSocket 端点
+            "/ws-sockjs/**", // SockJS 端点
+            "/api/announcement/list", // 公告列表
+            "/api/announcement/*" // 公告详情
     };
 
     /**

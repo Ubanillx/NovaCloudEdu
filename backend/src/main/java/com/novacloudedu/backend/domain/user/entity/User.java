@@ -42,6 +42,7 @@ public class User {
         User user = new User();
         user.account = account;
         user.password = password;
+        user.userName = generateDefaultUserName();
         user.userPhone = phone;
         user.role = UserRole.STUDENT;
         user.level = 0;
@@ -49,6 +50,27 @@ public class User {
         user.createTime = LocalDateTime.now();
         user.updateTime = LocalDateTime.now();
         return user;
+    }
+
+    /**
+     * 生成默认用户名
+     * 格式：用户 + 随机字符串，如 "用户a3f8k2_x9m1"
+     */
+    private static String generateDefaultUserName() {
+        String chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+        StringBuilder sb = new StringBuilder("用户");
+        java.util.Random random = new java.util.Random();
+        
+        // 生成前6位随机字符
+        for (int i = 0; i < 6; i++) {
+            sb.append(chars.charAt(random.nextInt(chars.length())));
+        }
+        sb.append("_");
+        // 生成后4位随机字符
+        for (int i = 0; i < 4; i++) {
+            sb.append(chars.charAt(random.nextInt(chars.length())));
+        }
+        return sb.toString();
     }
 
     /**
