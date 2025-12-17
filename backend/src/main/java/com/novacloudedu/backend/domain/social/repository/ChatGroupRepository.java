@@ -28,6 +28,11 @@ public interface ChatGroupRepository {
     Optional<ChatGroup> findById(GroupId id);
 
     /**
+     * 根据班级ID查找群聊
+     */
+    Optional<ChatGroup> findByClassId(Long classId);
+
+    /**
      * 根据群主ID查找群列表
      */
     List<ChatGroup> findByOwnerId(UserId ownerId);

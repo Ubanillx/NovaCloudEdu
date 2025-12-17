@@ -37,9 +37,17 @@ public class ChatGroup {
      * 创建群聊
      */
     public static ChatGroup create(String groupName, UserId ownerId) {
+        return create(groupName, ownerId, null);
+    }
+
+    /**
+     * 创建群聊（带班级关联）
+     */
+    public static ChatGroup create(String groupName, UserId ownerId, Long classId) {
         ChatGroup group = new ChatGroup();
         group.groupName = groupName;
         group.ownerId = ownerId;
+        group.classId = classId;
         group.maxMembers = 200;
         group.memberCount = 1;
         group.inviteMode = InviteMode.ALL;
@@ -49,6 +57,14 @@ public class ChatGroup {
         group.createTime = LocalDateTime.now();
         group.updateTime = LocalDateTime.now();
         return group;
+    }
+
+    /**
+     * 关联班级
+     */
+    public void associateClass(Long classId) {
+        this.classId = classId;
+        this.updateTime = LocalDateTime.now();
     }
 
     /**

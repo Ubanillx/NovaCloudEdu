@@ -46,6 +46,14 @@ public class ChatGroupRepositoryImpl implements ChatGroupRepository {
     }
 
     @Override
+    public Optional<ChatGroup> findByClassId(Long classId) {
+        LambdaQueryWrapper<ChatGroupPO> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(ChatGroupPO::getClassId, classId);
+        ChatGroupPO po = chatGroupMapper.selectOne(wrapper);
+        return Optional.ofNullable(converter.toDomain(po));
+    }
+
+    @Override
     public List<ChatGroup> findByOwnerId(UserId ownerId) {
         LambdaQueryWrapper<ChatGroupPO> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(ChatGroupPO::getOwnerId, ownerId.value())
