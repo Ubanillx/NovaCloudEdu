@@ -61,6 +61,55 @@ public class ChatGroupApplicationService {
     }
 
     /**
+     * 为班级创建群聊
+     */
+    @Transactional
+    public Long createGroupForClass(Long ownerId, String groupName, String description, String avatar, Long classId) {
+        // 验证用户存在
+        userRepository.findById(UserId.of(ownerId))
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_ERROR, "用户不存在"));
+
+        // 创建群
+        ChatGroup group = ChatGroup.create(groupName, UserId.of(ownerId), classId);
+        if (description != null) {
+            group.updateInfo(groupName, avatar, description);
+        }
+        ChatGroup savedGroup = groupRepository.save(group);
+
+        // 添加群主为成员
+        ChatGroupMember ownerMember = ChatGroupMember.createUserMember(
+                savedGroup.getId(), UserId.of(ownerId), GroupRole.OWNER
+        );
+        memberRepository.save(ownerMember);
+
+        log.info("班级群聊创建成功: groupId={}, classId={}, ownerId={}", 
+                savedGroup.getId().value(), classId, ownerId);
+        return savedGroup.getId().value();
+    }
+
+    /**
+     * 直接添加成员（内部调用，跳过审批）
+     */
+    @Transactional
+    public void addMemberDirectly(Long groupId, Long userId) {
+        ChatGroup group = getGroupOrThrow(groupId);
+        UserId userIdVo = UserId.of(userId);
+
+        // 检查是否已是成员
+        if (memberRepository.isMember(GroupId.of(groupId), userIdVo)) {
+            return;
+        }
+
+        // 检查群是否已满
+        if (group.isFull()) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "群成员已满");
+        }
+
+        addMemberInternal(group, userIdVo, GroupRole.MEMBER);
+        log.info("直接添加成员成功: groupId={}, userId={}", groupId, userId);
+    }
+
+    /**
      * 更新群信息
      */
     @Transactional
