@@ -3,6 +3,11 @@ spring:
     name: backend
   profiles:
     active: dev
+  servlet:
+    multipart:
+      max-file-size: 500MB
+      max-request-size: 500MB
+      enabled: true
 # JWT 配置
 jwt:
   secret: ${JWT_SECRET:NovaCloudEduSecretKey123456789012345678901234567890}
