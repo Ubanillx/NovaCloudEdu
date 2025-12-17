@@ -75,6 +75,40 @@ COMMENT ON COLUMN teacher.create_time IS '创建时间';
 COMMENT ON COLUMN teacher.update_time IS '更新时间';
 COMMENT ON COLUMN teacher.is_delete IS '是否删除';
 
+-- 讲师申请表
+CREATE TABLE IF NOT EXISTS teacher_application
+(
+    id              BIGSERIAL PRIMARY KEY,
+    user_id         BIGINT                             NOT NULL,
+    name            VARCHAR(128)                       NOT NULL,
+    introduction    TEXT                               NULL,
+    expertise       VARCHAR(512)                       NULL,
+    certificate_url VARCHAR(1024)                      NULL,
+    status          SMALLINT  DEFAULT 0                NOT NULL,
+    reject_reason   TEXT                               NULL,
+    reviewer_id     BIGINT                             NULL,
+    review_time     TIMESTAMP                          NULL,
+    create_time     TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    update_time     TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    is_delete       SMALLINT  DEFAULT 0                NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_ta_user_id ON teacher_application(user_id);
+CREATE INDEX IF NOT EXISTS idx_ta_status ON teacher_application(status);
+COMMENT ON TABLE teacher_application IS '讲师申请';
+COMMENT ON COLUMN teacher_application.id IS 'id';
+COMMENT ON COLUMN teacher_application.user_id IS '申请用户id';
+COMMENT ON COLUMN teacher_application.name IS '讲师姓名';
+COMMENT ON COLUMN teacher_application.introduction IS '讲师简介';
+COMMENT ON COLUMN teacher_application.expertise IS '专业领域，JSON数组格式';
+COMMENT ON COLUMN teacher_application.certificate_url IS '资质证书URL';
+COMMENT ON COLUMN teacher_application.status IS '状态：0-待审核，1-已通过，2-已拒绝';
+COMMENT ON COLUMN teacher_application.reject_reason IS '拒绝原因';
+COMMENT ON COLUMN teacher_application.reviewer_id IS '审核人id';
+COMMENT ON COLUMN teacher_application.review_time IS '审核时间';
+COMMENT ON COLUMN teacher_application.create_time IS '创建时间';
+COMMENT ON COLUMN teacher_application.update_time IS '更新时间';
+COMMENT ON COLUMN teacher_application.is_delete IS '是否删除';
+
 -- 课程章节表
 CREATE TABLE IF NOT EXISTS course_chapter
 (
