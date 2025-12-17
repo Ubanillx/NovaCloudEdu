@@ -160,6 +160,14 @@ public class User {
     }
 
     /**
+     * 升级为讲师
+     */
+    public void promoteToTeacher() {
+        this.role = UserRole.TEACHER;
+        this.updateTime = LocalDateTime.now();
+    }
+
+    /**
      * 更新用户资料（用户自己）
      */
     public void updateProfile(String userName, String userAvatar, String userProfile,
