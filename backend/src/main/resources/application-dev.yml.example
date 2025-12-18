@@ -15,6 +15,13 @@ spring:
       password: 
       database: 0
 
+  # Neo4j 知识图谱数据库配置
+  neo4j:
+    uri: bolt://example:7687
+    authentication:
+      username: neo4j
+      password: neo4j
+
 # JWT 配置（可选，会覆盖 application.yml 中的默认值）
 jwt:
   secret: YourSecretKeyHereAtLeast32CharactersLong
