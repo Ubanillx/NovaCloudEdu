@@ -4,7 +4,6 @@
 
 import 'dart:async';
 
-import 'package:built_value/json_object.dart';
 import 'package:built_value/serializer.dart';
 import 'package:dio/dio.dart';
 
@@ -13,7 +12,6 @@ import 'package:nova_api/src/model/base_response_boolean.dart';
 import 'package:nova_api/src/model/base_response_list_long.dart';
 import 'package:nova_api/src/model/base_response_login_user_response.dart';
 import 'package:nova_api/src/model/base_response_long.dart';
-import 'package:nova_api/src/model/base_response_object.dart';
 import 'package:nova_api/src/model/base_response_send_result.dart';
 import 'package:nova_api/src/model/base_response_string.dart';
 import 'package:nova_api/src/model/base_response_user_detail_response.dart';
