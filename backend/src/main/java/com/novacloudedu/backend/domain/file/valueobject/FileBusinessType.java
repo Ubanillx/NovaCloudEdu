@@ -16,7 +16,9 @@ public enum FileBusinessType {
     GENERAL("general", "通用文件", 100 * 1024 * 1024),
     CHAT_FILE("chat/file", "对话文件", 50 * 1024 * 1024),
     GROUP_CHAT_FILE("chat/group", "群聊文件", 50 * 1024 * 1024),
-    AI_CHAT_FILE("chat/ai", "AI聊天文件", 50 * 1024 * 1024);
+    AI_CHAT_FILE("chat/ai", "AI聊天文件", 50 * 1024 * 1024),
+    BOOK_FILE("book/file", "书籍文件", 200 * 1024 * 1024),
+    BOOK_COVER("book/cover", "书籍封面", 5 * 1024 * 1024);
 
     private final String folder;
     private final String description;
