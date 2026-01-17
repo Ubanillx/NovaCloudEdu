@@ -5,6 +5,8 @@
 /// 运行命令: flutter pub run build_runner build --delete-conflicting-outputs
 ///
 /// 注意: 生成代码时需要后端服务在 localhost:8080 运行
+library;
+
 import 'package:openapi_generator_annotations/openapi_generator_annotations.dart';
 
 @Openapi(
