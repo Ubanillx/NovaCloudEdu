@@ -1,0 +1,38 @@
+package com.novacloudedu.backend.interfaces.rest.book;
+
+import com.novacloudedu.backend.application.book.dto.ChapterContentDTO;
+import com.novacloudedu.backend.application.book.dto.ChapterDTO;
+import com.novacloudedu.backend.application.book.service.ChapterApplicationService;
+import com.novacloudedu.backend.common.BaseResponse;
+import com.novacloudedu.backend.common.ResultUtils;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@Tag(name = "章节管理", description = "章节查询、内容获取等接口")
+@RestController
+@RequestMapping("/api/books/{bookId}/chapters")
+@RequiredArgsConstructor
+public class ChapterController {
+
+    private final ChapterApplicationService chapterApplicationService;
+
+    @Operation(summary = "获取书籍章节列表")
+    @GetMapping
+    public BaseResponse<List<ChapterDTO>> getBookChapters(@PathVariable Long bookId) {
+        List<ChapterDTO> chapters = chapterApplicationService.getBookChapters(bookId);
+        return ResultUtils.success(chapters);
+    }
+
+    @Operation(summary = "获取章节内容")
+    @GetMapping("/{chapterIndex}")
+    public BaseResponse<ChapterContentDTO> getChapterContent(
+            @PathVariable Long bookId,
+            @PathVariable Integer chapterIndex) {
+        ChapterContentDTO content = chapterApplicationService.getChapterContent(bookId, chapterIndex);
+        return ResultUtils.success(content);
+    }
+}
