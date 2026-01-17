@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.novacloudedu.backend.infrastructure.persistence.mybatis.mapper.KnowledgePointMapper">
+
+    <select id="findByChapterId" resultType="com.novacloudedu.backend.infrastructure.persistence.po.KnowledgePointPO">
+        SELECT * FROM knowledge_point
+        WHERE chapter_id = #{chapterId} AND is_delete = 0
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="findByChapterIdAndType" resultType="com.novacloudedu.backend.infrastructure.persistence.po.KnowledgePointPO">
+        SELECT * FROM knowledge_point
+        WHERE chapter_id = #{chapterId} AND point_type = #{pointType} AND is_delete = 0
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="searchByName" resultType="com.novacloudedu.backend.infrastructure.persistence.po.KnowledgePointPO">
+        SELECT * FROM knowledge_point
+        WHERE name LIKE CONCAT('%', #{keyword}, '%') AND is_delete = 0
+        ORDER BY create_time DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <delete id="deleteByChapterId">
+        UPDATE knowledge_point
+        SET is_delete = 1
+        WHERE chapter_id = #{chapterId}
+    </delete>
+
+</mapper>
