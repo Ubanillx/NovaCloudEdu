@@ -91,7 +91,7 @@
 │  核心:     Java 21 + Spring Boot 3.5.8                      │
 │  持久化:   MyBatis Plus 3.5.5                               │
 │  安全:     Spring Security + JWT                            │
-│  AI:       Spring AI 1.1.0 + 阿里云 DashSDK                 │
+│  AI:       Langchain4j + 阿里云 DashSDK                 │
 ├─────────────────────────────────────────────────────────────┤
 │  数据存储  │  PostgreSQL (主数据库)                          │
 │            │  Redis (缓存/会话)                              │
@@ -112,11 +112,11 @@
 
 ### AI & 云服务
 
-[![Spring AI](https://img.shields.io/badge/Spring%20AI-1.1.0-6DB33F?logo=spring&logoColor=white)](https://spring.io/projects/spring-ai)
+[![Langchain4j](https://img.shields.io/badge/Langchain4j-1.10.0-000000?logo=github&logoColor=white)](https://github.com/langchain4j/langchain4j)
+[![Langchain4j Docs](https://img.shields.io/badge/Langchain4j-Docs-4285F4?logo=readthedocs&logoColor=white)](https://docs.langchain4j.dev)
 [![阿里云](https://img.shields.io/badge/阿里云-DashSDK-FF6A00?logo=alibabacloud&logoColor=white)](https://www.aliyun.com/)
 [![阿里云 OSS](https://img.shields.io/badge/阿里云%20OSS-对象存储-FF6A00?logo=alibabacloud&logoColor=white)](https://www.aliyun.com/product/oss)
 [![WebSocket](https://img.shields.io/badge/WebSocket-实时通信-010101?logo=websocket&logoColor=white)](https://websocket.org/)
-
 ---
 
 ## 核心功能
@@ -433,5 +433,6 @@ Creative Commons BY-NC-SA 4.0
   **⭐ 如果觉得这个项目有帮助，请给我们一个 Star！**
 
   Made with ❤️ by NovaCloudEdu Team
+
 
 </div>
