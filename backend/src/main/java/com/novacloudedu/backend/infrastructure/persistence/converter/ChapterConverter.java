@@ -20,6 +20,7 @@ public class ChapterConverter {
         po.setWordCount(chapter.getWordCount());
         po.setContent(chapter.getContent());
         po.setContentHash(chapter.getContentHash());
+        po.setEncryptionIv(chapter.getEncryptionIv());
         po.setCreateTime(chapter.getCreateTime());
         po.setUpdateTime(chapter.getUpdateTime());
         return po;
@@ -34,6 +35,7 @@ public class ChapterConverter {
                 po.getWordCount(),
                 po.getContent(),
                 po.getContentHash(),
+                po.getEncryptionIv(),
                 po.getCreateTime(),
                 po.getUpdateTime()
         );

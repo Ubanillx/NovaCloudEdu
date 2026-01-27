@@ -51,6 +51,7 @@ CREATE TABLE IF NOT EXISTS chapter
     word_count      INT            DEFAULT 0                 NOT NULL,
     content         TEXT                                     NOT NULL,
     content_hash    VARCHAR(64)                              NULL,
+    encryption_iv   VARCHAR(64)                              NULL,
     create_time     TIMESTAMP      DEFAULT CURRENT_TIMESTAMP NOT NULL,
     update_time     TIMESTAMP      DEFAULT CURRENT_TIMESTAMP NOT NULL,
     is_delete       SMALLINT       DEFAULT 0                 NOT NULL,
@@ -68,6 +69,7 @@ COMMENT ON COLUMN chapter.chapter_index IS '章节序号（从0开始）';
 COMMENT ON COLUMN chapter.word_count IS '章节字数';
 COMMENT ON COLUMN chapter.content IS '章节内容（清洗后的HTML）';
 COMMENT ON COLUMN chapter.content_hash IS '内容哈希值（用于去重和版本控制）';
+COMMENT ON COLUMN chapter.encryption_iv IS '加密IV（Base64编码，用于AES解密）';
 COMMENT ON COLUMN chapter.create_time IS '创建时间';
 COMMENT ON COLUMN chapter.update_time IS '更新时间';
 COMMENT ON COLUMN chapter.is_delete IS '是否删除：0-否，1-是';

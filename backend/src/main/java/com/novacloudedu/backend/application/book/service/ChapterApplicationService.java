@@ -22,6 +22,9 @@ public class ChapterApplicationService {
     
     @Value("${book.content.encryption.enabled:false}")
     private boolean encryptionEnabled;
+    
+    @Value("${book.content.encryption.secret-key:NovaCloudEduBookKey1}")
+    private String encryptionSecretKey;
 
     public List<ChapterDTO> getBookChapters(Long bookId) {
         return chapterRepository.findByBookIdOrderByIndex(BookId.of(bookId)).stream()
@@ -38,20 +41,14 @@ public class ChapterApplicationService {
 
         String content = chapter.getContent();
         
-        // 如果启用了加密,尝试解密内容
-        // 注意: 实际使用时需要从配置或数据库中获取密钥和IV
-        // 这里暂时注释掉加密功能,待完整实现密钥管理后启用
-        /*
-        if (encryptionEnabled && isEncrypted(content)) {
+        // 如果启用了加密且内容已加密,尝试解密内容
+        if (encryptionEnabled && isEncrypted(content) && chapter.getEncryptionIv() != null) {
             try {
-                String secretKey = "your-secret-key"; // TODO: 从配置中获取
-                String iv = "your-iv"; // TODO: 从数据库中获取
-                content = contentSecurityService.decrypt(content, secretKey, iv);
+                content = contentSecurityService.decrypt(content, encryptionSecretKey, chapter.getEncryptionIv());
             } catch (Exception e) {
                 throw new RuntimeException("内容解密失败: " + e.getMessage(), e);
             }
         }
-        */
 
         return ChapterContentDTO.builder()
                 .id(chapter.getId().value())
@@ -62,6 +59,31 @@ public class ChapterApplicationService {
                 .build();
     }
     
+    /**
+     * 加密指定章节的内容
+     * @param bookId 书籍ID
+     * @param chapterIndex 章节序号
+     */
+    public void encryptChapterContent(Long bookId, Integer chapterIndex) {
+        if (!encryptionEnabled) {
+            throw new RuntimeException("加密功能未启用");
+        }
+        
+        Chapter chapter = chapterRepository.findByBookIdAndIndex(BookId.of(bookId), chapterIndex)
+                .orElseThrow(() -> new RuntimeException("章节不存在"));
+        
+        if (chapter.isEncrypted()) {
+            throw new RuntimeException("章节内容已加密");
+        }
+        
+        String originalContent = chapter.getContent();
+        ContentSecurityService.EncryptedContent encrypted = 
+                contentSecurityService.encrypt(originalContent, encryptionSecretKey);
+        
+        chapter.setEncryptedContent(encrypted.getContent(), encrypted.getIv());
+        chapterRepository.save(chapter);
+    }
+
     /**
      * 简单判断内容是否已加密(Base64编码的内容)
      */

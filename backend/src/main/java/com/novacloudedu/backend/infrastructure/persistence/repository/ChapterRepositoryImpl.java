@@ -93,4 +93,33 @@ public class ChapterRepositoryImpl implements ChapterRepository {
         wrapper.eq(ChapterPO::getBookId, bookId.value());
         chapterMapper.delete(wrapper);
     }
+
+    @Override
+    public List<Chapter> searchByContentKeyword(String keyword, int page, int size) {
+        LambdaQueryWrapper<ChapterPO> wrapper = new LambdaQueryWrapper<>();
+        wrapper.and(w -> w
+                .like(ChapterPO::getTitle, keyword)
+                .or()
+                .like(ChapterPO::getContent, keyword))
+                .orderByDesc(ChapterPO::getUpdateTime)
+                .last("LIMIT " + size + " OFFSET " + (page - 1) * size);
+        return chapterMapper.selectList(wrapper).stream()
+                .map(chapterConverter::toChapter)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Chapter> searchByBookIdAndKeyword(Long bookId, String keyword, int page, int size) {
+        LambdaQueryWrapper<ChapterPO> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(ChapterPO::getBookId, bookId)
+                .and(w -> w
+                        .like(ChapterPO::getTitle, keyword)
+                        .or()
+                        .like(ChapterPO::getContent, keyword))
+                .orderByAsc(ChapterPO::getChapterIndex)
+                .last("LIMIT " + size + " OFFSET " + (page - 1) * size);
+        return chapterMapper.selectList(wrapper).stream()
+                .map(chapterConverter::toChapter)
+                .collect(Collectors.toList());
+    }
 }

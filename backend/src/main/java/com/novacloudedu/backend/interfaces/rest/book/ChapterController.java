@@ -35,4 +35,13 @@ public class ChapterController {
         ChapterContentDTO content = chapterApplicationService.getChapterContent(bookId, chapterIndex);
         return ResultUtils.success(content);
     }
+
+    @Operation(summary = "加密章节内容", description = "对指定章节的内容进行AES加密存储")
+    @PostMapping("/{chapterIndex}/encrypt")
+    public BaseResponse<Void> encryptChapterContent(
+            @PathVariable Long bookId,
+            @PathVariable Integer chapterIndex) {
+        chapterApplicationService.encryptChapterContent(bookId, chapterIndex);
+        return ResultUtils.success(null);
+    }
 }

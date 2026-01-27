@@ -27,15 +27,12 @@ public class PostgresBookSearchService implements BookSearchService {
 
     @Override
     public List<Chapter> searchChapterContent(String keyword, int page, int size) {
-        // TODO: 实现基于 PostgreSQL 全文检索的章节内容搜索
-        // 需要在数据库层面添加全文索引
-        throw new UnsupportedOperationException("章节内容全文搜索功能待实现");
+        return chapterRepository.searchByContentKeyword(keyword, page, size);
     }
 
     @Override
     public List<Chapter> searchInBook(Long bookId, String keyword, int page, int size) {
-        // TODO: 实现指定书籍内的章节搜索
-        throw new UnsupportedOperationException("书籍内章节搜索功能待实现");
+        return chapterRepository.searchByBookIdAndKeyword(bookId, keyword, page, size);
     }
 
     @Override
