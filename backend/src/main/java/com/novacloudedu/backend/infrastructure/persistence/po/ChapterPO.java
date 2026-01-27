@@ -26,6 +26,8 @@ public class ChapterPO implements Serializable {
 
     private String contentHash;
 
+    private String encryptionIv;
+
     private LocalDateTime createTime;
 
     private LocalDateTime updateTime;

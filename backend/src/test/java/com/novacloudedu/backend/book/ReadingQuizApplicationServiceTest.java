@@ -65,6 +65,7 @@ class ReadingQuizApplicationServiceTest {
                 500,
                 "这是第一章的内容，包含了很多重要的知识点。",
                 "hash123",
+                null,
                 LocalDateTime.now(),
                 LocalDateTime.now()
         );

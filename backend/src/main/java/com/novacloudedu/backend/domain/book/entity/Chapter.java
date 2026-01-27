@@ -22,6 +22,7 @@ public class Chapter {
     private Integer wordCount;
     private String content;
     private String contentHash;
+    private String encryptionIv;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
 
@@ -42,6 +43,7 @@ public class Chapter {
     public static Chapter reconstruct(ChapterId id, BookId bookId, String title,
                                      Integer chapterIndex, Integer wordCount,
                                      String content, String contentHash,
+                                     String encryptionIv,
                                      LocalDateTime createTime, LocalDateTime updateTime) {
         Chapter chapter = new Chapter();
         chapter.id = id;
@@ -51,6 +53,7 @@ public class Chapter {
         chapter.wordCount = wordCount;
         chapter.content = content;
         chapter.contentHash = contentHash;
+        chapter.encryptionIv = encryptionIv;
         chapter.createTime = createTime;
         chapter.updateTime = updateTime;
         return chapter;
@@ -68,6 +71,16 @@ public class Chapter {
         this.wordCount = calculateWordCount(content);
         this.contentHash = generateContentHash(content);
         this.updateTime = LocalDateTime.now();
+    }
+
+    public void setEncryptedContent(String encryptedContent, String iv) {
+        this.content = encryptedContent;
+        this.encryptionIv = iv;
+        this.updateTime = LocalDateTime.now();
+    }
+
+    public boolean isEncrypted() {
+        return this.encryptionIv != null && !this.encryptionIv.isEmpty();
     }
 
     private static Integer calculateWordCount(String content) {

@@ -26,4 +26,8 @@ public interface ChapterRepository {
     void deleteById(ChapterId id);
 
     void deleteByBookId(BookId bookId);
+
+    List<Chapter> searchByContentKeyword(String keyword, int page, int size);
+
+    List<Chapter> searchByBookIdAndKeyword(Long bookId, String keyword, int page, int size);
 }
