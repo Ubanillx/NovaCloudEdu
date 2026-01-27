@@ -25,6 +25,9 @@ public class DashScopeLlmService implements LlmService {
 
     private final Generation generation;
 
+    @Value("${ai.dashscope.api-key}")
+    private String apiKey;
+
     @Value("${ai.dashscope.llm.model-name}")
     private String modelName;
 
@@ -42,6 +45,7 @@ public class DashScopeLlmService implements LlmService {
         log.info("发送单条消息到 DashScope: {}", message);
         try {
             GenerationParam param = GenerationParam.builder()
+                    .apiKey(apiKey)
                     .model(modelName)
                     .prompt(message)
                     .temperature(temperature)
@@ -92,6 +96,7 @@ public class DashScopeLlmService implements LlmService {
             }
             
             GenerationParam param = GenerationParam.builder()
+                    .apiKey(apiKey)
                     .model(modelName)
                     .messages(dashscopeMessages)
                     .temperature(temperature)
@@ -125,6 +130,7 @@ public class DashScopeLlmService implements LlmService {
                     .build());
             
             GenerationParam param = GenerationParam.builder()
+                    .apiKey(apiKey)
                     .model(modelName)
                     .messages(messages)
                     .temperature(temperature)
@@ -145,10 +151,100 @@ public class DashScopeLlmService implements LlmService {
 
     @Override
     public void streamChat(String message, StreamCallback callback) {
-        log.info("流式对话暂不支持，使用普通对话代替");
-        // TODO: 实现流式调用
-        String response = chat(message);
-        callback.onToken(response);
+        log.info("开始流式对话: {}", message);
+        try {
+            GenerationParam param = GenerationParam.builder()
+                    .apiKey(apiKey)
+                    .model(modelName)
+                    .prompt(message)
+                    .temperature(temperature)
+                    .maxTokens(maxTokens)
+                    .topP(topP)
+                    .incrementalOutput(true)
+                    .build();
+
+            generation.streamCall(param, new com.alibaba.dashscope.common.ResultCallback<GenerationResult>() {
+                @Override
+                public void onEvent(GenerationResult result) {
+                    if (result != null && result.getOutput() != null && result.getOutput().getText() != null) {
+                        callback.onToken(result.getOutput().getText());
+                    }
+                }
+
+                @Override
+                public void onComplete() {
+                    log.info("流式对话完成");
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    log.error("流式对话出错", e);
+                }
+            });
+        } catch (Exception e) {
+            log.error("DashScope 流式调用失败", e);
+            throw new RuntimeException("流式调用失败: " + e.getMessage(), e);
+        }
+    }
+
+    public void streamChatWithMessages(List<Map<String, String>> messages, StreamCallback callback) {
+        log.info("开始流式多轮对话，消息数: {}", messages.size());
+        try {
+            List<Message> dashscopeMessages = new ArrayList<>();
+            
+            for (Map<String, String> msg : messages) {
+                String role = msg.get("role");
+                String content = msg.get("content");
+                
+                Role dashscopeRole;
+                switch (role.toLowerCase()) {
+                    case "system":
+                        dashscopeRole = Role.SYSTEM;
+                        break;
+                    case "user":
+                        dashscopeRole = Role.USER;
+                        break;
+                    case "assistant":
+                        dashscopeRole = Role.ASSISTANT;
+                        break;
+                    default:
+                        log.warn("未知的消息角色: {}，使用 USER", role);
+                        dashscopeRole = Role.USER;
+                }
+                
+                dashscopeMessages.add(Message.builder()
+                        .role(dashscopeRole.getValue())
+                        .content(content)
+                        .build());
+            }
+            
+            GenerationParam param = GenerationParam.builder()
+                    .apiKey(apiKey)
+                    .model(modelName)
+                    .messages(dashscopeMessages)
+                    .temperature(temperature)
+                    .maxTokens(maxTokens)
+                    .topP(topP)
+                    .incrementalOutput(true)
+                    .resultFormat(GenerationParam.ResultFormat.MESSAGE)
+                    .build();
+
+            io.reactivex.Flowable<GenerationResult> flowable = generation.streamCall(param);
+            flowable.blockingForEach(result -> {
+                if (result != null && result.getOutput() != null 
+                        && result.getOutput().getChoices() != null 
+                        && !result.getOutput().getChoices().isEmpty()) {
+                    String content = result.getOutput().getChoices().get(0).getMessage().getContent();
+                    if (content != null && !content.isEmpty()) {
+                        callback.onToken(content);
+                    }
+                }
+            });
+            log.info("流式多轮对话完成");
+        } catch (Exception e) {
+            log.error("DashScope 流式多轮对话调用失败", e);
+            throw new RuntimeException("流式调用失败: " + e.getMessage(), e);
+        }
     }
 
     @Override

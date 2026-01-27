@@ -12,6 +12,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import jakarta.servlet.DispatcherType;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -84,6 +85,8 @@ public class SecurityConfig {
                 )
                 // 配置请求授权
                 .authorizeHttpRequests(auth -> {
+                    // 允许异步dispatch请求通过（SSE需要）
+                    auth.dispatcherTypeMatchers(DispatcherType.ASYNC).permitAll();
                     auth.requestMatchers(WHITE_LIST).permitAll();
                     if (isDevProfile) {
                         // 开发环境：放开 Swagger 文档和 JSON
