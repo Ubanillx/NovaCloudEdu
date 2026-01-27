@@ -1,68 +1,128 @@
--- AI聊天领域相关表
+-- AI聊天领域相关表（重构版）
+-- 包含：AI助手、知识库、工作流、会话消息等
 
--- AI聊天消息表
-CREATE TABLE IF NOT EXISTS ai_chat_message
+-- =====================================================
+-- AI助手表（替代原ai_role表，增强功能）
+-- =====================================================
+CREATE TABLE IF NOT EXISTS ai_assistant
 (
-    id          BIGSERIAL PRIMARY KEY,
-    session_id  BIGINT                             NOT NULL,
-    user_id     BIGINT                             NOT NULL,
-    content     TEXT                               NOT NULL,
-    type        VARCHAR(32)                        NOT NULL,
-    role        VARCHAR(32)                        NOT NULL,
-    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    is_delete   SMALLINT  DEFAULT 0                NOT NULL
+    id              BIGSERIAL PRIMARY KEY,
+    name            VARCHAR(128)                            NOT NULL,
+    description     TEXT                                    NULL,
+    avatar_url      VARCHAR(1024)                           NULL,
+    tags            JSONB           DEFAULT '[]'            NOT NULL,
+    category        VARCHAR(64)                             NULL,
+    
+    -- 提示词配置
+    system_prompt   TEXT                                    NULL,
+    opening_message TEXT                                    NULL,
+    suggested_questions JSONB       DEFAULT '[]'            NOT NULL,
+    
+    -- 模型配置
+    model_name      VARCHAR(64)     DEFAULT 'qwen-plus'     NOT NULL,
+    temperature     DECIMAL(3,2)    DEFAULT 0.7             NOT NULL,
+    top_p           DECIMAL(3,2)    DEFAULT 0.8             NOT NULL,
+    max_tokens      INT             DEFAULT 2000            NOT NULL,
+    
+    -- 状态与版本
+    status          VARCHAR(32)     DEFAULT 'DRAFT'         NOT NULL,
+    version         INT             DEFAULT 1               NOT NULL,
+    published_version INT           DEFAULT 0               NOT NULL,
+    
+    -- 统计
+    is_public       SMALLINT        DEFAULT 0               NOT NULL,
+    usage_count     INT             DEFAULT 0               NOT NULL,
+    rating          DECIMAL(2,1)    DEFAULT 0.0             NOT NULL,
+    
+    -- 审计
+    creator_id      BIGINT                                  NOT NULL,
+    sort            INT             DEFAULT 0               NOT NULL,
+    create_time     TIMESTAMP       DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    update_time     TIMESTAMP       DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    is_delete       SMALLINT        DEFAULT 0               NOT NULL
 );
-CREATE INDEX IF NOT EXISTS idx_acm_session_id ON ai_chat_message(session_id);
-CREATE INDEX IF NOT EXISTS idx_acm_user_id ON ai_chat_message(user_id);
-COMMENT ON TABLE ai_chat_message IS 'AI聊天消息';
-COMMENT ON COLUMN ai_chat_message.id IS 'id';
-COMMENT ON COLUMN ai_chat_message.session_id IS '会话id';
-COMMENT ON COLUMN ai_chat_message.user_id IS '用户id';
-COMMENT ON COLUMN ai_chat_message.content IS '消息内容';
-COMMENT ON COLUMN ai_chat_message.type IS '消息类型：text/image/file/audio/video';
-COMMENT ON COLUMN ai_chat_message.role IS '消息角色：user/ai';
-COMMENT ON COLUMN ai_chat_message.create_time IS '创建时间';
-COMMENT ON COLUMN ai_chat_message.update_time IS '更新时间';
-COMMENT ON COLUMN ai_chat_message.is_delete IS '是否删除';
 
--- AI角色表
-CREATE TABLE IF NOT EXISTS ai_role
+CREATE INDEX IF NOT EXISTS idx_aa_creator_id ON ai_assistant(creator_id);
+CREATE INDEX IF NOT EXISTS idx_aa_status ON ai_assistant(status);
+CREATE INDEX IF NOT EXISTS idx_aa_is_public ON ai_assistant(is_public);
+CREATE INDEX IF NOT EXISTS idx_aa_category ON ai_assistant(category);
+CREATE INDEX IF NOT EXISTS idx_aa_sort ON ai_assistant(sort);
+
+COMMENT ON TABLE ai_assistant IS 'AI助手';
+COMMENT ON COLUMN ai_assistant.id IS 'id';
+COMMENT ON COLUMN ai_assistant.name IS 'AI助手名称';
+COMMENT ON COLUMN ai_assistant.description IS 'AI助手描述';
+COMMENT ON COLUMN ai_assistant.avatar_url IS '头像URL';
+COMMENT ON COLUMN ai_assistant.tags IS '标签，JSON数组格式';
+COMMENT ON COLUMN ai_assistant.category IS '分类';
+COMMENT ON COLUMN ai_assistant.system_prompt IS '系统提示词';
+COMMENT ON COLUMN ai_assistant.opening_message IS '开场白';
+COMMENT ON COLUMN ai_assistant.suggested_questions IS '推荐问题，JSON数组格式';
+COMMENT ON COLUMN ai_assistant.model_name IS '模型名称';
+COMMENT ON COLUMN ai_assistant.temperature IS '温度参数';
+COMMENT ON COLUMN ai_assistant.top_p IS 'Top-P参数';
+COMMENT ON COLUMN ai_assistant.max_tokens IS '最大Token数';
+COMMENT ON COLUMN ai_assistant.status IS '状态：DRAFT-草稿，PUBLISHED-已发布，ARCHIVED-已归档';
+COMMENT ON COLUMN ai_assistant.version IS '当前版本号';
+COMMENT ON COLUMN ai_assistant.published_version IS '已发布版本号';
+COMMENT ON COLUMN ai_assistant.is_public IS '是否公开：0-否，1-是';
+COMMENT ON COLUMN ai_assistant.usage_count IS '使用次数';
+COMMENT ON COLUMN ai_assistant.rating IS '评分';
+COMMENT ON COLUMN ai_assistant.creator_id IS '创建者id';
+COMMENT ON COLUMN ai_assistant.sort IS '排序';
+COMMENT ON COLUMN ai_assistant.create_time IS '创建时间';
+COMMENT ON COLUMN ai_assistant.update_time IS '更新时间';
+COMMENT ON COLUMN ai_assistant.is_delete IS '是否删除';
+
+-- =====================================================
+-- AI助手版本历史表
+-- =====================================================
+CREATE TABLE IF NOT EXISTS ai_assistant_version
 (
-    id             BIGSERIAL PRIMARY KEY,
-    name           VARCHAR(128)                            NOT NULL,
-    description    TEXT                                    NULL,
-    avatar_img_url VARCHAR(1024)                           NULL,
-    avatar_auth    VARCHAR(512)                            NULL,
-    tags           VARCHAR(512)                            NULL,
-    is_public      SMALLINT      DEFAULT 1                 NOT NULL,
-    usage_count    INT           DEFAULT 0                 NOT NULL,
-    rating         DECIMAL(2, 1) DEFAULT 0.0               NOT NULL,
-    creator_id     BIGINT                                  NOT NULL,
-    sort           INT           DEFAULT 0                 NOT NULL,
-    create_time    TIMESTAMP     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    update_time    TIMESTAMP     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    is_delete      SMALLINT      DEFAULT 0                 NOT NULL
+    id              BIGSERIAL PRIMARY KEY,
+    assistant_id    BIGINT                                  NOT NULL,
+    version         INT                                     NOT NULL,
+    
+    -- 快照数据
+    name            VARCHAR(128)                            NOT NULL,
+    description     TEXT                                    NULL,
+    system_prompt   TEXT                                    NULL,
+    opening_message TEXT                                    NULL,
+    suggested_questions JSONB       DEFAULT '[]'            NOT NULL,
+    model_name      VARCHAR(64)                             NOT NULL,
+    temperature     DECIMAL(3,2)                            NOT NULL,
+    top_p           DECIMAL(3,2)                            NOT NULL,
+    max_tokens      INT                                     NOT NULL,
+    
+    -- 关联的知识库快照
+    knowledge_base_ids JSONB       DEFAULT '[]'             NOT NULL,
+    
+    -- 发布信息
+    publish_note    TEXT                                    NULL,
+    published_by    BIGINT                                  NOT NULL,
+    create_time     TIMESTAMP       DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
-CREATE INDEX IF NOT EXISTS idx_ar_tags ON ai_role(tags);
-CREATE INDEX IF NOT EXISTS idx_ar_creator_id ON ai_role(creator_id);
-CREATE INDEX IF NOT EXISTS idx_ar_sort ON ai_role(sort);
-CREATE INDEX IF NOT EXISTS idx_ar_usage_count ON ai_role(usage_count);
-COMMENT ON TABLE ai_role IS 'AI角色';
-COMMENT ON COLUMN ai_role.id IS 'id';
-COMMENT ON COLUMN ai_role.name IS 'AI角色名称';
-COMMENT ON COLUMN ai_role.description IS 'AI角色描述';
-COMMENT ON COLUMN ai_role.avatar_img_url IS 'AI角色头像URL';
-COMMENT ON COLUMN ai_role.avatar_auth IS 'AI角色鉴权，UUID';
-COMMENT ON COLUMN ai_role.tags IS '标签，JSON数组格式';
-COMMENT ON COLUMN ai_role.is_public IS '是否公开：0-否，1-是';
-COMMENT ON COLUMN ai_role.usage_count IS '使用次数';
-COMMENT ON COLUMN ai_role.rating IS '评分，1-5分';
-COMMENT ON COLUMN ai_role.creator_id IS '创建者id';
-COMMENT ON COLUMN ai_role.sort IS '排序，数字越小排序越靠前';
-COMMENT ON COLUMN ai_role.create_time IS '创建时间';
-COMMENT ON COLUMN ai_role.update_time IS '更新时间';
-COMMENT ON COLUMN ai_role.is_delete IS '是否删除';
+
+CREATE INDEX IF NOT EXISTS idx_aav_assistant_id ON ai_assistant_version(assistant_id);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_aav_assistant_version ON ai_assistant_version(assistant_id, version);
+
+COMMENT ON TABLE ai_assistant_version IS 'AI助手版本历史';
+COMMENT ON COLUMN ai_assistant_version.id IS 'id';
+COMMENT ON COLUMN ai_assistant_version.assistant_id IS 'AI助手id';
+COMMENT ON COLUMN ai_assistant_version.version IS '版本号';
+COMMENT ON COLUMN ai_assistant_version.name IS '名称快照';
+COMMENT ON COLUMN ai_assistant_version.description IS '描述快照';
+COMMENT ON COLUMN ai_assistant_version.system_prompt IS '系统提示词快照';
+COMMENT ON COLUMN ai_assistant_version.opening_message IS '开场白快照';
+COMMENT ON COLUMN ai_assistant_version.suggested_questions IS '推荐问题快照';
+COMMENT ON COLUMN ai_assistant_version.model_name IS '模型名称快照';
+COMMENT ON COLUMN ai_assistant_version.temperature IS '温度参数快照';
+COMMENT ON COLUMN ai_assistant_version.top_p IS 'Top-P参数快照';
+COMMENT ON COLUMN ai_assistant_version.max_tokens IS '最大Token数快照';
+COMMENT ON COLUMN ai_assistant_version.knowledge_base_ids IS '关联知识库ID列表快照';
+COMMENT ON COLUMN ai_assistant_version.publish_note IS '发布说明';
+COMMENT ON COLUMN ai_assistant_version.published_by IS '发布者id';
+COMMENT ON COLUMN ai_assistant_version.create_time IS '创建时间';
 
 -- AI工作流表
 CREATE TABLE IF NOT EXISTS ai_workflow
@@ -90,120 +150,329 @@ COMMENT ON COLUMN ai_workflow.create_time IS '创建时间';
 COMMENT ON COLUMN ai_workflow.update_time IS '更新时间';
 COMMENT ON COLUMN ai_workflow.is_delete IS '是否删除';
 
--- AI角色工作流关联表
-CREATE TABLE IF NOT EXISTS ai_role_workflow
+-- =====================================================
+-- AI助手工作流关联表
+-- =====================================================
+CREATE TABLE IF NOT EXISTS ai_assistant_workflow
 (
-    id           BIGSERIAL PRIMARY KEY,
-    ai_role_id   BIGINT                             NOT NULL,
-    workflow_id  BIGINT                             NOT NULL,
-    create_time  TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    update_time  TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+    id              BIGSERIAL PRIMARY KEY,
+    assistant_id    BIGINT                             NOT NULL,
+    workflow_id     BIGINT                             NOT NULL,
+    create_time     TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    update_time     TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
-CREATE INDEX IF NOT EXISTS idx_arw_ai_role_id ON ai_role_workflow(ai_role_id);
-CREATE INDEX IF NOT EXISTS idx_arw_workflow_id ON ai_role_workflow(workflow_id);
-CREATE UNIQUE INDEX IF NOT EXISTS idx_arw_role_workflow ON ai_role_workflow(ai_role_id, workflow_id);
-COMMENT ON TABLE ai_role_workflow IS 'AI角色工作流关联';
-COMMENT ON COLUMN ai_role_workflow.id IS 'id';
-COMMENT ON COLUMN ai_role_workflow.ai_role_id IS 'AI角色id';
-COMMENT ON COLUMN ai_role_workflow.workflow_id IS '工作流id';
-COMMENT ON COLUMN ai_role_workflow.create_time IS '创建时间';
-COMMENT ON COLUMN ai_role_workflow.update_time IS '更新时间';
+CREATE INDEX IF NOT EXISTS idx_aaw_assistant_id ON ai_assistant_workflow(assistant_id);
+CREATE INDEX IF NOT EXISTS idx_aaw_workflow_id ON ai_assistant_workflow(workflow_id);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_aaw_unique ON ai_assistant_workflow(assistant_id, workflow_id);
+COMMENT ON TABLE ai_assistant_workflow IS 'AI助手工作流关联';
+COMMENT ON COLUMN ai_assistant_workflow.id IS 'id';
+COMMENT ON COLUMN ai_assistant_workflow.assistant_id IS 'AI助手id';
+COMMENT ON COLUMN ai_assistant_workflow.workflow_id IS '工作流id';
+COMMENT ON COLUMN ai_assistant_workflow.create_time IS '创建时间';
+COMMENT ON COLUMN ai_assistant_workflow.update_time IS '更新时间';
 
--- AI角色知识库向量表（RAG）
-CREATE TABLE IF NOT EXISTS ai_role_knowledge
+-- =====================================================
+-- 知识库表
+-- =====================================================
+CREATE TABLE IF NOT EXISTS knowledge_base
 (
-    id           BIGSERIAL PRIMARY KEY,
-    ai_role_id   BIGINT                             NOT NULL,
-    content      TEXT                               NOT NULL,
-    embedding    VECTOR(1536)                       NOT NULL,
-    metadata     JSONB                              NULL,
-    create_time  TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    update_time  TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    is_delete    SMALLINT  DEFAULT 0                NOT NULL
+    id              BIGSERIAL PRIMARY KEY,
+    name            VARCHAR(128)                            NOT NULL,
+    description     TEXT                                    NULL,
+    
+    -- 向量化配置
+    embedding_model VARCHAR(64)     DEFAULT 'text-embedding-v2' NOT NULL,
+    embedding_dimension INT         DEFAULT 1536            NOT NULL,
+    chunk_size      INT             DEFAULT 500             NOT NULL,
+    chunk_overlap   INT             DEFAULT 50              NOT NULL,
+    
+    -- 统计
+    document_count  INT             DEFAULT 0               NOT NULL,
+    chunk_count     INT             DEFAULT 0               NOT NULL,
+    
+    -- 状态
+    status          VARCHAR(32)     DEFAULT 'ACTIVE'        NOT NULL,
+    
+    -- 审计
+    creator_id      BIGINT                                  NOT NULL,
+    create_time     TIMESTAMP       DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    update_time     TIMESTAMP       DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    is_delete       SMALLINT        DEFAULT 0               NOT NULL
 );
-CREATE INDEX IF NOT EXISTS idx_ark_ai_role_id ON ai_role_knowledge(ai_role_id);
-CREATE INDEX IF NOT EXISTS idx_ark_embedding ON ai_role_knowledge USING ivfflat (embedding vector_cosine_ops) WITH (lists = 100);
-COMMENT ON TABLE ai_role_knowledge IS 'AI角色知识库向量表';
-COMMENT ON COLUMN ai_role_knowledge.id IS 'id';
-COMMENT ON COLUMN ai_role_knowledge.ai_role_id IS 'AI角色id';
-COMMENT ON COLUMN ai_role_knowledge.content IS '原始文本内容';
-COMMENT ON COLUMN ai_role_knowledge.embedding IS '向量嵌入，1536维（OpenAI text-embedding-ada-002）';
-COMMENT ON COLUMN ai_role_knowledge.metadata IS '元数据JSON，如来源、标题、分块信息等';
-COMMENT ON COLUMN ai_role_knowledge.create_time IS '创建时间';
-COMMENT ON COLUMN ai_role_knowledge.update_time IS '更新时间';
-COMMENT ON COLUMN ai_role_knowledge.is_delete IS '是否删除';
 
--- 用户AI角色关联表
-CREATE TABLE IF NOT EXISTS user_ai_role
-(
-    id            BIGSERIAL PRIMARY KEY,
-    user_id       BIGINT                             NOT NULL,
-    ai_role_id    BIGINT                             NOT NULL,
-    is_favorite   SMALLINT DEFAULT 0                 NOT NULL,
-    last_use_time TIMESTAMP                          NULL,
-    rating        DECIMAL(2, 1) DEFAULT 0.0          NOT NULL,
-    use_count     INT      DEFAULT 0                 NOT NULL,
-    create_time   TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    update_time   TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
-);
-CREATE INDEX IF NOT EXISTS idx_uar_user_id ON user_ai_role(user_id);
-CREATE INDEX IF NOT EXISTS idx_uar_ai_role_id ON user_ai_role(ai_role_id);
-CREATE INDEX IF NOT EXISTS idx_uar_is_favorite ON user_ai_role(is_favorite);
-COMMENT ON TABLE user_ai_role IS '用户AI角色关联';
-COMMENT ON COLUMN user_ai_role.id IS 'id';
-COMMENT ON COLUMN user_ai_role.user_id IS '用户id';
-COMMENT ON COLUMN user_ai_role.ai_role_id IS 'AI角色id';
-COMMENT ON COLUMN user_ai_role.is_favorite IS '是否收藏：0-否，1-是';
-COMMENT ON COLUMN user_ai_role.last_use_time IS '最后使用时间';
-COMMENT ON COLUMN user_ai_role.rating IS '评分，1-5分';
-COMMENT ON COLUMN user_ai_role.use_count IS '使用次数';
-COMMENT ON COLUMN user_ai_role.create_time IS '创建时间';
-COMMENT ON COLUMN user_ai_role.update_time IS '更新时间';
+CREATE INDEX IF NOT EXISTS idx_kb_creator_id ON knowledge_base(creator_id);
+CREATE INDEX IF NOT EXISTS idx_kb_status ON knowledge_base(status);
 
--- AI角色会话表
-CREATE TABLE IF NOT EXISTS ai_role_session
-(
-    id           BIGSERIAL PRIMARY KEY,
-    user_id      BIGINT                             NOT NULL,
-    ai_role_id   BIGINT                             NOT NULL,
-    session_name VARCHAR(256)                       NULL,
-    create_time  TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    update_time  TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    is_delete    SMALLINT  DEFAULT 0                NOT NULL
-);
-CREATE INDEX IF NOT EXISTS idx_ars_user_id ON ai_role_session(user_id);
-CREATE INDEX IF NOT EXISTS idx_ars_ai_role_id ON ai_role_session(ai_role_id);
-COMMENT ON TABLE ai_role_session IS 'AI角色会话';
-COMMENT ON COLUMN ai_role_session.id IS 'id';
-COMMENT ON COLUMN ai_role_session.user_id IS '用户id';
-COMMENT ON COLUMN ai_role_session.ai_role_id IS 'AI角色id';
-COMMENT ON COLUMN ai_role_session.session_name IS '会话名称';
-COMMENT ON COLUMN ai_role_session.create_time IS '创建时间';
-COMMENT ON COLUMN ai_role_session.update_time IS '更新时间';
-COMMENT ON COLUMN ai_role_session.is_delete IS '是否删除';
+COMMENT ON TABLE knowledge_base IS '知识库';
+COMMENT ON COLUMN knowledge_base.id IS 'id';
+COMMENT ON COLUMN knowledge_base.name IS '知识库名称';
+COMMENT ON COLUMN knowledge_base.description IS '知识库描述';
+COMMENT ON COLUMN knowledge_base.embedding_model IS '向量化模型';
+COMMENT ON COLUMN knowledge_base.embedding_dimension IS '向量维度';
+COMMENT ON COLUMN knowledge_base.chunk_size IS '分块大小';
+COMMENT ON COLUMN knowledge_base.chunk_overlap IS '分块重叠';
+COMMENT ON COLUMN knowledge_base.document_count IS '文档数量';
+COMMENT ON COLUMN knowledge_base.chunk_count IS '分块数量';
+COMMENT ON COLUMN knowledge_base.status IS '状态：ACTIVE-活跃，ARCHIVED-已归档';
+COMMENT ON COLUMN knowledge_base.creator_id IS '创建者id';
+COMMENT ON COLUMN knowledge_base.create_time IS '创建时间';
+COMMENT ON COLUMN knowledge_base.update_time IS '更新时间';
+COMMENT ON COLUMN knowledge_base.is_delete IS '是否删除';
 
--- AI角色聊天消息列表
-CREATE TABLE IF NOT EXISTS ai_role_message_list
+-- =====================================================
+-- 知识库文档表
+-- =====================================================
+CREATE TABLE IF NOT EXISTS knowledge_document
 (
-    id          BIGSERIAL PRIMARY KEY,
-    session_id  BIGINT                             NOT NULL,
-    user_id     BIGINT                             NOT NULL,
-    content     TEXT                               NOT NULL,
-    type        VARCHAR(32)                        NOT NULL,
-    role        VARCHAR(32)                        NOT NULL,
-    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    is_delete   SMALLINT  DEFAULT 0                NOT NULL
+    id                  BIGSERIAL PRIMARY KEY,
+    knowledge_base_id   BIGINT                                  NOT NULL,
+    
+    -- 文档信息
+    name                VARCHAR(256)                            NOT NULL,
+    file_type           VARCHAR(32)                             NOT NULL,
+    file_url            VARCHAR(1024)                           NULL,
+    file_size           BIGINT          DEFAULT 0               NOT NULL,
+    
+    -- 内容
+    content             TEXT                                    NULL,
+    content_hash        VARCHAR(64)                             NULL,
+    
+    -- 处理状态
+    chunk_count         INT             DEFAULT 0               NOT NULL,
+    status              VARCHAR(32)     DEFAULT 'PENDING'       NOT NULL,
+    error_message       TEXT                                    NULL,
+    
+    -- 审计
+    creator_id          BIGINT                                  NOT NULL,
+    create_time         TIMESTAMP       DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    update_time         TIMESTAMP       DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    is_delete           SMALLINT        DEFAULT 0               NOT NULL
 );
-CREATE INDEX IF NOT EXISTS idx_arml_session_id ON ai_role_message_list(session_id);
-CREATE INDEX IF NOT EXISTS idx_arml_user_id ON ai_role_message_list(user_id);
-COMMENT ON TABLE ai_role_message_list IS 'AI角色聊天消息';
-COMMENT ON COLUMN ai_role_message_list.id IS 'id';
-COMMENT ON COLUMN ai_role_message_list.session_id IS '会话id';
-COMMENT ON COLUMN ai_role_message_list.user_id IS '用户id';
-COMMENT ON COLUMN ai_role_message_list.content IS '消息内容';
-COMMENT ON COLUMN ai_role_message_list.type IS '消息类型：text/image/file/audio/video';
-COMMENT ON COLUMN ai_role_message_list.role IS '消息角色：user/ai';
-COMMENT ON COLUMN ai_role_message_list.create_time IS '创建时间';
-COMMENT ON COLUMN ai_role_message_list.update_time IS '更新时间';
-COMMENT ON COLUMN ai_role_message_list.is_delete IS '是否删除';
+
+CREATE INDEX IF NOT EXISTS idx_kd_knowledge_base_id ON knowledge_document(knowledge_base_id);
+CREATE INDEX IF NOT EXISTS idx_kd_status ON knowledge_document(status);
+CREATE INDEX IF NOT EXISTS idx_kd_file_type ON knowledge_document(file_type);
+
+COMMENT ON TABLE knowledge_document IS '知识库文档';
+COMMENT ON COLUMN knowledge_document.id IS 'id';
+COMMENT ON COLUMN knowledge_document.knowledge_base_id IS '知识库id';
+COMMENT ON COLUMN knowledge_document.name IS '文档名称';
+COMMENT ON COLUMN knowledge_document.file_type IS '文件类型：PDF/DOCX/TXT/MD/HTML/URL';
+COMMENT ON COLUMN knowledge_document.file_url IS '文件URL';
+COMMENT ON COLUMN knowledge_document.file_size IS '文件大小（字节）';
+COMMENT ON COLUMN knowledge_document.content IS '文档内容（提取后的纯文本）';
+COMMENT ON COLUMN knowledge_document.content_hash IS '内容哈希（用于去重）';
+COMMENT ON COLUMN knowledge_document.chunk_count IS '分块数量';
+COMMENT ON COLUMN knowledge_document.status IS '状态：PENDING-待处理，PROCESSING-处理中，COMPLETED-已完成，FAILED-失败';
+COMMENT ON COLUMN knowledge_document.error_message IS '错误信息';
+COMMENT ON COLUMN knowledge_document.creator_id IS '创建者id';
+COMMENT ON COLUMN knowledge_document.create_time IS '创建时间';
+COMMENT ON COLUMN knowledge_document.update_time IS '更新时间';
+COMMENT ON COLUMN knowledge_document.is_delete IS '是否删除';
+
+-- =====================================================
+-- 知识库向量分块表
+-- =====================================================
+CREATE TABLE IF NOT EXISTS knowledge_chunk
+(
+    id                  BIGSERIAL PRIMARY KEY,
+    knowledge_base_id   BIGINT                                  NOT NULL,
+    document_id         BIGINT                                  NOT NULL,
+    
+    -- 分块内容
+    content             TEXT                                    NOT NULL,
+    chunk_index         INT                                     NOT NULL,
+    
+    -- 向量
+    embedding           VECTOR(1536)                            NOT NULL,
+    
+    -- 元数据
+    metadata            JSONB           DEFAULT '{}'            NOT NULL,
+    
+    -- 审计
+    create_time         TIMESTAMP       DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    is_delete           SMALLINT        DEFAULT 0               NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_kc_knowledge_base_id ON knowledge_chunk(knowledge_base_id);
+CREATE INDEX IF NOT EXISTS idx_kc_document_id ON knowledge_chunk(document_id);
+CREATE INDEX IF NOT EXISTS idx_kc_embedding ON knowledge_chunk USING ivfflat (embedding vector_cosine_ops) WITH (lists = 100);
+
+COMMENT ON TABLE knowledge_chunk IS '知识库向量分块';
+COMMENT ON COLUMN knowledge_chunk.id IS 'id';
+COMMENT ON COLUMN knowledge_chunk.knowledge_base_id IS '知识库id';
+COMMENT ON COLUMN knowledge_chunk.document_id IS '文档id';
+COMMENT ON COLUMN knowledge_chunk.content IS '分块内容';
+COMMENT ON COLUMN knowledge_chunk.chunk_index IS '分块索引';
+COMMENT ON COLUMN knowledge_chunk.embedding IS '向量嵌入';
+COMMENT ON COLUMN knowledge_chunk.metadata IS '元数据JSON';
+COMMENT ON COLUMN knowledge_chunk.create_time IS '创建时间';
+COMMENT ON COLUMN knowledge_chunk.is_delete IS '是否删除';
+
+-- =====================================================
+-- AI助手与知识库关联表
+-- =====================================================
+CREATE TABLE IF NOT EXISTS ai_assistant_knowledge
+(
+    id                  BIGSERIAL PRIMARY KEY,
+    assistant_id        BIGINT                                  NOT NULL,
+    knowledge_base_id   BIGINT                                  NOT NULL,
+    create_time         TIMESTAMP       DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_aak_assistant_id ON ai_assistant_knowledge(assistant_id);
+CREATE INDEX IF NOT EXISTS idx_aak_knowledge_base_id ON ai_assistant_knowledge(knowledge_base_id);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_aak_unique ON ai_assistant_knowledge(assistant_id, knowledge_base_id);
+
+COMMENT ON TABLE ai_assistant_knowledge IS 'AI助手与知识库关联';
+COMMENT ON COLUMN ai_assistant_knowledge.id IS 'id';
+COMMENT ON COLUMN ai_assistant_knowledge.assistant_id IS 'AI助手id';
+COMMENT ON COLUMN ai_assistant_knowledge.knowledge_base_id IS '知识库id';
+COMMENT ON COLUMN ai_assistant_knowledge.create_time IS '创建时间';
+
+-- =====================================================
+-- 用户AI助手收藏表
+-- =====================================================
+CREATE TABLE IF NOT EXISTS user_ai_assistant
+(
+    id              BIGSERIAL PRIMARY KEY,
+    user_id         BIGINT                                  NOT NULL,
+    assistant_id    BIGINT                                  NOT NULL,
+    
+    -- 用户偏好
+    is_favorite     SMALLINT        DEFAULT 0               NOT NULL,
+    use_count       INT             DEFAULT 0               NOT NULL,
+    last_use_time   TIMESTAMP                               NULL,
+    rating          DECIMAL(2,1)    DEFAULT 0.0             NOT NULL,
+    
+    -- 审计
+    create_time     TIMESTAMP       DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    update_time     TIMESTAMP       DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_uaa_user_id ON user_ai_assistant(user_id);
+CREATE INDEX IF NOT EXISTS idx_uaa_assistant_id ON user_ai_assistant(assistant_id);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_uaa_unique ON user_ai_assistant(user_id, assistant_id);
+
+COMMENT ON TABLE user_ai_assistant IS '用户AI助手收藏';
+COMMENT ON COLUMN user_ai_assistant.id IS 'id';
+COMMENT ON COLUMN user_ai_assistant.user_id IS '用户id';
+COMMENT ON COLUMN user_ai_assistant.assistant_id IS 'AI助手id';
+COMMENT ON COLUMN user_ai_assistant.is_favorite IS '是否收藏';
+COMMENT ON COLUMN user_ai_assistant.use_count IS '使用次数';
+COMMENT ON COLUMN user_ai_assistant.last_use_time IS '最后使用时间';
+COMMENT ON COLUMN user_ai_assistant.rating IS '评分';
+COMMENT ON COLUMN user_ai_assistant.create_time IS '创建时间';
+COMMENT ON COLUMN user_ai_assistant.update_time IS '更新时间';
+
+-- =====================================================
+-- AI助手会话表
+-- =====================================================
+CREATE TABLE IF NOT EXISTS ai_assistant_session
+(
+    id              BIGSERIAL PRIMARY KEY,
+    user_id         BIGINT                                  NOT NULL,
+    assistant_id    BIGINT                                  NOT NULL,
+    
+    -- 会话信息
+    title           VARCHAR(256)                            NULL,
+    
+    -- 审计
+    create_time     TIMESTAMP       DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    update_time     TIMESTAMP       DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    is_delete       SMALLINT        DEFAULT 0               NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_aas_user_id ON ai_assistant_session(user_id);
+CREATE INDEX IF NOT EXISTS idx_aas_assistant_id ON ai_assistant_session(assistant_id);
+
+COMMENT ON TABLE ai_assistant_session IS 'AI助手会话';
+COMMENT ON COLUMN ai_assistant_session.id IS 'id';
+COMMENT ON COLUMN ai_assistant_session.user_id IS '用户id';
+COMMENT ON COLUMN ai_assistant_session.assistant_id IS 'AI助手id';
+COMMENT ON COLUMN ai_assistant_session.title IS '会话标题';
+COMMENT ON COLUMN ai_assistant_session.create_time IS '创建时间';
+COMMENT ON COLUMN ai_assistant_session.update_time IS '更新时间';
+COMMENT ON COLUMN ai_assistant_session.is_delete IS '是否删除';
+
+-- =====================================================
+-- AI助手会话消息表
+-- =====================================================
+CREATE TABLE IF NOT EXISTS ai_assistant_message
+(
+    id              BIGSERIAL PRIMARY KEY,
+    session_id      BIGINT                                  NOT NULL,
+    user_id         BIGINT                                  NOT NULL,
+    
+    -- 消息内容
+    role            VARCHAR(32)                             NOT NULL,
+    content         TEXT                                    NOT NULL,
+    content_type    VARCHAR(32)     DEFAULT 'TEXT'          NOT NULL,
+    
+    -- RAG来源
+    sources         JSONB           DEFAULT '[]'            NOT NULL,
+    
+    -- 审计
+    create_time     TIMESTAMP       DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    is_delete       SMALLINT        DEFAULT 0               NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_aam_session_id ON ai_assistant_message(session_id);
+CREATE INDEX IF NOT EXISTS idx_aam_user_id ON ai_assistant_message(user_id);
+
+COMMENT ON TABLE ai_assistant_message IS 'AI助手会话消息';
+COMMENT ON COLUMN ai_assistant_message.id IS 'id';
+COMMENT ON COLUMN ai_assistant_message.session_id IS '会话id';
+COMMENT ON COLUMN ai_assistant_message.user_id IS '用户id';
+COMMENT ON COLUMN ai_assistant_message.role IS '角色：USER/ASSISTANT/SYSTEM';
+COMMENT ON COLUMN ai_assistant_message.content IS '消息内容';
+COMMENT ON COLUMN ai_assistant_message.content_type IS '内容类型：TEXT/IMAGE/FILE';
+COMMENT ON COLUMN ai_assistant_message.sources IS 'RAG来源，JSON数组';
+COMMENT ON COLUMN ai_assistant_message.create_time IS '创建时间';
+COMMENT ON COLUMN ai_assistant_message.is_delete IS '是否删除';
+
+-- =====================================================
+-- 工作流执行日志表
+-- =====================================================
+CREATE TABLE IF NOT EXISTS ai_workflow_execution_log
+(
+    id              BIGSERIAL PRIMARY KEY,
+    execution_id    VARCHAR(64)                             NOT NULL,
+    workflow_id     BIGINT                                  NOT NULL,
+    workflow_name   VARCHAR(128)                            NOT NULL,
+    node_id         VARCHAR(64)                             NULL,
+    node_name       VARCHAR(128)                            NULL,
+    node_type       VARCHAR(32)                             NULL,
+    level           VARCHAR(16)     DEFAULT 'INFO'          NOT NULL,
+    message         TEXT                                    NOT NULL,
+    input           JSONB           DEFAULT '{}'            NOT NULL,
+    output          JSONB           DEFAULT '{}'            NOT NULL,
+    error_stack     TEXT                                    NULL,
+    duration_ms     BIGINT          DEFAULT 0               NOT NULL,
+    trace_id        VARCHAR(64)                             NULL,
+    user_id         BIGINT                                  NOT NULL,
+    timestamp       TIMESTAMP       DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_awel_execution_id ON ai_workflow_execution_log(execution_id);
+CREATE INDEX IF NOT EXISTS idx_awel_workflow_id ON ai_workflow_execution_log(workflow_id);
+CREATE INDEX IF NOT EXISTS idx_awel_timestamp ON ai_workflow_execution_log(timestamp);
+CREATE INDEX IF NOT EXISTS idx_awel_level ON ai_workflow_execution_log(level);
+
+COMMENT ON TABLE ai_workflow_execution_log IS '工作流执行日志';
+COMMENT ON COLUMN ai_workflow_execution_log.id IS 'id';
+COMMENT ON COLUMN ai_workflow_execution_log.execution_id IS '执行ID';
+COMMENT ON COLUMN ai_workflow_execution_log.workflow_id IS '工作流ID';
+COMMENT ON COLUMN ai_workflow_execution_log.workflow_name IS '工作流名称';
+COMMENT ON COLUMN ai_workflow_execution_log.node_id IS '节点ID';
+COMMENT ON COLUMN ai_workflow_execution_log.node_name IS '节点名称';
+COMMENT ON COLUMN ai_workflow_execution_log.node_type IS '节点类型';
+COMMENT ON COLUMN ai_workflow_execution_log.level IS '日志级别：DEBUG/INFO/WARN/ERROR';
+COMMENT ON COLUMN ai_workflow_execution_log.message IS '日志消息';
+COMMENT ON COLUMN ai_workflow_execution_log.input IS '输入数据';
+COMMENT ON COLUMN ai_workflow_execution_log.output IS '输出数据';
+COMMENT ON COLUMN ai_workflow_execution_log.error_stack IS '错误堆栈';
+COMMENT ON COLUMN ai_workflow_execution_log.duration_ms IS '执行耗时(毫秒)';
+COMMENT ON COLUMN ai_workflow_execution_log.trace_id IS '追踪ID';
+COMMENT ON COLUMN ai_workflow_execution_log.user_id IS '用户ID';
+COMMENT ON COLUMN ai_workflow_execution_log.timestamp IS '时间戳';
