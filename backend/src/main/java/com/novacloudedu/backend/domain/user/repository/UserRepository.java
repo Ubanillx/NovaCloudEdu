@@ -34,6 +34,16 @@ public interface UserRepository {
     Optional<User> findByAccount(UserAccount account);
 
     /**
+     * 根据手机号查找用户
+     */
+    Optional<User> findByPhone(String phone);
+
+    /**
+     * 检查手机号是否已存在
+     */
+    boolean existsByPhone(String phone);
+
+    /**
      * 检查账号是否已存在
      */
     boolean existsByAccount(UserAccount account);

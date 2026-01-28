@@ -181,4 +181,14 @@ public class UserManageController {
         User user = userApplicationService.getUserPublicInfo(id);
         return ResultUtils.success(userManageAssembler.toPublicResponse(user));
     }
+
+    /**
+     * 获取用户详细信息（管理员和本人可访问）
+     */
+    @Operation(summary = "获取用户详细信息", description = "获取用户的详细信息，只有管理员和本人可以访问")
+    @GetMapping("/detail/{id}")
+    public BaseResponse<UserDetailResponse> getUserDetailInfo(@PathVariable Long id) {
+        User user = userApplicationService.getUserDetailInfo(id);
+        return ResultUtils.success(userManageAssembler.toDetailResponse(user));
+    }
 }

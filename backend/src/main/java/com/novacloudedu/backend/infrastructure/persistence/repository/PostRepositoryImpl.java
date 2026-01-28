@@ -147,4 +147,10 @@ public class PostRepositoryImpl implements PostRepository {
     public void delete(PostId id) {
         postMapper.deleteById(id.value());
     }
+
+    @Override
+    public long countTotalLikesByUserId(UserId userId) {
+        Long count = postMapper.sumLikesByUserId(userId.value());
+        return count != null ? count : 0L;
+    }
 }

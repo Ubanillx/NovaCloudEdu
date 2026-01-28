@@ -53,6 +53,24 @@ public class User {
     }
 
     /**
+     * 手机号快捷注册（验证码登录时自动创建）
+     * 账号使用手机号，密码随机生成
+     */
+    public static User createByPhone(String phone, Password randomPassword) {
+        User user = new User();
+        user.account = UserAccount.of(phone);
+        user.password = randomPassword;
+        user.userName = generateDefaultUserName();
+        user.userPhone = phone;
+        user.role = UserRole.STUDENT;
+        user.level = 0;
+        user.banned = false;
+        user.createTime = LocalDateTime.now();
+        user.updateTime = LocalDateTime.now();
+        return user;
+    }
+
+    /**
      * 生成默认用户名
      * 格式：用户 + 随机字符串，如 "用户a3f8k2_x9m1"
      */

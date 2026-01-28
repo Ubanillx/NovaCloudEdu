@@ -64,6 +64,11 @@ public interface PostRepository {
     void delete(PostId id);
 
     /**
+     * 统计用户帖子获赞总数
+     */
+    long countTotalLikesByUserId(UserId userId);
+
+    /**
      * 帖子分页结果
      */
     record PostPage(List<Post> posts, long total, int pageNum, int pageSize) {

@@ -2,8 +2,10 @@ package com.novacloudedu.backend.interfaces.rest.auth.assembler;
 
 import com.novacloudedu.backend.application.service.UserApplicationService;
 import com.novacloudedu.backend.application.user.command.LoginUserCommand;
+import com.novacloudedu.backend.application.user.command.PhoneLoginCommand;
 import com.novacloudedu.backend.application.user.command.RegisterUserCommand;
 import com.novacloudedu.backend.domain.user.entity.User;
+import com.novacloudedu.backend.interfaces.rest.auth.dto.request.PhoneLoginRequest;
 import com.novacloudedu.backend.interfaces.rest.auth.dto.request.UserLoginRequest;
 import com.novacloudedu.backend.interfaces.rest.auth.dto.request.UserRegisterRequest;
 import com.novacloudedu.backend.interfaces.rest.auth.dto.response.LoginUserResponse;
@@ -36,6 +38,16 @@ public class UserAssembler {
         return new LoginUserCommand(
                 request.getUserAccount(),
                 request.getUserPassword()
+        );
+    }
+
+    /**
+     * 手机登录请求 -> 手机登录命令
+     */
+    public PhoneLoginCommand toPhoneLoginCommand(PhoneLoginRequest request) {
+        return new PhoneLoginCommand(
+                request.phone(),
+                request.smsCode()
         );
     }
 

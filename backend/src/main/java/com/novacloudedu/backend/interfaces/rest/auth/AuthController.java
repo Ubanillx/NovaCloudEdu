@@ -7,6 +7,7 @@ import com.novacloudedu.backend.domain.user.entity.User;
 import com.novacloudedu.backend.infrastructure.sms.SmsCodeService;
 import com.novacloudedu.backend.infrastructure.sms.SmsService.SendResult;
 import com.novacloudedu.backend.interfaces.rest.auth.assembler.UserAssembler;
+import com.novacloudedu.backend.interfaces.rest.auth.dto.request.PhoneLoginRequest;
 import com.novacloudedu.backend.interfaces.rest.auth.dto.request.SendCodeRequest;
 import com.novacloudedu.backend.interfaces.rest.auth.dto.request.UserLoginRequest;
 import com.novacloudedu.backend.interfaces.rest.auth.dto.request.UserRegisterRequest;
@@ -63,6 +64,18 @@ public class AuthController {
     public BaseResponse<LoginUserResponse> userLogin(@RequestBody @Valid UserLoginRequest request) {
         UserApplicationService.LoginResult result = userApplicationService.login(
                 userAssembler.toLoginCommand(request)
+        );
+        return ResultUtils.success(userAssembler.toLoginUserResponse(result));
+    }
+
+    /**
+     * 手机验证码登录
+     */
+    @Operation(summary = "手机验证码登录", description = "使用手机号和验证码登录，未注册用户自动注册")
+    @PostMapping("/login/phone")
+    public BaseResponse<LoginUserResponse> phoneLogin(@RequestBody @Valid PhoneLoginRequest request) {
+        UserApplicationService.LoginResult result = userApplicationService.loginByPhone(
+                userAssembler.toPhoneLoginCommand(request)
         );
         return ResultUtils.success(userAssembler.toLoginUserResponse(result));
     }

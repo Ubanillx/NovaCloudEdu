@@ -1,6 +1,7 @@
 package com.novacloudedu.backend.application.service;
 
 import com.novacloudedu.backend.application.user.command.*;
+import com.novacloudedu.backend.application.user.command.PhoneLoginCommand;
 import com.novacloudedu.backend.application.user.query.UserQuery;
 import com.novacloudedu.backend.common.ErrorCode;
 import com.novacloudedu.backend.domain.user.entity.User;
@@ -126,6 +127,69 @@ public class UserApplicationService {
         }
 
         throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR);
+    }
+
+    /**
+     * 手机验证码登录（未注册自动注册）
+     */
+    @Transactional
+    public LoginResult loginByPhone(PhoneLoginCommand command) {
+        // 1. 校验短信验证码
+        if (!smsCodeService.verifyCode(command.phone(), command.smsCode())) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "验证码错误或已过期");
+        }
+
+        // 2. 查找用户，不存在则自动注册
+        User user = userRepository.findByPhone(command.phone())
+                .orElseGet(() -> autoRegisterByPhone(command.phone()));
+
+        // 3. 检查封禁状态
+        user.ensureNotBanned();
+
+        // 4. 生成Token
+        String token = jwtTokenProvider.generateToken(
+                user.getId().value(),
+                user.getAccount().value(),
+                user.getRole().getValue()
+        );
+
+        log.info("手机验证码登录成功: {}", command.phone());
+        return new LoginResult(user, token);
+    }
+
+    /**
+     * 手机号自动注册
+     */
+    private User autoRegisterByPhone(String phone) {
+        synchronized (phone.intern()) {
+            // 双重检查，防止并发注册
+            return userRepository.findByPhone(phone)
+                    .orElseGet(() -> {
+                        // 生成随机密码
+                        String randomPwd = generateRandomPassword();
+                        Password password = Password.fromRaw(randomPwd, passwordEncoder);
+                        
+                        // 创建用户
+                        User newUser = User.createByPhone(phone, password);
+                        userRepository.save(newUser);
+                        
+                        log.info("手机号自动注册成功: {}", phone);
+                        return newUser;
+                    });
+        }
+    }
+
+    /**
+     * 生成随机密码
+     */
+    private String generateRandomPassword() {
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%";
+        StringBuilder sb = new StringBuilder();
+        java.util.Random random = new java.util.Random();
+        for (int i = 0; i < 16; i++) {
+            sb.append(chars.charAt(random.nextInt(chars.length())));
+        }
+        return sb.toString();
     }
 
     /**
@@ -283,6 +347,26 @@ public class UserApplicationService {
     @Transactional
     public void updateProfile(UpdateProfileCommand command) {
         User user = getCurrentUser();
+        
+        // 如果修改了手机号，需要验证码校验
+        String newPhone = command.userPhone();
+        String currentPhone = user.getUserPhone();
+        boolean phoneChanged = newPhone != null && !newPhone.equals(currentPhone);
+        
+        if (phoneChanged) {
+            // 校验新手机号的验证码
+            if (command.phoneSmsCode() == null || command.phoneSmsCode().isBlank()) {
+                throw new BusinessException(ErrorCode.PARAMS_ERROR, "修改手机号需要验证码");
+            }
+            if (!smsCodeService.verifyCode(newPhone, command.phoneSmsCode())) {
+                throw new BusinessException(ErrorCode.PARAMS_ERROR, "验证码错误或已过期");
+            }
+            // 检查新手机号是否已被其他用户使用
+            if (userRepository.existsByPhone(newPhone)) {
+                throw new BusinessException(ErrorCode.PARAMS_ERROR, "该手机号已被其他用户使用");
+            }
+        }
+        
         user.updateProfile(
                 command.userName(), command.userAvatar(), command.userProfile(),
                 command.userGender(), command.userPhone(), command.userEmail(),
@@ -301,5 +385,22 @@ public class UserApplicationService {
     public User getUserPublicInfo(Long userId) {
         return userRepository.findById(UserId.of(userId))
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_EXIST));
+    }
+
+    /**
+     * 获取用户详细信息（管理员和本人可访问）
+     */
+    @Transactional(readOnly = true)
+    public User getUserDetailInfo(Long userId) {
+        User currentUser = getCurrentUser();
+        User targetUser = userRepository.findById(UserId.of(userId))
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_EXIST));
+        
+        // 权限检查：只有管理员或本人可以访问详细信息
+        if (!currentUser.isAdmin() && !currentUser.getId().equals(targetUser.getId())) {
+            throw new BusinessException(ErrorCode.NO_AUTH_ERROR, "无权访问该用户的详细信息");
+        }
+        
+        return targetUser;
     }
 }
