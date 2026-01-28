@@ -18,7 +18,7 @@ class _$SendSmsRequest extends SendSmsRequest {
       (SendSmsRequestBuilder()..update(updates))._build();
 
   _$SendSmsRequest._({required this.phone, this.code, this.expireMinutes})
-      : super._();
+    : super._();
   @override
   SendSmsRequest rebuild(void Function(SendSmsRequestBuilder) updates) =>
       (toBuilder()..update(updates)).build();
@@ -101,10 +101,14 @@ class SendSmsRequestBuilder
   SendSmsRequest build() => _build();
 
   _$SendSmsRequest _build() {
-    final _$result = _$v ??
+    final _$result =
+        _$v ??
         _$SendSmsRequest._(
           phone: BuiltValueNullFieldError.checkNotNull(
-              phone, r'SendSmsRequest', 'phone'),
+            phone,
+            r'SendSmsRequest',
+            'phone',
+          ),
           code: code,
           expireMinutes: expireMinutes,
         );

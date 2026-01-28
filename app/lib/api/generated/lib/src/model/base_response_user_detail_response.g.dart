@@ -14,16 +14,16 @@ class _$BaseResponseUserDetailResponse extends BaseResponseUserDetailResponse {
   @override
   final String? message;
 
-  factory _$BaseResponseUserDetailResponse(
-          [void Function(BaseResponseUserDetailResponseBuilder)? updates]) =>
-      (BaseResponseUserDetailResponseBuilder()..update(updates))._build();
+  factory _$BaseResponseUserDetailResponse([
+    void Function(BaseResponseUserDetailResponseBuilder)? updates,
+  ]) => (BaseResponseUserDetailResponseBuilder()..update(updates))._build();
 
   _$BaseResponseUserDetailResponse._({this.code, this.data, this.message})
-      : super._();
+    : super._();
   @override
   BaseResponseUserDetailResponse rebuild(
-          void Function(BaseResponseUserDetailResponseBuilder) updates) =>
-      (toBuilder()..update(updates)).build();
+    void Function(BaseResponseUserDetailResponseBuilder) updates,
+  ) => (toBuilder()..update(updates)).build();
 
   @override
   BaseResponseUserDetailResponseBuilder toBuilder() =>
@@ -60,8 +60,10 @@ class _$BaseResponseUserDetailResponse extends BaseResponseUserDetailResponse {
 
 class BaseResponseUserDetailResponseBuilder
     implements
-        Builder<BaseResponseUserDetailResponse,
-            BaseResponseUserDetailResponseBuilder> {
+        Builder<
+          BaseResponseUserDetailResponse,
+          BaseResponseUserDetailResponseBuilder
+        > {
   _$BaseResponseUserDetailResponse? _$v;
 
   int? _code;
@@ -108,7 +110,8 @@ class BaseResponseUserDetailResponseBuilder
   _$BaseResponseUserDetailResponse _build() {
     _$BaseResponseUserDetailResponse _$result;
     try {
-      _$result = _$v ??
+      _$result =
+          _$v ??
           _$BaseResponseUserDetailResponse._(
             code: code,
             data: _data?.build(),
@@ -121,7 +124,10 @@ class BaseResponseUserDetailResponseBuilder
         _data?.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'BaseResponseUserDetailResponse', _$failedField, e.toString());
+          r'BaseResponseUserDetailResponse',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

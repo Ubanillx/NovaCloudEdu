@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import '../../../config/app_theme.dart';
+import '../../../widgets/common/nova_refresh_header.dart';
 import '../../data/mock_data.dart';
 
 /// 聊天页面 - 参考smartclass ChatContainer.vue
@@ -28,8 +31,9 @@ class _ChatPageState extends State<ChatPage>
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return Scaffold(
-      backgroundColor: const Color(0xFFF2F7FD),
+      backgroundColor: colors.background,
       body: SafeArea(
         child: Column(
           children: [
@@ -135,18 +139,21 @@ class _ChatPageState extends State<ChatPage>
 
   // 历史对话
   Widget _buildHistoryTab() {
-    return RefreshIndicator(
+    return NovaRefreshableList(
       onRefresh: () async {
         await Future.delayed(const Duration(seconds: 1));
       },
-      child: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: MockData.chatSessions.length,
-        itemBuilder: (context, index) {
-          final session = MockData.chatSessions[index];
-          return _buildChatItem(session);
-        },
-      ),
+      slivers: [
+        SliverPadding(
+          padding: const EdgeInsets.all(16),
+          sliver: SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (context, index) => _buildChatItem(MockData.chatSessions[index]),
+              childCount: MockData.chatSessions.length,
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -174,24 +181,27 @@ class _ChatPageState extends State<ChatPage>
 
   // 智慧体中心
   Widget _buildIntelligenceTab() {
-    return RefreshIndicator(
+    return NovaRefreshableList(
       onRefresh: () async {
         await Future.delayed(const Duration(seconds: 1));
       },
-      child: GridView.builder(
-        padding: const EdgeInsets.all(16),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 12,
-          mainAxisSpacing: 12,
-          childAspectRatio: 0.9,
+      slivers: [
+        SliverPadding(
+          padding: const EdgeInsets.all(16),
+          sliver: SliverGrid(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+              childAspectRatio: 0.9,
+            ),
+            delegate: SliverChildBuilderDelegate(
+              (context, index) => _buildAssistantCard(MockData.aiAssistants[index]),
+              childCount: MockData.aiAssistants.length,
+            ),
+          ),
         ),
-        itemCount: MockData.aiAssistants.length,
-        itemBuilder: (context, index) {
-          final assistant = MockData.aiAssistants[index];
-          return _buildAssistantCard(assistant);
-        },
-      ),
+      ],
     );
   }
 

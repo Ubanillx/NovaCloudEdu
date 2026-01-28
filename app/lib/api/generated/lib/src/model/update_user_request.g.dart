@@ -30,23 +30,23 @@ class _$UpdateUserRequest extends UpdateUserRequest {
   @override
   final int? level;
 
-  factory _$UpdateUserRequest(
-          [void Function(UpdateUserRequestBuilder)? updates]) =>
-      (UpdateUserRequestBuilder()..update(updates))._build();
+  factory _$UpdateUserRequest([
+    void Function(UpdateUserRequestBuilder)? updates,
+  ]) => (UpdateUserRequestBuilder()..update(updates))._build();
 
-  _$UpdateUserRequest._(
-      {required this.id,
-      this.userName,
-      this.userAvatar,
-      this.userProfile,
-      this.role,
-      this.userGender,
-      this.userPhone,
-      this.userEmail,
-      this.userAddress,
-      this.birthday,
-      this.level})
-      : super._();
+  _$UpdateUserRequest._({
+    required this.id,
+    this.userName,
+    this.userAvatar,
+    this.userProfile,
+    this.role,
+    this.userGender,
+    this.userPhone,
+    this.userEmail,
+    this.userAddress,
+    this.birthday,
+    this.level,
+  }) : super._();
   @override
   UpdateUserRequest rebuild(void Function(UpdateUserRequestBuilder) updates) =>
       (toBuilder()..update(updates)).build();
@@ -193,10 +193,14 @@ class UpdateUserRequestBuilder
   UpdateUserRequest build() => _build();
 
   _$UpdateUserRequest _build() {
-    final _$result = _$v ??
+    final _$result =
+        _$v ??
         _$UpdateUserRequest._(
           id: BuiltValueNullFieldError.checkNotNull(
-              id, r'UpdateUserRequest', 'id'),
+            id,
+            r'UpdateUserRequest',
+            'id',
+          ),
           userName: userName,
           userAvatar: userAvatar,
           userProfile: userProfile,

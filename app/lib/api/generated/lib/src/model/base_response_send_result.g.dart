@@ -14,15 +14,15 @@ class _$BaseResponseSendResult extends BaseResponseSendResult {
   @override
   final String? message;
 
-  factory _$BaseResponseSendResult(
-          [void Function(BaseResponseSendResultBuilder)? updates]) =>
-      (BaseResponseSendResultBuilder()..update(updates))._build();
+  factory _$BaseResponseSendResult([
+    void Function(BaseResponseSendResultBuilder)? updates,
+  ]) => (BaseResponseSendResultBuilder()..update(updates))._build();
 
   _$BaseResponseSendResult._({this.code, this.data, this.message}) : super._();
   @override
   BaseResponseSendResult rebuild(
-          void Function(BaseResponseSendResultBuilder) updates) =>
-      (toBuilder()..update(updates)).build();
+    void Function(BaseResponseSendResultBuilder) updates,
+  ) => (toBuilder()..update(updates)).build();
 
   @override
   BaseResponseSendResultBuilder toBuilder() =>
@@ -104,7 +104,8 @@ class BaseResponseSendResultBuilder
   _$BaseResponseSendResult _build() {
     _$BaseResponseSendResult _$result;
     try {
-      _$result = _$v ??
+      _$result =
+          _$v ??
           _$BaseResponseSendResult._(
             code: code,
             data: _data?.build(),
@@ -117,7 +118,10 @@ class BaseResponseSendResultBuilder
         _data?.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'BaseResponseSendResult', _$failedField, e.toString());
+          r'BaseResponseSendResult',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

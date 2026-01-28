@@ -18,21 +18,21 @@ class _$UserRegisterRequest extends UserRegisterRequest {
   @override
   final String smsCode;
 
-  factory _$UserRegisterRequest(
-          [void Function(UserRegisterRequestBuilder)? updates]) =>
-      (UserRegisterRequestBuilder()..update(updates))._build();
+  factory _$UserRegisterRequest([
+    void Function(UserRegisterRequestBuilder)? updates,
+  ]) => (UserRegisterRequestBuilder()..update(updates))._build();
 
-  _$UserRegisterRequest._(
-      {required this.userAccount,
-      required this.userPassword,
-      required this.checkPassword,
-      required this.phone,
-      required this.smsCode})
-      : super._();
+  _$UserRegisterRequest._({
+    required this.userAccount,
+    required this.userPassword,
+    required this.checkPassword,
+    required this.phone,
+    required this.smsCode,
+  }) : super._();
   @override
   UserRegisterRequest rebuild(
-          void Function(UserRegisterRequestBuilder) updates) =>
-      (toBuilder()..update(updates)).build();
+    void Function(UserRegisterRequestBuilder) updates,
+  ) => (toBuilder()..update(updates)).build();
 
   @override
   UserRegisterRequestBuilder toBuilder() =>
@@ -129,18 +129,34 @@ class UserRegisterRequestBuilder
   UserRegisterRequest build() => _build();
 
   _$UserRegisterRequest _build() {
-    final _$result = _$v ??
+    final _$result =
+        _$v ??
         _$UserRegisterRequest._(
           userAccount: BuiltValueNullFieldError.checkNotNull(
-              userAccount, r'UserRegisterRequest', 'userAccount'),
+            userAccount,
+            r'UserRegisterRequest',
+            'userAccount',
+          ),
           userPassword: BuiltValueNullFieldError.checkNotNull(
-              userPassword, r'UserRegisterRequest', 'userPassword'),
+            userPassword,
+            r'UserRegisterRequest',
+            'userPassword',
+          ),
           checkPassword: BuiltValueNullFieldError.checkNotNull(
-              checkPassword, r'UserRegisterRequest', 'checkPassword'),
+            checkPassword,
+            r'UserRegisterRequest',
+            'checkPassword',
+          ),
           phone: BuiltValueNullFieldError.checkNotNull(
-              phone, r'UserRegisterRequest', 'phone'),
+            phone,
+            r'UserRegisterRequest',
+            'phone',
+          ),
           smsCode: BuiltValueNullFieldError.checkNotNull(
-              smsCode, r'UserRegisterRequest', 'smsCode'),
+            smsCode,
+            r'UserRegisterRequest',
+            'smsCode',
+          ),
         );
     replace(_$result);
     return _$result;

@@ -98,7 +98,8 @@ class SendResultBuilder implements Builder<SendResult, SendResultBuilder> {
   SendResult build() => _build();
 
   _$SendResult _build() {
-    final _$result = _$v ??
+    final _$result =
+        _$v ??
         _$SendResult._(
           success: success,
           requestId: requestId,

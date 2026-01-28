@@ -14,16 +14,16 @@ class _$BaseResponseUserPageResponse extends BaseResponseUserPageResponse {
   @override
   final String? message;
 
-  factory _$BaseResponseUserPageResponse(
-          [void Function(BaseResponseUserPageResponseBuilder)? updates]) =>
-      (BaseResponseUserPageResponseBuilder()..update(updates))._build();
+  factory _$BaseResponseUserPageResponse([
+    void Function(BaseResponseUserPageResponseBuilder)? updates,
+  ]) => (BaseResponseUserPageResponseBuilder()..update(updates))._build();
 
   _$BaseResponseUserPageResponse._({this.code, this.data, this.message})
-      : super._();
+    : super._();
   @override
   BaseResponseUserPageResponse rebuild(
-          void Function(BaseResponseUserPageResponseBuilder) updates) =>
-      (toBuilder()..update(updates)).build();
+    void Function(BaseResponseUserPageResponseBuilder) updates,
+  ) => (toBuilder()..update(updates)).build();
 
   @override
   BaseResponseUserPageResponseBuilder toBuilder() =>
@@ -60,8 +60,10 @@ class _$BaseResponseUserPageResponse extends BaseResponseUserPageResponse {
 
 class BaseResponseUserPageResponseBuilder
     implements
-        Builder<BaseResponseUserPageResponse,
-            BaseResponseUserPageResponseBuilder> {
+        Builder<
+          BaseResponseUserPageResponse,
+          BaseResponseUserPageResponseBuilder
+        > {
   _$BaseResponseUserPageResponse? _$v;
 
   int? _code;
@@ -108,7 +110,8 @@ class BaseResponseUserPageResponseBuilder
   _$BaseResponseUserPageResponse _build() {
     _$BaseResponseUserPageResponse _$result;
     try {
-      _$result = _$v ??
+      _$result =
+          _$v ??
           _$BaseResponseUserPageResponse._(
             code: code,
             data: _data?.build(),
@@ -121,7 +124,10 @@ class BaseResponseUserPageResponseBuilder
         _data?.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'BaseResponseUserPageResponse', _$failedField, e.toString());
+          r'BaseResponseUserPageResponse',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

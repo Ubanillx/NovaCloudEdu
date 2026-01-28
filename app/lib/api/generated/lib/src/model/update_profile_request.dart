@@ -17,6 +17,7 @@ part 'update_profile_request.g.dart';
 /// * [userProfile]
 /// * [userGender]
 /// * [userPhone]
+/// * [phoneSmsCode]
 /// * [userEmail]
 /// * [userAddress]
 /// * [birthday]
@@ -37,6 +38,9 @@ abstract class UpdateProfileRequest
 
   @BuiltValueField(wireName: r'userPhone')
   String? get userPhone;
+
+  @BuiltValueField(wireName: r'phoneSmsCode')
+  String? get phoneSmsCode;
 
   @BuiltValueField(wireName: r'userEmail')
   String? get userEmail;
@@ -108,6 +112,13 @@ class _$UpdateProfileRequestSerializer
       yield r'userPhone';
       yield serializers.serialize(
         object.userPhone,
+        specifiedType: const FullType(String),
+      );
+    }
+    if (object.phoneSmsCode != null) {
+      yield r'phoneSmsCode';
+      yield serializers.serialize(
+        object.phoneSmsCode,
         specifiedType: const FullType(String),
       );
     }
@@ -191,6 +202,13 @@ class _$UpdateProfileRequestSerializer
             specifiedType: const FullType(String),
           ) as String;
           result.userPhone = valueDes;
+          break;
+        case r'phoneSmsCode':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.phoneSmsCode = valueDes;
           break;
         case r'userEmail':
           final valueDes = serializers.deserialize(

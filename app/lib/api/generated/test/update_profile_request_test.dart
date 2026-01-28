@@ -32,6 +32,11 @@ void main() {
       // TODO
     });
 
+    // String phoneSmsCode
+    test('to test the property `phoneSmsCode`', () async {
+      // TODO
+    });
+
     // String userEmail
     test('to test the property `userEmail`', () async {
       // TODO

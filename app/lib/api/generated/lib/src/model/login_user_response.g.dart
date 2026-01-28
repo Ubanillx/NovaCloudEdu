@@ -32,24 +32,24 @@ class _$LoginUserResponse extends LoginUserResponse {
   @override
   final String? token;
 
-  factory _$LoginUserResponse(
-          [void Function(LoginUserResponseBuilder)? updates]) =>
-      (LoginUserResponseBuilder()..update(updates))._build();
+  factory _$LoginUserResponse([
+    void Function(LoginUserResponseBuilder)? updates,
+  ]) => (LoginUserResponseBuilder()..update(updates))._build();
 
-  _$LoginUserResponse._(
-      {this.id,
-      this.userAccount,
-      this.userName,
-      this.userAvatar,
-      this.userProfile,
-      this.userRole,
-      this.userGender,
-      this.userPhone,
-      this.userEmail,
-      this.level,
-      this.createTime,
-      this.token})
-      : super._();
+  _$LoginUserResponse._({
+    this.id,
+    this.userAccount,
+    this.userName,
+    this.userAvatar,
+    this.userProfile,
+    this.userRole,
+    this.userGender,
+    this.userPhone,
+    this.userEmail,
+    this.level,
+    this.createTime,
+    this.token,
+  }) : super._();
   @override
   LoginUserResponse rebuild(void Function(LoginUserResponseBuilder) updates) =>
       (toBuilder()..update(updates)).build();
@@ -204,7 +204,8 @@ class LoginUserResponseBuilder
   LoginUserResponse build() => _build();
 
   _$LoginUserResponse _build() {
-    final _$result = _$v ??
+    final _$result =
+        _$v ??
         _$LoginUserResponse._(
           id: id,
           userAccount: userAccount,

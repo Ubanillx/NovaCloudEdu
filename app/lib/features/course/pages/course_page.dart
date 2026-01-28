@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import '../../../config/app_theme.dart';
+import '../../../widgets/common/nova_refresh_header.dart';
 import '../../data/mock_data.dart';
 
 /// 课程页面 - 参考smartclass Courses.vue
@@ -25,8 +28,9 @@ class _CoursePageState extends State<CoursePage> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return Scaffold(
-      backgroundColor: const Color(0xFFF2F7FD),
+      backgroundColor: colors.background,
       body: SafeArea(
         child: Column(
           children: [
@@ -124,27 +128,25 @@ class _CoursePageState extends State<CoursePage> {
 
   // 课程列表
   Widget _buildCourseList() {
-    return RefreshIndicator(
+    return NovaRefreshableList(
       onRefresh: () async {
         await Future.delayed(const Duration(seconds: 1));
       },
-      child: CustomScrollView(
-        slivers: [
-          // 年级筛选（非推荐分类时显示）
-          if (_selectedCategory != 0)
-            SliverToBoxAdapter(child: _buildGradeFilter()),
-          // 课程列表
-          SliverPadding(
-            padding: const EdgeInsets.all(16),
-            sliver: SliverList(
-              delegate: SliverChildBuilderDelegate((context, index) {
-                if (index >= MockData.courses.length) return null;
-                return _buildCourseCard(MockData.courses[index]);
-              }, childCount: MockData.courses.length),
-            ),
+      slivers: [
+        // 年级筛选（非推荐分类时显示）
+        if (_selectedCategory != 0)
+          SliverToBoxAdapter(child: _buildGradeFilter()),
+        // 课程列表
+        SliverPadding(
+          padding: const EdgeInsets.all(16),
+          sliver: SliverList(
+            delegate: SliverChildBuilderDelegate((context, index) {
+              if (index >= MockData.courses.length) return null;
+              return _buildCourseCard(MockData.courses[index]);
+            }, childCount: MockData.courses.length),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 

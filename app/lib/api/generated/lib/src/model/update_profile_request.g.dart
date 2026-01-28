@@ -18,30 +18,33 @@ class _$UpdateProfileRequest extends UpdateProfileRequest {
   @override
   final String? userPhone;
   @override
+  final String? phoneSmsCode;
+  @override
   final String? userEmail;
   @override
   final String? userAddress;
   @override
   final Date? birthday;
 
-  factory _$UpdateProfileRequest(
-          [void Function(UpdateProfileRequestBuilder)? updates]) =>
-      (UpdateProfileRequestBuilder()..update(updates))._build();
+  factory _$UpdateProfileRequest([
+    void Function(UpdateProfileRequestBuilder)? updates,
+  ]) => (UpdateProfileRequestBuilder()..update(updates))._build();
 
-  _$UpdateProfileRequest._(
-      {this.userName,
-      this.userAvatar,
-      this.userProfile,
-      this.userGender,
-      this.userPhone,
-      this.userEmail,
-      this.userAddress,
-      this.birthday})
-      : super._();
+  _$UpdateProfileRequest._({
+    this.userName,
+    this.userAvatar,
+    this.userProfile,
+    this.userGender,
+    this.userPhone,
+    this.phoneSmsCode,
+    this.userEmail,
+    this.userAddress,
+    this.birthday,
+  }) : super._();
   @override
   UpdateProfileRequest rebuild(
-          void Function(UpdateProfileRequestBuilder) updates) =>
-      (toBuilder()..update(updates)).build();
+    void Function(UpdateProfileRequestBuilder) updates,
+  ) => (toBuilder()..update(updates)).build();
 
   @override
   UpdateProfileRequestBuilder toBuilder() =>
@@ -56,6 +59,7 @@ class _$UpdateProfileRequest extends UpdateProfileRequest {
         userProfile == other.userProfile &&
         userGender == other.userGender &&
         userPhone == other.userPhone &&
+        phoneSmsCode == other.phoneSmsCode &&
         userEmail == other.userEmail &&
         userAddress == other.userAddress &&
         birthday == other.birthday;
@@ -69,6 +73,7 @@ class _$UpdateProfileRequest extends UpdateProfileRequest {
     _$hash = $jc(_$hash, userProfile.hashCode);
     _$hash = $jc(_$hash, userGender.hashCode);
     _$hash = $jc(_$hash, userPhone.hashCode);
+    _$hash = $jc(_$hash, phoneSmsCode.hashCode);
     _$hash = $jc(_$hash, userEmail.hashCode);
     _$hash = $jc(_$hash, userAddress.hashCode);
     _$hash = $jc(_$hash, birthday.hashCode);
@@ -84,6 +89,7 @@ class _$UpdateProfileRequest extends UpdateProfileRequest {
           ..add('userProfile', userProfile)
           ..add('userGender', userGender)
           ..add('userPhone', userPhone)
+          ..add('phoneSmsCode', phoneSmsCode)
           ..add('userEmail', userEmail)
           ..add('userAddress', userAddress)
           ..add('birthday', birthday))
@@ -115,6 +121,10 @@ class UpdateProfileRequestBuilder
   String? get userPhone => _$this._userPhone;
   set userPhone(String? userPhone) => _$this._userPhone = userPhone;
 
+  String? _phoneSmsCode;
+  String? get phoneSmsCode => _$this._phoneSmsCode;
+  set phoneSmsCode(String? phoneSmsCode) => _$this._phoneSmsCode = phoneSmsCode;
+
   String? _userEmail;
   String? get userEmail => _$this._userEmail;
   set userEmail(String? userEmail) => _$this._userEmail = userEmail;
@@ -139,6 +149,7 @@ class UpdateProfileRequestBuilder
       _userProfile = $v.userProfile;
       _userGender = $v.userGender;
       _userPhone = $v.userPhone;
+      _phoneSmsCode = $v.phoneSmsCode;
       _userEmail = $v.userEmail;
       _userAddress = $v.userAddress;
       _birthday = $v.birthday;
@@ -161,13 +172,15 @@ class UpdateProfileRequestBuilder
   UpdateProfileRequest build() => _build();
 
   _$UpdateProfileRequest _build() {
-    final _$result = _$v ??
+    final _$result =
+        _$v ??
         _$UpdateProfileRequest._(
           userName: userName,
           userAvatar: userAvatar,
           userProfile: userProfile,
           userGender: userGender,
           userPhone: userPhone,
+          phoneSmsCode: phoneSmsCode,
           userEmail: userEmail,
           userAddress: userAddress,
           birthday: birthday,

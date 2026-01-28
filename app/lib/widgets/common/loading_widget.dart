@@ -1,44 +1,246 @@
-/// 加载组件
-/// 使用 TDesign Loading 组件
+/// Nova 加载组件
 library;
 
 import 'package:flutter/material.dart';
-import 'package:tdesign_flutter/tdesign_flutter.dart';
 
-class LoadingWidget extends StatelessWidget {
+/// 品牌主色
+const Color _themeColor = Color(0xFFFF4B2B);
+
+/// 基础加载组件
+class LoadingWidget extends StatefulWidget {
   final String? message;
-  final TDLoadingSize size;
+  final double size;
+  final Color? color;
 
   const LoadingWidget({
     super.key,
     this.message,
-    this.size = TDLoadingSize.medium,
+    this.size = 32,
+    this.color,
   });
 
   @override
+  State<LoadingWidget> createState() => _LoadingWidgetState();
+}
+
+class _LoadingWidgetState extends State<LoadingWidget> {
+  bool _isVisible = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // 延迟一帧显示，触发淡入动画
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        setState(() => _isVisible = true);
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Center(
-      child: TDLoading(
-        size: size,
-        icon: TDLoadingIcon.circle,
-        text: message,
-        axis: Axis.vertical,
+    return AnimatedOpacity(
+      opacity: _isVisible ? 1.0 : 0.0,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              width: widget.size,
+              height: widget.size,
+              child: CircularProgressIndicator(
+                strokeWidth: 2.5,
+                valueColor: AlwaysStoppedAnimation<Color>(widget.color ?? _themeColor),
+                backgroundColor: (widget.color ?? _themeColor).withOpacity(0.15),
+              ),
+            ),
+            if (widget.message != null) ...[
+              const SizedBox(height: 12),
+              Text(
+                widget.message!,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[600],
+                ),
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }
 }
 
-/// 页面加载组件
+/// 全屏加载页面
 class PageLoading extends StatelessWidget {
-  const PageLoading({super.key});
+  final String? message;
+  final Color? backgroundColor;
+
+  const PageLoading({
+    super.key,
+    this.message,
+    this.backgroundColor,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: TDLoading(
-        size: TDLoadingSize.large,
-        icon: TDLoadingIcon.circle,
+    return Container(
+      color: backgroundColor ?? Theme.of(context).scaffoldBackgroundColor,
+      child: LoadingWidget(
+        size: 40,
+        message: message,
       ),
+    );
+  }
+}
+
+/// 加载遮罩层
+class LoadingOverlay extends StatefulWidget {
+  final Widget child;
+  final bool isLoading;
+  final String? message;
+
+  const LoadingOverlay({
+    super.key,
+    required this.child,
+    required this.isLoading,
+    this.message,
+  });
+
+  @override
+  State<LoadingOverlay> createState() => _LoadingOverlayState();
+}
+
+class _LoadingOverlayState extends State<LoadingOverlay> {
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        widget.child,
+        AnimatedSwitcher(
+          duration: const Duration(milliseconds: 300),
+          child: widget.isLoading
+              ? Container(
+                  key: const ValueKey('overlay'),
+                  color: Colors.black.withOpacity(0.3),
+                  child: Center(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 16,
+                          ),
+                        ],
+                      ),
+                      child: LoadingWidget(
+                        size: 36,
+                        message: widget.message ?? '请稍候...',
+                      ),
+                    ),
+                  ),
+                )
+              : const SizedBox.shrink(),
+        ),
+      ],
+    );
+  }
+}
+
+/// 骨架屏闪烁效果
+class ShimmerLoading extends StatefulWidget {
+  final Widget child;
+
+  const ShimmerLoading({super.key, required this.child});
+
+  @override
+  State<ShimmerLoading> createState() => _ShimmerLoadingState();
+}
+
+class _ShimmerLoadingState extends State<ShimmerLoading> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return ShaderMask(
+          shaderCallback: (bounds) {
+            return LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.grey[300]!,
+                Colors.grey[100]!,
+                Colors.grey[300]!,
+              ],
+              stops: [
+                0.0,
+                _controller.value,
+                1.0,
+              ],
+            ).createShader(bounds);
+          },
+          blendMode: BlendMode.srcATop,
+          child: widget.child,
+        );
+      },
+    );
+  }
+}
+
+/// 列表骨架屏
+class ListSkeleton extends StatelessWidget {
+  final int itemCount;
+  final double itemHeight;
+
+  const ListSkeleton({
+    super.key,
+    this.itemCount = 5,
+    this.itemHeight = 72,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: itemCount,
+      itemBuilder: (context, index) {
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: ShimmerLoading(
+            child: Container(
+              height: itemHeight,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }
