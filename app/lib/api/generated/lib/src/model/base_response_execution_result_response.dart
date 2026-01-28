@@ -1,0 +1,156 @@
+//
+// AUTO-GENERATED FILE, DO NOT MODIFY!
+//
+
+// ignore_for_file: unused_element
+import 'package:nova_api/src/model/execution_result_response.dart';
+import 'package:built_value/built_value.dart';
+import 'package:built_value/serializer.dart';
+
+part 'base_response_execution_result_response.g.dart';
+
+/// BaseResponseExecutionResultResponse
+///
+/// Properties:
+/// * [code]
+/// * [data]
+/// * [message]
+@BuiltValue()
+abstract class BaseResponseExecutionResultResponse
+    implements
+        Built<BaseResponseExecutionResultResponse,
+            BaseResponseExecutionResultResponseBuilder> {
+  @BuiltValueField(wireName: r'code')
+  int? get code;
+
+  @BuiltValueField(wireName: r'data')
+  ExecutionResultResponse? get data;
+
+  @BuiltValueField(wireName: r'message')
+  String? get message;
+
+  BaseResponseExecutionResultResponse._();
+
+  factory BaseResponseExecutionResultResponse(
+          [void updates(BaseResponseExecutionResultResponseBuilder b)]) =
+      _$BaseResponseExecutionResultResponse;
+
+  @BuiltValueHook(initializeBuilder: true)
+  static void _defaults(BaseResponseExecutionResultResponseBuilder b) => b;
+
+  @BuiltValueSerializer(custom: true)
+  static Serializer<BaseResponseExecutionResultResponse> get serializer =>
+      _$BaseResponseExecutionResultResponseSerializer();
+}
+
+class _$BaseResponseExecutionResultResponseSerializer
+    implements PrimitiveSerializer<BaseResponseExecutionResultResponse> {
+  @override
+  final Iterable<Type> types = const [
+    BaseResponseExecutionResultResponse,
+    _$BaseResponseExecutionResultResponse
+  ];
+
+  @override
+  final String wireName = r'BaseResponseExecutionResultResponse';
+
+  Iterable<Object?> _serializeProperties(
+    Serializers serializers,
+    BaseResponseExecutionResultResponse object, {
+    FullType specifiedType = FullType.unspecified,
+  }) sync* {
+    if (object.code != null) {
+      yield r'code';
+      yield serializers.serialize(
+        object.code,
+        specifiedType: const FullType(int),
+      );
+    }
+    if (object.data != null) {
+      yield r'data';
+      yield serializers.serialize(
+        object.data,
+        specifiedType: const FullType(ExecutionResultResponse),
+      );
+    }
+    if (object.message != null) {
+      yield r'message';
+      yield serializers.serialize(
+        object.message,
+        specifiedType: const FullType(String),
+      );
+    }
+  }
+
+  @override
+  Object serialize(
+    Serializers serializers,
+    BaseResponseExecutionResultResponse object, {
+    FullType specifiedType = FullType.unspecified,
+  }) {
+    return _serializeProperties(serializers, object,
+            specifiedType: specifiedType)
+        .toList();
+  }
+
+  void _deserializeProperties(
+    Serializers serializers,
+    Object serialized, {
+    FullType specifiedType = FullType.unspecified,
+    required List<Object?> serializedList,
+    required BaseResponseExecutionResultResponseBuilder result,
+    required List<Object?> unhandled,
+  }) {
+    for (var i = 0; i < serializedList.length; i += 2) {
+      final key = serializedList[i] as String;
+      final value = serializedList[i + 1];
+      switch (key) {
+        case r'code':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(int),
+          ) as int;
+          result.code = valueDes;
+          break;
+        case r'data':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(ExecutionResultResponse),
+          ) as ExecutionResultResponse;
+          result.data.replace(valueDes);
+          break;
+        case r'message':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.message = valueDes;
+          break;
+        default:
+          unhandled.add(key);
+          unhandled.add(value);
+          break;
+      }
+    }
+  }
+
+  @override
+  BaseResponseExecutionResultResponse deserialize(
+    Serializers serializers,
+    Object serialized, {
+    FullType specifiedType = FullType.unspecified,
+  }) {
+    final result = BaseResponseExecutionResultResponseBuilder();
+    final serializedList = (serialized as Iterable<Object?>).toList();
+    final unhandled = <Object?>[];
+    _deserializeProperties(
+      serializers,
+      serialized,
+      specifiedType: specifiedType,
+      serializedList: serializedList,
+      unhandled: unhandled,
+      result: result,
+    );
+    return result.build();
+  }
+}

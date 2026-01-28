@@ -14,15 +14,15 @@ class _$BaseResponseBoolean extends BaseResponseBoolean {
   @override
   final String? message;
 
-  factory _$BaseResponseBoolean(
-          [void Function(BaseResponseBooleanBuilder)? updates]) =>
-      (BaseResponseBooleanBuilder()..update(updates))._build();
+  factory _$BaseResponseBoolean([
+    void Function(BaseResponseBooleanBuilder)? updates,
+  ]) => (BaseResponseBooleanBuilder()..update(updates))._build();
 
   _$BaseResponseBoolean._({this.code, this.data, this.message}) : super._();
   @override
   BaseResponseBoolean rebuild(
-          void Function(BaseResponseBooleanBuilder) updates) =>
-      (toBuilder()..update(updates)).build();
+    void Function(BaseResponseBooleanBuilder) updates,
+  ) => (toBuilder()..update(updates)).build();
 
   @override
   BaseResponseBooleanBuilder toBuilder() =>
@@ -102,12 +102,9 @@ class BaseResponseBooleanBuilder
   BaseResponseBoolean build() => _build();
 
   _$BaseResponseBoolean _build() {
-    final _$result = _$v ??
-        _$BaseResponseBoolean._(
-          code: code,
-          data: data,
-          message: message,
-        );
+    final _$result =
+        _$v ??
+        _$BaseResponseBoolean._(code: code, data: data, message: message);
     replace(_$result);
     return _$result;
   }

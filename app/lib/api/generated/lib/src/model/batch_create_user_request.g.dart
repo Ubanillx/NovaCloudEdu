@@ -10,15 +10,15 @@ class _$BatchCreateUserRequest extends BatchCreateUserRequest {
   @override
   final BuiltList<CreateUserRequest> users;
 
-  factory _$BatchCreateUserRequest(
-          [void Function(BatchCreateUserRequestBuilder)? updates]) =>
-      (BatchCreateUserRequestBuilder()..update(updates))._build();
+  factory _$BatchCreateUserRequest([
+    void Function(BatchCreateUserRequestBuilder)? updates,
+  ]) => (BatchCreateUserRequestBuilder()..update(updates))._build();
 
   _$BatchCreateUserRequest._({required this.users}) : super._();
   @override
   BatchCreateUserRequest rebuild(
-          void Function(BatchCreateUserRequestBuilder) updates) =>
-      (toBuilder()..update(updates)).build();
+    void Function(BatchCreateUserRequestBuilder) updates,
+  ) => (toBuilder()..update(updates)).build();
 
   @override
   BatchCreateUserRequestBuilder toBuilder() =>
@@ -40,9 +40,9 @@ class _$BatchCreateUserRequest extends BatchCreateUserRequest {
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper(r'BatchCreateUserRequest')
-          ..add('users', users))
-        .toString();
+    return (newBuiltValueToStringHelper(
+      r'BatchCreateUserRequest',
+    )..add('users', users)).toString();
   }
 }
 
@@ -84,10 +84,7 @@ class BatchCreateUserRequestBuilder
   _$BatchCreateUserRequest _build() {
     _$BatchCreateUserRequest _$result;
     try {
-      _$result = _$v ??
-          _$BatchCreateUserRequest._(
-            users: users.build(),
-          );
+      _$result = _$v ?? _$BatchCreateUserRequest._(users: users.build());
     } catch (_) {
       late String _$failedField;
       try {
@@ -95,7 +92,10 @@ class BatchCreateUserRequestBuilder
         users.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'BatchCreateUserRequest', _$failedField, e.toString());
+          r'BatchCreateUserRequest',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

@@ -1,0 +1,17 @@
+# nova_api.model.CheckinStatusResult
+
+## Load the model package
+```dart
+import 'package:nova_api/api.dart';
+```
+
+## Properties
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**checkedInToday** | **bool** |  | [optional] 
+**currentStreak** | **int** |  | [optional] 
+**totalCheckinDays** | **int** |  | [optional] 
+
+[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+
+

@@ -12,16 +12,16 @@ class _$BatchBanUserRequest extends BatchBanUserRequest {
   @override
   final bool banned;
 
-  factory _$BatchBanUserRequest(
-          [void Function(BatchBanUserRequestBuilder)? updates]) =>
-      (BatchBanUserRequestBuilder()..update(updates))._build();
+  factory _$BatchBanUserRequest([
+    void Function(BatchBanUserRequestBuilder)? updates,
+  ]) => (BatchBanUserRequestBuilder()..update(updates))._build();
 
   _$BatchBanUserRequest._({required this.userIds, required this.banned})
-      : super._();
+    : super._();
   @override
   BatchBanUserRequest rebuild(
-          void Function(BatchBanUserRequestBuilder) updates) =>
-      (toBuilder()..update(updates)).build();
+    void Function(BatchBanUserRequestBuilder) updates,
+  ) => (toBuilder()..update(updates)).build();
 
   @override
   BatchBanUserRequestBuilder toBuilder() =>
@@ -95,11 +95,15 @@ class BatchBanUserRequestBuilder
   _$BatchBanUserRequest _build() {
     _$BatchBanUserRequest _$result;
     try {
-      _$result = _$v ??
+      _$result =
+          _$v ??
           _$BatchBanUserRequest._(
             userIds: userIds.build(),
             banned: BuiltValueNullFieldError.checkNotNull(
-                banned, r'BatchBanUserRequest', 'banned'),
+              banned,
+              r'BatchBanUserRequest',
+              'banned',
+            ),
           );
     } catch (_) {
       late String _$failedField;
@@ -108,7 +112,10 @@ class BatchBanUserRequestBuilder
         userIds.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'BatchBanUserRequest', _$failedField, e.toString());
+          r'BatchBanUserRequest',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

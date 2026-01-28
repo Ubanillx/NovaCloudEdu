@@ -22,23 +22,23 @@ class _$UserPublicResponse extends UserPublicResponse {
   @override
   final int? level;
 
-  factory _$UserPublicResponse(
-          [void Function(UserPublicResponseBuilder)? updates]) =>
-      (UserPublicResponseBuilder()..update(updates))._build();
+  factory _$UserPublicResponse([
+    void Function(UserPublicResponseBuilder)? updates,
+  ]) => (UserPublicResponseBuilder()..update(updates))._build();
 
-  _$UserPublicResponse._(
-      {this.id,
-      this.userName,
-      this.userAvatar,
-      this.userProfile,
-      this.role,
-      this.userGender,
-      this.level})
-      : super._();
+  _$UserPublicResponse._({
+    this.id,
+    this.userName,
+    this.userAvatar,
+    this.userProfile,
+    this.role,
+    this.userGender,
+    this.level,
+  }) : super._();
   @override
   UserPublicResponse rebuild(
-          void Function(UserPublicResponseBuilder) updates) =>
-      (toBuilder()..update(updates)).build();
+    void Function(UserPublicResponseBuilder) updates,
+  ) => (toBuilder()..update(updates)).build();
 
   @override
   UserPublicResponseBuilder toBuilder() =>
@@ -150,7 +150,8 @@ class UserPublicResponseBuilder
   UserPublicResponse build() => _build();
 
   _$UserPublicResponse _build() {
-    final _$result = _$v ??
+    final _$result =
+        _$v ??
         _$UserPublicResponse._(
           id: id,
           userName: userName,

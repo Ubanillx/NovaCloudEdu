@@ -1,0 +1,17 @@
+# nova_api.model.ChatRequest
+
+## Load the model package
+```dart
+import 'package:nova_api/api.dart';
+```
+
+## Properties
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**message** | **String** |  | 
+**history** | [**BuiltList&lt;BuiltMap&lt;String, String&gt;&gt;**](BuiltMap.md) |  | [optional] 
+**systemPrompt** | **String** |  | [optional] 
+
+[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+
+

@@ -14,15 +14,15 @@ class _$BaseResponseObject extends BaseResponseObject {
   @override
   final String? message;
 
-  factory _$BaseResponseObject(
-          [void Function(BaseResponseObjectBuilder)? updates]) =>
-      (BaseResponseObjectBuilder()..update(updates))._build();
+  factory _$BaseResponseObject([
+    void Function(BaseResponseObjectBuilder)? updates,
+  ]) => (BaseResponseObjectBuilder()..update(updates))._build();
 
   _$BaseResponseObject._({this.code, this.data, this.message}) : super._();
   @override
   BaseResponseObject rebuild(
-          void Function(BaseResponseObjectBuilder) updates) =>
-      (toBuilder()..update(updates)).build();
+    void Function(BaseResponseObjectBuilder) updates,
+  ) => (toBuilder()..update(updates)).build();
 
   @override
   BaseResponseObjectBuilder toBuilder() =>
@@ -102,12 +102,8 @@ class BaseResponseObjectBuilder
   BaseResponseObject build() => _build();
 
   _$BaseResponseObject _build() {
-    final _$result = _$v ??
-        _$BaseResponseObject._(
-          code: code,
-          data: data,
-          message: message,
-        );
+    final _$result =
+        _$v ?? _$BaseResponseObject._(code: code, data: data, message: message);
     replace(_$result);
     return _$result;
   }

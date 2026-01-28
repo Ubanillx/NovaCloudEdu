@@ -10,6 +10,8 @@ import 'package:nova_api/src/auth/basic_auth.dart';
 import 'package:nova_api/src/auth/bearer_auth.dart';
 import 'package:nova_api/src/auth/oauth.dart';
 import 'package:nova_api/src/api/default_api.dart';
+import 'package:nova_api/src/api/ai_api.dart';
+import 'package:nova_api/src/api/webhook_api.dart';
 
 class NovaApi {
   static const String basePath = r'http://localhost:8080';
@@ -80,5 +82,17 @@ class NovaApi {
   /// by doing that all interceptors will not be executed
   DefaultApi getDefaultApi() {
     return DefaultApi(dio, serializers);
+  }
+
+  /// Get AIApi instance, base route and serializer can be overridden by a given but be careful,
+  /// by doing that all interceptors will not be executed
+  AIApi getAIApi() {
+    return AIApi(dio, serializers);
+  }
+
+  /// Get WebhookApi instance, base route and serializer can be overridden by a given but be careful,
+  /// by doing that all interceptors will not be executed
+  WebhookApi getWebhookApi() {
+    return WebhookApi(dio, serializers);
   }
 }

@@ -3,6 +3,7 @@
 //
 
 // ignore_for_file: unused_element
+import 'package:built_collection/built_collection.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
@@ -21,7 +22,7 @@ abstract class BaseResponseString
   int? get code;
 
   @BuiltValueField(wireName: r'data')
-  String? get data;
+  BuiltList<String>? get data;
 
   @BuiltValueField(wireName: r'message')
   String? get message;
@@ -63,7 +64,7 @@ class _$BaseResponseStringSerializer
       yield r'data';
       yield serializers.serialize(
         object.data,
-        specifiedType: const FullType(String),
+        specifiedType: const FullType(BuiltList, [FullType(String)]),
       );
     }
     if (object.message != null) {
@@ -108,9 +109,9 @@ class _$BaseResponseStringSerializer
         case r'data':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.data = valueDes;
+            specifiedType: const FullType(BuiltList, [FullType(String)]),
+          ) as BuiltList<String>;
+          result.data.replace(valueDes);
           break;
         case r'message':
           final valueDes = serializers.deserialize(

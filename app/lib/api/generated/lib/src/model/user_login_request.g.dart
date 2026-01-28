@@ -12,12 +12,12 @@ class _$UserLoginRequest extends UserLoginRequest {
   @override
   final String userPassword;
 
-  factory _$UserLoginRequest(
-          [void Function(UserLoginRequestBuilder)? updates]) =>
-      (UserLoginRequestBuilder()..update(updates))._build();
+  factory _$UserLoginRequest([
+    void Function(UserLoginRequestBuilder)? updates,
+  ]) => (UserLoginRequestBuilder()..update(updates))._build();
 
   _$UserLoginRequest._({required this.userAccount, required this.userPassword})
-      : super._();
+    : super._();
   @override
   UserLoginRequest rebuild(void Function(UserLoginRequestBuilder) updates) =>
       (toBuilder()..update(updates)).build();
@@ -92,12 +92,19 @@ class UserLoginRequestBuilder
   UserLoginRequest build() => _build();
 
   _$UserLoginRequest _build() {
-    final _$result = _$v ??
+    final _$result =
+        _$v ??
         _$UserLoginRequest._(
           userAccount: BuiltValueNullFieldError.checkNotNull(
-              userAccount, r'UserLoginRequest', 'userAccount'),
+            userAccount,
+            r'UserLoginRequest',
+            'userAccount',
+          ),
           userPassword: BuiltValueNullFieldError.checkNotNull(
-              userPassword, r'UserLoginRequest', 'userPassword'),
+            userPassword,
+            r'UserLoginRequest',
+            'userPassword',
+          ),
         );
     replace(_$result);
     return _$result;

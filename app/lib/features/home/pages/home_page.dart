@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import '../../../config/app_theme.dart';
+import '../../../widgets/common/nova_refresh_header.dart';
 import '../../data/mock_data.dart';
 
 /// 首页 - 参考smartclass Home.vue
@@ -21,33 +24,32 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return Scaffold(
-      backgroundColor: const Color(0xFFF2F7FD),
+      backgroundColor: colors.background,
       body: SafeArea(
-        child: RefreshIndicator(
+        child: NovaRefreshableList(
           onRefresh: () async {
             await Future.delayed(const Duration(seconds: 1));
           },
-          child: CustomScrollView(
-            slivers: [
-              // 搜索栏
-              SliverToBoxAdapter(child: _buildSearchBar()),
-              // 轮播图
-              SliverToBoxAdapter(child: _buildBannerCarousel()),
-              // 公告卡片
-              SliverToBoxAdapter(child: _buildNoticeCard()),
-              // AI助手列表
-              SliverToBoxAdapter(child: _buildAiAssistants()),
-              // 热门课程
-              SliverToBoxAdapter(child: _buildPopularCourses()),
-              // 每日单词
-              SliverToBoxAdapter(child: _buildDailyWord()),
-              // 文章列表
-              SliverToBoxAdapter(child: _buildArticles()),
-              // 底部间距
-              const SliverToBoxAdapter(child: SizedBox(height: 80)),
-            ],
-          ),
+          slivers: [
+            // 搜索栏
+            SliverToBoxAdapter(child: _buildSearchBar()),
+            // 轮播图
+            SliverToBoxAdapter(child: _buildBannerCarousel()),
+            // 公告卡片
+            SliverToBoxAdapter(child: _buildNoticeCard()),
+            // AI助手列表
+            SliverToBoxAdapter(child: _buildAiAssistants()),
+            // 热门课程
+            SliverToBoxAdapter(child: _buildPopularCourses()),
+            // 每日单词
+            SliverToBoxAdapter(child: _buildDailyWord()),
+            // 文章列表
+            SliverToBoxAdapter(child: _buildArticles()),
+            // 底部间距
+            const SliverToBoxAdapter(child: SizedBox(height: 80)),
+          ],
         ),
       ),
       floatingActionButton: FloatingActionButton(

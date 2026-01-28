@@ -37,9 +37,9 @@ class _$SendCodeRequest extends SendCodeRequest {
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper(r'SendCodeRequest')
-          ..add('phone', phone))
-        .toString();
+    return (newBuiltValueToStringHelper(
+      r'SendCodeRequest',
+    )..add('phone', phone)).toString();
   }
 }
 
@@ -78,10 +78,14 @@ class SendCodeRequestBuilder
   SendCodeRequest build() => _build();
 
   _$SendCodeRequest _build() {
-    final _$result = _$v ??
+    final _$result =
+        _$v ??
         _$SendCodeRequest._(
           phone: BuiltValueNullFieldError.checkNotNull(
-              phone, r'SendCodeRequest', 'phone'),
+            phone,
+            r'SendCodeRequest',
+            'phone',
+          ),
         );
     replace(_$result);
     return _$result;

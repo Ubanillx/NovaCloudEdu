@@ -38,31 +38,31 @@ class _$UserDetailResponse extends UserDetailResponse {
   @override
   final DateTime? updateTime;
 
-  factory _$UserDetailResponse(
-          [void Function(UserDetailResponseBuilder)? updates]) =>
-      (UserDetailResponseBuilder()..update(updates))._build();
+  factory _$UserDetailResponse([
+    void Function(UserDetailResponseBuilder)? updates,
+  ]) => (UserDetailResponseBuilder()..update(updates))._build();
 
-  _$UserDetailResponse._(
-      {this.id,
-      this.userAccount,
-      this.userName,
-      this.userAvatar,
-      this.userProfile,
-      this.role,
-      this.userGender,
-      this.userPhone,
-      this.userEmail,
-      this.userAddress,
-      this.birthday,
-      this.level,
-      this.banned,
-      this.createTime,
-      this.updateTime})
-      : super._();
+  _$UserDetailResponse._({
+    this.id,
+    this.userAccount,
+    this.userName,
+    this.userAvatar,
+    this.userProfile,
+    this.role,
+    this.userGender,
+    this.userPhone,
+    this.userEmail,
+    this.userAddress,
+    this.birthday,
+    this.level,
+    this.banned,
+    this.createTime,
+    this.updateTime,
+  }) : super._();
   @override
   UserDetailResponse rebuild(
-          void Function(UserDetailResponseBuilder) updates) =>
-      (toBuilder()..update(updates)).build();
+    void Function(UserDetailResponseBuilder) updates,
+  ) => (toBuilder()..update(updates)).build();
 
   @override
   UserDetailResponseBuilder toBuilder() =>
@@ -238,7 +238,8 @@ class UserDetailResponseBuilder
   UserDetailResponse build() => _build();
 
   _$UserDetailResponse _build() {
-    final _$result = _$v ??
+    final _$result =
+        _$v ??
         _$UserDetailResponse._(
           id: id,
           userAccount: userAccount,

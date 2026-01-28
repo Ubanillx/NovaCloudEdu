@@ -18,13 +18,17 @@ class _$UserPageResponse extends UserPageResponse {
   @override
   final int? totalPages;
 
-  factory _$UserPageResponse(
-          [void Function(UserPageResponseBuilder)? updates]) =>
-      (UserPageResponseBuilder()..update(updates))._build();
+  factory _$UserPageResponse([
+    void Function(UserPageResponseBuilder)? updates,
+  ]) => (UserPageResponseBuilder()..update(updates))._build();
 
-  _$UserPageResponse._(
-      {this.users, this.total, this.pageNum, this.pageSize, this.totalPages})
-      : super._();
+  _$UserPageResponse._({
+    this.users,
+    this.total,
+    this.pageNum,
+    this.pageSize,
+    this.totalPages,
+  }) : super._();
   @override
   UserPageResponse rebuild(void Function(UserPageResponseBuilder) updates) =>
       (toBuilder()..update(updates)).build();
@@ -126,7 +130,8 @@ class UserPageResponseBuilder
   _$UserPageResponse _build() {
     _$UserPageResponse _$result;
     try {
-      _$result = _$v ??
+      _$result =
+          _$v ??
           _$UserPageResponse._(
             users: _users?.build(),
             total: total,
@@ -141,7 +146,10 @@ class UserPageResponseBuilder
         _users?.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'UserPageResponse', _$failedField, e.toString());
+          r'UserPageResponse',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

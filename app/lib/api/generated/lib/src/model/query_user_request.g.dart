@@ -24,20 +24,20 @@ class _$QueryUserRequest extends QueryUserRequest {
   @override
   final int? pageSize;
 
-  factory _$QueryUserRequest(
-          [void Function(QueryUserRequestBuilder)? updates]) =>
-      (QueryUserRequestBuilder()..update(updates))._build();
+  factory _$QueryUserRequest([
+    void Function(QueryUserRequestBuilder)? updates,
+  ]) => (QueryUserRequestBuilder()..update(updates))._build();
 
-  _$QueryUserRequest._(
-      {this.userName,
-      this.userAccount,
-      this.userPhone,
-      this.userEmail,
-      this.role,
-      this.banned,
-      this.pageNum,
-      this.pageSize})
-      : super._();
+  _$QueryUserRequest._({
+    this.userName,
+    this.userAccount,
+    this.userPhone,
+    this.userEmail,
+    this.role,
+    this.banned,
+    this.pageNum,
+    this.pageSize,
+  }) : super._();
   @override
   QueryUserRequest rebuild(void Function(QueryUserRequestBuilder) updates) =>
       (toBuilder()..update(updates)).build();
@@ -160,7 +160,8 @@ class QueryUserRequestBuilder
   QueryUserRequest build() => _build();
 
   _$QueryUserRequest _build() {
-    final _$result = _$v ??
+    final _$result =
+        _$v ??
         _$QueryUserRequest._(
           userName: userName,
           userAccount: userAccount,

@@ -14,16 +14,16 @@ class _$BaseResponseUserPublicResponse extends BaseResponseUserPublicResponse {
   @override
   final String? message;
 
-  factory _$BaseResponseUserPublicResponse(
-          [void Function(BaseResponseUserPublicResponseBuilder)? updates]) =>
-      (BaseResponseUserPublicResponseBuilder()..update(updates))._build();
+  factory _$BaseResponseUserPublicResponse([
+    void Function(BaseResponseUserPublicResponseBuilder)? updates,
+  ]) => (BaseResponseUserPublicResponseBuilder()..update(updates))._build();
 
   _$BaseResponseUserPublicResponse._({this.code, this.data, this.message})
-      : super._();
+    : super._();
   @override
   BaseResponseUserPublicResponse rebuild(
-          void Function(BaseResponseUserPublicResponseBuilder) updates) =>
-      (toBuilder()..update(updates)).build();
+    void Function(BaseResponseUserPublicResponseBuilder) updates,
+  ) => (toBuilder()..update(updates)).build();
 
   @override
   BaseResponseUserPublicResponseBuilder toBuilder() =>
@@ -60,8 +60,10 @@ class _$BaseResponseUserPublicResponse extends BaseResponseUserPublicResponse {
 
 class BaseResponseUserPublicResponseBuilder
     implements
-        Builder<BaseResponseUserPublicResponse,
-            BaseResponseUserPublicResponseBuilder> {
+        Builder<
+          BaseResponseUserPublicResponse,
+          BaseResponseUserPublicResponseBuilder
+        > {
   _$BaseResponseUserPublicResponse? _$v;
 
   int? _code;
@@ -108,7 +110,8 @@ class BaseResponseUserPublicResponseBuilder
   _$BaseResponseUserPublicResponse _build() {
     _$BaseResponseUserPublicResponse _$result;
     try {
-      _$result = _$v ??
+      _$result =
+          _$v ??
           _$BaseResponseUserPublicResponse._(
             code: code,
             data: _data?.build(),
@@ -121,7 +124,10 @@ class BaseResponseUserPublicResponseBuilder
         _data?.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'BaseResponseUserPublicResponse', _$failedField, e.toString());
+          r'BaseResponseUserPublicResponse',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

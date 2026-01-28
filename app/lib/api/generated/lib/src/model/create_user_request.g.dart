@@ -26,21 +26,21 @@ class _$CreateUserRequest extends CreateUserRequest {
   @override
   final Date? birthday;
 
-  factory _$CreateUserRequest(
-          [void Function(CreateUserRequestBuilder)? updates]) =>
-      (CreateUserRequestBuilder()..update(updates))._build();
+  factory _$CreateUserRequest([
+    void Function(CreateUserRequestBuilder)? updates,
+  ]) => (CreateUserRequestBuilder()..update(updates))._build();
 
-  _$CreateUserRequest._(
-      {required this.userAccount,
-      required this.userPassword,
-      this.userName,
-      this.role,
-      this.userGender,
-      this.userPhone,
-      this.userEmail,
-      this.userAddress,
-      this.birthday})
-      : super._();
+  _$CreateUserRequest._({
+    required this.userAccount,
+    required this.userPassword,
+    this.userName,
+    this.role,
+    this.userGender,
+    this.userPhone,
+    this.userEmail,
+    this.userAddress,
+    this.birthday,
+  }) : super._();
   @override
   CreateUserRequest rebuild(void Function(CreateUserRequestBuilder) updates) =>
       (toBuilder()..update(updates)).build();
@@ -171,12 +171,19 @@ class CreateUserRequestBuilder
   CreateUserRequest build() => _build();
 
   _$CreateUserRequest _build() {
-    final _$result = _$v ??
+    final _$result =
+        _$v ??
         _$CreateUserRequest._(
           userAccount: BuiltValueNullFieldError.checkNotNull(
-              userAccount, r'CreateUserRequest', 'userAccount'),
+            userAccount,
+            r'CreateUserRequest',
+            'userAccount',
+          ),
           userPassword: BuiltValueNullFieldError.checkNotNull(
-              userPassword, r'CreateUserRequest', 'userPassword'),
+            userPassword,
+            r'CreateUserRequest',
+            'userPassword',
+          ),
           userName: userName,
           role: role,
           userGender: userGender,

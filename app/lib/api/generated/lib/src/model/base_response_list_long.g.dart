@@ -14,15 +14,15 @@ class _$BaseResponseListLong extends BaseResponseListLong {
   @override
   final String? message;
 
-  factory _$BaseResponseListLong(
-          [void Function(BaseResponseListLongBuilder)? updates]) =>
-      (BaseResponseListLongBuilder()..update(updates))._build();
+  factory _$BaseResponseListLong([
+    void Function(BaseResponseListLongBuilder)? updates,
+  ]) => (BaseResponseListLongBuilder()..update(updates))._build();
 
   _$BaseResponseListLong._({this.code, this.data, this.message}) : super._();
   @override
   BaseResponseListLong rebuild(
-          void Function(BaseResponseListLongBuilder) updates) =>
-      (toBuilder()..update(updates)).build();
+    void Function(BaseResponseListLongBuilder) updates,
+  ) => (toBuilder()..update(updates)).build();
 
   @override
   BaseResponseListLongBuilder toBuilder() =>
@@ -104,7 +104,8 @@ class BaseResponseListLongBuilder
   _$BaseResponseListLong _build() {
     _$BaseResponseListLong _$result;
     try {
-      _$result = _$v ??
+      _$result =
+          _$v ??
           _$BaseResponseListLong._(
             code: code,
             data: _data?.build(),
@@ -117,7 +118,10 @@ class BaseResponseListLongBuilder
         _data?.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'BaseResponseListLong', _$failedField, e.toString());
+          r'BaseResponseListLong',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

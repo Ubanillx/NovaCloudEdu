@@ -14,16 +14,16 @@ class _$BaseResponseLoginUserResponse extends BaseResponseLoginUserResponse {
   @override
   final String? message;
 
-  factory _$BaseResponseLoginUserResponse(
-          [void Function(BaseResponseLoginUserResponseBuilder)? updates]) =>
-      (BaseResponseLoginUserResponseBuilder()..update(updates))._build();
+  factory _$BaseResponseLoginUserResponse([
+    void Function(BaseResponseLoginUserResponseBuilder)? updates,
+  ]) => (BaseResponseLoginUserResponseBuilder()..update(updates))._build();
 
   _$BaseResponseLoginUserResponse._({this.code, this.data, this.message})
-      : super._();
+    : super._();
   @override
   BaseResponseLoginUserResponse rebuild(
-          void Function(BaseResponseLoginUserResponseBuilder) updates) =>
-      (toBuilder()..update(updates)).build();
+    void Function(BaseResponseLoginUserResponseBuilder) updates,
+  ) => (toBuilder()..update(updates)).build();
 
   @override
   BaseResponseLoginUserResponseBuilder toBuilder() =>
@@ -60,8 +60,10 @@ class _$BaseResponseLoginUserResponse extends BaseResponseLoginUserResponse {
 
 class BaseResponseLoginUserResponseBuilder
     implements
-        Builder<BaseResponseLoginUserResponse,
-            BaseResponseLoginUserResponseBuilder> {
+        Builder<
+          BaseResponseLoginUserResponse,
+          BaseResponseLoginUserResponseBuilder
+        > {
   _$BaseResponseLoginUserResponse? _$v;
 
   int? _code;
@@ -108,7 +110,8 @@ class BaseResponseLoginUserResponseBuilder
   _$BaseResponseLoginUserResponse _build() {
     _$BaseResponseLoginUserResponse _$result;
     try {
-      _$result = _$v ??
+      _$result =
+          _$v ??
           _$BaseResponseLoginUserResponse._(
             code: code,
             data: _data?.build(),
@@ -121,7 +124,10 @@ class BaseResponseLoginUserResponseBuilder
         _data?.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'BaseResponseLoginUserResponse', _$failedField, e.toString());
+          r'BaseResponseLoginUserResponse',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

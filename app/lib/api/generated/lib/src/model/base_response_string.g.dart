@@ -10,19 +10,19 @@ class _$BaseResponseString extends BaseResponseString {
   @override
   final int? code;
   @override
-  final String? data;
+  final BuiltList<String>? data;
   @override
   final String? message;
 
-  factory _$BaseResponseString(
-          [void Function(BaseResponseStringBuilder)? updates]) =>
-      (BaseResponseStringBuilder()..update(updates))._build();
+  factory _$BaseResponseString([
+    void Function(BaseResponseStringBuilder)? updates,
+  ]) => (BaseResponseStringBuilder()..update(updates))._build();
 
   _$BaseResponseString._({this.code, this.data, this.message}) : super._();
   @override
   BaseResponseString rebuild(
-          void Function(BaseResponseStringBuilder) updates) =>
-      (toBuilder()..update(updates)).build();
+    void Function(BaseResponseStringBuilder) updates,
+  ) => (toBuilder()..update(updates)).build();
 
   @override
   BaseResponseStringBuilder toBuilder() =>
@@ -65,9 +65,9 @@ class BaseResponseStringBuilder
   int? get code => _$this._code;
   set code(int? code) => _$this._code = code;
 
-  String? _data;
-  String? get data => _$this._data;
-  set data(String? data) => _$this._data = data;
+  ListBuilder<String>? _data;
+  ListBuilder<String> get data => _$this._data ??= ListBuilder<String>();
+  set data(ListBuilder<String>? data) => _$this._data = data;
 
   String? _message;
   String? get message => _$this._message;
@@ -81,7 +81,7 @@ class BaseResponseStringBuilder
     final $v = _$v;
     if ($v != null) {
       _code = $v.code;
-      _data = $v.data;
+      _data = $v.data?.toBuilder();
       _message = $v.message;
       _$v = null;
     }
@@ -102,12 +102,29 @@ class BaseResponseStringBuilder
   BaseResponseString build() => _build();
 
   _$BaseResponseString _build() {
-    final _$result = _$v ??
-        _$BaseResponseString._(
-          code: code,
-          data: data,
-          message: message,
+    _$BaseResponseString _$result;
+    try {
+      _$result =
+          _$v ??
+          _$BaseResponseString._(
+            code: code,
+            data: _data?.build(),
+            message: message,
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'data';
+        _data?.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+          r'BaseResponseString',
+          _$failedField,
+          e.toString(),
         );
+      }
+      rethrow;
+    }
     replace(_$result);
     return _$result;
   }

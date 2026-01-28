@@ -13,6 +13,7 @@ Name | Type | Description | Notes
 **userProfile** | **String** |  | [optional] 
 **userGender** | **int** |  | [optional] 
 **userPhone** | **String** |  | [optional] 
+**phoneSmsCode** | **String** |  | [optional] 
 **userEmail** | **String** |  | [optional] 
 **userAddress** | **String** |  | [optional] 
 **birthday** | [**Date**](Date.md) |  | [optional] 

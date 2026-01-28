@@ -14,9 +14,9 @@ class _$BaseResponseLong extends BaseResponseLong {
   @override
   final String? message;
 
-  factory _$BaseResponseLong(
-          [void Function(BaseResponseLongBuilder)? updates]) =>
-      (BaseResponseLongBuilder()..update(updates))._build();
+  factory _$BaseResponseLong([
+    void Function(BaseResponseLongBuilder)? updates,
+  ]) => (BaseResponseLongBuilder()..update(updates))._build();
 
   _$BaseResponseLong._({this.code, this.data, this.message}) : super._();
   @override
@@ -101,12 +101,8 @@ class BaseResponseLongBuilder
   BaseResponseLong build() => _build();
 
   _$BaseResponseLong _build() {
-    final _$result = _$v ??
-        _$BaseResponseLong._(
-          code: code,
-          data: data,
-          message: message,
-        );
+    final _$result =
+        _$v ?? _$BaseResponseLong._(code: code, data: data, message: message);
     replace(_$result);
     return _$result;
   }

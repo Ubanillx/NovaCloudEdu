@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import '../../../config/app_theme.dart';
+import '../../../widgets/common/nova_refresh_header.dart';
 import '../../data/mock_data.dart';
 
 /// 圈子页面 - 参考smartclass Circle.vue
@@ -28,8 +31,9 @@ class _CirclePageState extends State<CirclePage>
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return Scaffold(
-      backgroundColor: const Color(0xFFF2F7FD),
+      backgroundColor: colors.background,
       body: SafeArea(
         child: Column(
           children: [
@@ -109,17 +113,21 @@ class _CirclePageState extends State<CirclePage>
 
   // 帖子列表
   Widget _buildPostList() {
-    return RefreshIndicator(
+    return NovaRefreshableList(
       onRefresh: () async {
         await Future.delayed(const Duration(seconds: 1));
       },
-      child: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: MockData.posts.length,
-        itemBuilder: (context, index) {
-          return _buildPostCard(MockData.posts[index]);
-        },
-      ),
+      slivers: [
+        SliverPadding(
+          padding: const EdgeInsets.all(16),
+          sliver: SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (context, index) => _buildPostCard(MockData.posts[index]),
+              childCount: MockData.posts.length,
+            ),
+          ),
+        ),
+      ],
     );
   }
 
