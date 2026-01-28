@@ -84,4 +84,62 @@ public class WorkflowDefinition {
                 .filter(e -> e.getTargetNodeId().equals(nodeId))
                 .toList();
     }
+
+    /**
+     * 深拷贝工作流定义
+     */
+    public WorkflowDefinition copy() {
+        List<WorkflowNode> copiedNodes = new ArrayList<>();
+        for (WorkflowNode node : this.nodes) {
+            copiedNodes.add(WorkflowNode.builder()
+                    .id(node.getId())
+                    .type(node.getType())
+                    .name(node.getName())
+                    .position(node.getPosition() != null ? 
+                            WorkflowNode.Position.builder()
+                                    .x(node.getPosition().getX())
+                                    .y(node.getPosition().getY())
+                                    .build() : null)
+                    .config(node.getConfig() != null ? new HashMap<>(node.getConfig()) : null)
+                    .errorHandling(node.getErrorHandling())
+                    .build());
+        }
+
+        List<WorkflowEdge> copiedEdges = new ArrayList<>();
+        for (WorkflowEdge edge : this.edges) {
+            copiedEdges.add(WorkflowEdge.builder()
+                    .id(edge.getId())
+                    .sourceNodeId(edge.getSourceNodeId())
+                    .targetNodeId(edge.getTargetNodeId())
+                    .sourceHandle(edge.getSourceHandle())
+                    .targetHandle(edge.getTargetHandle())
+                    .condition(edge.getCondition())
+                    .label(edge.getLabel())
+                    .build());
+        }
+
+        Map<String, VariableDefinition> copiedVariables = new HashMap<>();
+        for (Map.Entry<String, VariableDefinition> entry : this.variables.entrySet()) {
+            VariableDefinition v = entry.getValue();
+            copiedVariables.put(entry.getKey(), VariableDefinition.builder()
+                    .name(v.getName())
+                    .type(v.getType())
+                    .defaultValue(v.getDefaultValue())
+                    .description(v.getDescription())
+                    .build());
+        }
+
+        return WorkflowDefinition.builder()
+                .version(this.version)
+                .nodes(copiedNodes)
+                .edges(copiedEdges)
+                .variables(copiedVariables)
+                .settings(WorkflowSettings.builder()
+                        .maxExecutionTimeMs(this.settings.getMaxExecutionTimeMs())
+                        .enableLogging(this.settings.isEnableLogging())
+                        .logLevel(this.settings.getLogLevel())
+                        .enableDebug(this.settings.isEnableDebug())
+                        .build())
+                .build();
+    }
 }
