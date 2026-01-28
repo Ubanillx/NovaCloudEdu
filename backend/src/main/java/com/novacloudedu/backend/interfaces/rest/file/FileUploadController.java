@@ -38,12 +38,20 @@ public class FileUploadController {
     private final UserRepository userRepository;
     private final FileAssembler fileAssembler;
 
-    @PostMapping("/upload/{businessType}")
+    @PostMapping("/upload/{businessType}/**")
     @Operation(summary = "上传文件（按业务类型）")
     public BaseResponse<UploadFileResponse> uploadFile(
             @RequestParam("file") @Parameter(description = "文件") MultipartFile file,
             @PathVariable @Parameter(description = "业务类型：course/cover, course/video, course/material, user/avatar, teacher/avatar, teacher/certificate, system/document, feedback/attachment, general, chat/file, chat/group, chat/ai") String businessType,
+            jakarta.servlet.http.HttpServletRequest request,
             Authentication authentication) {
+        
+        // 从完整路径中提取 businessType（支持包含斜杠的类型如 user/avatar）
+        String fullPath = request.getRequestURI();
+        String prefix = "/api/file/upload/";
+        if (fullPath.startsWith(prefix)) {
+            businessType = fullPath.substring(prefix.length());
+        }
         
         Long userId = Long.parseLong(authentication.getName());
         User user = userRepository.findById(UserId.of(userId))

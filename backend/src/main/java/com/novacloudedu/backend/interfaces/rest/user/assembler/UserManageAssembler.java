@@ -54,6 +54,7 @@ public class UserManageAssembler {
                 request.userProfile(),
                 request.userGender(),
                 request.userPhone(),
+                request.phoneSmsCode(),
                 request.userEmail(),
                 request.userAddress(),
                 request.birthday()

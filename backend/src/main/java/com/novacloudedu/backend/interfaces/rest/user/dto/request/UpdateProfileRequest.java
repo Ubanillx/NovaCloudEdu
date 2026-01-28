@@ -11,6 +11,7 @@ public record UpdateProfileRequest(
         String userProfile,
         Integer userGender,
         String userPhone,
+        String phoneSmsCode,  // 修改手机号时需要的验证码
         String userEmail,
         String userAddress,
         LocalDate birthday

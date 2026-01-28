@@ -67,6 +67,21 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
+    public Optional<User> findByPhone(String phone) {
+        LambdaQueryWrapper<UserPO> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(UserPO::getUserPhone, phone);
+        UserPO po = userMapper.selectOne(wrapper);
+        return Optional.ofNullable(userConverter.toDomain(po));
+    }
+
+    @Override
+    public boolean existsByPhone(String phone) {
+        LambdaQueryWrapper<UserPO> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(UserPO::getUserPhone, phone);
+        return userMapper.selectCount(wrapper) > 0;
+    }
+
+    @Override
     public boolean existsByAccount(UserAccount account) {
         LambdaQueryWrapper<UserPO> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(UserPO::getUserAccount, account.value());
