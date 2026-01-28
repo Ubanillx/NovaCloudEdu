@@ -476,3 +476,160 @@ COMMENT ON COLUMN ai_workflow_execution_log.duration_ms IS '执行耗时(毫秒)
 COMMENT ON COLUMN ai_workflow_execution_log.trace_id IS '追踪ID';
 COMMENT ON COLUMN ai_workflow_execution_log.user_id IS '用户ID';
 COMMENT ON COLUMN ai_workflow_execution_log.timestamp IS '时间戳';
+
+-- =====================================================
+-- 工作流执行记录表（主表）
+-- =====================================================
+CREATE TABLE IF NOT EXISTS workflow_execution
+(
+    id                  VARCHAR(64) PRIMARY KEY,
+    workflow_id         BIGINT                                  NOT NULL,
+    workflow_name       VARCHAR(255)                            NOT NULL,
+    workflow_version    INT             DEFAULT 1               NOT NULL,
+    status              VARCHAR(32)     DEFAULT 'PENDING'       NOT NULL,
+    input               JSONB                                   NULL,
+    output              JSONB                                   NULL,
+    variables           JSONB                                   NULL,
+    node_executions     JSONB                                   NULL,
+    current_node_id     VARCHAR(64)                             NULL,
+    error_message       TEXT                                    NULL,
+    user_id             BIGINT                                  NOT NULL,
+    start_time          TIMESTAMP                               NULL,
+    end_time            TIMESTAMP                               NULL,
+    duration_ms         BIGINT          DEFAULT 0               NOT NULL,
+    create_time         TIMESTAMP       DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    update_time         TIMESTAMP       DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted             INT             DEFAULT 0               NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_we_workflow_id ON workflow_execution(workflow_id);
+CREATE INDEX IF NOT EXISTS idx_we_user_id ON workflow_execution(user_id);
+CREATE INDEX IF NOT EXISTS idx_we_status ON workflow_execution(status);
+CREATE INDEX IF NOT EXISTS idx_we_create_time ON workflow_execution(create_time);
+
+COMMENT ON TABLE workflow_execution IS '工作流执行记录';
+COMMENT ON COLUMN workflow_execution.id IS '执行ID（UUID）';
+COMMENT ON COLUMN workflow_execution.workflow_id IS '工作流ID';
+COMMENT ON COLUMN workflow_execution.workflow_name IS '工作流名称快照';
+COMMENT ON COLUMN workflow_execution.workflow_version IS '工作流版本快照';
+COMMENT ON COLUMN workflow_execution.status IS '执行状态：PENDING/RUNNING/PAUSED/COMPLETED/FAILED/TIMEOUT/CANCELLED';
+COMMENT ON COLUMN workflow_execution.input IS '输入参数JSON';
+COMMENT ON COLUMN workflow_execution.output IS '输出结果JSON';
+COMMENT ON COLUMN workflow_execution.variables IS '执行变量JSON';
+COMMENT ON COLUMN workflow_execution.node_executions IS '节点执行记录JSON';
+COMMENT ON COLUMN workflow_execution.current_node_id IS '当前执行节点ID';
+COMMENT ON COLUMN workflow_execution.error_message IS '错误信息';
+COMMENT ON COLUMN workflow_execution.user_id IS '执行用户ID';
+COMMENT ON COLUMN workflow_execution.start_time IS '开始时间';
+COMMENT ON COLUMN workflow_execution.end_time IS '结束时间';
+COMMENT ON COLUMN workflow_execution.duration_ms IS '执行耗时（毫秒）';
+COMMENT ON COLUMN workflow_execution.create_time IS '创建时间';
+COMMENT ON COLUMN workflow_execution.update_time IS '更新时间';
+COMMENT ON COLUMN workflow_execution.deleted IS '是否删除';
+
+-- =====================================================
+-- 工作流模板表
+-- =====================================================
+CREATE TABLE IF NOT EXISTS workflow_template
+(
+    id                  BIGSERIAL PRIMARY KEY,
+    name                VARCHAR(128)                            NOT NULL,
+    description         TEXT                                    NULL,
+    category            VARCHAR(64)                             NULL,
+    icon                VARCHAR(256)                            NULL,
+    definition          JSONB                                   NOT NULL,
+    tags                JSONB           DEFAULT '[]'            NOT NULL,
+    is_system           SMALLINT        DEFAULT 0               NOT NULL,
+    is_public           SMALLINT        DEFAULT 0               NOT NULL,
+    creator_id          BIGINT                                  NULL,
+    usage_count         INT             DEFAULT 0               NOT NULL,
+    create_time         TIMESTAMP       DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    update_time         TIMESTAMP       DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted             INT             DEFAULT 0               NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_wt_category ON workflow_template(category);
+CREATE INDEX IF NOT EXISTS idx_wt_is_system ON workflow_template(is_system);
+CREATE INDEX IF NOT EXISTS idx_wt_is_public ON workflow_template(is_public);
+CREATE INDEX IF NOT EXISTS idx_wt_creator_id ON workflow_template(creator_id);
+
+COMMENT ON TABLE workflow_template IS '工作流模板';
+COMMENT ON COLUMN workflow_template.id IS 'id';
+COMMENT ON COLUMN workflow_template.name IS '模板名称';
+COMMENT ON COLUMN workflow_template.description IS '模板描述';
+COMMENT ON COLUMN workflow_template.category IS '分类：RAG/CHATBOT/AUTOMATION/DATA_PROCESSING';
+COMMENT ON COLUMN workflow_template.icon IS '图标URL';
+COMMENT ON COLUMN workflow_template.definition IS '工作流定义JSON';
+COMMENT ON COLUMN workflow_template.tags IS '标签JSON数组';
+COMMENT ON COLUMN workflow_template.is_system IS '是否系统预置：0-否，1-是';
+COMMENT ON COLUMN workflow_template.is_public IS '是否公开：0-否，1-是';
+COMMENT ON COLUMN workflow_template.creator_id IS '创建者ID（系统模板为空）';
+COMMENT ON COLUMN workflow_template.usage_count IS '使用次数';
+COMMENT ON COLUMN workflow_template.create_time IS '创建时间';
+COMMENT ON COLUMN workflow_template.update_time IS '更新时间';
+COMMENT ON COLUMN workflow_template.deleted IS '是否删除';
+
+-- =====================================================
+-- 工作流触发器表
+-- =====================================================
+CREATE TABLE IF NOT EXISTS workflow_trigger
+(
+    id                  BIGSERIAL PRIMARY KEY,
+    workflow_id         BIGINT                                  NOT NULL,
+    type                VARCHAR(32)                             NOT NULL,
+    name                VARCHAR(128)                            NOT NULL,
+    enabled             SMALLINT        DEFAULT 0               NOT NULL,
+    config              JSONB           DEFAULT '{}'            NOT NULL,
+    last_triggered_at   TIMESTAMP                               NULL,
+    trigger_count       INT             DEFAULT 0               NOT NULL,
+    create_time         TIMESTAMP       DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    update_time         TIMESTAMP       DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted             INT             DEFAULT 0               NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_wtr_workflow_id ON workflow_trigger(workflow_id);
+CREATE INDEX IF NOT EXISTS idx_wtr_type ON workflow_trigger(type);
+CREATE INDEX IF NOT EXISTS idx_wtr_enabled ON workflow_trigger(enabled);
+
+COMMENT ON TABLE workflow_trigger IS '工作流触发器';
+COMMENT ON COLUMN workflow_trigger.id IS 'id';
+COMMENT ON COLUMN workflow_trigger.workflow_id IS '工作流ID';
+COMMENT ON COLUMN workflow_trigger.type IS '触发器类型：SCHEDULE/WEBHOOK/EVENT';
+COMMENT ON COLUMN workflow_trigger.name IS '触发器名称';
+COMMENT ON COLUMN workflow_trigger.enabled IS '是否启用：0-否，1-是';
+COMMENT ON COLUMN workflow_trigger.config IS '配置JSON（cron表达式/webhook路径/事件类型等）';
+COMMENT ON COLUMN workflow_trigger.last_triggered_at IS '最后触发时间';
+COMMENT ON COLUMN workflow_trigger.trigger_count IS '触发次数';
+COMMENT ON COLUMN workflow_trigger.create_time IS '创建时间';
+COMMENT ON COLUMN workflow_trigger.update_time IS '更新时间';
+COMMENT ON COLUMN workflow_trigger.deleted IS '是否删除';
+
+-- =====================================================
+-- 工作流版本历史表
+-- =====================================================
+CREATE TABLE IF NOT EXISTS workflow_version
+(
+    id                  BIGSERIAL PRIMARY KEY,
+    workflow_id         BIGINT                                  NOT NULL,
+    version             INT                                     NOT NULL,
+    name                VARCHAR(128)                            NOT NULL,
+    description         TEXT                                    NULL,
+    definition          JSONB                                   NOT NULL,
+    publish_note        TEXT                                    NULL,
+    published_by        BIGINT                                  NOT NULL,
+    create_time         TIMESTAMP       DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_wv_workflow_id ON workflow_version(workflow_id);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_wv_workflow_version ON workflow_version(workflow_id, version);
+
+COMMENT ON TABLE workflow_version IS '工作流版本历史';
+COMMENT ON COLUMN workflow_version.id IS 'id';
+COMMENT ON COLUMN workflow_version.workflow_id IS '工作流ID';
+COMMENT ON COLUMN workflow_version.version IS '版本号';
+COMMENT ON COLUMN workflow_version.name IS '名称快照';
+COMMENT ON COLUMN workflow_version.description IS '描述快照';
+COMMENT ON COLUMN workflow_version.definition IS '工作流定义快照';
+COMMENT ON COLUMN workflow_version.publish_note IS '发布说明';
+COMMENT ON COLUMN workflow_version.published_by IS '发布者ID';
+COMMENT ON COLUMN workflow_version.create_time IS '创建时间';
