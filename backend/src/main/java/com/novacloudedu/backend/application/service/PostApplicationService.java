@@ -4,6 +4,7 @@ import com.novacloudedu.backend.common.ErrorCode;
 import com.novacloudedu.backend.domain.post.entity.*;
 import com.novacloudedu.backend.domain.post.repository.*;
 import com.novacloudedu.backend.domain.post.valueobject.*;
+import com.novacloudedu.backend.domain.social.repository.UserFollowRepository;
 import com.novacloudedu.backend.domain.user.repository.UserRepository;
 import com.novacloudedu.backend.domain.user.valueobject.UserId;
 import com.novacloudedu.backend.exception.BusinessException;
@@ -12,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -28,6 +30,7 @@ public class PostApplicationService {
     private final PostCommentRepository commentRepository;
     private final PostCommentReplyRepository replyRepository;
     private final UserRepository userRepository;
+    private final UserFollowRepository userFollowRepository;
 
     // ==================== 帖子管理 ====================
 
@@ -325,6 +328,48 @@ public class PostApplicationService {
         commentRepository.findById(CommentId.of(commentId))
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_ERROR, "评论不存在"));
         return replyRepository.findByCommentId(CommentId.of(commentId), pageNum, pageSize);
+    }
+
+    // ==================== 关注用户帖子 ====================
+
+    /**
+     * 获取关注用户的帖子列表
+     */
+    public PostRepository.PostPage getFollowingPosts(Long userId, int pageNum, int pageSize) {
+        List<UserId> followingUserIds = userFollowRepository.findFollowingUserIds(UserId.of(userId));
+        if (followingUserIds.isEmpty()) {
+            return new PostRepository.PostPage(List.of(), 0, pageNum, pageSize);
+        }
+        return postRepository.findByUserIds(followingUserIds, pageNum, pageSize);
+    }
+
+    // ==================== 点赞排行榜 ====================
+
+    /**
+     * 获取点赞排行榜（全部时间）
+     */
+    public PostRepository.PostPage getTopPosts(int pageNum, int pageSize) {
+        return postRepository.findTopByThumbNum(null, null, pageNum, pageSize);
+    }
+
+    /**
+     * 获取点赞排行榜（指定时间范围）
+     * @param days 最近多少天内的帖子（null表示不限制）
+     */
+    public PostRepository.PostPage getTopPostsByDays(Integer days, int pageNum, int pageSize) {
+        LocalDateTime startTime = null;
+        if (days != null && days > 0) {
+            startTime = LocalDateTime.now().minusDays(days);
+        }
+        return postRepository.findTopByThumbNum(startTime, null, pageNum, pageSize);
+    }
+
+    /**
+     * 获取点赞排行榜（自定义时间范围）
+     */
+    public PostRepository.PostPage getTopPostsByTimeRange(LocalDateTime startTime, LocalDateTime endTime, 
+                                                          int pageNum, int pageSize) {
+        return postRepository.findTopByThumbNum(startTime, endTime, pageNum, pageSize);
     }
 
     // ==================== 私有方法 ====================

@@ -5,6 +5,7 @@ import com.novacloudedu.backend.domain.post.valueobject.PostId;
 import com.novacloudedu.backend.domain.post.valueobject.PostType;
 import com.novacloudedu.backend.domain.user.valueobject.UserId;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -67,6 +68,21 @@ public interface PostRepository {
      * 统计用户帖子获赞总数
      */
     long countTotalLikesByUserId(UserId userId);
+
+    /**
+     * 获取关注用户的帖子列表（分页）
+     */
+    PostPage findByUserIds(List<UserId> userIds, int pageNum, int pageSize);
+
+    /**
+     * 获取点赞排行榜（支持时间筛选）
+     * @param startTime 开始时间（可为null，表示不限制）
+     * @param endTime 结束时间（可为null，表示不限制）
+     * @param pageNum 页码
+     * @param pageSize 每页数量
+     * @return 按点赞数降序排列的帖子分页结果
+     */
+    PostPage findTopByThumbNum(LocalDateTime startTime, LocalDateTime endTime, int pageNum, int pageSize);
 
     /**
      * 帖子分页结果
