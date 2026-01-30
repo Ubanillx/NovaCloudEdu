@@ -160,9 +160,9 @@ class _$ChatGroup extends ChatGroup {
   @override
   final bool? mute;
   @override
-  final bool? full;
-  @override
   final bool? delete;
+  @override
+  final bool? full;
 
   factory _$ChatGroup([void Function(ChatGroupBuilder)? updates]) =>
       (ChatGroupBuilder()..update(updates))._build();
@@ -183,8 +183,8 @@ class _$ChatGroup extends ChatGroup {
     this.createTime,
     this.updateTime,
     this.mute,
-    this.full,
     this.delete,
+    this.full,
   }) : super._();
   @override
   ChatGroup rebuild(void Function(ChatGroupBuilder) updates) =>
@@ -212,8 +212,8 @@ class _$ChatGroup extends ChatGroup {
         createTime == other.createTime &&
         updateTime == other.updateTime &&
         mute == other.mute &&
-        full == other.full &&
-        delete == other.delete;
+        delete == other.delete &&
+        full == other.full;
   }
 
   @override
@@ -234,8 +234,8 @@ class _$ChatGroup extends ChatGroup {
     _$hash = $jc(_$hash, createTime.hashCode);
     _$hash = $jc(_$hash, updateTime.hashCode);
     _$hash = $jc(_$hash, mute.hashCode);
-    _$hash = $jc(_$hash, full.hashCode);
     _$hash = $jc(_$hash, delete.hashCode);
+    _$hash = $jc(_$hash, full.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -258,8 +258,8 @@ class _$ChatGroup extends ChatGroup {
           ..add('createTime', createTime)
           ..add('updateTime', updateTime)
           ..add('mute', mute)
-          ..add('full', full)
-          ..add('delete', delete))
+          ..add('delete', delete)
+          ..add('full', full))
         .toString();
   }
 }
@@ -329,13 +329,13 @@ class ChatGroupBuilder implements Builder<ChatGroup, ChatGroupBuilder> {
   bool? get mute => _$this._mute;
   set mute(bool? mute) => _$this._mute = mute;
 
-  bool? _full;
-  bool? get full => _$this._full;
-  set full(bool? full) => _$this._full = full;
-
   bool? _delete;
   bool? get delete => _$this._delete;
   set delete(bool? delete) => _$this._delete = delete;
+
+  bool? _full;
+  bool? get full => _$this._full;
+  set full(bool? full) => _$this._full = full;
 
   ChatGroupBuilder() {
     ChatGroup._defaults(this);
@@ -359,8 +359,8 @@ class ChatGroupBuilder implements Builder<ChatGroup, ChatGroupBuilder> {
       _createTime = $v.createTime;
       _updateTime = $v.updateTime;
       _mute = $v.mute;
-      _full = $v.full;
       _delete = $v.delete;
+      _full = $v.full;
       _$v = null;
     }
     return this;
@@ -400,8 +400,8 @@ class ChatGroupBuilder implements Builder<ChatGroup, ChatGroupBuilder> {
             createTime: createTime,
             updateTime: updateTime,
             mute: mute,
-            full: full,
             delete: delete,
+            full: full,
           );
     } catch (_) {
       late String _$failedField;

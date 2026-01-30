@@ -168,8 +168,8 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     final colors = context.colors;
     final isDark = context.isDarkMode;
-    const brand = Color(0xFF2563EB);
-    const brand2 = Color(0xFF3B82F6);
+    const brand = AppTheme.brand;
+    const brand2 = AppTheme.brand2;
 
     return Scaffold(
       backgroundColor: colors.background,

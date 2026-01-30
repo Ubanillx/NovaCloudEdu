@@ -54,7 +54,7 @@ class _HomePageState extends State<HomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
-        backgroundColor: const Color(0xFF1989FA),
+        backgroundColor: AppTheme.brand,
         child: const Icon(Icons.add, color: Colors.white),
       ),
     );
@@ -196,7 +196,7 @@ class _HomePageState extends State<HomePage> {
                 width: isActive ? 18 : 10,
                 decoration: BoxDecoration(
                   color: isActive
-                      ? const Color(0xFF1989FA)
+                      ? AppTheme.brand
                       : const Color(0xFFE5E5E5),
                   borderRadius: BorderRadius.circular(2),
                 ),
@@ -290,11 +290,11 @@ class _HomePageState extends State<HomePage> {
               children: [
                 CircleAvatar(
                   radius: 16,
-                  backgroundColor: const Color(0xFF1989FA).withOpacity(0.1),
+                  backgroundColor: AppTheme.brand.withOpacity(0.1),
                   child: const Icon(
                     Icons.smart_toy,
                     size: 18,
-                    color: Color(0xFF1989FA),
+                    color: AppTheme.brand,
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -403,14 +403,14 @@ class _HomePageState extends State<HomePage> {
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF1989FA).withOpacity(0.1),
+                          color: AppTheme.brand.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
                           course.tag,
                           style: const TextStyle(
                             fontSize: 10,
-                            color: Color(0xFF1989FA),
+                            color: AppTheme.brand,
                           ),
                         ),
                       ),
@@ -447,7 +447,7 @@ class _HomePageState extends State<HomePage> {
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               gradient: const LinearGradient(
-                colors: [Color(0xFF1989FA), Color(0xFF36D1DC)],
+                colors: [AppTheme.brand, Color(0xFF36D1DC)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),

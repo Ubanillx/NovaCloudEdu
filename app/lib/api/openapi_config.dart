@@ -1,4 +1,4 @@
-// Openapi Generator last run: : 2026-01-28T23:25:34.425601
+// Openapi Generator last run: : 2026-01-29T12:51:37.157810
 /// OpenAPI Generator 配置
 ///
 /// 此文件仅用于开发时生成 API 客户端代码。

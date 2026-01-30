@@ -13,6 +13,7 @@ import 'settings_page.dart';
 import 'profile_detail_page.dart';
 import 'study_plan_page.dart';
 import 'checkin_ranking_page.dart';
+import '../../circle/pages/my_favourites_page.dart';
 
 /// 个人中心页面 - 参考smartclass Profile.vue
 class ProfilePage extends StatefulWidget {
@@ -108,9 +109,9 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  Future<void> _loadUserStats() async {
+  Future<void> _loadUserStats({bool forceRefresh = false}) async {
     try {
-      final stats = await _checkinService.getUserStats();
+      final stats = await _checkinService.getUserStats(forceRefresh: forceRefresh);
       if (mounted) {
         setState(() {
           _userStats = stats;
@@ -132,6 +133,8 @@ class _ProfilePageState extends State<ProfilePage> {
       final result = await _checkinService.checkin();
       if (mounted) {
         NovaMessage.success(context, '打卡成功！连续 ${result.streakDays} 天');
+        // 打卡成功后更新缓存并刷新UI
+        _checkinService.updateCacheAfterCheckin(result);
         await _loadUserStats();
       }
     } catch (e) {
@@ -179,7 +182,7 @@ class _ProfilePageState extends State<ProfilePage> {
         child: NovaRefreshableList(
           onRefresh: () async {
             await _loadUserInfo();
-            await _loadUserStats();
+            await _loadUserStats(forceRefresh: true);
           },
           slivers: [
             // 用户信息卡片
@@ -629,7 +632,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF2563EB).withOpacity(0.1),
+                      color: AppTheme.brand.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(100),
                     ),
                     child: Text(
@@ -637,7 +640,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       style: const TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w900,
-                        color: Color(0xFF2563EB),
+                        color: AppTheme.brand,
                       ),
                     ),
                   ),
@@ -659,12 +662,12 @@ class _ProfilePageState extends State<ProfilePage> {
               child: Container(
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
-                    colors: [Color(0xFF2563EB), Color(0xFF3B82F6)],
+                    colors: [AppTheme.brand, AppTheme.brand2],
                   ),
                   borderRadius: BorderRadius.circular(100),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFF2563EB).withOpacity(0.3),
+                      color: AppTheme.brand.withOpacity(0.3),
                       blurRadius: 8,
                       offset: const Offset(0, 4),
                     ),
@@ -943,7 +946,9 @@ class _ProfilePageState extends State<ProfilePage> {
         // TODO: 实现学习历史页面
         break;
       case 'bookmark':
-        // TODO: 实现我的收藏页面
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const MyFavouritesPage()),
+        );
         break;
       case 'download':
         // TODO: 实现离线下载页面

@@ -29,8 +29,8 @@ part 'chat_group.g.dart';
 /// * [createTime]
 /// * [updateTime]
 /// * [mute]
-/// * [full]
 /// * [delete]
+/// * [full]
 @BuiltValue()
 abstract class ChatGroup implements Built<ChatGroup, ChatGroupBuilder> {
   @BuiltValueField(wireName: r'id')
@@ -80,11 +80,11 @@ abstract class ChatGroup implements Built<ChatGroup, ChatGroupBuilder> {
   @BuiltValueField(wireName: r'mute')
   bool? get mute;
 
-  @BuiltValueField(wireName: r'full')
-  bool? get full;
-
   @BuiltValueField(wireName: r'delete')
   bool? get delete;
+
+  @BuiltValueField(wireName: r'full')
+  bool? get full;
 
   ChatGroup._();
 
@@ -214,17 +214,17 @@ class _$ChatGroupSerializer implements PrimitiveSerializer<ChatGroup> {
         specifiedType: const FullType(bool),
       );
     }
-    if (object.full != null) {
-      yield r'full';
-      yield serializers.serialize(
-        object.full,
-        specifiedType: const FullType(bool),
-      );
-    }
     if (object.delete != null) {
       yield r'delete';
       yield serializers.serialize(
         object.delete,
+        specifiedType: const FullType(bool),
+      );
+    }
+    if (object.full != null) {
+      yield r'full';
+      yield serializers.serialize(
+        object.full,
         specifiedType: const FullType(bool),
       );
     }
@@ -358,19 +358,19 @@ class _$ChatGroupSerializer implements PrimitiveSerializer<ChatGroup> {
           ) as bool;
           result.mute = valueDes;
           break;
-        case r'full':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(bool),
-          ) as bool;
-          result.full = valueDes;
-          break;
         case r'delete':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(bool),
           ) as bool;
           result.delete = valueDes;
+          break;
+        case r'full':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(bool),
+          ) as bool;
+          result.full = valueDes;
           break;
         default:
           unhandled.add(key);

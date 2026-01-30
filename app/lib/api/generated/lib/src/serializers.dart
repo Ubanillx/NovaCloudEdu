@@ -57,6 +57,8 @@ import 'package:nova_api/src/model/base_response_daily_word_response.dart';
 import 'package:nova_api/src/model/base_response_execution_result_response.dart';
 import 'package:nova_api/src/model/base_response_feedback_detail_response.dart';
 import 'package:nova_api/src/model/base_response_feedback_page_response.dart';
+import 'package:nova_api/src/model/base_response_follow_page_response.dart';
+import 'package:nova_api/src/model/base_response_follow_stats_response.dart';
 import 'package:nova_api/src/model/base_response_friend_page_response.dart';
 import 'package:nova_api/src/model/base_response_friend_request_page_response.dart';
 import 'package:nova_api/src/model/base_response_group_message_page_response.dart';
@@ -214,6 +216,9 @@ import 'package:nova_api/src/model/feedback_page_response.dart';
 import 'package:nova_api/src/model/feedback_reply_response.dart';
 import 'package:nova_api/src/model/feedback_response.dart';
 import 'package:nova_api/src/model/file_info_response.dart';
+import 'package:nova_api/src/model/follow_page_response.dart';
+import 'package:nova_api/src/model/follow_stats_response.dart';
+import 'package:nova_api/src/model/follow_user_response.dart';
 import 'package:nova_api/src/model/friend_list_request_dto.dart';
 import 'package:nova_api/src/model/friend_page_response.dart';
 import 'package:nova_api/src/model/friend_request_list_dto.dart';
@@ -379,6 +384,8 @@ part 'serializers.g.dart';
   BaseResponseExecutionResultResponse,
   BaseResponseFeedbackDetailResponse,
   BaseResponseFeedbackPageResponse,
+  BaseResponseFollowPageResponse,
+  BaseResponseFollowStatsResponse,
   BaseResponseFriendPageResponse,
   BaseResponseFriendRequestPageResponse,
   BaseResponseGroupMessagePageResponse,
@@ -536,6 +543,9 @@ part 'serializers.g.dart';
   FeedbackReplyResponse,
   FeedbackResponse,
   FileInfoResponse,
+  FollowPageResponse,
+  FollowStatsResponse,
+  FollowUserResponse,
   FriendListRequestDTO,
   FriendPageResponse,
   FriendRequestListDTO,

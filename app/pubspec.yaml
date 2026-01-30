@@ -62,6 +62,9 @@ dependencies:
   # SQLite 本地数据库
   sqflite: ^2.3.0
   path: ^1.8.3
+  
+  # Markdown 渲染
+  markdown_widget: ^2.3.2+6
 
 dev_dependencies:
   flutter_test:

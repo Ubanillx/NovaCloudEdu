@@ -49,29 +49,34 @@ class _CoursePageState extends State<CoursePage> {
   // 头部
   Widget _buildHeader() {
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(20, 16, 8, 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Row(
-            children: [
-              Icon(Icons.menu_book, color: Color(0xFF1989FA), size: 24),
-              SizedBox(width: 8),
-              Text(
-                '课程',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-            ],
+          const Text(
+            '课程中心',
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 0.5,
+            ),
           ),
           Row(
             children: [
               IconButton(
-                onPressed: () {},
-                icon: const Icon(Icons.calendar_today_outlined, size: 22),
+                onPressed: () {
+                  // TODO: 跳转到电子书页面
+                },
+                icon: const Icon(Icons.menu_book_rounded, color: AppTheme.brand, size: 24),
+                tooltip: '电子书',
               ),
               IconButton(
                 onPressed: () {},
-                icon: const Icon(Icons.checklist, size: 22),
+                icon: const Icon(Icons.calendar_today_outlined, size: 20),
+              ),
+              IconButton(
+                onPressed: () {},
+                icon: const Icon(Icons.checklist_rounded, size: 22),
               ),
             ],
           ),
@@ -83,39 +88,32 @@ class _CoursePageState extends State<CoursePage> {
   // 分类标签
   Widget _buildCategories() {
     return Container(
-      height: 44,
-      margin: const EdgeInsets.symmetric(horizontal: 16),
+      height: 40,
+      margin: const EdgeInsets.symmetric(vertical: 8),
       child: ListView.separated(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
         scrollDirection: Axis.horizontal,
         itemCount: MockData.categories.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 12),
+        separatorBuilder: (_, __) => const SizedBox(width: 10),
         itemBuilder: (context, index) {
           final category = MockData.categories[index];
           final isSelected = _selectedCategory == index;
           return GestureDetector(
             onTap: () => setState(() => _selectedCategory = index),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
               decoration: BoxDecoration(
-                color: isSelected ? const Color(0xFF1989FA) : Colors.white,
+                color: isSelected ? AppTheme.brand : Colors.grey[100],
                 borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
               ),
               child: Center(
                 child: Text(
                   category.name,
                   style: TextStyle(
                     fontSize: 14,
-                    fontWeight: isSelected
-                        ? FontWeight.w600
-                        : FontWeight.normal,
-                    color: isSelected ? Colors.white : Colors.black87,
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                    color: isSelected ? Colors.white : Colors.black54,
                   ),
                 ),
               ),
@@ -204,7 +202,7 @@ class _CoursePageState extends State<CoursePage> {
               return ListTile(
                 title: Text(_gradeOptions[index]),
                 trailing: _selectedGrade == index
-                    ? const Icon(Icons.check, color: Color(0xFF1989FA))
+                    ? const Icon(Icons.check, color: AppTheme.brand)
                     : null,
                 onTap: () {
                   setState(() => _selectedGrade = index);
@@ -223,15 +221,15 @@ class _CoursePageState extends State<CoursePage> {
     return GestureDetector(
       onTap: () => _showCourseDetail(course),
       child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
+        margin: const EdgeInsets.only(bottom: 16),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
             ),
           ],
         ),
@@ -239,111 +237,104 @@ class _CoursePageState extends State<CoursePage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // 封面图
-            ClipRRect(
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(12),
-              ),
-              child: Image.network(
-                course.cover,
-                width: double.infinity,
-                height: 140,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => Container(
-                  width: double.infinity,
-                  height: 140,
-                  color: Colors.grey[200],
-                  child: const Icon(Icons.image, size: 40, color: Colors.grey),
+            Stack(
+              children: [
+                ClipRRect(
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(16),
+                  ),
+                  child: Image.network(
+                    course.cover,
+                    width: double.infinity,
+                    height: 160,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => Container(
+                      width: double.infinity,
+                      height: 160,
+                      color: Colors.grey[100],
+                      child: Icon(Icons.image_outlined, size: 40, color: Colors.grey[300]),
+                    ),
+                  ),
                 ),
-              ),
+                if (course.grade != null)
+                  Positioned(
+                    top: 12,
+                    left: 12,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.6),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        course.grade!,
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
             ),
             // 课程信息
             Padding(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     course.title,
                     style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
+                      fontSize: 17,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF333333),
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 6),
                   Text(
                     course.brief,
-                    style: const TextStyle(fontSize: 13, color: Colors.grey),
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Colors.grey[600],
+                      height: 1.4,
+                    ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 12),
                   Row(
                     children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 3,
-                        ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF1989FA).withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          course.tag,
-                          style: const TextStyle(
-                            fontSize: 11,
-                            color: Color(0xFF1989FA),
-                          ),
-                        ),
-                      ),
-                      if (course.grade != null) ...[
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 3,
-                          ),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF07C160).withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Text(
-                            course.grade!,
-                            style: const TextStyle(
-                              fontSize: 11,
-                              color: Color(0xFF07C160),
-                            ),
-                          ),
-                        ),
-                      ],
+                      _buildCourseTag(course.tag, AppTheme.brand),
                       const Spacer(),
-                      const Icon(
-                        Icons.access_time,
+                      Icon(
+                        Icons.access_time_rounded,
                         size: 14,
-                        color: Colors.grey,
+                        color: Colors.grey[400],
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        '${course.duration}分钟',
-                        style: const TextStyle(
+                        '${course.duration}min',
+                        style: TextStyle(
                           fontSize: 12,
-                          color: Colors.grey,
+                          color: Colors.grey[500],
                         ),
                       ),
                       const SizedBox(width: 12),
-                      const Icon(
-                        Icons.people_outline,
+                      Icon(
+                        Icons.person_outline_rounded,
                         size: 14,
-                        color: Colors.grey,
+                        color: Colors.grey[400],
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        '${course.studentsCount}人',
-                        style: const TextStyle(
+                        '${course.studentsCount}',
+                        style: TextStyle(
                           fontSize: 12,
-                          color: Colors.grey,
+                          color: Colors.grey[500],
                         ),
                       ),
                     ],
@@ -352,6 +343,24 @@ class _CoursePageState extends State<CoursePage> {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCourseTag(String text, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: 11,
+          color: color,
+          fontWeight: FontWeight.w500,
         ),
       ),
     );
@@ -404,7 +413,7 @@ class _CoursePageState extends State<CoursePage> {
               // 标签
               Row(
                 children: [
-                  _buildDetailTag(course.tag, const Color(0xFF1989FA)),
+                  _buildDetailTag(course.tag, AppTheme.brand),
                   if (course.grade != null) ...[
                     const SizedBox(width: 8),
                     _buildDetailTag(course.grade!, const Color(0xFF07C160)),
@@ -423,7 +432,7 @@ class _CoursePageState extends State<CoursePage> {
                     Navigator.pop(context);
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF1989FA),
+                    backgroundColor: AppTheme.brand,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(24),
                     ),

@@ -83,6 +83,7 @@ Method | HTTP request | Description
 [**execute**](DefaultApi.md#execute) | **POST** /api/workflows/{id}/execute | 执行工作流
 [**executeAsync**](DefaultApi.md#executeasync) | **POST** /api/workflows/{id}/execute-async | 异步执行工作流
 [**favouriteCourse**](DefaultApi.md#favouritecourse) | **POST** /api/course/favourite/{courseId} | 收藏课程
+[**follow**](DefaultApi.md#follow) | **POST** /api/follow/{targetUserId} | 关注用户
 [**getAllFriends**](DefaultApi.md#getallfriends) | **GET** /api/friend/all | 获取全部好友
 [**getAnnouncement**](DefaultApi.md#getannouncement) | **GET** /api/announcement/admin/{id} | 获取公告详情
 [**getAnnouncementDetail**](DefaultApi.md#getannouncementdetail) | **GET** /api/announcement/{id} | 获取公告详情
@@ -119,6 +120,7 @@ Method | HTTP request | Description
 [**getFeedbackReplies**](DefaultApi.md#getfeedbackreplies) | **GET** /api/feedback/{id}/replies | 获取反馈回复列表
 [**getFeedbackReplies1**](DefaultApi.md#getfeedbackreplies1) | **GET** /api/feedback/admin/{id}/replies | 获取反馈回复列表
 [**getFilesByBusinessType**](DefaultApi.md#getfilesbybusinesstype) | **GET** /api/file/business-type/{businessType} | 按业务类型获取文件列表（管理员）
+[**getFollowingPosts**](DefaultApi.md#getfollowingposts) | **GET** /api/posts/following | 获取关注用户的帖子列表
 [**getFriendList**](DefaultApi.md#getfriendlist) | **POST** /api/friend/list | 获取好友列表
 [**getGroupInfo**](DefaultApi.md#getgroupinfo) | **GET** /api/groups/{groupId} | 获取群详情
 [**getGroupMembers**](DefaultApi.md#getgroupmembers) | **GET** /api/groups/{groupId}/members | 获取群成员列表
@@ -133,6 +135,9 @@ Method | HTTP request | Description
 [**getMyFavourites1**](DefaultApi.md#getmyfavourites1) | **GET** /api/course/favourite/my | 获取我的收藏列表
 [**getMyFeedbacks**](DefaultApi.md#getmyfeedbacks) | **GET** /api/feedback/my | 获取我的反馈列表
 [**getMyFiles**](DefaultApi.md#getmyfiles) | **GET** /api/file/my | 获取我的文件列表
+[**getMyFollowStats**](DefaultApi.md#getmyfollowstats) | **GET** /api/follow/stats | 获取我的关注统计
+[**getMyFollowers**](DefaultApi.md#getmyfollowers) | **GET** /api/follow/followers | 获取我的粉丝列表
+[**getMyFollowings**](DefaultApi.md#getmyfollowings) | **GET** /api/follow/followings | 获取我的关注列表
 [**getMyGroups**](DefaultApi.md#getmygroups) | **GET** /api/groups/my | 获取我加入的群列表
 [**getMyOrders**](DefaultApi.md#getmyorders) | **GET** /api/order/my | 获取我的订单列表
 [**getMyPosts**](DefaultApi.md#getmyposts) | **GET** /api/posts/my | 获取我的帖子列表
@@ -168,11 +173,16 @@ Method | HTTP request | Description
 [**getTeacherByUserId**](DefaultApi.md#getteacherbyuserid) | **GET** /api/teacher/user/{userId} | 根据用户ID获取讲师信息
 [**getTodayArticles**](DefaultApi.md#gettodayarticles) | **GET** /api/daily-article/today | 获取今日推荐文章（个性化推荐）
 [**getTodayWords**](DefaultApi.md#gettodaywords) | **GET** /api/daily-word/today | 获取今日推荐单词（个性化推荐）
+[**getTopPosts**](DefaultApi.md#gettopposts) | **GET** /api/posts/top | 获取点赞排行榜（全部时间）
+[**getTopPostsByDays**](DefaultApi.md#gettoppostsbydays) | **GET** /api/posts/top/days | 获取点赞排行榜（指定天数内）
 [**getUnreadCount**](DefaultApi.md#getunreadcount) | **GET** /api/group-chat/{groupId}/unread/count | 获取群未读消息数
 [**getUnreadCount1**](DefaultApi.md#getunreadcount1) | **GET** /api/chat/unread/count | 获取未读消息数
 [**getUnreadCount2**](DefaultApi.md#getunreadcount2) | **GET** /api/announcement/unread-count | 获取未读公告数量
 [**getUserDetail**](DefaultApi.md#getuserdetail) | **GET** /api/user/admin/{id} | 获取用户详情
 [**getUserDetailInfo**](DefaultApi.md#getuserdetailinfo) | **GET** /api/user/detail/{id} | 获取用户详细信息
+[**getUserFollowStats**](DefaultApi.md#getuserfollowstats) | **GET** /api/follow/user/{targetUserId}/stats | 获取指定用户的关注统计
+[**getUserFollowers**](DefaultApi.md#getuserfollowers) | **GET** /api/follow/user/{targetUserId}/followers | 获取指定用户的粉丝列表
+[**getUserFollowings**](DefaultApi.md#getuserfollowings) | **GET** /api/follow/user/{targetUserId}/followings | 获取指定用户的关注列表
 [**getUserPosts**](DefaultApi.md#getuserposts) | **GET** /api/posts/user/{targetUserId} | 获取指定用户的帖子列表
 [**getUserPublicInfo**](DefaultApi.md#getuserpublicinfo) | **GET** /api/user/public/{id} | 获取用户公开信息
 [**getUserShelf**](DefaultApi.md#getusershelf) | **GET** /api/reading/shelf/{userId} | 获取用户书架
@@ -184,6 +194,7 @@ Method | HTTP request | Description
 [**handleJoinRequest**](DefaultApi.md#handlejoinrequest) | **POST** /api/groups/requests/{requestId}/handle | 处理加入申请
 [**health**](DefaultApi.md#health) | **GET** /api/health | 健康检查
 [**inviteMember**](DefaultApi.md#invitemember) | **POST** /api/groups/{groupId}/invite | 邀请用户加入群
+[**isFollowing**](DefaultApi.md#isfollowing) | **GET** /api/follow/check/{targetUserId} | 检查是否已关注
 [**leaveGroup**](DefaultApi.md#leavegroup) | **POST** /api/groups/{groupId}/leave | 退出群
 [**listApplications**](DefaultApi.md#listapplications) | **GET** /api/teacher/application/list | 获取申请列表（管理员）
 [**listArticles**](DefaultApi.md#listarticles) | **GET** /api/daily-article/list | 获取文章列表
@@ -248,10 +259,12 @@ Method | HTTP request | Description
 [**toggleCollect**](DefaultApi.md#togglecollect) | **POST** /api/user/daily-word/{wordId}/collect | 收藏/取消收藏单词
 [**toggleCollect1**](DefaultApi.md#togglecollect1) | **POST** /api/user/daily-article/{articleId}/collect | 收藏/取消收藏文章
 [**toggleFavour**](DefaultApi.md#togglefavour) | **POST** /api/posts/{postId}/favour | 收藏/取消收藏帖子
+[**toggleFollow**](DefaultApi.md#togglefollow) | **POST** /api/follow/{targetUserId}/toggle | 切换关注状态
 [**toggleLike**](DefaultApi.md#togglelike) | **POST** /api/user/daily-article/{articleId}/like | 点赞/取消点赞文章
 [**toggleThumb**](DefaultApi.md#togglethumb) | **POST** /api/posts/{postId}/thumb | 点赞/取消点赞帖子
 [**transferOwnership**](DefaultApi.md#transferownership) | **POST** /api/groups/{groupId}/transfer | 转让群主
 [**unfavouriteCourse**](DefaultApi.md#unfavouritecourse) | **DELETE** /api/course/favourite/{courseId} | 取消收藏
+[**unfollow**](DefaultApi.md#unfollow) | **DELETE** /api/follow/{targetUserId} | 取消关注
 [**update**](DefaultApi.md#update) | **PUT** /api/workflows/{id} | 更新工作流基本信息
 [**update1**](DefaultApi.md#update1) | **PUT** /api/ai/knowledge-bases/{id} | 更新知识库
 [**updateAnnouncement**](DefaultApi.md#updateannouncement) | **PUT** /api/announcement/admin/update | 更新公告
@@ -3412,6 +3425,47 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **follow**
+> BaseResponseVoid follow(targetUserId)
+
+关注用户
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int targetUserId = 789; // int | 
+
+try {
+    final response = api.follow(targetUserId);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->follow: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **targetUserId** | **int**|  | 
+
+### Return type
+
+[**BaseResponseVoid**](BaseResponseVoid.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **getAllFriends**
 > BaseResponseListFriendResponse getAllFriends()
 
@@ -4924,6 +4978,49 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **getFollowingPosts**
+> BaseResponsePostPageResponse getFollowingPosts(pageNum, pageSize)
+
+获取关注用户的帖子列表
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int pageNum = 56; // int | 
+final int pageSize = 56; // int | 
+
+try {
+    final response = api.getFollowingPosts(pageNum, pageSize);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getFollowingPosts: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **pageNum** | **int**|  | [optional] [default to 1]
+ **pageSize** | **int**|  | [optional] [default to 10]
+
+### Return type
+
+[**BaseResponsePostPageResponse**](BaseResponsePostPageResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **getFriendList**
 > BaseResponseFriendPageResponse getFriendList(friendListRequestDTO)
 
@@ -5508,6 +5605,129 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**BaseResponseListFileInfoResponse**](BaseResponseListFileInfoResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getMyFollowStats**
+> BaseResponseFollowStatsResponse getMyFollowStats()
+
+获取我的关注统计
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+
+try {
+    final response = api.getMyFollowStats();
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getMyFollowStats: $e\n');
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**BaseResponseFollowStatsResponse**](BaseResponseFollowStatsResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getMyFollowers**
+> BaseResponseFollowPageResponse getMyFollowers(pageNum, pageSize)
+
+获取我的粉丝列表
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int pageNum = 56; // int | 
+final int pageSize = 56; // int | 
+
+try {
+    final response = api.getMyFollowers(pageNum, pageSize);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getMyFollowers: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **pageNum** | **int**|  | [optional] [default to 1]
+ **pageSize** | **int**|  | [optional] [default to 10]
+
+### Return type
+
+[**BaseResponseFollowPageResponse**](BaseResponseFollowPageResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getMyFollowings**
+> BaseResponseFollowPageResponse getMyFollowings(pageNum, pageSize)
+
+获取我的关注列表
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int pageNum = 56; // int | 
+final int pageSize = 56; // int | 
+
+try {
+    final response = api.getMyFollowings(pageNum, pageSize);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getMyFollowings: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **pageNum** | **int**|  | [optional] [default to 1]
+ **pageSize** | **int**|  | [optional] [default to 10]
+
+### Return type
+
+[**BaseResponseFollowPageResponse**](BaseResponseFollowPageResponse.md)
 
 ### Authorization
 
@@ -6937,6 +7157,94 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **getTopPosts**
+> BaseResponsePostPageResponse getTopPosts(pageNum, pageSize)
+
+获取点赞排行榜（全部时间）
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int pageNum = 56; // int | 
+final int pageSize = 56; // int | 
+
+try {
+    final response = api.getTopPosts(pageNum, pageSize);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getTopPosts: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **pageNum** | **int**|  | [optional] [default to 1]
+ **pageSize** | **int**|  | [optional] [default to 10]
+
+### Return type
+
+[**BaseResponsePostPageResponse**](BaseResponsePostPageResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getTopPostsByDays**
+> BaseResponsePostPageResponse getTopPostsByDays(days, pageNum, pageSize)
+
+获取点赞排行榜（指定天数内）
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int days = 56; // int | 
+final int pageNum = 56; // int | 
+final int pageSize = 56; // int | 
+
+try {
+    final response = api.getTopPostsByDays(days, pageNum, pageSize);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getTopPostsByDays: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **days** | **int**|  | [optional] 
+ **pageNum** | **int**|  | [optional] [default to 1]
+ **pageSize** | **int**|  | [optional] [default to 10]
+
+### Return type
+
+[**BaseResponsePostPageResponse**](BaseResponsePostPageResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **getUnreadCount**
 > BaseResponseInteger getUnreadCount(groupId)
 
@@ -7130,6 +7438,137 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**BaseResponseUserDetailResponse**](BaseResponseUserDetailResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getUserFollowStats**
+> BaseResponseFollowStatsResponse getUserFollowStats(targetUserId)
+
+获取指定用户的关注统计
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int targetUserId = 789; // int | 
+
+try {
+    final response = api.getUserFollowStats(targetUserId);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getUserFollowStats: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **targetUserId** | **int**|  | 
+
+### Return type
+
+[**BaseResponseFollowStatsResponse**](BaseResponseFollowStatsResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getUserFollowers**
+> BaseResponseFollowPageResponse getUserFollowers(targetUserId, pageNum, pageSize)
+
+获取指定用户的粉丝列表
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int targetUserId = 789; // int | 
+final int pageNum = 56; // int | 
+final int pageSize = 56; // int | 
+
+try {
+    final response = api.getUserFollowers(targetUserId, pageNum, pageSize);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getUserFollowers: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **targetUserId** | **int**|  | 
+ **pageNum** | **int**|  | [optional] [default to 1]
+ **pageSize** | **int**|  | [optional] [default to 10]
+
+### Return type
+
+[**BaseResponseFollowPageResponse**](BaseResponseFollowPageResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getUserFollowings**
+> BaseResponseFollowPageResponse getUserFollowings(targetUserId, pageNum, pageSize)
+
+获取指定用户的关注列表
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int targetUserId = 789; // int | 
+final int pageNum = 56; // int | 
+final int pageSize = 56; // int | 
+
+try {
+    final response = api.getUserFollowings(targetUserId, pageNum, pageSize);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getUserFollowings: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **targetUserId** | **int**|  | 
+ **pageNum** | **int**|  | [optional] [default to 1]
+ **pageSize** | **int**|  | [optional] [default to 10]
+
+### Return type
+
+[**BaseResponseFollowPageResponse**](BaseResponseFollowPageResponse.md)
 
 ### Authorization
 
@@ -7593,6 +8032,47 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**BaseResponseVoid**](BaseResponseVoid.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **isFollowing**
+> BaseResponseBoolean isFollowing(targetUserId)
+
+检查是否已关注
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int targetUserId = 789; // int | 
+
+try {
+    final response = api.isFollowing(targetUserId);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->isFollowing: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **targetUserId** | **int**|  | 
+
+### Return type
+
+[**BaseResponseBoolean**](BaseResponseBoolean.md)
 
 ### Authorization
 
@@ -10373,6 +10853,47 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **toggleFollow**
+> BaseResponseBoolean toggleFollow(targetUserId)
+
+切换关注状态
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int targetUserId = 789; // int | 
+
+try {
+    final response = api.toggleFollow(targetUserId);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->toggleFollow: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **targetUserId** | **int**|  | 
+
+### Return type
+
+[**BaseResponseBoolean**](BaseResponseBoolean.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **toggleLike**
 > BaseResponseVoid toggleLike(articleId)
 
@@ -10523,6 +11044,47 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **courseId** | **int**| 课程ID | 
+
+### Return type
+
+[**BaseResponseVoid**](BaseResponseVoid.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **unfollow**
+> BaseResponseVoid unfollow(targetUserId)
+
+取消关注
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int targetUserId = 789; // int | 
+
+try {
+    final response = api.unfollow(targetUserId);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->unfollow: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **targetUserId** | **int**|  | 
 
 ### Return type
 

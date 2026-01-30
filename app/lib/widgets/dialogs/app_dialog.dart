@@ -12,29 +12,80 @@ Future<bool?> showConfirmDialog(
   String? content,
   String confirmText = '确定',
   String cancelText = '取消',
+  bool isDanger = false,
 }) {
-  return showGeneralDialog<bool>(
+  return showDialog<bool>(
     context: context,
-    barrierDismissible: true,
-    barrierLabel: '',
-    barrierColor: Colors.black54,
-    pageBuilder: (context, animation, secondaryAnimation) {
-      return Center(
-        child: TDAlertDialog(
-          title: title,
-          content: content,
-          leftBtn: TDDialogButtonOptions(
-            title: cancelText,
-            action: () => Navigator.of(context).pop(false),
-          ),
-          rightBtn: TDDialogButtonOptions(
-            title: confirmText,
-            theme: TDButtonTheme.primary,
-            action: () => Navigator.of(context).pop(true),
-          ),
+    builder: (context) => Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      backgroundColor: Colors.white,
+      surfaceTintColor: Colors.white,
+      child: Container(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Colors.black87,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            if (content != null) ...[
+              const SizedBox(height: 12),
+              Text(
+                content,
+                style: TextStyle(
+                  fontSize: 15,
+                  color: Colors.grey[600],
+                  height: 1.5,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+            const SizedBox(height: 24),
+            Row(
+              children: [
+                Expanded(
+                  child: TDButton(
+                    text: cancelText,
+                    theme: TDButtonTheme.light,
+                    size: TDButtonSize.large,
+                    style: TDButtonStyle(
+                      radius: BorderRadius.circular(8),
+                      backgroundColor: Colors.grey[100],
+                      textColor: Colors.grey[700],
+                    ),
+                    isBlock: true,
+                    onTap: () => Navigator.of(context).pop(false),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: TDButton(
+                    text: confirmText,
+                    theme: isDanger ? TDButtonTheme.danger : TDButtonTheme.primary,
+                    size: TDButtonSize.large,
+                    style: TDButtonStyle(
+                      radius: BorderRadius.circular(8),
+                      backgroundColor: isDanger ? Colors.red : null,
+                      textColor: isDanger ? Colors.white : null,
+                    ),
+                    isBlock: true,
+                    onTap: () => Navigator.of(context).pop(true),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
-      );
-    },
+      ),
+    ),
   );
 }
 

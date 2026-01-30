@@ -3,6 +3,10 @@ import '../../../core/network/api_client.dart';
 
 class CheckinService {
   final Dio _dio = ApiClient.instance.dio;
+  
+  // 缓存用户统计数据
+  static UserStats? _cachedUserStats;
+  static DateTime? _cacheTime;
 
   /// 用户打卡
   Future<CheckinResult> checkin() async {
@@ -14,13 +18,46 @@ class CheckinService {
     }
   }
 
-  /// 获取用户统计数据
-  Future<UserStats> getUserStats() async {
+  /// 获取用户统计数据（带缓存）
+  /// [forceRefresh] 为 true 时强制刷新，否则使用缓存
+  Future<UserStats> getUserStats({bool forceRefresh = false}) async {
+    // 如果不强制刷新且有缓存，直接返回缓存数据
+    if (!forceRefresh && _cachedUserStats != null) {
+      return _cachedUserStats!;
+    }
+    
     try {
       final response = await _dio.get('/api/user/stats');
-      return UserStats.fromJson(response.data['data']);
+      final stats = UserStats.fromJson(response.data['data']);
+      // 更新缓存
+      _cachedUserStats = stats;
+      _cacheTime = DateTime.now();
+      return stats;
     } catch (e) {
+      // 如果请求失败但有缓存，返回缓存数据
+      if (_cachedUserStats != null) {
+        return _cachedUserStats!;
+      }
       rethrow;
+    }
+  }
+  
+  /// 清除缓存
+  void clearCache() {
+    _cachedUserStats = null;
+    _cacheTime = null;
+  }
+  
+  /// 更新缓存中的打卡状态（打卡成功后调用）
+  void updateCacheAfterCheckin(CheckinResult result) {
+    if (_cachedUserStats != null) {
+      _cachedUserStats = UserStats(
+        registerDays: _cachedUserStats!.registerDays,
+        totalCheckinDays: result.totalCheckinDays,
+        currentStreak: result.streakDays,
+        checkedInToday: true,
+        totalLikes: _cachedUserStats!.totalLikes,
+      );
     }
   }
 
