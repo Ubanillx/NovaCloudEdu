@@ -24,11 +24,11 @@ part 'chat_group_member.g.dart';
 /// * [muteUntil]
 /// * [joinTime]
 /// * [updateTime]
-/// * [mute]
 /// * [adminOrOwner]
 /// * [owner]
 /// * [delete]
 /// * [muted]
+/// * [mute]
 @BuiltValue()
 abstract class ChatGroupMember
     implements Built<ChatGroupMember, ChatGroupMemberBuilder> {
@@ -64,9 +64,6 @@ abstract class ChatGroupMember
   @BuiltValueField(wireName: r'updateTime')
   DateTime? get updateTime;
 
-  @BuiltValueField(wireName: r'mute')
-  bool? get mute;
-
   @BuiltValueField(wireName: r'adminOrOwner')
   bool? get adminOrOwner;
 
@@ -78,6 +75,9 @@ abstract class ChatGroupMember
 
   @BuiltValueField(wireName: r'muted')
   bool? get muted;
+
+  @BuiltValueField(wireName: r'mute')
+  bool? get mute;
 
   ChatGroupMember._();
 
@@ -175,13 +175,6 @@ class _$ChatGroupMemberSerializer
         specifiedType: const FullType(DateTime),
       );
     }
-    if (object.mute != null) {
-      yield r'mute';
-      yield serializers.serialize(
-        object.mute,
-        specifiedType: const FullType(bool),
-      );
-    }
     if (object.adminOrOwner != null) {
       yield r'adminOrOwner';
       yield serializers.serialize(
@@ -207,6 +200,13 @@ class _$ChatGroupMemberSerializer
       yield r'muted';
       yield serializers.serialize(
         object.muted,
+        specifiedType: const FullType(bool),
+      );
+    }
+    if (object.mute != null) {
+      yield r'mute';
+      yield serializers.serialize(
+        object.mute,
         specifiedType: const FullType(bool),
       );
     }
@@ -305,13 +305,6 @@ class _$ChatGroupMemberSerializer
           ) as DateTime;
           result.updateTime = valueDes;
           break;
-        case r'mute':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(bool),
-          ) as bool;
-          result.mute = valueDes;
-          break;
         case r'adminOrOwner':
           final valueDes = serializers.deserialize(
             value,
@@ -339,6 +332,13 @@ class _$ChatGroupMemberSerializer
             specifiedType: const FullType(bool),
           ) as bool;
           result.muted = valueDes;
+          break;
+        case r'mute':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(bool),
+          ) as bool;
+          result.mute = valueDes;
           break;
         default:
           unhandled.add(key);

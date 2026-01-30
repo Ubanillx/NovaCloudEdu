@@ -6,7 +6,7 @@ class AppTheme {
   AppTheme._();
 
   // ==================== 品牌色 ====================
-  static const Color brand = Color(0xFF2563EB);
+  static const Color brand = Color(0xFF1989FA);
   static const Color brand2 = Color(0xFF3B82F6);
 
   // ==================== 亮色模式颜色 ====================

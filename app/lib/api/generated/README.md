@@ -139,6 +139,7 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**execute**](doc/DefaultApi.md#execute) | **POST** /api/workflows/{id}/execute | 执行工作流
 [*DefaultApi*](doc/DefaultApi.md) | [**executeAsync**](doc/DefaultApi.md#executeasync) | **POST** /api/workflows/{id}/execute-async | 异步执行工作流
 [*DefaultApi*](doc/DefaultApi.md) | [**favouriteCourse**](doc/DefaultApi.md#favouritecourse) | **POST** /api/course/favourite/{courseId} | 收藏课程
+[*DefaultApi*](doc/DefaultApi.md) | [**follow**](doc/DefaultApi.md#follow) | **POST** /api/follow/{targetUserId} | 关注用户
 [*DefaultApi*](doc/DefaultApi.md) | [**getAllFriends**](doc/DefaultApi.md#getallfriends) | **GET** /api/friend/all | 获取全部好友
 [*DefaultApi*](doc/DefaultApi.md) | [**getAnnouncement**](doc/DefaultApi.md#getannouncement) | **GET** /api/announcement/admin/{id} | 获取公告详情
 [*DefaultApi*](doc/DefaultApi.md) | [**getAnnouncementDetail**](doc/DefaultApi.md#getannouncementdetail) | **GET** /api/announcement/{id} | 获取公告详情
@@ -175,6 +176,7 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**getFeedbackReplies**](doc/DefaultApi.md#getfeedbackreplies) | **GET** /api/feedback/{id}/replies | 获取反馈回复列表
 [*DefaultApi*](doc/DefaultApi.md) | [**getFeedbackReplies1**](doc/DefaultApi.md#getfeedbackreplies1) | **GET** /api/feedback/admin/{id}/replies | 获取反馈回复列表
 [*DefaultApi*](doc/DefaultApi.md) | [**getFilesByBusinessType**](doc/DefaultApi.md#getfilesbybusinesstype) | **GET** /api/file/business-type/{businessType} | 按业务类型获取文件列表（管理员）
+[*DefaultApi*](doc/DefaultApi.md) | [**getFollowingPosts**](doc/DefaultApi.md#getfollowingposts) | **GET** /api/posts/following | 获取关注用户的帖子列表
 [*DefaultApi*](doc/DefaultApi.md) | [**getFriendList**](doc/DefaultApi.md#getfriendlist) | **POST** /api/friend/list | 获取好友列表
 [*DefaultApi*](doc/DefaultApi.md) | [**getGroupInfo**](doc/DefaultApi.md#getgroupinfo) | **GET** /api/groups/{groupId} | 获取群详情
 [*DefaultApi*](doc/DefaultApi.md) | [**getGroupMembers**](doc/DefaultApi.md#getgroupmembers) | **GET** /api/groups/{groupId}/members | 获取群成员列表
@@ -189,6 +191,9 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**getMyFavourites1**](doc/DefaultApi.md#getmyfavourites1) | **GET** /api/course/favourite/my | 获取我的收藏列表
 [*DefaultApi*](doc/DefaultApi.md) | [**getMyFeedbacks**](doc/DefaultApi.md#getmyfeedbacks) | **GET** /api/feedback/my | 获取我的反馈列表
 [*DefaultApi*](doc/DefaultApi.md) | [**getMyFiles**](doc/DefaultApi.md#getmyfiles) | **GET** /api/file/my | 获取我的文件列表
+[*DefaultApi*](doc/DefaultApi.md) | [**getMyFollowStats**](doc/DefaultApi.md#getmyfollowstats) | **GET** /api/follow/stats | 获取我的关注统计
+[*DefaultApi*](doc/DefaultApi.md) | [**getMyFollowers**](doc/DefaultApi.md#getmyfollowers) | **GET** /api/follow/followers | 获取我的粉丝列表
+[*DefaultApi*](doc/DefaultApi.md) | [**getMyFollowings**](doc/DefaultApi.md#getmyfollowings) | **GET** /api/follow/followings | 获取我的关注列表
 [*DefaultApi*](doc/DefaultApi.md) | [**getMyGroups**](doc/DefaultApi.md#getmygroups) | **GET** /api/groups/my | 获取我加入的群列表
 [*DefaultApi*](doc/DefaultApi.md) | [**getMyOrders**](doc/DefaultApi.md#getmyorders) | **GET** /api/order/my | 获取我的订单列表
 [*DefaultApi*](doc/DefaultApi.md) | [**getMyPosts**](doc/DefaultApi.md#getmyposts) | **GET** /api/posts/my | 获取我的帖子列表
@@ -224,11 +229,16 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**getTeacherByUserId**](doc/DefaultApi.md#getteacherbyuserid) | **GET** /api/teacher/user/{userId} | 根据用户ID获取讲师信息
 [*DefaultApi*](doc/DefaultApi.md) | [**getTodayArticles**](doc/DefaultApi.md#gettodayarticles) | **GET** /api/daily-article/today | 获取今日推荐文章（个性化推荐）
 [*DefaultApi*](doc/DefaultApi.md) | [**getTodayWords**](doc/DefaultApi.md#gettodaywords) | **GET** /api/daily-word/today | 获取今日推荐单词（个性化推荐）
+[*DefaultApi*](doc/DefaultApi.md) | [**getTopPosts**](doc/DefaultApi.md#gettopposts) | **GET** /api/posts/top | 获取点赞排行榜（全部时间）
+[*DefaultApi*](doc/DefaultApi.md) | [**getTopPostsByDays**](doc/DefaultApi.md#gettoppostsbydays) | **GET** /api/posts/top/days | 获取点赞排行榜（指定天数内）
 [*DefaultApi*](doc/DefaultApi.md) | [**getUnreadCount**](doc/DefaultApi.md#getunreadcount) | **GET** /api/group-chat/{groupId}/unread/count | 获取群未读消息数
 [*DefaultApi*](doc/DefaultApi.md) | [**getUnreadCount1**](doc/DefaultApi.md#getunreadcount1) | **GET** /api/chat/unread/count | 获取未读消息数
 [*DefaultApi*](doc/DefaultApi.md) | [**getUnreadCount2**](doc/DefaultApi.md#getunreadcount2) | **GET** /api/announcement/unread-count | 获取未读公告数量
 [*DefaultApi*](doc/DefaultApi.md) | [**getUserDetail**](doc/DefaultApi.md#getuserdetail) | **GET** /api/user/admin/{id} | 获取用户详情
 [*DefaultApi*](doc/DefaultApi.md) | [**getUserDetailInfo**](doc/DefaultApi.md#getuserdetailinfo) | **GET** /api/user/detail/{id} | 获取用户详细信息
+[*DefaultApi*](doc/DefaultApi.md) | [**getUserFollowStats**](doc/DefaultApi.md#getuserfollowstats) | **GET** /api/follow/user/{targetUserId}/stats | 获取指定用户的关注统计
+[*DefaultApi*](doc/DefaultApi.md) | [**getUserFollowers**](doc/DefaultApi.md#getuserfollowers) | **GET** /api/follow/user/{targetUserId}/followers | 获取指定用户的粉丝列表
+[*DefaultApi*](doc/DefaultApi.md) | [**getUserFollowings**](doc/DefaultApi.md#getuserfollowings) | **GET** /api/follow/user/{targetUserId}/followings | 获取指定用户的关注列表
 [*DefaultApi*](doc/DefaultApi.md) | [**getUserPosts**](doc/DefaultApi.md#getuserposts) | **GET** /api/posts/user/{targetUserId} | 获取指定用户的帖子列表
 [*DefaultApi*](doc/DefaultApi.md) | [**getUserPublicInfo**](doc/DefaultApi.md#getuserpublicinfo) | **GET** /api/user/public/{id} | 获取用户公开信息
 [*DefaultApi*](doc/DefaultApi.md) | [**getUserShelf**](doc/DefaultApi.md#getusershelf) | **GET** /api/reading/shelf/{userId} | 获取用户书架
@@ -240,6 +250,7 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**handleJoinRequest**](doc/DefaultApi.md#handlejoinrequest) | **POST** /api/groups/requests/{requestId}/handle | 处理加入申请
 [*DefaultApi*](doc/DefaultApi.md) | [**health**](doc/DefaultApi.md#health) | **GET** /api/health | 健康检查
 [*DefaultApi*](doc/DefaultApi.md) | [**inviteMember**](doc/DefaultApi.md#invitemember) | **POST** /api/groups/{groupId}/invite | 邀请用户加入群
+[*DefaultApi*](doc/DefaultApi.md) | [**isFollowing**](doc/DefaultApi.md#isfollowing) | **GET** /api/follow/check/{targetUserId} | 检查是否已关注
 [*DefaultApi*](doc/DefaultApi.md) | [**leaveGroup**](doc/DefaultApi.md#leavegroup) | **POST** /api/groups/{groupId}/leave | 退出群
 [*DefaultApi*](doc/DefaultApi.md) | [**listApplications**](doc/DefaultApi.md#listapplications) | **GET** /api/teacher/application/list | 获取申请列表（管理员）
 [*DefaultApi*](doc/DefaultApi.md) | [**listArticles**](doc/DefaultApi.md#listarticles) | **GET** /api/daily-article/list | 获取文章列表
@@ -304,10 +315,12 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**toggleCollect**](doc/DefaultApi.md#togglecollect) | **POST** /api/user/daily-word/{wordId}/collect | 收藏/取消收藏单词
 [*DefaultApi*](doc/DefaultApi.md) | [**toggleCollect1**](doc/DefaultApi.md#togglecollect1) | **POST** /api/user/daily-article/{articleId}/collect | 收藏/取消收藏文章
 [*DefaultApi*](doc/DefaultApi.md) | [**toggleFavour**](doc/DefaultApi.md#togglefavour) | **POST** /api/posts/{postId}/favour | 收藏/取消收藏帖子
+[*DefaultApi*](doc/DefaultApi.md) | [**toggleFollow**](doc/DefaultApi.md#togglefollow) | **POST** /api/follow/{targetUserId}/toggle | 切换关注状态
 [*DefaultApi*](doc/DefaultApi.md) | [**toggleLike**](doc/DefaultApi.md#togglelike) | **POST** /api/user/daily-article/{articleId}/like | 点赞/取消点赞文章
 [*DefaultApi*](doc/DefaultApi.md) | [**toggleThumb**](doc/DefaultApi.md#togglethumb) | **POST** /api/posts/{postId}/thumb | 点赞/取消点赞帖子
 [*DefaultApi*](doc/DefaultApi.md) | [**transferOwnership**](doc/DefaultApi.md#transferownership) | **POST** /api/groups/{groupId}/transfer | 转让群主
 [*DefaultApi*](doc/DefaultApi.md) | [**unfavouriteCourse**](doc/DefaultApi.md#unfavouritecourse) | **DELETE** /api/course/favourite/{courseId} | 取消收藏
+[*DefaultApi*](doc/DefaultApi.md) | [**unfollow**](doc/DefaultApi.md#unfollow) | **DELETE** /api/follow/{targetUserId} | 取消关注
 [*DefaultApi*](doc/DefaultApi.md) | [**update**](doc/DefaultApi.md#update) | **PUT** /api/workflows/{id} | 更新工作流基本信息
 [*DefaultApi*](doc/DefaultApi.md) | [**update1**](doc/DefaultApi.md#update1) | **PUT** /api/ai/knowledge-bases/{id} | 更新知识库
 [*DefaultApi*](doc/DefaultApi.md) | [**updateAnnouncement**](doc/DefaultApi.md#updateannouncement) | **PUT** /api/announcement/admin/update | 更新公告
@@ -421,6 +434,8 @@ Class | Method | HTTP request | Description
  - [BaseResponseExecutionResultResponse](doc/BaseResponseExecutionResultResponse.md)
  - [BaseResponseFeedbackDetailResponse](doc/BaseResponseFeedbackDetailResponse.md)
  - [BaseResponseFeedbackPageResponse](doc/BaseResponseFeedbackPageResponse.md)
+ - [BaseResponseFollowPageResponse](doc/BaseResponseFollowPageResponse.md)
+ - [BaseResponseFollowStatsResponse](doc/BaseResponseFollowStatsResponse.md)
  - [BaseResponseFriendPageResponse](doc/BaseResponseFriendPageResponse.md)
  - [BaseResponseFriendRequestPageResponse](doc/BaseResponseFriendRequestPageResponse.md)
  - [BaseResponseGroupMessagePageResponse](doc/BaseResponseGroupMessagePageResponse.md)
@@ -578,6 +593,9 @@ Class | Method | HTTP request | Description
  - [FeedbackReplyResponse](doc/FeedbackReplyResponse.md)
  - [FeedbackResponse](doc/FeedbackResponse.md)
  - [FileInfoResponse](doc/FileInfoResponse.md)
+ - [FollowPageResponse](doc/FollowPageResponse.md)
+ - [FollowStatsResponse](doc/FollowStatsResponse.md)
+ - [FollowUserResponse](doc/FollowUserResponse.md)
  - [FriendListRequestDTO](doc/FriendListRequestDTO.md)
  - [FriendPageResponse](doc/FriendPageResponse.md)
  - [FriendRequestListDTO](doc/FriendRequestListDTO.md)

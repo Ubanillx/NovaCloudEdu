@@ -54,6 +54,8 @@ Serializers _$serializers =
           ..add(BaseResponseExecutionResultResponse.serializer)
           ..add(BaseResponseFeedbackDetailResponse.serializer)
           ..add(BaseResponseFeedbackPageResponse.serializer)
+          ..add(BaseResponseFollowPageResponse.serializer)
+          ..add(BaseResponseFollowStatsResponse.serializer)
           ..add(BaseResponseFriendPageResponse.serializer)
           ..add(BaseResponseFriendRequestPageResponse.serializer)
           ..add(BaseResponseGroupMessagePageResponse.serializer)
@@ -222,6 +224,9 @@ Serializers _$serializers =
           ..add(FeedbackReplyResponse.serializer)
           ..add(FeedbackResponse.serializer)
           ..add(FileInfoResponse.serializer)
+          ..add(FollowPageResponse.serializer)
+          ..add(FollowStatsResponse.serializer)
+          ..add(FollowUserResponse.serializer)
           ..add(FriendListRequestDTO.serializer)
           ..add(FriendPageResponse.serializer)
           ..add(FriendRequestListDTO.serializer)
@@ -525,6 +530,12 @@ Serializers _$serializers =
           ..addBuilderFactory(
             const FullType(BuiltList, const [const FullType(FileInfoResponse)]),
             () => ListBuilder<FileInfoResponse>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [
+              const FullType(FollowUserResponse),
+            ]),
+            () => ListBuilder<FollowUserResponse>(),
           )
           ..addBuilderFactory(
             const FullType(BuiltList, const [

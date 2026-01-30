@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:nova_api/nova_api.dart';
 import 'package:tdesign_flutter/tdesign_flutter.dart';
 
 // 主题配置
@@ -15,6 +16,11 @@ import 'features/chat/pages/chat_page.dart';
 import 'features/profile/pages/profile_page.dart';
 import 'features/auth/pages/login_page.dart';
 import 'features/auth/services/auth_service.dart';
+
+// 圈子相关页面
+import 'features/circle/pages/post_edit_page.dart';
+import 'features/circle/pages/user_posts_page.dart';
+import 'features/circle/pages/user_profile_page.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -55,14 +61,61 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: '智云星课',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      themeMode: _themeProvider.currentThemeMode,
-      home: const SplashPage(),
+    // 自定义 TDesign 主题颜色
+    final customTDTheme = TDThemeData.defaultData().copyWithTDThemeData(
+      'custom',
+      colorMap: {
+        'brandColor7': AppTheme.brand,
+        'brandNormalColor': AppTheme.brand,
+        'brandHoverColor': AppTheme.brand,
+        'brandFocusColor': AppTheme.brand,
+        'brandClickColor': AppTheme.brand,
+      },
     );
+
+    return TDTheme(
+      data: customTDTheme,
+      child: MaterialApp(
+        title: '智云星课',
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.lightTheme,
+        darkTheme: AppTheme.darkTheme,
+        themeMode: _themeProvider.currentThemeMode,
+        home: const SplashPage(),
+        onGenerateRoute: _onGenerateRoute,
+      ),
+    );
+  }
+
+  Route<dynamic>? _onGenerateRoute(RouteSettings settings) {
+    switch (settings.name) {
+      case '/circle/edit':
+        final args = settings.arguments as Map<String, dynamic>?;
+        return MaterialPageRoute(
+          builder: (context) => PostEditPage(
+            postId: args?['postId'] as int?,
+            post: args?['post'] as PostDetailResponse?,
+          ),
+        );
+      case '/circle/user-posts':
+        final args = settings.arguments as Map<String, dynamic>;
+        return MaterialPageRoute(
+          builder: (context) => UserPostsPage(
+            userId: args['userId'] as int,
+            userName: args['userName'] as String?,
+          ),
+        );
+      case '/circle/user-profile':
+        final args = settings.arguments as Map<String, dynamic>;
+        return MaterialPageRoute(
+          builder: (context) => UserProfilePage(
+            userId: args['userId'] as int,
+            initialUserInfo: args['userInfo'] as UserPublicResponse?,
+          ),
+        );
+      default:
+        return null;
+    }
   }
 }
 
@@ -142,8 +195,8 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    const brand = Color(0xFF2563EB);
-    const brand2 = Color(0xFF3B82F6);
+    const brand = AppTheme.brand;
+    const brand2 = AppTheme.brand2;
 
     return Scaffold(
       backgroundColor: colors.background,

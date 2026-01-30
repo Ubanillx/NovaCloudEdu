@@ -45,6 +45,8 @@ doc/BaseResponseDailyWordResponse.md
 doc/BaseResponseExecutionResultResponse.md
 doc/BaseResponseFeedbackDetailResponse.md
 doc/BaseResponseFeedbackPageResponse.md
+doc/BaseResponseFollowPageResponse.md
+doc/BaseResponseFollowStatsResponse.md
 doc/BaseResponseFriendPageResponse.md
 doc/BaseResponseFriendRequestPageResponse.md
 doc/BaseResponseGroupMessagePageResponse.md
@@ -203,6 +205,9 @@ doc/FeedbackPageResponse.md
 doc/FeedbackReplyResponse.md
 doc/FeedbackResponse.md
 doc/FileInfoResponse.md
+doc/FollowPageResponse.md
+doc/FollowStatsResponse.md
+doc/FollowUserResponse.md
 doc/FriendListRequestDTO.md
 doc/FriendPageResponse.md
 doc/FriendRequestListDTO.md
@@ -377,6 +382,8 @@ lib/src/model/base_response_daily_word_response.dart
 lib/src/model/base_response_execution_result_response.dart
 lib/src/model/base_response_feedback_detail_response.dart
 lib/src/model/base_response_feedback_page_response.dart
+lib/src/model/base_response_follow_page_response.dart
+lib/src/model/base_response_follow_stats_response.dart
 lib/src/model/base_response_friend_page_response.dart
 lib/src/model/base_response_friend_request_page_response.dart
 lib/src/model/base_response_group_message_page_response.dart
@@ -535,6 +542,9 @@ lib/src/model/feedback_page_response.dart
 lib/src/model/feedback_reply_response.dart
 lib/src/model/feedback_response.dart
 lib/src/model/file_info_response.dart
+lib/src/model/follow_page_response.dart
+lib/src/model/follow_stats_response.dart
+lib/src/model/follow_user_response.dart
 lib/src/model/friend_list_request_dto.dart
 lib/src/model/friend_page_response.dart
 lib/src/model/friend_request_list_dto.dart
@@ -655,11 +665,8 @@ lib/src/model/workflow_validation_response.dart
 lib/src/model/workflow_variable_response.dart
 lib/src/serializers.dart
 pubspec.yaml
-test/base_response_checkin_result_test.dart
-test/base_response_checkin_status_result_test.dart
-test/base_response_list_checkin_ranking_item_test.dart
-test/base_response_user_stats_result_test.dart
-test/checkin_ranking_item_test.dart
-test/checkin_result_test.dart
-test/checkin_status_result_test.dart
-test/user_stats_result_test.dart
+test/base_response_follow_page_response_test.dart
+test/base_response_follow_stats_response_test.dart
+test/follow_page_response_test.dart
+test/follow_stats_response_test.dart
+test/follow_user_response_test.dart

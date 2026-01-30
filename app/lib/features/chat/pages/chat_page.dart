@@ -21,6 +21,9 @@ class _ChatPageState extends State<ChatPage>
   void initState() {
     super.initState();
     _tabController = TabController(length: _tabs.length, vsync: this);
+    _tabController.addListener(() {
+      setState(() {});
+    });
   }
 
   @override
@@ -57,7 +60,7 @@ class _ChatPageState extends State<ChatPage>
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
-        backgroundColor: const Color(0xFF1989FA),
+        backgroundColor: AppTheme.brand,
         child: const Icon(Icons.add, color: Colors.white),
       ),
     );
@@ -66,23 +69,17 @@ class _ChatPageState extends State<ChatPage>
   // 头部
   Widget _buildHeader() {
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(20, 16, 8, 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Row(
-            children: [
-              Icon(
-                Icons.chat_bubble_outline,
-                color: Color(0xFF1989FA),
-                size: 24,
-              ),
-              SizedBox(width: 8),
-              Text(
-                '聊天',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-            ],
+          const Text(
+            '消息',
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 0.5,
+            ),
           ),
           Row(
             children: [
@@ -90,7 +87,7 @@ class _ChatPageState extends State<ChatPage>
                 children: [
                   IconButton(
                     onPressed: () {},
-                    icon: const Icon(Icons.person_add_outlined, size: 22),
+                    icon: const Icon(Icons.person_add_outlined, size: 24),
                   ),
                   Positioned(
                     right: 8,
@@ -108,7 +105,7 @@ class _ChatPageState extends State<ChatPage>
               ),
               IconButton(
                 onPressed: () {},
-                icon: const Icon(Icons.search, size: 22),
+                icon: const Icon(Icons.search_rounded, size: 24),
               ),
             ],
           ),
@@ -120,19 +117,37 @@ class _ChatPageState extends State<ChatPage>
   // 导航标签
   Widget _buildTabBar() {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: Color(0xFFEBEDF0), width: 1)),
-      ),
-      child: TabBar(
-        controller: _tabController,
-        labelColor: const Color(0xFF1989FA),
-        unselectedLabelColor: const Color(0xFF969799),
-        labelStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-        unselectedLabelStyle: const TextStyle(fontSize: 14),
-        indicatorColor: const Color(0xFF1989FA),
-        indicatorSize: TabBarIndicatorSize.label,
-        tabs: _tabs.map((tab) => Tab(text: tab)).toList(),
+      height: 40,
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      child: ListView.separated(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        scrollDirection: Axis.horizontal,
+        itemCount: _tabs.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 10),
+        itemBuilder: (context, index) {
+          final isSelected = _tabController.index == index;
+          return GestureDetector(
+            onTap: () => _tabController.animateTo(index),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+              decoration: BoxDecoration(
+                color: isSelected ? AppTheme.brand : Colors.grey[100],
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Center(
+                child: Text(
+                  _tabs[index],
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                    color: isSelected ? Colors.white : Colors.black54,
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -187,16 +202,19 @@ class _ChatPageState extends State<ChatPage>
       },
       slivers: [
         SliverPadding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
           sliver: SliverGrid(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
-              childAspectRatio: 0.9,
+              crossAxisSpacing: 16,
+              mainAxisSpacing: 16,
+              childAspectRatio: 0.75,
             ),
             delegate: SliverChildBuilderDelegate(
-              (context, index) => _buildAssistantCard(MockData.aiAssistants[index]),
+              (context, index) {
+                if (index >= MockData.aiAssistants.length) return null;
+                return _buildAssistantCard(MockData.aiAssistants[index]);
+              },
               childCount: MockData.aiAssistants.length,
             ),
           ),
@@ -231,10 +249,10 @@ class _ChatPageState extends State<ChatPage>
                 CircleAvatar(
                   radius: 24,
                   backgroundColor: session.isAi
-                      ? const Color(0xFF1989FA).withOpacity(0.1)
+                      ? AppTheme.brand.withOpacity(0.1)
                       : Colors.grey[200],
                   child: session.isAi
-                      ? const Icon(Icons.smart_toy, color: Color(0xFF1989FA))
+                      ? const Icon(Icons.smart_toy, color: AppTheme.brand)
                       : const Icon(Icons.person, color: Colors.grey),
                 ),
                 if (session.unreadCount > 0)
@@ -289,7 +307,7 @@ class _ChatPageState extends State<ChatPage>
                                 vertical: 1,
                               ),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF1989FA),
+                                color: AppTheme.brand,
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: const Text(
@@ -330,69 +348,91 @@ class _ChatPageState extends State<ChatPage>
 
   // 智慧体卡片
   Widget _buildAssistantCard(AiAssistant assistant) {
-    return GestureDetector(
-      onTap: () {},
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircleAvatar(
-              radius: 32,
-              backgroundColor: const Color(0xFF1989FA).withOpacity(0.1),
-              child: const Icon(
-                Icons.smart_toy,
-                size: 32,
-                color: Color(0xFF1989FA),
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.grey[100]!, width: 1),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: AppTheme.brand.withOpacity(0.1),
+                width: 2,
               ),
             ),
-            const SizedBox(height: 12),
-            Text(
-              assistant.name,
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.center,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(30),
+              child: Image.network(
+                assistant.avatar,
+                width: 60,
+                height: 60,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => CircleAvatar(
+                  radius: 30,
+                  backgroundColor: AppTheme.brand.withOpacity(0.1),
+                  child: const Icon(Icons.smart_toy_rounded, color: AppTheme.brand, size: 30),
+                ),
+              ),
             ),
-            const SizedBox(height: 4),
-            Text(
+          ),
+          const SizedBox(height: 12),
+          Text(
+            assistant.name,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF333333),
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 6),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Text(
               assistant.description,
-              style: const TextStyle(fontSize: 12, color: Colors.grey),
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.grey[500],
+                height: 1.3,
+              ),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 12),
-            SizedBox(
+          ),
+          const SizedBox(height: 16),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: SizedBox(
               width: double.infinity,
               height: 32,
-              child: OutlinedButton(
+              child: ElevatedButton(
                 onPressed: () {},
-                style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: Color(0xFF1989FA)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.brand.withOpacity(0.1),
+                  foregroundColor: AppTheme.brand,
+                  elevation: 0,
+                  padding: EdgeInsets.zero,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
                 ),
                 child: const Text(
-                  '开始对话',
-                  style: TextStyle(fontSize: 12, color: Color(0xFF1989FA)),
+                  '立即开启',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
