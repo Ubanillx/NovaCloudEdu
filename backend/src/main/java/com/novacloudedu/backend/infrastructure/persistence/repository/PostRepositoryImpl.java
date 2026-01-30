@@ -15,6 +15,7 @@ import com.novacloudedu.backend.infrastructure.persistence.po.PostPO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -152,5 +153,51 @@ public class PostRepositoryImpl implements PostRepository {
     public long countTotalLikesByUserId(UserId userId) {
         Long count = postMapper.sumLikesByUserId(userId.value());
         return count != null ? count : 0L;
+    }
+
+    @Override
+    public PostPage findByUserIds(List<UserId> userIds, int pageNum, int pageSize) {
+        if (userIds == null || userIds.isEmpty()) {
+            return new PostPage(List.of(), 0, pageNum, pageSize);
+        }
+
+        List<Long> ids = userIds.stream().map(UserId::value).toList();
+        
+        Page<PostPO> page = new Page<>(pageNum, pageSize);
+        LambdaQueryWrapper<PostPO> wrapper = new LambdaQueryWrapper<>();
+        wrapper.in(PostPO::getUserId, ids)
+               .eq(PostPO::getIsDelete, 0)
+               .orderByDesc(PostPO::getCreateTime);
+        Page<PostPO> result = postMapper.selectPage(page, wrapper);
+
+        List<Post> posts = result.getRecords().stream()
+                .map(converter::toDomain)
+                .toList();
+        return new PostPage(posts, result.getTotal(), pageNum, pageSize);
+    }
+
+    @Override
+    public PostPage findTopByThumbNum(LocalDateTime startTime, LocalDateTime endTime, int pageNum, int pageSize) {
+        Page<PostPO> page = new Page<>(pageNum, pageSize);
+        LambdaQueryWrapper<PostPO> wrapper = new LambdaQueryWrapper<>();
+        
+        wrapper.eq(PostPO::getIsDelete, 0);
+        
+        if (startTime != null) {
+            wrapper.ge(PostPO::getCreateTime, startTime);
+        }
+        if (endTime != null) {
+            wrapper.le(PostPO::getCreateTime, endTime);
+        }
+        
+        wrapper.orderByDesc(PostPO::getThumbNum)
+               .orderByDesc(PostPO::getCreateTime);
+        
+        Page<PostPO> result = postMapper.selectPage(page, wrapper);
+
+        List<Post> posts = result.getRecords().stream()
+                .map(converter::toDomain)
+                .toList();
+        return new PostPage(posts, result.getTotal(), pageNum, pageSize);
     }
 }

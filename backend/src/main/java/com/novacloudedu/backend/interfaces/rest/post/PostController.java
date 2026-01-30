@@ -157,6 +157,36 @@ public class PostController {
         return ResultUtils.success(result);
     }
 
+    // ==================== 关注用户帖子 ====================
+
+    @GetMapping("/following")
+    @Operation(summary = "获取关注用户的帖子列表")
+    public BaseResponse<PostPageResponse> getFollowingPosts(
+            @AuthenticationPrincipal Long userId,
+            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(defaultValue = "10") int pageSize) {
+        return ResultUtils.success(PostPageResponse.from(postService.getFollowingPosts(userId, pageNum, pageSize)));
+    }
+
+    // ==================== 点赞排行榜 ====================
+
+    @GetMapping("/top")
+    @Operation(summary = "获取点赞排行榜（全部时间）")
+    public BaseResponse<PostPageResponse> getTopPosts(
+            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(defaultValue = "10") int pageSize) {
+        return ResultUtils.success(PostPageResponse.from(postService.getTopPosts(pageNum, pageSize)));
+    }
+
+    @GetMapping("/top/days")
+    @Operation(summary = "获取点赞排行榜（指定天数内）")
+    public BaseResponse<PostPageResponse> getTopPostsByDays(
+            @RequestParam(required = false) Integer days,
+            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(defaultValue = "10") int pageSize) {
+        return ResultUtils.success(PostPageResponse.from(postService.getTopPostsByDays(days, pageNum, pageSize)));
+    }
+
     // ==================== 私有方法 ====================
 
     private String getIpAddress(HttpServletRequest request) {
