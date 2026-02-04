@@ -358,6 +358,7 @@ class GroupChatServiceTest {
     private ChatGroup createMockGroup(boolean isMute) {
         return ChatGroup.reconstruct(
                 GroupId.of(GROUP_ID),
+                "12345678", // 群号
                 "测试群",
                 null,
                 "群描述",
