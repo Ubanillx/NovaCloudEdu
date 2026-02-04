@@ -45,6 +45,9 @@ public class LoginUserResponse {
     @Schema(description = "创建时间")
     private LocalDateTime createTime;
 
-    @Schema(description = "JWT Token")
+    @Schema(description = "JWT Token (Access Token)")
     private String token;
+
+    @Schema(description = "Refresh Token (用于刷新Access Token)")
+    private String refreshToken;
 }

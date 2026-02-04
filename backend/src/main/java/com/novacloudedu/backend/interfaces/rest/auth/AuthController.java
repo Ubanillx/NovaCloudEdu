@@ -10,8 +10,10 @@ import com.novacloudedu.backend.interfaces.rest.auth.assembler.UserAssembler;
 import com.novacloudedu.backend.interfaces.rest.auth.dto.request.PhoneLoginRequest;
 import com.novacloudedu.backend.interfaces.rest.auth.dto.request.SendCodeRequest;
 import com.novacloudedu.backend.interfaces.rest.auth.dto.request.UserLoginRequest;
+import com.novacloudedu.backend.interfaces.rest.auth.dto.request.RefreshTokenRequest;
 import com.novacloudedu.backend.interfaces.rest.auth.dto.request.UserRegisterRequest;
 import com.novacloudedu.backend.interfaces.rest.auth.dto.response.LoginUserResponse;
+import com.novacloudedu.backend.interfaces.rest.auth.dto.response.RefreshTokenResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -88,5 +90,15 @@ public class AuthController {
     public BaseResponse<LoginUserResponse> getLoginUser() {
         User user = userApplicationService.getCurrentUser();
         return ResultUtils.success(userAssembler.toLoginUserResponse(user));
+    }
+
+    /**
+     * 刷新Token
+     */
+    @Operation(summary = "刷新Token", description = "使用Refresh Token获取新的Access Token和Refresh Token")
+    @PostMapping("/refresh")
+    public BaseResponse<RefreshTokenResponse> refreshToken(@RequestBody @Valid RefreshTokenRequest request) {
+        UserApplicationService.RefreshTokenResult result = userApplicationService.refreshToken(request.refreshToken());
+        return ResultUtils.success(new RefreshTokenResponse(result.token(), result.refreshToken()));
     }
 }

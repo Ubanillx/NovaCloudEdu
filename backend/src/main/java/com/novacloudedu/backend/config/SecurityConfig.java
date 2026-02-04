@@ -46,12 +46,14 @@ public class SecurityConfig {
             "/api/auth/login",
             "/api/auth/login/phone",  // 手机号登录
             "/api/auth/send-code",
+            "/api/auth/refresh",      // 刷新Token
             "/api/health",
             "/error",
             "/ws/**",       // WebSocket 端点
             "/ws-sockjs/**", // SockJS 端点
             "/api/announcement/list", // 公告列表
             "/api/announcement/*", // 公告详情
+            "/api/banner/list", // 轮播图列表
             "/api/user/checkin/ranking" // 打卡排行榜（公开）
     };
 
