@@ -103,9 +103,10 @@ public class UserApplicationService {
                 user.getAccount().value(),
                 user.getRole().getValue()
         );
+        String refreshToken = jwtTokenProvider.generateRefreshToken(user.getId().value());
 
         log.info("用户登录成功: {}", account);
-        return new LoginResult(user, token);
+        return new LoginResult(user, token, refreshToken);
     }
 
     /**
@@ -152,9 +153,10 @@ public class UserApplicationService {
                 user.getAccount().value(),
                 user.getRole().getValue()
         );
+        String refreshToken = jwtTokenProvider.generateRefreshToken(user.getId().value());
 
         log.info("手机验证码登录成功: {}", command.phone());
-        return new LoginResult(user, token);
+        return new LoginResult(user, token, refreshToken);
     }
 
     /**
@@ -195,7 +197,45 @@ public class UserApplicationService {
     /**
      * 登录结果
      */
-    public record LoginResult(User user, String token) {
+    public record LoginResult(User user, String token, String refreshToken) {
+    }
+
+    /**
+     * 刷新Token结果
+     */
+    public record RefreshTokenResult(String token, String refreshToken) {
+    }
+
+    /**
+     * 使用Refresh Token刷新Access Token
+     */
+    @Transactional(readOnly = true)
+    public RefreshTokenResult refreshToken(String refreshToken) {
+        // 1. 验证refresh token
+        if (!jwtTokenProvider.validateRefreshToken(refreshToken)) {
+            throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR, "Refresh Token无效或已过期");
+        }
+
+        // 2. 获取用户ID
+        Long userId = jwtTokenProvider.getUserIdFromRefreshToken(refreshToken);
+
+        // 3. 查找用户
+        User user = userRepository.findById(UserId.of(userId))
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_EXIST, "用户不存在"));
+
+        // 4. 检查封禁状态
+        user.ensureNotBanned();
+
+        // 5. 生成新的Token
+        String newToken = jwtTokenProvider.generateToken(
+                user.getId().value(),
+                user.getAccount().value(),
+                user.getRole().getValue()
+        );
+        String newRefreshToken = jwtTokenProvider.generateRefreshToken(user.getId().value());
+
+        log.info("Token刷新成功: userId={}", userId);
+        return new RefreshTokenResult(newToken, newRefreshToken);
     }
 
     // ==================== 用户管理功能（管理员） ====================

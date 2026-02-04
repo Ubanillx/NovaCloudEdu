@@ -80,6 +80,7 @@ public class UserAssembler {
         LoginUserResponse response = toLoginUserResponse(result.user());
         if (response != null) {
             response.setToken(result.token());
+            response.setRefreshToken(result.refreshToken());
         }
         return response;
     }

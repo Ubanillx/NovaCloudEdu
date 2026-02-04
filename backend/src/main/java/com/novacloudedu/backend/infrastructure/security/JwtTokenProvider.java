@@ -25,8 +25,11 @@ public class JwtTokenProvider {
     @Value("${jwt.expiration:86400000}")
     private long expiration; // 默认24小时
 
+    @Value("${jwt.refresh-expiration:604800000}")
+    private long refreshExpiration; // 默认7天
+
     /**
-     * 生成 Token
+     * 生成 Access Token
      */
     public String generateToken(Long userId, String userAccount, String userRole) {
         Date now = new Date();
@@ -36,6 +39,23 @@ public class JwtTokenProvider {
                 .subject(String.valueOf(userId))
                 .claim("userAccount", userAccount)
                 .claim("userRole", userRole)
+                .claim("tokenType", "access")
+                .issuedAt(now)
+                .expiration(expiryDate)
+                .signWith(getSigningKey())
+                .compact();
+    }
+
+    /**
+     * 生成 Refresh Token
+     */
+    public String generateRefreshToken(Long userId) {
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + refreshExpiration);
+
+        return Jwts.builder()
+                .subject(String.valueOf(userId))
+                .claim("tokenType", "refresh")
                 .issuedAt(now)
                 .expiration(expiryDate)
                 .signWith(getSigningKey())
@@ -71,12 +91,37 @@ public class JwtTokenProvider {
      */
     public boolean validateToken(String token) {
         try {
-            parseToken(token);
-            return true;
+            Claims claims = parseToken(token);
+            // 验证是否为access token
+            String tokenType = claims.get("tokenType", String.class);
+            return "access".equals(tokenType);
         } catch (JwtException | IllegalArgumentException e) {
             log.error("Invalid JWT token: {}", e.getMessage());
             return false;
         }
+    }
+
+    /**
+     * 验证 Refresh Token
+     */
+    public boolean validateRefreshToken(String refreshToken) {
+        try {
+            Claims claims = parseToken(refreshToken);
+            // 验证是否为refresh token
+            String tokenType = claims.get("tokenType", String.class);
+            return "refresh".equals(tokenType);
+        } catch (JwtException | IllegalArgumentException e) {
+            log.error("Invalid refresh token: {}", e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * 从 Refresh Token 中获取用户ID
+     */
+    public Long getUserIdFromRefreshToken(String refreshToken) {
+        Claims claims = parseToken(refreshToken);
+        return Long.parseLong(claims.getSubject());
     }
 
     /**
