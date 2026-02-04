@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 public class ChatGroup {
 
     private GroupId id;
+    private String groupNumber; // 群号（唯一标识，用于搜索和分享）
     private String groupName;
     private String avatar;
     private String description;
@@ -45,6 +46,7 @@ public class ChatGroup {
      */
     public static ChatGroup create(String groupName, UserId ownerId, Long classId) {
         ChatGroup group = new ChatGroup();
+        group.groupNumber = generateGroupNumber(); // 自动生成群号
         group.groupName = groupName;
         group.ownerId = ownerId;
         group.classId = classId;
@@ -60,6 +62,16 @@ public class ChatGroup {
     }
 
     /**
+     * 生成群号（8位数字）
+     */
+    private static String generateGroupNumber() {
+        // 生成8位随机数字群号
+        long timestamp = System.currentTimeMillis() % 100000000;
+        int random = (int) (Math.random() * 1000);
+        return String.format("%08d", (timestamp + random) % 100000000);
+    }
+
+    /**
      * 关联班级
      */
     public void associateClass(Long classId) {
@@ -70,13 +82,14 @@ public class ChatGroup {
     /**
      * 重建群聊（从数据库恢复）
      */
-    public static ChatGroup reconstruct(GroupId id, String groupName, String avatar, String description,
+    public static ChatGroup reconstruct(GroupId id, String groupNumber, String groupName, String avatar, String description,
                                         UserId ownerId, Long classId, int maxMembers, int memberCount,
                                         InviteMode inviteMode, JoinMode joinMode, boolean isMute,
                                         String announcement, LocalDateTime announcementTime,
                                         LocalDateTime createTime, LocalDateTime updateTime, boolean isDelete) {
         ChatGroup group = new ChatGroup();
         group.id = id;
+        group.groupNumber = groupNumber;
         group.groupName = groupName;
         group.avatar = avatar;
         group.description = description;

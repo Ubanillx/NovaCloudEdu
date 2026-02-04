@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 public class GroupResponse {
 
     private Long id;
+    private String groupNumber; // 群号
     private String groupName;
     private String avatar;
     private String description;
@@ -29,6 +30,7 @@ public class GroupResponse {
     public static GroupResponse from(ChatGroup group) {
         GroupResponse response = new GroupResponse();
         response.setId(group.getId().value());
+        response.setGroupNumber(group.getGroupNumber());
         response.setGroupName(group.getGroupName());
         response.setAvatar(group.getAvatar());
         response.setDescription(group.getDescription());

@@ -80,8 +80,12 @@ public class ChatGroupRepositoryImpl implements ChatGroupRepository {
     public GroupPage searchByName(String keyword, int pageNum, int pageSize) {
         Page<ChatGroupPO> page = new Page<>(pageNum, pageSize);
         LambdaQueryWrapper<ChatGroupPO> wrapper = new LambdaQueryWrapper<>();
-        wrapper.like(ChatGroupPO::getGroupName, keyword)
-               .orderByDesc(ChatGroupPO::getCreateTime);
+        // 支持按群名或群号搜索
+        wrapper.and(w -> w
+                .like(ChatGroupPO::getGroupName, keyword)
+                .or()
+                .eq(ChatGroupPO::getGroupNumber, keyword)
+        ).orderByDesc(ChatGroupPO::getCreateTime);
         Page<ChatGroupPO> result = chatGroupMapper.selectPage(page, wrapper);
         
         List<ChatGroup> groups = result.getRecords().stream()

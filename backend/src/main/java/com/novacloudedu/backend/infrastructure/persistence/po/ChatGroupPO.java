@@ -18,6 +18,7 @@ public class ChatGroupPO {
     @TableId(type = IdType.AUTO)
     private Long id;
 
+    private String groupNumber; // 群号
     private String groupName;
     private String avatar;
     private String description;

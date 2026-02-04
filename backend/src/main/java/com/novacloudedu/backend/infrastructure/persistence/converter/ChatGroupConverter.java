@@ -20,6 +20,7 @@ public class ChatGroupConverter {
         }
         return ChatGroup.reconstruct(
                 GroupId.of(po.getId()),
+                po.getGroupNumber(),
                 po.getGroupName(),
                 po.getAvatar(),
                 po.getDescription(),
@@ -46,6 +47,7 @@ public class ChatGroupConverter {
         if (domain.getId() != null) {
             po.setId(domain.getId().value());
         }
+        po.setGroupNumber(domain.getGroupNumber());
         po.setGroupName(domain.getGroupName());
         po.setAvatar(domain.getAvatar());
         po.setDescription(domain.getDescription());

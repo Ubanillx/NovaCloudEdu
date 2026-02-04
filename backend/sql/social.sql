@@ -95,6 +95,7 @@ COMMENT ON COLUMN friend_request.update_time IS '更新时间';
 CREATE TABLE IF NOT EXISTS chat_group
 (
     id                BIGSERIAL PRIMARY KEY,
+    group_number      VARCHAR(20)                        NULL,
     group_name        VARCHAR(128)                       NOT NULL,
     avatar            VARCHAR(1024)                      NULL,
     description       VARCHAR(512)                       NULL,
@@ -114,8 +115,10 @@ CREATE TABLE IF NOT EXISTS chat_group
 CREATE INDEX IF NOT EXISTS idx_cg_owner_id ON chat_group(owner_id);
 CREATE INDEX IF NOT EXISTS idx_cg_class_id ON chat_group(class_id);
 CREATE INDEX IF NOT EXISTS idx_cg_create_time ON chat_group(create_time);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_cg_group_number ON chat_group(group_number);
 COMMENT ON TABLE chat_group IS '群聊信息';
 COMMENT ON COLUMN chat_group.id IS '群ID';
+COMMENT ON COLUMN chat_group.group_number IS '群号（唯一标识，用于搜索和分享）';
 COMMENT ON COLUMN chat_group.group_name IS '群名称';
 COMMENT ON COLUMN chat_group.avatar IS '群头像URL';
 COMMENT ON COLUMN chat_group.description IS '群描述';
