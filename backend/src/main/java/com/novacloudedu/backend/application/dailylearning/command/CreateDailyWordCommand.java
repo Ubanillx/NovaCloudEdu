@@ -17,12 +17,14 @@ public class CreateDailyWordCommand {
     private final DailyWordRepository dailyWordRepository;
 
     @Transactional
-    public Long execute(String word, String pronunciation, String audioUrl, String translation,
+    public Long execute(String word, String pronunciationUs, String pronunciationUk,
+                       String audioUrlUs, String audioUrlUk, String translation,
                        String example, String exampleTranslation, Integer difficulty,
                        String category, String notes, LocalDate publishDate, Long adminId) {
         
         DailyWord dailyWord = DailyWord.create(
-                word, pronunciation, audioUrl, translation, example, exampleTranslation,
+                word, pronunciationUs, pronunciationUk, audioUrlUs, audioUrlUk,
+                translation, example, exampleTranslation,
                 Difficulty.fromCode(difficulty), category, notes, publishDate, UserId.of(adminId)
         );
 

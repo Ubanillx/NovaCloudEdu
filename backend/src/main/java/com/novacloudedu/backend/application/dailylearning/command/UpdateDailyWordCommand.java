@@ -18,14 +18,16 @@ public class UpdateDailyWordCommand {
     private final DailyWordRepository dailyWordRepository;
 
     @Transactional
-    public void execute(Long id, String word, String pronunciation, String audioUrl, String translation,
+    public void execute(Long id, String word, String pronunciationUs, String pronunciationUk,
+                       String audioUrlUs, String audioUrlUk, String translation,
                        String example, String exampleTranslation, Integer difficulty,
                        String category, String notes, LocalDate publishDate) {
         
         DailyWord dailyWord = dailyWordRepository.findById(DailyWordId.of(id))
                 .orElseThrow(() -> new BusinessException(40400, "每日单词不存在"));
 
-        dailyWord.updateInfo(word, pronunciation, audioUrl, translation, example, exampleTranslation,
+        dailyWord.updateInfo(word, pronunciationUs, pronunciationUk, audioUrlUs, audioUrlUk,
+                translation, example, exampleTranslation,
                 Difficulty.fromCode(difficulty), category, notes, publishDate);
 
         dailyWordRepository.save(dailyWord);

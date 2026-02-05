@@ -17,9 +17,13 @@ public class DailyWordPO implements Serializable {
 
     private String word;
 
-    private String pronunciation;
+    private String pronunciationUs;
 
-    private String audioUrl;
+    private String pronunciationUk;
+
+    private String audioUrlUs;
+
+    private String audioUrlUk;
 
     private String translation;
 

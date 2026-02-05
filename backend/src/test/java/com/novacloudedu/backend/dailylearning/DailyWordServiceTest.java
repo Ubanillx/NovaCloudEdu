@@ -74,7 +74,9 @@ class DailyWordServiceTest {
                 DailyWordId.of(WORD_ID),
                 "hello",
                 "həˈloʊ",
-                "http://audio.mp3",
+                "həˈləʊ",
+                "http://audio-us.mp3",
+                "http://audio-uk.mp3",
                 "你好",
                 "Hello, world!",
                 "你好，世界！",
@@ -114,7 +116,9 @@ class DailyWordServiceTest {
         Long id = createDailyWordCommand.execute(
                 "world",
                 "wɜːrld",
-                "http://audio2.mp3",
+                "wɜːld",
+                "http://audio2-us.mp3",
+                "http://audio2-uk.mp3",
                 "世界",
                 "The world is beautiful.",
                 "世界是美丽的。",
@@ -141,7 +145,9 @@ class DailyWordServiceTest {
                 WORD_ID,
                 "hello updated",
                 "həˈloʊ",
-                "http://audio.mp3",
+                "həˈləʊ",
+                "http://audio-us.mp3",
+                "http://audio-uk.mp3",
                 "你好（更新）",
                 "Hello, updated world!",
                 "你好，更新的世界！",
@@ -162,7 +168,7 @@ class DailyWordServiceTest {
                 .thenReturn(Optional.empty());
 
         assertThrows(BusinessException.class, () -> updateDailyWordCommand.execute(
-                999L, "test", null, null, "测试", null, null, null, null, null, null
+                999L, "test", null, null, null, null, "测试", null, null, null, null, null, null
         ));
     }
 

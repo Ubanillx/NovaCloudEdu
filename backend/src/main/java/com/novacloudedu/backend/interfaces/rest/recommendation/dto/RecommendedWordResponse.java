@@ -18,11 +18,17 @@ public class RecommendedWordResponse {
     @Schema(description = "单词")
     private String word;
 
-    @Schema(description = "音标")
-    private String pronunciation;
+    @Schema(description = "美式音标")
+    private String pronunciationUs;
 
-    @Schema(description = "发音音频URL")
-    private String audioUrl;
+    @Schema(description = "英式音标")
+    private String pronunciationUk;
+
+    @Schema(description = "美式发音音频URL")
+    private String audioUrlUs;
+
+    @Schema(description = "英式发音音频URL")
+    private String audioUrlUk;
 
     @Schema(description = "翻译")
     private String translation;
