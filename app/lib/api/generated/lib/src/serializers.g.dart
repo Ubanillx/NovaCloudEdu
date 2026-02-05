@@ -26,6 +26,8 @@ Serializers _$serializers =
           ..add(AnnouncementPageResponse.serializer)
           ..add(AnnouncementResponse.serializer)
           ..add(ApplyTeacherRequest.serializer)
+          ..add(ArticleResponse.serializer)
+          ..add(ArticleSourceResponse.serializer)
           ..add(AsyncExecutionResponse.serializer)
           ..add(BannerListResponse.serializer)
           ..add(BannerPageResponse.serializer)
@@ -35,6 +37,7 @@ Serializers _$serializers =
           ..add(BaseResponseAnnouncementDetailResponse.serializer)
           ..add(BaseResponseAnnouncementPageResponse.serializer)
           ..add(BaseResponseAnnouncementResponse.serializer)
+          ..add(BaseResponseArticleResponse.serializer)
           ..add(BaseResponseAsyncExecutionResponse.serializer)
           ..add(BaseResponseBannerPageResponse.serializer)
           ..add(BaseResponseBannerResponse.serializer)
@@ -54,7 +57,9 @@ Serializers _$serializers =
           ..add(BaseResponseCourseResponse.serializer)
           ..add(BaseResponseCourseReviewResponse.serializer)
           ..add(BaseResponseCourseStructureResponse.serializer)
+          ..add(BaseResponseDailyArticlePageResponse.serializer)
           ..add(BaseResponseDailyArticleResponse.serializer)
+          ..add(BaseResponseDailyWordPageResponse.serializer)
           ..add(BaseResponseDailyWordResponse.serializer)
           ..add(BaseResponseExecutionResultResponse.serializer)
           ..add(BaseResponseFeedbackDetailResponse.serializer)
@@ -73,6 +78,7 @@ Serializers _$serializers =
           ..add(BaseResponseLearningStats.serializer)
           ..add(BaseResponseListAiAssistantVO.serializer)
           ..add(BaseResponseListAiConversation.serializer)
+          ..add(BaseResponseListArticleSourceResponse.serializer)
           ..add(BaseResponseListBannerListResponse.serializer)
           ..add(BaseResponseListBookDTO.serializer)
           ..add(BaseResponseListChapterDTO.serializer)
@@ -101,7 +107,9 @@ Serializers _$serializers =
           ..add(BaseResponseListOrderResponse.serializer)
           ..add(BaseResponseListPostResponse.serializer)
           ..add(BaseResponseListProgressResponse.serializer)
+          ..add(BaseResponseListScraperConfigResponse.serializer)
           ..add(BaseResponseListSectionResponse.serializer)
+          ..add(BaseResponseListString.serializer)
           ..add(BaseResponseListTeacherApplicationResponse.serializer)
           ..add(BaseResponseListTeacherResponse.serializer)
           ..add(BaseResponseListUserDailyArticleResponse.serializer)
@@ -130,6 +138,11 @@ Serializers _$serializers =
           ..add(BaseResponseReplyPageResponse.serializer)
           ..add(BaseResponseReplyResponse.serializer)
           ..add(BaseResponseScheduleResponse.serializer)
+          ..add(BaseResponseScrapeResultResponse.serializer)
+          ..add(BaseResponseScraperConfigPageResponse.serializer)
+          ..add(BaseResponseScraperConfigResponse.serializer)
+          ..add(BaseResponseScraperTaskPageResponse.serializer)
+          ..add(BaseResponseScraperTaskResponse.serializer)
           ..add(BaseResponseSearchUserPageResponse.serializer)
           ..add(BaseResponseSectionResponse.serializer)
           ..add(BaseResponseSendResult.serializer)
@@ -156,6 +169,7 @@ Serializers _$serializers =
           ..add(BatchBanUserRequest.serializer)
           ..add(BatchCreateUserRequest.serializer)
           ..add(BatchProcessResult.serializer)
+          ..add(BatchScrapeRequest.serializer)
           ..add(BatchUpdateNodesRequest.serializer)
           ..add(BookDTO.serializer)
           ..add(BookId.serializer)
@@ -214,12 +228,16 @@ Serializers _$serializers =
           ..add(CreateSectionRequest.serializer)
           ..add(CreateUserRequest.serializer)
           ..add(CreateWorkflowRequest.serializer)
+          ..add(DailyArticlePageResponse.serializer)
           ..add(DailyArticleResponse.serializer)
+          ..add(DailyWordPageResponse.serializer)
           ..add(DailyWordResponse.serializer)
+          ..add(DynamicScrapeRequest.serializer)
           ..add(ErrorHandlingConfig.serializer)
           ..add(ErrorHandlingConfigDTO.serializer)
           ..add(ErrorHandlingConfigDTOOnErrorEnum.serializer)
           ..add(ErrorHandlingConfigOnErrorEnum.serializer)
+          ..add(ExecuteTaskRequest.serializer)
           ..add(ExecuteWorkflowRequest.serializer)
           ..add(ExecutionLogResponse.serializer)
           ..add(ExecutionLogResponseLevelEnum.serializer)
@@ -289,6 +307,14 @@ Serializers _$serializers =
           ..add(ReviewApplicationRequest.serializer)
           ..add(ReviewCourseRequest.serializer)
           ..add(ScheduleResponse.serializer)
+          ..add(ScrapeConfigRequest.serializer)
+          ..add(ScrapeRequest.serializer)
+          ..add(ScrapeResultResponse.serializer)
+          ..add(ScraperConfigPageResponse.serializer)
+          ..add(ScraperConfigRequest.serializer)
+          ..add(ScraperConfigResponse.serializer)
+          ..add(ScraperTaskPageResponse.serializer)
+          ..add(ScraperTaskResponse.serializer)
           ..add(SearchUserPageResponse.serializer)
           ..add(SearchUserRequestDTO.serializer)
           ..add(SearchUserResponse.serializer)
@@ -297,6 +323,7 @@ Serializers _$serializers =
           ..add(SendFriendRequestDTO.serializer)
           ..add(SendResult.serializer)
           ..add(SendSmsRequest.serializer)
+          ..add(SourceScrapeRequest.serializer)
           ..add(SseEmitter.serializer)
           ..add(TeacherApplicationResponse.serializer)
           ..add(TeacherResponse.serializer)
@@ -401,6 +428,20 @@ Serializers _$serializers =
               const FullType(AnnouncementResponse),
             ]),
             () => ListBuilder<AnnouncementResponse>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [const FullType(ArticleResponse)]),
+            () => ListBuilder<ArticleResponse>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [const FullType(String)]),
+            () => ListBuilder<String>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [
+              const FullType(ArticleSourceResponse),
+            ]),
+            () => ListBuilder<ArticleSourceResponse>(),
           )
           ..addBuilderFactory(
             const FullType(BuiltList, const [
@@ -520,6 +561,18 @@ Serializers _$serializers =
               const FullType(DailyArticleResponse),
             ]),
             () => ListBuilder<DailyArticleResponse>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [
+              const FullType(DailyArticleResponse),
+            ]),
+            () => ListBuilder<DailyArticleResponse>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [
+              const FullType(DailyWordResponse),
+            ]),
+            () => ListBuilder<DailyWordResponse>(),
           )
           ..addBuilderFactory(
             const FullType(BuiltList, const [
@@ -652,6 +705,24 @@ Serializers _$serializers =
           )
           ..addBuilderFactory(
             const FullType(BuiltList, const [
+              const FullType(ScraperConfigResponse),
+            ]),
+            () => ListBuilder<ScraperConfigResponse>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [
+              const FullType(ScraperConfigResponse),
+            ]),
+            () => ListBuilder<ScraperConfigResponse>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [
+              const FullType(ScraperTaskResponse),
+            ]),
+            () => ListBuilder<ScraperTaskResponse>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [
               const FullType(SearchUserResponse),
             ]),
             () => ListBuilder<SearchUserResponse>(),
@@ -663,6 +734,18 @@ Serializers _$serializers =
           ..addBuilderFactory(
             const FullType(BuiltList, const [const FullType(SectionResponse)]),
             () => ListBuilder<SectionResponse>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [const FullType(String)]),
+            () => ListBuilder<String>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [const FullType(String)]),
+            () => ListBuilder<String>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [const FullType(String)]),
+            () => ListBuilder<String>(),
           )
           ..addBuilderFactory(
             const FullType(BuiltList, const [const FullType(String)]),
@@ -881,6 +964,10 @@ Serializers _$serializers =
               const FullType(WorkflowVariableResponse),
             ]),
             () => ListBuilder<WorkflowVariableResponse>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [const FullType(int)]),
+            () => ListBuilder<int>(),
           )
           ..addBuilderFactory(
             const FullType(BuiltList, const [const FullType(int)]),

@@ -14,9 +14,9 @@ class _$BatchProcessResult extends BatchProcessResult {
   @override
   final BuiltList<FailedItem>? failedItems;
   @override
-  final int? failedCount;
-  @override
   final int? successCount;
+  @override
+  final int? failedCount;
 
   factory _$BatchProcessResult([
     void Function(BatchProcessResultBuilder)? updates,
@@ -26,8 +26,8 @@ class _$BatchProcessResult extends BatchProcessResult {
     this.total,
     this.successIds,
     this.failedItems,
-    this.failedCount,
     this.successCount,
+    this.failedCount,
   }) : super._();
   @override
   BatchProcessResult rebuild(
@@ -45,8 +45,8 @@ class _$BatchProcessResult extends BatchProcessResult {
         total == other.total &&
         successIds == other.successIds &&
         failedItems == other.failedItems &&
-        failedCount == other.failedCount &&
-        successCount == other.successCount;
+        successCount == other.successCount &&
+        failedCount == other.failedCount;
   }
 
   @override
@@ -55,8 +55,8 @@ class _$BatchProcessResult extends BatchProcessResult {
     _$hash = $jc(_$hash, total.hashCode);
     _$hash = $jc(_$hash, successIds.hashCode);
     _$hash = $jc(_$hash, failedItems.hashCode);
-    _$hash = $jc(_$hash, failedCount.hashCode);
     _$hash = $jc(_$hash, successCount.hashCode);
+    _$hash = $jc(_$hash, failedCount.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -67,8 +67,8 @@ class _$BatchProcessResult extends BatchProcessResult {
           ..add('total', total)
           ..add('successIds', successIds)
           ..add('failedItems', failedItems)
-          ..add('failedCount', failedCount)
-          ..add('successCount', successCount))
+          ..add('successCount', successCount)
+          ..add('failedCount', failedCount))
         .toString();
   }
 }
@@ -92,13 +92,13 @@ class BatchProcessResultBuilder
   set failedItems(ListBuilder<FailedItem>? failedItems) =>
       _$this._failedItems = failedItems;
 
-  int? _failedCount;
-  int? get failedCount => _$this._failedCount;
-  set failedCount(int? failedCount) => _$this._failedCount = failedCount;
-
   int? _successCount;
   int? get successCount => _$this._successCount;
   set successCount(int? successCount) => _$this._successCount = successCount;
+
+  int? _failedCount;
+  int? get failedCount => _$this._failedCount;
+  set failedCount(int? failedCount) => _$this._failedCount = failedCount;
 
   BatchProcessResultBuilder() {
     BatchProcessResult._defaults(this);
@@ -110,8 +110,8 @@ class BatchProcessResultBuilder
       _total = $v.total;
       _successIds = $v.successIds?.toBuilder();
       _failedItems = $v.failedItems?.toBuilder();
-      _failedCount = $v.failedCount;
       _successCount = $v.successCount;
+      _failedCount = $v.failedCount;
       _$v = null;
     }
     return this;
@@ -139,8 +139,8 @@ class BatchProcessResultBuilder
             total: total,
             successIds: _successIds?.build(),
             failedItems: _failedItems?.build(),
-            failedCount: failedCount,
             successCount: successCount,
+            failedCount: failedCount,
           );
     } catch (_) {
       late String _$failedField;

@@ -16,8 +16,8 @@ part 'batch_process_result.g.dart';
 /// * [total]
 /// * [successIds]
 /// * [failedItems]
-/// * [failedCount]
 /// * [successCount]
+/// * [failedCount]
 @BuiltValue()
 abstract class BatchProcessResult
     implements Built<BatchProcessResult, BatchProcessResultBuilder> {
@@ -30,11 +30,11 @@ abstract class BatchProcessResult
   @BuiltValueField(wireName: r'failedItems')
   BuiltList<FailedItem>? get failedItems;
 
-  @BuiltValueField(wireName: r'failedCount')
-  int? get failedCount;
-
   @BuiltValueField(wireName: r'successCount')
   int? get successCount;
+
+  @BuiltValueField(wireName: r'failedCount')
+  int? get failedCount;
 
   BatchProcessResult._();
 
@@ -83,17 +83,17 @@ class _$BatchProcessResultSerializer
         specifiedType: const FullType(BuiltList, [FullType(FailedItem)]),
       );
     }
-    if (object.failedCount != null) {
-      yield r'failedCount';
-      yield serializers.serialize(
-        object.failedCount,
-        specifiedType: const FullType(int),
-      );
-    }
     if (object.successCount != null) {
       yield r'successCount';
       yield serializers.serialize(
         object.successCount,
+        specifiedType: const FullType(int),
+      );
+    }
+    if (object.failedCount != null) {
+      yield r'failedCount';
+      yield serializers.serialize(
+        object.failedCount,
         specifiedType: const FullType(int),
       );
     }
@@ -143,19 +143,19 @@ class _$BatchProcessResultSerializer
           ) as BuiltList<FailedItem>;
           result.failedItems.replace(valueDes);
           break;
-        case r'failedCount':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(int),
-          ) as int;
-          result.failedCount = valueDes;
-          break;
         case r'successCount':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(int),
           ) as int;
           result.successCount = valueDes;
+          break;
+        case r'failedCount':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(int),
+          ) as int;
+          result.failedCount = valueDes;
           break;
         default:
           unhandled.add(key);
