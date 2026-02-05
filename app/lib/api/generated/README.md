@@ -96,6 +96,7 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**create**](doc/DefaultApi.md#create) | **POST** /api/workflows | 创建工作流
 [*DefaultApi*](doc/DefaultApi.md) | [**create1**](doc/DefaultApi.md#create1) | **POST** /api/ai/knowledge-bases | 创建知识库
 [*DefaultApi*](doc/DefaultApi.md) | [**createAnnouncement**](doc/DefaultApi.md#createannouncement) | **POST** /api/announcement/admin/create | 创建公告
+[*DefaultApi*](doc/DefaultApi.md) | [**createBanner**](doc/DefaultApi.md#createbanner) | **POST** /api/admin/banner | 创建轮播图
 [*DefaultApi*](doc/DefaultApi.md) | [**createChapter**](doc/DefaultApi.md#createchapter) | **POST** /api/course/{courseId}/chapter | 创建章节（管理员）
 [*DefaultApi*](doc/DefaultApi.md) | [**createClass**](doc/DefaultApi.md#createclass) | **POST** /api/classes | 创建班级
 [*DefaultApi*](doc/DefaultApi.md) | [**createComment**](doc/DefaultApi.md#createcomment) | **POST** /api/posts/{postId}/comments | 发表评论
@@ -114,6 +115,7 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**delete**](doc/DefaultApi.md#delete) | **DELETE** /api/workflows/{id} | 删除工作流
 [*DefaultApi*](doc/DefaultApi.md) | [**delete1**](doc/DefaultApi.md#delete1) | **DELETE** /api/ai/knowledge-bases/{id} | 删除知识库
 [*DefaultApi*](doc/DefaultApi.md) | [**deleteAnnouncement**](doc/DefaultApi.md#deleteannouncement) | **DELETE** /api/announcement/admin/delete/{id} | 删除公告
+[*DefaultApi*](doc/DefaultApi.md) | [**deleteBanner**](doc/DefaultApi.md#deletebanner) | **DELETE** /api/admin/banner/{id} | 删除轮播图
 [*DefaultApi*](doc/DefaultApi.md) | [**deleteBook**](doc/DefaultApi.md#deletebook) | **DELETE** /api/books/{bookId} | 删除书籍
 [*DefaultApi*](doc/DefaultApi.md) | [**deleteChapter**](doc/DefaultApi.md#deletechapter) | **DELETE** /api/course/{courseId}/chapter/{chapterId} | 删除章节（管理员）
 [*DefaultApi*](doc/DefaultApi.md) | [**deleteClass**](doc/DefaultApi.md#deleteclass) | **DELETE** /api/classes/{classId} | 删除班级
@@ -146,6 +148,8 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**getAnnouncementList**](doc/DefaultApi.md#getannouncementlist) | **GET** /api/announcement/list | 获取公告列表
 [*DefaultApi*](doc/DefaultApi.md) | [**getApplication**](doc/DefaultApi.md#getapplication) | **GET** /api/teacher/application/{id} | 获取申请详情
 [*DefaultApi*](doc/DefaultApi.md) | [**getArticlesByDate**](doc/DefaultApi.md#getarticlesbydate) | **GET** /api/daily-article/date/{date} | 获取指定日期文章
+[*DefaultApi*](doc/DefaultApi.md) | [**getBannerDetail**](doc/DefaultApi.md#getbannerdetail) | **GET** /api/admin/banner/{id} | 获取轮播图详情
+[*DefaultApi*](doc/DefaultApi.md) | [**getBannerList**](doc/DefaultApi.md#getbannerlist) | **GET** /api/banner/list | 获取轮播图列表
 [*DefaultApi*](doc/DefaultApi.md) | [**getBook**](doc/DefaultApi.md#getbook) | **GET** /api/books/{bookId} | 获取书籍详情
 [*DefaultApi*](doc/DefaultApi.md) | [**getBookChapters**](doc/DefaultApi.md#getbookchapters) | **GET** /api/books/{bookId}/chapters | 获取书籍章节列表
 [*DefaultApi*](doc/DefaultApi.md) | [**getById**](doc/DefaultApi.md#getbyid) | **GET** /api/workflows/{id} | 获取工作流详情
@@ -273,15 +277,19 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**markAsRead3**](doc/DefaultApi.md#markasread3) | **POST** /api/announcement/{id}/read | 标记公告已读
 [*DefaultApi*](doc/DefaultApi.md) | [**markRepliesAsRead**](doc/DefaultApi.md#markrepliesasread) | **POST** /api/feedback/{id}/read | 标记回复为已读
 [*DefaultApi*](doc/DefaultApi.md) | [**offlineAnnouncement**](doc/DefaultApi.md#offlineannouncement) | **POST** /api/announcement/admin/offline/{id} | 下线公告
+[*DefaultApi*](doc/DefaultApi.md) | [**offlineBanner**](doc/DefaultApi.md#offlinebanner) | **POST** /api/admin/banner/{id}/offline | 下线轮播图
 [*DefaultApi*](doc/DefaultApi.md) | [**phoneLogin**](doc/DefaultApi.md#phonelogin) | **POST** /api/auth/login/phone | 手机验证码登录
 [*DefaultApi*](doc/DefaultApi.md) | [**processDocument**](doc/DefaultApi.md#processdocument) | **POST** /api/ai/knowledge-bases/{id}/documents/{docId}/embed | 触发文档向量化
 [*DefaultApi*](doc/DefaultApi.md) | [**publish1**](doc/DefaultApi.md#publish1) | **POST** /api/workflows/{id}/publish | 发布工作流
 [*DefaultApi*](doc/DefaultApi.md) | [**publishAnnouncement**](doc/DefaultApi.md#publishannouncement) | **PUT** /api/groups/{groupId}/announcement | 发布群公告
 [*DefaultApi*](doc/DefaultApi.md) | [**publishAnnouncement1**](doc/DefaultApi.md#publishannouncement1) | **POST** /api/announcement/admin/publish/{id} | 发布公告
+[*DefaultApi*](doc/DefaultApi.md) | [**publishBanner**](doc/DefaultApi.md#publishbanner) | **POST** /api/admin/banner/{id}/publish | 发布轮播图
 [*DefaultApi*](doc/DefaultApi.md) | [**publishCourse**](doc/DefaultApi.md#publishcourse) | **POST** /api/course/{id}/publish | 发布课程（管理员）
 [*DefaultApi*](doc/DefaultApi.md) | [**queryAnnouncements**](doc/DefaultApi.md#queryannouncements) | **POST** /api/announcement/admin/list | 分页查询公告
+[*DefaultApi*](doc/DefaultApi.md) | [**queryBanners**](doc/DefaultApi.md#querybanners) | **GET** /api/admin/banner/list | 分页查询轮播图
 [*DefaultApi*](doc/DefaultApi.md) | [**queryFeedbacks**](doc/DefaultApi.md#queryfeedbacks) | **POST** /api/feedback/admin/list | 分页查询反馈
 [*DefaultApi*](doc/DefaultApi.md) | [**queryUsers**](doc/DefaultApi.md#queryusers) | **POST** /api/user/admin/list | 分页查询用户
+[*DefaultApi*](doc/DefaultApi.md) | [**refreshToken**](doc/DefaultApi.md#refreshtoken) | **POST** /api/auth/refresh | 刷新Token
 [*DefaultApi*](doc/DefaultApi.md) | [**refund**](doc/DefaultApi.md#refund) | **POST** /api/admin/order/{orderNo}/refund | 退款（管理员）
 [*DefaultApi*](doc/DefaultApi.md) | [**removeCourse**](doc/DefaultApi.md#removecourse) | **DELETE** /api/classes/{classId}/courses/{courseId} | 移除课程
 [*DefaultApi*](doc/DefaultApi.md) | [**removeFromShelf**](doc/DefaultApi.md#removefromshelf) | **DELETE** /api/reading/shelf | 从书架移除书籍
@@ -324,6 +332,7 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**update**](doc/DefaultApi.md#update) | **PUT** /api/workflows/{id} | 更新工作流基本信息
 [*DefaultApi*](doc/DefaultApi.md) | [**update1**](doc/DefaultApi.md#update1) | **PUT** /api/ai/knowledge-bases/{id} | 更新知识库
 [*DefaultApi*](doc/DefaultApi.md) | [**updateAnnouncement**](doc/DefaultApi.md#updateannouncement) | **PUT** /api/announcement/admin/update | 更新公告
+[*DefaultApi*](doc/DefaultApi.md) | [**updateBanner**](doc/DefaultApi.md#updatebanner) | **PUT** /api/admin/banner | 更新轮播图
 [*DefaultApi*](doc/DefaultApi.md) | [**updateChapter**](doc/DefaultApi.md#updatechapter) | **PUT** /api/course/{courseId}/chapter/{chapterId} | 更新章节（管理员）
 [*DefaultApi*](doc/DefaultApi.md) | [**updateClass**](doc/DefaultApi.md#updateclass) | **PUT** /api/classes/{classId} | 更新班级信息
 [*DefaultApi*](doc/DefaultApi.md) | [**updateCourse**](doc/DefaultApi.md#updatecourse) | **PUT** /api/course/{id} | 更新课程（管理员）
@@ -407,12 +416,17 @@ Class | Method | HTTP request | Description
  - [AnnouncementResponse](doc/AnnouncementResponse.md)
  - [ApplyTeacherRequest](doc/ApplyTeacherRequest.md)
  - [AsyncExecutionResponse](doc/AsyncExecutionResponse.md)
+ - [BannerListResponse](doc/BannerListResponse.md)
+ - [BannerPageResponse](doc/BannerPageResponse.md)
+ - [BannerResponse](doc/BannerResponse.md)
  - [BaseResponseAiAssistantVO](doc/BaseResponseAiAssistantVO.md)
  - [BaseResponseAiConversation](doc/BaseResponseAiConversation.md)
  - [BaseResponseAnnouncementDetailResponse](doc/BaseResponseAnnouncementDetailResponse.md)
  - [BaseResponseAnnouncementPageResponse](doc/BaseResponseAnnouncementPageResponse.md)
  - [BaseResponseAnnouncementResponse](doc/BaseResponseAnnouncementResponse.md)
  - [BaseResponseAsyncExecutionResponse](doc/BaseResponseAsyncExecutionResponse.md)
+ - [BaseResponseBannerPageResponse](doc/BaseResponseBannerPageResponse.md)
+ - [BaseResponseBannerResponse](doc/BaseResponseBannerResponse.md)
  - [BaseResponseBatchProcessResult](doc/BaseResponseBatchProcessResult.md)
  - [BaseResponseBookDTO](doc/BaseResponseBookDTO.md)
  - [BaseResponseBoolean](doc/BaseResponseBoolean.md)
@@ -448,6 +462,7 @@ Class | Method | HTTP request | Description
  - [BaseResponseLearningStats](doc/BaseResponseLearningStats.md)
  - [BaseResponseListAiAssistantVO](doc/BaseResponseListAiAssistantVO.md)
  - [BaseResponseListAiConversation](doc/BaseResponseListAiConversation.md)
+ - [BaseResponseListBannerListResponse](doc/BaseResponseListBannerListResponse.md)
  - [BaseResponseListBookDTO](doc/BaseResponseListBookDTO.md)
  - [BaseResponseListChapterDTO](doc/BaseResponseListChapterDTO.md)
  - [BaseResponseListChapterResponse](doc/BaseResponseListChapterResponse.md)
@@ -500,6 +515,7 @@ Class | Method | HTTP request | Description
  - [BaseResponseProgressResponse](doc/BaseResponseProgressResponse.md)
  - [BaseResponseReadingQuiz](doc/BaseResponseReadingQuiz.md)
  - [BaseResponseReadingStats](doc/BaseResponseReadingStats.md)
+ - [BaseResponseRefreshTokenResponse](doc/BaseResponseRefreshTokenResponse.md)
  - [BaseResponseReplyPageResponse](doc/BaseResponseReplyPageResponse.md)
  - [BaseResponseReplyResponse](doc/BaseResponseReplyResponse.md)
  - [BaseResponseScheduleResponse](doc/BaseResponseScheduleResponse.md)
@@ -564,6 +580,7 @@ Class | Method | HTTP request | Description
  - [CourseStructureResponse](doc/CourseStructureResponse.md)
  - [CreateAiAssistantCommand](doc/CreateAiAssistantCommand.md)
  - [CreateAnnouncementRequest](doc/CreateAnnouncementRequest.md)
+ - [CreateBannerRequest](doc/CreateBannerRequest.md)
  - [CreateChapterRequest](doc/CreateChapterRequest.md)
  - [CreateClassRequest](doc/CreateClassRequest.md)
  - [CreateCommentRequest](doc/CreateCommentRequest.md)
@@ -632,12 +649,15 @@ Class | Method | HTTP request | Description
  - [PostResponse](doc/PostResponse.md)
  - [ProgressResponse](doc/ProgressResponse.md)
  - [QueryAnnouncementRequest](doc/QueryAnnouncementRequest.md)
+ - [QueryBannerRequest](doc/QueryBannerRequest.md)
  - [QueryFeedbackRequest](doc/QueryFeedbackRequest.md)
  - [QueryUserRequest](doc/QueryUserRequest.md)
  - [QuizQuestion](doc/QuizQuestion.md)
  - [ReadingQuiz](doc/ReadingQuiz.md)
  - [ReadingQuizId](doc/ReadingQuizId.md)
  - [ReadingStats](doc/ReadingStats.md)
+ - [RefreshTokenRequest](doc/RefreshTokenRequest.md)
+ - [RefreshTokenResponse](doc/RefreshTokenResponse.md)
  - [ReplyPageResponse](doc/ReplyPageResponse.md)
  - [ReplyResponse](doc/ReplyResponse.md)
  - [ResetPasswordRequest](doc/ResetPasswordRequest.md)
@@ -660,6 +680,7 @@ Class | Method | HTTP request | Description
  - [TtsResponse](doc/TtsResponse.md)
  - [UpdateAiAssistantCommand](doc/UpdateAiAssistantCommand.md)
  - [UpdateAnnouncementRequest](doc/UpdateAnnouncementRequest.md)
+ - [UpdateBannerRequest](doc/UpdateBannerRequest.md)
  - [UpdateChapterRequest](doc/UpdateChapterRequest.md)
  - [UpdateClassRequest](doc/UpdateClassRequest.md)
  - [UpdateCourseRequest](doc/UpdateCourseRequest.md)

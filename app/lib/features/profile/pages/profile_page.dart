@@ -14,6 +14,7 @@ import 'profile_detail_page.dart';
 import 'study_plan_page.dart';
 import 'checkin_ranking_page.dart';
 import '../../circle/pages/my_favourites_page.dart';
+import '../../home/daily_word/pages/word_book_page.dart';
 
 /// 个人中心页面 - 参考smartclass Profile.vue
 class ProfilePage extends StatefulWidget {
@@ -648,7 +649,7 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 12),
           // 进度条
           Container(
             height: 10,
@@ -676,7 +677,7 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
           // 计划列表
           if (_isLoadingPlans)
             const LoadingWidget(size: 24)
@@ -874,6 +875,7 @@ class _ProfilePageState extends State<ProfilePage> {
     final colors = context.colors;
     final menuItems = [
       {'icon': Icons.person_outline_rounded, 'title': '个人资料', 'color': const Color(0xFF8B5CF6), 'action': 'profile'},
+      {'icon': Icons.menu_book_rounded, 'title': '生词本', 'color': const Color(0xFFF59E0B), 'action': 'wordbook'},
       {'icon': Icons.history_rounded, 'title': '学习历史', 'color': const Color(0xFF6366F1), 'action': 'history'},
       {'icon': Icons.bookmark_rounded, 'title': '我的收藏', 'color': const Color(0xFFEC4899), 'action': 'bookmark'},
       {'icon': Icons.download_rounded, 'title': '离线下载', 'color': const Color(0xFF10B981), 'action': 'download'},
@@ -929,7 +931,7 @@ class _ProfilePageState extends State<ProfilePage> {
               trailing: Icon(Icons.chevron_right_rounded, color: colors.border, size: 24),
               onTap: () => _handleMenuTap(item['action'] as String),
             );
-          }).toList(),
+          }),
         ],
       ),
     );
@@ -940,6 +942,11 @@ class _ProfilePageState extends State<ProfilePage> {
       case 'profile':
         Navigator.of(context).push(
           MaterialPageRoute(builder: (_) => const ProfileDetailPage()),
+        );
+        break;
+      case 'wordbook':
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const WordBookPage()),
         );
         break;
       case 'history':

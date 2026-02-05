@@ -155,6 +155,8 @@ class _$ChatGroupMember extends ChatGroupMember {
   @override
   final DateTime? updateTime;
   @override
+  final bool? mute;
+  @override
   final bool? adminOrOwner;
   @override
   final bool? owner;
@@ -162,8 +164,6 @@ class _$ChatGroupMember extends ChatGroupMember {
   final bool? delete;
   @override
   final bool? muted;
-  @override
-  final bool? mute;
 
   factory _$ChatGroupMember([void Function(ChatGroupMemberBuilder)? updates]) =>
       (ChatGroupMemberBuilder()..update(updates))._build();
@@ -179,11 +179,11 @@ class _$ChatGroupMember extends ChatGroupMember {
     this.muteUntil,
     this.joinTime,
     this.updateTime,
+    this.mute,
     this.adminOrOwner,
     this.owner,
     this.delete,
     this.muted,
-    this.mute,
   }) : super._();
   @override
   ChatGroupMember rebuild(void Function(ChatGroupMemberBuilder) updates) =>
@@ -206,11 +206,11 @@ class _$ChatGroupMember extends ChatGroupMember {
         muteUntil == other.muteUntil &&
         joinTime == other.joinTime &&
         updateTime == other.updateTime &&
+        mute == other.mute &&
         adminOrOwner == other.adminOrOwner &&
         owner == other.owner &&
         delete == other.delete &&
-        muted == other.muted &&
-        mute == other.mute;
+        muted == other.muted;
   }
 
   @override
@@ -226,11 +226,11 @@ class _$ChatGroupMember extends ChatGroupMember {
     _$hash = $jc(_$hash, muteUntil.hashCode);
     _$hash = $jc(_$hash, joinTime.hashCode);
     _$hash = $jc(_$hash, updateTime.hashCode);
+    _$hash = $jc(_$hash, mute.hashCode);
     _$hash = $jc(_$hash, adminOrOwner.hashCode);
     _$hash = $jc(_$hash, owner.hashCode);
     _$hash = $jc(_$hash, delete.hashCode);
     _$hash = $jc(_$hash, muted.hashCode);
-    _$hash = $jc(_$hash, mute.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -248,11 +248,11 @@ class _$ChatGroupMember extends ChatGroupMember {
           ..add('muteUntil', muteUntil)
           ..add('joinTime', joinTime)
           ..add('updateTime', updateTime)
+          ..add('mute', mute)
           ..add('adminOrOwner', adminOrOwner)
           ..add('owner', owner)
           ..add('delete', delete)
-          ..add('muted', muted)
-          ..add('mute', mute))
+          ..add('muted', muted))
         .toString();
   }
 }
@@ -302,6 +302,10 @@ class ChatGroupMemberBuilder
   DateTime? get updateTime => _$this._updateTime;
   set updateTime(DateTime? updateTime) => _$this._updateTime = updateTime;
 
+  bool? _mute;
+  bool? get mute => _$this._mute;
+  set mute(bool? mute) => _$this._mute = mute;
+
   bool? _adminOrOwner;
   bool? get adminOrOwner => _$this._adminOrOwner;
   set adminOrOwner(bool? adminOrOwner) => _$this._adminOrOwner = adminOrOwner;
@@ -317,10 +321,6 @@ class ChatGroupMemberBuilder
   bool? _muted;
   bool? get muted => _$this._muted;
   set muted(bool? muted) => _$this._muted = muted;
-
-  bool? _mute;
-  bool? get mute => _$this._mute;
-  set mute(bool? mute) => _$this._mute = mute;
 
   ChatGroupMemberBuilder() {
     ChatGroupMember._defaults(this);
@@ -339,11 +339,11 @@ class ChatGroupMemberBuilder
       _muteUntil = $v.muteUntil;
       _joinTime = $v.joinTime;
       _updateTime = $v.updateTime;
+      _mute = $v.mute;
       _adminOrOwner = $v.adminOrOwner;
       _owner = $v.owner;
       _delete = $v.delete;
       _muted = $v.muted;
-      _mute = $v.mute;
       _$v = null;
     }
     return this;
@@ -378,11 +378,11 @@ class ChatGroupMemberBuilder
             muteUntil: muteUntil,
             joinTime: joinTime,
             updateTime: updateTime,
+            mute: mute,
             adminOrOwner: adminOrOwner,
             owner: owner,
             delete: delete,
             muted: muted,
-            mute: mute,
           );
     } catch (_) {
       late String _$failedField;

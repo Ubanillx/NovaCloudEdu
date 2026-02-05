@@ -22,7 +22,8 @@ part 'login_user_response.g.dart';
 /// * [userEmail] - 用户邮箱
 /// * [level] - 等级
 /// * [createTime] - 创建时间
-/// * [token] - JWT Token
+/// * [token] - JWT Token (Access Token)
+/// * [refreshToken] - Refresh Token (用于刷新Access Token)
 @BuiltValue()
 abstract class LoginUserResponse
     implements Built<LoginUserResponse, LoginUserResponseBuilder> {
@@ -70,9 +71,13 @@ abstract class LoginUserResponse
   @BuiltValueField(wireName: r'createTime')
   DateTime? get createTime;
 
-  /// JWT Token
+  /// JWT Token (Access Token)
   @BuiltValueField(wireName: r'token')
   String? get token;
+
+  /// Refresh Token (用于刷新Access Token)
+  @BuiltValueField(wireName: r'refreshToken')
+  String? get refreshToken;
 
   LoginUserResponse._();
 
@@ -184,6 +189,13 @@ class _$LoginUserResponseSerializer
         specifiedType: const FullType(String),
       );
     }
+    if (object.refreshToken != null) {
+      yield r'refreshToken';
+      yield serializers.serialize(
+        object.refreshToken,
+        specifiedType: const FullType(String),
+      );
+    }
   }
 
   @override
@@ -292,6 +304,13 @@ class _$LoginUserResponseSerializer
             specifiedType: const FullType(String),
           ) as String;
           result.token = valueDes;
+          break;
+        case r'refreshToken':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.refreshToken = valueDes;
           break;
         default:
           unhandled.add(key);

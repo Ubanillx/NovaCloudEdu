@@ -27,12 +27,17 @@ Serializers _$serializers =
           ..add(AnnouncementResponse.serializer)
           ..add(ApplyTeacherRequest.serializer)
           ..add(AsyncExecutionResponse.serializer)
+          ..add(BannerListResponse.serializer)
+          ..add(BannerPageResponse.serializer)
+          ..add(BannerResponse.serializer)
           ..add(BaseResponseAiAssistantVO.serializer)
           ..add(BaseResponseAiConversation.serializer)
           ..add(BaseResponseAnnouncementDetailResponse.serializer)
           ..add(BaseResponseAnnouncementPageResponse.serializer)
           ..add(BaseResponseAnnouncementResponse.serializer)
           ..add(BaseResponseAsyncExecutionResponse.serializer)
+          ..add(BaseResponseBannerPageResponse.serializer)
+          ..add(BaseResponseBannerResponse.serializer)
           ..add(BaseResponseBatchProcessResult.serializer)
           ..add(BaseResponseBookDTO.serializer)
           ..add(BaseResponseBoolean.serializer)
@@ -68,6 +73,7 @@ Serializers _$serializers =
           ..add(BaseResponseLearningStats.serializer)
           ..add(BaseResponseListAiAssistantVO.serializer)
           ..add(BaseResponseListAiConversation.serializer)
+          ..add(BaseResponseListBannerListResponse.serializer)
           ..add(BaseResponseListBookDTO.serializer)
           ..add(BaseResponseListChapterDTO.serializer)
           ..add(BaseResponseListChapterResponse.serializer)
@@ -120,6 +126,7 @@ Serializers _$serializers =
           ..add(BaseResponseProgressResponse.serializer)
           ..add(BaseResponseReadingQuiz.serializer)
           ..add(BaseResponseReadingStats.serializer)
+          ..add(BaseResponseRefreshTokenResponse.serializer)
           ..add(BaseResponseReplyPageResponse.serializer)
           ..add(BaseResponseReplyResponse.serializer)
           ..add(BaseResponseScheduleResponse.serializer)
@@ -190,6 +197,7 @@ Serializers _$serializers =
           ..add(CourseStructureResponse.serializer)
           ..add(CreateAiAssistantCommand.serializer)
           ..add(CreateAnnouncementRequest.serializer)
+          ..add(CreateBannerRequest.serializer)
           ..add(CreateChapterRequest.serializer)
           ..add(CreateClassRequest.serializer)
           ..add(CreateCommentRequest.serializer)
@@ -264,6 +272,7 @@ Serializers _$serializers =
           ..add(PostResponse.serializer)
           ..add(ProgressResponse.serializer)
           ..add(QueryAnnouncementRequest.serializer)
+          ..add(QueryBannerRequest.serializer)
           ..add(QueryFeedbackRequest.serializer)
           ..add(QueryUserRequest.serializer)
           ..add(QuizQuestion.serializer)
@@ -272,6 +281,8 @@ Serializers _$serializers =
           ..add(ReadingQuiz.serializer)
           ..add(ReadingQuizId.serializer)
           ..add(ReadingStats.serializer)
+          ..add(RefreshTokenRequest.serializer)
+          ..add(RefreshTokenResponse.serializer)
           ..add(ReplyPageResponse.serializer)
           ..add(ReplyResponse.serializer)
           ..add(ResetPasswordRequest.serializer)
@@ -294,6 +305,7 @@ Serializers _$serializers =
           ..add(TtsResponse.serializer)
           ..add(UpdateAiAssistantCommand.serializer)
           ..add(UpdateAnnouncementRequest.serializer)
+          ..add(UpdateBannerRequest.serializer)
           ..add(UpdateChapterRequest.serializer)
           ..add(UpdateClassRequest.serializer)
           ..add(UpdateCourseRequest.serializer)
@@ -389,6 +401,16 @@ Serializers _$serializers =
               const FullType(AnnouncementResponse),
             ]),
             () => ListBuilder<AnnouncementResponse>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [
+              const FullType(BannerListResponse),
+            ]),
+            () => ListBuilder<BannerListResponse>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [const FullType(BannerResponse)]),
+            () => ListBuilder<BannerResponse>(),
           )
           ..addBuilderFactory(
             const FullType(BuiltList, const [const FullType(BookDTO)]),

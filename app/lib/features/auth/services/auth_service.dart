@@ -3,6 +3,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:nova_api/nova_api.dart';
 import '../../../core/network/api_client.dart';
+import '../../chat/services/chat_websocket_service.dart';
+import '../../chat/services/chat_sync_service.dart';
 
 class AuthService {
   static final AuthService _instance = AuthService._internal();
@@ -12,6 +14,7 @@ class AuthService {
   final DefaultApi _api = ApiClient.instance.defaultApi;
   final _storage = const FlutterSecureStorage();
   static const String _tokenKey = 'auth_token';
+  static const String _refreshTokenKey = 'refresh_token';
   static const String _userInfoKey = 'user_info';
 
   // 缓存的用户信息
@@ -22,9 +25,38 @@ class AuthService {
     final token = await _storage.read(key: _tokenKey);
     if (token != null && token.isNotEmpty) {
       ApiClient.instance.setAuthToken(token);
+      // 设置Token过期回调
+      ApiClient.instance.setOnTokenExpired(_handleTokenExpired);
+      // 连接 WebSocket
+      ChatWebSocketService.instance.connect(token);
+      // 初始化同步服务
+      final userInfo = await getUserInfo();
+      if (userInfo != null && userInfo['id'] != null) {
+        final userId = int.tryParse(userInfo['id'].toString());
+        if (userId != null) {
+          ChatSyncService().init(userId);
+        }
+      }
       return true;
     }
     return false;
+  }
+
+  // Token过期回调（刷新失败时调用）
+  Future<void> _handleTokenExpired() async {
+    // 清除本地存储
+    await _storage.delete(key: _tokenKey);
+    await _storage.delete(key: _refreshTokenKey);
+    await _storage.delete(key: _userInfoKey);
+    _cachedUserInfo = null;
+    // 断开WebSocket
+    ChatWebSocketService.instance.disconnect();
+    // TODO: 可以在这里发送事件通知UI跳转到登录页
+  }
+
+  // 获取当前Token
+  Future<String?> getToken() async {
+    return await _storage.read(key: _tokenKey);
   }
 
   // 账号密码登录
@@ -36,10 +68,16 @@ class AuthService {
           ..userPassword = password
         ),
       );
-      if (response.data != null) {
-        await _handleLoginSuccess(response.data!);
+      final data = response.data;
+      if (data == null) {
+        throw Exception('登录失败：服务器无响应');
       }
-      return response.data!;
+      // 检查业务状态码，code == 0 表示成功
+      if (data.code != 0) {
+        throw Exception(data.message ?? '登录失败');
+      }
+      await _handleLoginSuccess(data);
+      return data;
     } catch (e) {
       rethrow;
     }
@@ -54,10 +92,16 @@ class AuthService {
           ..smsCode = code
         ),
       );
-      if (response.data != null) {
-        await _handleLoginSuccess(response.data!);
+      final data = response.data;
+      if (data == null) {
+        throw Exception('登录失败：服务器无响应');
       }
-      return response.data!;
+      // 检查业务状态码，code == 0 表示成功
+      if (data.code != 0) {
+        throw Exception(data.message ?? '登录失败');
+      }
+      await _handleLoginSuccess(data);
+      return data;
     } catch (e) {
       rethrow;
     }
@@ -66,8 +110,24 @@ class AuthService {
   Future<void> _handleLoginSuccess(BaseResponseLoginUserResponse responseData) async {
     if (responseData.data != null && responseData.data!.token != null) {
       final token = responseData.data!.token!;
+      final refreshToken = responseData.data!.refreshToken;
+      
+      // 保存Token
       await _storage.write(key: _tokenKey, value: token);
+      if (refreshToken != null) {
+        await _storage.write(key: _refreshTokenKey, value: refreshToken);
+      }
+      
       ApiClient.instance.setAuthToken(token);
+      // 设置Token过期回调
+      ApiClient.instance.setOnTokenExpired(_handleTokenExpired);
+      // 连接 WebSocket
+      ChatWebSocketService.instance.connect(token);
+
+      // 初始化同步服务
+      if (responseData.data!.id != null) {
+        ChatSyncService().init(responseData.data!.id!);
+      }
 
       // 存储用户信息
       final userInfo = <String, dynamic>{
@@ -115,10 +175,18 @@ class AuthService {
 
   // 退出登录
   Future<void> logout() async {
+    // 断开 WebSocket 连接
+    ChatWebSocketService.instance.disconnect();
     await _storage.delete(key: _tokenKey);
+    await _storage.delete(key: _refreshTokenKey);
     await _storage.delete(key: _userInfoKey);
     _cachedUserInfo = null;
     ApiClient.instance.clearAuthToken();
+  }
+
+  // 获取Refresh Token
+  Future<String?> getRefreshToken() async {
+    return await _storage.read(key: _refreshTokenKey);
   }
 
   // 刷新用户公开资料（通过用户ID获取最新信息）

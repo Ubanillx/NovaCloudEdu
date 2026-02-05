@@ -2,6 +2,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../config/app_theme.dart';
 
 /// 品牌主色
 const Color _themeColor = Color(0xFFFF4B2B);
@@ -62,7 +63,7 @@ class _LoadingWidgetState extends State<LoadingWidget> {
                 widget.message!,
                 style: TextStyle(
                   fontSize: 14,
-                  color: Colors.grey[600],
+                  color: context.colors.textSecondary,
                 ),
               ),
             ],
@@ -129,11 +130,11 @@ class _LoadingOverlayState extends State<LoadingOverlay> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: context.colors.surface,
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
+                            color: Colors.black.withOpacity(context.isDarkMode ? 0.3 : 0.1),
                             blurRadius: 16,
                           ),
                         ],
@@ -182,6 +183,7 @@ class _ShimmerLoadingState extends State<ShimmerLoading> with SingleTickerProvid
 
   @override
   Widget build(BuildContext context) {
+    final isDark = context.isDarkMode;
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {
@@ -190,11 +192,17 @@ class _ShimmerLoadingState extends State<ShimmerLoading> with SingleTickerProvid
             return LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [
-                Colors.grey[300]!,
-                Colors.grey[100]!,
-                Colors.grey[300]!,
-              ],
+              colors: isDark
+                  ? [
+                      Colors.grey[700]!,
+                      Colors.grey[600]!,
+                      Colors.grey[700]!,
+                    ]
+                  : [
+                      Colors.grey[300]!,
+                      Colors.grey[100]!,
+                      Colors.grey[300]!,
+                    ],
               stops: [
                 0.0,
                 _controller.value,
@@ -223,6 +231,7 @@ class ListSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = context.isDarkMode;
     return ListView.builder(
       padding: const EdgeInsets.all(16),
       physics: const NeverScrollableScrollPhysics(),
@@ -234,7 +243,7 @@ class ListSkeleton extends StatelessWidget {
             child: Container(
               height: itemHeight,
               decoration: BoxDecoration(
-                color: Colors.grey[300],
+                color: isDark ? Colors.grey[700] : Colors.grey[300],
                 borderRadius: BorderRadius.circular(12),
               ),
             ),

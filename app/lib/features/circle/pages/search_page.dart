@@ -225,30 +225,31 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
   }
 
   Widget _buildSearchBar() {
+    final colors = context.colors;
     return Container(
       height: 40,
       margin: const EdgeInsets.only(right: 16),
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: Colors.grey[100],
+        color: colors.surfaceVariant,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
         children: [
-          Icon(Icons.search, size: 20, color: Colors.grey[500]),
+          Icon(Icons.search, size: 20, color: colors.textTertiary),
           const SizedBox(width: 8),
           Expanded(
             child: TextField(
               controller: _searchController,
               autofocus: false,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 hintText: '搜索帖子、用户...',
-                hintStyle: TextStyle(fontSize: 14),
+                hintStyle: TextStyle(fontSize: 14, color: colors.textTertiary),
                 border: InputBorder.none,
-                contentPadding: EdgeInsets.symmetric(vertical: 10),
+                contentPadding: const EdgeInsets.symmetric(vertical: 10),
                 isDense: true,
               ),
-              style: const TextStyle(fontSize: 14),
+              style: TextStyle(fontSize: 14, color: colors.textPrimary),
               onSubmitted: _onSearchSubmitted,
               textInputAction: TextInputAction.search,
             ),
@@ -256,7 +257,7 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
           if (_searchController.text.isNotEmpty)
             GestureDetector(
               onTap: _clearSearch,
-              child: Icon(Icons.cancel, size: 18, color: Colors.grey[400]),
+              child: Icon(Icons.cancel, size: 18, color: colors.textTertiary),
             ),
         ],
       ),
@@ -264,17 +265,18 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
   }
 
   Widget _buildSearchHint() {
+    final colors = context.colors;
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.search_rounded, size: 64, color: Colors.grey[200]),
+          Icon(Icons.search_rounded, size: 64, color: colors.textTertiary),
           const SizedBox(height: 16),
           Text(
             '搜索帖子或用户',
             style: TextStyle(
               fontSize: 16,
-              color: Colors.grey[400],
+              color: colors.textSecondary,
               fontWeight: FontWeight.w500,
             ),
           ),

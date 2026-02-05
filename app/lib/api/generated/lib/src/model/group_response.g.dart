@@ -10,6 +10,8 @@ class _$GroupResponse extends GroupResponse {
   @override
   final int? id;
   @override
+  final String? groupNumber;
+  @override
   final String? groupName;
   @override
   final String? avatar;
@@ -41,6 +43,7 @@ class _$GroupResponse extends GroupResponse {
 
   _$GroupResponse._({
     this.id,
+    this.groupNumber,
     this.groupName,
     this.avatar,
     this.description,
@@ -67,6 +70,7 @@ class _$GroupResponse extends GroupResponse {
     if (identical(other, this)) return true;
     return other is GroupResponse &&
         id == other.id &&
+        groupNumber == other.groupNumber &&
         groupName == other.groupName &&
         avatar == other.avatar &&
         description == other.description &&
@@ -86,6 +90,7 @@ class _$GroupResponse extends GroupResponse {
   int get hashCode {
     var _$hash = 0;
     _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jc(_$hash, groupNumber.hashCode);
     _$hash = $jc(_$hash, groupName.hashCode);
     _$hash = $jc(_$hash, avatar.hashCode);
     _$hash = $jc(_$hash, description.hashCode);
@@ -107,6 +112,7 @@ class _$GroupResponse extends GroupResponse {
   String toString() {
     return (newBuiltValueToStringHelper(r'GroupResponse')
           ..add('id', id)
+          ..add('groupNumber', groupNumber)
           ..add('groupName', groupName)
           ..add('avatar', avatar)
           ..add('description', description)
@@ -131,6 +137,10 @@ class GroupResponseBuilder
   int? _id;
   int? get id => _$this._id;
   set id(int? id) => _$this._id = id;
+
+  String? _groupNumber;
+  String? get groupNumber => _$this._groupNumber;
+  set groupNumber(String? groupNumber) => _$this._groupNumber = groupNumber;
 
   String? _groupName;
   String? get groupName => _$this._groupName;
@@ -193,6 +203,7 @@ class GroupResponseBuilder
     final $v = _$v;
     if ($v != null) {
       _id = $v.id;
+      _groupNumber = $v.groupNumber;
       _groupName = $v.groupName;
       _avatar = $v.avatar;
       _description = $v.description;
@@ -229,6 +240,7 @@ class GroupResponseBuilder
         _$v ??
         _$GroupResponse._(
           id: id,
+          groupNumber: groupNumber,
           groupName: groupName,
           avatar: avatar,
           description: description,

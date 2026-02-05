@@ -51,6 +51,7 @@ dependencies:
     path: ./lib/api/generated
   flutter_client_sse: ^2.0.3
   web_socket_channel: ^3.0.3
+  stomp_dart_client: ^2.0.0
   flutter_secure_storage: ^10.0.0
   
   # 中国省市区数据
@@ -65,6 +66,23 @@ dependencies:
   
   # Markdown 渲染
   markdown_widget: ^2.3.2+6
+  
+  # 录音和音频播放
+  record: ^6.0.0
+  audioplayers: ^6.1.0
+  
+  # 文件选择器
+  file_picker: ^8.1.2
+  
+  # 权限管理
+  permission_handler: ^11.3.1
+  
+  # 路径工具
+  path_provider: ^2.1.4
+  
+  # 文件预览
+  open_filex: ^4.5.0
+  url_launcher: ^6.2.5
 
 dev_dependencies:
   flutter_test:

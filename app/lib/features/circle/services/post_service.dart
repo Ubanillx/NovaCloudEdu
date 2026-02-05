@@ -289,10 +289,15 @@ class PostService {
     try {
       // 先检查当前关注状态
       final currentStatus = await isFollowing(targetUserId);
-      // 调用关注接口（切换状态）
-      await _api.follow(targetUserId: targetUserId);
-      // 返回新的关注状态（取反）
-      return !(currentStatus ?? false);
+      if (currentStatus == true) {
+        // 已关注，调用取消关注接口
+        await _api.unfollow(targetUserId: targetUserId);
+        return false;
+      } else {
+        // 未关注，调用关注接口
+        await _api.follow(targetUserId: targetUserId);
+        return true;
+      }
     } catch (e) {
       rethrow;
     }

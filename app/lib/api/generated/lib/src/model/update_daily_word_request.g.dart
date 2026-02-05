@@ -16,9 +16,13 @@ class _$UpdateDailyWordRequest extends UpdateDailyWordRequest {
   @override
   final Date publishDate;
   @override
-  final String? pronunciation;
+  final String? pronunciationUs;
   @override
-  final String? audioUrl;
+  final String? pronunciationUk;
+  @override
+  final String? audioUrlUs;
+  @override
+  final String? audioUrlUk;
   @override
   final String? example;
   @override
@@ -37,8 +41,10 @@ class _$UpdateDailyWordRequest extends UpdateDailyWordRequest {
     required this.translation,
     required this.difficulty,
     required this.publishDate,
-    this.pronunciation,
-    this.audioUrl,
+    this.pronunciationUs,
+    this.pronunciationUk,
+    this.audioUrlUs,
+    this.audioUrlUk,
     this.example,
     this.exampleTranslation,
     this.category,
@@ -61,8 +67,10 @@ class _$UpdateDailyWordRequest extends UpdateDailyWordRequest {
         translation == other.translation &&
         difficulty == other.difficulty &&
         publishDate == other.publishDate &&
-        pronunciation == other.pronunciation &&
-        audioUrl == other.audioUrl &&
+        pronunciationUs == other.pronunciationUs &&
+        pronunciationUk == other.pronunciationUk &&
+        audioUrlUs == other.audioUrlUs &&
+        audioUrlUk == other.audioUrlUk &&
         example == other.example &&
         exampleTranslation == other.exampleTranslation &&
         category == other.category &&
@@ -76,8 +84,10 @@ class _$UpdateDailyWordRequest extends UpdateDailyWordRequest {
     _$hash = $jc(_$hash, translation.hashCode);
     _$hash = $jc(_$hash, difficulty.hashCode);
     _$hash = $jc(_$hash, publishDate.hashCode);
-    _$hash = $jc(_$hash, pronunciation.hashCode);
-    _$hash = $jc(_$hash, audioUrl.hashCode);
+    _$hash = $jc(_$hash, pronunciationUs.hashCode);
+    _$hash = $jc(_$hash, pronunciationUk.hashCode);
+    _$hash = $jc(_$hash, audioUrlUs.hashCode);
+    _$hash = $jc(_$hash, audioUrlUk.hashCode);
     _$hash = $jc(_$hash, example.hashCode);
     _$hash = $jc(_$hash, exampleTranslation.hashCode);
     _$hash = $jc(_$hash, category.hashCode);
@@ -93,8 +103,10 @@ class _$UpdateDailyWordRequest extends UpdateDailyWordRequest {
           ..add('translation', translation)
           ..add('difficulty', difficulty)
           ..add('publishDate', publishDate)
-          ..add('pronunciation', pronunciation)
-          ..add('audioUrl', audioUrl)
+          ..add('pronunciationUs', pronunciationUs)
+          ..add('pronunciationUk', pronunciationUk)
+          ..add('audioUrlUs', audioUrlUs)
+          ..add('audioUrlUk', audioUrlUk)
           ..add('example', example)
           ..add('exampleTranslation', exampleTranslation)
           ..add('category', category)
@@ -123,14 +135,23 @@ class UpdateDailyWordRequestBuilder
   Date? get publishDate => _$this._publishDate;
   set publishDate(Date? publishDate) => _$this._publishDate = publishDate;
 
-  String? _pronunciation;
-  String? get pronunciation => _$this._pronunciation;
-  set pronunciation(String? pronunciation) =>
-      _$this._pronunciation = pronunciation;
+  String? _pronunciationUs;
+  String? get pronunciationUs => _$this._pronunciationUs;
+  set pronunciationUs(String? pronunciationUs) =>
+      _$this._pronunciationUs = pronunciationUs;
 
-  String? _audioUrl;
-  String? get audioUrl => _$this._audioUrl;
-  set audioUrl(String? audioUrl) => _$this._audioUrl = audioUrl;
+  String? _pronunciationUk;
+  String? get pronunciationUk => _$this._pronunciationUk;
+  set pronunciationUk(String? pronunciationUk) =>
+      _$this._pronunciationUk = pronunciationUk;
+
+  String? _audioUrlUs;
+  String? get audioUrlUs => _$this._audioUrlUs;
+  set audioUrlUs(String? audioUrlUs) => _$this._audioUrlUs = audioUrlUs;
+
+  String? _audioUrlUk;
+  String? get audioUrlUk => _$this._audioUrlUk;
+  set audioUrlUk(String? audioUrlUk) => _$this._audioUrlUk = audioUrlUk;
 
   String? _example;
   String? get example => _$this._example;
@@ -160,8 +181,10 @@ class UpdateDailyWordRequestBuilder
       _translation = $v.translation;
       _difficulty = $v.difficulty;
       _publishDate = $v.publishDate;
-      _pronunciation = $v.pronunciation;
-      _audioUrl = $v.audioUrl;
+      _pronunciationUs = $v.pronunciationUs;
+      _pronunciationUk = $v.pronunciationUk;
+      _audioUrlUs = $v.audioUrlUs;
+      _audioUrlUk = $v.audioUrlUk;
       _example = $v.example;
       _exampleTranslation = $v.exampleTranslation;
       _category = $v.category;
@@ -208,8 +231,10 @@ class UpdateDailyWordRequestBuilder
             r'UpdateDailyWordRequest',
             'publishDate',
           ),
-          pronunciation: pronunciation,
-          audioUrl: audioUrl,
+          pronunciationUs: pronunciationUs,
+          pronunciationUk: pronunciationUk,
+          audioUrlUs: audioUrlUs,
+          audioUrlUk: audioUrlUk,
           example: example,
           exampleTranslation: exampleTranslation,
           category: category,

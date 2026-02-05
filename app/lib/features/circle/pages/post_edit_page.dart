@@ -88,9 +88,10 @@ class _PostEditPageState extends State<PostEditPage> {
   }
 
   Future<void> _pickAndUploadImage() async {
+    final colors = context.colors;
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.white,
+      backgroundColor: colors.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
@@ -100,7 +101,7 @@ class _PostEditPageState extends State<PostEditPage> {
           children: [
             ListTile(
               leading: const Icon(Icons.photo_library, color: AppTheme.brand),
-              title: const Text('从相册选择'),
+              title: Text('从相册选择', style: TextStyle(color: colors.textPrimary)),
               onTap: () {
                 Navigator.pop(context);
                 _uploadFromGallery();
@@ -108,7 +109,7 @@ class _PostEditPageState extends State<PostEditPage> {
             ),
             ListTile(
               leading: const Icon(Icons.camera_alt, color: AppTheme.brand),
-              title: const Text('拍照'),
+              title: Text('拍照', style: TextStyle(color: colors.textPrimary)),
               onTap: () {
                 Navigator.pop(context);
                 _uploadFromCamera();
@@ -142,9 +143,7 @@ class _PostEditPageState extends State<PostEditPage> {
       if (markdownLink != null && mounted) {
         final currentText = _contentController.text;
         final selection = _contentController.selection;
-        final newText = currentText.substring(0, selection.baseOffset) +
-            '\n$markdownLink\n' +
-            currentText.substring(selection.extentOffset);
+        final newText = '${currentText.substring(0, selection.baseOffset)}\n$markdownLink\n${currentText.substring(selection.extentOffset)}';
         _contentController.text = newText;
         _contentController.selection = TextSelection.collapsed(
           offset: selection.baseOffset + markdownLink.length + 2,
@@ -212,19 +211,20 @@ class _PostEditPageState extends State<PostEditPage> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: colors.background,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: colors.surface,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.close, color: Colors.black87),
+          icon: Icon(Icons.close, color: colors.textPrimary),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           _isEdit ? '编辑帖子' : '发布帖子',
-          style: const TextStyle(
-            color: Colors.black87,
+          style: TextStyle(
+            color: colors.textPrimary,
             fontSize: 17,
             fontWeight: FontWeight.w600,
           ),
@@ -259,13 +259,13 @@ class _PostEditPageState extends State<PostEditPage> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: colors.surface,
               border: Border(
-                top: BorderSide(color: Colors.grey[200]!),
+                top: BorderSide(color: colors.border),
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withOpacity(context.isDarkMode ? 0.2 : 0.05),
                   offset: const Offset(0, -2),
                   blurRadius: 4,
                 ),
@@ -301,6 +301,7 @@ class _PostEditPageState extends State<PostEditPage> {
   }
 
   Widget _buildNormalEditor() {
+    final colors = context.colors;
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -310,16 +311,16 @@ class _PostEditPageState extends State<PostEditPage> {
           TextField(
             controller: _titleController,
             maxLength: 50,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
               height: 1.3,
-              color: Colors.black87,
+              color: colors.textPrimary,
             ),
             decoration: InputDecoration(
               hintText: '请输入标题',
               hintStyle: TextStyle(
-                color: Colors.grey[400],
+                color: colors.textTertiary,
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
               ),
@@ -334,7 +335,7 @@ class _PostEditPageState extends State<PostEditPage> {
           _buildContentArea(minLines: 15),
           
           const SizedBox(height: 30),
-          const Divider(height: 1, color: Color(0xFFEEEEEE)),
+          Divider(height: 1, color: colors.border),
           const SizedBox(height: 20),
 
           // 标签区域
@@ -342,12 +343,12 @@ class _PostEditPageState extends State<PostEditPage> {
             children: [
               const Icon(Icons.tag, size: 20, color: AppTheme.brand),
               const SizedBox(width: 8),
-              const Text(
+              Text(
                 '添加标签',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: Colors.black87,
+                  color: colors.textPrimary,
                 ),
               ),
               const SizedBox(width: 8),
@@ -355,7 +356,7 @@ class _PostEditPageState extends State<PostEditPage> {
                 '(${_tags.length}/5)',
                 style: TextStyle(
                   fontSize: 14,
-                  color: Colors.grey[500],
+                  color: colors.textTertiary,
                 ),
               ),
             ],
@@ -370,18 +371,18 @@ class _PostEditPageState extends State<PostEditPage> {
                   height: 40,
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   decoration: BoxDecoration(
-                    color: Colors.grey[100],
+                    color: colors.surfaceVariant,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: TextField(
                     controller: _tagController,
                     decoration: InputDecoration(
                       hintText: '输入标签话题',
-                      hintStyle: TextStyle(fontSize: 14, color: Colors.grey[500]),
+                      hintStyle: TextStyle(fontSize: 14, color: colors.textTertiary),
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.only(bottom: 10),
                     ),
-                    style: const TextStyle(fontSize: 14),
+                    style: TextStyle(fontSize: 14, color: colors.textPrimary),
                     onSubmitted: (_) => _addTag(),
                     textInputAction: TextInputAction.done,
                   ),
@@ -427,6 +428,7 @@ class _PostEditPageState extends State<PostEditPage> {
   }
 
   Widget _buildContentArea({int minLines = 8, bool expanded = false}) {
+    final colors = context.colors;
     // 计算最小高度：行数 * 行高(16 * 1.6)
     final minHeight = minLines * 16.0 * 1.6;
     
@@ -436,7 +438,7 @@ class _PostEditPageState extends State<PostEditPage> {
           ? Text(
               '暂无内容',
               style: TextStyle(
-                color: Colors.grey[400],
+                color: colors.textTertiary,
                 fontSize: 16,
               ),
             )
@@ -446,7 +448,7 @@ class _PostEditPageState extends State<PostEditPage> {
               shrinkWrap: true,
               config: MarkdownConfig(
                 configs: [
-                  const PConfig(textStyle: TextStyle(fontSize: 16, height: 1.6)),
+                  PConfig(textStyle: TextStyle(fontSize: 16, height: 1.6, color: colors.textPrimary)),
                   ImgConfig(builder: (url, attributes) {
                     return ClipRRect(
                       borderRadius: BorderRadius.circular(8),
@@ -457,10 +459,10 @@ class _PostEditPageState extends State<PostEditPage> {
                           return Container(
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
-                              color: Colors.grey[100],
+                              color: colors.surfaceVariant,
                               borderRadius: BorderRadius.circular(8),
                             ),
-                            child: const Icon(Icons.broken_image, color: Colors.grey),
+                            child: Icon(Icons.broken_image, color: colors.textTertiary),
                           );
                         },
                       ),
@@ -484,6 +486,7 @@ class _PostEditPageState extends State<PostEditPage> {
       );
     } else {
       // 内容输入
+      final colors = context.colors;
       return TextField(
         controller: _contentController,
         maxLines: expanded ? null : null,
@@ -491,15 +494,15 @@ class _PostEditPageState extends State<PostEditPage> {
         maxLength: 2000,
         expands: expanded,
         textAlignVertical: expanded ? TextAlignVertical.top : null,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 16,
           height: 1.6,
-          color: Colors.black87,
+          color: colors.textPrimary,
         ),
         decoration: InputDecoration(
           hintText: '分享你的想法...',
           hintStyle: TextStyle(
-            color: Colors.grey[400],
+            color: colors.textTertiary,
             fontSize: 16,
           ),
           border: InputBorder.none,
@@ -516,6 +519,7 @@ class _PostEditPageState extends State<PostEditPage> {
     required VoidCallback onTap,
     bool isLoading = false,
   }) {
+    final colors = context.colors;
     return InkWell(
       onTap: isLoading ? null : onTap,
       borderRadius: BorderRadius.circular(8),
@@ -537,7 +541,7 @@ class _PostEditPageState extends State<PostEditPage> {
               label,
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.grey[700],
+                color: colors.textSecondary,
                 fontWeight: FontWeight.w500,
               ),
             ),

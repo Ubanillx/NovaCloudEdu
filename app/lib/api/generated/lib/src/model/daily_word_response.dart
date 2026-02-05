@@ -14,8 +14,10 @@ part 'daily_word_response.g.dart';
 /// Properties:
 /// * [id] - ID
 /// * [word] - 单词
-/// * [pronunciation] - 音标
-/// * [audioUrl] - 发音音频URL
+/// * [pronunciationUs] - 美式音标
+/// * [pronunciationUk] - 英式音标
+/// * [audioUrlUs] - 美式发音音频URL
+/// * [audioUrlUk] - 英式发音音频URL
 /// * [translation] - 翻译
 /// * [example] - 例句
 /// * [exampleTranslation] - 例句翻译
@@ -37,13 +39,21 @@ abstract class DailyWordResponse
   @BuiltValueField(wireName: r'word')
   String? get word;
 
-  /// 音标
-  @BuiltValueField(wireName: r'pronunciation')
-  String? get pronunciation;
+  /// 美式音标
+  @BuiltValueField(wireName: r'pronunciationUs')
+  String? get pronunciationUs;
 
-  /// 发音音频URL
-  @BuiltValueField(wireName: r'audioUrl')
-  String? get audioUrl;
+  /// 英式音标
+  @BuiltValueField(wireName: r'pronunciationUk')
+  String? get pronunciationUk;
+
+  /// 美式发音音频URL
+  @BuiltValueField(wireName: r'audioUrlUs')
+  String? get audioUrlUs;
+
+  /// 英式发音音频URL
+  @BuiltValueField(wireName: r'audioUrlUk')
+  String? get audioUrlUk;
 
   /// 翻译
   @BuiltValueField(wireName: r'translation')
@@ -125,17 +135,31 @@ class _$DailyWordResponseSerializer
         specifiedType: const FullType(String),
       );
     }
-    if (object.pronunciation != null) {
-      yield r'pronunciation';
+    if (object.pronunciationUs != null) {
+      yield r'pronunciationUs';
       yield serializers.serialize(
-        object.pronunciation,
+        object.pronunciationUs,
         specifiedType: const FullType(String),
       );
     }
-    if (object.audioUrl != null) {
-      yield r'audioUrl';
+    if (object.pronunciationUk != null) {
+      yield r'pronunciationUk';
       yield serializers.serialize(
-        object.audioUrl,
+        object.pronunciationUk,
+        specifiedType: const FullType(String),
+      );
+    }
+    if (object.audioUrlUs != null) {
+      yield r'audioUrlUs';
+      yield serializers.serialize(
+        object.audioUrlUs,
+        specifiedType: const FullType(String),
+      );
+    }
+    if (object.audioUrlUk != null) {
+      yield r'audioUrlUk';
+      yield serializers.serialize(
+        object.audioUrlUk,
         specifiedType: const FullType(String),
       );
     }
@@ -248,19 +272,33 @@ class _$DailyWordResponseSerializer
           ) as String;
           result.word = valueDes;
           break;
-        case r'pronunciation':
+        case r'pronunciationUs':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(String),
           ) as String;
-          result.pronunciation = valueDes;
+          result.pronunciationUs = valueDes;
           break;
-        case r'audioUrl':
+        case r'pronunciationUk':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(String),
           ) as String;
-          result.audioUrl = valueDes;
+          result.pronunciationUk = valueDes;
+          break;
+        case r'audioUrlUs':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.audioUrlUs = valueDes;
+          break;
+        case r'audioUrlUk':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.audioUrlUk = valueDes;
           break;
         case r'translation':
           final valueDes = serializers.deserialize(

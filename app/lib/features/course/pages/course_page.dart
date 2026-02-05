@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import '../../../config/app_theme.dart';
 import '../../../widgets/common/nova_refresh_header.dart';
 import '../../data/mock_data.dart';
+import 'schedule_page.dart';
+import 'task_list_page.dart';
 
 /// 课程页面 - 参考smartclass Courses.vue
 class CoursePage extends StatefulWidget {
@@ -48,17 +49,19 @@ class _CoursePageState extends State<CoursePage> {
 
   // 头部
   Widget _buildHeader() {
+    final colors = context.colors;
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 16, 8, 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Text(
+          Text(
             '课程中心',
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
               letterSpacing: 0.5,
+              color: colors.textPrimary,
             ),
           ),
           Row(
@@ -71,12 +74,24 @@ class _CoursePageState extends State<CoursePage> {
                 tooltip: '电子书',
               ),
               IconButton(
-                onPressed: () {},
-                icon: const Icon(Icons.calendar_today_outlined, size: 20),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const SchedulePage()),
+                  );
+                },
+                icon: Icon(Icons.calendar_today_outlined, size: 20, color: colors.iconPrimary),
+                tooltip: '课程表',
               ),
               IconButton(
-                onPressed: () {},
-                icon: const Icon(Icons.checklist_rounded, size: 22),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const TaskListPage()),
+                  );
+                },
+                icon: Icon(Icons.checklist_rounded, size: 22, color: colors.iconPrimary),
+                tooltip: '任务清单',
               ),
             ],
           ),
@@ -87,6 +102,7 @@ class _CoursePageState extends State<CoursePage> {
 
   // 分类标签
   Widget _buildCategories() {
+    final colors = context.colors;
     return Container(
       height: 40,
       margin: const EdgeInsets.symmetric(vertical: 8),
@@ -104,7 +120,7 @@ class _CoursePageState extends State<CoursePage> {
               duration: const Duration(milliseconds: 200),
               padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
               decoration: BoxDecoration(
-                color: isSelected ? AppTheme.brand : Colors.grey[100],
+                color: isSelected ? AppTheme.brand : colors.surfaceVariant,
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Center(
@@ -113,7 +129,7 @@ class _CoursePageState extends State<CoursePage> {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                    color: isSelected ? Colors.white : Colors.black54,
+                    color: isSelected ? Colors.white : colors.textSecondary,
                   ),
                 ),
               ),
@@ -150,6 +166,7 @@ class _CoursePageState extends State<CoursePage> {
 
   // 年级筛选
   Widget _buildGradeFilter() {
+    final colors = context.colors;
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       child: Row(
@@ -160,19 +177,19 @@ class _CoursePageState extends State<CoursePage> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: colors.surface,
                 borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: Colors.grey[300]!),
+                border: Border.all(color: colors.border),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
                     _gradeOptions[_selectedGrade],
-                    style: const TextStyle(fontSize: 13),
+                    style: TextStyle(fontSize: 13, color: colors.textPrimary),
                   ),
                   const SizedBox(width: 4),
-                  const Icon(Icons.arrow_drop_down, size: 18),
+                  Icon(Icons.arrow_drop_down, size: 18, color: colors.iconSecondary),
                 ],
               ),
             ),
@@ -218,16 +235,17 @@ class _CoursePageState extends State<CoursePage> {
 
   // 课程卡片
   Widget _buildCourseCard(Course course) {
+    final colors = context.colors;
     return GestureDetector(
       onTap: () => _showCourseDetail(course),
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: colors.surface,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.04),
+              color: Colors.black.withOpacity(context.isDarkMode ? 0.2 : 0.04),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -286,10 +304,10 @@ class _CoursePageState extends State<CoursePage> {
                 children: [
                   Text(
                     course.title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF333333),
+                      color: colors.textPrimary,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -299,7 +317,7 @@ class _CoursePageState extends State<CoursePage> {
                     course.brief,
                     style: TextStyle(
                       fontSize: 13,
-                      color: Colors.grey[600],
+                      color: colors.textSecondary,
                       height: 1.4,
                     ),
                     maxLines: 2,
@@ -313,28 +331,28 @@ class _CoursePageState extends State<CoursePage> {
                       Icon(
                         Icons.access_time_rounded,
                         size: 14,
-                        color: Colors.grey[400],
+                        color: colors.textTertiary,
                       ),
                       const SizedBox(width: 4),
                       Text(
                         '${course.duration}min',
                         style: TextStyle(
                           fontSize: 12,
-                          color: Colors.grey[500],
+                          color: colors.textTertiary,
                         ),
                       ),
                       const SizedBox(width: 12),
                       Icon(
                         Icons.person_outline_rounded,
                         size: 14,
-                        color: Colors.grey[400],
+                        color: colors.textTertiary,
                       ),
                       const SizedBox(width: 4),
                       Text(
                         '${course.studentsCount}',
                         style: TextStyle(
                           fontSize: 12,
-                          color: Colors.grey[500],
+                          color: colors.textTertiary,
                         ),
                       ),
                     ],

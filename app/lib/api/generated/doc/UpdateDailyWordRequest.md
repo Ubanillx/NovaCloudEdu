@@ -12,8 +12,10 @@ Name | Type | Description | Notes
 **translation** | **String** | 翻译 | 
 **difficulty** | **int** | 难度等级：1-简单，2-中等，3-困难 | 
 **publishDate** | [**Date**](Date.md) | 发布日期 | 
-**pronunciation** | **String** | 音标 | [optional] 
-**audioUrl** | **String** | 发音音频URL | [optional] 
+**pronunciationUs** | **String** | 美式音标 | [optional] 
+**pronunciationUk** | **String** | 英式音标 | [optional] 
+**audioUrlUs** | **String** | 美式发音音频URL | [optional] 
+**audioUrlUk** | **String** | 英式发音音频URL | [optional] 
 **example** | **String** | 例句 | [optional] 
 **exampleTranslation** | **String** | 例句翻译 | [optional] 
 **category** | **String** | 单词分类 | [optional] 

@@ -19,7 +19,8 @@ Name | Type | Description | Notes
 **userEmail** | **String** | 用户邮箱 | [optional] 
 **level** | **int** | 等级 | [optional] 
 **createTime** | [**DateTime**](DateTime.md) | 创建时间 | [optional] 
-**token** | **String** | JWT Token | [optional] 
+**token** | **String** | JWT Token (Access Token) | [optional] 
+**refreshToken** | **String** | Refresh Token (用于刷新Access Token) | [optional] 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

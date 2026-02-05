@@ -9,6 +9,7 @@ import 'package:nova_api/api.dart';
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **id** | **int** |  | [optional] 
+**groupNumber** | **String** |  | [optional] 
 **groupName** | **String** |  | [optional] 
 **avatar** | **String** |  | [optional] 
 **description** | **String** |  | [optional] 
