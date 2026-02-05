@@ -44,6 +44,7 @@ Method | HTTP request | Description
 [**createChapter**](DefaultApi.md#createchapter) | **POST** /api/course/{courseId}/chapter | 创建章节（管理员）
 [**createClass**](DefaultApi.md#createclass) | **POST** /api/classes | 创建班级
 [**createComment**](DefaultApi.md#createcomment) | **POST** /api/posts/{postId}/comments | 发表评论
+[**createConfig**](DefaultApi.md#createconfig) | **POST** /api/admin/scraper/config | 创建抓取配置
 [**createCourse**](DefaultApi.md#createcourse) | **POST** /api/course | 创建课程（管理员）
 [**createDailyArticle**](DefaultApi.md#createdailyarticle) | **POST** /api/daily-article | 创建每日文章（管理员）
 [**createDailyWord**](DefaultApi.md#createdailyword) | **POST** /api/daily-word | 创建每日单词（管理员）
@@ -64,6 +65,7 @@ Method | HTTP request | Description
 [**deleteChapter**](DefaultApi.md#deletechapter) | **DELETE** /api/course/{courseId}/chapter/{chapterId} | 删除章节（管理员）
 [**deleteClass**](DefaultApi.md#deleteclass) | **DELETE** /api/classes/{classId} | 删除班级
 [**deleteComment**](DefaultApi.md#deletecomment) | **DELETE** /api/posts/comments/{commentId} | 删除评论
+[**deleteConfig**](DefaultApi.md#deleteconfig) | **DELETE** /api/admin/scraper/config/{id} | 删除配置
 [**deleteCourse**](DefaultApi.md#deletecourse) | **DELETE** /api/course/{id} | 删除课程（管理员）
 [**deleteDailyArticle**](DefaultApi.md#deletedailyarticle) | **DELETE** /api/daily-article/{id} | 删除每日文章（管理员）
 [**deleteDailyWord**](DefaultApi.md#deletedailyword) | **DELETE** /api/daily-word/{id} | 删除每日单词（管理员）
@@ -80,13 +82,19 @@ Method | HTTP request | Description
 [**deleteReply**](DefaultApi.md#deletereply) | **DELETE** /api/posts/replies/{replyId} | 删除回复
 [**deleteSection**](DefaultApi.md#deletesection) | **DELETE** /api/course/{courseId}/section/{sectionId} | 删除小节（管理员）
 [**deleteVariable**](DefaultApi.md#deletevariable) | **DELETE** /api/workflows/{id}/variables/{variableName} | 删除变量
+[**disableConfig**](DefaultApi.md#disableconfig) | **POST** /api/admin/scraper/config/{id}/disable | 禁用配置
 [**dissolveGroup**](DefaultApi.md#dissolvegroup) | **DELETE** /api/groups/{groupId} | 解散群
+[**enableConfig**](DefaultApi.md#enableconfig) | **POST** /api/admin/scraper/config/{id}/enable | 启用配置
 [**encryptChapterContent**](DefaultApi.md#encryptchaptercontent) | **POST** /api/books/{bookId}/chapters/{chapterIndex}/encrypt | 加密章节内容
 [**execute**](DefaultApi.md#execute) | **POST** /api/workflows/{id}/execute | 执行工作流
+[**executeAllTasks**](DefaultApi.md#executealltasks) | **POST** /api/admin/scraper/config/execute-all | 触发所有抓取
 [**executeAsync**](DefaultApi.md#executeasync) | **POST** /api/workflows/{id}/execute-async | 异步执行工作流
+[**executeTask**](DefaultApi.md#executetask) | **POST** /api/admin/scraper/config/execute | 执行抓取任务
 [**favouriteCourse**](DefaultApi.md#favouritecourse) | **POST** /api/course/favourite/{courseId} | 收藏课程
 [**follow**](DefaultApi.md#follow) | **POST** /api/follow/{targetUserId} | 关注用户
+[**getAllConfigs**](DefaultApi.md#getallconfigs) | **GET** /api/admin/scraper/config | 获取所有配置
 [**getAllFriends**](DefaultApi.md#getallfriends) | **GET** /api/friend/all | 获取全部好友
+[**getAllTasks**](DefaultApi.md#getalltasks) | **GET** /api/admin/scraper/config/tasks | 获取所有任务
 [**getAnnouncement**](DefaultApi.md#getannouncement) | **GET** /api/announcement/admin/{id} | 获取公告详情
 [**getAnnouncementDetail**](DefaultApi.md#getannouncementdetail) | **GET** /api/announcement/{id} | 获取公告详情
 [**getAnnouncementList**](DefaultApi.md#getannouncementlist) | **GET** /api/announcement/list | 获取公告列表
@@ -108,6 +116,8 @@ Method | HTTP request | Description
 [**getCollectedArticles**](DefaultApi.md#getcollectedarticles) | **GET** /api/user/daily-article/collected | 获取收藏文章列表
 [**getCollectedWords**](DefaultApi.md#getcollectedwords) | **GET** /api/user/daily-word/collected | 获取收藏单词列表
 [**getCommentReplies**](DefaultApi.md#getcommentreplies) | **GET** /api/posts/comments/{commentId}/replies | 获取评论回复列表
+[**getConfig**](DefaultApi.md#getconfig) | **GET** /api/admin/scraper/config/{id} | 获取配置详情
+[**getConfigsByPage**](DefaultApi.md#getconfigsbypage) | **GET** /api/admin/scraper/config/page | 分页获取配置
 [**getCourse**](DefaultApi.md#getcourse) | **GET** /api/course/{id} | 获取课程详情
 [**getCourseProgress**](DefaultApi.md#getcourseprogress) | **GET** /api/progress/course/{courseId} | 获取课程所有小节的学习进度
 [**getCourseProgressSummary**](DefaultApi.md#getcourseprogresssummary) | **GET** /api/progress/course/{courseId}/summary | 获取课程进度汇总
@@ -172,7 +182,10 @@ Method | HTTP request | Description
 [**getStats1**](DefaultApi.md#getstats1) | **GET** /api/user/daily-word/stats | 获取学习统计
 [**getStats2**](DefaultApi.md#getstats2) | **GET** /api/user/daily-article/stats | 获取阅读统计
 [**getStudiedWords**](DefaultApi.md#getstudiedwords) | **GET** /api/user/daily-word/studied | 获取已学习单词列表
+[**getSupportedSources**](DefaultApi.md#getsupportedsources) | **GET** /api/scraper/sources | 获取预设来源列表
 [**getSupportedVoices**](DefaultApi.md#getsupportedvoices) | **GET** /api/speech/tts/voices | 获取支持的发音人列表
+[**getTask**](DefaultApi.md#gettask) | **GET** /api/admin/scraper/config/task/{taskId} | 获取任务详情
+[**getTasksByConfig**](DefaultApi.md#gettasksbyconfig) | **GET** /api/admin/scraper/config/{configId}/tasks | 获取配置的任务列表
 [**getTeacher**](DefaultApi.md#getteacher) | **GET** /api/teacher/{id} | 获取讲师信息
 [**getTeacherByUserId**](DefaultApi.md#getteacherbyuserid) | **GET** /api/teacher/user/{userId} | 根据用户ID获取讲师信息
 [**getTodayArticles**](DefaultApi.md#gettodayarticles) | **GET** /api/daily-article/today | 获取今日推荐文章（个性化推荐）
@@ -233,6 +246,8 @@ Method | HTTP request | Description
 [**queryBanners**](DefaultApi.md#querybanners) | **GET** /api/admin/banner/list | 分页查询轮播图
 [**queryFeedbacks**](DefaultApi.md#queryfeedbacks) | **POST** /api/feedback/admin/list | 分页查询反馈
 [**queryUsers**](DefaultApi.md#queryusers) | **POST** /api/user/admin/list | 分页查询用户
+[**quickDynamicScrape**](DefaultApi.md#quickdynamicscrape) | **GET** /api/scraper/dynamic/quick | 快速动态抓取
+[**quickScrape**](DefaultApi.md#quickscrape) | **GET** /api/scraper/quick | 快速抓取
 [**refreshToken**](DefaultApi.md#refreshtoken) | **POST** /api/auth/refresh | 刷新Token
 [**refund**](DefaultApi.md#refund) | **POST** /api/admin/order/{orderNo}/refund | 退款（管理员）
 [**removeCourse**](DefaultApi.md#removecourse) | **DELETE** /api/classes/{classId}/courses/{courseId} | 移除课程
@@ -246,6 +261,16 @@ Method | HTTP request | Description
 [**resetProgress**](DefaultApi.md#resetprogress) | **POST** /api/progress/section/{sectionId}/reset | 重置小节进度
 [**reviewApplication**](DefaultApi.md#reviewapplication) | **POST** /api/teacher/application/review | 审核讲师申请（管理员）
 [**reviewCourse**](DefaultApi.md#reviewcourse) | **POST** /api/course/review/{courseId} | 评价课程
+[**scrapeArticleLinks**](DefaultApi.md#scrapearticlelinks) | **POST** /api/scraper/links | 获取文章链接
+[**scrapeDynamicArticleLinks**](DefaultApi.md#scrapedynamicarticlelinks) | **POST** /api/scraper/dynamic/links | 动态获取文章链接
+[**scrapeDynamicMultiplePages**](DefaultApi.md#scrapedynamicmultiplepages) | **POST** /api/scraper/dynamic/batch | 批量动态抓取
+[**scrapeDynamicPage**](DefaultApi.md#scrapedynamicpage) | **POST** /api/scraper/dynamic/single | 动态抓取单个页面
+[**scrapeDynamicPageWithSelector**](DefaultApi.md#scrapedynamicpagewithselector) | **POST** /api/scraper/dynamic/wait-for | 动态抓取（等待元素）
+[**scrapeDynamicRecursively**](DefaultApi.md#scrapedynamicrecursively) | **POST** /api/scraper/dynamic/recursive | 递归动态抓取
+[**scrapeFromSource**](DefaultApi.md#scrapefromsource) | **POST** /api/scraper/source | 从预设来源抓取
+[**scrapeMultiplePages**](DefaultApi.md#scrapemultiplepages) | **POST** /api/scraper/batch | 批量抓取
+[**scrapeRecursively**](DefaultApi.md#scraperecursively) | **POST** /api/scraper/recursive | 递归抓取
+[**scrapeSinglePage**](DefaultApi.md#scrapesinglepage) | **POST** /api/scraper/single | 抓取单个页面
 [**search**](DefaultApi.md#search) | **GET** /api/ai/knowledge-bases/search | 搜索知识库
 [**searchArticles**](DefaultApi.md#searcharticles) | **GET** /api/daily-article/search | 搜索文章
 [**searchBooks**](DefaultApi.md#searchbooks) | **GET** /api/books/search | 搜索书籍
@@ -260,6 +285,8 @@ Method | HTTP request | Description
 [**sendSms**](DefaultApi.md#sendsms) | **POST** /api/user/admin/send-sms | 发送短信验证码
 [**setAdmin**](DefaultApi.md#setadmin) | **PUT** /api/groups/{groupId}/members/{targetUserId}/admin | 设置/取消管理员
 [**setJoinMode**](DefaultApi.md#setjoinmode) | **PUT** /api/groups/{groupId}/join-mode | 设置群加入模式
+[**smartDynamicScrape**](DefaultApi.md#smartdynamicscrape) | **POST** /api/scraper/dynamic/smart | 智能动态抓取
+[**smartScrape**](DefaultApi.md#smartscrape) | **POST** /api/scraper/smart | 智能抓取
 [**studyWord**](DefaultApi.md#studyword) | **POST** /api/user/daily-word/{wordId}/study | 标记单词为已学习
 [**takeOffline**](DefaultApi.md#takeoffline) | **POST** /api/course/{id}/offline | 下架课程（管理员）
 [**textToSpeech**](DefaultApi.md#texttospeech) | **POST** /api/speech/tts | 文本转语音
@@ -279,6 +306,7 @@ Method | HTTP request | Description
 [**updateBanner**](DefaultApi.md#updatebanner) | **PUT** /api/admin/banner | 更新轮播图
 [**updateChapter**](DefaultApi.md#updatechapter) | **PUT** /api/course/{courseId}/chapter/{chapterId} | 更新章节（管理员）
 [**updateClass**](DefaultApi.md#updateclass) | **PUT** /api/classes/{classId} | 更新班级信息
+[**updateConfig**](DefaultApi.md#updateconfig) | **PUT** /api/admin/scraper/config/{id} | 更新抓取配置
 [**updateCourse**](DefaultApi.md#updatecourse) | **PUT** /api/course/{id} | 更新课程（管理员）
 [**updateDailyArticle**](DefaultApi.md#updatedailyarticle) | **PUT** /api/daily-article/{id} | 更新每日文章（管理员）
 [**updateDailyWord**](DefaultApi.md#updatedailyword) | **PUT** /api/daily-word/{id} | 更新每日单词（管理员）
@@ -1795,6 +1823,49 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **createConfig**
+> BaseResponseScraperConfigResponse createConfig(scraperConfigRequest)
+
+创建抓取配置
+
+创建新的抓取源配置
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final ScraperConfigRequest scraperConfigRequest = ; // ScraperConfigRequest | 
+
+try {
+    final response = api.createConfig(scraperConfigRequest);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->createConfig: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **scraperConfigRequest** | [**ScraperConfigRequest**](ScraperConfigRequest.md)|  | 
+
+### Return type
+
+[**BaseResponseScraperConfigResponse**](BaseResponseScraperConfigResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **createCourse**
 > BaseResponseLong createCourse(createCourseRequest)
 
@@ -2631,6 +2702,49 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **deleteConfig**
+> BaseResponseVoid deleteConfig(id)
+
+删除配置
+
+删除指定的抓取配置
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int id = 789; // int | 
+
+try {
+    final response = api.deleteConfig(id);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->deleteConfig: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **int**|  | 
+
+### Return type
+
+[**BaseResponseVoid**](BaseResponseVoid.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **deleteCourse**
 > BaseResponseVoid deleteCourse(id)
 
@@ -3307,6 +3421,49 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **disableConfig**
+> BaseResponseVoid disableConfig(id)
+
+禁用配置
+
+禁用指定的抓取配置
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int id = 789; // int | 
+
+try {
+    final response = api.disableConfig(id);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->disableConfig: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **int**|  | 
+
+### Return type
+
+[**BaseResponseVoid**](BaseResponseVoid.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **dissolveGroup**
 > BaseResponseVoid dissolveGroup(groupId)
 
@@ -3332,6 +3489,49 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **groupId** | **int**|  | 
+
+### Return type
+
+[**BaseResponseVoid**](BaseResponseVoid.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **enableConfig**
+> BaseResponseVoid enableConfig(id)
+
+启用配置
+
+启用指定的抓取配置
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int id = 789; // int | 
+
+try {
+    final response = api.enableConfig(id);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->enableConfig: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **int**|  | 
 
 ### Return type
 
@@ -3436,6 +3636,45 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **executeAllTasks**
+> BaseResponseVoid executeAllTasks()
+
+触发所有抓取
+
+手动触发所有启用配置的抓取任务
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+
+try {
+    final response = api.executeAllTasks();
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->executeAllTasks: $e\n');
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**BaseResponseVoid**](BaseResponseVoid.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **executeAsync**
 > BaseResponseAsyncExecutionResponse executeAsync(id, executeWorkflowRequest)
 
@@ -3467,6 +3706,49 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**BaseResponseAsyncExecutionResponse**](BaseResponseAsyncExecutionResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **executeTask**
+> BaseResponseScraperTaskResponse executeTask(executeTaskRequest)
+
+执行抓取任务
+
+手动触发指定配置的抓取任务
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final ExecuteTaskRequest executeTaskRequest = ; // ExecuteTaskRequest | 
+
+try {
+    final response = api.executeTask(executeTaskRequest);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->executeTask: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **executeTaskRequest** | [**ExecuteTaskRequest**](ExecuteTaskRequest.md)|  | 
+
+### Return type
+
+[**BaseResponseScraperTaskResponse**](BaseResponseScraperTaskResponse.md)
 
 ### Authorization
 
@@ -3561,6 +3843,45 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **getAllConfigs**
+> BaseResponseListScraperConfigResponse getAllConfigs()
+
+获取所有配置
+
+获取所有抓取源配置列表
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+
+try {
+    final response = api.getAllConfigs();
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getAllConfigs: $e\n');
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**BaseResponseListScraperConfigResponse**](BaseResponseListScraperConfigResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **getAllFriends**
 > BaseResponseListFriendResponse getAllFriends()
 
@@ -3588,6 +3909,51 @@ This endpoint does not need any parameter.
 ### Return type
 
 [**BaseResponseListFriendResponse**](BaseResponseListFriendResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getAllTasks**
+> BaseResponseScraperTaskPageResponse getAllTasks(page, size)
+
+获取所有任务
+
+获取所有抓取任务列表
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int page = 56; // int | 
+final int size = 56; // int | 
+
+try {
+    final response = api.getAllTasks(page, size);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getAllTasks: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **page** | **int**|  | [optional] [default to 1]
+ **size** | **int**|  | [optional] [default to 10]
+
+### Return type
+
+[**BaseResponseScraperTaskPageResponse**](BaseResponseScraperTaskPageResponse.md)
 
 ### Authorization
 
@@ -4475,6 +4841,94 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**BaseResponseReplyPageResponse**](BaseResponseReplyPageResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getConfig**
+> BaseResponseScraperConfigResponse getConfig(id)
+
+获取配置详情
+
+获取指定抓取配置的详细信息
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int id = 789; // int | 
+
+try {
+    final response = api.getConfig(id);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getConfig: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **int**|  | 
+
+### Return type
+
+[**BaseResponseScraperConfigResponse**](BaseResponseScraperConfigResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getConfigsByPage**
+> BaseResponseScraperConfigPageResponse getConfigsByPage(page, size)
+
+分页获取配置
+
+分页获取抓取源配置列表
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int page = 56; // int | 
+final int size = 56; // int | 
+
+try {
+    final response = api.getConfigsByPage(page, size);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getConfigsByPage: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **page** | **int**|  | [optional] [default to 1]
+ **size** | **int**|  | [optional] [default to 10]
+
+### Return type
+
+[**BaseResponseScraperConfigPageResponse**](BaseResponseScraperConfigPageResponse.md)
 
 ### Authorization
 
@@ -7133,6 +7587,45 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **getSupportedSources**
+> BaseResponseListArticleSourceResponse getSupportedSources()
+
+获取预设来源列表
+
+获取所有支持的预设新闻来源
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+
+try {
+    final response = api.getSupportedSources();
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getSupportedSources: $e\n');
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**BaseResponseListArticleSourceResponse**](BaseResponseListArticleSourceResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **getSupportedVoices**
 > BaseResponseString getSupportedVoices()
 
@@ -7158,6 +7651,96 @@ This endpoint does not need any parameter.
 ### Return type
 
 [**BaseResponseString**](BaseResponseString.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getTask**
+> BaseResponseScraperTaskResponse getTask(taskId)
+
+获取任务详情
+
+获取指定抓取任务的详细信息
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int taskId = 789; // int | 
+
+try {
+    final response = api.getTask(taskId);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getTask: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **taskId** | **int**|  | 
+
+### Return type
+
+[**BaseResponseScraperTaskResponse**](BaseResponseScraperTaskResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getTasksByConfig**
+> BaseResponseScraperTaskPageResponse getTasksByConfig(configId, page, size)
+
+获取配置的任务列表
+
+获取指定配置的任务执行历史
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int configId = 789; // int | 
+final int page = 56; // int | 
+final int size = 56; // int | 
+
+try {
+    final response = api.getTasksByConfig(configId, page, size);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getTasksByConfig: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **configId** | **int**|  | 
+ **page** | **int**|  | [optional] [default to 1]
+ **size** | **int**|  | [optional] [default to 10]
+
+### Return type
+
+[**BaseResponseScraperTaskPageResponse**](BaseResponseScraperTaskPageResponse.md)
 
 ### Authorization
 
@@ -7303,7 +7886,7 @@ Name | Type | Description  | Notes
 import 'package:nova_api/api.dart';
 
 final api = NovaApi().getDefaultApi();
-final int size = 56; // int | 推荐数量
+final int size = 56; // int | 推荐数量，最大100
 final String type = type_example; // String | 单词分类：小学三年级、小学四年级、小学五年级、小学六年级、初中七年级、初中八年级、初中九年级、初中、初中(乱序)、外研社初中、高中、高中(乱序)、北师高中、四级、四级(乱序)、专四、专四(乱序)、六级、六级(乱序)、考研、考研(乱序)、专八、专八(乱序)、托福、雅思、雅思(乱序)、GRE、GMAT、GMAT(乱序)、SAT、BEC商务英语
 
 try {
@@ -7318,7 +7901,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **size** | **int**| 推荐数量 | [optional] [default to 10]
+ **size** | **int**| 推荐数量，最大100 | [optional] [default to 10]
  **type** | **String**| 单词分类：小学三年级、小学四年级、小学五年级、小学六年级、初中七年级、初中八年级、初中九年级、初中、初中(乱序)、外研社初中、高中、高中(乱序)、北师高中、四级、四级(乱序)、专四、专四(乱序)、六级、六级(乱序)、考研、考研(乱序)、专八、专八(乱序)、托福、雅思、雅思(乱序)、GRE、GMAT、GMAT(乱序)、SAT、BEC商务英语 | [optional] 
 
 ### Return type
@@ -8351,7 +8934,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **listArticles**
-> BaseResponseListDailyArticleResponse listArticles(category, difficulty, page, size)
+> BaseResponseDailyArticlePageResponse listArticles(category, difficulty, page, size)
 
 获取文章列表
 
@@ -8384,7 +8967,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**BaseResponseListDailyArticleResponse**](BaseResponseListDailyArticleResponse.md)
+[**BaseResponseDailyArticlePageResponse**](BaseResponseDailyArticlePageResponse.md)
 
 ### Authorization
 
@@ -8924,7 +9507,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **listWords**
-> BaseResponseListDailyWordResponse listWords(category, difficulty, page, size)
+> BaseResponseDailyWordPageResponse listWords(category, difficulty, page, size)
 
 获取单词列表
 
@@ -8957,7 +9540,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**BaseResponseListDailyWordResponse**](BaseResponseListDailyWordResponse.md)
+[**BaseResponseDailyWordPageResponse**](BaseResponseDailyWordPageResponse.md)
 
 ### Authorization
 
@@ -9738,6 +10321,94 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **quickDynamicScrape**
+> BaseResponseArticleResponse quickDynamicScrape(url, waitForJsMs)
+
+快速动态抓取
+
+通过GET方式快速动态抓取单个页面
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final String url = url_example; // String | 
+final int waitForJsMs = 56; // int | 
+
+try {
+    final response = api.quickDynamicScrape(url, waitForJsMs);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->quickDynamicScrape: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **url** | **String**|  | 
+ **waitForJsMs** | **int**|  | [optional] [default to 3000]
+
+### Return type
+
+[**BaseResponseArticleResponse**](BaseResponseArticleResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **quickScrape**
+> BaseResponseArticleResponse quickScrape(url)
+
+快速抓取
+
+通过GET方式快速抓取单个页面
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final String url = url_example; // String | 
+
+try {
+    final response = api.quickScrape(url);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->quickScrape: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **url** | **String**|  | 
+
+### Return type
+
+[**BaseResponseArticleResponse**](BaseResponseArticleResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **refreshToken**
 > BaseResponseRefreshTokenResponse refreshToken(refreshTokenRequest)
 
@@ -10289,6 +10960,438 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **scrapeArticleLinks**
+> BaseResponseListString scrapeArticleLinks(scrapeRequest)
+
+获取文章链接
+
+从列表页获取所有文章链接
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final ScrapeRequest scrapeRequest = ; // ScrapeRequest | 
+
+try {
+    final response = api.scrapeArticleLinks(scrapeRequest);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->scrapeArticleLinks: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **scrapeRequest** | [**ScrapeRequest**](ScrapeRequest.md)|  | 
+
+### Return type
+
+[**BaseResponseListString**](BaseResponseListString.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **scrapeDynamicArticleLinks**
+> BaseResponseListString scrapeDynamicArticleLinks(dynamicScrapeRequest)
+
+动态获取文章链接
+
+从动态页面获取所有文章链接
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final DynamicScrapeRequest dynamicScrapeRequest = ; // DynamicScrapeRequest | 
+
+try {
+    final response = api.scrapeDynamicArticleLinks(dynamicScrapeRequest);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->scrapeDynamicArticleLinks: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **dynamicScrapeRequest** | [**DynamicScrapeRequest**](DynamicScrapeRequest.md)|  | 
+
+### Return type
+
+[**BaseResponseListString**](BaseResponseListString.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **scrapeDynamicMultiplePages**
+> BaseResponseScrapeResultResponse scrapeDynamicMultiplePages(batchScrapeRequest, waitForJsMs)
+
+批量动态抓取
+
+批量抓取多个动态页面
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final BatchScrapeRequest batchScrapeRequest = ; // BatchScrapeRequest | 
+final int waitForJsMs = 56; // int | 
+
+try {
+    final response = api.scrapeDynamicMultiplePages(batchScrapeRequest, waitForJsMs);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->scrapeDynamicMultiplePages: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **batchScrapeRequest** | [**BatchScrapeRequest**](BatchScrapeRequest.md)|  | 
+ **waitForJsMs** | **int**|  | [optional] [default to 3000]
+
+### Return type
+
+[**BaseResponseScrapeResultResponse**](BaseResponseScrapeResultResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **scrapeDynamicPage**
+> BaseResponseArticleResponse scrapeDynamicPage(dynamicScrapeRequest)
+
+动态抓取单个页面
+
+使用无头浏览器抓取 JavaScript 渲染的动态页面
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final DynamicScrapeRequest dynamicScrapeRequest = ; // DynamicScrapeRequest | 
+
+try {
+    final response = api.scrapeDynamicPage(dynamicScrapeRequest);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->scrapeDynamicPage: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **dynamicScrapeRequest** | [**DynamicScrapeRequest**](DynamicScrapeRequest.md)|  | 
+
+### Return type
+
+[**BaseResponseArticleResponse**](BaseResponseArticleResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **scrapeDynamicPageWithSelector**
+> BaseResponseArticleResponse scrapeDynamicPageWithSelector(dynamicScrapeRequest)
+
+动态抓取（等待元素）
+
+等待页面特定元素加载后再抓取
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final DynamicScrapeRequest dynamicScrapeRequest = ; // DynamicScrapeRequest | 
+
+try {
+    final response = api.scrapeDynamicPageWithSelector(dynamicScrapeRequest);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->scrapeDynamicPageWithSelector: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **dynamicScrapeRequest** | [**DynamicScrapeRequest**](DynamicScrapeRequest.md)|  | 
+
+### Return type
+
+[**BaseResponseArticleResponse**](BaseResponseArticleResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **scrapeDynamicRecursively**
+> BaseResponseScrapeResultResponse scrapeDynamicRecursively(dynamicScrapeRequest)
+
+递归动态抓取
+
+递归抓取动态网站，支持 SPA 和 JavaScript 渲染页面
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final DynamicScrapeRequest dynamicScrapeRequest = ; // DynamicScrapeRequest | 
+
+try {
+    final response = api.scrapeDynamicRecursively(dynamicScrapeRequest);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->scrapeDynamicRecursively: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **dynamicScrapeRequest** | [**DynamicScrapeRequest**](DynamicScrapeRequest.md)|  | 
+
+### Return type
+
+[**BaseResponseScrapeResultResponse**](BaseResponseScrapeResultResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **scrapeFromSource**
+> BaseResponseScrapeResultResponse scrapeFromSource(sourceScrapeRequest)
+
+从预设来源抓取
+
+使用预设的来源配置抓取内容，支持 Dogo News、Science News for Students 等
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final SourceScrapeRequest sourceScrapeRequest = ; // SourceScrapeRequest | 
+
+try {
+    final response = api.scrapeFromSource(sourceScrapeRequest);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->scrapeFromSource: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **sourceScrapeRequest** | [**SourceScrapeRequest**](SourceScrapeRequest.md)|  | 
+
+### Return type
+
+[**BaseResponseScrapeResultResponse**](BaseResponseScrapeResultResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **scrapeMultiplePages**
+> BaseResponseScrapeResultResponse scrapeMultiplePages(batchScrapeRequest)
+
+批量抓取
+
+批量抓取多个URL的页面内容
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final BatchScrapeRequest batchScrapeRequest = ; // BatchScrapeRequest | 
+
+try {
+    final response = api.scrapeMultiplePages(batchScrapeRequest);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->scrapeMultiplePages: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **batchScrapeRequest** | [**BatchScrapeRequest**](BatchScrapeRequest.md)|  | 
+
+### Return type
+
+[**BaseResponseScrapeResultResponse**](BaseResponseScrapeResultResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **scrapeRecursively**
+> BaseResponseScrapeResultResponse scrapeRecursively(scrapeRequest)
+
+递归抓取
+
+从起始URL开始递归抓取网站内容，支持嵌套页面扫描
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final ScrapeRequest scrapeRequest = ; // ScrapeRequest | 
+
+try {
+    final response = api.scrapeRecursively(scrapeRequest);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->scrapeRecursively: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **scrapeRequest** | [**ScrapeRequest**](ScrapeRequest.md)|  | 
+
+### Return type
+
+[**BaseResponseScrapeResultResponse**](BaseResponseScrapeResultResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **scrapeSinglePage**
+> BaseResponseArticleResponse scrapeSinglePage(scrapeRequest)
+
+抓取单个页面
+
+抓取指定URL的页面内容，提取标题、作者、来源、正文等信息
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final ScrapeRequest scrapeRequest = ; // ScrapeRequest | 
+
+try {
+    final response = api.scrapeSinglePage(scrapeRequest);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->scrapeSinglePage: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **scrapeRequest** | [**ScrapeRequest**](ScrapeRequest.md)|  | 
+
+### Return type
+
+[**BaseResponseArticleResponse**](BaseResponseArticleResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **search**
 > BaseResponseListKnowledgeBaseVO search(keyword, userId, page, size)
 
@@ -10337,7 +11440,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **searchArticles**
-> BaseResponseListDailyArticleResponse searchArticles(keyword, page, size)
+> BaseResponseDailyArticlePageResponse searchArticles(keyword, page, size)
 
 搜索文章
 
@@ -10368,7 +11471,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**BaseResponseListDailyArticleResponse**](BaseResponseListDailyArticleResponse.md)
+[**BaseResponseDailyArticlePageResponse**](BaseResponseDailyArticlePageResponse.md)
 
 ### Authorization
 
@@ -10650,7 +11753,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **searchWords**
-> BaseResponseListDailyWordResponse searchWords(keyword, page, size)
+> BaseResponseDailyWordPageResponse searchWords(keyword, page, size)
 
 搜索单词
 
@@ -10681,7 +11784,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**BaseResponseListDailyWordResponse**](BaseResponseListDailyWordResponse.md)
+[**BaseResponseDailyWordPageResponse**](BaseResponseDailyWordPageResponse.md)
 
 ### Authorization
 
@@ -10901,6 +12004,98 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**BaseResponseVoid**](BaseResponseVoid.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **smartDynamicScrape**
+> BaseResponseScrapeResultResponse smartDynamicScrape(url, maxArticles, forceDynamic)
+
+智能动态抓取
+
+自动检测是否需要动态抓取，先尝试静态抓取，失败后自动切换到动态抓取
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final String url = url_example; // String | 
+final int maxArticles = 56; // int | 
+final bool forceDynamic = true; // bool | 
+
+try {
+    final response = api.smartDynamicScrape(url, maxArticles, forceDynamic);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->smartDynamicScrape: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **url** | **String**|  | 
+ **maxArticles** | **int**|  | [optional] [default to 10]
+ **forceDynamic** | **bool**|  | [optional] [default to false]
+
+### Return type
+
+[**BaseResponseScrapeResultResponse**](BaseResponseScrapeResultResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **smartScrape**
+> BaseResponseScrapeResultResponse smartScrape(url, maxArticles)
+
+智能抓取
+
+自动识别页面类型并使用最佳策略抓取
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final String url = url_example; // String | 
+final int maxArticles = 56; // int | 
+
+try {
+    final response = api.smartScrape(url, maxArticles);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->smartScrape: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **url** | **String**|  | 
+ **maxArticles** | **int**|  | [optional] [default to 10]
+
+### Return type
+
+[**BaseResponseScrapeResultResponse**](BaseResponseScrapeResultResponse.md)
 
 ### Authorization
 
@@ -11700,6 +12895,51 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**BaseResponseVoid**](BaseResponseVoid.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **updateConfig**
+> BaseResponseScraperConfigResponse updateConfig(id, scraperConfigRequest)
+
+更新抓取配置
+
+更新已有的抓取源配置
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int id = 789; // int | 
+final ScraperConfigRequest scraperConfigRequest = ; // ScraperConfigRequest | 
+
+try {
+    final response = api.updateConfig(id, scraperConfigRequest);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->updateConfig: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **int**|  | 
+ **scraperConfigRequest** | [**ScraperConfigRequest**](ScraperConfigRequest.md)|  | 
+
+### Return type
+
+[**BaseResponseScraperConfigResponse**](BaseResponseScraperConfigResponse.md)
 
 ### Authorization
 

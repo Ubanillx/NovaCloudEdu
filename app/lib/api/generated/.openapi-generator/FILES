@@ -17,6 +17,8 @@ doc/AnnouncementListResponse.md
 doc/AnnouncementPageResponse.md
 doc/AnnouncementResponse.md
 doc/ApplyTeacherRequest.md
+doc/ArticleResponse.md
+doc/ArticleSourceResponse.md
 doc/AsyncExecutionResponse.md
 doc/BannerListResponse.md
 doc/BannerPageResponse.md
@@ -26,6 +28,7 @@ doc/BaseResponseAiConversation.md
 doc/BaseResponseAnnouncementDetailResponse.md
 doc/BaseResponseAnnouncementPageResponse.md
 doc/BaseResponseAnnouncementResponse.md
+doc/BaseResponseArticleResponse.md
 doc/BaseResponseAsyncExecutionResponse.md
 doc/BaseResponseBannerPageResponse.md
 doc/BaseResponseBannerResponse.md
@@ -45,7 +48,9 @@ doc/BaseResponseCourseProgressSummaryResponse.md
 doc/BaseResponseCourseResponse.md
 doc/BaseResponseCourseReviewResponse.md
 doc/BaseResponseCourseStructureResponse.md
+doc/BaseResponseDailyArticlePageResponse.md
 doc/BaseResponseDailyArticleResponse.md
+doc/BaseResponseDailyWordPageResponse.md
 doc/BaseResponseDailyWordResponse.md
 doc/BaseResponseExecutionResultResponse.md
 doc/BaseResponseFeedbackDetailResponse.md
@@ -64,6 +69,7 @@ doc/BaseResponseKnowledgeDocumentVO.md
 doc/BaseResponseLearningStats.md
 doc/BaseResponseListAiAssistantVO.md
 doc/BaseResponseListAiConversation.md
+doc/BaseResponseListArticleSourceResponse.md
 doc/BaseResponseListBannerListResponse.md
 doc/BaseResponseListBookDTO.md
 doc/BaseResponseListChapterDTO.md
@@ -92,7 +98,9 @@ doc/BaseResponseListNodeTypeResponse.md
 doc/BaseResponseListOrderResponse.md
 doc/BaseResponseListPostResponse.md
 doc/BaseResponseListProgressResponse.md
+doc/BaseResponseListScraperConfigResponse.md
 doc/BaseResponseListSectionResponse.md
+doc/BaseResponseListString.md
 doc/BaseResponseListTeacherApplicationResponse.md
 doc/BaseResponseListTeacherResponse.md
 doc/BaseResponseListUserDailyArticleResponse.md
@@ -121,6 +129,11 @@ doc/BaseResponseRefreshTokenResponse.md
 doc/BaseResponseReplyPageResponse.md
 doc/BaseResponseReplyResponse.md
 doc/BaseResponseScheduleResponse.md
+doc/BaseResponseScrapeResultResponse.md
+doc/BaseResponseScraperConfigPageResponse.md
+doc/BaseResponseScraperConfigResponse.md
+doc/BaseResponseScraperTaskPageResponse.md
+doc/BaseResponseScraperTaskResponse.md
 doc/BaseResponseSearchUserPageResponse.md
 doc/BaseResponseSectionResponse.md
 doc/BaseResponseSendResult.md
@@ -147,6 +160,7 @@ doc/BaseResponseWorkflowVariableResponse.md
 doc/BatchBanUserRequest.md
 doc/BatchCreateUserRequest.md
 doc/BatchProcessResult.md
+doc/BatchScrapeRequest.md
 doc/BatchUpdateNodesRequest.md
 doc/BookDTO.md
 doc/BookId.md
@@ -199,11 +213,15 @@ doc/CreateScheduleSettingRequest.md
 doc/CreateSectionRequest.md
 doc/CreateUserRequest.md
 doc/CreateWorkflowRequest.md
+doc/DailyArticlePageResponse.md
 doc/DailyArticleResponse.md
+doc/DailyWordPageResponse.md
 doc/DailyWordResponse.md
 doc/DefaultApi.md
+doc/DynamicScrapeRequest.md
 doc/ErrorHandlingConfig.md
 doc/ErrorHandlingConfigDTO.md
+doc/ExecuteTaskRequest.md
 doc/ExecuteWorkflowRequest.md
 doc/ExecutionLogResponse.md
 doc/ExecutionResultResponse.md
@@ -267,6 +285,14 @@ doc/ResetPasswordRequest.md
 doc/ReviewApplicationRequest.md
 doc/ReviewCourseRequest.md
 doc/ScheduleResponse.md
+doc/ScrapeConfigRequest.md
+doc/ScrapeRequest.md
+doc/ScrapeResultResponse.md
+doc/ScraperConfigPageResponse.md
+doc/ScraperConfigRequest.md
+doc/ScraperConfigResponse.md
+doc/ScraperTaskPageResponse.md
+doc/ScraperTaskResponse.md
 doc/SearchUserPageResponse.md
 doc/SearchUserRequestDTO.md
 doc/SearchUserResponse.md
@@ -275,6 +301,7 @@ doc/SendCodeRequest.md
 doc/SendFriendRequestDTO.md
 doc/SendResult.md
 doc/SendSmsRequest.md
+doc/SourceScrapeRequest.md
 doc/SseEmitter.md
 doc/TeacherApplicationResponse.md
 doc/TeacherResponse.md
@@ -366,6 +393,8 @@ lib/src/model/announcement_list_response.dart
 lib/src/model/announcement_page_response.dart
 lib/src/model/announcement_response.dart
 lib/src/model/apply_teacher_request.dart
+lib/src/model/article_response.dart
+lib/src/model/article_source_response.dart
 lib/src/model/async_execution_response.dart
 lib/src/model/banner_list_response.dart
 lib/src/model/banner_page_response.dart
@@ -375,6 +404,7 @@ lib/src/model/base_response_ai_conversation.dart
 lib/src/model/base_response_announcement_detail_response.dart
 lib/src/model/base_response_announcement_page_response.dart
 lib/src/model/base_response_announcement_response.dart
+lib/src/model/base_response_article_response.dart
 lib/src/model/base_response_async_execution_response.dart
 lib/src/model/base_response_banner_page_response.dart
 lib/src/model/base_response_banner_response.dart
@@ -394,7 +424,9 @@ lib/src/model/base_response_course_progress_summary_response.dart
 lib/src/model/base_response_course_response.dart
 lib/src/model/base_response_course_review_response.dart
 lib/src/model/base_response_course_structure_response.dart
+lib/src/model/base_response_daily_article_page_response.dart
 lib/src/model/base_response_daily_article_response.dart
+lib/src/model/base_response_daily_word_page_response.dart
 lib/src/model/base_response_daily_word_response.dart
 lib/src/model/base_response_execution_result_response.dart
 lib/src/model/base_response_feedback_detail_response.dart
@@ -413,6 +445,7 @@ lib/src/model/base_response_knowledge_document_vo.dart
 lib/src/model/base_response_learning_stats.dart
 lib/src/model/base_response_list_ai_assistant_vo.dart
 lib/src/model/base_response_list_ai_conversation.dart
+lib/src/model/base_response_list_article_source_response.dart
 lib/src/model/base_response_list_banner_list_response.dart
 lib/src/model/base_response_list_book_dto.dart
 lib/src/model/base_response_list_chapter_dto.dart
@@ -441,7 +474,9 @@ lib/src/model/base_response_list_node_type_response.dart
 lib/src/model/base_response_list_order_response.dart
 lib/src/model/base_response_list_post_response.dart
 lib/src/model/base_response_list_progress_response.dart
+lib/src/model/base_response_list_scraper_config_response.dart
 lib/src/model/base_response_list_section_response.dart
+lib/src/model/base_response_list_string.dart
 lib/src/model/base_response_list_teacher_application_response.dart
 lib/src/model/base_response_list_teacher_response.dart
 lib/src/model/base_response_list_user_daily_article_response.dart
@@ -470,6 +505,11 @@ lib/src/model/base_response_refresh_token_response.dart
 lib/src/model/base_response_reply_page_response.dart
 lib/src/model/base_response_reply_response.dart
 lib/src/model/base_response_schedule_response.dart
+lib/src/model/base_response_scrape_result_response.dart
+lib/src/model/base_response_scraper_config_page_response.dart
+lib/src/model/base_response_scraper_config_response.dart
+lib/src/model/base_response_scraper_task_page_response.dart
+lib/src/model/base_response_scraper_task_response.dart
 lib/src/model/base_response_search_user_page_response.dart
 lib/src/model/base_response_section_response.dart
 lib/src/model/base_response_send_result.dart
@@ -496,6 +536,7 @@ lib/src/model/base_response_workflow_variable_response.dart
 lib/src/model/batch_ban_user_request.dart
 lib/src/model/batch_create_user_request.dart
 lib/src/model/batch_process_result.dart
+lib/src/model/batch_scrape_request.dart
 lib/src/model/batch_update_nodes_request.dart
 lib/src/model/book_dto.dart
 lib/src/model/book_id.dart
@@ -548,11 +589,15 @@ lib/src/model/create_schedule_setting_request.dart
 lib/src/model/create_section_request.dart
 lib/src/model/create_user_request.dart
 lib/src/model/create_workflow_request.dart
+lib/src/model/daily_article_page_response.dart
 lib/src/model/daily_article_response.dart
+lib/src/model/daily_word_page_response.dart
 lib/src/model/daily_word_response.dart
 lib/src/model/date.dart
+lib/src/model/dynamic_scrape_request.dart
 lib/src/model/error_handling_config.dart
 lib/src/model/error_handling_config_dto.dart
+lib/src/model/execute_task_request.dart
 lib/src/model/execute_workflow_request.dart
 lib/src/model/execution_log_response.dart
 lib/src/model/execution_result_response.dart
@@ -616,6 +661,14 @@ lib/src/model/reset_password_request.dart
 lib/src/model/review_application_request.dart
 lib/src/model/review_course_request.dart
 lib/src/model/schedule_response.dart
+lib/src/model/scrape_config_request.dart
+lib/src/model/scrape_request.dart
+lib/src/model/scrape_result_response.dart
+lib/src/model/scraper_config_page_response.dart
+lib/src/model/scraper_config_request.dart
+lib/src/model/scraper_config_response.dart
+lib/src/model/scraper_task_page_response.dart
+lib/src/model/scraper_task_response.dart
 lib/src/model/search_user_page_response.dart
 lib/src/model/search_user_request_dto.dart
 lib/src/model/search_user_response.dart
@@ -624,6 +677,7 @@ lib/src/model/send_code_request.dart
 lib/src/model/send_friend_request_dto.dart
 lib/src/model/send_result.dart
 lib/src/model/send_sms_request.dart
+lib/src/model/source_scrape_request.dart
 lib/src/model/sse_emitter.dart
 lib/src/model/teacher_application_response.dart
 lib/src/model/teacher_response.dart

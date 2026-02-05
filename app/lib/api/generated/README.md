@@ -100,6 +100,7 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**createChapter**](doc/DefaultApi.md#createchapter) | **POST** /api/course/{courseId}/chapter | 创建章节（管理员）
 [*DefaultApi*](doc/DefaultApi.md) | [**createClass**](doc/DefaultApi.md#createclass) | **POST** /api/classes | 创建班级
 [*DefaultApi*](doc/DefaultApi.md) | [**createComment**](doc/DefaultApi.md#createcomment) | **POST** /api/posts/{postId}/comments | 发表评论
+[*DefaultApi*](doc/DefaultApi.md) | [**createConfig**](doc/DefaultApi.md#createconfig) | **POST** /api/admin/scraper/config | 创建抓取配置
 [*DefaultApi*](doc/DefaultApi.md) | [**createCourse**](doc/DefaultApi.md#createcourse) | **POST** /api/course | 创建课程（管理员）
 [*DefaultApi*](doc/DefaultApi.md) | [**createDailyArticle**](doc/DefaultApi.md#createdailyarticle) | **POST** /api/daily-article | 创建每日文章（管理员）
 [*DefaultApi*](doc/DefaultApi.md) | [**createDailyWord**](doc/DefaultApi.md#createdailyword) | **POST** /api/daily-word | 创建每日单词（管理员）
@@ -120,6 +121,7 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**deleteChapter**](doc/DefaultApi.md#deletechapter) | **DELETE** /api/course/{courseId}/chapter/{chapterId} | 删除章节（管理员）
 [*DefaultApi*](doc/DefaultApi.md) | [**deleteClass**](doc/DefaultApi.md#deleteclass) | **DELETE** /api/classes/{classId} | 删除班级
 [*DefaultApi*](doc/DefaultApi.md) | [**deleteComment**](doc/DefaultApi.md#deletecomment) | **DELETE** /api/posts/comments/{commentId} | 删除评论
+[*DefaultApi*](doc/DefaultApi.md) | [**deleteConfig**](doc/DefaultApi.md#deleteconfig) | **DELETE** /api/admin/scraper/config/{id} | 删除配置
 [*DefaultApi*](doc/DefaultApi.md) | [**deleteCourse**](doc/DefaultApi.md#deletecourse) | **DELETE** /api/course/{id} | 删除课程（管理员）
 [*DefaultApi*](doc/DefaultApi.md) | [**deleteDailyArticle**](doc/DefaultApi.md#deletedailyarticle) | **DELETE** /api/daily-article/{id} | 删除每日文章（管理员）
 [*DefaultApi*](doc/DefaultApi.md) | [**deleteDailyWord**](doc/DefaultApi.md#deletedailyword) | **DELETE** /api/daily-word/{id} | 删除每日单词（管理员）
@@ -136,13 +138,19 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**deleteReply**](doc/DefaultApi.md#deletereply) | **DELETE** /api/posts/replies/{replyId} | 删除回复
 [*DefaultApi*](doc/DefaultApi.md) | [**deleteSection**](doc/DefaultApi.md#deletesection) | **DELETE** /api/course/{courseId}/section/{sectionId} | 删除小节（管理员）
 [*DefaultApi*](doc/DefaultApi.md) | [**deleteVariable**](doc/DefaultApi.md#deletevariable) | **DELETE** /api/workflows/{id}/variables/{variableName} | 删除变量
+[*DefaultApi*](doc/DefaultApi.md) | [**disableConfig**](doc/DefaultApi.md#disableconfig) | **POST** /api/admin/scraper/config/{id}/disable | 禁用配置
 [*DefaultApi*](doc/DefaultApi.md) | [**dissolveGroup**](doc/DefaultApi.md#dissolvegroup) | **DELETE** /api/groups/{groupId} | 解散群
+[*DefaultApi*](doc/DefaultApi.md) | [**enableConfig**](doc/DefaultApi.md#enableconfig) | **POST** /api/admin/scraper/config/{id}/enable | 启用配置
 [*DefaultApi*](doc/DefaultApi.md) | [**encryptChapterContent**](doc/DefaultApi.md#encryptchaptercontent) | **POST** /api/books/{bookId}/chapters/{chapterIndex}/encrypt | 加密章节内容
 [*DefaultApi*](doc/DefaultApi.md) | [**execute**](doc/DefaultApi.md#execute) | **POST** /api/workflows/{id}/execute | 执行工作流
+[*DefaultApi*](doc/DefaultApi.md) | [**executeAllTasks**](doc/DefaultApi.md#executealltasks) | **POST** /api/admin/scraper/config/execute-all | 触发所有抓取
 [*DefaultApi*](doc/DefaultApi.md) | [**executeAsync**](doc/DefaultApi.md#executeasync) | **POST** /api/workflows/{id}/execute-async | 异步执行工作流
+[*DefaultApi*](doc/DefaultApi.md) | [**executeTask**](doc/DefaultApi.md#executetask) | **POST** /api/admin/scraper/config/execute | 执行抓取任务
 [*DefaultApi*](doc/DefaultApi.md) | [**favouriteCourse**](doc/DefaultApi.md#favouritecourse) | **POST** /api/course/favourite/{courseId} | 收藏课程
 [*DefaultApi*](doc/DefaultApi.md) | [**follow**](doc/DefaultApi.md#follow) | **POST** /api/follow/{targetUserId} | 关注用户
+[*DefaultApi*](doc/DefaultApi.md) | [**getAllConfigs**](doc/DefaultApi.md#getallconfigs) | **GET** /api/admin/scraper/config | 获取所有配置
 [*DefaultApi*](doc/DefaultApi.md) | [**getAllFriends**](doc/DefaultApi.md#getallfriends) | **GET** /api/friend/all | 获取全部好友
+[*DefaultApi*](doc/DefaultApi.md) | [**getAllTasks**](doc/DefaultApi.md#getalltasks) | **GET** /api/admin/scraper/config/tasks | 获取所有任务
 [*DefaultApi*](doc/DefaultApi.md) | [**getAnnouncement**](doc/DefaultApi.md#getannouncement) | **GET** /api/announcement/admin/{id} | 获取公告详情
 [*DefaultApi*](doc/DefaultApi.md) | [**getAnnouncementDetail**](doc/DefaultApi.md#getannouncementdetail) | **GET** /api/announcement/{id} | 获取公告详情
 [*DefaultApi*](doc/DefaultApi.md) | [**getAnnouncementList**](doc/DefaultApi.md#getannouncementlist) | **GET** /api/announcement/list | 获取公告列表
@@ -164,6 +172,8 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**getCollectedArticles**](doc/DefaultApi.md#getcollectedarticles) | **GET** /api/user/daily-article/collected | 获取收藏文章列表
 [*DefaultApi*](doc/DefaultApi.md) | [**getCollectedWords**](doc/DefaultApi.md#getcollectedwords) | **GET** /api/user/daily-word/collected | 获取收藏单词列表
 [*DefaultApi*](doc/DefaultApi.md) | [**getCommentReplies**](doc/DefaultApi.md#getcommentreplies) | **GET** /api/posts/comments/{commentId}/replies | 获取评论回复列表
+[*DefaultApi*](doc/DefaultApi.md) | [**getConfig**](doc/DefaultApi.md#getconfig) | **GET** /api/admin/scraper/config/{id} | 获取配置详情
+[*DefaultApi*](doc/DefaultApi.md) | [**getConfigsByPage**](doc/DefaultApi.md#getconfigsbypage) | **GET** /api/admin/scraper/config/page | 分页获取配置
 [*DefaultApi*](doc/DefaultApi.md) | [**getCourse**](doc/DefaultApi.md#getcourse) | **GET** /api/course/{id} | 获取课程详情
 [*DefaultApi*](doc/DefaultApi.md) | [**getCourseProgress**](doc/DefaultApi.md#getcourseprogress) | **GET** /api/progress/course/{courseId} | 获取课程所有小节的学习进度
 [*DefaultApi*](doc/DefaultApi.md) | [**getCourseProgressSummary**](doc/DefaultApi.md#getcourseprogresssummary) | **GET** /api/progress/course/{courseId}/summary | 获取课程进度汇总
@@ -228,7 +238,10 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**getStats1**](doc/DefaultApi.md#getstats1) | **GET** /api/user/daily-word/stats | 获取学习统计
 [*DefaultApi*](doc/DefaultApi.md) | [**getStats2**](doc/DefaultApi.md#getstats2) | **GET** /api/user/daily-article/stats | 获取阅读统计
 [*DefaultApi*](doc/DefaultApi.md) | [**getStudiedWords**](doc/DefaultApi.md#getstudiedwords) | **GET** /api/user/daily-word/studied | 获取已学习单词列表
+[*DefaultApi*](doc/DefaultApi.md) | [**getSupportedSources**](doc/DefaultApi.md#getsupportedsources) | **GET** /api/scraper/sources | 获取预设来源列表
 [*DefaultApi*](doc/DefaultApi.md) | [**getSupportedVoices**](doc/DefaultApi.md#getsupportedvoices) | **GET** /api/speech/tts/voices | 获取支持的发音人列表
+[*DefaultApi*](doc/DefaultApi.md) | [**getTask**](doc/DefaultApi.md#gettask) | **GET** /api/admin/scraper/config/task/{taskId} | 获取任务详情
+[*DefaultApi*](doc/DefaultApi.md) | [**getTasksByConfig**](doc/DefaultApi.md#gettasksbyconfig) | **GET** /api/admin/scraper/config/{configId}/tasks | 获取配置的任务列表
 [*DefaultApi*](doc/DefaultApi.md) | [**getTeacher**](doc/DefaultApi.md#getteacher) | **GET** /api/teacher/{id} | 获取讲师信息
 [*DefaultApi*](doc/DefaultApi.md) | [**getTeacherByUserId**](doc/DefaultApi.md#getteacherbyuserid) | **GET** /api/teacher/user/{userId} | 根据用户ID获取讲师信息
 [*DefaultApi*](doc/DefaultApi.md) | [**getTodayArticles**](doc/DefaultApi.md#gettodayarticles) | **GET** /api/daily-article/today | 获取今日推荐文章（个性化推荐）
@@ -289,6 +302,8 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**queryBanners**](doc/DefaultApi.md#querybanners) | **GET** /api/admin/banner/list | 分页查询轮播图
 [*DefaultApi*](doc/DefaultApi.md) | [**queryFeedbacks**](doc/DefaultApi.md#queryfeedbacks) | **POST** /api/feedback/admin/list | 分页查询反馈
 [*DefaultApi*](doc/DefaultApi.md) | [**queryUsers**](doc/DefaultApi.md#queryusers) | **POST** /api/user/admin/list | 分页查询用户
+[*DefaultApi*](doc/DefaultApi.md) | [**quickDynamicScrape**](doc/DefaultApi.md#quickdynamicscrape) | **GET** /api/scraper/dynamic/quick | 快速动态抓取
+[*DefaultApi*](doc/DefaultApi.md) | [**quickScrape**](doc/DefaultApi.md#quickscrape) | **GET** /api/scraper/quick | 快速抓取
 [*DefaultApi*](doc/DefaultApi.md) | [**refreshToken**](doc/DefaultApi.md#refreshtoken) | **POST** /api/auth/refresh | 刷新Token
 [*DefaultApi*](doc/DefaultApi.md) | [**refund**](doc/DefaultApi.md#refund) | **POST** /api/admin/order/{orderNo}/refund | 退款（管理员）
 [*DefaultApi*](doc/DefaultApi.md) | [**removeCourse**](doc/DefaultApi.md#removecourse) | **DELETE** /api/classes/{classId}/courses/{courseId} | 移除课程
@@ -302,6 +317,16 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**resetProgress**](doc/DefaultApi.md#resetprogress) | **POST** /api/progress/section/{sectionId}/reset | 重置小节进度
 [*DefaultApi*](doc/DefaultApi.md) | [**reviewApplication**](doc/DefaultApi.md#reviewapplication) | **POST** /api/teacher/application/review | 审核讲师申请（管理员）
 [*DefaultApi*](doc/DefaultApi.md) | [**reviewCourse**](doc/DefaultApi.md#reviewcourse) | **POST** /api/course/review/{courseId} | 评价课程
+[*DefaultApi*](doc/DefaultApi.md) | [**scrapeArticleLinks**](doc/DefaultApi.md#scrapearticlelinks) | **POST** /api/scraper/links | 获取文章链接
+[*DefaultApi*](doc/DefaultApi.md) | [**scrapeDynamicArticleLinks**](doc/DefaultApi.md#scrapedynamicarticlelinks) | **POST** /api/scraper/dynamic/links | 动态获取文章链接
+[*DefaultApi*](doc/DefaultApi.md) | [**scrapeDynamicMultiplePages**](doc/DefaultApi.md#scrapedynamicmultiplepages) | **POST** /api/scraper/dynamic/batch | 批量动态抓取
+[*DefaultApi*](doc/DefaultApi.md) | [**scrapeDynamicPage**](doc/DefaultApi.md#scrapedynamicpage) | **POST** /api/scraper/dynamic/single | 动态抓取单个页面
+[*DefaultApi*](doc/DefaultApi.md) | [**scrapeDynamicPageWithSelector**](doc/DefaultApi.md#scrapedynamicpagewithselector) | **POST** /api/scraper/dynamic/wait-for | 动态抓取（等待元素）
+[*DefaultApi*](doc/DefaultApi.md) | [**scrapeDynamicRecursively**](doc/DefaultApi.md#scrapedynamicrecursively) | **POST** /api/scraper/dynamic/recursive | 递归动态抓取
+[*DefaultApi*](doc/DefaultApi.md) | [**scrapeFromSource**](doc/DefaultApi.md#scrapefromsource) | **POST** /api/scraper/source | 从预设来源抓取
+[*DefaultApi*](doc/DefaultApi.md) | [**scrapeMultiplePages**](doc/DefaultApi.md#scrapemultiplepages) | **POST** /api/scraper/batch | 批量抓取
+[*DefaultApi*](doc/DefaultApi.md) | [**scrapeRecursively**](doc/DefaultApi.md#scraperecursively) | **POST** /api/scraper/recursive | 递归抓取
+[*DefaultApi*](doc/DefaultApi.md) | [**scrapeSinglePage**](doc/DefaultApi.md#scrapesinglepage) | **POST** /api/scraper/single | 抓取单个页面
 [*DefaultApi*](doc/DefaultApi.md) | [**search**](doc/DefaultApi.md#search) | **GET** /api/ai/knowledge-bases/search | 搜索知识库
 [*DefaultApi*](doc/DefaultApi.md) | [**searchArticles**](doc/DefaultApi.md#searcharticles) | **GET** /api/daily-article/search | 搜索文章
 [*DefaultApi*](doc/DefaultApi.md) | [**searchBooks**](doc/DefaultApi.md#searchbooks) | **GET** /api/books/search | 搜索书籍
@@ -316,6 +341,8 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**sendSms**](doc/DefaultApi.md#sendsms) | **POST** /api/user/admin/send-sms | 发送短信验证码
 [*DefaultApi*](doc/DefaultApi.md) | [**setAdmin**](doc/DefaultApi.md#setadmin) | **PUT** /api/groups/{groupId}/members/{targetUserId}/admin | 设置/取消管理员
 [*DefaultApi*](doc/DefaultApi.md) | [**setJoinMode**](doc/DefaultApi.md#setjoinmode) | **PUT** /api/groups/{groupId}/join-mode | 设置群加入模式
+[*DefaultApi*](doc/DefaultApi.md) | [**smartDynamicScrape**](doc/DefaultApi.md#smartdynamicscrape) | **POST** /api/scraper/dynamic/smart | 智能动态抓取
+[*DefaultApi*](doc/DefaultApi.md) | [**smartScrape**](doc/DefaultApi.md#smartscrape) | **POST** /api/scraper/smart | 智能抓取
 [*DefaultApi*](doc/DefaultApi.md) | [**studyWord**](doc/DefaultApi.md#studyword) | **POST** /api/user/daily-word/{wordId}/study | 标记单词为已学习
 [*DefaultApi*](doc/DefaultApi.md) | [**takeOffline**](doc/DefaultApi.md#takeoffline) | **POST** /api/course/{id}/offline | 下架课程（管理员）
 [*DefaultApi*](doc/DefaultApi.md) | [**textToSpeech**](doc/DefaultApi.md#texttospeech) | **POST** /api/speech/tts | 文本转语音
@@ -335,6 +362,7 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**updateBanner**](doc/DefaultApi.md#updatebanner) | **PUT** /api/admin/banner | 更新轮播图
 [*DefaultApi*](doc/DefaultApi.md) | [**updateChapter**](doc/DefaultApi.md#updatechapter) | **PUT** /api/course/{courseId}/chapter/{chapterId} | 更新章节（管理员）
 [*DefaultApi*](doc/DefaultApi.md) | [**updateClass**](doc/DefaultApi.md#updateclass) | **PUT** /api/classes/{classId} | 更新班级信息
+[*DefaultApi*](doc/DefaultApi.md) | [**updateConfig**](doc/DefaultApi.md#updateconfig) | **PUT** /api/admin/scraper/config/{id} | 更新抓取配置
 [*DefaultApi*](doc/DefaultApi.md) | [**updateCourse**](doc/DefaultApi.md#updatecourse) | **PUT** /api/course/{id} | 更新课程（管理员）
 [*DefaultApi*](doc/DefaultApi.md) | [**updateDailyArticle**](doc/DefaultApi.md#updatedailyarticle) | **PUT** /api/daily-article/{id} | 更新每日文章（管理员）
 [*DefaultApi*](doc/DefaultApi.md) | [**updateDailyWord**](doc/DefaultApi.md#updatedailyword) | **PUT** /api/daily-word/{id} | 更新每日单词（管理员）
@@ -415,6 +443,8 @@ Class | Method | HTTP request | Description
  - [AnnouncementPageResponse](doc/AnnouncementPageResponse.md)
  - [AnnouncementResponse](doc/AnnouncementResponse.md)
  - [ApplyTeacherRequest](doc/ApplyTeacherRequest.md)
+ - [ArticleResponse](doc/ArticleResponse.md)
+ - [ArticleSourceResponse](doc/ArticleSourceResponse.md)
  - [AsyncExecutionResponse](doc/AsyncExecutionResponse.md)
  - [BannerListResponse](doc/BannerListResponse.md)
  - [BannerPageResponse](doc/BannerPageResponse.md)
@@ -424,6 +454,7 @@ Class | Method | HTTP request | Description
  - [BaseResponseAnnouncementDetailResponse](doc/BaseResponseAnnouncementDetailResponse.md)
  - [BaseResponseAnnouncementPageResponse](doc/BaseResponseAnnouncementPageResponse.md)
  - [BaseResponseAnnouncementResponse](doc/BaseResponseAnnouncementResponse.md)
+ - [BaseResponseArticleResponse](doc/BaseResponseArticleResponse.md)
  - [BaseResponseAsyncExecutionResponse](doc/BaseResponseAsyncExecutionResponse.md)
  - [BaseResponseBannerPageResponse](doc/BaseResponseBannerPageResponse.md)
  - [BaseResponseBannerResponse](doc/BaseResponseBannerResponse.md)
@@ -443,7 +474,9 @@ Class | Method | HTTP request | Description
  - [BaseResponseCourseResponse](doc/BaseResponseCourseResponse.md)
  - [BaseResponseCourseReviewResponse](doc/BaseResponseCourseReviewResponse.md)
  - [BaseResponseCourseStructureResponse](doc/BaseResponseCourseStructureResponse.md)
+ - [BaseResponseDailyArticlePageResponse](doc/BaseResponseDailyArticlePageResponse.md)
  - [BaseResponseDailyArticleResponse](doc/BaseResponseDailyArticleResponse.md)
+ - [BaseResponseDailyWordPageResponse](doc/BaseResponseDailyWordPageResponse.md)
  - [BaseResponseDailyWordResponse](doc/BaseResponseDailyWordResponse.md)
  - [BaseResponseExecutionResultResponse](doc/BaseResponseExecutionResultResponse.md)
  - [BaseResponseFeedbackDetailResponse](doc/BaseResponseFeedbackDetailResponse.md)
@@ -462,6 +495,7 @@ Class | Method | HTTP request | Description
  - [BaseResponseLearningStats](doc/BaseResponseLearningStats.md)
  - [BaseResponseListAiAssistantVO](doc/BaseResponseListAiAssistantVO.md)
  - [BaseResponseListAiConversation](doc/BaseResponseListAiConversation.md)
+ - [BaseResponseListArticleSourceResponse](doc/BaseResponseListArticleSourceResponse.md)
  - [BaseResponseListBannerListResponse](doc/BaseResponseListBannerListResponse.md)
  - [BaseResponseListBookDTO](doc/BaseResponseListBookDTO.md)
  - [BaseResponseListChapterDTO](doc/BaseResponseListChapterDTO.md)
@@ -490,7 +524,9 @@ Class | Method | HTTP request | Description
  - [BaseResponseListOrderResponse](doc/BaseResponseListOrderResponse.md)
  - [BaseResponseListPostResponse](doc/BaseResponseListPostResponse.md)
  - [BaseResponseListProgressResponse](doc/BaseResponseListProgressResponse.md)
+ - [BaseResponseListScraperConfigResponse](doc/BaseResponseListScraperConfigResponse.md)
  - [BaseResponseListSectionResponse](doc/BaseResponseListSectionResponse.md)
+ - [BaseResponseListString](doc/BaseResponseListString.md)
  - [BaseResponseListTeacherApplicationResponse](doc/BaseResponseListTeacherApplicationResponse.md)
  - [BaseResponseListTeacherResponse](doc/BaseResponseListTeacherResponse.md)
  - [BaseResponseListUserDailyArticleResponse](doc/BaseResponseListUserDailyArticleResponse.md)
@@ -519,6 +555,11 @@ Class | Method | HTTP request | Description
  - [BaseResponseReplyPageResponse](doc/BaseResponseReplyPageResponse.md)
  - [BaseResponseReplyResponse](doc/BaseResponseReplyResponse.md)
  - [BaseResponseScheduleResponse](doc/BaseResponseScheduleResponse.md)
+ - [BaseResponseScrapeResultResponse](doc/BaseResponseScrapeResultResponse.md)
+ - [BaseResponseScraperConfigPageResponse](doc/BaseResponseScraperConfigPageResponse.md)
+ - [BaseResponseScraperConfigResponse](doc/BaseResponseScraperConfigResponse.md)
+ - [BaseResponseScraperTaskPageResponse](doc/BaseResponseScraperTaskPageResponse.md)
+ - [BaseResponseScraperTaskResponse](doc/BaseResponseScraperTaskResponse.md)
  - [BaseResponseSearchUserPageResponse](doc/BaseResponseSearchUserPageResponse.md)
  - [BaseResponseSectionResponse](doc/BaseResponseSectionResponse.md)
  - [BaseResponseSendResult](doc/BaseResponseSendResult.md)
@@ -545,6 +586,7 @@ Class | Method | HTTP request | Description
  - [BatchBanUserRequest](doc/BatchBanUserRequest.md)
  - [BatchCreateUserRequest](doc/BatchCreateUserRequest.md)
  - [BatchProcessResult](doc/BatchProcessResult.md)
+ - [BatchScrapeRequest](doc/BatchScrapeRequest.md)
  - [BatchUpdateNodesRequest](doc/BatchUpdateNodesRequest.md)
  - [BookDTO](doc/BookDTO.md)
  - [BookId](doc/BookId.md)
@@ -597,10 +639,14 @@ Class | Method | HTTP request | Description
  - [CreateSectionRequest](doc/CreateSectionRequest.md)
  - [CreateUserRequest](doc/CreateUserRequest.md)
  - [CreateWorkflowRequest](doc/CreateWorkflowRequest.md)
+ - [DailyArticlePageResponse](doc/DailyArticlePageResponse.md)
  - [DailyArticleResponse](doc/DailyArticleResponse.md)
+ - [DailyWordPageResponse](doc/DailyWordPageResponse.md)
  - [DailyWordResponse](doc/DailyWordResponse.md)
+ - [DynamicScrapeRequest](doc/DynamicScrapeRequest.md)
  - [ErrorHandlingConfig](doc/ErrorHandlingConfig.md)
  - [ErrorHandlingConfigDTO](doc/ErrorHandlingConfigDTO.md)
+ - [ExecuteTaskRequest](doc/ExecuteTaskRequest.md)
  - [ExecuteWorkflowRequest](doc/ExecuteWorkflowRequest.md)
  - [ExecutionLogResponse](doc/ExecutionLogResponse.md)
  - [ExecutionResultResponse](doc/ExecutionResultResponse.md)
@@ -664,6 +710,14 @@ Class | Method | HTTP request | Description
  - [ReviewApplicationRequest](doc/ReviewApplicationRequest.md)
  - [ReviewCourseRequest](doc/ReviewCourseRequest.md)
  - [ScheduleResponse](doc/ScheduleResponse.md)
+ - [ScrapeConfigRequest](doc/ScrapeConfigRequest.md)
+ - [ScrapeRequest](doc/ScrapeRequest.md)
+ - [ScrapeResultResponse](doc/ScrapeResultResponse.md)
+ - [ScraperConfigPageResponse](doc/ScraperConfigPageResponse.md)
+ - [ScraperConfigRequest](doc/ScraperConfigRequest.md)
+ - [ScraperConfigResponse](doc/ScraperConfigResponse.md)
+ - [ScraperTaskPageResponse](doc/ScraperTaskPageResponse.md)
+ - [ScraperTaskResponse](doc/ScraperTaskResponse.md)
  - [SearchUserPageResponse](doc/SearchUserPageResponse.md)
  - [SearchUserRequestDTO](doc/SearchUserRequestDTO.md)
  - [SearchUserResponse](doc/SearchUserResponse.md)
@@ -672,6 +726,7 @@ Class | Method | HTTP request | Description
  - [SendFriendRequestDTO](doc/SendFriendRequestDTO.md)
  - [SendResult](doc/SendResult.md)
  - [SendSmsRequest](doc/SendSmsRequest.md)
+ - [SourceScrapeRequest](doc/SourceScrapeRequest.md)
  - [SseEmitter](doc/SseEmitter.md)
  - [TeacherApplicationResponse](doc/TeacherApplicationResponse.md)
  - [TeacherResponse](doc/TeacherResponse.md)

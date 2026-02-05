@@ -29,6 +29,8 @@ import 'package:nova_api/src/model/announcement_list_response.dart';
 import 'package:nova_api/src/model/announcement_page_response.dart';
 import 'package:nova_api/src/model/announcement_response.dart';
 import 'package:nova_api/src/model/apply_teacher_request.dart';
+import 'package:nova_api/src/model/article_response.dart';
+import 'package:nova_api/src/model/article_source_response.dart';
 import 'package:nova_api/src/model/async_execution_response.dart';
 import 'package:nova_api/src/model/banner_list_response.dart';
 import 'package:nova_api/src/model/banner_page_response.dart';
@@ -38,6 +40,7 @@ import 'package:nova_api/src/model/base_response_ai_conversation.dart';
 import 'package:nova_api/src/model/base_response_announcement_detail_response.dart';
 import 'package:nova_api/src/model/base_response_announcement_page_response.dart';
 import 'package:nova_api/src/model/base_response_announcement_response.dart';
+import 'package:nova_api/src/model/base_response_article_response.dart';
 import 'package:nova_api/src/model/base_response_async_execution_response.dart';
 import 'package:nova_api/src/model/base_response_banner_page_response.dart';
 import 'package:nova_api/src/model/base_response_banner_response.dart';
@@ -57,7 +60,9 @@ import 'package:nova_api/src/model/base_response_course_progress_summary_respons
 import 'package:nova_api/src/model/base_response_course_response.dart';
 import 'package:nova_api/src/model/base_response_course_review_response.dart';
 import 'package:nova_api/src/model/base_response_course_structure_response.dart';
+import 'package:nova_api/src/model/base_response_daily_article_page_response.dart';
 import 'package:nova_api/src/model/base_response_daily_article_response.dart';
+import 'package:nova_api/src/model/base_response_daily_word_page_response.dart';
 import 'package:nova_api/src/model/base_response_daily_word_response.dart';
 import 'package:nova_api/src/model/base_response_execution_result_response.dart';
 import 'package:nova_api/src/model/base_response_feedback_detail_response.dart';
@@ -76,6 +81,7 @@ import 'package:nova_api/src/model/base_response_knowledge_document_vo.dart';
 import 'package:nova_api/src/model/base_response_learning_stats.dart';
 import 'package:nova_api/src/model/base_response_list_ai_assistant_vo.dart';
 import 'package:nova_api/src/model/base_response_list_ai_conversation.dart';
+import 'package:nova_api/src/model/base_response_list_article_source_response.dart';
 import 'package:nova_api/src/model/base_response_list_banner_list_response.dart';
 import 'package:nova_api/src/model/base_response_list_book_dto.dart';
 import 'package:nova_api/src/model/base_response_list_chapter_dto.dart';
@@ -104,7 +110,9 @@ import 'package:nova_api/src/model/base_response_list_node_type_response.dart';
 import 'package:nova_api/src/model/base_response_list_order_response.dart';
 import 'package:nova_api/src/model/base_response_list_post_response.dart';
 import 'package:nova_api/src/model/base_response_list_progress_response.dart';
+import 'package:nova_api/src/model/base_response_list_scraper_config_response.dart';
 import 'package:nova_api/src/model/base_response_list_section_response.dart';
+import 'package:nova_api/src/model/base_response_list_string.dart';
 import 'package:nova_api/src/model/base_response_list_teacher_application_response.dart';
 import 'package:nova_api/src/model/base_response_list_teacher_response.dart';
 import 'package:nova_api/src/model/base_response_list_user_daily_article_response.dart';
@@ -133,6 +141,11 @@ import 'package:nova_api/src/model/base_response_refresh_token_response.dart';
 import 'package:nova_api/src/model/base_response_reply_page_response.dart';
 import 'package:nova_api/src/model/base_response_reply_response.dart';
 import 'package:nova_api/src/model/base_response_schedule_response.dart';
+import 'package:nova_api/src/model/base_response_scrape_result_response.dart';
+import 'package:nova_api/src/model/base_response_scraper_config_page_response.dart';
+import 'package:nova_api/src/model/base_response_scraper_config_response.dart';
+import 'package:nova_api/src/model/base_response_scraper_task_page_response.dart';
+import 'package:nova_api/src/model/base_response_scraper_task_response.dart';
 import 'package:nova_api/src/model/base_response_search_user_page_response.dart';
 import 'package:nova_api/src/model/base_response_section_response.dart';
 import 'package:nova_api/src/model/base_response_send_result.dart';
@@ -159,6 +172,7 @@ import 'package:nova_api/src/model/base_response_workflow_variable_response.dart
 import 'package:nova_api/src/model/batch_ban_user_request.dart';
 import 'package:nova_api/src/model/batch_create_user_request.dart';
 import 'package:nova_api/src/model/batch_process_result.dart';
+import 'package:nova_api/src/model/batch_scrape_request.dart';
 import 'package:nova_api/src/model/batch_update_nodes_request.dart';
 import 'package:nova_api/src/model/book_dto.dart';
 import 'package:nova_api/src/model/book_id.dart';
@@ -211,10 +225,14 @@ import 'package:nova_api/src/model/create_schedule_setting_request.dart';
 import 'package:nova_api/src/model/create_section_request.dart';
 import 'package:nova_api/src/model/create_user_request.dart';
 import 'package:nova_api/src/model/create_workflow_request.dart';
+import 'package:nova_api/src/model/daily_article_page_response.dart';
 import 'package:nova_api/src/model/daily_article_response.dart';
+import 'package:nova_api/src/model/daily_word_page_response.dart';
 import 'package:nova_api/src/model/daily_word_response.dart';
+import 'package:nova_api/src/model/dynamic_scrape_request.dart';
 import 'package:nova_api/src/model/error_handling_config.dart';
 import 'package:nova_api/src/model/error_handling_config_dto.dart';
+import 'package:nova_api/src/model/execute_task_request.dart';
 import 'package:nova_api/src/model/execute_workflow_request.dart';
 import 'package:nova_api/src/model/execution_log_response.dart';
 import 'package:nova_api/src/model/execution_result_response.dart';
@@ -278,6 +296,14 @@ import 'package:nova_api/src/model/reset_password_request.dart';
 import 'package:nova_api/src/model/review_application_request.dart';
 import 'package:nova_api/src/model/review_course_request.dart';
 import 'package:nova_api/src/model/schedule_response.dart';
+import 'package:nova_api/src/model/scrape_config_request.dart';
+import 'package:nova_api/src/model/scrape_request.dart';
+import 'package:nova_api/src/model/scrape_result_response.dart';
+import 'package:nova_api/src/model/scraper_config_page_response.dart';
+import 'package:nova_api/src/model/scraper_config_request.dart';
+import 'package:nova_api/src/model/scraper_config_response.dart';
+import 'package:nova_api/src/model/scraper_task_page_response.dart';
+import 'package:nova_api/src/model/scraper_task_response.dart';
 import 'package:nova_api/src/model/search_user_page_response.dart';
 import 'package:nova_api/src/model/search_user_request_dto.dart';
 import 'package:nova_api/src/model/search_user_response.dart';
@@ -286,6 +312,7 @@ import 'package:nova_api/src/model/send_code_request.dart';
 import 'package:nova_api/src/model/send_friend_request_dto.dart';
 import 'package:nova_api/src/model/send_result.dart';
 import 'package:nova_api/src/model/send_sms_request.dart';
+import 'package:nova_api/src/model/source_scrape_request.dart';
 import 'package:nova_api/src/model/sse_emitter.dart';
 import 'package:nova_api/src/model/teacher_application_response.dart';
 import 'package:nova_api/src/model/teacher_response.dart';
@@ -368,6 +395,8 @@ part 'serializers.g.dart';
   AnnouncementPageResponse,
   AnnouncementResponse,
   ApplyTeacherRequest,
+  ArticleResponse,
+  ArticleSourceResponse,
   AsyncExecutionResponse,
   BannerListResponse,
   BannerPageResponse,
@@ -377,6 +406,7 @@ part 'serializers.g.dart';
   BaseResponseAnnouncementDetailResponse,
   BaseResponseAnnouncementPageResponse,
   BaseResponseAnnouncementResponse,
+  BaseResponseArticleResponse,
   BaseResponseAsyncExecutionResponse,
   BaseResponseBannerPageResponse,
   BaseResponseBannerResponse,
@@ -396,7 +426,9 @@ part 'serializers.g.dart';
   BaseResponseCourseResponse,
   BaseResponseCourseReviewResponse,
   BaseResponseCourseStructureResponse,
+  BaseResponseDailyArticlePageResponse,
   BaseResponseDailyArticleResponse,
+  BaseResponseDailyWordPageResponse,
   BaseResponseDailyWordResponse,
   BaseResponseExecutionResultResponse,
   BaseResponseFeedbackDetailResponse,
@@ -415,6 +447,7 @@ part 'serializers.g.dart';
   BaseResponseLearningStats,
   BaseResponseListAiAssistantVO,
   BaseResponseListAiConversation,
+  BaseResponseListArticleSourceResponse,
   BaseResponseListBannerListResponse,
   BaseResponseListBookDTO,
   BaseResponseListChapterDTO,
@@ -443,7 +476,9 @@ part 'serializers.g.dart';
   BaseResponseListOrderResponse,
   BaseResponseListPostResponse,
   BaseResponseListProgressResponse,
+  BaseResponseListScraperConfigResponse,
   BaseResponseListSectionResponse,
+  BaseResponseListString,
   BaseResponseListTeacherApplicationResponse,
   BaseResponseListTeacherResponse,
   BaseResponseListUserDailyArticleResponse,
@@ -472,6 +507,11 @@ part 'serializers.g.dart';
   BaseResponseReplyPageResponse,
   BaseResponseReplyResponse,
   BaseResponseScheduleResponse,
+  BaseResponseScrapeResultResponse,
+  BaseResponseScraperConfigPageResponse,
+  BaseResponseScraperConfigResponse,
+  BaseResponseScraperTaskPageResponse,
+  BaseResponseScraperTaskResponse,
   BaseResponseSearchUserPageResponse,
   BaseResponseSectionResponse,
   BaseResponseSendResult,
@@ -498,6 +538,7 @@ part 'serializers.g.dart';
   BatchBanUserRequest,
   BatchCreateUserRequest,
   BatchProcessResult,
+  BatchScrapeRequest,
   BatchUpdateNodesRequest,
   BookDTO,
   BookId,
@@ -550,10 +591,14 @@ part 'serializers.g.dart';
   CreateSectionRequest,
   CreateUserRequest,
   CreateWorkflowRequest,
+  DailyArticlePageResponse,
   DailyArticleResponse,
+  DailyWordPageResponse,
   DailyWordResponse,
+  DynamicScrapeRequest,
   ErrorHandlingConfig,
   ErrorHandlingConfigDTO,
+  ExecuteTaskRequest,
   ExecuteWorkflowRequest,
   ExecutionLogResponse,
   ExecutionResultResponse,
@@ -617,6 +662,14 @@ part 'serializers.g.dart';
   ReviewApplicationRequest,
   ReviewCourseRequest,
   ScheduleResponse,
+  ScrapeConfigRequest,
+  ScrapeRequest,
+  ScrapeResultResponse,
+  ScraperConfigPageResponse,
+  ScraperConfigRequest,
+  ScraperConfigResponse,
+  ScraperTaskPageResponse,
+  ScraperTaskResponse,
   SearchUserPageResponse,
   SearchUserRequestDTO,
   SearchUserResponse,
@@ -625,6 +678,7 @@ part 'serializers.g.dart';
   SendFriendRequestDTO,
   SendResult,
   SendSmsRequest,
+  SourceScrapeRequest,
   SseEmitter,
   TeacherApplicationResponse,
   TeacherResponse,

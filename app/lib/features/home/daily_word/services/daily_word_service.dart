@@ -87,8 +87,8 @@ class DailyWordService {
         page: page,
         size: size,
       );
-      if (response.data?.data != null) {
-        return response.data!.data!.toList();
+      if (response.data?.data?.records != null) {
+        return response.data!.data!.records!.toList();
       }
       return [];
     } catch (e) {
