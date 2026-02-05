@@ -440,7 +440,7 @@ export const UserManagementPage: React.FC = () => {
       {/* User Table */}
       <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden transition-all duration-300">
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+          <table className="w-full text-left border-collapse admin-table">
             <thead>
               <tr className="bg-gray-50/50 dark:bg-gray-800/50 border-b border-gray-100 dark:border-gray-800 transition-colors duration-300">
                 <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">用户信息</th>

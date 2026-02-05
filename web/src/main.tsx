@@ -8,6 +8,10 @@ import { LoginPage, RegisterPage } from './pages'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { AdminLayout } from './components/layout/AdminLayout'
 import { UserManagementPage } from './pages/admin/UserManagementPage'
+import { ScraperConfigPage } from './pages/admin/ScraperConfigPage'
+import { ScraperTaskPage } from './pages/admin/ScraperTaskPage'
+import { DailyWordManagementPage } from './pages/admin/DailyWordManagementPage'
+import { DailyArticleManagementPage } from './pages/admin/DailyArticleManagementPage'
 import { getToken } from './api'
 
 // 初始重定向组件 - 仅在首次进入时根据角色分流
@@ -48,6 +52,10 @@ createRoot(document.getElementById('root')!).render(
                     <Route index element={<div className="text-2xl font-bold">欢迎进入管理后台</div>} />
                     <Route path="users" element={<UserManagementPage />} />
                     <Route path="courses" element={<div className="p-8 bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm"><h2 className="text-2xl font-bold">课程管理 (开发中...)</h2></div>} />
+                    <Route path="scraper/config" element={<ScraperConfigPage />} />
+                    <Route path="scraper/tasks" element={<ScraperTaskPage />} />
+                    <Route path="daily-words" element={<DailyWordManagementPage />} />
+                    <Route path="daily-articles" element={<DailyArticleManagementPage />} />
                     <Route path="settings" element={<div className="p-8 bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm"><h2 className="text-2xl font-bold">系统设置 (开发中...)</h2></div>} />
                   </Routes>
                 </AdminLayout>

@@ -82,7 +82,11 @@ import type { BaseResponseCourseReviewResponse } from '../models';
 // @ts-ignore
 import type { BaseResponseCourseStructureResponse } from '../models';
 // @ts-ignore
+import type { BaseResponseDailyArticlePageResponse } from '../models';
+// @ts-ignore
 import type { BaseResponseDailyArticleResponse } from '../models';
+// @ts-ignore
+import type { BaseResponseDailyWordPageResponse } from '../models';
 // @ts-ignore
 import type { BaseResponseDailyWordResponse } from '../models';
 // @ts-ignore
@@ -172,8 +176,6 @@ import type { BaseResponseListProgressResponse } from '../models';
 // @ts-ignore
 import type { BaseResponseListScraperConfigResponse } from '../models';
 // @ts-ignore
-import type { BaseResponseListScraperTaskResponse } from '../models';
-// @ts-ignore
 import type { BaseResponseListSectionResponse } from '../models';
 // @ts-ignore
 import type { BaseResponseListString } from '../models';
@@ -232,7 +234,11 @@ import type { BaseResponseScheduleResponse } from '../models';
 // @ts-ignore
 import type { BaseResponseScrapeResultResponse } from '../models';
 // @ts-ignore
+import type { BaseResponseScraperConfigPageResponse } from '../models';
+// @ts-ignore
 import type { BaseResponseScraperConfigResponse } from '../models';
+// @ts-ignore
+import type { BaseResponseScraperTaskPageResponse } from '../models';
 // @ts-ignore
 import type { BaseResponseScraperTaskResponse } from '../models';
 // @ts-ignore
@@ -14854,7 +14860,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getAllTasks(page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseListScraperTaskResponse>> {
+        async getAllTasks(page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseScraperTaskPageResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getAllTasks(page, size, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.getAllTasks']?.[localVarOperationServerIndex]?.url;
@@ -15161,7 +15167,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getConfigsByPage(page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseListScraperConfigResponse>> {
+        async getConfigsByPage(page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseScraperConfigPageResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getConfigsByPage(page, size, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.getConfigsByPage']?.[localVarOperationServerIndex]?.url;
@@ -16058,7 +16064,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getTasksByConfig(configId: number, page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseListScraperTaskResponse>> {
+        async getTasksByConfig(configId: number, page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseScraperTaskPageResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getTasksByConfig(configId, page, size, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.getTasksByConfig']?.[localVarOperationServerIndex]?.url;
@@ -16450,7 +16456,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listArticles(category?: string, difficulty?: number, page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseListDailyArticleResponse>> {
+        async listArticles(category?: string, difficulty?: number, page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseDailyArticlePageResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.listArticles(category, difficulty, page, size, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.listArticles']?.[localVarOperationServerIndex]?.url;
@@ -16639,7 +16645,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listWords(category?: string, difficulty?: number, page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseListDailyWordResponse>> {
+        async listWords(category?: string, difficulty?: number, page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseDailyWordPageResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.listWords(category, difficulty, page, size, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.listWords']?.[localVarOperationServerIndex]?.url;
@@ -17239,7 +17245,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async searchArticles(keyword: string, page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseListDailyArticleResponse>> {
+        async searchArticles(keyword: string, page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseDailyArticlePageResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.searchArticles(keyword, page, size, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.searchArticles']?.[localVarOperationServerIndex]?.url;
@@ -17342,7 +17348,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async searchWords(keyword: string, page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseListDailyWordResponse>> {
+        async searchWords(keyword: string, page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseDailyWordPageResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.searchWords(keyword, page, size, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.searchWords']?.[localVarOperationServerIndex]?.url;
@@ -18948,7 +18954,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getAllTasks(requestParameters: DefaultApiGetAllTasksRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListScraperTaskResponse> {
+        getAllTasks(requestParameters: DefaultApiGetAllTasksRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseScraperTaskPageResponse> {
             return localVarFp.getAllTasks(requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
         },
         /**
@@ -19176,7 +19182,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getConfigsByPage(requestParameters: DefaultApiGetConfigsByPageRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListScraperConfigResponse> {
+        getConfigsByPage(requestParameters: DefaultApiGetConfigsByPageRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseScraperConfigPageResponse> {
             return localVarFp.getConfigsByPage(requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
         },
         /**
@@ -19840,7 +19846,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getTasksByConfig(requestParameters: DefaultApiGetTasksByConfigRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListScraperTaskResponse> {
+        getTasksByConfig(requestParameters: DefaultApiGetTasksByConfigRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseScraperTaskPageResponse> {
             return localVarFp.getTasksByConfig(requestParameters.configId, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
         },
         /**
@@ -20126,7 +20132,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listArticles(requestParameters: DefaultApiListArticlesRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListDailyArticleResponse> {
+        listArticles(requestParameters: DefaultApiListArticlesRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseDailyArticlePageResponse> {
             return localVarFp.listArticles(requestParameters.category, requestParameters.difficulty, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
         },
         /**
@@ -20256,7 +20262,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listWords(requestParameters: DefaultApiListWordsRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListDailyWordResponse> {
+        listWords(requestParameters: DefaultApiListWordsRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseDailyWordPageResponse> {
             return localVarFp.listWords(requestParameters.category, requestParameters.difficulty, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
         },
         /**
@@ -20706,7 +20712,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        searchArticles(requestParameters: DefaultApiSearchArticlesRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListDailyArticleResponse> {
+        searchArticles(requestParameters: DefaultApiSearchArticlesRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseDailyArticlePageResponse> {
             return localVarFp.searchArticles(requestParameters.keyword, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
         },
         /**
@@ -20776,7 +20782,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        searchWords(requestParameters: DefaultApiSearchWordsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListDailyWordResponse> {
+        searchWords(requestParameters: DefaultApiSearchWordsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseDailyWordPageResponse> {
             return localVarFp.searchWords(requestParameters.keyword, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
         },
         /**
@@ -22094,7 +22100,7 @@ export interface DefaultApiInterface {
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    getAllTasks(requestParameters?: DefaultApiGetAllTasksRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListScraperTaskResponse>;
+    getAllTasks(requestParameters?: DefaultApiGetAllTasksRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseScraperTaskPageResponse>;
 
     /**
      * 获取公告详细信息，包含阅读统计
@@ -22299,7 +22305,7 @@ export interface DefaultApiInterface {
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    getConfigsByPage(requestParameters?: DefaultApiGetConfigsByPageRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListScraperConfigResponse>;
+    getConfigsByPage(requestParameters?: DefaultApiGetConfigsByPageRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseScraperConfigPageResponse>;
 
     /**
      * 
@@ -22895,7 +22901,7 @@ export interface DefaultApiInterface {
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    getTasksByConfig(requestParameters: DefaultApiGetTasksByConfigRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListScraperTaskResponse>;
+    getTasksByConfig(requestParameters: DefaultApiGetTasksByConfigRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseScraperTaskPageResponse>;
 
     /**
      * 
@@ -23152,7 +23158,7 @@ export interface DefaultApiInterface {
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    listArticles(requestParameters?: DefaultApiListArticlesRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListDailyArticleResponse>;
+    listArticles(requestParameters?: DefaultApiListArticlesRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseDailyArticlePageResponse>;
 
     /**
      * 
@@ -23269,7 +23275,7 @@ export interface DefaultApiInterface {
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    listWords(requestParameters?: DefaultApiListWordsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListDailyWordResponse>;
+    listWords(requestParameters?: DefaultApiListWordsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseDailyWordPageResponse>;
 
     /**
      * 
@@ -23674,7 +23680,7 @@ export interface DefaultApiInterface {
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    searchArticles(requestParameters: DefaultApiSearchArticlesRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListDailyArticleResponse>;
+    searchArticles(requestParameters: DefaultApiSearchArticlesRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseDailyArticlePageResponse>;
 
     /**
      * 
@@ -23737,7 +23743,7 @@ export interface DefaultApiInterface {
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    searchWords(requestParameters: DefaultApiSearchWordsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListDailyWordResponse>;
+    searchWords(requestParameters: DefaultApiSearchWordsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseDailyWordPageResponse>;
 
     /**
      * 向指定用户发送好友申请

@@ -4794,7 +4794,7 @@ This endpoint does not have any parameters.
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **getAllTasks**
-> BaseResponseListScraperTaskResponse getAllTasks()
+> BaseResponseScraperTaskPageResponse getAllTasks()
 
 获取所有抓取任务列表
 
@@ -4828,7 +4828,7 @@ const { status, data } = await apiInstance.getAllTasks(
 
 ### Return type
 
-**BaseResponseListScraperTaskResponse**
+**BaseResponseScraperTaskPageResponse**
 
 ### Authorization
 
@@ -5994,7 +5994,7 @@ const { status, data } = await apiInstance.getConfig(
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **getConfigsByPage**
-> BaseResponseListScraperConfigResponse getConfigsByPage()
+> BaseResponseScraperConfigPageResponse getConfigsByPage()
 
 分页获取抓取源配置列表
 
@@ -6028,7 +6028,7 @@ const { status, data } = await apiInstance.getConfigsByPage(
 
 ### Return type
 
-**BaseResponseListScraperConfigResponse**
+**BaseResponseScraperConfigPageResponse**
 
 ### Authorization
 
@@ -9452,7 +9452,7 @@ const { status, data } = await apiInstance.getTask(
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **getTasksByConfig**
-> BaseResponseListScraperTaskResponse getTasksByConfig()
+> BaseResponseScraperTaskPageResponse getTasksByConfig()
 
 获取指定配置的任务执行历史
 
@@ -9489,7 +9489,7 @@ const { status, data } = await apiInstance.getTasksByConfig(
 
 ### Return type
 
-**BaseResponseListScraperTaskResponse**
+**BaseResponseScraperTaskPageResponse**
 
 ### Authorization
 
@@ -10968,7 +10968,7 @@ const { status, data } = await apiInstance.listApplications(
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **listArticles**
-> BaseResponseListDailyArticleResponse listArticles()
+> BaseResponseDailyArticlePageResponse listArticles()
 
 
 ### Example
@@ -11007,7 +11007,7 @@ const { status, data } = await apiInstance.listArticles(
 
 ### Return type
 
-**BaseResponseListDailyArticleResponse**
+**BaseResponseDailyArticlePageResponse**
 
 ### Authorization
 
@@ -11691,7 +11691,7 @@ const { status, data } = await apiInstance.listTeachers(
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **listWords**
-> BaseResponseListDailyWordResponse listWords()
+> BaseResponseDailyWordPageResponse listWords()
 
 
 ### Example
@@ -11730,7 +11730,7 @@ const { status, data } = await apiInstance.listWords(
 
 ### Return type
 
-**BaseResponseListDailyWordResponse**
+**BaseResponseDailyWordPageResponse**
 
 ### Authorization
 
@@ -14083,7 +14083,7 @@ const { status, data } = await apiInstance.search(
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **searchArticles**
-> BaseResponseListDailyArticleResponse searchArticles()
+> BaseResponseDailyArticlePageResponse searchArticles()
 
 
 ### Example
@@ -14119,7 +14119,7 @@ const { status, data } = await apiInstance.searchArticles(
 
 ### Return type
 
-**BaseResponseListDailyArticleResponse**
+**BaseResponseDailyArticlePageResponse**
 
 ### Authorization
 
@@ -14478,7 +14478,7 @@ const { status, data } = await apiInstance.searchUsers(
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **searchWords**
-> BaseResponseListDailyWordResponse searchWords()
+> BaseResponseDailyWordPageResponse searchWords()
 
 
 ### Example
@@ -14514,7 +14514,7 @@ const { status, data } = await apiInstance.searchWords(
 
 ### Return type
 
-**BaseResponseListDailyWordResponse**
+**BaseResponseDailyWordPageResponse**
 
 ### Authorization
 

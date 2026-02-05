@@ -6,6 +6,10 @@
 
 import axios from 'axios';
 import type { AxiosError, AxiosRequestConfig, InternalAxiosRequestConfig } from 'axios';
+import JSONBig from 'json-bigint';
+
+// 配置 json-bigint：将大整数转为字符串，避免精度丢失
+const JSONBigString = JSONBig({ storeAsString: true });
 
 // Token 存储 key
 const TOKEN_KEY = 'auth_token';
@@ -132,6 +136,17 @@ export const apiClient = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  // 自定义响应转换器，使用 json-bigint 解析响应，解决 Long 精度丢失问题
+  transformResponse: [(data) => {
+    if (typeof data === 'string') {
+      try {
+        return JSONBigString.parse(data);
+      } catch {
+        return data;
+      }
+    }
+    return data;
+  }],
 });
 
 // 请求拦截器 - 自动添加 Token
