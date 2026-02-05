@@ -1,6 +1,54 @@
 @import "tailwindcss";
 @variant dark (&:where(.dark, .dark *));
 
+@theme {
+  /* 品牌主色调 (Blue) */
+  --color-brand-50: #eff6ff;
+  --color-brand-100: #dbeafe;
+  --color-brand-200: #bfdbfe;
+  --color-brand-300: #93c5fd;
+  --color-brand-400: #60a5fa;
+  --color-brand-500: #3b82f6;
+  --color-brand-600: #2563eb;
+  --color-brand-700: #1d4ed8;
+  --color-brand-800: #1e40af;
+  --color-brand-900: #1e3a8a;
+  --color-brand-950: #172554;
+
+  /* 辅助色 (Cyan/Indigo) 用于渐变和点缀 */
+  --color-accent-50: #ecfeff;
+  --color-accent-100: #cffafe;
+  --color-accent-200: #a5f3fc;
+  --color-accent-300: #67e8f9;
+  --color-accent-400: #22d3ee;
+  --color-accent-500: #06b6d4;
+  --color-accent-600: #0891b2;
+  
+  --color-highlight-50: #eef2ff;
+  --color-highlight-100: #e0e7ff;
+  --color-highlight-200: #c7d2fe;
+  --color-highlight-300: #a5b4fc;
+  --color-highlight-400: #818cf8;
+  --color-highlight-500: #6366f1;
+  --color-highlight-600: #4f46e5;
+
+  /* 状态颜色 */
+  --color-success: var(--color-emerald-500);
+  --color-success-bg: var(--color-emerald-50);
+  --color-success-dark: var(--color-emerald-600);
+  
+  --color-warning: var(--color-amber-500);
+  --color-warning-bg: var(--color-amber-50);
+  --color-warning-dark: var(--color-amber-600);
+  
+  --color-error: var(--color-rose-500);
+  --color-error-bg: var(--color-rose-50);
+  --color-error-dark: var(--color-rose-600);
+
+  --color-info: var(--color-brand-500);
+  --color-info-bg: var(--color-brand-50);
+}
+
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
