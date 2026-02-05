@@ -1,0 +1,63 @@
+# OpenAPI Generator 配置文件
+# 用于从 backend 的 SpringDoc 接口生成 TypeScript API 客户端
+
+# 输入配置
+inputSpec: "http://localhost:8080/v3/api-docs"
+# 或者使用本地文件:
+# inputSpec: "../backend/openapi.json"
+
+# 生成器配置
+generatorName: typescript-axios
+# 其他可选生成器: typescript-fetch, typescript-node, javascript-axios
+
+# 输出目录
+outputDir: "src/api/generated"
+
+# 全局配置
+additionalProperties:
+  # TypeScript 配置
+  typescriptThreePlus: "true"
+  supportsES6: "true"
+  withInterfaces: "true"
+  withSeparateModelsAndApi: "true"
+  modelPackage: "models"
+  apiPackage: "api"
+  # 使用单文件请求
+  useSingleRequestParameter: "true"
+  # 枚举处理
+  enumPropertyNaming: "original"
+  # 日期格式
+  dateLibrary: "string"
+  # 移除操作Id 前缀
+  removeOperationIdPrefix: "false"
+  # 字符串类型
+  stringTypeMappings: "BigDecimal=number,BigInteger=number"
+
+# 类型映射 (将 Java 类型映射到 TypeScript 类型)
+typeMappings:
+  LocalDate: "string"
+  LocalDateTime: "string"
+  LocalTime: "string"
+  BigDecimal: "number"
+  BigInteger: "number"
+
+# 导入映射
+importMappings:
+  LocalDate: "string"
+  LocalDateTime: "string"
+  LocalTime: "string"
+
+# 文件生成配置
+generateApis: true
+generateApiTests: false
+generateApiDocumentation: false
+generateModels: true
+generateModelTests: false
+generateModelDocumentation: false
+
+# 代码生成选项
+# 以下是需要保留的选项
+# globalProperties:
+#   models: true
+#   apis: true
+#   supportingFiles: true
