@@ -15,13 +15,11 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { FailedItem } from './failed-item';
+import type { ScraperConfigPageResponse } from './scraper-config-page-response';
 
-export interface BatchProcessResult {
-    'total'?: number;
-    'successIds'?: Array<number>;
-    'failedItems'?: Array<FailedItem>;
-    'successCount'?: number;
-    'failedCount'?: number;
+export interface BaseResponseScraperConfigPageResponse {
+    'code'?: number;
+    'data'?: ScraperConfigPageResponse;
+    'message'?: string;
 }
 

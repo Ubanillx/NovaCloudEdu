@@ -1,6 +1,5 @@
 .gitignore
 .npmignore
-.openapi-generator-ignore
 api.ts
 api/aiapi.ts
 api/default-api.ts
@@ -55,7 +54,9 @@ docs/BaseResponseCourseProgressSummaryResponse.md
 docs/BaseResponseCourseResponse.md
 docs/BaseResponseCourseReviewResponse.md
 docs/BaseResponseCourseStructureResponse.md
+docs/BaseResponseDailyArticlePageResponse.md
 docs/BaseResponseDailyArticleResponse.md
+docs/BaseResponseDailyWordPageResponse.md
 docs/BaseResponseDailyWordResponse.md
 docs/BaseResponseExecutionResultResponse.md
 docs/BaseResponseFeedbackDetailResponse.md
@@ -104,7 +105,6 @@ docs/BaseResponseListOrderResponse.md
 docs/BaseResponseListPostResponse.md
 docs/BaseResponseListProgressResponse.md
 docs/BaseResponseListScraperConfigResponse.md
-docs/BaseResponseListScraperTaskResponse.md
 docs/BaseResponseListSectionResponse.md
 docs/BaseResponseListString.md
 docs/BaseResponseListTeacherApplicationResponse.md
@@ -136,7 +136,9 @@ docs/BaseResponseReplyPageResponse.md
 docs/BaseResponseReplyResponse.md
 docs/BaseResponseScheduleResponse.md
 docs/BaseResponseScrapeResultResponse.md
+docs/BaseResponseScraperConfigPageResponse.md
 docs/BaseResponseScraperConfigResponse.md
+docs/BaseResponseScraperTaskPageResponse.md
 docs/BaseResponseScraperTaskResponse.md
 docs/BaseResponseSearchUserPageResponse.md
 docs/BaseResponseSectionResponse.md
@@ -217,7 +219,9 @@ docs/CreateScheduleSettingRequest.md
 docs/CreateSectionRequest.md
 docs/CreateUserRequest.md
 docs/CreateWorkflowRequest.md
+docs/DailyArticlePageResponse.md
 docs/DailyArticleResponse.md
+docs/DailyWordPageResponse.md
 docs/DailyWordResponse.md
 docs/DefaultApi.md
 docs/DynamicScrapeRequest.md
@@ -290,8 +294,10 @@ docs/ScheduleResponse.md
 docs/ScrapeConfigRequest.md
 docs/ScrapeRequest.md
 docs/ScrapeResultResponse.md
+docs/ScraperConfigPageResponse.md
 docs/ScraperConfigRequest.md
 docs/ScraperConfigResponse.md
+docs/ScraperTaskPageResponse.md
 docs/ScraperTaskResponse.md
 docs/SearchUserPageResponse.md
 docs/SearchUserRequestDTO.md
@@ -414,7 +420,9 @@ models/base-response-course-progress-summary-response.ts
 models/base-response-course-response.ts
 models/base-response-course-review-response.ts
 models/base-response-course-structure-response.ts
+models/base-response-daily-article-page-response.ts
 models/base-response-daily-article-response.ts
+models/base-response-daily-word-page-response.ts
 models/base-response-daily-word-response.ts
 models/base-response-execution-result-response.ts
 models/base-response-feedback-detail-response.ts
@@ -463,7 +471,6 @@ models/base-response-list-order-response.ts
 models/base-response-list-post-response.ts
 models/base-response-list-progress-response.ts
 models/base-response-list-scraper-config-response.ts
-models/base-response-list-scraper-task-response.ts
 models/base-response-list-section-response.ts
 models/base-response-list-string.ts
 models/base-response-list-teacher-application-response.ts
@@ -495,7 +502,9 @@ models/base-response-reply-page-response.ts
 models/base-response-reply-response.ts
 models/base-response-schedule-response.ts
 models/base-response-scrape-result-response.ts
+models/base-response-scraper-config-page-response.ts
 models/base-response-scraper-config-response.ts
+models/base-response-scraper-task-page-response.ts
 models/base-response-scraper-task-response.ts
 models/base-response-search-user-page-response.ts
 models/base-response-section-response.ts
@@ -576,7 +585,9 @@ models/create-schedule-setting-request.ts
 models/create-section-request.ts
 models/create-user-request.ts
 models/create-workflow-request.ts
+models/daily-article-page-response.ts
 models/daily-article-response.ts
+models/daily-word-page-response.ts
 models/daily-word-response.ts
 models/dynamic-scrape-request.ts
 models/error-handling-config-dto.ts
@@ -649,8 +660,10 @@ models/schedule-response.ts
 models/scrape-config-request.ts
 models/scrape-request.ts
 models/scrape-result-response.ts
+models/scraper-config-page-response.ts
 models/scraper-config-request.ts
 models/scraper-config-response.ts
+models/scraper-task-page-response.ts
 models/scraper-task-response.ts
 models/search-user-page-response.ts
 models/search-user-request-dto.ts
