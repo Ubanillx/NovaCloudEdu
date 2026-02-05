@@ -1,0 +1,24 @@
+# BaseResponseWorkflowNodeResponse
+
+
+## Properties
+
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**code** | **number** |  | [optional] [default to undefined]
+**data** | [**WorkflowNodeResponse**](WorkflowNodeResponse.md) |  | [optional] [default to undefined]
+**message** | **string** |  | [optional] [default to undefined]
+
+## Example
+
+```typescript
+import { BaseResponseWorkflowNodeResponse } from './api';
+
+const instance: BaseResponseWorkflowNodeResponse = {
+    code,
+    data,
+    message,
+};
+```
+
+[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

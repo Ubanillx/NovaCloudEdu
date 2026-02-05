@@ -1,0 +1,26 @@
+# OpenAPI Generator 忽略文件
+# 以下文件/目录将不会被覆盖
+
+# 保留自定义配置
+.gitignore
+.npmrc
+.prettierrc
+.eslintrc
+
+# 保留自定义代码
+src/api/generated/**/*.custom.ts
+src/api/generated/**/index.ts
+
+# 保留文档
+README.md
+NOTICE
+
+# 保留测试文件中的自定义修改
+**/*.test.ts
+**/*.spec.ts
+
+# 保留构建配置
+package.json
+package-lock.json
+yarn.lock
+tsconfig.json
