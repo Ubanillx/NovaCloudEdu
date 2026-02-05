@@ -13,12 +13,18 @@ export const Sider: React.FC<SiderProps> = ({ collapsed = false }) => {
       <div className="p-4 space-y-6">
         {/* Section 1: Categories */}
         <div>
-          <h3 className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Categories</h3>
+          <h3 className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">探索领域</h3>
           <ul className="space-y-1">
-            {['Mobile', 'Web', 'Backend', 'Design', 'Database'].map((item) => (
-              <li key={item}>
-                <a href="#" className="block px-3 py-2 text-sm text-gray-700 dark:text-gray-300 rounded-md hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-                  {item}
+            {[
+              { name: '少儿编程', item: 'Coding' },
+              { name: '趣味数学', item: 'Math' },
+              { name: '人文艺术', item: 'Arts' },
+              { name: '科学探索', item: 'Science' },
+              { name: '英语口语', item: 'English' }
+            ].map((item) => (
+              <li key={item.item}>
+                <a href="#" className="block px-3 py-2 text-sm text-gray-700 dark:text-gray-300 rounded-md hover:bg-brand-50 dark:hover:bg-brand-900/30 hover:text-brand-600 dark:hover:text-brand-400 transition-colors">
+                  {item.name}
                 </a>
               </li>
             ))}
@@ -27,12 +33,12 @@ export const Sider: React.FC<SiderProps> = ({ collapsed = false }) => {
 
         {/* Section 2: AI Assistants */}
         <div>
-          <h3 className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">AI Assistants</h3>
+          <h3 className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">AI 助手</h3>
           <ul className="space-y-1">
             {MockData.aiAssistants.map((assistant) => (
               <li key={assistant.id}>
-                <a href="#" className="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 rounded-md hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 transition-colors group">
-                  <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xs group-hover:bg-blue-200 dark:group-hover:bg-blue-800 transition-colors">
+                <a href="#" className="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 rounded-md hover:bg-brand-50 dark:hover:bg-brand-900/30 hover:text-brand-600 dark:hover:text-brand-400 transition-colors group">
+                  <div className="w-6 h-6 rounded-full bg-brand-100 dark:bg-brand-900/50 text-brand-600 dark:text-brand-400 flex items-center justify-center text-xs group-hover:bg-brand-200 dark:group-hover:bg-brand-800 transition-colors">
                     {assistant.name[0]}
                   </div>
                   <span className="truncate">{assistant.name}</span>
