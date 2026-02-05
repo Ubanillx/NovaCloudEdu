@@ -47,8 +47,10 @@ public class DailyWordController {
         Long adminId = Long.parseLong(authentication.getName());
         Long wordId = createDailyWordCommand.execute(
                 request.getWord(),
-                request.getPronunciation(),
-                request.getAudioUrl(),
+                request.getPronunciationUs(),
+                request.getPronunciationUk(),
+                request.getAudioUrlUs(),
+                request.getAudioUrlUk(),
                 request.getTranslation(),
                 request.getExample(),
                 request.getExampleTranslation(),
@@ -68,8 +70,10 @@ public class DailyWordController {
         updateDailyWordCommand.execute(
                 id,
                 request.getWord(),
-                request.getPronunciation(),
-                request.getAudioUrl(),
+                request.getPronunciationUs(),
+                request.getPronunciationUk(),
+                request.getAudioUrlUs(),
+                request.getAudioUrlUk(),
                 request.getTranslation(),
                 request.getExample(),
                 request.getExampleTranslation(),
@@ -99,10 +103,18 @@ public class DailyWordController {
     @GetMapping("/today")
     @Operation(summary = "获取今日推荐单词（个性化推荐）")
     public BaseResponse<List<DailyWordResponse>> getTodayWords(
-            @RequestParam(defaultValue = "10") @Parameter(description = "推荐数量") int size,
+            @RequestParam(defaultValue = "10") @Parameter(description = "推荐数量，最大100") int size,
+            @RequestParam(required = false) @Parameter(description = "单词分类：小学三年级、小学四年级、小学五年级、小学六年级、初中七年级、初中八年级、初中九年级、初中、初中(乱序)、外研社初中、高中、高中(乱序)、北师高中、四级、四级(乱序)、专四、专四(乱序)、六级、六级(乱序)、考研、考研(乱序)、专八、专八(乱序)、托福、雅思、雅思(乱序)、GRE、GMAT、GMAT(乱序)、SAT、BEC商务英语") String type,
             Authentication authentication) {
         Long userId = Long.parseLong(authentication.getName());
-        List<DailyWord> words = knowledgeGraphRecommendationService.recommendWords(userId, size);
+        // 限制size范围：1-100
+        int limitedSize = Math.max(1, Math.min(size, 100));
+        List<DailyWord> words;
+        if (type != null && !type.isEmpty()) {
+            words = getDailyWordQuery.executeByCategory(type, 1, limitedSize);
+        } else {
+            words = knowledgeGraphRecommendationService.recommendWords(userId, limitedSize);
+        }
         List<DailyWordResponse> responses = words.stream()
                 .map(assembler::toDailyWordResponse)
                 .collect(Collectors.toList());

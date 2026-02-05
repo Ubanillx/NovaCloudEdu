@@ -16,8 +16,10 @@ public class DailyWord {
 
     private DailyWordId id;
     private String word;
-    private String pronunciation;
-    private String audioUrl;
+    private String pronunciationUs;
+    private String pronunciationUk;
+    private String audioUrlUs;
+    private String audioUrlUk;
     private String translation;
     private String example;
     private String exampleTranslation;
@@ -29,14 +31,17 @@ public class DailyWord {
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
 
-    public static DailyWord create(String word, String pronunciation, String audioUrl,
+    public static DailyWord create(String word, String pronunciationUs, String pronunciationUk,
+                                   String audioUrlUs, String audioUrlUk,
                                    String translation, String example, String exampleTranslation,
                                    Difficulty difficulty, String category, String notes,
                                    LocalDate publishDate, UserId adminId) {
         DailyWord dailyWord = new DailyWord();
         dailyWord.word = word;
-        dailyWord.pronunciation = pronunciation;
-        dailyWord.audioUrl = audioUrl;
+        dailyWord.pronunciationUs = pronunciationUs;
+        dailyWord.pronunciationUk = pronunciationUk;
+        dailyWord.audioUrlUs = audioUrlUs;
+        dailyWord.audioUrlUk = audioUrlUk;
         dailyWord.translation = translation;
         dailyWord.example = example;
         dailyWord.exampleTranslation = exampleTranslation;
@@ -50,7 +55,8 @@ public class DailyWord {
         return dailyWord;
     }
 
-    public static DailyWord reconstruct(DailyWordId id, String word, String pronunciation, String audioUrl,
+    public static DailyWord reconstruct(DailyWordId id, String word, String pronunciationUs, String pronunciationUk,
+                                        String audioUrlUs, String audioUrlUk,
                                         String translation, String example, String exampleTranslation,
                                         Difficulty difficulty, String category, String notes,
                                         LocalDate publishDate, UserId adminId,
@@ -58,8 +64,10 @@ public class DailyWord {
         DailyWord dailyWord = new DailyWord();
         dailyWord.id = id;
         dailyWord.word = word;
-        dailyWord.pronunciation = pronunciation;
-        dailyWord.audioUrl = audioUrl;
+        dailyWord.pronunciationUs = pronunciationUs;
+        dailyWord.pronunciationUk = pronunciationUk;
+        dailyWord.audioUrlUs = audioUrlUs;
+        dailyWord.audioUrlUk = audioUrlUk;
         dailyWord.translation = translation;
         dailyWord.example = example;
         dailyWord.exampleTranslation = exampleTranslation;
@@ -80,13 +88,16 @@ public class DailyWord {
         this.id = id;
     }
 
-    public void updateInfo(String word, String pronunciation, String audioUrl,
+    public void updateInfo(String word, String pronunciationUs, String pronunciationUk,
+                          String audioUrlUs, String audioUrlUk,
                           String translation, String example, String exampleTranslation,
                           Difficulty difficulty, String category, String notes,
                           LocalDate publishDate) {
         this.word = word;
-        this.pronunciation = pronunciation;
-        this.audioUrl = audioUrl;
+        this.pronunciationUs = pronunciationUs;
+        this.pronunciationUk = pronunciationUk;
+        this.audioUrlUs = audioUrlUs;
+        this.audioUrlUk = audioUrlUk;
         this.translation = translation;
         this.example = example;
         this.exampleTranslation = exampleTranslation;

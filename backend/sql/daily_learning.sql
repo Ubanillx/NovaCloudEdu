@@ -5,8 +5,10 @@ CREATE TABLE IF NOT EXISTS daily_word
 (
     id                  BIGSERIAL PRIMARY KEY,
     word                VARCHAR(128) NOT NULL,
-    pronunciation       VARCHAR(128) NULL,
-    audio_url           VARCHAR(2048) NULL,
+    pronunciation_us    VARCHAR(128) NULL,
+    pronunciation_uk    VARCHAR(128) NULL,
+    audio_url_us        VARCHAR(2048) NULL,
+    audio_url_uk        VARCHAR(2048) NULL,
     translation         VARCHAR(512) NOT NULL,
     example             TEXT NULL,
     example_translation TEXT NULL,
@@ -26,8 +28,10 @@ CREATE INDEX IF NOT EXISTS idx_dw_difficulty ON daily_word(difficulty);
 COMMENT ON TABLE daily_word IS '每日单词';
 COMMENT ON COLUMN daily_word.id IS 'ID';
 COMMENT ON COLUMN daily_word.word IS '单词';
-COMMENT ON COLUMN daily_word.pronunciation IS '音标';
-COMMENT ON COLUMN daily_word.audio_url IS '发音音频URL';
+COMMENT ON COLUMN daily_word.pronunciation_us IS '美式音标';
+COMMENT ON COLUMN daily_word.pronunciation_uk IS '英式音标';
+COMMENT ON COLUMN daily_word.audio_url_us IS '美式发音音频URL';
+COMMENT ON COLUMN daily_word.audio_url_uk IS '英式发音音频URL';
 COMMENT ON COLUMN daily_word.translation IS '翻译';
 COMMENT ON COLUMN daily_word.example IS '例句';
 COMMENT ON COLUMN daily_word.example_translation IS '例句翻译';

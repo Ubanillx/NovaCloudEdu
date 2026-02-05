@@ -16,8 +16,10 @@ public class DailyWordConverter {
             po.setId(dailyWord.getId().value());
         }
         po.setWord(dailyWord.getWord());
-        po.setPronunciation(dailyWord.getPronunciation());
-        po.setAudioUrl(dailyWord.getAudioUrl());
+        po.setPronunciationUs(dailyWord.getPronunciationUs());
+        po.setPronunciationUk(dailyWord.getPronunciationUk());
+        po.setAudioUrlUs(dailyWord.getAudioUrlUs());
+        po.setAudioUrlUk(dailyWord.getAudioUrlUk());
         po.setTranslation(dailyWord.getTranslation());
         po.setExample(dailyWord.getExample());
         po.setExampleTranslation(dailyWord.getExampleTranslation());
@@ -35,8 +37,10 @@ public class DailyWordConverter {
         return DailyWord.reconstruct(
                 DailyWordId.of(po.getId()),
                 po.getWord(),
-                po.getPronunciation(),
-                po.getAudioUrl(),
+                po.getPronunciationUs(),
+                po.getPronunciationUk(),
+                po.getAudioUrlUs(),
+                po.getAudioUrlUk(),
                 po.getTranslation(),
                 po.getExample(),
                 po.getExampleTranslation(),
