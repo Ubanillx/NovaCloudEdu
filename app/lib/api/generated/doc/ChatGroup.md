@@ -9,6 +9,7 @@ import 'package:nova_api/api.dart';
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **id** | [**GroupId**](GroupId.md) |  | [optional] 
+**groupNumber** | **String** |  | [optional] 
 **groupName** | **String** |  | [optional] 
 **avatar** | **String** |  | [optional] 
 **description** | **String** |  | [optional] 
@@ -23,8 +24,8 @@ Name | Type | Description | Notes
 **createTime** | [**DateTime**](DateTime.md) |  | [optional] 
 **updateTime** | [**DateTime**](DateTime.md) |  | [optional] 
 **mute** | **bool** |  | [optional] 
-**delete** | **bool** |  | [optional] 
 **full** | **bool** |  | [optional] 
+**delete** | **bool** |  | [optional] 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

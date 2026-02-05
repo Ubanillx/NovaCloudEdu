@@ -1,3 +1,5 @@
+import 'dart:io';
+
 /// 应用环境配置
 enum Environment { dev, prod }
 
@@ -22,7 +24,9 @@ class EnvConfig {
   static String get apiBaseUrl {
     switch (_current) {
       case Environment.dev:
-        return 'http://localhost:8080';
+        // Android 模拟器使用 10.0.2.2 访问宿主机，iOS 模拟器和其他平台使用 localhost
+        final host = Platform.isAndroid ? '10.0.2.2' : 'localhost';
+        return 'http://$host:8080';
       case Environment.prod:
         return 'https://api.novacloudedu.com'; // TODO: 替换为生产环境地址
     }

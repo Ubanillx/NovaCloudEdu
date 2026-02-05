@@ -84,7 +84,8 @@ class FileUploadService {
 
       if (response.statusCode == 200 && response.data != null) {
         final data = response.data;
-        if (data['code'] == 200 && data['data'] != null) {
+        // 后端返回 code=0 表示成功
+        if ((data['code'] == 0 || data['code'] == 200) && data['data'] != null) {
           return UploadFileResult.fromJson(data['data'] as Map<String, dynamic>);
         }
       }
@@ -128,7 +129,8 @@ class FileUploadService {
 
       if (response.statusCode == 200 && response.data != null) {
         final data = response.data;
-        if (data['code'] == 200 && data['data'] != null) {
+        // 后端返回 code=0 表示成功
+        if ((data['code'] == 0 || data['code'] == 200) && data['data'] != null) {
           return UploadFileResult.fromJson(data['data'] as Map<String, dynamic>);
         }
       }

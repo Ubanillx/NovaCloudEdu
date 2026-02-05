@@ -31,6 +31,8 @@ class _$LoginUserResponse extends LoginUserResponse {
   final DateTime? createTime;
   @override
   final String? token;
+  @override
+  final String? refreshToken;
 
   factory _$LoginUserResponse([
     void Function(LoginUserResponseBuilder)? updates,
@@ -49,6 +51,7 @@ class _$LoginUserResponse extends LoginUserResponse {
     this.level,
     this.createTime,
     this.token,
+    this.refreshToken,
   }) : super._();
   @override
   LoginUserResponse rebuild(void Function(LoginUserResponseBuilder) updates) =>
@@ -73,7 +76,8 @@ class _$LoginUserResponse extends LoginUserResponse {
         userEmail == other.userEmail &&
         level == other.level &&
         createTime == other.createTime &&
-        token == other.token;
+        token == other.token &&
+        refreshToken == other.refreshToken;
   }
 
   @override
@@ -91,6 +95,7 @@ class _$LoginUserResponse extends LoginUserResponse {
     _$hash = $jc(_$hash, level.hashCode);
     _$hash = $jc(_$hash, createTime.hashCode);
     _$hash = $jc(_$hash, token.hashCode);
+    _$hash = $jc(_$hash, refreshToken.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -109,7 +114,8 @@ class _$LoginUserResponse extends LoginUserResponse {
           ..add('userEmail', userEmail)
           ..add('level', level)
           ..add('createTime', createTime)
-          ..add('token', token))
+          ..add('token', token)
+          ..add('refreshToken', refreshToken))
         .toString();
   }
 }
@@ -166,6 +172,10 @@ class LoginUserResponseBuilder
   String? get token => _$this._token;
   set token(String? token) => _$this._token = token;
 
+  String? _refreshToken;
+  String? get refreshToken => _$this._refreshToken;
+  set refreshToken(String? refreshToken) => _$this._refreshToken = refreshToken;
+
   LoginUserResponseBuilder() {
     LoginUserResponse._defaults(this);
   }
@@ -185,6 +195,7 @@ class LoginUserResponseBuilder
       _level = $v.level;
       _createTime = $v.createTime;
       _token = $v.token;
+      _refreshToken = $v.refreshToken;
       _$v = null;
     }
     return this;
@@ -219,6 +230,7 @@ class LoginUserResponseBuilder
           level: level,
           createTime: createTime,
           token: token,
+          refreshToken: refreshToken,
         );
     replace(_$result);
     return _$result;

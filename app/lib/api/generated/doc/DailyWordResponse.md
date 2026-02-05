@@ -10,8 +10,10 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **id** | **int** | ID | [optional] 
 **word** | **String** | 单词 | [optional] 
-**pronunciation** | **String** | 音标 | [optional] 
-**audioUrl** | **String** | 发音音频URL | [optional] 
+**pronunciationUs** | **String** | 美式音标 | [optional] 
+**pronunciationUk** | **String** | 英式音标 | [optional] 
+**audioUrlUs** | **String** | 美式发音音频URL | [optional] 
+**audioUrlUk** | **String** | 英式发音音频URL | [optional] 
 **translation** | **String** | 翻译 | [optional] 
 **example** | **String** | 例句 | [optional] 
 **exampleTranslation** | **String** | 例句翻译 | [optional] 

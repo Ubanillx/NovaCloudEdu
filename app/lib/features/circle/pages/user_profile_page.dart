@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:nova_api/nova_api.dart';
 import '../../../config/app_theme.dart';
 import '../../../widgets/common/loading_widget.dart';
+import '../../../widgets/toast/nova_message.dart';
+import '../../../widgets/dialogs/app_dialog.dart';
 import '../services/post_service.dart';
+import '../../chat/services/friend_service.dart';
+import '../../chat/pages/private_chat_page.dart';
 import 'post_detail_page.dart';
 
 /// 用户公开资料页面
@@ -22,6 +26,7 @@ class UserProfilePage extends StatefulWidget {
 
 class _UserProfilePageState extends State<UserProfilePage> {
   final PostService _postService = PostService();
+  final FriendService _friendService = FriendService();
   
   UserPublicResponse? _userInfo;
   List<PostResponse> _posts = [];
@@ -29,6 +34,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
   bool _isLoadingPosts = false;
   bool _isFollowing = false;
   bool _isLoadingFollow = false;
+  bool _isFriend = false;
+  bool _hasPendingRequest = false;
+  bool _isLoadingFriend = false;
 
   @override
   void initState() {
@@ -51,6 +59,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
       if (followStatus != null && mounted) {
         setState(() => _isFollowing = followStatus);
       }
+      
+      // 检查好友状态
+      await _checkFriendStatus();
       
       // 加载用户帖子
       await _loadPosts();
@@ -93,6 +104,69 @@ class _UserProfilePageState extends State<UserProfilePage> {
     } finally {
       if (mounted) setState(() => _isLoadingFollow = false);
     }
+  }
+
+  /// 检查好友状态
+  Future<void> _checkFriendStatus() async {
+    try {
+      final isFriend = await _friendService.checkFriendship(widget.userId);
+      if (mounted) {
+        setState(() => _isFriend = isFriend);
+      }
+    } catch (e) {
+      debugPrint('检查好友状态失败: $e');
+    }
+  }
+
+  /// 发送好友申请
+  Future<void> _sendFriendRequest() async {
+    if (_isLoadingFriend) return;
+    
+    // 显示输入验证消息对话框
+    final message = await showInputDialog(
+      context,
+      title: '添加好友',
+      hintText: '请输入验证消息（可选）',
+      confirmText: '发送申请',
+    );
+    
+    if (message == null) return; // 用户取消
+    
+    setState(() => _isLoadingFriend = true);
+    try {
+      final success = await _friendService.sendFriendRequest(
+        receiverId: widget.userId,
+        message: message.isNotEmpty ? message : null,
+      );
+      if (mounted) {
+        if (success) {
+          NovaMessage.success(context, '好友申请已发送');
+          setState(() => _hasPendingRequest = true);
+        } else {
+          NovaMessage.error(context, '发送失败');
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        NovaMessage.error(context, '发送失败');
+      }
+    } finally {
+      if (mounted) setState(() => _isLoadingFriend = false);
+    }
+  }
+
+  /// 开始聊天
+  void _startChat() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => PrivateChatPage(
+          partnerId: widget.userId,
+          partnerName: _userInfo?.userName ?? '用户${widget.userId}',
+          partnerAvatar: _userInfo?.userAvatar,
+        ),
+      ),
+    );
   }
 
   @override
@@ -179,50 +253,132 @@ class _UserProfilePageState extends State<UserProfilePage> {
             ),
           ),
           const SizedBox(height: 24),
-          // 关注按钮
+          // 操作按钮
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 48),
-            child: SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: _isLoadingFollow ? null : _toggleFollow,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: _isFollowing ? colors.surfaceVariant : AppTheme.brand,
-                  foregroundColor: _isFollowing ? colors.textSecondary : Colors.white,
-                  elevation: _isFollowing ? 0 : 4,
-                  shadowColor: AppTheme.brand.withOpacity(0.4),
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(100),
+            padding: const EdgeInsets.symmetric(horizontal: 32),
+            child: Row(
+              children: [
+                // 关注按钮
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: _isLoadingFollow ? null : _toggleFollow,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: _isFollowing ? colors.surfaceVariant : AppTheme.brand,
+                      foregroundColor: _isFollowing ? colors.textSecondary : Colors.white,
+                      elevation: _isFollowing ? 0 : 2,
+                      shadowColor: AppTheme.brand.withOpacity(0.4),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(100),
+                      ),
+                    ),
+                    child: _isLoadingFollow
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                            ),
+                          )
+                        : Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                _isFollowing ? Icons.check_rounded : Icons.add_rounded,
+                                size: 18,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                _isFollowing ? '已关注' : '关注',
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
                   ),
                 ),
-                child: _isLoadingFollow
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                        ),
-                      )
-                    : Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            _isFollowing ? Icons.check_rounded : Icons.add_rounded,
-                            size: 20,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            _isFollowing ? '已关注' : '关注',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
+                const SizedBox(width: 12),
+                // 好友/聊天按钮
+                Expanded(
+                  child: _isFriend
+                      ? ElevatedButton(
+                          onPressed: _startChat,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green,
+                            foregroundColor: Colors.white,
+                            elevation: 2,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(100),
                             ),
                           ),
-                        ],
-                      ),
-              ),
+                          child: const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.chat_bubble_outline, size: 18),
+                              SizedBox(width: 4),
+                              Text(
+                                '发消息',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      : ElevatedButton(
+                          onPressed: _hasPendingRequest || _isLoadingFriend
+                              ? null
+                              : _sendFriendRequest,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: _hasPendingRequest
+                                ? colors.surfaceVariant
+                                : Colors.orange,
+                            foregroundColor: _hasPendingRequest
+                                ? colors.textSecondary
+                                : Colors.white,
+                            elevation: _hasPendingRequest ? 0 : 2,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(100),
+                            ),
+                          ),
+                          child: _isLoadingFriend
+                              ? const SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor:
+                                        AlwaysStoppedAnimation<Color>(Colors.white),
+                                  ),
+                                )
+                              : Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      _hasPendingRequest
+                                          ? Icons.hourglass_empty
+                                          : Icons.person_add_outlined,
+                                      size: 18,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      _hasPendingRequest ? '已申请' : '加好友',
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                        ),
+                ),
+              ],
             ),
           ),
         ],

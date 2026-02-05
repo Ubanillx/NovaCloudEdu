@@ -30,12 +30,17 @@ import 'package:nova_api/src/model/announcement_page_response.dart';
 import 'package:nova_api/src/model/announcement_response.dart';
 import 'package:nova_api/src/model/apply_teacher_request.dart';
 import 'package:nova_api/src/model/async_execution_response.dart';
+import 'package:nova_api/src/model/banner_list_response.dart';
+import 'package:nova_api/src/model/banner_page_response.dart';
+import 'package:nova_api/src/model/banner_response.dart';
 import 'package:nova_api/src/model/base_response_ai_assistant_vo.dart';
 import 'package:nova_api/src/model/base_response_ai_conversation.dart';
 import 'package:nova_api/src/model/base_response_announcement_detail_response.dart';
 import 'package:nova_api/src/model/base_response_announcement_page_response.dart';
 import 'package:nova_api/src/model/base_response_announcement_response.dart';
 import 'package:nova_api/src/model/base_response_async_execution_response.dart';
+import 'package:nova_api/src/model/base_response_banner_page_response.dart';
+import 'package:nova_api/src/model/base_response_banner_response.dart';
 import 'package:nova_api/src/model/base_response_batch_process_result.dart';
 import 'package:nova_api/src/model/base_response_book_dto.dart';
 import 'package:nova_api/src/model/base_response_boolean.dart';
@@ -71,6 +76,7 @@ import 'package:nova_api/src/model/base_response_knowledge_document_vo.dart';
 import 'package:nova_api/src/model/base_response_learning_stats.dart';
 import 'package:nova_api/src/model/base_response_list_ai_assistant_vo.dart';
 import 'package:nova_api/src/model/base_response_list_ai_conversation.dart';
+import 'package:nova_api/src/model/base_response_list_banner_list_response.dart';
 import 'package:nova_api/src/model/base_response_list_book_dto.dart';
 import 'package:nova_api/src/model/base_response_list_chapter_dto.dart';
 import 'package:nova_api/src/model/base_response_list_chapter_response.dart';
@@ -123,6 +129,7 @@ import 'package:nova_api/src/model/base_response_post_response.dart';
 import 'package:nova_api/src/model/base_response_progress_response.dart';
 import 'package:nova_api/src/model/base_response_reading_quiz.dart';
 import 'package:nova_api/src/model/base_response_reading_stats.dart';
+import 'package:nova_api/src/model/base_response_refresh_token_response.dart';
 import 'package:nova_api/src/model/base_response_reply_page_response.dart';
 import 'package:nova_api/src/model/base_response_reply_response.dart';
 import 'package:nova_api/src/model/base_response_schedule_response.dart';
@@ -187,6 +194,7 @@ import 'package:nova_api/src/model/course_review_response.dart';
 import 'package:nova_api/src/model/course_structure_response.dart';
 import 'package:nova_api/src/model/create_ai_assistant_command.dart';
 import 'package:nova_api/src/model/create_announcement_request.dart';
+import 'package:nova_api/src/model/create_banner_request.dart';
 import 'package:nova_api/src/model/create_chapter_request.dart';
 import 'package:nova_api/src/model/create_class_request.dart';
 import 'package:nova_api/src/model/create_comment_request.dart';
@@ -255,12 +263,15 @@ import 'package:nova_api/src/model/post_page_response.dart';
 import 'package:nova_api/src/model/post_response.dart';
 import 'package:nova_api/src/model/progress_response.dart';
 import 'package:nova_api/src/model/query_announcement_request.dart';
+import 'package:nova_api/src/model/query_banner_request.dart';
 import 'package:nova_api/src/model/query_feedback_request.dart';
 import 'package:nova_api/src/model/query_user_request.dart';
 import 'package:nova_api/src/model/quiz_question.dart';
 import 'package:nova_api/src/model/reading_quiz.dart';
 import 'package:nova_api/src/model/reading_quiz_id.dart';
 import 'package:nova_api/src/model/reading_stats.dart';
+import 'package:nova_api/src/model/refresh_token_request.dart';
+import 'package:nova_api/src/model/refresh_token_response.dart';
 import 'package:nova_api/src/model/reply_page_response.dart';
 import 'package:nova_api/src/model/reply_response.dart';
 import 'package:nova_api/src/model/reset_password_request.dart';
@@ -283,6 +294,7 @@ import 'package:nova_api/src/model/tts_request.dart';
 import 'package:nova_api/src/model/tts_response.dart';
 import 'package:nova_api/src/model/update_ai_assistant_command.dart';
 import 'package:nova_api/src/model/update_announcement_request.dart';
+import 'package:nova_api/src/model/update_banner_request.dart';
 import 'package:nova_api/src/model/update_chapter_request.dart';
 import 'package:nova_api/src/model/update_class_request.dart';
 import 'package:nova_api/src/model/update_course_request.dart';
@@ -357,12 +369,17 @@ part 'serializers.g.dart';
   AnnouncementResponse,
   ApplyTeacherRequest,
   AsyncExecutionResponse,
+  BannerListResponse,
+  BannerPageResponse,
+  BannerResponse,
   BaseResponseAiAssistantVO,
   BaseResponseAiConversation,
   BaseResponseAnnouncementDetailResponse,
   BaseResponseAnnouncementPageResponse,
   BaseResponseAnnouncementResponse,
   BaseResponseAsyncExecutionResponse,
+  BaseResponseBannerPageResponse,
+  BaseResponseBannerResponse,
   BaseResponseBatchProcessResult,
   BaseResponseBookDTO,
   BaseResponseBoolean,
@@ -398,6 +415,7 @@ part 'serializers.g.dart';
   BaseResponseLearningStats,
   BaseResponseListAiAssistantVO,
   BaseResponseListAiConversation,
+  BaseResponseListBannerListResponse,
   BaseResponseListBookDTO,
   BaseResponseListChapterDTO,
   BaseResponseListChapterResponse,
@@ -450,6 +468,7 @@ part 'serializers.g.dart';
   BaseResponseProgressResponse,
   BaseResponseReadingQuiz,
   BaseResponseReadingStats,
+  BaseResponseRefreshTokenResponse,
   BaseResponseReplyPageResponse,
   BaseResponseReplyResponse,
   BaseResponseScheduleResponse,
@@ -514,6 +533,7 @@ part 'serializers.g.dart';
   CourseStructureResponse,
   CreateAiAssistantCommand,
   CreateAnnouncementRequest,
+  CreateBannerRequest,
   CreateChapterRequest,
   CreateClassRequest,
   CreateCommentRequest,
@@ -582,12 +602,15 @@ part 'serializers.g.dart';
   PostResponse,
   ProgressResponse,
   QueryAnnouncementRequest,
+  QueryBannerRequest,
   QueryFeedbackRequest,
   QueryUserRequest,
   QuizQuestion,
   ReadingQuiz,
   ReadingQuizId,
   ReadingStats,
+  RefreshTokenRequest,
+  RefreshTokenResponse,
   ReplyPageResponse,
   ReplyResponse,
   ResetPasswordRequest,
@@ -610,6 +633,7 @@ part 'serializers.g.dart';
   TtsResponse,
   UpdateAiAssistantCommand,
   UpdateAnnouncementRequest,
+  UpdateBannerRequest,
   UpdateChapterRequest,
   UpdateClassRequest,
   UpdateCourseRequest,

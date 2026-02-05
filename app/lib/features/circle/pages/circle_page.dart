@@ -369,12 +369,12 @@ class _CirclePageState extends State<CirclePage>
             children: [
               IconButton(
                 onPressed: _navigateToCreatePost,
-                icon: const Icon(Icons.add_box_outlined, size: 24),
+                icon: Icon(Icons.add_box_outlined, size: 24, color: colors.iconPrimary),
                 tooltip: '发布',
               ),
               IconButton(
                 onPressed: _navigateToSearch,
-                icon: const Icon(Icons.search_rounded, size: 24),
+                icon: Icon(Icons.search_rounded, size: 24, color: colors.iconPrimary),
               ),
             ],
           ),

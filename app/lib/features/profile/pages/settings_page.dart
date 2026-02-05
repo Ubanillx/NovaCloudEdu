@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../../config/app_theme.dart';
-import '../../../config/theme_provider.dart';
 import '../../../main.dart';
 import '../../../core/database/database_service.dart';
 import '../../auth/services/auth_service.dart';
@@ -333,7 +332,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 themeProvider.toggleTheme();
                 NovaMessage.success(context, value ? '已切换到深色模式' : '已切换到浅色模式');
               },
-              activeColor: const Color(0xFF3B82F6),
+              activeThumbColor: const Color(0xFF3B82F6),
             ),
           ],
         ),

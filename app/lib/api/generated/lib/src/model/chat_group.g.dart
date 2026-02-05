@@ -132,6 +132,8 @@ class _$ChatGroup extends ChatGroup {
   @override
   final GroupId? id;
   @override
+  final String? groupNumber;
+  @override
   final String? groupName;
   @override
   final String? avatar;
@@ -160,15 +162,16 @@ class _$ChatGroup extends ChatGroup {
   @override
   final bool? mute;
   @override
-  final bool? delete;
-  @override
   final bool? full;
+  @override
+  final bool? delete;
 
   factory _$ChatGroup([void Function(ChatGroupBuilder)? updates]) =>
       (ChatGroupBuilder()..update(updates))._build();
 
   _$ChatGroup._({
     this.id,
+    this.groupNumber,
     this.groupName,
     this.avatar,
     this.description,
@@ -183,8 +186,8 @@ class _$ChatGroup extends ChatGroup {
     this.createTime,
     this.updateTime,
     this.mute,
-    this.delete,
     this.full,
+    this.delete,
   }) : super._();
   @override
   ChatGroup rebuild(void Function(ChatGroupBuilder) updates) =>
@@ -198,6 +201,7 @@ class _$ChatGroup extends ChatGroup {
     if (identical(other, this)) return true;
     return other is ChatGroup &&
         id == other.id &&
+        groupNumber == other.groupNumber &&
         groupName == other.groupName &&
         avatar == other.avatar &&
         description == other.description &&
@@ -212,14 +216,15 @@ class _$ChatGroup extends ChatGroup {
         createTime == other.createTime &&
         updateTime == other.updateTime &&
         mute == other.mute &&
-        delete == other.delete &&
-        full == other.full;
+        full == other.full &&
+        delete == other.delete;
   }
 
   @override
   int get hashCode {
     var _$hash = 0;
     _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jc(_$hash, groupNumber.hashCode);
     _$hash = $jc(_$hash, groupName.hashCode);
     _$hash = $jc(_$hash, avatar.hashCode);
     _$hash = $jc(_$hash, description.hashCode);
@@ -234,8 +239,8 @@ class _$ChatGroup extends ChatGroup {
     _$hash = $jc(_$hash, createTime.hashCode);
     _$hash = $jc(_$hash, updateTime.hashCode);
     _$hash = $jc(_$hash, mute.hashCode);
-    _$hash = $jc(_$hash, delete.hashCode);
     _$hash = $jc(_$hash, full.hashCode);
+    _$hash = $jc(_$hash, delete.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -244,6 +249,7 @@ class _$ChatGroup extends ChatGroup {
   String toString() {
     return (newBuiltValueToStringHelper(r'ChatGroup')
           ..add('id', id)
+          ..add('groupNumber', groupNumber)
           ..add('groupName', groupName)
           ..add('avatar', avatar)
           ..add('description', description)
@@ -258,8 +264,8 @@ class _$ChatGroup extends ChatGroup {
           ..add('createTime', createTime)
           ..add('updateTime', updateTime)
           ..add('mute', mute)
-          ..add('delete', delete)
-          ..add('full', full))
+          ..add('full', full)
+          ..add('delete', delete))
         .toString();
   }
 }
@@ -270,6 +276,10 @@ class ChatGroupBuilder implements Builder<ChatGroup, ChatGroupBuilder> {
   GroupIdBuilder? _id;
   GroupIdBuilder get id => _$this._id ??= GroupIdBuilder();
   set id(GroupIdBuilder? id) => _$this._id = id;
+
+  String? _groupNumber;
+  String? get groupNumber => _$this._groupNumber;
+  set groupNumber(String? groupNumber) => _$this._groupNumber = groupNumber;
 
   String? _groupName;
   String? get groupName => _$this._groupName;
@@ -329,13 +339,13 @@ class ChatGroupBuilder implements Builder<ChatGroup, ChatGroupBuilder> {
   bool? get mute => _$this._mute;
   set mute(bool? mute) => _$this._mute = mute;
 
-  bool? _delete;
-  bool? get delete => _$this._delete;
-  set delete(bool? delete) => _$this._delete = delete;
-
   bool? _full;
   bool? get full => _$this._full;
   set full(bool? full) => _$this._full = full;
+
+  bool? _delete;
+  bool? get delete => _$this._delete;
+  set delete(bool? delete) => _$this._delete = delete;
 
   ChatGroupBuilder() {
     ChatGroup._defaults(this);
@@ -345,6 +355,7 @@ class ChatGroupBuilder implements Builder<ChatGroup, ChatGroupBuilder> {
     final $v = _$v;
     if ($v != null) {
       _id = $v.id?.toBuilder();
+      _groupNumber = $v.groupNumber;
       _groupName = $v.groupName;
       _avatar = $v.avatar;
       _description = $v.description;
@@ -359,8 +370,8 @@ class ChatGroupBuilder implements Builder<ChatGroup, ChatGroupBuilder> {
       _createTime = $v.createTime;
       _updateTime = $v.updateTime;
       _mute = $v.mute;
-      _delete = $v.delete;
       _full = $v.full;
+      _delete = $v.delete;
       _$v = null;
     }
     return this;
@@ -386,6 +397,7 @@ class ChatGroupBuilder implements Builder<ChatGroup, ChatGroupBuilder> {
           _$v ??
           _$ChatGroup._(
             id: _id?.build(),
+            groupNumber: groupNumber,
             groupName: groupName,
             avatar: avatar,
             description: description,
@@ -400,8 +412,8 @@ class ChatGroupBuilder implements Builder<ChatGroup, ChatGroupBuilder> {
             createTime: createTime,
             updateTime: updateTime,
             mute: mute,
-            delete: delete,
             full: full,
+            delete: delete,
           );
     } catch (_) {
       late String _$failedField;

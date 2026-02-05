@@ -4,6 +4,7 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:tdesign_flutter/tdesign_flutter.dart';
+import '../../config/app_theme.dart';
 
 /// 通用卡片
 class AppCard extends StatelessWidget {
@@ -24,14 +25,16 @@ class AppCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+    final isDark = context.isDarkMode;
     return Container(
       margin: margin ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: TDTheme.of(context).whiteColor1,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(borderRadius ?? 8),
         boxShadow: [
           BoxShadow(
-            color: TDTheme.of(context).grayColor3.withValues(alpha: 0.1),
+            color: Colors.black.withOpacity(isDark ? 0.3 : 0.08),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),

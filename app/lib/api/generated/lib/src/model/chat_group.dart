@@ -15,6 +15,7 @@ part 'chat_group.g.dart';
 ///
 /// Properties:
 /// * [id]
+/// * [groupNumber]
 /// * [groupName]
 /// * [avatar]
 /// * [description]
@@ -29,12 +30,15 @@ part 'chat_group.g.dart';
 /// * [createTime]
 /// * [updateTime]
 /// * [mute]
-/// * [delete]
 /// * [full]
+/// * [delete]
 @BuiltValue()
 abstract class ChatGroup implements Built<ChatGroup, ChatGroupBuilder> {
   @BuiltValueField(wireName: r'id')
   GroupId? get id;
+
+  @BuiltValueField(wireName: r'groupNumber')
+  String? get groupNumber;
 
   @BuiltValueField(wireName: r'groupName')
   String? get groupName;
@@ -80,11 +84,11 @@ abstract class ChatGroup implements Built<ChatGroup, ChatGroupBuilder> {
   @BuiltValueField(wireName: r'mute')
   bool? get mute;
 
-  @BuiltValueField(wireName: r'delete')
-  bool? get delete;
-
   @BuiltValueField(wireName: r'full')
   bool? get full;
+
+  @BuiltValueField(wireName: r'delete')
+  bool? get delete;
 
   ChatGroup._();
 
@@ -114,6 +118,13 @@ class _$ChatGroupSerializer implements PrimitiveSerializer<ChatGroup> {
       yield serializers.serialize(
         object.id,
         specifiedType: const FullType(GroupId),
+      );
+    }
+    if (object.groupNumber != null) {
+      yield r'groupNumber';
+      yield serializers.serialize(
+        object.groupNumber,
+        specifiedType: const FullType(String),
       );
     }
     if (object.groupName != null) {
@@ -214,17 +225,17 @@ class _$ChatGroupSerializer implements PrimitiveSerializer<ChatGroup> {
         specifiedType: const FullType(bool),
       );
     }
-    if (object.delete != null) {
-      yield r'delete';
-      yield serializers.serialize(
-        object.delete,
-        specifiedType: const FullType(bool),
-      );
-    }
     if (object.full != null) {
       yield r'full';
       yield serializers.serialize(
         object.full,
+        specifiedType: const FullType(bool),
+      );
+    }
+    if (object.delete != null) {
+      yield r'delete';
+      yield serializers.serialize(
+        object.delete,
         specifiedType: const FullType(bool),
       );
     }
@@ -259,6 +270,13 @@ class _$ChatGroupSerializer implements PrimitiveSerializer<ChatGroup> {
             specifiedType: const FullType(GroupId),
           ) as GroupId;
           result.id.replace(valueDes);
+          break;
+        case r'groupNumber':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.groupNumber = valueDes;
           break;
         case r'groupName':
           final valueDes = serializers.deserialize(
@@ -358,19 +376,19 @@ class _$ChatGroupSerializer implements PrimitiveSerializer<ChatGroup> {
           ) as bool;
           result.mute = valueDes;
           break;
-        case r'delete':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(bool),
-          ) as bool;
-          result.delete = valueDes;
-          break;
         case r'full':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(bool),
           ) as bool;
           result.full = valueDes;
+          break;
+        case r'delete':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(bool),
+          ) as bool;
+          result.delete = valueDes;
           break;
         default:
           unhandled.add(key);

@@ -12,9 +12,13 @@ class _$DailyWordResponse extends DailyWordResponse {
   @override
   final String? word;
   @override
-  final String? pronunciation;
+  final String? pronunciationUs;
   @override
-  final String? audioUrl;
+  final String? pronunciationUk;
+  @override
+  final String? audioUrlUs;
+  @override
+  final String? audioUrlUk;
   @override
   final String? translation;
   @override
@@ -43,8 +47,10 @@ class _$DailyWordResponse extends DailyWordResponse {
   _$DailyWordResponse._({
     this.id,
     this.word,
-    this.pronunciation,
-    this.audioUrl,
+    this.pronunciationUs,
+    this.pronunciationUk,
+    this.audioUrlUs,
+    this.audioUrlUk,
     this.translation,
     this.example,
     this.exampleTranslation,
@@ -70,8 +76,10 @@ class _$DailyWordResponse extends DailyWordResponse {
     return other is DailyWordResponse &&
         id == other.id &&
         word == other.word &&
-        pronunciation == other.pronunciation &&
-        audioUrl == other.audioUrl &&
+        pronunciationUs == other.pronunciationUs &&
+        pronunciationUk == other.pronunciationUk &&
+        audioUrlUs == other.audioUrlUs &&
+        audioUrlUk == other.audioUrlUk &&
         translation == other.translation &&
         example == other.example &&
         exampleTranslation == other.exampleTranslation &&
@@ -89,8 +97,10 @@ class _$DailyWordResponse extends DailyWordResponse {
     var _$hash = 0;
     _$hash = $jc(_$hash, id.hashCode);
     _$hash = $jc(_$hash, word.hashCode);
-    _$hash = $jc(_$hash, pronunciation.hashCode);
-    _$hash = $jc(_$hash, audioUrl.hashCode);
+    _$hash = $jc(_$hash, pronunciationUs.hashCode);
+    _$hash = $jc(_$hash, pronunciationUk.hashCode);
+    _$hash = $jc(_$hash, audioUrlUs.hashCode);
+    _$hash = $jc(_$hash, audioUrlUk.hashCode);
     _$hash = $jc(_$hash, translation.hashCode);
     _$hash = $jc(_$hash, example.hashCode);
     _$hash = $jc(_$hash, exampleTranslation.hashCode);
@@ -110,8 +120,10 @@ class _$DailyWordResponse extends DailyWordResponse {
     return (newBuiltValueToStringHelper(r'DailyWordResponse')
           ..add('id', id)
           ..add('word', word)
-          ..add('pronunciation', pronunciation)
-          ..add('audioUrl', audioUrl)
+          ..add('pronunciationUs', pronunciationUs)
+          ..add('pronunciationUk', pronunciationUk)
+          ..add('audioUrlUs', audioUrlUs)
+          ..add('audioUrlUk', audioUrlUk)
           ..add('translation', translation)
           ..add('example', example)
           ..add('exampleTranslation', exampleTranslation)
@@ -138,14 +150,23 @@ class DailyWordResponseBuilder
   String? get word => _$this._word;
   set word(String? word) => _$this._word = word;
 
-  String? _pronunciation;
-  String? get pronunciation => _$this._pronunciation;
-  set pronunciation(String? pronunciation) =>
-      _$this._pronunciation = pronunciation;
+  String? _pronunciationUs;
+  String? get pronunciationUs => _$this._pronunciationUs;
+  set pronunciationUs(String? pronunciationUs) =>
+      _$this._pronunciationUs = pronunciationUs;
 
-  String? _audioUrl;
-  String? get audioUrl => _$this._audioUrl;
-  set audioUrl(String? audioUrl) => _$this._audioUrl = audioUrl;
+  String? _pronunciationUk;
+  String? get pronunciationUk => _$this._pronunciationUk;
+  set pronunciationUk(String? pronunciationUk) =>
+      _$this._pronunciationUk = pronunciationUk;
+
+  String? _audioUrlUs;
+  String? get audioUrlUs => _$this._audioUrlUs;
+  set audioUrlUs(String? audioUrlUs) => _$this._audioUrlUs = audioUrlUs;
+
+  String? _audioUrlUk;
+  String? get audioUrlUk => _$this._audioUrlUk;
+  set audioUrlUk(String? audioUrlUk) => _$this._audioUrlUk = audioUrlUk;
 
   String? _translation;
   String? get translation => _$this._translation;
@@ -198,8 +219,10 @@ class DailyWordResponseBuilder
     if ($v != null) {
       _id = $v.id;
       _word = $v.word;
-      _pronunciation = $v.pronunciation;
-      _audioUrl = $v.audioUrl;
+      _pronunciationUs = $v.pronunciationUs;
+      _pronunciationUk = $v.pronunciationUk;
+      _audioUrlUs = $v.audioUrlUs;
+      _audioUrlUk = $v.audioUrlUk;
       _translation = $v.translation;
       _example = $v.example;
       _exampleTranslation = $v.exampleTranslation;
@@ -234,8 +257,10 @@ class DailyWordResponseBuilder
         _$DailyWordResponse._(
           id: id,
           word: word,
-          pronunciation: pronunciation,
-          audioUrl: audioUrl,
+          pronunciationUs: pronunciationUs,
+          pronunciationUk: pronunciationUk,
+          audioUrlUs: audioUrlUs,
+          audioUrlUk: audioUrlUk,
           translation: translation,
           example: example,
           exampleTranslation: exampleTranslation,

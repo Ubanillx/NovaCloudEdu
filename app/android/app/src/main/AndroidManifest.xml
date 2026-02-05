@@ -1,4 +1,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 录音权限 -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <!-- 相机权限 -->
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <!-- 存储权限 -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <!-- 网络权限 -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+    
     <application
         android:label="智云星课"
         android:name="${applicationName}"
