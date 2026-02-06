@@ -29,6 +29,7 @@
     <properties>
         <java.version>21</java.version>
         <spring-ai.version>1.1.0</spring-ai.version>
+        <langchain4j.version>0.36.2</langchain4j.version>
     </properties>
     <dependencies>
         <dependency>
@@ -203,24 +204,41 @@
             <artifactId>nls-sdk-tts</artifactId>
             <version>2.1.6</version>
         </dependency>
-        <!-- Selenium WebDriver for dynamic page scraping -->
+        <!-- Selenium WebDriver for dynamic page scraping (4.6+ 内置 Selenium Manager 自动管理驱动) -->
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-java</artifactId>
-            <version>4.18.1</version>
-        </dependency>
-        <!-- WebDriverManager for automatic driver management -->
-        <dependency>
-            <groupId>io.github.bonigarcia</groupId>
-            <artifactId>webdrivermanager</artifactId>
-            <version>5.7.0</version>
         </dependency>
         <!-- HtmlUnit for headless browser (lightweight alternative) -->
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>htmlunit3-driver</artifactId>
-            <version>4.39.0</version>
             <scope>compile</scope>
+        </dependency>
+        <!-- Langchain4j Core -->
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j</artifactId>
+        </dependency>
+        <!-- Langchain4j DashScope (阿里云通义千问) -->
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-dashscope</artifactId>
+        </dependency>
+        <!-- Langchain4j OpenAI (兼容 OpenAI / DeepSeek / Moonshot / SiliconFlow 等) -->
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-open-ai</artifactId>
+        </dependency>
+        <!-- Langchain4j Zhipu (智谱GLM) -->
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-zhipu-ai</artifactId>
+        </dependency>
+        <!-- Langchain4j Ollama (本地模型) -->
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-ollama</artifactId>
         </dependency>
     </dependencies>
     <dependencyManagement>
@@ -229,6 +247,20 @@
                 <groupId>org.springframework.ai</groupId>
                 <artifactId>spring-ai-bom</artifactId>
                 <version>${spring-ai.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.seleniumhq.selenium</groupId>
+                <artifactId>selenium-bom</artifactId>
+                <version>4.31.0</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>dev.langchain4j</groupId>
+                <artifactId>langchain4j-bom</artifactId>
+                <version>${langchain4j.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
