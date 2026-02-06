@@ -10,8 +10,10 @@ import com.novacloudedu.backend.common.ErrorCode;
 import com.novacloudedu.backend.common.ResultUtils;
 import com.novacloudedu.backend.domain.dailylearning.entity.DailyWord;
 import com.novacloudedu.backend.exception.BusinessException;
+import com.novacloudedu.backend.domain.dailylearning.repository.DailyWordRepository.DailyWordPage;
 import com.novacloudedu.backend.interfaces.rest.dailylearning.assembler.DailyLearningAssembler;
 import com.novacloudedu.backend.interfaces.rest.dailylearning.dto.CreateDailyWordRequest;
+import com.novacloudedu.backend.interfaces.rest.dailylearning.dto.DailyWordPageResponse;
 import com.novacloudedu.backend.interfaces.rest.dailylearning.dto.DailyWordResponse;
 import com.novacloudedu.backend.interfaces.rest.dailylearning.dto.UpdateDailyWordRequest;
 import io.swagger.v3.oas.annotations.Operation;
@@ -134,38 +136,32 @@ public class DailyWordController {
 
     @GetMapping("/list")
     @Operation(summary = "获取单词列表")
-    public BaseResponse<List<DailyWordResponse>> listWords(
+    public BaseResponse<DailyWordPageResponse> listWords(
             @RequestParam(required = false) @Parameter(description = "分类") String category,
             @RequestParam(required = false) @Parameter(description = "难度等级") Integer difficulty,
             @RequestParam(defaultValue = "1") @Parameter(description = "页码") int page,
             @RequestParam(defaultValue = "10") @Parameter(description = "每页数量") int size) {
 
-        List<DailyWord> words;
+        DailyWordPage wordPage;
         if (category != null && !category.isEmpty()) {
-            words = getDailyWordQuery.executeByCategory(category, page, size);
+            wordPage = getDailyWordQuery.executeByCategoryPaged(category, page, size);
         } else if (difficulty != null) {
-            words = getDailyWordQuery.executeByDifficulty(difficulty, page, size);
+            wordPage = getDailyWordQuery.executeByDifficultyPaged(difficulty, page, size);
         } else {
-            words = getDailyWordQuery.executeList(page, size);
+            wordPage = getDailyWordQuery.executeListPaged(page, size);
         }
 
-        List<DailyWordResponse> responses = words.stream()
-                .map(assembler::toDailyWordResponse)
-                .collect(Collectors.toList());
-        return ResultUtils.success(responses);
+        return ResultUtils.success(assembler.toDailyWordPageResponse(wordPage));
     }
 
     @GetMapping("/search")
     @Operation(summary = "搜索单词")
-    public BaseResponse<List<DailyWordResponse>> searchWords(
+    public BaseResponse<DailyWordPageResponse> searchWords(
             @RequestParam @Parameter(description = "关键词") String keyword,
             @RequestParam(defaultValue = "1") @Parameter(description = "页码") int page,
             @RequestParam(defaultValue = "10") @Parameter(description = "每页数量") int size) {
 
-        List<DailyWord> words = getDailyWordQuery.searchByWord(keyword, page, size);
-        List<DailyWordResponse> responses = words.stream()
-                .map(assembler::toDailyWordResponse)
-                .collect(Collectors.toList());
-        return ResultUtils.success(responses);
+        DailyWordPage wordPage = getDailyWordQuery.searchByWordPaged(keyword, page, size);
+        return ResultUtils.success(assembler.toDailyWordPageResponse(wordPage));
     }
 }

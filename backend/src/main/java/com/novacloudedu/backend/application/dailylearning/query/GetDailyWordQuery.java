@@ -2,6 +2,7 @@ package com.novacloudedu.backend.application.dailylearning.query;
 
 import com.novacloudedu.backend.domain.dailylearning.entity.DailyWord;
 import com.novacloudedu.backend.domain.dailylearning.repository.DailyWordRepository;
+import com.novacloudedu.backend.domain.dailylearning.repository.DailyWordRepository.DailyWordPage;
 import com.novacloudedu.backend.domain.dailylearning.valueobject.DailyWordId;
 import com.novacloudedu.backend.domain.dailylearning.valueobject.Difficulty;
 import lombok.RequiredArgsConstructor;
@@ -47,5 +48,23 @@ public class GetDailyWordQuery {
 
     public long count() {
         return dailyWordRepository.count();
+    }
+
+    // ==================== 分页查询（带完整分页信息） ====================
+
+    public DailyWordPage executeListPaged(int page, int size) {
+        return dailyWordRepository.findAllPaged(page, size);
+    }
+
+    public DailyWordPage executeByCategoryPaged(String category, int page, int size) {
+        return dailyWordRepository.findByCategoryPaged(category, page, size);
+    }
+
+    public DailyWordPage executeByDifficultyPaged(Integer difficulty, int page, int size) {
+        return dailyWordRepository.findByDifficultyPaged(Difficulty.fromCode(difficulty), page, size);
+    }
+
+    public DailyWordPage searchByWordPaged(String keyword, int page, int size) {
+        return dailyWordRepository.searchByWordPaged(keyword, page, size);
     }
 }
