@@ -1,5 +1,6 @@
 package com.novacloudedu.backend.application.dailylearning.command;
 
+import com.novacloudedu.backend.application.recommendation.service.GraphDataSyncService;
 import com.novacloudedu.backend.domain.dailylearning.entity.DailyArticle;
 import com.novacloudedu.backend.domain.dailylearning.repository.DailyArticleRepository;
 import com.novacloudedu.backend.domain.dailylearning.valueobject.DailyArticleId;
@@ -17,6 +18,7 @@ import java.util.List;
 public class UpdateDailyArticleCommand {
 
     private final DailyArticleRepository dailyArticleRepository;
+    private final GraphDataSyncService graphDataSyncService;
 
     @Transactional
     public void execute(Long id, String title, String content, String summary, String coverImage,
@@ -30,5 +32,8 @@ public class UpdateDailyArticleCommand {
                 category, tags, Difficulty.fromCode(difficulty), readTime, publishDate);
 
         dailyArticleRepository.save(article);
+        
+        // 同步更新到Neo4j知识图谱
+        graphDataSyncService.syncArticleToGraph(article);
     }
 }

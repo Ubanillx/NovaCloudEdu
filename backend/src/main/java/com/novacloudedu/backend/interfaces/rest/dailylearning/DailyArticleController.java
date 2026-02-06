@@ -10,8 +10,10 @@ import com.novacloudedu.backend.common.ErrorCode;
 import com.novacloudedu.backend.common.ResultUtils;
 import com.novacloudedu.backend.domain.dailylearning.entity.DailyArticle;
 import com.novacloudedu.backend.exception.BusinessException;
+import com.novacloudedu.backend.domain.dailylearning.repository.DailyArticleRepository.DailyArticlePage;
 import com.novacloudedu.backend.interfaces.rest.dailylearning.assembler.DailyLearningAssembler;
 import com.novacloudedu.backend.interfaces.rest.dailylearning.dto.CreateDailyArticleRequest;
+import com.novacloudedu.backend.interfaces.rest.dailylearning.dto.DailyArticlePageResponse;
 import com.novacloudedu.backend.interfaces.rest.dailylearning.dto.DailyArticleResponse;
 import com.novacloudedu.backend.interfaces.rest.dailylearning.dto.UpdateDailyArticleRequest;
 import io.swagger.v3.oas.annotations.Operation;
@@ -126,38 +128,32 @@ public class DailyArticleController {
 
     @GetMapping("/list")
     @Operation(summary = "获取文章列表")
-    public BaseResponse<List<DailyArticleResponse>> listArticles(
+    public BaseResponse<DailyArticlePageResponse> listArticles(
             @RequestParam(required = false) @Parameter(description = "分类") String category,
             @RequestParam(required = false) @Parameter(description = "难度等级") Integer difficulty,
             @RequestParam(defaultValue = "1") @Parameter(description = "页码") int page,
             @RequestParam(defaultValue = "10") @Parameter(description = "每页数量") int size) {
 
-        List<DailyArticle> articles;
+        DailyArticlePage articlePage;
         if (category != null && !category.isEmpty()) {
-            articles = getDailyArticleQuery.executeByCategory(category, page, size);
+            articlePage = getDailyArticleQuery.executeByCategoryPaged(category, page, size);
         } else if (difficulty != null) {
-            articles = getDailyArticleQuery.executeByDifficulty(difficulty, page, size);
+            articlePage = getDailyArticleQuery.executeByDifficultyPaged(difficulty, page, size);
         } else {
-            articles = getDailyArticleQuery.executeList(page, size);
+            articlePage = getDailyArticleQuery.executeListPaged(page, size);
         }
 
-        List<DailyArticleResponse> responses = articles.stream()
-                .map(assembler::toDailyArticleResponse)
-                .collect(Collectors.toList());
-        return ResultUtils.success(responses);
+        return ResultUtils.success(assembler.toDailyArticlePageResponse(articlePage));
     }
 
     @GetMapping("/search")
     @Operation(summary = "搜索文章")
-    public BaseResponse<List<DailyArticleResponse>> searchArticles(
+    public BaseResponse<DailyArticlePageResponse> searchArticles(
             @RequestParam @Parameter(description = "关键词") String keyword,
             @RequestParam(defaultValue = "1") @Parameter(description = "页码") int page,
             @RequestParam(defaultValue = "10") @Parameter(description = "每页数量") int size) {
 
-        List<DailyArticle> articles = getDailyArticleQuery.searchByKeyword(keyword, page, size);
-        List<DailyArticleResponse> responses = articles.stream()
-                .map(assembler::toDailyArticleResponse)
-                .collect(Collectors.toList());
-        return ResultUtils.success(responses);
+        DailyArticlePage articlePage = getDailyArticleQuery.searchByKeywordPaged(keyword, page, size);
+        return ResultUtils.success(assembler.toDailyArticlePageResponse(articlePage));
     }
 }

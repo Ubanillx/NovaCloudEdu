@@ -2,6 +2,7 @@ package com.novacloudedu.backend.application.dailylearning.query;
 
 import com.novacloudedu.backend.domain.dailylearning.entity.DailyArticle;
 import com.novacloudedu.backend.domain.dailylearning.repository.DailyArticleRepository;
+import com.novacloudedu.backend.domain.dailylearning.repository.DailyArticleRepository.DailyArticlePage;
 import com.novacloudedu.backend.domain.dailylearning.valueobject.DailyArticleId;
 import com.novacloudedu.backend.domain.dailylearning.valueobject.Difficulty;
 import lombok.RequiredArgsConstructor;
@@ -47,5 +48,23 @@ public class GetDailyArticleQuery {
 
     public long count() {
         return dailyArticleRepository.count();
+    }
+
+    // ==================== 分页查询（带完整分页信息） ====================
+
+    public DailyArticlePage executeListPaged(int page, int size) {
+        return dailyArticleRepository.findAllPaged(page, size);
+    }
+
+    public DailyArticlePage executeByCategoryPaged(String category, int page, int size) {
+        return dailyArticleRepository.findByCategoryPaged(category, page, size);
+    }
+
+    public DailyArticlePage executeByDifficultyPaged(Integer difficulty, int page, int size) {
+        return dailyArticleRepository.findByDifficultyPaged(Difficulty.fromCode(difficulty), page, size);
+    }
+
+    public DailyArticlePage searchByKeywordPaged(String keyword, int page, int size) {
+        return dailyArticleRepository.searchByKeywordPaged(keyword, page, size);
     }
 }

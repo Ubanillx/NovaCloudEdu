@@ -114,7 +114,76 @@ public class DailyArticleRepositoryImpl implements DailyArticleRepository {
     }
 
     @Override
+    public long countByDifficulty(Difficulty difficulty) {
+        LambdaQueryWrapper<DailyArticlePO> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(DailyArticlePO::getDifficulty, difficulty.getCode());
+        return dailyArticleMapper.selectCount(wrapper);
+    }
+
+    @Override
+    public long countByKeyword(String keyword) {
+        LambdaQueryWrapper<DailyArticlePO> wrapper = new LambdaQueryWrapper<>();
+        wrapper.and(w -> w.like(DailyArticlePO::getTitle, keyword)
+                        .or().like(DailyArticlePO::getContent, keyword)
+                        .or().like(DailyArticlePO::getSummary, keyword));
+        return dailyArticleMapper.selectCount(wrapper);
+    }
+
+    @Override
     public void deleteById(DailyArticleId id) {
         dailyArticleMapper.deleteById(id.value());
+    }
+
+    @Override
+    public DailyArticlePage findAllPaged(int page, int size) {
+        Page<DailyArticlePO> pageParam = new Page<>(page, size);
+        LambdaQueryWrapper<DailyArticlePO> wrapper = new LambdaQueryWrapper<>();
+        wrapper.orderByDesc(DailyArticlePO::getPublishDate);
+        Page<DailyArticlePO> result = dailyArticleMapper.selectPage(pageParam, wrapper);
+        List<DailyArticle> articles = result.getRecords().stream()
+                .map(dailyArticleConverter::toDomain)
+                .collect(Collectors.toList());
+        return new DailyArticlePage(articles, result.getTotal(), page, size);
+    }
+
+    @Override
+    public DailyArticlePage findByCategoryPaged(String category, int page, int size) {
+        Page<DailyArticlePO> pageParam = new Page<>(page, size);
+        LambdaQueryWrapper<DailyArticlePO> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(DailyArticlePO::getCategory, category)
+                .orderByDesc(DailyArticlePO::getPublishDate);
+        Page<DailyArticlePO> result = dailyArticleMapper.selectPage(pageParam, wrapper);
+        List<DailyArticle> articles = result.getRecords().stream()
+                .map(dailyArticleConverter::toDomain)
+                .collect(Collectors.toList());
+        return new DailyArticlePage(articles, result.getTotal(), page, size);
+    }
+
+    @Override
+    public DailyArticlePage findByDifficultyPaged(Difficulty difficulty, int page, int size) {
+        Page<DailyArticlePO> pageParam = new Page<>(page, size);
+        LambdaQueryWrapper<DailyArticlePO> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(DailyArticlePO::getDifficulty, difficulty.getCode())
+                .orderByDesc(DailyArticlePO::getPublishDate);
+        Page<DailyArticlePO> result = dailyArticleMapper.selectPage(pageParam, wrapper);
+        List<DailyArticle> articles = result.getRecords().stream()
+                .map(dailyArticleConverter::toDomain)
+                .collect(Collectors.toList());
+        return new DailyArticlePage(articles, result.getTotal(), page, size);
+    }
+
+    @Override
+    public DailyArticlePage searchByKeywordPaged(String keyword, int page, int size) {
+        Page<DailyArticlePO> pageParam = new Page<>(page, size);
+        LambdaQueryWrapper<DailyArticlePO> wrapper = new LambdaQueryWrapper<>();
+        wrapper.and(w -> w.like(DailyArticlePO::getTitle, keyword)
+                        .or().like(DailyArticlePO::getContent, keyword)
+                        .or().like(DailyArticlePO::getSummary, keyword))
+                .orderByDesc(DailyArticlePO::getPublishDate);
+        Page<DailyArticlePO> result = dailyArticleMapper.selectPage(pageParam, wrapper);
+        List<DailyArticle> articles = result.getRecords().stream()
+                .map(dailyArticleConverter::toDomain)
+                .collect(Collectors.toList());
+        return new DailyArticlePage(articles, result.getTotal(), page, size);
     }
 }
