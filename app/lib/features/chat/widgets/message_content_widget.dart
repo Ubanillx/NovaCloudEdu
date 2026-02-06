@@ -196,7 +196,7 @@ class MessageContentWidget extends StatelessWidget {
       case 'wav':
       case 'aac':
       case 'm4a':
-        return _FileInfo(Icons.audio_file, const Color(0xFF9C27B0));
+        return _FileInfo(Icons.audio_file, const Color(0xFF1989FA));
       case 'mp4':
       case 'avi':
       case 'mov':

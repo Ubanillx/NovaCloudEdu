@@ -16,6 +16,8 @@ import '../daily_word/services/daily_word_service.dart';
 import '../daily_word/services/daily_word_storage_service.dart';
 import 'announcement_list_page.dart';
 import '../daily_word/pages/daily_word_page.dart';
+import '../daily_article/daily_article.dart';
+import '../daily_article/services/daily_article_service.dart';
 
 /// 首页 - 参考smartclass Home.vue
 class HomePage extends StatefulWidget {
@@ -45,9 +47,12 @@ class _HomePageState extends State<HomePage> {
   // 每日单词数据
   final DailyWordService _dailyWordService = DailyWordService();
   final DailyWordStorageService _dailyWordStorageService = DailyWordStorageService();
+  final DailyArticleService _dailyArticleService = DailyArticleService();
   final AudioPlayer _audioPlayer = AudioPlayer();
   DailyWordResponse? _dailyWord;
+  DailyArticleResponse? _latestArticle;
   bool _isDailyWordLoading = true;
+  bool _isDailyArticleLoading = true;
   bool _hasSettings = false;
 
   @override
@@ -57,6 +62,27 @@ class _HomePageState extends State<HomePage> {
     _loadBanners();
     _loadLatestAnnouncement();
     _loadDailyWord();
+    _loadLatestArticle();
+  }
+
+  /// 加载最新美文
+  Future<void> _loadLatestArticle() async {
+    try {
+      final articles = await _dailyArticleService.getTodayArticles(size: 1);
+      if (mounted && articles.isNotEmpty) {
+        setState(() {
+          _latestArticle = articles.first;
+          _isDailyArticleLoading = false;
+        });
+      } else if (mounted) {
+        setState(() => _isDailyArticleLoading = false);
+      }
+    } catch (e) {
+      debugPrint('加载最新文章失败: $e');
+      if (mounted) {
+        setState(() => _isDailyArticleLoading = false);
+      }
+    }
   }
 
   /// 加载每日单词数据
@@ -271,6 +297,8 @@ class _HomePageState extends State<HomePage> {
             await Future.wait([
               _loadBanners(),
               _loadLatestAnnouncement(),
+              _loadDailyWord(),
+              _loadLatestArticle(),
             ]);
           },
           slivers: [
@@ -838,7 +866,7 @@ class _HomePageState extends State<HomePage> {
               height: 160,
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
-                  colors: [AppTheme.brand, Color(0xFF36D1DC)],
+                  colors: [AppTheme.brand, AppTheme.brand2],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -911,7 +939,7 @@ class _HomePageState extends State<HomePage> {
                 gradient: LinearGradient(
                   colors: [
                     AppTheme.brand.withOpacity(0.8),
-                    const Color(0xFF36D1DC).withOpacity(0.8),
+                    AppTheme.brand2.withOpacity(0.8),
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -1055,7 +1083,7 @@ class _HomePageState extends State<HomePage> {
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
-                  colors: [AppTheme.brand, Color(0xFF36D1DC)],
+                  colors: [AppTheme.brand, AppTheme.brand2],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -1187,119 +1215,181 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  // 文章列表
+  // 每日美文入口
   Widget _buildArticles() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildSectionHeader('精美文章', onMore: () {}),
+          _buildSectionHeader('每日美文', onMore: () => _navigateToDailyArticle()),
           const SizedBox(height: 12),
-          ...MockData.articles.map((article) => _buildArticleCard(article)),
+          _buildDailyArticleCard(),
         ],
       ),
     );
   }
 
-  Widget _buildArticleCard(Article article) {
+  /// 每日美文卡片
+  Widget _buildDailyArticleCard() {
     final colors = context.colors;
-    return GestureDetector(
-      onTap: () {},
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(12),
+    final isDark = context.isDarkMode;
+    
+    if (_isDailyArticleLoading) {
+      return Container(
+        height: 120,
         decoration: BoxDecoration(
-          color: colors.surface,
-          borderRadius: BorderRadius.circular(12),
+          color: colors.surfaceVariant,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+      );
+    }
+
+    return GestureDetector(
+      onTap: () => _navigateToDailyArticle(),
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: isDark
+                ? [const Color(0xFF1E293B), const Color(0xFF0F172A)]
+                : [AppTheme.brand, AppTheme.brand2],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(context.isDarkMode ? 0.2 : 0.05),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
+              color: AppTheme.brand.withOpacity(isDark ? 0.2 : 0.3),
+              blurRadius: 12,
+              offset: const Offset(0, 6),
             ),
           ],
         ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    article.title,
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: colors.textPrimary,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    article.brief,
-                    style: TextStyle(fontSize: 12, color: colors.textSecondary),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: colors.surfaceVariant,
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          article.category,
-                          style: TextStyle(
-                            fontSize: 10,
-                            color: colors.textTertiary,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: Stack(
+            children: [
+              // 背景装饰
+              Positioned(
+                right: -20,
+                top: -20,
+                child: Icon(
+                  Icons.auto_stories_rounded,
+                  size: 120,
+                  color: Colors.white.withOpacity(0.1),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(
+                            Icons.auto_stories_rounded,
+                            color: Colors.white,
+                            size: 20,
                           ),
                         ),
-                      ),
-                      const SizedBox(width: 8),
-                      Icon(
-                        Icons.access_time,
-                        size: 12,
-                        color: colors.textTertiary,
-                      ),
-                      const SizedBox(width: 2),
+                        const SizedBox(width: 12),
+                        const Text(
+                          '每日美文',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const Spacer(),
+                        Icon(
+                          Icons.arrow_forward_ios_rounded,
+                          color: Colors.white.withOpacity(0.7),
+                          size: 16,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    if (_latestArticle != null) ...[
                       Text(
-                        '${article.readTime}分钟',
+                        _latestArticle!.title ?? '',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        _latestArticle!.summary ?? _latestArticle!.content ?? '精选优质文章，开启心灵之旅',
                         style: TextStyle(
-                          fontSize: 10,
-                          color: colors.textTertiary,
+                          fontSize: 13,
+                          color: Colors.white.withOpacity(0.8),
+                          height: 1.5,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ] else ...[
+                      const Text(
+                        '精选优质文章，开启心灵之旅',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.white70,
                         ),
                       ),
                     ],
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 12),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Image.network(
-                article.cover,
-                width: 80,
-                height: 80,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => Container(
-                  width: 80,
-                  height: 80,
-                  color: colors.surfaceVariant,
-                  child: Icon(Icons.image, color: colors.textTertiary),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        _buildArticleTag('海量文章'),
+                        const SizedBox(width: 8),
+                        _buildArticleTag('AI讨论'),
+                        const SizedBox(width: 8),
+                        _buildArticleTag('收藏阅读'),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildArticleTag(String label) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.15),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Text(
+        label,
+        style: const TextStyle(
+          fontSize: 11,
+          color: Colors.white,
+        ),
+      ),
+    );
+  }
+
+  /// 跳转到每日美文页面
+  void _navigateToDailyArticle() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const DailyArticlePage(),
       ),
     );
   }

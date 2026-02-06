@@ -1,16 +1,14 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'chat_request.dart';
+part of 'session_chat_request.dart';
 
 // **************************************************************************
 // BuiltValueGenerator
 // **************************************************************************
 
-class _$ChatRequest extends ChatRequest {
+class _$SessionChatRequest extends SessionChatRequest {
   @override
   final String message;
-  @override
-  final BuiltList<BuiltMap<String, String>>? history;
   @override
   final String? systemPrompt;
   @override
@@ -18,29 +16,30 @@ class _$ChatRequest extends ChatRequest {
   @override
   final String? modelId;
 
-  factory _$ChatRequest([void Function(ChatRequestBuilder)? updates]) =>
-      (ChatRequestBuilder()..update(updates))._build();
+  factory _$SessionChatRequest([
+    void Function(SessionChatRequestBuilder)? updates,
+  ]) => (SessionChatRequestBuilder()..update(updates))._build();
 
-  _$ChatRequest._({
+  _$SessionChatRequest._({
     required this.message,
-    this.history,
     this.systemPrompt,
     this.imageUrls,
     this.modelId,
   }) : super._();
   @override
-  ChatRequest rebuild(void Function(ChatRequestBuilder) updates) =>
-      (toBuilder()..update(updates)).build();
+  SessionChatRequest rebuild(
+    void Function(SessionChatRequestBuilder) updates,
+  ) => (toBuilder()..update(updates)).build();
 
   @override
-  ChatRequestBuilder toBuilder() => ChatRequestBuilder()..replace(this);
+  SessionChatRequestBuilder toBuilder() =>
+      SessionChatRequestBuilder()..replace(this);
 
   @override
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
-    return other is ChatRequest &&
+    return other is SessionChatRequest &&
         message == other.message &&
-        history == other.history &&
         systemPrompt == other.systemPrompt &&
         imageUrls == other.imageUrls &&
         modelId == other.modelId;
@@ -50,7 +49,6 @@ class _$ChatRequest extends ChatRequest {
   int get hashCode {
     var _$hash = 0;
     _$hash = $jc(_$hash, message.hashCode);
-    _$hash = $jc(_$hash, history.hashCode);
     _$hash = $jc(_$hash, systemPrompt.hashCode);
     _$hash = $jc(_$hash, imageUrls.hashCode);
     _$hash = $jc(_$hash, modelId.hashCode);
@@ -60,9 +58,8 @@ class _$ChatRequest extends ChatRequest {
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper(r'ChatRequest')
+    return (newBuiltValueToStringHelper(r'SessionChatRequest')
           ..add('message', message)
-          ..add('history', history)
           ..add('systemPrompt', systemPrompt)
           ..add('imageUrls', imageUrls)
           ..add('modelId', modelId))
@@ -70,18 +67,13 @@ class _$ChatRequest extends ChatRequest {
   }
 }
 
-class ChatRequestBuilder implements Builder<ChatRequest, ChatRequestBuilder> {
-  _$ChatRequest? _$v;
+class SessionChatRequestBuilder
+    implements Builder<SessionChatRequest, SessionChatRequestBuilder> {
+  _$SessionChatRequest? _$v;
 
   String? _message;
   String? get message => _$this._message;
   set message(String? message) => _$this._message = message;
-
-  ListBuilder<BuiltMap<String, String>>? _history;
-  ListBuilder<BuiltMap<String, String>> get history =>
-      _$this._history ??= ListBuilder<BuiltMap<String, String>>();
-  set history(ListBuilder<BuiltMap<String, String>>? history) =>
-      _$this._history = history;
 
   String? _systemPrompt;
   String? get systemPrompt => _$this._systemPrompt;
@@ -97,15 +89,14 @@ class ChatRequestBuilder implements Builder<ChatRequest, ChatRequestBuilder> {
   String? get modelId => _$this._modelId;
   set modelId(String? modelId) => _$this._modelId = modelId;
 
-  ChatRequestBuilder() {
-    ChatRequest._defaults(this);
+  SessionChatRequestBuilder() {
+    SessionChatRequest._defaults(this);
   }
 
-  ChatRequestBuilder get _$this {
+  SessionChatRequestBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
       _message = $v.message;
-      _history = $v.history?.toBuilder();
       _systemPrompt = $v.systemPrompt;
       _imageUrls = $v.imageUrls?.toBuilder();
       _modelId = $v.modelId;
@@ -115,30 +106,29 @@ class ChatRequestBuilder implements Builder<ChatRequest, ChatRequestBuilder> {
   }
 
   @override
-  void replace(ChatRequest other) {
-    _$v = other as _$ChatRequest;
+  void replace(SessionChatRequest other) {
+    _$v = other as _$SessionChatRequest;
   }
 
   @override
-  void update(void Function(ChatRequestBuilder)? updates) {
+  void update(void Function(SessionChatRequestBuilder)? updates) {
     if (updates != null) updates(this);
   }
 
   @override
-  ChatRequest build() => _build();
+  SessionChatRequest build() => _build();
 
-  _$ChatRequest _build() {
-    _$ChatRequest _$result;
+  _$SessionChatRequest _build() {
+    _$SessionChatRequest _$result;
     try {
       _$result =
           _$v ??
-          _$ChatRequest._(
+          _$SessionChatRequest._(
             message: BuiltValueNullFieldError.checkNotNull(
               message,
-              r'ChatRequest',
+              r'SessionChatRequest',
               'message',
             ),
-            history: _history?.build(),
             systemPrompt: systemPrompt,
             imageUrls: _imageUrls?.build(),
             modelId: modelId,
@@ -146,14 +136,11 @@ class ChatRequestBuilder implements Builder<ChatRequest, ChatRequestBuilder> {
     } catch (_) {
       late String _$failedField;
       try {
-        _$failedField = 'history';
-        _history?.build();
-
         _$failedField = 'imageUrls';
         _imageUrls?.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-          r'ChatRequest',
+          r'SessionChatRequest',
           _$failedField,
           e.toString(),
         );

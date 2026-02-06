@@ -24,11 +24,14 @@ import 'package:nova_api/src/model/add_variable_request.dart';
 import 'package:nova_api/src/model/ai_assistant_vo.dart';
 import 'package:nova_api/src/model/ai_conversation.dart';
 import 'package:nova_api/src/model/ai_conversation_id.dart';
+import 'package:nova_api/src/model/ai_process_article_request.dart';
+import 'package:nova_api/src/model/ai_process_result_response.dart';
 import 'package:nova_api/src/model/announcement_detail_response.dart';
 import 'package:nova_api/src/model/announcement_list_response.dart';
 import 'package:nova_api/src/model/announcement_page_response.dart';
 import 'package:nova_api/src/model/announcement_response.dart';
 import 'package:nova_api/src/model/apply_teacher_request.dart';
+import 'package:nova_api/src/model/article_chat_request.dart';
 import 'package:nova_api/src/model/article_response.dart';
 import 'package:nova_api/src/model/article_source_response.dart';
 import 'package:nova_api/src/model/async_execution_response.dart';
@@ -37,6 +40,7 @@ import 'package:nova_api/src/model/banner_page_response.dart';
 import 'package:nova_api/src/model/banner_response.dart';
 import 'package:nova_api/src/model/base_response_ai_assistant_vo.dart';
 import 'package:nova_api/src/model/base_response_ai_conversation.dart';
+import 'package:nova_api/src/model/base_response_ai_process_result_response.dart';
 import 'package:nova_api/src/model/base_response_announcement_detail_response.dart';
 import 'package:nova_api/src/model/base_response_announcement_page_response.dart';
 import 'package:nova_api/src/model/base_response_announcement_response.dart';
@@ -106,6 +110,7 @@ import 'package:nova_api/src/model/base_response_list_knowledge_base_vo.dart';
 import 'package:nova_api/src/model/base_response_list_knowledge_document_vo.dart';
 import 'package:nova_api/src/model/base_response_list_knowledge_point.dart';
 import 'package:nova_api/src/model/base_response_list_long.dart';
+import 'package:nova_api/src/model/base_response_list_map_string_object.dart';
 import 'package:nova_api/src/model/base_response_list_node_type_response.dart';
 import 'package:nova_api/src/model/base_response_list_order_response.dart';
 import 'package:nova_api/src/model/base_response_list_post_response.dart';
@@ -126,6 +131,7 @@ import 'package:nova_api/src/model/base_response_list_workflow_variable_response
 import 'package:nova_api/src/model/base_response_login_user_response.dart';
 import 'package:nova_api/src/model/base_response_long.dart';
 import 'package:nova_api/src/model/base_response_map_string_object.dart';
+import 'package:nova_api/src/model/base_response_map_string_string.dart';
 import 'package:nova_api/src/model/base_response_member_page.dart';
 import 'package:nova_api/src/model/base_response_object.dart';
 import 'package:nova_api/src/model/base_response_order_response.dart';
@@ -169,6 +175,7 @@ import 'package:nova_api/src/model/base_response_workflow_response.dart';
 import 'package:nova_api/src/model/base_response_workflow_settings_dto.dart';
 import 'package:nova_api/src/model/base_response_workflow_validation_response.dart';
 import 'package:nova_api/src/model/base_response_workflow_variable_response.dart';
+import 'package:nova_api/src/model/batch_ai_process_request.dart';
 import 'package:nova_api/src/model/batch_ban_user_request.dart';
 import 'package:nova_api/src/model/batch_create_user_request.dart';
 import 'package:nova_api/src/model/batch_process_result.dart';
@@ -279,6 +286,7 @@ import 'package:nova_api/src/model/position_dto.dart';
 import 'package:nova_api/src/model/post_detail_response.dart';
 import 'package:nova_api/src/model/post_page_response.dart';
 import 'package:nova_api/src/model/post_response.dart';
+import 'package:nova_api/src/model/preview_ai_process_request.dart';
 import 'package:nova_api/src/model/progress_response.dart';
 import 'package:nova_api/src/model/query_announcement_request.dart';
 import 'package:nova_api/src/model/query_banner_request.dart';
@@ -312,6 +320,7 @@ import 'package:nova_api/src/model/send_code_request.dart';
 import 'package:nova_api/src/model/send_friend_request_dto.dart';
 import 'package:nova_api/src/model/send_result.dart';
 import 'package:nova_api/src/model/send_sms_request.dart';
+import 'package:nova_api/src/model/session_chat_request.dart';
 import 'package:nova_api/src/model/source_scrape_request.dart';
 import 'package:nova_api/src/model/sse_emitter.dart';
 import 'package:nova_api/src/model/teacher_application_response.dart';
@@ -390,11 +399,14 @@ part 'serializers.g.dart';
   AiAssistantVO,
   AiConversation,
   AiConversationId,
+  AiProcessArticleRequest,
+  AiProcessResultResponse,
   AnnouncementDetailResponse,
   AnnouncementListResponse,
   AnnouncementPageResponse,
   AnnouncementResponse,
   ApplyTeacherRequest,
+  ArticleChatRequest,
   ArticleResponse,
   ArticleSourceResponse,
   AsyncExecutionResponse,
@@ -403,6 +415,7 @@ part 'serializers.g.dart';
   BannerResponse,
   BaseResponseAiAssistantVO,
   BaseResponseAiConversation,
+  BaseResponseAiProcessResultResponse,
   BaseResponseAnnouncementDetailResponse,
   BaseResponseAnnouncementPageResponse,
   BaseResponseAnnouncementResponse,
@@ -472,6 +485,7 @@ part 'serializers.g.dart';
   BaseResponseListKnowledgeDocumentVO,
   BaseResponseListKnowledgePoint,
   BaseResponseListLong,
+  BaseResponseListMapStringObject,
   BaseResponseListNodeTypeResponse,
   BaseResponseListOrderResponse,
   BaseResponseListPostResponse,
@@ -492,6 +506,7 @@ part 'serializers.g.dart';
   BaseResponseLoginUserResponse,
   BaseResponseLong,
   BaseResponseMapStringObject,
+  BaseResponseMapStringString,
   BaseResponseMemberPage,
   BaseResponseObject,
   BaseResponseOrderResponse,
@@ -535,6 +550,7 @@ part 'serializers.g.dart';
   BaseResponseWorkflowSettingsDTO,
   BaseResponseWorkflowValidationResponse,
   BaseResponseWorkflowVariableResponse,
+  BatchAiProcessRequest,
   BatchBanUserRequest,
   BatchCreateUserRequest,
   BatchProcessResult,
@@ -645,6 +661,7 @@ part 'serializers.g.dart';
   PostDetailResponse,
   PostPageResponse,
   PostResponse,
+  PreviewAiProcessRequest,
   ProgressResponse,
   QueryAnnouncementRequest,
   QueryBannerRequest,
@@ -678,6 +695,7 @@ part 'serializers.g.dart';
   SendFriendRequestDTO,
   SendResult,
   SendSmsRequest,
+  SessionChatRequest,
   SourceScrapeRequest,
   SseEmitter,
   TeacherApplicationResponse,

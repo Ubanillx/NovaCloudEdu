@@ -7,56 +7,60 @@ import 'package:built_collection/built_collection.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
-part 'chat_request.g.dart';
+part 'article_chat_request.g.dart';
 
-/// ChatRequest
+/// 文章对话请求
 ///
 /// Properties:
-/// * [message]
-/// * [history]
-/// * [systemPrompt]
-/// * [imageUrls]
-/// * [modelId]
+/// * [articleId] - 文章ID
+/// * [message] - 用户消息
+/// * [history] - 对话历史
 @BuiltValue()
-abstract class ChatRequest implements Built<ChatRequest, ChatRequestBuilder> {
+abstract class ArticleChatRequest
+    implements Built<ArticleChatRequest, ArticleChatRequestBuilder> {
+  /// 文章ID
+  @BuiltValueField(wireName: r'articleId')
+  int get articleId;
+
+  /// 用户消息
   @BuiltValueField(wireName: r'message')
   String get message;
 
+  /// 对话历史
   @BuiltValueField(wireName: r'history')
   BuiltList<BuiltMap<String, String>>? get history;
 
-  @BuiltValueField(wireName: r'systemPrompt')
-  String? get systemPrompt;
+  ArticleChatRequest._();
 
-  @BuiltValueField(wireName: r'imageUrls')
-  BuiltList<String>? get imageUrls;
-
-  @BuiltValueField(wireName: r'modelId')
-  String? get modelId;
-
-  ChatRequest._();
-
-  factory ChatRequest([void updates(ChatRequestBuilder b)]) = _$ChatRequest;
+  factory ArticleChatRequest([void updates(ArticleChatRequestBuilder b)]) =
+      _$ArticleChatRequest;
 
   @BuiltValueHook(initializeBuilder: true)
-  static void _defaults(ChatRequestBuilder b) => b;
+  static void _defaults(ArticleChatRequestBuilder b) => b;
 
   @BuiltValueSerializer(custom: true)
-  static Serializer<ChatRequest> get serializer => _$ChatRequestSerializer();
+  static Serializer<ArticleChatRequest> get serializer =>
+      _$ArticleChatRequestSerializer();
 }
 
-class _$ChatRequestSerializer implements PrimitiveSerializer<ChatRequest> {
+class _$ArticleChatRequestSerializer
+    implements PrimitiveSerializer<ArticleChatRequest> {
   @override
-  final Iterable<Type> types = const [ChatRequest, _$ChatRequest];
+  final Iterable<Type> types = const [ArticleChatRequest, _$ArticleChatRequest];
 
   @override
-  final String wireName = r'ChatRequest';
+  final String wireName = r'ArticleChatRequest';
 
   Iterable<Object?> _serializeProperties(
     Serializers serializers,
-    ChatRequest object, {
+    ArticleChatRequest object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
+    yield r'articleId';
+    yield serializers.serialize(
+      object.articleId,
+      specifiedType: const FullType(int),
+    );
     yield r'message';
     yield serializers.serialize(
       object.message,
@@ -71,33 +75,12 @@ class _$ChatRequestSerializer implements PrimitiveSerializer<ChatRequest> {
         ]),
       );
     }
-    if (object.systemPrompt != null) {
-      yield r'systemPrompt';
-      yield serializers.serialize(
-        object.systemPrompt,
-        specifiedType: const FullType(String),
-      );
-    }
-    if (object.imageUrls != null) {
-      yield r'imageUrls';
-      yield serializers.serialize(
-        object.imageUrls,
-        specifiedType: const FullType(BuiltList, [FullType(String)]),
-      );
-    }
-    if (object.modelId != null) {
-      yield r'modelId';
-      yield serializers.serialize(
-        object.modelId,
-        specifiedType: const FullType(String),
-      );
-    }
   }
 
   @override
   Object serialize(
     Serializers serializers,
-    ChatRequest object, {
+    ArticleChatRequest object, {
     FullType specifiedType = FullType.unspecified,
   }) {
     return _serializeProperties(serializers, object,
@@ -110,13 +93,20 @@ class _$ChatRequestSerializer implements PrimitiveSerializer<ChatRequest> {
     Object serialized, {
     FullType specifiedType = FullType.unspecified,
     required List<Object?> serializedList,
-    required ChatRequestBuilder result,
+    required ArticleChatRequestBuilder result,
     required List<Object?> unhandled,
   }) {
     for (var i = 0; i < serializedList.length; i += 2) {
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
+        case r'articleId':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(int),
+          ) as int;
+          result.articleId = valueDes;
+          break;
         case r'message':
           final valueDes = serializers.deserialize(
             value,
@@ -133,27 +123,6 @@ class _$ChatRequestSerializer implements PrimitiveSerializer<ChatRequest> {
           ) as BuiltList<BuiltMap<String, String>>;
           result.history.replace(valueDes);
           break;
-        case r'systemPrompt':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.systemPrompt = valueDes;
-          break;
-        case r'imageUrls':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(BuiltList, [FullType(String)]),
-          ) as BuiltList<String>;
-          result.imageUrls.replace(valueDes);
-          break;
-        case r'modelId':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.modelId = valueDes;
-          break;
         default:
           unhandled.add(key);
           unhandled.add(value);
@@ -163,12 +132,12 @@ class _$ChatRequestSerializer implements PrimitiveSerializer<ChatRequest> {
   }
 
   @override
-  ChatRequest deserialize(
+  ArticleChatRequest deserialize(
     Serializers serializers,
     Object serialized, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    final result = ChatRequestBuilder();
+    final result = ArticleChatRequestBuilder();
     final serializedList = (serialized as Iterable<Object?>).toList();
     final unhandled = <Object?>[];
     _deserializeProperties(

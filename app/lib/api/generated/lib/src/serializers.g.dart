@@ -21,11 +21,14 @@ Serializers _$serializers =
           ..add(AiConversation.serializer)
           ..add(AiConversationConversationTypeEnum.serializer)
           ..add(AiConversationId.serializer)
+          ..add(AiProcessArticleRequest.serializer)
+          ..add(AiProcessResultResponse.serializer)
           ..add(AnnouncementDetailResponse.serializer)
           ..add(AnnouncementListResponse.serializer)
           ..add(AnnouncementPageResponse.serializer)
           ..add(AnnouncementResponse.serializer)
           ..add(ApplyTeacherRequest.serializer)
+          ..add(ArticleChatRequest.serializer)
           ..add(ArticleResponse.serializer)
           ..add(ArticleSourceResponse.serializer)
           ..add(AsyncExecutionResponse.serializer)
@@ -34,6 +37,7 @@ Serializers _$serializers =
           ..add(BannerResponse.serializer)
           ..add(BaseResponseAiAssistantVO.serializer)
           ..add(BaseResponseAiConversation.serializer)
+          ..add(BaseResponseAiProcessResultResponse.serializer)
           ..add(BaseResponseAnnouncementDetailResponse.serializer)
           ..add(BaseResponseAnnouncementPageResponse.serializer)
           ..add(BaseResponseAnnouncementResponse.serializer)
@@ -103,6 +107,7 @@ Serializers _$serializers =
           ..add(BaseResponseListKnowledgeDocumentVO.serializer)
           ..add(BaseResponseListKnowledgePoint.serializer)
           ..add(BaseResponseListLong.serializer)
+          ..add(BaseResponseListMapStringObject.serializer)
           ..add(BaseResponseListNodeTypeResponse.serializer)
           ..add(BaseResponseListOrderResponse.serializer)
           ..add(BaseResponseListPostResponse.serializer)
@@ -123,6 +128,7 @@ Serializers _$serializers =
           ..add(BaseResponseLoginUserResponse.serializer)
           ..add(BaseResponseLong.serializer)
           ..add(BaseResponseMapStringObject.serializer)
+          ..add(BaseResponseMapStringString.serializer)
           ..add(BaseResponseMemberPage.serializer)
           ..add(BaseResponseObject.serializer)
           ..add(BaseResponseOrderResponse.serializer)
@@ -166,6 +172,7 @@ Serializers _$serializers =
           ..add(BaseResponseWorkflowSettingsDTO.serializer)
           ..add(BaseResponseWorkflowValidationResponse.serializer)
           ..add(BaseResponseWorkflowVariableResponse.serializer)
+          ..add(BatchAiProcessRequest.serializer)
           ..add(BatchBanUserRequest.serializer)
           ..add(BatchCreateUserRequest.serializer)
           ..add(BatchProcessResult.serializer)
@@ -288,6 +295,7 @@ Serializers _$serializers =
           ..add(PostDetailResponse.serializer)
           ..add(PostPageResponse.serializer)
           ..add(PostResponse.serializer)
+          ..add(PreviewAiProcessRequest.serializer)
           ..add(ProgressResponse.serializer)
           ..add(QueryAnnouncementRequest.serializer)
           ..add(QueryBannerRequest.serializer)
@@ -323,6 +331,7 @@ Serializers _$serializers =
           ..add(SendFriendRequestDTO.serializer)
           ..add(SendResult.serializer)
           ..add(SendSmsRequest.serializer)
+          ..add(SessionChatRequest.serializer)
           ..add(SourceScrapeRequest.serializer)
           ..add(SseEmitter.serializer)
           ..add(TeacherApplicationResponse.serializer)
@@ -461,10 +470,32 @@ Serializers _$serializers =
             const FullType(BuiltList, const [
               const FullType(BuiltMap, const [
                 const FullType(String),
+                const FullType(JsonObject),
+              ]),
+            ]),
+            () => ListBuilder<BuiltMap<String, JsonObject>>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [
+              const FullType(BuiltMap, const [
+                const FullType(String),
                 const FullType(String),
               ]),
             ]),
             () => ListBuilder<BuiltMap<String, String>>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [
+              const FullType(BuiltMap, const [
+                const FullType(String),
+                const FullType(String),
+              ]),
+            ]),
+            () => ListBuilder<BuiltMap<String, String>>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [const FullType(String)]),
+            () => ListBuilder<String>(),
           )
           ..addBuilderFactory(
             const FullType(BuiltList, const [const FullType(ChapterDTO)]),
@@ -832,6 +863,10 @@ Serializers _$serializers =
             () => ListBuilder<String>(),
           )
           ..addBuilderFactory(
+            const FullType(BuiltList, const [const FullType(String)]),
+            () => ListBuilder<String>(),
+          )
+          ..addBuilderFactory(
             const FullType(BuiltList, const [const FullType(KnowledgeBaseVO)]),
             () => ListBuilder<KnowledgeBaseVO>(),
           )
@@ -982,6 +1017,10 @@ Serializers _$serializers =
             () => ListBuilder<int>(),
           )
           ..addBuilderFactory(
+            const FullType(BuiltList, const [const FullType(int)]),
+            () => ListBuilder<int>(),
+          )
+          ..addBuilderFactory(
             const FullType(BuiltList, const [const FullType(FailedItem)]),
             () => ListBuilder<FailedItem>(),
           )
@@ -1062,6 +1101,13 @@ Serializers _$serializers =
               const FullType(JsonObject),
             ]),
             () => MapBuilder<String, JsonObject>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltMap, const [
+              const FullType(String),
+              const FullType(String),
+            ]),
+            () => MapBuilder<String, String>(),
           ))
         .build();
 

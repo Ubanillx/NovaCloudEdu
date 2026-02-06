@@ -12,11 +12,14 @@ doc/AddVariableRequest.md
 doc/AiAssistantVO.md
 doc/AiConversation.md
 doc/AiConversationId.md
+doc/AiProcessArticleRequest.md
+doc/AiProcessResultResponse.md
 doc/AnnouncementDetailResponse.md
 doc/AnnouncementListResponse.md
 doc/AnnouncementPageResponse.md
 doc/AnnouncementResponse.md
 doc/ApplyTeacherRequest.md
+doc/ArticleChatRequest.md
 doc/ArticleResponse.md
 doc/ArticleSourceResponse.md
 doc/AsyncExecutionResponse.md
@@ -25,6 +28,7 @@ doc/BannerPageResponse.md
 doc/BannerResponse.md
 doc/BaseResponseAiAssistantVO.md
 doc/BaseResponseAiConversation.md
+doc/BaseResponseAiProcessResultResponse.md
 doc/BaseResponseAnnouncementDetailResponse.md
 doc/BaseResponseAnnouncementPageResponse.md
 doc/BaseResponseAnnouncementResponse.md
@@ -94,6 +98,7 @@ doc/BaseResponseListKnowledgeBaseVO.md
 doc/BaseResponseListKnowledgeDocumentVO.md
 doc/BaseResponseListKnowledgePoint.md
 doc/BaseResponseListLong.md
+doc/BaseResponseListMapStringObject.md
 doc/BaseResponseListNodeTypeResponse.md
 doc/BaseResponseListOrderResponse.md
 doc/BaseResponseListPostResponse.md
@@ -114,6 +119,7 @@ doc/BaseResponseListWorkflowVariableResponse.md
 doc/BaseResponseLoginUserResponse.md
 doc/BaseResponseLong.md
 doc/BaseResponseMapStringObject.md
+doc/BaseResponseMapStringString.md
 doc/BaseResponseMemberPage.md
 doc/BaseResponseObject.md
 doc/BaseResponseOrderResponse.md
@@ -157,6 +163,7 @@ doc/BaseResponseWorkflowResponse.md
 doc/BaseResponseWorkflowSettingsDTO.md
 doc/BaseResponseWorkflowValidationResponse.md
 doc/BaseResponseWorkflowVariableResponse.md
+doc/BatchAiProcessRequest.md
 doc/BatchBanUserRequest.md
 doc/BatchCreateUserRequest.md
 doc/BatchProcessResult.md
@@ -268,6 +275,7 @@ doc/PositionDTO.md
 doc/PostDetailResponse.md
 doc/PostPageResponse.md
 doc/PostResponse.md
+doc/PreviewAiProcessRequest.md
 doc/ProgressResponse.md
 doc/QueryAnnouncementRequest.md
 doc/QueryBannerRequest.md
@@ -301,6 +309,7 @@ doc/SendCodeRequest.md
 doc/SendFriendRequestDTO.md
 doc/SendResult.md
 doc/SendSmsRequest.md
+doc/SessionChatRequest.md
 doc/SourceScrapeRequest.md
 doc/SseEmitter.md
 doc/TeacherApplicationResponse.md
@@ -388,11 +397,14 @@ lib/src/model/add_variable_request.dart
 lib/src/model/ai_assistant_vo.dart
 lib/src/model/ai_conversation.dart
 lib/src/model/ai_conversation_id.dart
+lib/src/model/ai_process_article_request.dart
+lib/src/model/ai_process_result_response.dart
 lib/src/model/announcement_detail_response.dart
 lib/src/model/announcement_list_response.dart
 lib/src/model/announcement_page_response.dart
 lib/src/model/announcement_response.dart
 lib/src/model/apply_teacher_request.dart
+lib/src/model/article_chat_request.dart
 lib/src/model/article_response.dart
 lib/src/model/article_source_response.dart
 lib/src/model/async_execution_response.dart
@@ -401,6 +413,7 @@ lib/src/model/banner_page_response.dart
 lib/src/model/banner_response.dart
 lib/src/model/base_response_ai_assistant_vo.dart
 lib/src/model/base_response_ai_conversation.dart
+lib/src/model/base_response_ai_process_result_response.dart
 lib/src/model/base_response_announcement_detail_response.dart
 lib/src/model/base_response_announcement_page_response.dart
 lib/src/model/base_response_announcement_response.dart
@@ -470,6 +483,7 @@ lib/src/model/base_response_list_knowledge_base_vo.dart
 lib/src/model/base_response_list_knowledge_document_vo.dart
 lib/src/model/base_response_list_knowledge_point.dart
 lib/src/model/base_response_list_long.dart
+lib/src/model/base_response_list_map_string_object.dart
 lib/src/model/base_response_list_node_type_response.dart
 lib/src/model/base_response_list_order_response.dart
 lib/src/model/base_response_list_post_response.dart
@@ -490,6 +504,7 @@ lib/src/model/base_response_list_workflow_variable_response.dart
 lib/src/model/base_response_login_user_response.dart
 lib/src/model/base_response_long.dart
 lib/src/model/base_response_map_string_object.dart
+lib/src/model/base_response_map_string_string.dart
 lib/src/model/base_response_member_page.dart
 lib/src/model/base_response_object.dart
 lib/src/model/base_response_order_response.dart
@@ -533,6 +548,7 @@ lib/src/model/base_response_workflow_response.dart
 lib/src/model/base_response_workflow_settings_dto.dart
 lib/src/model/base_response_workflow_validation_response.dart
 lib/src/model/base_response_workflow_variable_response.dart
+lib/src/model/batch_ai_process_request.dart
 lib/src/model/batch_ban_user_request.dart
 lib/src/model/batch_create_user_request.dart
 lib/src/model/batch_process_result.dart
@@ -644,6 +660,7 @@ lib/src/model/position_dto.dart
 lib/src/model/post_detail_response.dart
 lib/src/model/post_page_response.dart
 lib/src/model/post_response.dart
+lib/src/model/preview_ai_process_request.dart
 lib/src/model/progress_response.dart
 lib/src/model/query_announcement_request.dart
 lib/src/model/query_banner_request.dart
@@ -677,6 +694,7 @@ lib/src/model/send_code_request.dart
 lib/src/model/send_friend_request_dto.dart
 lib/src/model/send_result.dart
 lib/src/model/send_sms_request.dart
+lib/src/model/session_chat_request.dart
 lib/src/model/source_scrape_request.dart
 lib/src/model/sse_emitter.dart
 lib/src/model/teacher_application_response.dart
@@ -743,3 +761,5 @@ lib/src/model/workflow_validation_response.dart
 lib/src/model/workflow_variable_response.dart
 lib/src/serializers.dart
 pubspec.yaml
+test/base_response_list_map_string_object_test.dart
+test/session_chat_request_test.dart
