@@ -1,8 +1,12 @@
 package com.novacloudedu.backend.interfaces.rest.dailylearning.assembler;
 
 import com.novacloudedu.backend.domain.dailylearning.entity.*;
+import com.novacloudedu.backend.domain.dailylearning.repository.DailyWordRepository.DailyWordPage;
+import com.novacloudedu.backend.domain.dailylearning.repository.DailyArticleRepository.DailyArticlePage;
 import com.novacloudedu.backend.interfaces.rest.dailylearning.dto.*;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 public class DailyLearningAssembler {
@@ -110,5 +114,33 @@ public class DailyLearningAssembler {
         UserWordBookResponse response = toUserWordBookResponse(wordBook);
         response.setWord(toDailyWordResponse(word));
         return response;
+    }
+
+    // ==================== 分页响应转换 ====================
+
+    public DailyWordPageResponse toDailyWordPageResponse(DailyWordPage page) {
+        List<DailyWordResponse> records = page.words().stream()
+                .map(this::toDailyWordResponse)
+                .toList();
+        return new DailyWordPageResponse(
+                records,
+                page.total(),
+                page.pageNum(),
+                page.pageSize(),
+                page.getTotalPages()
+        );
+    }
+
+    public DailyArticlePageResponse toDailyArticlePageResponse(DailyArticlePage page) {
+        List<DailyArticleResponse> records = page.articles().stream()
+                .map(this::toDailyArticleResponse)
+                .toList();
+        return new DailyArticlePageResponse(
+                records,
+                page.total(),
+                page.pageNum(),
+                page.pageSize(),
+                page.getTotalPages()
+        );
     }
 }

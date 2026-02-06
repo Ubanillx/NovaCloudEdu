@@ -113,7 +113,74 @@ public class DailyWordRepositoryImpl implements DailyWordRepository {
     }
 
     @Override
+    public long countByDifficulty(Difficulty difficulty) {
+        LambdaQueryWrapper<DailyWordPO> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(DailyWordPO::getDifficulty, difficulty.getCode());
+        return dailyWordMapper.selectCount(wrapper);
+    }
+
+    @Override
+    public long countByKeyword(String keyword) {
+        LambdaQueryWrapper<DailyWordPO> wrapper = new LambdaQueryWrapper<>();
+        wrapper.like(DailyWordPO::getWord, keyword)
+                .or().like(DailyWordPO::getTranslation, keyword);
+        return dailyWordMapper.selectCount(wrapper);
+    }
+
+    @Override
     public void deleteById(DailyWordId id) {
         dailyWordMapper.deleteById(id.value());
+    }
+
+    @Override
+    public DailyWordPage findAllPaged(int page, int size) {
+        Page<DailyWordPO> pageParam = new Page<>(page, size);
+        LambdaQueryWrapper<DailyWordPO> wrapper = new LambdaQueryWrapper<>();
+        wrapper.orderByDesc(DailyWordPO::getPublishDate);
+        Page<DailyWordPO> result = dailyWordMapper.selectPage(pageParam, wrapper);
+        List<DailyWord> words = result.getRecords().stream()
+                .map(dailyWordConverter::toDomain)
+                .collect(Collectors.toList());
+        return new DailyWordPage(words, result.getTotal(), page, size);
+    }
+
+    @Override
+    public DailyWordPage findByCategoryPaged(String category, int page, int size) {
+        Page<DailyWordPO> pageParam = new Page<>(page, size);
+        LambdaQueryWrapper<DailyWordPO> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(DailyWordPO::getCategory, category)
+                .orderByDesc(DailyWordPO::getPublishDate);
+        Page<DailyWordPO> result = dailyWordMapper.selectPage(pageParam, wrapper);
+        List<DailyWord> words = result.getRecords().stream()
+                .map(dailyWordConverter::toDomain)
+                .collect(Collectors.toList());
+        return new DailyWordPage(words, result.getTotal(), page, size);
+    }
+
+    @Override
+    public DailyWordPage findByDifficultyPaged(Difficulty difficulty, int page, int size) {
+        Page<DailyWordPO> pageParam = new Page<>(page, size);
+        LambdaQueryWrapper<DailyWordPO> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(DailyWordPO::getDifficulty, difficulty.getCode())
+                .orderByDesc(DailyWordPO::getPublishDate);
+        Page<DailyWordPO> result = dailyWordMapper.selectPage(pageParam, wrapper);
+        List<DailyWord> words = result.getRecords().stream()
+                .map(dailyWordConverter::toDomain)
+                .collect(Collectors.toList());
+        return new DailyWordPage(words, result.getTotal(), page, size);
+    }
+
+    @Override
+    public DailyWordPage searchByWordPaged(String keyword, int page, int size) {
+        Page<DailyWordPO> pageParam = new Page<>(page, size);
+        LambdaQueryWrapper<DailyWordPO> wrapper = new LambdaQueryWrapper<>();
+        wrapper.like(DailyWordPO::getWord, keyword)
+                .or().like(DailyWordPO::getTranslation, keyword)
+                .orderByDesc(DailyWordPO::getPublishDate);
+        Page<DailyWordPO> result = dailyWordMapper.selectPage(pageParam, wrapper);
+        List<DailyWord> words = result.getRecords().stream()
+                .map(dailyWordConverter::toDomain)
+                .collect(Collectors.toList());
+        return new DailyWordPage(words, result.getTotal(), page, size);
     }
 }
