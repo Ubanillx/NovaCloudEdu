@@ -11,8 +11,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Slf4j
@@ -231,5 +234,162 @@ public class GraphDataSyncService {
         } while (!articles.isEmpty());
         
         log.info("全量同步文章完成，共同步 {} 篇文章", total);
+    }
+
+    @Transactional
+    public int batchSyncArticlesToGraph(int batchSize) {
+        log.info("开始批量同步文章到知识图谱，批次大小: {}", batchSize);
+        int page = 1;
+        List<DailyArticle> articles;
+        int total = 0;
+
+        do {
+            articles = dailyArticleRepository.findAll(page, batchSize);
+            if (articles.isEmpty()) {
+                break;
+            }
+
+            // 1. 预处理：收集所有分类和标签
+            Set<String> allCategories = new HashSet<>();
+            Set<String> allTags = new HashSet<>();
+            for (DailyArticle article : articles) {
+                if (article.getCategory() != null && !article.getCategory().isEmpty()) {
+                    allCategories.add(article.getCategory());
+                }
+                if (article.getTags() != null) {
+                    allTags.addAll(article.getTags());
+                }
+            }
+
+            // 2. 批量创建/获取分类节点
+            Map<String, CategoryNode> categoryMap = new HashMap<>();
+            for (String categoryName : allCategories) {
+                CategoryNode categoryNode = categoryNodeRepository.findByName(categoryName)
+                        .orElseGet(() -> categoryNodeRepository.save(new CategoryNode(categoryName, "ARTICLE")));
+                categoryMap.put(categoryName, categoryNode);
+            }
+
+            // 3. 批量创建/获取标签节点
+            Map<String, TagNode> tagMap = new HashMap<>();
+            for (String tagName : allTags) {
+                TagNode tagNode = tagNodeRepository.findByName(tagName)
+                        .orElseGet(() -> tagNodeRepository.save(new TagNode(tagName)));
+                tagMap.put(tagName, tagNode);
+            }
+
+            // 4. 批量构建ArticleNode
+            List<ArticleNode> articleNodes = new ArrayList<>();
+            for (DailyArticle article : articles) {
+                ArticleNode articleNode = articleNodeRepository.findById(article.getId().value())
+                        .orElse(new ArticleNode());
+
+                articleNode.setId(article.getId().value());
+                articleNode.setTitle(article.getTitle());
+                articleNode.setSummary(article.getSummary());
+                articleNode.setDifficulty(article.getDifficulty().getCode());
+                articleNode.setCategory(article.getCategory());
+                articleNode.setViewCount(article.getViewCount());
+                articleNode.setLikeCount(article.getLikeCount());
+
+                if (article.getCategory() != null && !article.getCategory().isEmpty()) {
+                    articleNode.setCategoryNode(categoryMap.get(article.getCategory()));
+                }
+
+                DifficultyNode difficultyNode = new DifficultyNode(
+                        article.getDifficulty().getCode(),
+                        article.getDifficulty().getDescription()
+                );
+                articleNode.setDifficultyNode(difficultyNode);
+
+                if (article.getTags() != null && !article.getTags().isEmpty()) {
+                    Set<TagNode> tagNodes = new HashSet<>();
+                    for (String tagName : article.getTags()) {
+                        TagNode tagNode = tagMap.get(tagName);
+                        if (tagNode != null) {
+                            tagNodes.add(tagNode);
+                        }
+                    }
+                    articleNode.setTags(tagNodes);
+                }
+
+                articleNodes.add(articleNode);
+            }
+
+            // 5. 批量保存
+            articleNodeRepository.saveAll(articleNodes);
+            total += articleNodes.size();
+            log.info("批量同步文章进度: 已同步 {} 篇", total);
+
+            page++;
+        } while (!articles.isEmpty());
+
+        log.info("批量同步文章完成，共同步 {} 篇文章", total);
+        return total;
+    }
+
+    @Transactional
+    public int batchSyncWordsToGraph(int batchSize) {
+        log.info("开始批量同步单词到知识图谱，批次大小: {}", batchSize);
+        int page = 1;
+        List<DailyWord> words;
+        int total = 0;
+
+        do {
+            words = dailyWordRepository.findAll(page, batchSize);
+            if (words.isEmpty()) {
+                break;
+            }
+
+            // 1. 预处理：收集所有分类
+            Set<String> allCategories = new HashSet<>();
+            for (DailyWord word : words) {
+                if (word.getCategory() != null && !word.getCategory().isEmpty()) {
+                    allCategories.add(word.getCategory());
+                }
+            }
+
+            // 2. 批量创建/获取分类节点
+            Map<String, CategoryNode> categoryMap = new HashMap<>();
+            for (String categoryName : allCategories) {
+                CategoryNode categoryNode = categoryNodeRepository.findByName(categoryName)
+                        .orElseGet(() -> categoryNodeRepository.save(new CategoryNode(categoryName, "WORD")));
+                categoryMap.put(categoryName, categoryNode);
+            }
+
+            // 3. 批量构建WordNode
+            List<WordNode> wordNodes = new ArrayList<>();
+            for (DailyWord word : words) {
+                WordNode wordNode = wordNodeRepository.findById(word.getId().value())
+                        .orElse(new WordNode());
+
+                wordNode.setId(word.getId().value());
+                wordNode.setWord(word.getWord());
+                wordNode.setTranslation(word.getTranslation());
+                wordNode.setDifficulty(word.getDifficulty().getCode());
+                wordNode.setCategory(word.getCategory());
+
+                if (word.getCategory() != null && !word.getCategory().isEmpty()) {
+                    wordNode.setCategoryNode(categoryMap.get(word.getCategory()));
+                }
+
+                DifficultyNode difficultyNode = new DifficultyNode(
+                        word.getDifficulty().getCode(),
+                        word.getDifficulty().getDescription()
+                );
+                wordNode.setDifficultyNode(difficultyNode);
+
+                wordNodes.add(wordNode);
+            }
+
+            // 4. 批量保存
+            wordNodeRepository.saveAll(wordNodes);
+            total += wordNodes.size();
+            log.info("批量同步单词进度: 已同步 {} 个", total);
+
+            page++;
+        } while (!words.isEmpty());
+
+        log.info("批量同步单词完成，共同步 {} 个单词", total);
+        return total;
     }
 }
