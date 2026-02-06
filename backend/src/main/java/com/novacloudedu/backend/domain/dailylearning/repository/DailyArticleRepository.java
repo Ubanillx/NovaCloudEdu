@@ -28,5 +28,29 @@ public interface DailyArticleRepository {
 
     long countByCategory(String category);
 
+    long countByDifficulty(Difficulty difficulty);
+
+    long countByKeyword(String keyword);
+
     void deleteById(DailyArticleId id);
+
+    /**
+     * 分页查询（带完整分页信息）
+     */
+    DailyArticlePage findAllPaged(int page, int size);
+
+    DailyArticlePage findByCategoryPaged(String category, int page, int size);
+
+    DailyArticlePage findByDifficultyPaged(Difficulty difficulty, int page, int size);
+
+    DailyArticlePage searchByKeywordPaged(String keyword, int page, int size);
+
+    /**
+     * 文章分页结果
+     */
+    record DailyArticlePage(List<DailyArticle> articles, long total, int pageNum, int pageSize) {
+        public int getTotalPages() {
+            return pageSize > 0 ? (int) Math.ceil((double) total / pageSize) : 0;
+        }
+    }
 }

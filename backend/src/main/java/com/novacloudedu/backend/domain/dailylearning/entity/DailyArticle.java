@@ -144,4 +144,13 @@ public class DailyArticle {
             this.updateTime = LocalDateTime.now();
         }
     }
+
+    /**
+     * 更新文章内容和摘要（用于 AI 处理后更新）
+     */
+    public void updateContentAndSummary(String content, String summary) {
+        this.content = content;
+        this.summary = summary;
+        this.updateTime = LocalDateTime.now();
+    }
 }
