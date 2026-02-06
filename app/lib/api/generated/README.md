@@ -84,6 +84,9 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**batchProcessByKnowledgeBase**](doc/DefaultApi.md#batchprocessbyknowledgebase) | **POST** /api/ai/knowledge-bases/{id}/embed-all | 向量化知识库所有待处理文档
 [*DefaultApi*](doc/DefaultApi.md) | [**batchProcessDocuments**](doc/DefaultApi.md#batchprocessdocuments) | **POST** /api/ai/knowledge-bases/{id}/documents/batch-embed | 批量文档向量化
 [*DefaultApi*](doc/DefaultApi.md) | [**batchProcessDocumentsAsync**](doc/DefaultApi.md#batchprocessdocumentsasync) | **POST** /api/ai/knowledge-bases/{id}/documents/batch-embed-async | 异步批量文档向量化
+[*DefaultApi*](doc/DefaultApi.md) | [**batchSyncAll**](doc/DefaultApi.md#batchsyncall) | **POST** /api/dailylearning/graph-sync/all/batch | 批量同步所有数据到知识图谱（高效批量导入）
+[*DefaultApi*](doc/DefaultApi.md) | [**batchSyncArticles**](doc/DefaultApi.md#batchsyncarticles) | **POST** /api/dailylearning/graph-sync/articles/batch | 批量同步每日文章到知识图谱（高效批量导入）
+[*DefaultApi*](doc/DefaultApi.md) | [**batchSyncWords**](doc/DefaultApi.md#batchsyncwords) | **POST** /api/dailylearning/graph-sync/words/batch | 批量同步每日单词到知识图谱（高效批量导入）
 [*DefaultApi*](doc/DefaultApi.md) | [**batchUpdate**](doc/DefaultApi.md#batchupdate) | **POST** /api/workflows/{id}/batch-update | 批量更新节点和连接线
 [*DefaultApi*](doc/DefaultApi.md) | [**cancelExecution**](doc/DefaultApi.md#cancelexecution) | **POST** /api/workflows/executions/{executionId}/cancel | 取消执行
 [*DefaultApi*](doc/DefaultApi.md) | [**changePassword**](doc/DefaultApi.md#changepassword) | **POST** /api/user/password | 修改密码
@@ -392,11 +395,15 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**validate**](doc/DefaultApi.md#validate) | **POST** /api/workflows/{id}/validate | 验证工作流定义
 [*AIApi*](doc/AIApi.md) | [**archive**](doc/AIApi.md#archive) | **PUT** /api/ai/assistants/{id}/archive | 归档AI助手
 [*AIApi*](doc/AIApi.md) | [**askQuestion**](doc/AIApi.md#askquestion) | **POST** /api/books/{bookId}/ai/chat | 提问（新对话）
+[*AIApi*](doc/AIApi.md) | [**batchProcessArticles**](doc/AIApi.md#batchprocessarticles) | **POST** /api/admin/articles/ai/batch-process | 批量AI处理文章
 [*AIApi*](doc/AIApi.md) | [**bindKnowledgeBase**](doc/AIApi.md#bindknowledgebase) | **POST** /api/ai/assistants/{id}/knowledge-bases/{kbId} | 绑定知识库
 [*AIApi*](doc/AIApi.md) | [**bindWorkflow**](doc/AIApi.md#bindworkflow) | **POST** /api/ai/assistants/{id}/workflows/{workflowId} | 绑定工作流到AI助手
+[*AIApi*](doc/AIApi.md) | [**chat**](doc/AIApi.md#chat) | **POST** /api/articles/chat | 非流式对话
 [*AIApi*](doc/AIApi.md) | [**continueConversation**](doc/AIApi.md#continueconversation) | **POST** /api/books/{bookId}/ai/chat/{conversationId} | 继续对话
 [*AIApi*](doc/AIApi.md) | [**create2**](doc/AIApi.md#create2) | **POST** /api/ai/assistants | 创建AI助手
+[*AIApi*](doc/AIApi.md) | [**createSession**](doc/AIApi.md#createsession) | **POST** /api/ai/chat/sessions | 创建新会话
 [*AIApi*](doc/AIApi.md) | [**delete2**](doc/AIApi.md#delete2) | **DELETE** /api/ai/assistants/{id} | 删除AI助手
+[*AIApi*](doc/AIApi.md) | [**deleteSession**](doc/AIApi.md#deletesession) | **DELETE** /api/ai/chat/sessions/{sessionId} | 删除会话
 [*AIApi*](doc/AIApi.md) | [**executeWorkflow**](doc/AIApi.md#executeworkflow) | **POST** /api/ai/assistants/{id}/workflows/{workflowId}/execute | 执行AI助手绑定的工作流
 [*AIApi*](doc/AIApi.md) | [**extractKnowledgePoints**](doc/AIApi.md#extractknowledgepoints) | **POST** /api/books/{bookId}/ai/chapters/{chapterId}/knowledge-points | 提取章节知识点
 [*AIApi*](doc/AIApi.md) | [**generateQuiz**](doc/AIApi.md#generatequiz) | **POST** /api/books/{bookId}/ai/chapters/{chapterId}/quiz | 生成阅读测试
@@ -407,17 +414,26 @@ Class | Method | HTTP request | Description
 [*AIApi*](doc/AIApi.md) | [**getKnowledgePoints**](doc/AIApi.md#getknowledgepoints) | **GET** /api/books/{bookId}/ai/chapters/{chapterId}/knowledge-points | 获取章节知识点
 [*AIApi*](doc/AIApi.md) | [**getLatestQuiz**](doc/AIApi.md#getlatestquiz) | **GET** /api/books/{bookId}/ai/chapters/{chapterId}/quiz/latest | 获取章节最新测试
 [*AIApi*](doc/AIApi.md) | [**getQuiz**](doc/AIApi.md#getquiz) | **GET** /api/books/{bookId}/ai/quiz/{quizId} | 获取测试
+[*AIApi*](doc/AIApi.md) | [**getSessionDetail**](doc/AIApi.md#getsessiondetail) | **GET** /api/ai/chat/sessions/{sessionId} | 获取会话详情（含消息列表）
 [*AIApi*](doc/AIApi.md) | [**getSummary**](doc/AIApi.md#getsummary) | **GET** /api/books/{bookId}/ai/chapters/{chapterId}/summary | 获取章节总结
 [*AIApi*](doc/AIApi.md) | [**getUserConversations**](doc/AIApi.md#getuserconversations) | **GET** /api/books/{bookId}/ai/conversations | 获取用户对话列表
 [*AIApi*](doc/AIApi.md) | [**getWorkflows**](doc/AIApi.md#getworkflows) | **GET** /api/ai/assistants/{id}/workflows | 获取AI助手绑定的工作流列表
+[*AIApi*](doc/AIApi.md) | [**listAllModels**](doc/AIApi.md#listallmodels) | **GET** /api/ai/chat/models/all | 获取全量模型配置
 [*AIApi*](doc/AIApi.md) | [**listByCreator1**](doc/AIApi.md#listbycreator1) | **GET** /api/ai/assistants | 获取用户的AI助手列表
+[*AIApi*](doc/AIApi.md) | [**listModels**](doc/AIApi.md#listmodels) | **GET** /api/ai/chat/models | 获取可用模型列表
 [*AIApi*](doc/AIApi.md) | [**listPublic1**](doc/AIApi.md#listpublic1) | **GET** /api/ai/assistants/public | 获取公开的AI助手列表
+[*AIApi*](doc/AIApi.md) | [**listSessions**](doc/AIApi.md#listsessions) | **GET** /api/ai/chat/sessions | 获取会话列表
+[*AIApi*](doc/AIApi.md) | [**previewAiProcess**](doc/AIApi.md#previewaiprocess) | **POST** /api/admin/articles/ai/preview | 预览AI处理结果
+[*AIApi*](doc/AIApi.md) | [**processArticle**](doc/AIApi.md#processarticle) | **POST** /api/admin/articles/ai/process | AI处理单篇文章
 [*AIApi*](doc/AIApi.md) | [**publish**](doc/AIApi.md#publish) | **PUT** /api/ai/assistants/{id}/publish | 发布AI助手
 [*AIApi*](doc/AIApi.md) | [**regenerateKnowledgePoints**](doc/AIApi.md#regenerateknowledgepoints) | **POST** /api/books/{bookId}/ai/chapters/{chapterId}/knowledge-points/regenerate | 重新提取知识点
 [*AIApi*](doc/AIApi.md) | [**regenerateSummary**](doc/AIApi.md#regeneratesummary) | **POST** /api/books/{bookId}/ai/chapters/{chapterId}/summary/regenerate | 重新生成总结
 [*AIApi*](doc/AIApi.md) | [**search1**](doc/AIApi.md#search1) | **GET** /api/ai/assistants/search | 搜索AI助手
 [*AIApi*](doc/AIApi.md) | [**searchKnowledgePoints**](doc/AIApi.md#searchknowledgepoints) | **GET** /api/books/{bookId}/ai/knowledge-points/search | 搜索知识点
-[*AIApi*](doc/AIApi.md) | [**streamChat**](doc/AIApi.md#streamchat) | **POST** /api/ai/chat/stream | 流式对话
+[*AIApi*](doc/AIApi.md) | [**sessionStreamChat**](doc/AIApi.md#sessionstreamchat) | **POST** /api/ai/chat/sessions/{sessionId}/stream | 会话级流式对话
+[*AIApi*](doc/AIApi.md) | [**streamChat**](doc/AIApi.md#streamchat) | **POST** /api/articles/chat/stream | 流式对话
+[*AIApi*](doc/AIApi.md) | [**streamChat1**](doc/AIApi.md#streamchat1) | **POST** /api/ai/chat/stream | 无状态流式对话
+[*AIApi*](doc/AIApi.md) | [**streamChatGet**](doc/AIApi.md#streamchatget) | **GET** /api/articles/{articleId}/chat/stream | GET流式对话
 [*AIApi*](doc/AIApi.md) | [**submitAnswers**](doc/AIApi.md#submitanswers) | **POST** /api/books/{bookId}/ai/quiz/{quizId}/submit | 提交答案并评分
 [*AIApi*](doc/AIApi.md) | [**unbindKnowledgeBase**](doc/AIApi.md#unbindknowledgebase) | **DELETE** /api/ai/assistants/{id}/knowledge-bases/{kbId} | 解绑知识库
 [*AIApi*](doc/AIApi.md) | [**unbindWorkflow**](doc/AIApi.md#unbindworkflow) | **DELETE** /api/ai/assistants/{id}/workflows/{workflowId} | 解绑工作流
@@ -438,11 +454,14 @@ Class | Method | HTTP request | Description
  - [AiAssistantVO](doc/AiAssistantVO.md)
  - [AiConversation](doc/AiConversation.md)
  - [AiConversationId](doc/AiConversationId.md)
+ - [AiProcessArticleRequest](doc/AiProcessArticleRequest.md)
+ - [AiProcessResultResponse](doc/AiProcessResultResponse.md)
  - [AnnouncementDetailResponse](doc/AnnouncementDetailResponse.md)
  - [AnnouncementListResponse](doc/AnnouncementListResponse.md)
  - [AnnouncementPageResponse](doc/AnnouncementPageResponse.md)
  - [AnnouncementResponse](doc/AnnouncementResponse.md)
  - [ApplyTeacherRequest](doc/ApplyTeacherRequest.md)
+ - [ArticleChatRequest](doc/ArticleChatRequest.md)
  - [ArticleResponse](doc/ArticleResponse.md)
  - [ArticleSourceResponse](doc/ArticleSourceResponse.md)
  - [AsyncExecutionResponse](doc/AsyncExecutionResponse.md)
@@ -451,6 +470,7 @@ Class | Method | HTTP request | Description
  - [BannerResponse](doc/BannerResponse.md)
  - [BaseResponseAiAssistantVO](doc/BaseResponseAiAssistantVO.md)
  - [BaseResponseAiConversation](doc/BaseResponseAiConversation.md)
+ - [BaseResponseAiProcessResultResponse](doc/BaseResponseAiProcessResultResponse.md)
  - [BaseResponseAnnouncementDetailResponse](doc/BaseResponseAnnouncementDetailResponse.md)
  - [BaseResponseAnnouncementPageResponse](doc/BaseResponseAnnouncementPageResponse.md)
  - [BaseResponseAnnouncementResponse](doc/BaseResponseAnnouncementResponse.md)
@@ -520,6 +540,7 @@ Class | Method | HTTP request | Description
  - [BaseResponseListKnowledgeDocumentVO](doc/BaseResponseListKnowledgeDocumentVO.md)
  - [BaseResponseListKnowledgePoint](doc/BaseResponseListKnowledgePoint.md)
  - [BaseResponseListLong](doc/BaseResponseListLong.md)
+ - [BaseResponseListMapStringObject](doc/BaseResponseListMapStringObject.md)
  - [BaseResponseListNodeTypeResponse](doc/BaseResponseListNodeTypeResponse.md)
  - [BaseResponseListOrderResponse](doc/BaseResponseListOrderResponse.md)
  - [BaseResponseListPostResponse](doc/BaseResponseListPostResponse.md)
@@ -540,6 +561,7 @@ Class | Method | HTTP request | Description
  - [BaseResponseLoginUserResponse](doc/BaseResponseLoginUserResponse.md)
  - [BaseResponseLong](doc/BaseResponseLong.md)
  - [BaseResponseMapStringObject](doc/BaseResponseMapStringObject.md)
+ - [BaseResponseMapStringString](doc/BaseResponseMapStringString.md)
  - [BaseResponseMemberPage](doc/BaseResponseMemberPage.md)
  - [BaseResponseObject](doc/BaseResponseObject.md)
  - [BaseResponseOrderResponse](doc/BaseResponseOrderResponse.md)
@@ -583,6 +605,7 @@ Class | Method | HTTP request | Description
  - [BaseResponseWorkflowSettingsDTO](doc/BaseResponseWorkflowSettingsDTO.md)
  - [BaseResponseWorkflowValidationResponse](doc/BaseResponseWorkflowValidationResponse.md)
  - [BaseResponseWorkflowVariableResponse](doc/BaseResponseWorkflowVariableResponse.md)
+ - [BatchAiProcessRequest](doc/BatchAiProcessRequest.md)
  - [BatchBanUserRequest](doc/BatchBanUserRequest.md)
  - [BatchCreateUserRequest](doc/BatchCreateUserRequest.md)
  - [BatchProcessResult](doc/BatchProcessResult.md)
@@ -693,6 +716,7 @@ Class | Method | HTTP request | Description
  - [PostDetailResponse](doc/PostDetailResponse.md)
  - [PostPageResponse](doc/PostPageResponse.md)
  - [PostResponse](doc/PostResponse.md)
+ - [PreviewAiProcessRequest](doc/PreviewAiProcessRequest.md)
  - [ProgressResponse](doc/ProgressResponse.md)
  - [QueryAnnouncementRequest](doc/QueryAnnouncementRequest.md)
  - [QueryBannerRequest](doc/QueryBannerRequest.md)
@@ -726,6 +750,7 @@ Class | Method | HTTP request | Description
  - [SendFriendRequestDTO](doc/SendFriendRequestDTO.md)
  - [SendResult](doc/SendResult.md)
  - [SendSmsRequest](doc/SendSmsRequest.md)
+ - [SessionChatRequest](doc/SessionChatRequest.md)
  - [SourceScrapeRequest](doc/SourceScrapeRequest.md)
  - [SseEmitter](doc/SseEmitter.md)
  - [TeacherApplicationResponse](doc/TeacherApplicationResponse.md)

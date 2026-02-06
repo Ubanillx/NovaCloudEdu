@@ -28,6 +28,9 @@ Method | HTTP request | Description
 [**batchProcessByKnowledgeBase**](DefaultApi.md#batchprocessbyknowledgebase) | **POST** /api/ai/knowledge-bases/{id}/embed-all | 向量化知识库所有待处理文档
 [**batchProcessDocuments**](DefaultApi.md#batchprocessdocuments) | **POST** /api/ai/knowledge-bases/{id}/documents/batch-embed | 批量文档向量化
 [**batchProcessDocumentsAsync**](DefaultApi.md#batchprocessdocumentsasync) | **POST** /api/ai/knowledge-bases/{id}/documents/batch-embed-async | 异步批量文档向量化
+[**batchSyncAll**](DefaultApi.md#batchsyncall) | **POST** /api/dailylearning/graph-sync/all/batch | 批量同步所有数据到知识图谱（高效批量导入）
+[**batchSyncArticles**](DefaultApi.md#batchsyncarticles) | **POST** /api/dailylearning/graph-sync/articles/batch | 批量同步每日文章到知识图谱（高效批量导入）
+[**batchSyncWords**](DefaultApi.md#batchsyncwords) | **POST** /api/dailylearning/graph-sync/words/batch | 批量同步每日单词到知识图谱（高效批量导入）
 [**batchUpdate**](DefaultApi.md#batchupdate) | **POST** /api/workflows/{id}/batch-update | 批量更新节点和连接线
 [**cancelExecution**](DefaultApi.md#cancelexecution) | **POST** /api/workflows/executions/{executionId}/cancel | 取消执行
 [**changePassword**](DefaultApi.md#changepassword) | **POST** /api/user/password | 修改密码
@@ -1143,6 +1146,129 @@ Name | Type | Description  | Notes
 ### HTTP request headers
 
  - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **batchSyncAll**
+> BaseResponseString batchSyncAll(batchSize)
+
+批量同步所有数据到知识图谱（高效批量导入）
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int batchSize = 56; // int | 每批次数量，默认500
+
+try {
+    final response = api.batchSyncAll(batchSize);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->batchSyncAll: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **batchSize** | **int**| 每批次数量，默认500 | [optional] [default to 500]
+
+### Return type
+
+[**BaseResponseString**](BaseResponseString.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **batchSyncArticles**
+> BaseResponseInteger batchSyncArticles(batchSize)
+
+批量同步每日文章到知识图谱（高效批量导入）
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int batchSize = 56; // int | 每批次数量，默认500
+
+try {
+    final response = api.batchSyncArticles(batchSize);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->batchSyncArticles: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **batchSize** | **int**| 每批次数量，默认500 | [optional] [default to 500]
+
+### Return type
+
+[**BaseResponseInteger**](BaseResponseInteger.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **batchSyncWords**
+> BaseResponseInteger batchSyncWords(batchSize)
+
+批量同步每日单词到知识图谱（高效批量导入）
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int batchSize = 56; // int | 每批次数量，默认500
+
+try {
+    final response = api.batchSyncWords(batchSize);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->batchSyncWords: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **batchSize** | **int**| 每批次数量，默认500 | [optional] [default to 500]
+
+### Return type
+
+[**BaseResponseInteger**](BaseResponseInteger.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
  - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)

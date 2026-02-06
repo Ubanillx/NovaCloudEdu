@@ -298,8 +298,8 @@ class _DailyWordPageState extends State<DailyWordPage> {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: isDark
-                ? [const Color(0xFF2D3748), const Color(0xFF1A202C)]
-                : [AppTheme.brand, const Color(0xFF36D1DC)],
+                ? [const Color(0xFF1E293B), const Color(0xFF0F172A)]
+                : [AppTheme.brand, AppTheme.brand2],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),

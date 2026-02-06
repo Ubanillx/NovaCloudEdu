@@ -1,4 +1,4 @@
-# nova_api.model.ChatRequest
+# nova_api.model.SessionChatRequest
 
 ## Load the model package
 ```dart
@@ -9,7 +9,6 @@ import 'package:nova_api/api.dart';
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **message** | **String** |  | 
-**history** | [**BuiltList&lt;BuiltMap&lt;String, String&gt;&gt;**](BuiltMap.md) |  | [optional] 
 **systemPrompt** | **String** |  | [optional] 
 **imageUrls** | **BuiltList&lt;String&gt;** |  | [optional] 
 **modelId** | **String** |  | [optional] 

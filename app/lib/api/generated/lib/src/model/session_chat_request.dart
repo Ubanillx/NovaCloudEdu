@@ -7,23 +7,20 @@ import 'package:built_collection/built_collection.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
-part 'chat_request.g.dart';
+part 'session_chat_request.g.dart';
 
-/// ChatRequest
+/// SessionChatRequest
 ///
 /// Properties:
 /// * [message]
-/// * [history]
 /// * [systemPrompt]
 /// * [imageUrls]
 /// * [modelId]
 @BuiltValue()
-abstract class ChatRequest implements Built<ChatRequest, ChatRequestBuilder> {
+abstract class SessionChatRequest
+    implements Built<SessionChatRequest, SessionChatRequestBuilder> {
   @BuiltValueField(wireName: r'message')
   String get message;
-
-  @BuiltValueField(wireName: r'history')
-  BuiltList<BuiltMap<String, String>>? get history;
 
   @BuiltValueField(wireName: r'systemPrompt')
   String? get systemPrompt;
@@ -34,27 +31,30 @@ abstract class ChatRequest implements Built<ChatRequest, ChatRequestBuilder> {
   @BuiltValueField(wireName: r'modelId')
   String? get modelId;
 
-  ChatRequest._();
+  SessionChatRequest._();
 
-  factory ChatRequest([void updates(ChatRequestBuilder b)]) = _$ChatRequest;
+  factory SessionChatRequest([void updates(SessionChatRequestBuilder b)]) =
+      _$SessionChatRequest;
 
   @BuiltValueHook(initializeBuilder: true)
-  static void _defaults(ChatRequestBuilder b) => b;
+  static void _defaults(SessionChatRequestBuilder b) => b;
 
   @BuiltValueSerializer(custom: true)
-  static Serializer<ChatRequest> get serializer => _$ChatRequestSerializer();
+  static Serializer<SessionChatRequest> get serializer =>
+      _$SessionChatRequestSerializer();
 }
 
-class _$ChatRequestSerializer implements PrimitiveSerializer<ChatRequest> {
+class _$SessionChatRequestSerializer
+    implements PrimitiveSerializer<SessionChatRequest> {
   @override
-  final Iterable<Type> types = const [ChatRequest, _$ChatRequest];
+  final Iterable<Type> types = const [SessionChatRequest, _$SessionChatRequest];
 
   @override
-  final String wireName = r'ChatRequest';
+  final String wireName = r'SessionChatRequest';
 
   Iterable<Object?> _serializeProperties(
     Serializers serializers,
-    ChatRequest object, {
+    SessionChatRequest object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
     yield r'message';
@@ -62,15 +62,6 @@ class _$ChatRequestSerializer implements PrimitiveSerializer<ChatRequest> {
       object.message,
       specifiedType: const FullType(String),
     );
-    if (object.history != null) {
-      yield r'history';
-      yield serializers.serialize(
-        object.history,
-        specifiedType: const FullType(BuiltList, [
-          FullType(BuiltMap, [FullType(String), FullType(String)])
-        ]),
-      );
-    }
     if (object.systemPrompt != null) {
       yield r'systemPrompt';
       yield serializers.serialize(
@@ -97,7 +88,7 @@ class _$ChatRequestSerializer implements PrimitiveSerializer<ChatRequest> {
   @override
   Object serialize(
     Serializers serializers,
-    ChatRequest object, {
+    SessionChatRequest object, {
     FullType specifiedType = FullType.unspecified,
   }) {
     return _serializeProperties(serializers, object,
@@ -110,7 +101,7 @@ class _$ChatRequestSerializer implements PrimitiveSerializer<ChatRequest> {
     Object serialized, {
     FullType specifiedType = FullType.unspecified,
     required List<Object?> serializedList,
-    required ChatRequestBuilder result,
+    required SessionChatRequestBuilder result,
     required List<Object?> unhandled,
   }) {
     for (var i = 0; i < serializedList.length; i += 2) {
@@ -123,15 +114,6 @@ class _$ChatRequestSerializer implements PrimitiveSerializer<ChatRequest> {
             specifiedType: const FullType(String),
           ) as String;
           result.message = valueDes;
-          break;
-        case r'history':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(BuiltList, [
-              FullType(BuiltMap, [FullType(String), FullType(String)])
-            ]),
-          ) as BuiltList<BuiltMap<String, String>>;
-          result.history.replace(valueDes);
           break;
         case r'systemPrompt':
           final valueDes = serializers.deserialize(
@@ -163,12 +145,12 @@ class _$ChatRequestSerializer implements PrimitiveSerializer<ChatRequest> {
   }
 
   @override
-  ChatRequest deserialize(
+  SessionChatRequest deserialize(
     Serializers serializers,
     Object serialized, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    final result = ChatRequestBuilder();
+    final result = SessionChatRequestBuilder();
     final serializedList = (serialized as Iterable<Object?>).toList();
     final unhandled = <Object?>[];
     _deserializeProperties(
