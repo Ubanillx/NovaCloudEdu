@@ -14,6 +14,8 @@ class _$SessionChatRequest extends SessionChatRequest {
   @override
   final BuiltList<String>? imageUrls;
   @override
+  final BuiltList<String>? documentUrls;
+  @override
   final String? modelId;
 
   factory _$SessionChatRequest([
@@ -24,6 +26,7 @@ class _$SessionChatRequest extends SessionChatRequest {
     required this.message,
     this.systemPrompt,
     this.imageUrls,
+    this.documentUrls,
     this.modelId,
   }) : super._();
   @override
@@ -42,6 +45,7 @@ class _$SessionChatRequest extends SessionChatRequest {
         message == other.message &&
         systemPrompt == other.systemPrompt &&
         imageUrls == other.imageUrls &&
+        documentUrls == other.documentUrls &&
         modelId == other.modelId;
   }
 
@@ -51,6 +55,7 @@ class _$SessionChatRequest extends SessionChatRequest {
     _$hash = $jc(_$hash, message.hashCode);
     _$hash = $jc(_$hash, systemPrompt.hashCode);
     _$hash = $jc(_$hash, imageUrls.hashCode);
+    _$hash = $jc(_$hash, documentUrls.hashCode);
     _$hash = $jc(_$hash, modelId.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
@@ -62,6 +67,7 @@ class _$SessionChatRequest extends SessionChatRequest {
           ..add('message', message)
           ..add('systemPrompt', systemPrompt)
           ..add('imageUrls', imageUrls)
+          ..add('documentUrls', documentUrls)
           ..add('modelId', modelId))
         .toString();
   }
@@ -85,6 +91,12 @@ class SessionChatRequestBuilder
   set imageUrls(ListBuilder<String>? imageUrls) =>
       _$this._imageUrls = imageUrls;
 
+  ListBuilder<String>? _documentUrls;
+  ListBuilder<String> get documentUrls =>
+      _$this._documentUrls ??= ListBuilder<String>();
+  set documentUrls(ListBuilder<String>? documentUrls) =>
+      _$this._documentUrls = documentUrls;
+
   String? _modelId;
   String? get modelId => _$this._modelId;
   set modelId(String? modelId) => _$this._modelId = modelId;
@@ -99,6 +111,7 @@ class SessionChatRequestBuilder
       _message = $v.message;
       _systemPrompt = $v.systemPrompt;
       _imageUrls = $v.imageUrls?.toBuilder();
+      _documentUrls = $v.documentUrls?.toBuilder();
       _modelId = $v.modelId;
       _$v = null;
     }
@@ -131,6 +144,7 @@ class SessionChatRequestBuilder
             ),
             systemPrompt: systemPrompt,
             imageUrls: _imageUrls?.build(),
+            documentUrls: _documentUrls?.build(),
             modelId: modelId,
           );
     } catch (_) {
@@ -138,6 +152,8 @@ class SessionChatRequestBuilder
       try {
         _$failedField = 'imageUrls';
         _imageUrls?.build();
+        _$failedField = 'documentUrls';
+        _documentUrls?.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
           r'SessionChatRequest',

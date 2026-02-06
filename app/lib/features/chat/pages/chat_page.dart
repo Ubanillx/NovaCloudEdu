@@ -17,6 +17,8 @@ import 'unified_search_page.dart';
 import '../services/group_service.dart';
 import '../services/notification_service.dart';
 import '../../../widgets/dialogs/app_dialog.dart';
+import 'ai_chat_page.dart';
+import 'ai_session_list_page.dart';
 
 /// 聊天页面 - 参考smartclass ChatContainer.vue
 class ChatPage extends StatefulWidget {
@@ -985,40 +987,250 @@ class _ChatPageState extends State<ChatPage>
 
   // 智慧体中心
   Widget _buildIntelligenceTab() {
+    final colors = context.colors;
     return NovaRefreshableList(
       onRefresh: () async {
-        await Future.delayed(const Duration(seconds: 1));
+        await Future.delayed(const Duration(milliseconds: 500));
       },
       slivers: [
+        // 常驻通用 AI 助手入口
+        SliverToBoxAdapter(
+          child: _buildResidentAiAssistant(colors),
+        ),
+        // 快捷操作
+        SliverToBoxAdapter(
+          child: _buildQuickActions(colors),
+        ),
+        // 智慧体列表标题
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 24, 20, 12),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  '更多智慧体',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: colors.textPrimary,
+                  ),
+                ),
+                Text(
+                  '即将上线',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: colors.textTertiary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        // 预留智慧体网格
         SliverPadding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
           sliver: SliverGrid(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
-              crossAxisSpacing: 16,
-              mainAxisSpacing: 16,
-              childAspectRatio: 0.75,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+              childAspectRatio: 0.85,
             ),
             delegate: SliverChildBuilderDelegate(
               (context, index) {
                 if (index >= MockData.aiAssistants.length) return null;
-                return _buildAssistantCard(MockData.aiAssistants[index]);
+                return _buildAssistantCard(MockData.aiAssistants[index], colors);
               },
               childCount: MockData.aiAssistants.length,
             ),
           ),
         ),
+        const SliverToBoxAdapter(child: SizedBox(height: 32)),
       ],
     );
   }
 
+  // 常驻通用AI助手入口
+  Widget _buildResidentAiAssistant(AppColors colors) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const AiChatPage()),
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFF1989FA), Color(0xFF3B82F6)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: AppTheme.brand.withOpacity(0.3),
+              blurRadius: 16,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            // AI 头像
+            Container(
+              width: 56,
+              height: 56,
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.2),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.smart_toy_rounded,
+                color: Colors.white,
+                size: 32,
+              ),
+            ),
+            const SizedBox(width: 16),
+            // 文字
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    '通用 AI 助手',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '智能问答 · 学习辅导 · 知识探索',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Colors.white.withOpacity(0.85),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // 箭头
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.2),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.arrow_forward_rounded,
+                color: Colors.white,
+                size: 20,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // 快捷操作
+  Widget _buildQuickActions(AppColors colors) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+      child: Row(
+        children: [
+          Expanded(
+            child: _buildQuickActionItem(
+              icon: Icons.history_rounded,
+              label: '对话历史',
+              colors: colors,
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const AiSessionListPage(),
+                  ),
+                );
+              },
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: _buildQuickActionItem(
+              icon: Icons.add_comment_rounded,
+              label: '新建对话',
+              colors: colors,
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const AiChatPage(),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQuickActionItem({
+    required IconData icon,
+    required String label,
+    required AppColors colors,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        decoration: BoxDecoration(
+          color: colors.surface,
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(context.isDarkMode ? 0.15 : 0.04),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: AppTheme.brand, size: 20),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: colors.textPrimary,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   // 智慧体卡片
-  Widget _buildAssistantCard(AiAssistant assistant) {
+  Widget _buildAssistantCard(AiAssistant assistant, AppColors colors) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.grey[100]!, width: 1),
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(context.isDarkMode ? 0.15 : 0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -1036,37 +1248,37 @@ class _ChatPageState extends State<ChatPage>
               borderRadius: BorderRadius.circular(30),
               child: Image.network(
                 assistant.avatar,
-                width: 60,
-                height: 60,
+                width: 52,
+                height: 52,
                 fit: BoxFit.cover,
                 errorBuilder: (_, __, ___) => CircleAvatar(
-                  radius: 30,
+                  radius: 26,
                   backgroundColor: AppTheme.brand.withOpacity(0.1),
-                  child: const Icon(Icons.smart_toy_rounded, color: AppTheme.brand, size: 30),
+                  child: const Icon(Icons.smart_toy_rounded, color: AppTheme.brand, size: 26),
                 ),
               ),
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
           Text(
             assistant.name,
-            style: const TextStyle(
-              fontSize: 16,
+            style: TextStyle(
+              fontSize: 14,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF333333),
+              color: colors.textPrimary,
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 4),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12),
             child: Text(
               assistant.description,
               style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey[500],
+                fontSize: 11,
+                color: colors.textTertiary,
                 height: 1.3,
               ),
               maxLines: 2,
@@ -1074,26 +1286,28 @@ class _ChatPageState extends State<ChatPage>
               textAlign: TextAlign.center,
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: SizedBox(
               width: double.infinity,
-              height: 32,
+              height: 30,
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  // TODO: 后续对接具体智慧体
+                },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.brand.withOpacity(0.1),
+                  backgroundColor: AppTheme.brand.withOpacity(0.08),
                   foregroundColor: AppTheme.brand,
                   elevation: 0,
                   padding: EdgeInsets.zero,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(15),
                   ),
                 ),
                 child: const Text(
-                  '立即开启',
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                  '即将上线',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
                 ),
               ),
             ),
