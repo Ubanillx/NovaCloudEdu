@@ -1,73 +1,103 @@
-# React + TypeScript + Vite
+# NovaCloudEdu Web
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+智云星课 Web，基于 **React 19 + TypeScript 5.9 + Vite 7.2 + TailwindCSS 4.1**。
 
-Currently, two official plugins are available:
+## 技术栈
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-## React Compiler
+| 分类         | 技术                                 | 版本   |
+| :----------- | :----------------------------------- | :----- |
+| **框架**     | React                                | 19.2   |
+| **语言**     | TypeScript                           | ~5.9.3 |
+| **构建**     | Vite (SWC)                           | 7.2    |
+| **样式**     | TailwindCSS + Typography 插件        | 4.1    |
+| **路由**     | React Router DOM                     | 7.13   |
+| **HTTP**     | Axios                                | 1.7    |
+| **图标**     | Lucide React                         | 0.562  |
+| **Markdown** | react-markdown                       | 10.1   |
+| **API 生成** | OpenAPI Generator (typescript-axios) | 2.7    |
 
-The React Compiler is currently not compatible with SWC. See [this issue](https://github.com/vitejs/vite-plugin-react/issues/428) for tracking the progress.
+## 项目结构
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```
+src/
+├── pages/                           # 页面
+│   ├── LoginPage.tsx                #   登录页
+│   ├── RegisterPage.tsx             #   注册页
+│   ├── admin/                       #   管理后台页面
+│   │   ├── UserManagementPage.tsx   #     用户管理
+│   │   ├── AnnouncementManagementPage.tsx  # 公告管理
+│   │   ├── BannerManagementPage.tsx #     轮播图管理
+│   │   ├── PostManagementPage.tsx   #     帖子管理
+│   │   ├── FeedbackManagementPage.tsx #   反馈管理
+│   │   ├── DailyWordManagementPage.tsx #  每日单词管理
+│   │   ├── DailyArticleManagementPage.tsx # 每日文章管理
+│   │   ├── ScraperConfigPage.tsx    #     爬虫配置
+│   │   └── ScraperTaskPage.tsx      #     爬虫任务
+│   └── index.ts
+│
+├── components/                      # 通用组件
+│   ├── layout/                      #   布局组件
+│   │   ├── AdminLayout.tsx          #     管理后台布局
+│   │   ├── Header.tsx / Sider.tsx   #     头部 / 侧边栏
+│   │   ├── Content.tsx / Footer.tsx #     内容区 / 底部
+│   │   └── index.ts
+│   ├── ui/                          #   UI 组件
+│   │   ├── Toast.tsx / Tooltip.tsx  #     提示 / 工具提示
+│   │   └── index.ts
+│   └── ProtectedRoute.tsx           #   路由守卫
+│
+├── context/                         # 全局状态管理（React Context）
+├── data/                            # 静态数据
+├── assets/                          # 静态资源
+│
+├── api/                             # API 层
+│   └── generated/                   #   OpenAPI Generator 自动生成的 API 客户端
+│
+├── App.tsx                          # 应用入口
+├── App.css                          # 全局样式
+├── main.tsx                         # 渲染入口
+└── index.css                        # 基础样式
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 快速开始
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### 安装依赖
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+```
+
+### 启动开发服务器
+
+```bash
+npm run dev
+```
+
+访问 http://localhost:5173
+
+### 生成 API 客户端
+
+从后端 Swagger 接口自动生成 TypeScript API 客户端：
+
+```bash
+# 从运行中的后端服务生成（需先启动后端）
+npm run openapi:generate
+
+# 从本地 openapi.json 文件生成
+npm run openapi:generate:local
+```
+
+生成的代码位于 `src/api/generated/`。
+
+### 构建生产版本
+
+```bash
+npm run build
+```
+
+### 代码检查
+
+```bash
+npm run lint
 ```
