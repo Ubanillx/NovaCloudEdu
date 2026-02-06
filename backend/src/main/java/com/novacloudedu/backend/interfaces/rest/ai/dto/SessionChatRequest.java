@@ -18,6 +18,9 @@ public class SessionChatRequest {
 
     private List<String> imageUrls;
 
+    /** 文档URL列表，后端自动解析文档内容注入对话上下文 */
+    private List<String> documentUrls;
+
     /** 模型ID，格式: "provider/model"，如 "dashscope/qwen-max"。为空则使用默认模型 */
     private String modelId;
 }

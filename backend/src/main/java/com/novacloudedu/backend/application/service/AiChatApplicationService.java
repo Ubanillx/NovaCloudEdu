@@ -8,6 +8,7 @@ import com.novacloudedu.backend.domain.ai.valueobject.AiChatMessageId;
 import com.novacloudedu.backend.domain.ai.valueobject.AiChatSessionId;
 import com.novacloudedu.backend.domain.user.valueobject.UserId;
 import com.novacloudedu.backend.exception.BusinessException;
+import com.novacloudedu.backend.infrastructure.ai.DocumentParseService;
 import com.novacloudedu.backend.infrastructure.ai.LangchainChatService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +39,7 @@ public class AiChatApplicationService {
     private final LangchainChatService langchainChatService;
     private final AiChatSessionRepository sessionRepository;
     private final AiChatMessageRepository messageRepository;
+    private final DocumentParseService documentParseService;
     private final ExecutorService executor = Executors.newCachedThreadPool();
 
     /** 滑动窗口大小：保留最近多少条消息原文发送给LLM */
@@ -107,14 +109,18 @@ public class AiChatApplicationService {
      */
     public SseEmitter sessionStreamChat(Long sessionId, Long userId, String message,
                                          String systemPrompt, List<String> imageUrls,
-                                         String modelId) {
+                                         List<String> documentUrls, String modelId) {
         AiChatSession session = getSessionAndVerifyOwner(sessionId, userId);
         boolean hasImages = imageUrls != null && !imageUrls.isEmpty();
+        // hasDocuments 在 lambda 内通过 safeDocUrls 判断
 
-        // 1. 先保存用户消息
+        // 1. 先保存用户消息（附件包含图片URL + 文档URL）
+        List<String> allAttachments = new ArrayList<>();
+        if (imageUrls != null) allAttachments.addAll(imageUrls);
+        if (documentUrls != null) allAttachments.addAll(documentUrls);
         AiChatMessage userMsg = AiChatMessage.create(
                 AiChatSessionId.of(sessionId), UserId.of(userId),
-                "user", message, imageUrls
+                "user", message, allAttachments.isEmpty() ? null : allAttachments
         );
         messageRepository.save(userMsg);
         session.incrementMessageCount(1);
@@ -123,8 +129,21 @@ public class AiChatApplicationService {
 
         executor.execute(() -> {
             try {
-                // 2. 构建带记忆的上下文
-                List<Map<String, String>> contextMessages = buildContextWithMemory(session, systemPrompt);
+                // 2. 解析文档内容（如果有）
+                final List<String> safeDocUrls = documentUrls != null ? documentUrls : List.of();
+                String documentContext = null;
+                if (!safeDocUrls.isEmpty()) {
+                    log.info("会话[{}] 开始解析{}个文档", sessionId, safeDocUrls.size());
+                    List<DocumentParseService.ParsedDocument> parsedDocs = new ArrayList<>();
+                    for (String docUrl : safeDocUrls) {
+                        parsedDocs.add(documentParseService.parseFromUrl(docUrl));
+                    }
+                    documentContext = documentParseService.formatForAiContext(parsedDocs);
+                    log.info("会话[{}] 文档解析完成，上下文长度: {}", sessionId, documentContext.length());
+                }
+
+                // 3. 构建带记忆的上下文
+                List<Map<String, String>> contextMessages = buildContextWithMemory(session, systemPrompt, documentContext);
 
                 StringBuilder fullResponse = new StringBuilder();
 
@@ -140,10 +159,11 @@ public class AiChatApplicationService {
                     }
                 };
 
-                // 3. 调用LLM
+                // 4. 调用LLM
+                final List<String> safeImageUrls = imageUrls != null ? imageUrls : List.of();
                 if (hasImages) {
-                    log.info("会话[{}] 使用多模态模型，图片数: {}, modelId={}", sessionId, imageUrls.size(), modelId);
-                    langchainChatService.streamChatWithImages(modelId, contextMessages, imageUrls, callback);
+                    log.info("会话[{}] 使用多模态模型，图片数: {}, modelId={}", sessionId, safeImageUrls.size(), modelId);
+                    langchainChatService.streamChatWithImages(modelId, contextMessages, safeImageUrls, callback);
                 } else {
                     langchainChatService.streamChat(modelId, contextMessages, callback);
                 }
@@ -248,7 +268,7 @@ public class AiChatApplicationService {
      * [system（记忆摘要，如果有的话）]
      * [最近 windowSize 条未摘要消息]
      */
-    private List<Map<String, String>> buildContextWithMemory(AiChatSession session, String systemPrompt) {
+    private List<Map<String, String>> buildContextWithMemory(AiChatSession session, String systemPrompt, String documentContext) {
         List<Map<String, String>> messages = new ArrayList<>();
 
         // 1. 用户自定义 system prompt
@@ -256,13 +276,18 @@ public class AiChatApplicationService {
             messages.add(makeMsg("system", systemPrompt));
         }
 
-        // 2. 注入记忆摘要
+        // 2. 注入文档上下文（如果有）
+        if (documentContext != null && !documentContext.isBlank()) {
+            messages.add(makeMsg("system", documentContext));
+        }
+
+        // 3. 注入记忆摘要
         if (session.getMemorySummary() != null && !session.getMemorySummary().trim().isEmpty()) {
             String summaryPrompt = "以下是之前对话的摘要，请结合这些上下文继续对话：\n" + session.getMemorySummary();
             messages.add(makeMsg("system", summaryPrompt));
         }
 
-        // 3. 取滑动窗口内的未摘要消息
+        // 4. 取滑动窗口内的未摘要消息
         List<AiChatMessage> unsummarized = messageRepository.findUnsummarizedBySessionId(session.getId());
 
         // 如果未摘要消息太多，只取最近 windowSize 条
