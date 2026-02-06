@@ -1,0 +1,275 @@
+spring:
+  data:
+    redis:
+      host: your-redis-host
+      port: 6379
+      password: your-redis-password
+      database: 0
+      timeout: 3000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: -1ms
+  datasource:
+    url: jdbc:postgresql://your-db-host:5432/NovaCloudEdu?stringtype=unspecified
+    username: your-db-username
+    password: your-db-password
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      idle-timeout: 30000
+      connection-timeout: 30000
+      max-lifetime: 1800000
+      
+  # Neo4j 知识图谱数据库配置
+  neo4j:
+    uri: bolt://your-neo4j-host:7687
+    authentication:
+      username: neo4j
+      password: your-neo4j-password
+
+mybatis-plus:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.novacloudedu.backend.entity
+  global-config:
+    db-config:
+      id-type: auto
+      logic-delete-field: isDelete
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+logging:
+  level:
+    com.novacloudedu: DEBUG
+    org.mybatis: DEBUG
+  
+sms:
+  url: https://push.spug.cc/sms/your-sms-key
+  query-url: https://push.spug.cc/request/query
+  token: your-sms-token
+  app-name: 智云星课
+  expire-minutes: 5 
+
+# 阿里云配置
+aliyun:
+  oss:
+    endpoint: oss-cn-hangzhou.aliyuncs.com
+    access-key-id: your-oss-access-key-id
+    access-key-secret: your-oss-access-key-secret
+    bucket-name: your-bucket-name
+    # 自定义域名（可选，如果配置了CDN加速域名）
+    domain: https://your-oss-domain.example.com
+  # 智能语音交互 (NLS) 配置
+  nls:
+    access-key-id: ${ALIYUN_ACCESS_KEY_ID:your-nls-access-key-id}
+    access-key-secret: ${ALIYUN_ACCESS_KEY_SECRET:your-nls-access-key-secret}
+    app-key: ${ALIYUN_NLS_APP_KEY:your-nls-app-key}
+    url: wss://nls-gateway.cn-shanghai.aliyuncs.com/ws/v1
+    asr:
+      enable-intermediate-result: true
+      enable-punctuation: true
+      enable-itn: true
+      sample-rate: 16000
+      format: pcm
+    tts:
+      voice: xiaoyun
+      volume: 50
+      speech-rate: 0
+      pitch-rate: 0
+      format: pcm
+      sample-rate: 16000
+    transcriber:
+      enable-intermediate-result: true
+      enable-punctuation: true
+      enable-itn: true
+      max-sentence-silence: 800
+      sample-rate: 16000
+      format: pcm
+
+# =================================================================
+# AI 配置
+# =================================================================
+ai:
+  # ----- DashScope 基础配置（供旧服务 + Embedding 使用）-----
+  dashscope:
+    api-key: your-dashscope-api-key
+    llm:
+      model-name: qwen-max
+      vision-model-name: qwen-vl-max
+      temperature: 0.7
+      max-tokens: 2000
+      top-p: 0.8
+      enable-search: false
+    embedding:
+      model-name: ${DASHSCOPE_EMBEDDING_MODEL:text-embedding-v2}
+      dimension: 1536
+      text-type: document
+
+  # ----- 对话记忆配置 -----
+  conversation:
+    max-history: 10
+    context-window: 4000
+    window-size: 20              # 滑动窗口：发送给LLM的最近消息条数
+    summarize-threshold: 30      # 未摘要消息超过此值时触发摘要压缩
+
+  # ----- 多模型路由配置（Langchain4j）-----
+  # modelId 格式: "provider/model"，如 "dashscope/qwen-max"
+  # 前端不传 modelId 时使用 default-model；有图片时自动用 default-vision-model
+  chat-models:
+    default-model: dashscope/qwen-max
+    default-vision-model: dashscope/qwen-vl-max
+    providers:
+
+      # ── 阿里云通义千问 ──
+      dashscope:
+        enabled: true
+        api-key: ${ai.dashscope.api-key}
+        models:
+          qwen-max:
+            type: text
+            temperature: 0.7
+            max-tokens: 2000
+            top-p: 0.8
+          qwen-plus:
+            type: text
+            temperature: 0.7
+            max-tokens: 2000
+          qwen-turbo:
+            type: text
+            temperature: 0.7
+            max-tokens: 2000
+          qwen-vl-max:
+            type: vision
+            temperature: 0.7
+            max-tokens: 2000
+          qwen-vl-plus:
+            type: vision
+            temperature: 0.7
+            max-tokens: 2000
+
+      # ── OpenAI（GPT 系列）──
+      openai:
+        enabled: false           # 填入 API Key 后改为 true
+        api-key: ${OPENAI_API_KEY:}
+        base-url: https://api.openai.com/v1
+        models:
+          gpt-4o:
+            type: vision
+            temperature: 0.7
+            max-tokens: 4000
+          gpt-4o-mini:
+            type: vision
+            temperature: 0.7
+            max-tokens: 2000
+
+      # ── DeepSeek（OpenAI 兼容协议）──
+      deepseek:
+        enabled: false           # 填入 API Key 后改为 true
+        api-key: ${DEEPSEEK_API_KEY:}
+        base-url: https://api.deepseek.com/v1
+        models:
+          deepseek-chat:
+            type: text
+            temperature: 0.7
+            max-tokens: 4000
+          deepseek-reasoner:
+            type: text
+            temperature: 0.6
+            max-tokens: 8000
+
+      # ── Moonshot（月之暗面 Kimi，OpenAI 兼容协议）──
+      moonshot:
+        enabled: false           # 填入 API Key 后改为 true
+        api-key: ${MOONSHOT_API_KEY:}
+        base-url: https://api.moonshot.cn/v1
+        models:
+          moonshot-v1-128k:
+            type: text
+            temperature: 0.7
+            max-tokens: 4000
+          moonshot-v1-32k:
+            type: text
+            temperature: 0.7
+            max-tokens: 4000
+
+      # ── 智谱 GLM ──
+      zhipu:
+        enabled: false           # 填入 API Key 后改为 true
+        api-key: ${ZHIPU_API_KEY:}
+        models:
+          glm-4:
+            type: text
+            temperature: 0.7
+            max-tokens: 4000
+          glm-4v:
+            type: vision
+            temperature: 0.7
+            max-tokens: 2000
+
+      # ── SiliconFlow 硅基流动（OpenAI 兼容协议，聚合多家开源模型）──
+      siliconflow:
+        enabled: false           # 填入 API Key 后改为 true
+        api-key: ${SILICONFLOW_API_KEY:}
+        base-url: https://api.siliconflow.cn/v1
+        models:
+          deepseek-ai/DeepSeek-V3:
+            type: text
+            temperature: 0.7
+            max-tokens: 4000
+          Qwen/Qwen2.5-72B-Instruct:
+            type: text
+            temperature: 0.7
+            max-tokens: 4000
+
+      # ── Ollama 本地模型 ──
+      ollama:
+        enabled: false           # 本地启动 Ollama 后改为 true
+        base-url: http://localhost:11434
+        models:
+          llama3:
+            type: text
+            temperature: 0.7
+          llava:
+            type: vision
+            temperature: 0.7
+
+  # ----- RAG 配置 -----
+  rag:
+    enabled: true
+    top-k: 5
+    similarity-threshold: 0.7
+    chunk-size: 500
+    chunk-overlap: 50
+    max-context-length: 3000
+
+  # ----- 总结配置 -----
+  summary:
+    cache-enabled: true
+    cache-ttl: 7d
+    default-type: detailed
+
+  # ----- 知识点提取 -----
+  knowledge:
+    max-points: 20
+    min-confidence: 0.6
+
+  # ----- 测试题生成 -----
+  quiz:
+    default-count: 5
+    difficulty-distribution:
+      easy: 0.3
+      medium: 0.5
+      hard: 0.2
+
+# 书籍内容加密配置
+book:
+  content:
+    encryption:
+      enabled: false  # 开发环境默认关闭加密
+      secret-key: your-book-encryption-key  # AES密钥，需要16/24/32字节
