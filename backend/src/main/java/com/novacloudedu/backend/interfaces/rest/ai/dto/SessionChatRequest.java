@@ -4,15 +4,15 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 import java.util.List;
-import java.util.Map;
 
+/**
+ * 会话级聊天请求（不需要 history，服务端自动管理）
+ */
 @Data
-public class ChatRequest {
+public class SessionChatRequest {
 
     @NotBlank(message = "消息内容不能为空")
     private String message;
-
-    private List<Map<String, String>> history;
 
     private String systemPrompt;
 

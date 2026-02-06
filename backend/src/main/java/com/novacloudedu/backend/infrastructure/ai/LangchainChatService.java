@@ -1,0 +1,247 @@
+package com.novacloudedu.backend.infrastructure.ai;
+
+import dev.langchain4j.data.message.*;
+import dev.langchain4j.model.StreamingResponseHandler;
+import dev.langchain4j.model.chat.StreamingChatLanguageModel;
+import dev.langchain4j.model.output.Response;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * 基于 Langchain4j 的聊天服务
+ * 
+ * 支持多供应商、多模型的流式对话，包括多模态（图片+文本）。
+ * 通过 ChatModelFactory 动态获取模型实例。
+ */
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class LangchainChatService {
+
+    private final ChatModelFactory chatModelFactory;
+
+    @FunctionalInterface
+    public interface StreamCallback {
+        void onToken(String token);
+    }
+
+    /**
+     * 流式对话（文本）
+     *
+     * @param modelId   模型ID（如 "dashscope/qwen-max"），null 则用默认模型
+     * @param messages  对话消息列表 [{role, content}]
+     * @param callback  流式回调
+     */
+    public void streamChat(String modelId, List<Map<String, String>> messages, StreamCallback callback) {
+        StreamingChatLanguageModel model = resolveModel(modelId, false);
+        List<ChatMessage> chatMessages = convertMessages(messages, null);
+
+        log.info("Langchain4j 流式对话: modelId={}, 消息数={}", modelId, chatMessages.size());
+        doStreamChat(model, chatMessages, callback);
+    }
+
+    /**
+     * 流式多模态对话（图片+文本）
+     *
+     * @param modelId   模型ID，null 则用默认视觉模型
+     * @param messages  对话消息列表
+     * @param imageUrls 图片URL列表（附加到最后一条 user 消息）
+     * @param callback  流式回调
+     */
+    public void streamChatWithImages(String modelId, List<Map<String, String>> messages,
+                                      List<String> imageUrls, StreamCallback callback) {
+        StreamingChatLanguageModel model = resolveModel(modelId, true);
+        List<ChatMessage> chatMessages = convertMessages(messages, imageUrls);
+
+        log.info("Langchain4j 多模态流式对话: modelId={}, 消息数={}, 图片数={}",
+                modelId, chatMessages.size(), imageUrls != null ? imageUrls.size() : 0);
+        doStreamChat(model, chatMessages, callback);
+    }
+
+    /**
+     * 同步对话（用于内部摘要/标题生成等场景）
+     */
+    public String chat(String modelId, String systemPrompt, String userMessage) {
+        StreamingChatLanguageModel model = resolveModel(modelId, false);
+
+        List<ChatMessage> messages = new ArrayList<>();
+        if (systemPrompt != null && !systemPrompt.trim().isEmpty()) {
+            messages.add(SystemMessage.from(systemPrompt));
+        }
+        messages.add(UserMessage.from(userMessage));
+
+        StringBuilder result = new StringBuilder();
+        final Object lock = new Object();
+        final boolean[] done = {false};
+        final Throwable[] error = {null};
+
+        model.generate(messages, new StreamingResponseHandler<AiMessage>() {
+            @Override
+            public void onNext(String token) {
+                result.append(token);
+            }
+
+            @Override
+            public void onComplete(Response<AiMessage> response) {
+                synchronized (lock) {
+                    done[0] = true;
+                    lock.notifyAll();
+                }
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                synchronized (lock) {
+                    error[0] = throwable;
+                    done[0] = true;
+                    lock.notifyAll();
+                }
+            }
+        });
+
+        synchronized (lock) {
+            while (!done[0]) {
+                try {
+                    lock.wait(60000);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    throw new RuntimeException("对话被中断", e);
+                }
+            }
+        }
+
+        if (error[0] != null) {
+            throw new RuntimeException("LLM 对话失败: " + error[0].getMessage(), error[0]);
+        }
+
+        return result.toString();
+    }
+
+    /**
+     * 获取可用模型列表（仅启用的）
+     */
+    public List<Map<String, Object>> listAvailableModels() {
+        return chatModelFactory.listAvailableModels();
+    }
+
+    /**
+     * 获取全量模型列表（含未启用的，标注状态）
+     */
+    public List<Map<String, Object>> listAllModels() {
+        return chatModelFactory.listAllModels(false);
+    }
+
+    // ==================== 私有方法 ====================
+
+    private StreamingChatLanguageModel resolveModel(String modelId, boolean isVision) {
+        if (modelId != null && !modelId.trim().isEmpty()) {
+            return chatModelFactory.getStreamingModel(modelId);
+        }
+        return isVision ? chatModelFactory.getDefaultVisionModel() : chatModelFactory.getDefaultModel();
+    }
+
+    private void doStreamChat(StreamingChatLanguageModel model, List<ChatMessage> messages,
+                               StreamCallback callback) {
+        final Object lock = new Object();
+        final boolean[] done = {false};
+        final Throwable[] error = {null};
+
+        model.generate(messages, new StreamingResponseHandler<AiMessage>() {
+            @Override
+            public void onNext(String token) {
+                if (token != null && !token.isEmpty()) {
+                    callback.onToken(token);
+                }
+            }
+
+            @Override
+            public void onComplete(Response<AiMessage> response) {
+                synchronized (lock) {
+                    done[0] = true;
+                    lock.notifyAll();
+                }
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                synchronized (lock) {
+                    error[0] = throwable;
+                    done[0] = true;
+                    lock.notifyAll();
+                }
+            }
+        });
+
+        synchronized (lock) {
+            while (!done[0]) {
+                try {
+                    lock.wait(300000);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    throw new RuntimeException("流式对话被中断", e);
+                }
+            }
+        }
+
+        if (error[0] != null) {
+            throw new RuntimeException("流式对话失败: " + error[0].getMessage(), error[0]);
+        }
+    }
+
+    /**
+     * 将 Map 消息列表转换为 Langchain4j ChatMessage 列表
+     * 如果提供了 imageUrls，则附加到最后一条 user 消息上
+     */
+    private List<ChatMessage> convertMessages(List<Map<String, String>> messages, List<String> imageUrls) {
+        List<ChatMessage> result = new ArrayList<>();
+
+        for (int i = 0; i < messages.size(); i++) {
+            Map<String, String> msg = messages.get(i);
+            String role = msg.get("role");
+            String content = msg.get("content");
+
+            // 跳过 role 或 content 为空的无效消息
+            if (role == null || role.isBlank()) {
+                log.warn("跳过无效消息: role 为空, content={}", content);
+                continue;
+            }
+            if (content == null || content.isBlank()) {
+                log.warn("跳过无效消息: content 为空, role={}", role);
+                continue;
+            }
+
+            boolean isLastUser = (i == messages.size() - 1)
+                    && "user".equalsIgnoreCase(role)
+                    && imageUrls != null && !imageUrls.isEmpty();
+
+            switch (role.toLowerCase()) {
+                case "system" -> result.add(SystemMessage.from(content));
+                case "assistant" -> result.add(AiMessage.from(content));
+                case "user" -> {
+                    if (isLastUser) {
+                        List<Content> contents = new ArrayList<>();
+                        for (String url : imageUrls) {
+                            contents.add(ImageContent.from(URI.create(url)));
+                        }
+                        contents.add(TextContent.from(content));
+                        result.add(UserMessage.from(contents));
+                    } else {
+                        result.add(UserMessage.from(content));
+                    }
+                }
+                default -> {
+                    log.warn("未知消息角色: {}, 按 user 处理", role);
+                    result.add(UserMessage.from(content));
+                }
+            }
+        }
+
+        return result;
+    }
+}

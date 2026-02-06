@@ -3,7 +3,11 @@ package com.novacloudedu.backend.infrastructure.ai;
 import com.alibaba.dashscope.aigc.generation.Generation;
 import com.alibaba.dashscope.aigc.generation.GenerationParam;
 import com.alibaba.dashscope.aigc.generation.GenerationResult;
+import com.alibaba.dashscope.aigc.multimodalconversation.MultiModalConversation;
+import com.alibaba.dashscope.aigc.multimodalconversation.MultiModalConversationParam;
+import com.alibaba.dashscope.aigc.multimodalconversation.MultiModalConversationResult;
 import com.alibaba.dashscope.common.Message;
+import com.alibaba.dashscope.common.MultiModalMessage;
 import com.alibaba.dashscope.common.Role;
 import com.novacloudedu.backend.domain.book.service.LlmService;
 import lombok.RequiredArgsConstructor;
@@ -11,9 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 基于阿里云灵积平台的 LLM 服务实现
@@ -24,6 +26,7 @@ import java.util.Map;
 public class DashScopeLlmService implements LlmService {
 
     private final Generation generation;
+    private final MultiModalConversation multiModalConversation;
 
     @Value("${ai.dashscope.api-key}")
     private String apiKey;
@@ -39,6 +42,9 @@ public class DashScopeLlmService implements LlmService {
 
     @Value("${ai.dashscope.llm.top-p:0.8}")
     private Double topP;
+
+    @Value("${ai.dashscope.llm.vision-model-name:qwen-vl-max}")
+    private String visionModelName;
 
     @Override
     public String chat(String message) {
@@ -244,6 +250,89 @@ public class DashScopeLlmService implements LlmService {
         } catch (Exception e) {
             log.error("DashScope 流式多轮对话调用失败", e);
             throw new RuntimeException("流式调用失败: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * 多模态流式对话（支持图片+文本）
+     * 使用 DashScope MultiModalConversation API，将 OSS 图片 URL 作为图片内容传给视觉模型
+     *
+     * @param messages  对话历史 [{role, content}]
+     * @param imageUrls OSS 图片 URL 列表（附加在最后一条 user 消息上）
+     * @param callback  流式回调
+     */
+    public void streamChatWithImages(List<Map<String, String>> messages, List<String> imageUrls, StreamCallback callback) {
+        log.info("开始多模态流式对话，消息数: {}, 图片数: {}", messages.size(), imageUrls.size());
+        try {
+            List<MultiModalMessage> multiModalMessages = new ArrayList<>();
+
+            for (int i = 0; i < messages.size(); i++) {
+                Map<String, String> msg = messages.get(i);
+                String role = msg.get("role");
+                String content = msg.get("content");
+
+                Role dashscopeRole;
+                switch (role.toLowerCase()) {
+                    case "system":
+                        dashscopeRole = Role.SYSTEM;
+                        break;
+                    case "user":
+                        dashscopeRole = Role.USER;
+                        break;
+                    case "assistant":
+                        dashscopeRole = Role.ASSISTANT;
+                        break;
+                    default:
+                        log.warn("未知的消息角色: {}，使用 USER", role);
+                        dashscopeRole = Role.USER;
+                }
+
+                List<Map<String, Object>> contentList = new ArrayList<>();
+
+                // 最后一条 user 消息：附加图片
+                boolean isLastUserMessage = (i == messages.size() - 1)
+                        && "user".equalsIgnoreCase(role);
+
+                if (isLastUserMessage && imageUrls != null) {
+                    for (String imageUrl : imageUrls) {
+                        contentList.add(Collections.singletonMap("image", imageUrl));
+                    }
+                }
+
+                contentList.add(Collections.singletonMap("text", content));
+
+                multiModalMessages.add(MultiModalMessage.builder()
+                        .role(dashscopeRole.getValue())
+                        .content(contentList)
+                        .build());
+            }
+
+            MultiModalConversationParam param = MultiModalConversationParam.builder()
+                    .apiKey(apiKey)
+                    .model(visionModelName)
+                    .messages(multiModalMessages)
+                    .incrementalOutput(true)
+                    .build();
+
+            io.reactivex.Flowable<MultiModalConversationResult> flowable = multiModalConversation.streamCall(param);
+            flowable.blockingForEach(result -> {
+                if (result != null && result.getOutput() != null
+                        && result.getOutput().getChoices() != null
+                        && !result.getOutput().getChoices().isEmpty()) {
+                    List<Map<String, Object>> resultContent = result.getOutput().getChoices()
+                            .get(0).getMessage().getContent();
+                    if (resultContent != null && !resultContent.isEmpty()) {
+                        Object text = resultContent.get(0).get("text");
+                        if (text != null && !text.toString().isEmpty()) {
+                            callback.onToken(text.toString());
+                        }
+                    }
+                }
+            });
+            log.info("多模态流式对话完成");
+        } catch (Exception e) {
+            log.error("DashScope 多模态流式对话调用失败", e);
+            throw new RuntimeException("多模态流式调用失败: " + e.getMessage(), e);
         }
     }
 
