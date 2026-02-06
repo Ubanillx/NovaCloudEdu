@@ -12,6 +12,10 @@ import { ScraperConfigPage } from './pages/admin/ScraperConfigPage'
 import { ScraperTaskPage } from './pages/admin/ScraperTaskPage'
 import { DailyWordManagementPage } from './pages/admin/DailyWordManagementPage'
 import { DailyArticleManagementPage } from './pages/admin/DailyArticleManagementPage'
+import { AnnouncementManagementPage } from './pages/admin/AnnouncementManagementPage'
+import { BannerManagementPage } from './pages/admin/BannerManagementPage'
+import { FeedbackManagementPage } from './pages/admin/FeedbackManagementPage'
+import { PostManagementPage } from './pages/admin/PostManagementPage'
 import { getToken } from './api'
 
 // 初始重定向组件 - 仅在首次进入时根据角色分流
@@ -56,6 +60,10 @@ createRoot(document.getElementById('root')!).render(
                     <Route path="scraper/tasks" element={<ScraperTaskPage />} />
                     <Route path="daily-words" element={<DailyWordManagementPage />} />
                     <Route path="daily-articles" element={<DailyArticleManagementPage />} />
+                    <Route path="announcements" element={<AnnouncementManagementPage />} />
+                    <Route path="banners" element={<BannerManagementPage />} />
+                    <Route path="feedbacks" element={<FeedbackManagementPage />} />
+                    <Route path="posts" element={<PostManagementPage />} />
                     <Route path="settings" element={<div className="p-8 bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm"><h2 className="text-2xl font-bold">系统设置 (开发中...)</h2></div>} />
                   </Routes>
                 </AdminLayout>

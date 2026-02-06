@@ -22,9 +22,9 @@ const api = new DefaultApi(new Configuration(), '', apiClient);
 const statusConfig: Record<string, { icon: React.ElementType; color: string; bgColor: string; label: string }> = {
   PENDING: { icon: Clock, color: 'text-yellow-600', bgColor: 'bg-yellow-100 dark:bg-yellow-900/30', label: '等待中' },
   RUNNING: { icon: Loader, color: 'text-blue-600', bgColor: 'bg-blue-100 dark:bg-blue-900/30', label: '运行中' },
-  COMPLETED: { icon: CheckCircle, color: 'text-green-600', bgColor: 'bg-green-100 dark:bg-green-900/30', label: '已完成' },
+  SUCCESS: { icon: CheckCircle, color: 'text-green-600', bgColor: 'bg-green-100 dark:bg-green-900/30', label: '成功' },
+  PARTIAL: { icon: AlertCircle, color: 'text-orange-600', bgColor: 'bg-orange-100 dark:bg-orange-900/30', label: '部分成功' },
   FAILED: { icon: XCircle, color: 'text-red-600', bgColor: 'bg-red-100 dark:bg-red-900/30', label: '失败' },
-  CANCELLED: { icon: AlertCircle, color: 'text-gray-600', bgColor: 'bg-gray-100 dark:bg-gray-800', label: '已取消' },
 };
 
 const getStatusDisplay = (status?: string) => {
@@ -250,7 +250,8 @@ export const ScraperTaskPage: React.FC = () => {
     { value: 'all', label: '全部状态' },
     { value: 'PENDING', label: '等待中' },
     { value: 'RUNNING', label: '运行中' },
-    { value: 'COMPLETED', label: '已完成' },
+    { value: 'SUCCESS', label: '成功' },
+    { value: 'PARTIAL', label: '部分成功' },
     { value: 'FAILED', label: '失败' },
   ];
 
@@ -304,7 +305,7 @@ export const ScraperTaskPage: React.FC = () => {
             </div>
             <div>
               <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                {tasks.filter(t => t.status === 'COMPLETED').length}
+                {tasks.filter(t => t.status === 'SUCCESS' || t.status === 'PARTIAL').length}
               </p>
               <p className="text-xs text-gray-500 dark:text-gray-400">已完成</p>
             </div>

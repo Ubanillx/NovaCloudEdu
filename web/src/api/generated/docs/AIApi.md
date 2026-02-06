@@ -6,8 +6,10 @@ All URIs are relative to *http://localhost:8080*
 |------------- | ------------- | -------------|
 |[**archive**](#archive) | **PUT** /api/ai/assistants/{id}/archive | 归档AI助手|
 |[**askQuestion**](#askquestion) | **POST** /api/books/{bookId}/ai/chat | 提问（新对话）|
+|[**batchProcessArticles**](#batchprocessarticles) | **POST** /api/admin/articles/ai/batch-process | 批量AI处理文章|
 |[**bindKnowledgeBase**](#bindknowledgebase) | **POST** /api/ai/assistants/{id}/knowledge-bases/{kbId} | 绑定知识库|
 |[**bindWorkflow**](#bindworkflow) | **POST** /api/ai/assistants/{id}/workflows/{workflowId} | 绑定工作流到AI助手|
+|[**chat**](#chat) | **POST** /api/articles/chat | 非流式对话|
 |[**continueConversation**](#continueconversation) | **POST** /api/books/{bookId}/ai/chat/{conversationId} | 继续对话|
 |[**create2**](#create2) | **POST** /api/ai/assistants | 创建AI助手|
 |[**delete2**](#delete2) | **DELETE** /api/ai/assistants/{id} | 删除AI助手|
@@ -26,12 +28,16 @@ All URIs are relative to *http://localhost:8080*
 |[**getWorkflows**](#getworkflows) | **GET** /api/ai/assistants/{id}/workflows | 获取AI助手绑定的工作流列表|
 |[**listByCreator1**](#listbycreator1) | **GET** /api/ai/assistants | 获取用户的AI助手列表|
 |[**listPublic1**](#listpublic1) | **GET** /api/ai/assistants/public | 获取公开的AI助手列表|
+|[**previewAiProcess**](#previewaiprocess) | **POST** /api/admin/articles/ai/preview | 预览AI处理结果|
+|[**processArticle**](#processarticle) | **POST** /api/admin/articles/ai/process | AI处理单篇文章|
 |[**publish**](#publish) | **PUT** /api/ai/assistants/{id}/publish | 发布AI助手|
 |[**regenerateKnowledgePoints**](#regenerateknowledgepoints) | **POST** /api/books/{bookId}/ai/chapters/{chapterId}/knowledge-points/regenerate | 重新提取知识点|
 |[**regenerateSummary**](#regeneratesummary) | **POST** /api/books/{bookId}/ai/chapters/{chapterId}/summary/regenerate | 重新生成总结|
 |[**search1**](#search1) | **GET** /api/ai/assistants/search | 搜索AI助手|
 |[**searchKnowledgePoints**](#searchknowledgepoints) | **GET** /api/books/{bookId}/ai/knowledge-points/search | 搜索知识点|
-|[**streamChat**](#streamchat) | **POST** /api/ai/chat/stream | 流式对话|
+|[**streamChat**](#streamchat) | **POST** /api/articles/chat/stream | 流式对话|
+|[**streamChat1**](#streamchat1) | **POST** /api/ai/chat/stream | 流式对话|
+|[**streamChatGet**](#streamchatget) | **GET** /api/articles/{articleId}/chat/stream | GET流式对话|
 |[**submitAnswers**](#submitanswers) | **POST** /api/books/{bookId}/ai/quiz/{quizId}/submit | 提交答案并评分|
 |[**unbindKnowledgeBase**](#unbindknowledgebase) | **DELETE** /api/ai/assistants/{id}/knowledge-bases/{kbId} | 解绑知识库|
 |[**unbindWorkflow**](#unbindworkflow) | **DELETE** /api/ai/assistants/{id}/workflows/{workflowId} | 解绑工作流|
@@ -118,6 +124,59 @@ const { status, data } = await apiInstance.askQuestion(
 |------------- | ------------- | ------------- | -------------|
 | **requestBody** | **{ [key: string]: object; }**|  | |
 | **bookId** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseMapStringObject**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **batchProcessArticles**
+> BaseResponseMapStringObject batchProcessArticles(batchAiProcessRequest)
+
+批量对多篇文章进行AI处理
+
+### Example
+
+```typescript
+import {
+    AIApi,
+    Configuration,
+    BatchAiProcessRequest
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new AIApi(configuration);
+
+let batchAiProcessRequest: BatchAiProcessRequest; //
+
+const { status, data } = await apiInstance.batchProcessArticles(
+    batchAiProcessRequest
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **batchAiProcessRequest** | **BatchAiProcessRequest**|  | |
 
 
 ### Return type
@@ -239,6 +298,59 @@ const { status, data } = await apiInstance.bindWorkflow(
 ### HTTP request headers
 
  - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **chat**
+> BaseResponseMapStringString chat(articleChatRequest)
+
+与文章内容进行AI对话，返回完整回复
+
+### Example
+
+```typescript
+import {
+    AIApi,
+    Configuration,
+    ArticleChatRequest
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new AIApi(configuration);
+
+let articleChatRequest: ArticleChatRequest; //
+
+const { status, data } = await apiInstance.chat(
+    articleChatRequest
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **articleChatRequest** | **ArticleChatRequest**|  | |
+
+
+### Return type
+
+**BaseResponseMapStringString**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
  - **Accept**: application/json
 
 
@@ -1247,6 +1359,112 @@ const { status, data } = await apiInstance.listPublic1(
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **previewAiProcess**
+> BaseResponseAiProcessResultResponse previewAiProcess(previewAiProcessRequest)
+
+预览AI处理结果，不保存到数据库
+
+### Example
+
+```typescript
+import {
+    AIApi,
+    Configuration,
+    PreviewAiProcessRequest
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new AIApi(configuration);
+
+let previewAiProcessRequest: PreviewAiProcessRequest; //
+
+const { status, data } = await apiInstance.previewAiProcess(
+    previewAiProcessRequest
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **previewAiProcessRequest** | **PreviewAiProcessRequest**|  | |
+
+
+### Return type
+
+**BaseResponseAiProcessResultResponse**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **processArticle**
+> BaseResponseDailyArticleResponse processArticle(aiProcessArticleRequest)
+
+对指定文章进行AI内容排版和摘要生成
+
+### Example
+
+```typescript
+import {
+    AIApi,
+    Configuration,
+    AiProcessArticleRequest
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new AIApi(configuration);
+
+let aiProcessArticleRequest: AiProcessArticleRequest; //
+
+const { status, data } = await apiInstance.processArticle(
+    aiProcessArticleRequest
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **aiProcessArticleRequest** | **AiProcessArticleRequest**|  | |
+
+
+### Return type
+
+**BaseResponseDailyArticleResponse**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **publish**
 > BaseResponseAiAssistantVO publish()
 
@@ -1527,7 +1745,60 @@ const { status, data } = await apiInstance.searchKnowledgePoints(
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **streamChat**
-> SseEmitter streamChat(chatRequest)
+> SseEmitter streamChat(articleChatRequest)
+
+与文章内容进行AI流式对话，返回SSE事件流
+
+### Example
+
+```typescript
+import {
+    AIApi,
+    Configuration,
+    ArticleChatRequest
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new AIApi(configuration);
+
+let articleChatRequest: ArticleChatRequest; //
+
+const { status, data } = await apiInstance.streamChat(
+    articleChatRequest
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **articleChatRequest** | **ArticleChatRequest**|  | |
+
+
+### Return type
+
+**SseEmitter**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json, text/event-stream
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **streamChat1**
+> SseEmitter streamChat1(chatRequest)
 
 使用SSE推送方式进行AI对话
 
@@ -1545,7 +1816,7 @@ const apiInstance = new AIApi(configuration);
 
 let chatRequest: ChatRequest; //
 
-const { status, data } = await apiInstance.streamChat(
+const { status, data } = await apiInstance.streamChat1(
     chatRequest
 );
 ```
@@ -1568,6 +1839,64 @@ const { status, data } = await apiInstance.streamChat(
 ### HTTP request headers
 
  - **Content-Type**: application/json
+ - **Accept**: application/json, text/event-stream
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **streamChatGet**
+> SseEmitter streamChatGet()
+
+使用GET方式进行流式对话，便于EventSource使用
+
+### Example
+
+```typescript
+import {
+    AIApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new AIApi(configuration);
+
+let articleId: number; // (default to undefined)
+let message: string; // (default to undefined)
+let historyJson: string; // (optional) (default to undefined)
+
+const { status, data } = await apiInstance.streamChatGet(
+    articleId,
+    message,
+    historyJson
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **articleId** | [**number**] |  | defaults to undefined|
+| **message** | [**string**] |  | defaults to undefined|
+| **historyJson** | [**string**] |  | (optional) defaults to undefined|
+
+
+### Return type
+
+**SseEmitter**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
  - **Accept**: application/json, text/event-stream
 
 

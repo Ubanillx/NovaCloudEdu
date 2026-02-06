@@ -681,9 +681,6 @@ export const DailyWordManagementPage: React.FC = () => {
                   <tr key={word.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors group">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-50 to-indigo-50 dark:from-gray-800 dark:to-gray-800 flex items-center justify-center border border-gray-100 dark:border-gray-700">
-                          <BookOpen size={18} className="text-brand-500" />
-                        </div>
                         <div>
                           <button
                             onClick={() => { setViewingWord(word); setDetailModalOpen(true); }}
