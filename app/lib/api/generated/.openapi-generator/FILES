@@ -761,5 +761,3 @@ lib/src/model/workflow_validation_response.dart
 lib/src/model/workflow_variable_response.dart
 lib/src/serializers.dart
 pubspec.yaml
-test/base_response_list_map_string_object_test.dart
-test/session_chat_request_test.dart

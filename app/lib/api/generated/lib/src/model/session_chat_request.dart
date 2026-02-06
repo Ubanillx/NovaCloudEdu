@@ -15,6 +15,7 @@ part 'session_chat_request.g.dart';
 /// * [message]
 /// * [systemPrompt]
 /// * [imageUrls]
+/// * [documentUrls]
 /// * [modelId]
 @BuiltValue()
 abstract class SessionChatRequest
@@ -27,6 +28,9 @@ abstract class SessionChatRequest
 
   @BuiltValueField(wireName: r'imageUrls')
   BuiltList<String>? get imageUrls;
+
+  @BuiltValueField(wireName: r'documentUrls')
+  BuiltList<String>? get documentUrls;
 
   @BuiltValueField(wireName: r'modelId')
   String? get modelId;
@@ -73,6 +77,13 @@ class _$SessionChatRequestSerializer
       yield r'imageUrls';
       yield serializers.serialize(
         object.imageUrls,
+        specifiedType: const FullType(BuiltList, [FullType(String)]),
+      );
+    }
+    if (object.documentUrls != null) {
+      yield r'documentUrls';
+      yield serializers.serialize(
+        object.documentUrls,
         specifiedType: const FullType(BuiltList, [FullType(String)]),
       );
     }
@@ -128,6 +139,13 @@ class _$SessionChatRequestSerializer
             specifiedType: const FullType(BuiltList, [FullType(String)]),
           ) as BuiltList<String>;
           result.imageUrls.replace(valueDes);
+          break;
+        case r'documentUrls':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(BuiltList, [FullType(String)]),
+          ) as BuiltList<String>;
+          result.documentUrls.replace(valueDes);
           break;
         case r'modelId':
           final valueDes = serializers.deserialize(
