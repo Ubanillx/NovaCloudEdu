@@ -124,14 +124,16 @@ public class AiChatController {
             @Valid @RequestBody SessionChatRequest request,
             Authentication authentication) {
         Long userId = Long.parseLong(authentication.getName());
-        log.info("收到会话级对话请求: sessionId={}, msg={}, 图片数: {}",
+        log.info("收到会话级对话请求: sessionId={}, msg={}, 图片数: {}, 文档数: {}",
                 sessionId, request.getMessage(),
-                request.getImageUrls() != null ? request.getImageUrls().size() : 0);
+                request.getImageUrls() != null ? request.getImageUrls().size() : 0,
+                request.getDocumentUrls() != null ? request.getDocumentUrls().size() : 0);
         return aiChatApplicationService.sessionStreamChat(
                 sessionId, userId,
                 request.getMessage(),
                 request.getSystemPrompt(),
                 request.getImageUrls(),
+                request.getDocumentUrls(),
                 request.getModelId()
         );
     }
