@@ -18,11 +18,14 @@ docs/AddVariableRequest.md
 docs/AiAssistantVO.md
 docs/AiConversation.md
 docs/AiConversationId.md
+docs/AiProcessArticleRequest.md
+docs/AiProcessResultResponse.md
 docs/AnnouncementDetailResponse.md
 docs/AnnouncementListResponse.md
 docs/AnnouncementPageResponse.md
 docs/AnnouncementResponse.md
 docs/ApplyTeacherRequest.md
+docs/ArticleChatRequest.md
 docs/ArticleResponse.md
 docs/ArticleSourceResponse.md
 docs/AsyncExecutionResponse.md
@@ -31,6 +34,7 @@ docs/BannerPageResponse.md
 docs/BannerResponse.md
 docs/BaseResponseAiAssistantVO.md
 docs/BaseResponseAiConversation.md
+docs/BaseResponseAiProcessResultResponse.md
 docs/BaseResponseAnnouncementDetailResponse.md
 docs/BaseResponseAnnouncementPageResponse.md
 docs/BaseResponseAnnouncementResponse.md
@@ -120,6 +124,7 @@ docs/BaseResponseListWorkflowVariableResponse.md
 docs/BaseResponseLoginUserResponse.md
 docs/BaseResponseLong.md
 docs/BaseResponseMapStringObject.md
+docs/BaseResponseMapStringString.md
 docs/BaseResponseMemberPage.md
 docs/BaseResponseObject.md
 docs/BaseResponseOrderResponse.md
@@ -163,6 +168,7 @@ docs/BaseResponseWorkflowResponse.md
 docs/BaseResponseWorkflowSettingsDTO.md
 docs/BaseResponseWorkflowValidationResponse.md
 docs/BaseResponseWorkflowVariableResponse.md
+docs/BatchAiProcessRequest.md
 docs/BatchBanUserRequest.md
 docs/BatchCreateUserRequest.md
 docs/BatchProcessResult.md
@@ -274,6 +280,7 @@ docs/PositionDTO.md
 docs/PostDetailResponse.md
 docs/PostPageResponse.md
 docs/PostResponse.md
+docs/PreviewAiProcessRequest.md
 docs/ProgressResponse.md
 docs/QueryAnnouncementRequest.md
 docs/QueryBannerRequest.md
@@ -384,11 +391,14 @@ models/add-variable-request.ts
 models/ai-assistant-vo.ts
 models/ai-conversation-id.ts
 models/ai-conversation.ts
+models/ai-process-article-request.ts
+models/ai-process-result-response.ts
 models/announcement-detail-response.ts
 models/announcement-list-response.ts
 models/announcement-page-response.ts
 models/announcement-response.ts
 models/apply-teacher-request.ts
+models/article-chat-request.ts
 models/article-response.ts
 models/article-source-response.ts
 models/async-execution-response.ts
@@ -397,6 +407,7 @@ models/banner-page-response.ts
 models/banner-response.ts
 models/base-response-ai-assistant-vo.ts
 models/base-response-ai-conversation.ts
+models/base-response-ai-process-result-response.ts
 models/base-response-announcement-detail-response.ts
 models/base-response-announcement-page-response.ts
 models/base-response-announcement-response.ts
@@ -486,6 +497,7 @@ models/base-response-list-workflow-variable-response.ts
 models/base-response-login-user-response.ts
 models/base-response-long.ts
 models/base-response-map-string-object.ts
+models/base-response-map-string-string.ts
 models/base-response-member-page.ts
 models/base-response-object.ts
 models/base-response-order-response.ts
@@ -529,6 +541,7 @@ models/base-response-workflow-response.ts
 models/base-response-workflow-settings-dto.ts
 models/base-response-workflow-validation-response.ts
 models/base-response-workflow-variable-response.ts
+models/batch-ai-process-request.ts
 models/batch-ban-user-request.ts
 models/batch-create-user-request.ts
 models/batch-process-result.ts
@@ -640,6 +653,7 @@ models/position.ts
 models/post-detail-response.ts
 models/post-page-response.ts
 models/post-response.ts
+models/preview-ai-process-request.ts
 models/progress-response.ts
 models/query-announcement-request.ts
 models/query-banner-request.ts

@@ -36,8 +36,8 @@ export interface ChatGroup {
     'announcementTime'?: string;
     'createTime'?: string;
     'updateTime'?: string;
-    'mute'?: boolean;
     'full'?: boolean;
+    'mute'?: boolean;
     'delete'?: boolean;
 }
 

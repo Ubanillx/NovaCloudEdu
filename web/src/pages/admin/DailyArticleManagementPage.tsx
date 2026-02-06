@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import Markdown from 'react-markdown';
 import { 
   Search, 
   Plus, 
@@ -16,13 +17,18 @@ import {
   Bookmark,
   Clock,
   User,
-  Link2
+  Link2,
+  Sparkles,
+  CheckSquare,
+  Square,
+  Loader
 } from 'lucide-react';
-import { apiClient, DefaultApi, Configuration } from '../../api';
+import { apiClient, DefaultApi, AIApi, Configuration } from '../../api';
 import type { DailyArticleResponse, DailyArticlePageResponse, CreateDailyArticleRequest, UpdateDailyArticleRequest } from '../../api/generated/models';
 import { toast, TruncateWithTooltip } from '../../components/ui';
 
 const api = new DefaultApi(new Configuration(), '', apiClient);
+const aiApi = new AIApi(new Configuration(), '', apiClient);
 
 // 难度配置
 const DIFFICULTY_OPTIONS = [
@@ -475,8 +481,8 @@ const ArticleDetailModal: React.FC<ArticleDetailModalProps> = ({ isOpen, onClose
           )}
 
           {/* 正文内容 */}
-          <div className="prose dark:prose-invert max-w-none">
-            <p className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">{article.content}</p>
+          <div className="prose prose-sm dark:prose-invert max-w-none">
+            <Markdown>{article.content || ''}</Markdown>
           </div>
 
           {/* 原文链接 */}
@@ -506,6 +512,9 @@ export const DailyArticleManagementPage: React.FC = () => {
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [editingArticle, setEditingArticle] = useState<DailyArticleResponse | null>(null);
   const [viewingArticle, setViewingArticle] = useState<DailyArticleResponse | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [aiProcessing, setAiProcessing] = useState<number | null>(null); // 正在处理的文章ID
+  const [batchAiProcessing, setBatchAiProcessing] = useState(false);
   const [queryParams, setQueryParams] = useState({
     page: 1,
     size: 10,
@@ -563,6 +572,82 @@ export const DailyArticleManagementPage: React.FC = () => {
     }
   };
 
+  // AI 处理单篇文章
+  const handleAiProcess = async (article: DailyArticleResponse) => {
+    if (!article.id) return;
+    setAiProcessing(article.id);
+    try {
+      const response = await aiApi.processArticle({
+        aiProcessArticleRequest: {
+          articleId: article.id,
+          formatContent: true,
+          generateSummary: true,
+          summaryMaxLength: 150,
+        }
+      });
+      if (response.data.code === 0) {
+        toast.success('AI 处理完成');
+        fetchArticles();
+      } else {
+        toast.error(response.data.message || 'AI 处理失败');
+      }
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || 'AI 处理失败');
+    } finally {
+      setAiProcessing(null);
+    }
+  };
+
+  // 批量 AI 处理
+  const handleBatchAiProcess = async () => {
+    if (selectedIds.size === 0) {
+      toast.warning('请先选择要处理的文章');
+      return;
+    }
+    setBatchAiProcessing(true);
+    try {
+      const response = await aiApi.batchProcessArticles({
+        batchAiProcessRequest: {
+          articleIds: Array.from(selectedIds),
+          formatContent: true,
+          generateSummary: true,
+        }
+      });
+      if (response.data.code === 0) {
+        const result = response.data.data as { total?: number; successCount?: number; failCount?: number } | undefined;
+        toast.success(`AI 处理完成: 成功 ${result?.successCount || 0}/${result?.total || 0} 篇`);
+        setSelectedIds(new Set());
+        fetchArticles();
+      } else {
+        toast.error(response.data.message || '批量处理失败');
+      }
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || '批量处理失败');
+    } finally {
+      setBatchAiProcessing(false);
+    }
+  };
+
+  // 选择/取消选择文章
+  const toggleSelect = (id: number) => {
+    const newSet = new Set(selectedIds);
+    if (newSet.has(id)) {
+      newSet.delete(id);
+    } else {
+      newSet.add(id);
+    }
+    setSelectedIds(newSet);
+  };
+
+  // 全选/取消全选
+  const toggleSelectAll = () => {
+    if (selectedIds.size === articles.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(articles.map(a => a.id!).filter(Boolean)));
+    }
+  };
+
   const getDifficultyBadge = (difficulty?: number) => {
     const option = DIFFICULTY_OPTIONS.find(d => d.value === difficulty);
     if (!option) return null;
@@ -582,6 +667,16 @@ export const DailyArticleManagementPage: React.FC = () => {
           <p className="text-gray-500 dark:text-gray-400 mt-1">管理每日推送的文章内容、难度和分类</p>
         </div>
         <div className="flex items-center gap-3">
+          {selectedIds.size > 0 && (
+            <button 
+              onClick={handleBatchAiProcess}
+              disabled={batchAiProcessing}
+              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-xl text-sm font-bold hover:from-purple-600 hover:to-indigo-600 shadow-lg shadow-purple-500/20 transition-all active:scale-95 disabled:opacity-50"
+            >
+              {batchAiProcessing ? <Loader size={18} className="animate-spin" /> : <Sparkles size={18} />}
+              <span>AI处理 ({selectedIds.size})</span>
+            </button>
+          )}
           <button 
             onClick={() => { setEditingArticle(null); setModalOpen(true); }}
             className="flex items-center gap-2 px-4 py-2 bg-brand-600 text-white rounded-xl text-sm font-bold hover:bg-brand-700 shadow-lg shadow-brand-600/20 transition-all active:scale-95"
@@ -651,20 +746,25 @@ export const DailyArticleManagementPage: React.FC = () => {
           <table className="w-full text-left border-collapse admin-table">
             <thead>
               <tr className="bg-gray-50/50 dark:bg-gray-800/50 border-b border-gray-100 dark:border-gray-800 transition-colors duration-300">
-                <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">文章</th>
-                <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">作者</th>
-                <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">难度</th>
-                <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">分类</th>
-                <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">统计</th>
-                <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">发布日期</th>
-                <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">操作</th>
+                <th className="px-4 py-4 w-10">
+                  <button onClick={toggleSelectAll} className="text-gray-400 hover:text-brand-600">
+                    {selectedIds.size === articles.length && articles.length > 0 ? <CheckSquare size={18} /> : <Square size={18} />}
+                  </button>
+                </th>
+                <th className="px-4 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider min-w-[260px]">文章</th>
+                <th className="px-4 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider w-24">作者</th>
+                <th className="px-4 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider w-20">难度</th>
+                <th className="px-4 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider w-20">分类</th>
+                <th className="px-4 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider w-32">统计</th>
+                <th className="px-4 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider w-28">发布日期</th>
+                <th className="px-4 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider w-36">操作</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50 dark:divide-gray-800">
               {loading ? (
                 Array.from({ length: 5 }).map((_, i) => (
                   <tr key={i} className="animate-pulse">
-                    <td colSpan={7} className="px-6 py-8 h-16">
+                    <td colSpan={8} className="px-6 py-8 h-16">
                       <div className="flex gap-4">
                         <div className="w-16 h-12 bg-gray-100 dark:bg-gray-800 rounded-xl" />
                         <div className="space-y-2 flex-1">
@@ -678,49 +778,57 @@ export const DailyArticleManagementPage: React.FC = () => {
               ) : articles.length > 0 ? (
                 articles.map((article) => (
                   <tr key={article.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors group">
-                    <td className="px-6 py-4">
+                    <td className="px-4 py-3">
+                      <button 
+                        onClick={() => article.id && toggleSelect(article.id)} 
+                        className="text-gray-400 hover:text-brand-600"
+                      >
+                        {article.id && selectedIds.has(article.id) ? <CheckSquare size={18} /> : <Square size={18} />}
+                      </button>
+                    </td>
+                    <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
-                        <div className="w-16 h-12 rounded-xl bg-gradient-to-br from-brand-50 to-indigo-50 dark:from-gray-800 dark:to-gray-800 flex items-center justify-center border border-gray-100 dark:border-gray-700 overflow-hidden flex-shrink-0">
+                        <div className="w-14 h-10 rounded-lg bg-gradient-to-br from-brand-50 to-indigo-50 dark:from-gray-800 dark:to-gray-800 flex items-center justify-center border border-gray-100 dark:border-gray-700 overflow-hidden flex-shrink-0">
                           {article.coverImage ? (
                             <img src={article.coverImage} alt={article.title} className="w-full h-full object-cover" />
                           ) : (
-                            <FileText size={20} className="text-brand-500" />
+                            <FileText size={18} className="text-brand-500" />
                           )}
                         </div>
-                        <div className="min-w-0">
+                        <div className="min-w-0 flex-1">
                           <button
                             onClick={() => { setViewingArticle(article); setDetailModalOpen(true); }}
-                            className="font-bold text-gray-900 dark:text-white hover:text-brand-600 dark:hover:text-brand-400 transition-colors text-left block w-full"
+                            className="font-bold text-gray-900 dark:text-white hover:text-brand-600 dark:hover:text-brand-400 transition-colors text-left block w-full text-sm"
                           >
-                            <TruncateWithTooltip text={article.title || ''} maxWidth={280} />
+                            <TruncateWithTooltip text={article.title || ''} maxWidth={200} />
                           </button>
                           {article.summary && (
                             <TruncateWithTooltip 
                               text={article.summary} 
-                              maxWidth={280} 
+                              maxWidth={200} 
                               className="text-xs text-gray-400"
                             />
                           )}
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4">
-                      <p className="text-gray-600 dark:text-gray-300">{article.author || '-'}</p>
+                    <td className="px-4 py-3">
+                      <p className="text-sm text-gray-600 dark:text-gray-300 truncate">{article.author || '-'}</p>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-4 py-3">
                       {getDifficultyBadge(article.difficulty)}
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-4 py-3">
                       {article.category ? (
                         <span className="px-2.5 py-1 rounded-lg text-xs font-medium bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400">
                           {article.category}
                         </span>
                       ) : (
-                        <span className="text-gray-400">-</span>
+                        <span className="text-gray-400 text-sm">-</span>
                       )}
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
                         <span className="flex items-center gap-1">
                           <Eye size={12} />
                           {article.viewCount || 0}
@@ -735,34 +843,42 @@ export const DailyArticleManagementPage: React.FC = () => {
                         </span>
                       </div>
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
                         <Calendar size={14} />
                         <span>{article.publishDate || '-'}</span>
                       </div>
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button 
+                          onClick={() => handleAiProcess(article)}
+                          disabled={aiProcessing === article.id}
+                          className="p-1.5 text-gray-400 hover:text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-all disabled:opacity-50" 
+                          title="AI处理"
+                        >
+                          {aiProcessing === article.id ? <Loader size={16} className="animate-spin" /> : <Sparkles size={16} />}
+                        </button>
                         <button 
                           onClick={() => { setViewingArticle(article); setDetailModalOpen(true); }}
-                          className="p-2 text-gray-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded-lg transition-all" 
+                          className="p-1.5 text-gray-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded-lg transition-all" 
                           title="查看详情"
                         >
-                          <Eye size={18} />
+                          <Eye size={16} />
                         </button>
                         <button 
                           onClick={() => { setEditingArticle(article); setModalOpen(true); }}
-                          className="p-2 text-gray-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded-lg transition-all" 
+                          className="p-1.5 text-gray-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded-lg transition-all" 
                           title="编辑"
                         >
-                          <Edit2 size={18} />
+                          <Edit2 size={16} />
                         </button>
                         <button 
                           onClick={() => handleDeleteArticle(article)}
-                          className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all" 
+                          className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all" 
                           title="删除"
                         >
-                          <Trash2 size={18} />
+                          <Trash2 size={16} />
                         </button>
                       </div>
                     </td>
@@ -770,7 +886,7 @@ export const DailyArticleManagementPage: React.FC = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={7} className="px-6 py-12 text-center">
+                  <td colSpan={8} className="px-6 py-12 text-center">
                     <div className="flex flex-col items-center">
                       <div className="w-16 h-16 bg-gray-50 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4">
                         <FileText size={32} className="text-gray-300" />

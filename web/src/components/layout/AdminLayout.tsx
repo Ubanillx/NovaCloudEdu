@@ -15,7 +15,11 @@ import {
   Globe,
   ListTodo,
   BookA,
-  FileText
+  FileText,
+  Megaphone,
+  Image,
+  MessageSquare,
+  Newspaper
 } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { clearTokens } from '../../api';
@@ -54,6 +58,10 @@ const AdminSider: React.FC<AdminSiderProps> = ({
     { icon: BookOpen, label: '课程管理', path: '/admin/courses' },
     { icon: BookA, label: '每日单词', path: '/admin/daily-words' },
     { icon: FileText, label: '每日美文', path: '/admin/daily-articles' },
+    { icon: Megaphone, label: '公告管理', path: '/admin/announcements' },
+    { icon: Image, label: '轮播图管理', path: '/admin/banners' },
+    { icon: MessageSquare, label: '反馈管理', path: '/admin/feedbacks' },
+    { icon: Newspaper, label: '帖子管理', path: '/admin/posts' },
     { icon: Globe, label: '抓取配置', path: '/admin/scraper/config' },
     { icon: ListTodo, label: '抓取任务', path: '/admin/scraper/tasks' },
     { icon: Settings, label: '系统设置', path: '/admin/settings' },

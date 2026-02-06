@@ -15,11 +15,11 @@ Name | Type | Description | Notes
 **muteUntil** | **string** |  | [optional] [default to undefined]
 **joinTime** | **string** |  | [optional] [default to undefined]
 **updateTime** | **string** |  | [optional] [default to undefined]
+**mute** | **boolean** |  | [optional] [default to undefined]
 **adminOrOwner** | **boolean** |  | [optional] [default to undefined]
 **owner** | **boolean** |  | [optional] [default to undefined]
 **_delete** | **boolean** |  | [optional] [default to undefined]
 **muted** | **boolean** |  | [optional] [default to undefined]
-**mute** | **boolean** |  | [optional] [default to undefined]
 
 ## Example
 
@@ -37,11 +37,11 @@ const instance: ChatGroupMember = {
     muteUntil,
     joinTime,
     updateTime,
+    mute,
     adminOrOwner,
     owner,
     _delete,
     muted,
-    mute,
 };
 ```
 

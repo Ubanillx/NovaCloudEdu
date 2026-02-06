@@ -22,11 +22,19 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
+import type { AiProcessArticleRequest } from '../models';
+// @ts-ignore
+import type { ArticleChatRequest } from '../models';
+// @ts-ignore
 import type { BaseResponseAiAssistantVO } from '../models';
 // @ts-ignore
 import type { BaseResponseAiConversation } from '../models';
 // @ts-ignore
+import type { BaseResponseAiProcessResultResponse } from '../models';
+// @ts-ignore
 import type { BaseResponseChapterSummary } from '../models';
+// @ts-ignore
+import type { BaseResponseDailyArticleResponse } from '../models';
 // @ts-ignore
 import type { BaseResponseListAiAssistantVO } from '../models';
 // @ts-ignore
@@ -40,15 +48,21 @@ import type { BaseResponseListLong } from '../models';
 // @ts-ignore
 import type { BaseResponseMapStringObject } from '../models';
 // @ts-ignore
+import type { BaseResponseMapStringString } from '../models';
+// @ts-ignore
 import type { BaseResponseObject } from '../models';
 // @ts-ignore
 import type { BaseResponseReadingQuiz } from '../models';
 // @ts-ignore
 import type { BaseResponseVoid } from '../models';
 // @ts-ignore
+import type { BatchAiProcessRequest } from '../models';
+// @ts-ignore
 import type { ChatRequest } from '../models';
 // @ts-ignore
 import type { CreateAiAssistantCommand } from '../models';
+// @ts-ignore
+import type { PreviewAiProcessRequest } from '../models';
 // @ts-ignore
 import type { SseEmitter } from '../models';
 // @ts-ignore
@@ -140,6 +154,45 @@ export const AIApiAxiosParamCreator = function (configuration?: Configuration) {
             };
         },
         /**
+         * 批量对多篇文章进行AI处理
+         * @summary 批量AI处理文章
+         * @param {BatchAiProcessRequest} batchAiProcessRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        batchProcessArticles: async (batchAiProcessRequest: BatchAiProcessRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'batchAiProcessRequest' is not null or undefined
+            assertParamExists('batchProcessArticles', 'batchAiProcessRequest', batchAiProcessRequest)
+            const localVarPath = `/api/admin/articles/ai/batch-process`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(batchAiProcessRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 
          * @summary 绑定知识库
          * @param {number} id 
@@ -217,6 +270,45 @@ export const AIApiAxiosParamCreator = function (configuration?: Configuration) {
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 与文章内容进行AI对话，返回完整回复
+         * @summary 非流式对话
+         * @param {ArticleChatRequest} articleChatRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        chat: async (articleChatRequest: ArticleChatRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'articleChatRequest' is not null or undefined
+            assertParamExists('chat', 'articleChatRequest', articleChatRequest)
+            const localVarPath = `/api/articles/chat`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(articleChatRequest, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -1036,6 +1128,84 @@ export const AIApiAxiosParamCreator = function (configuration?: Configuration) {
             };
         },
         /**
+         * 预览AI处理结果，不保存到数据库
+         * @summary 预览AI处理结果
+         * @param {PreviewAiProcessRequest} previewAiProcessRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        previewAiProcess: async (previewAiProcessRequest: PreviewAiProcessRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'previewAiProcessRequest' is not null or undefined
+            assertParamExists('previewAiProcess', 'previewAiProcessRequest', previewAiProcessRequest)
+            const localVarPath = `/api/admin/articles/ai/preview`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(previewAiProcessRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 对指定文章进行AI内容排版和摘要生成
+         * @summary AI处理单篇文章
+         * @param {AiProcessArticleRequest} aiProcessArticleRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        processArticle: async (aiProcessArticleRequest: AiProcessArticleRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'aiProcessArticleRequest' is not null or undefined
+            assertParamExists('processArticle', 'aiProcessArticleRequest', aiProcessArticleRequest)
+            const localVarPath = `/api/admin/articles/ai/process`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(aiProcessArticleRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 
          * @summary 发布AI助手
          * @param {number} id 
@@ -1269,15 +1439,54 @@ export const AIApiAxiosParamCreator = function (configuration?: Configuration) {
             };
         },
         /**
+         * 与文章内容进行AI流式对话，返回SSE事件流
+         * @summary 流式对话
+         * @param {ArticleChatRequest} articleChatRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        streamChat: async (articleChatRequest: ArticleChatRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'articleChatRequest' is not null or undefined
+            assertParamExists('streamChat', 'articleChatRequest', articleChatRequest)
+            const localVarPath = `/api/articles/chat/stream`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json,text/event-stream';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(articleChatRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 使用SSE推送方式进行AI对话
          * @summary 流式对话
          * @param {ChatRequest} chatRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        streamChat: async (chatRequest: ChatRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        streamChat1: async (chatRequest: ChatRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'chatRequest' is not null or undefined
-            assertParamExists('streamChat', 'chatRequest', chatRequest)
+            assertParamExists('streamChat1', 'chatRequest', chatRequest)
             const localVarPath = `/api/ai/chat/stream`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -1301,6 +1510,56 @@ export const AIApiAxiosParamCreator = function (configuration?: Configuration) {
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(chatRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 使用GET方式进行流式对话，便于EventSource使用
+         * @summary GET流式对话
+         * @param {number} articleId 
+         * @param {string} message 
+         * @param {string} [historyJson] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        streamChatGet: async (articleId: number, message: string, historyJson?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'articleId' is not null or undefined
+            assertParamExists('streamChatGet', 'articleId', articleId)
+            // verify required parameter 'message' is not null or undefined
+            assertParamExists('streamChatGet', 'message', message)
+            const localVarPath = `/api/articles/{articleId}/chat/stream`
+                .replace(`{${"articleId"}}`, encodeURIComponent(String(articleId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (message !== undefined) {
+                localVarQueryParameter['message'] = message;
+            }
+
+            if (historyJson !== undefined) {
+                localVarQueryParameter['historyJson'] = historyJson;
+            }
+
+            localVarHeaderParameter['Accept'] = 'application/json,text/event-stream';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -1518,6 +1777,19 @@ export const AIApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 批量对多篇文章进行AI处理
+         * @summary 批量AI处理文章
+         * @param {BatchAiProcessRequest} batchAiProcessRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async batchProcessArticles(batchAiProcessRequest: BatchAiProcessRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseMapStringObject>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.batchProcessArticles(batchAiProcessRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AIApi.batchProcessArticles']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 
          * @summary 绑定知识库
          * @param {number} id 
@@ -1543,6 +1815,19 @@ export const AIApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.bindWorkflow(id, workflowId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['AIApi.bindWorkflow']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 与文章内容进行AI对话，返回完整回复
+         * @summary 非流式对话
+         * @param {ArticleChatRequest} articleChatRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async chat(articleChatRequest: ArticleChatRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseMapStringString>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.chat(articleChatRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AIApi.chat']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -1806,6 +2091,32 @@ export const AIApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 预览AI处理结果，不保存到数据库
+         * @summary 预览AI处理结果
+         * @param {PreviewAiProcessRequest} previewAiProcessRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async previewAiProcess(previewAiProcessRequest: PreviewAiProcessRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseAiProcessResultResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.previewAiProcess(previewAiProcessRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AIApi.previewAiProcess']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 对指定文章进行AI内容排版和摘要生成
+         * @summary AI处理单篇文章
+         * @param {AiProcessArticleRequest} aiProcessArticleRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async processArticle(aiProcessArticleRequest: AiProcessArticleRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseDailyArticleResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.processArticle(aiProcessArticleRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AIApi.processArticle']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 
          * @summary 发布AI助手
          * @param {number} id 
@@ -1879,16 +2190,44 @@ export const AIApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 与文章内容进行AI流式对话，返回SSE事件流
+         * @summary 流式对话
+         * @param {ArticleChatRequest} articleChatRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async streamChat(articleChatRequest: ArticleChatRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SseEmitter>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.streamChat(articleChatRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AIApi.streamChat']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 使用SSE推送方式进行AI对话
          * @summary 流式对话
          * @param {ChatRequest} chatRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async streamChat(chatRequest: ChatRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SseEmitter>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.streamChat(chatRequest, options);
+        async streamChat1(chatRequest: ChatRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SseEmitter>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.streamChat1(chatRequest, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['AIApi.streamChat']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['AIApi.streamChat1']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 使用GET方式进行流式对话，便于EventSource使用
+         * @summary GET流式对话
+         * @param {number} articleId 
+         * @param {string} message 
+         * @param {string} [historyJson] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async streamChatGet(articleId: number, message: string, historyJson?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SseEmitter>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.streamChatGet(articleId, message, historyJson, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AIApi.streamChatGet']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -1978,6 +2317,16 @@ export const AIApiFactory = function (configuration?: Configuration, basePath?: 
             return localVarFp.askQuestion(requestParameters.bookId, requestParameters.requestBody, options).then((request) => request(axios, basePath));
         },
         /**
+         * 批量对多篇文章进行AI处理
+         * @summary 批量AI处理文章
+         * @param {AIApiBatchProcessArticlesRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        batchProcessArticles(requestParameters: AIApiBatchProcessArticlesRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringObject> {
+            return localVarFp.batchProcessArticles(requestParameters.batchAiProcessRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 
          * @summary 绑定知识库
          * @param {AIApiBindKnowledgeBaseRequest} requestParameters Request parameters.
@@ -1996,6 +2345,16 @@ export const AIApiFactory = function (configuration?: Configuration, basePath?: 
          */
         bindWorkflow(requestParameters: AIApiBindWorkflowRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid> {
             return localVarFp.bindWorkflow(requestParameters.id, requestParameters.workflowId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 与文章内容进行AI对话，返回完整回复
+         * @summary 非流式对话
+         * @param {AIApiChatRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        chat(requestParameters: AIApiChatRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringString> {
+            return localVarFp.chat(requestParameters.articleChatRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -2178,6 +2537,26 @@ export const AIApiFactory = function (configuration?: Configuration, basePath?: 
             return localVarFp.listPublic1(requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
         },
         /**
+         * 预览AI处理结果，不保存到数据库
+         * @summary 预览AI处理结果
+         * @param {AIApiPreviewAiProcessRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        previewAiProcess(requestParameters: AIApiPreviewAiProcessRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseAiProcessResultResponse> {
+            return localVarFp.previewAiProcess(requestParameters.previewAiProcessRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 对指定文章进行AI内容排版和摘要生成
+         * @summary AI处理单篇文章
+         * @param {AIApiProcessArticleRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        processArticle(requestParameters: AIApiProcessArticleRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseDailyArticleResponse> {
+            return localVarFp.processArticle(requestParameters.aiProcessArticleRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 
          * @summary 发布AI助手
          * @param {AIApiPublishRequest} requestParameters Request parameters.
@@ -2228,14 +2607,34 @@ export const AIApiFactory = function (configuration?: Configuration, basePath?: 
             return localVarFp.searchKnowledgePoints(requestParameters.bookId, requestParameters.keyword, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
         },
         /**
-         * 使用SSE推送方式进行AI对话
+         * 与文章内容进行AI流式对话，返回SSE事件流
          * @summary 流式对话
          * @param {AIApiStreamChatRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
         streamChat(requestParameters: AIApiStreamChatRequest, options?: RawAxiosRequestConfig): AxiosPromise<SseEmitter> {
-            return localVarFp.streamChat(requestParameters.chatRequest, options).then((request) => request(axios, basePath));
+            return localVarFp.streamChat(requestParameters.articleChatRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 使用SSE推送方式进行AI对话
+         * @summary 流式对话
+         * @param {AIApiStreamChat1Request} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        streamChat1(requestParameters: AIApiStreamChat1Request, options?: RawAxiosRequestConfig): AxiosPromise<SseEmitter> {
+            return localVarFp.streamChat1(requestParameters.chatRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 使用GET方式进行流式对话，便于EventSource使用
+         * @summary GET流式对话
+         * @param {AIApiStreamChatGetRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        streamChatGet(requestParameters: AIApiStreamChatGetRequest, options?: RawAxiosRequestConfig): AxiosPromise<SseEmitter> {
+            return localVarFp.streamChatGet(requestParameters.articleId, requestParameters.message, requestParameters.historyJson, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -2303,6 +2702,15 @@ export interface AIApiInterface {
     askQuestion(requestParameters: AIApiAskQuestionRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringObject>;
 
     /**
+     * 批量对多篇文章进行AI处理
+     * @summary 批量AI处理文章
+     * @param {AIApiBatchProcessArticlesRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    batchProcessArticles(requestParameters: AIApiBatchProcessArticlesRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringObject>;
+
+    /**
      * 
      * @summary 绑定知识库
      * @param {AIApiBindKnowledgeBaseRequest} requestParameters Request parameters.
@@ -2319,6 +2727,15 @@ export interface AIApiInterface {
      * @throws {RequiredError}
      */
     bindWorkflow(requestParameters: AIApiBindWorkflowRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid>;
+
+    /**
+     * 与文章内容进行AI对话，返回完整回复
+     * @summary 非流式对话
+     * @param {AIApiChatRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    chat(requestParameters: AIApiChatRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringString>;
 
     /**
      * 
@@ -2483,6 +2900,24 @@ export interface AIApiInterface {
     listPublic1(requestParameters?: AIApiListPublic1Request, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListAiAssistantVO>;
 
     /**
+     * 预览AI处理结果，不保存到数据库
+     * @summary 预览AI处理结果
+     * @param {AIApiPreviewAiProcessRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    previewAiProcess(requestParameters: AIApiPreviewAiProcessRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseAiProcessResultResponse>;
+
+    /**
+     * 对指定文章进行AI内容排版和摘要生成
+     * @summary AI处理单篇文章
+     * @param {AIApiProcessArticleRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    processArticle(requestParameters: AIApiProcessArticleRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseDailyArticleResponse>;
+
+    /**
      * 
      * @summary 发布AI助手
      * @param {AIApiPublishRequest} requestParameters Request parameters.
@@ -2528,13 +2963,31 @@ export interface AIApiInterface {
     searchKnowledgePoints(requestParameters: AIApiSearchKnowledgePointsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListKnowledgePoint>;
 
     /**
-     * 使用SSE推送方式进行AI对话
+     * 与文章内容进行AI流式对话，返回SSE事件流
      * @summary 流式对话
      * @param {AIApiStreamChatRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     streamChat(requestParameters: AIApiStreamChatRequest, options?: RawAxiosRequestConfig): AxiosPromise<SseEmitter>;
+
+    /**
+     * 使用SSE推送方式进行AI对话
+     * @summary 流式对话
+     * @param {AIApiStreamChat1Request} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    streamChat1(requestParameters: AIApiStreamChat1Request, options?: RawAxiosRequestConfig): AxiosPromise<SseEmitter>;
+
+    /**
+     * 使用GET方式进行流式对话，便于EventSource使用
+     * @summary GET流式对话
+     * @param {AIApiStreamChatGetRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    streamChatGet(requestParameters: AIApiStreamChatGetRequest, options?: RawAxiosRequestConfig): AxiosPromise<SseEmitter>;
 
     /**
      * 
@@ -2591,6 +3044,13 @@ export interface AIApiAskQuestionRequest {
 }
 
 /**
+ * Request parameters for batchProcessArticles operation in AIApi.
+ */
+export interface AIApiBatchProcessArticlesRequest {
+    readonly batchAiProcessRequest: BatchAiProcessRequest
+}
+
+/**
  * Request parameters for bindKnowledgeBase operation in AIApi.
  */
 export interface AIApiBindKnowledgeBaseRequest {
@@ -2606,6 +3066,13 @@ export interface AIApiBindWorkflowRequest {
     readonly id: number
 
     readonly workflowId: number
+}
+
+/**
+ * Request parameters for chat operation in AIApi.
+ */
+export interface AIApiChatRequest {
+    readonly articleChatRequest: ArticleChatRequest
 }
 
 /**
@@ -2787,6 +3254,20 @@ export interface AIApiListPublic1Request {
 }
 
 /**
+ * Request parameters for previewAiProcess operation in AIApi.
+ */
+export interface AIApiPreviewAiProcessRequest {
+    readonly previewAiProcessRequest: PreviewAiProcessRequest
+}
+
+/**
+ * Request parameters for processArticle operation in AIApi.
+ */
+export interface AIApiProcessArticleRequest {
+    readonly aiProcessArticleRequest: AiProcessArticleRequest
+}
+
+/**
  * Request parameters for publish operation in AIApi.
  */
 export interface AIApiPublishRequest {
@@ -2841,7 +3322,25 @@ export interface AIApiSearchKnowledgePointsRequest {
  * Request parameters for streamChat operation in AIApi.
  */
 export interface AIApiStreamChatRequest {
+    readonly articleChatRequest: ArticleChatRequest
+}
+
+/**
+ * Request parameters for streamChat1 operation in AIApi.
+ */
+export interface AIApiStreamChat1Request {
     readonly chatRequest: ChatRequest
+}
+
+/**
+ * Request parameters for streamChatGet operation in AIApi.
+ */
+export interface AIApiStreamChatGetRequest {
+    readonly articleId: number
+
+    readonly message: string
+
+    readonly historyJson?: string
 }
 
 /**
@@ -2909,6 +3408,17 @@ export class AIApi extends BaseAPI implements AIApiInterface {
     }
 
     /**
+     * 批量对多篇文章进行AI处理
+     * @summary 批量AI处理文章
+     * @param {AIApiBatchProcessArticlesRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public batchProcessArticles(requestParameters: AIApiBatchProcessArticlesRequest, options?: RawAxiosRequestConfig) {
+        return AIApiFp(this.configuration).batchProcessArticles(requestParameters.batchAiProcessRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 
      * @summary 绑定知识库
      * @param {AIApiBindKnowledgeBaseRequest} requestParameters Request parameters.
@@ -2928,6 +3438,17 @@ export class AIApi extends BaseAPI implements AIApiInterface {
      */
     public bindWorkflow(requestParameters: AIApiBindWorkflowRequest, options?: RawAxiosRequestConfig) {
         return AIApiFp(this.configuration).bindWorkflow(requestParameters.id, requestParameters.workflowId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 与文章内容进行AI对话，返回完整回复
+     * @summary 非流式对话
+     * @param {AIApiChatRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public chat(requestParameters: AIApiChatRequest, options?: RawAxiosRequestConfig) {
+        return AIApiFp(this.configuration).chat(requestParameters.articleChatRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -3129,6 +3650,28 @@ export class AIApi extends BaseAPI implements AIApiInterface {
     }
 
     /**
+     * 预览AI处理结果，不保存到数据库
+     * @summary 预览AI处理结果
+     * @param {AIApiPreviewAiProcessRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public previewAiProcess(requestParameters: AIApiPreviewAiProcessRequest, options?: RawAxiosRequestConfig) {
+        return AIApiFp(this.configuration).previewAiProcess(requestParameters.previewAiProcessRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 对指定文章进行AI内容排版和摘要生成
+     * @summary AI处理单篇文章
+     * @param {AIApiProcessArticleRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public processArticle(requestParameters: AIApiProcessArticleRequest, options?: RawAxiosRequestConfig) {
+        return AIApiFp(this.configuration).processArticle(requestParameters.aiProcessArticleRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 
      * @summary 发布AI助手
      * @param {AIApiPublishRequest} requestParameters Request parameters.
@@ -3184,14 +3727,36 @@ export class AIApi extends BaseAPI implements AIApiInterface {
     }
 
     /**
-     * 使用SSE推送方式进行AI对话
+     * 与文章内容进行AI流式对话，返回SSE事件流
      * @summary 流式对话
      * @param {AIApiStreamChatRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     public streamChat(requestParameters: AIApiStreamChatRequest, options?: RawAxiosRequestConfig) {
-        return AIApiFp(this.configuration).streamChat(requestParameters.chatRequest, options).then((request) => request(this.axios, this.basePath));
+        return AIApiFp(this.configuration).streamChat(requestParameters.articleChatRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 使用SSE推送方式进行AI对话
+     * @summary 流式对话
+     * @param {AIApiStreamChat1Request} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public streamChat1(requestParameters: AIApiStreamChat1Request, options?: RawAxiosRequestConfig) {
+        return AIApiFp(this.configuration).streamChat1(requestParameters.chatRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 使用GET方式进行流式对话，便于EventSource使用
+     * @summary GET流式对话
+     * @param {AIApiStreamChatGetRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public streamChatGet(requestParameters: AIApiStreamChatGetRequest, options?: RawAxiosRequestConfig) {
+        return AIApiFp(this.configuration).streamChatGet(requestParameters.articleId, requestParameters.message, requestParameters.historyJson, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

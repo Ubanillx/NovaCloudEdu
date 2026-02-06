@@ -194,8 +194,8 @@ const ConfigFormModal: React.FC<ConfigFormModalProps> = ({ isOpen, onClose, onSu
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto">
-          <div className="p-6 space-y-4">
+        <div className="flex-1 overflow-y-auto">
+          <form onSubmit={handleSubmit} className="p-6 space-y-4">
             {activeTab === 'basic' && (
               <>
                 <div className="grid grid-cols-2 gap-4">
@@ -438,8 +438,8 @@ const ConfigFormModal: React.FC<ConfigFormModalProps> = ({ isOpen, onClose, onSu
                         formData.useDynamic ? 'bg-brand-600' : 'bg-gray-300 dark:bg-gray-600'
                       }`}
                     >
-                      <span className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-transform ${
-                        formData.useDynamic ? 'translate-x-7' : 'translate-x-1'
+                      <span className={`absolute left-1 top-1 w-4 h-4 bg-white rounded-full shadow transition-transform ${
+                        formData.useDynamic ? 'translate-x-6' : ''
                       }`} />
                     </button>
                   </div>
@@ -474,34 +474,35 @@ const ConfigFormModal: React.FC<ConfigFormModalProps> = ({ isOpen, onClose, onSu
                       formData.enabled ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600'
                     }`}
                   >
-                    <span className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-transform ${
-                      formData.enabled ? 'translate-x-7' : 'translate-x-1'
+                    <span className={`absolute left-1 top-1 w-4 h-4 bg-white rounded-full shadow transition-transform ${
+                      formData.enabled ? 'translate-x-6' : ''
                     }`} />
                   </button>
                 </div>
               </>
             )}
-          </div>
+          </form>
+        </div>
 
-          {/* Footer */}
-          <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 flex-shrink-0">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-5 py-2.5 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
-            >
-              取消
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white text-sm font-medium rounded-xl shadow-lg shadow-brand-600/20 hover:shadow-brand-600/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2"
-            >
-              {loading && <RefreshCw size={16} className="animate-spin" />}
-              {isEdit ? '保存修改' : '创建配置'}
-            </button>
-          </div>
-        </form>
+        {/* Footer */}
+        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 flex-shrink-0">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-5 py-2.5 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+          >
+            取消
+          </button>
+          <button
+            type="submit"
+            onClick={handleSubmit}
+            disabled={loading}
+            className="px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white text-sm font-medium rounded-xl shadow-lg shadow-brand-600/20 hover:shadow-brand-600/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2"
+          >
+            {loading && <RefreshCw size={16} className="animate-spin" />}
+            {isEdit ? '保存修改' : '创建配置'}
+          </button>
+        </div>
       </div>
     </div>
   );
