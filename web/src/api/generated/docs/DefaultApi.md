@@ -24,6 +24,9 @@ All URIs are relative to *http://localhost:8080*
 |[**batchProcessByKnowledgeBase**](#batchprocessbyknowledgebase) | **POST** /api/ai/knowledge-bases/{id}/embed-all | 向量化知识库所有待处理文档|
 |[**batchProcessDocuments**](#batchprocessdocuments) | **POST** /api/ai/knowledge-bases/{id}/documents/batch-embed | 批量文档向量化|
 |[**batchProcessDocumentsAsync**](#batchprocessdocumentsasync) | **POST** /api/ai/knowledge-bases/{id}/documents/batch-embed-async | 异步批量文档向量化|
+|[**batchSyncAll**](#batchsyncall) | **POST** /api/dailylearning/graph-sync/all/batch | 批量同步所有数据到知识图谱（高效批量导入）|
+|[**batchSyncArticles**](#batchsyncarticles) | **POST** /api/dailylearning/graph-sync/articles/batch | 批量同步每日文章到知识图谱（高效批量导入）|
+|[**batchSyncWords**](#batchsyncwords) | **POST** /api/dailylearning/graph-sync/words/batch | 批量同步每日单词到知识图谱（高效批量导入）|
 |[**batchUpdate**](#batchupdate) | **POST** /api/workflows/{id}/batch-update | 批量更新节点和连接线|
 |[**cancelExecution**](#cancelexecution) | **POST** /api/workflows/executions/{executionId}/cancel | 取消执行|
 |[**changePassword**](#changepassword) | **POST** /api/user/password | 修改密码|
@@ -165,6 +168,7 @@ All URIs are relative to *http://localhost:8080*
 |[**getPostListByType**](#getpostlistbytype) | **GET** /api/posts/type/{postType} | 根据类型获取帖子列表|
 |[**getReadArticles**](#getreadarticles) | **GET** /api/user/daily-article/read | 获取已阅读文章列表|
 |[**getReadCount**](#getreadcount) | **GET** /api/group-chat/messages/{messageId}/read-count | 获取消息已读人数|
+|[**getReadUsers**](#getreadusers) | **GET** /api/group-chat/messages/{messageId}/read-users | 获取消息已读用户列表（含昵称头像）|
 |[**getReceivedRequests**](#getreceivedrequests) | **POST** /api/friend/request/received | 获取收到的好友申请|
 |[**getReviewCount**](#getreviewcount) | **GET** /api/course/review/{courseId}/count | 获取课程评价数|
 |[**getScheduleBySetting**](#getschedulebysetting) | **GET** /api/schedule/setting/{settingId} | 获取特定配置的课表|
@@ -1390,6 +1394,159 @@ const { status, data } = await apiInstance.batchProcessDocumentsAsync(
 ### HTTP request headers
 
  - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **batchSyncAll**
+> BaseResponseString batchSyncAll()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let batchSize: number; //每批次数量，默认500 (optional) (default to 500)
+
+const { status, data } = await apiInstance.batchSyncAll(
+    batchSize
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **batchSize** | [**number**] | 每批次数量，默认500 | (optional) defaults to 500|
+
+
+### Return type
+
+**BaseResponseString**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **batchSyncArticles**
+> BaseResponseInteger batchSyncArticles()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let batchSize: number; //每批次数量，默认500 (optional) (default to 500)
+
+const { status, data } = await apiInstance.batchSyncArticles(
+    batchSize
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **batchSize** | [**number**] | 每批次数量，默认500 | (optional) defaults to 500|
+
+
+### Return type
+
+**BaseResponseInteger**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **batchSyncWords**
+> BaseResponseInteger batchSyncWords()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let batchSize: number; //每批次数量，默认500 (optional) (default to 500)
+
+const { status, data } = await apiInstance.batchSyncWords(
+    batchSize
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **batchSize** | [**number**] | 每批次数量，默认500 | (optional) defaults to 500|
+
+
+### Return type
+
+**BaseResponseInteger**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
  - **Accept**: application/json
 
 
@@ -8702,6 +8859,57 @@ const { status, data } = await apiInstance.getReadCount(
 ### Return type
 
 **BaseResponseInteger**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getReadUsers**
+> BaseResponseListMessageReadUserResponse getReadUsers()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let messageId: number; // (default to undefined)
+
+const { status, data } = await apiInstance.getReadUsers(
+    messageId
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **messageId** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseListMessageReadUserResponse**
 
 ### Authorization
 

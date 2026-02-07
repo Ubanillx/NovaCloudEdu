@@ -166,6 +166,8 @@ import type { BaseResponseListKnowledgeDocumentVO } from '../models';
 // @ts-ignore
 import type { BaseResponseListLong } from '../models';
 // @ts-ignore
+import type { BaseResponseListMessageReadUserResponse } from '../models';
+// @ts-ignore
 import type { BaseResponseListNodeTypeResponse } from '../models';
 // @ts-ignore
 import type { BaseResponseListOrderResponse } from '../models';
@@ -1269,6 +1271,123 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(requestBody, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 批量同步所有数据到知识图谱（高效批量导入）
+         * @param {number} [batchSize] 每批次数量，默认500
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        batchSyncAll: async (batchSize?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/dailylearning/graph-sync/all/batch`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (batchSize !== undefined) {
+                localVarQueryParameter['batchSize'] = batchSize;
+            }
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 批量同步每日文章到知识图谱（高效批量导入）
+         * @param {number} [batchSize] 每批次数量，默认500
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        batchSyncArticles: async (batchSize?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/dailylearning/graph-sync/articles/batch`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (batchSize !== undefined) {
+                localVarQueryParameter['batchSize'] = batchSize;
+            }
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 批量同步每日单词到知识图谱（高效批量导入）
+         * @param {number} [batchSize] 每批次数量，默认500
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        batchSyncWords: async (batchSize?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/dailylearning/graph-sync/words/batch`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (batchSize !== undefined) {
+                localVarQueryParameter['batchSize'] = batchSize;
+            }
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -6857,6 +6976,44 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             // verify required parameter 'messageId' is not null or undefined
             assertParamExists('getReadCount', 'messageId', messageId)
             const localVarPath = `/api/group-chat/messages/{messageId}/read-count`
+                .replace(`{${"messageId"}}`, encodeURIComponent(String(messageId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 获取消息已读用户列表（含昵称头像）
+         * @param {number} messageId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getReadUsers: async (messageId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'messageId' is not null or undefined
+            assertParamExists('getReadUsers', 'messageId', messageId)
+            const localVarPath = `/api/group-chat/messages/{messageId}/read-users`
                 .replace(`{${"messageId"}}`, encodeURIComponent(String(messageId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -13994,6 +14151,45 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary 批量同步所有数据到知识图谱（高效批量导入）
+         * @param {number} [batchSize] 每批次数量，默认500
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async batchSyncAll(batchSize?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseString>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.batchSyncAll(batchSize, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.batchSyncAll']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 批量同步每日文章到知识图谱（高效批量导入）
+         * @param {number} [batchSize] 每批次数量，默认500
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async batchSyncArticles(batchSize?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseInteger>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.batchSyncArticles(batchSize, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.batchSyncArticles']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 批量同步每日单词到知识图谱（高效批量导入）
+         * @param {number} [batchSize] 每批次数量，默认500
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async batchSyncWords(batchSize?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseInteger>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.batchSyncWords(batchSize, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.batchSyncWords']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @summary 批量更新节点和连接线
          * @param {number} id 工作流ID
          * @param {BatchUpdateNodesRequest} batchUpdateNodesRequest 
@@ -15863,6 +16059,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getReadCount(messageId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.getReadCount']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 获取消息已读用户列表（含昵称头像）
+         * @param {number} messageId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getReadUsers(messageId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseListMessageReadUserResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getReadUsers(messageId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getReadUsers']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -18303,6 +18512,36 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
+         * @summary 批量同步所有数据到知识图谱（高效批量导入）
+         * @param {DefaultApiBatchSyncAllRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        batchSyncAll(requestParameters: DefaultApiBatchSyncAllRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseString> {
+            return localVarFp.batchSyncAll(requestParameters.batchSize, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 批量同步每日文章到知识图谱（高效批量导入）
+         * @param {DefaultApiBatchSyncArticlesRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        batchSyncArticles(requestParameters: DefaultApiBatchSyncArticlesRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseInteger> {
+            return localVarFp.batchSyncArticles(requestParameters.batchSize, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 批量同步每日单词到知识图谱（高效批量导入）
+         * @param {DefaultApiBatchSyncWordsRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        batchSyncWords(requestParameters: DefaultApiBatchSyncWordsRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseInteger> {
+            return localVarFp.batchSyncWords(requestParameters.batchSize, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary 批量更新节点和连接线
          * @param {DefaultApiBatchUpdateRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
@@ -19695,6 +19934,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         getReadCount(requestParameters: DefaultApiGetReadCountRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseInteger> {
             return localVarFp.getReadCount(requestParameters.messageId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 获取消息已读用户列表（含昵称头像）
+         * @param {DefaultApiGetReadUsersRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getReadUsers(requestParameters: DefaultApiGetReadUsersRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListMessageReadUserResponse> {
+            return localVarFp.getReadUsers(requestParameters.messageId, options).then((request) => request(axios, basePath));
         },
         /**
          * 获取当前用户收到的好友申请列表
@@ -21514,6 +21763,33 @@ export interface DefaultApiInterface {
 
     /**
      * 
+     * @summary 批量同步所有数据到知识图谱（高效批量导入）
+     * @param {DefaultApiBatchSyncAllRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    batchSyncAll(requestParameters?: DefaultApiBatchSyncAllRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseString>;
+
+    /**
+     * 
+     * @summary 批量同步每日文章到知识图谱（高效批量导入）
+     * @param {DefaultApiBatchSyncArticlesRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    batchSyncArticles(requestParameters?: DefaultApiBatchSyncArticlesRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseInteger>;
+
+    /**
+     * 
+     * @summary 批量同步每日单词到知识图谱（高效批量导入）
+     * @param {DefaultApiBatchSyncWordsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    batchSyncWords(requestParameters?: DefaultApiBatchSyncWordsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseInteger>;
+
+    /**
+     * 
      * @summary 批量更新节点和连接线
      * @param {DefaultApiBatchUpdateRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -22765,6 +23041,15 @@ export interface DefaultApiInterface {
      * @throws {RequiredError}
      */
     getReadCount(requestParameters: DefaultApiGetReadCountRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseInteger>;
+
+    /**
+     * 
+     * @summary 获取消息已读用户列表（含昵称头像）
+     * @param {DefaultApiGetReadUsersRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getReadUsers(requestParameters: DefaultApiGetReadUsersRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListMessageReadUserResponse>;
 
     /**
      * 获取当前用户收到的好友申请列表
@@ -24419,6 +24704,36 @@ export interface DefaultApiBatchProcessDocumentsAsyncRequest {
 }
 
 /**
+ * Request parameters for batchSyncAll operation in DefaultApi.
+ */
+export interface DefaultApiBatchSyncAllRequest {
+    /**
+     * 每批次数量，默认500
+     */
+    readonly batchSize?: number
+}
+
+/**
+ * Request parameters for batchSyncArticles operation in DefaultApi.
+ */
+export interface DefaultApiBatchSyncArticlesRequest {
+    /**
+     * 每批次数量，默认500
+     */
+    readonly batchSize?: number
+}
+
+/**
+ * Request parameters for batchSyncWords operation in DefaultApi.
+ */
+export interface DefaultApiBatchSyncWordsRequest {
+    /**
+     * 每批次数量，默认500
+     */
+    readonly batchSize?: number
+}
+
+/**
  * Request parameters for batchUpdate operation in DefaultApi.
  */
 export interface DefaultApiBatchUpdateRequest {
@@ -25602,6 +25917,13 @@ export interface DefaultApiGetReadArticlesRequest {
  * Request parameters for getReadCount operation in DefaultApi.
  */
 export interface DefaultApiGetReadCountRequest {
+    readonly messageId: number
+}
+
+/**
+ * Request parameters for getReadUsers operation in DefaultApi.
+ */
+export interface DefaultApiGetReadUsersRequest {
     readonly messageId: number
 }
 
@@ -27399,6 +27721,39 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
 
     /**
      * 
+     * @summary 批量同步所有数据到知识图谱（高效批量导入）
+     * @param {DefaultApiBatchSyncAllRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public batchSyncAll(requestParameters: DefaultApiBatchSyncAllRequest = {}, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).batchSyncAll(requestParameters.batchSize, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 批量同步每日文章到知识图谱（高效批量导入）
+     * @param {DefaultApiBatchSyncArticlesRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public batchSyncArticles(requestParameters: DefaultApiBatchSyncArticlesRequest = {}, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).batchSyncArticles(requestParameters.batchSize, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 批量同步每日单词到知识图谱（高效批量导入）
+     * @param {DefaultApiBatchSyncWordsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public batchSyncWords(requestParameters: DefaultApiBatchSyncWordsRequest = {}, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).batchSyncWords(requestParameters.batchSize, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @summary 批量更新节点和连接线
      * @param {DefaultApiBatchUpdateRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -28931,6 +29286,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public getReadCount(requestParameters: DefaultApiGetReadCountRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).getReadCount(requestParameters.messageId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 获取消息已读用户列表（含昵称头像）
+     * @param {DefaultApiGetReadUsersRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getReadUsers(requestParameters: DefaultApiGetReadUsersRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getReadUsers(requestParameters.messageId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

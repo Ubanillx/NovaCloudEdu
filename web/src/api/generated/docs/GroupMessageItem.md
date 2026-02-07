@@ -16,6 +16,7 @@ Name | Type | Description | Notes
 **type** | **string** |  | [optional] [default to undefined]
 **replyTo** | **number** |  | [optional] [default to undefined]
 **createTime** | **string** |  | [optional] [default to undefined]
+**readCount** | **number** |  | [optional] [default to undefined]
 
 ## Example
 
@@ -34,6 +35,7 @@ const instance: GroupMessageItem = {
     type,
     replyTo,
     createTime,
+    readCount,
 };
 ```
 

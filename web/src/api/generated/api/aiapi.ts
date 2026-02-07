@@ -46,6 +46,8 @@ import type { BaseResponseListKnowledgePoint } from '../models';
 // @ts-ignore
 import type { BaseResponseListLong } from '../models';
 // @ts-ignore
+import type { BaseResponseListMapStringObject } from '../models';
+// @ts-ignore
 import type { BaseResponseMapStringObject } from '../models';
 // @ts-ignore
 import type { BaseResponseMapStringString } from '../models';
@@ -63,6 +65,8 @@ import type { ChatRequest } from '../models';
 import type { CreateAiAssistantCommand } from '../models';
 // @ts-ignore
 import type { PreviewAiProcessRequest } from '../models';
+// @ts-ignore
+import type { SessionChatRequest } from '../models';
 // @ts-ignore
 import type { SseEmitter } from '../models';
 // @ts-ignore
@@ -410,6 +414,40 @@ export const AIApiAxiosParamCreator = function (configuration?: Configuration) {
         },
         /**
          * 
+         * @summary 创建新会话
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createSession: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/ai/chat/sessions`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary 删除AI助手
          * @param {number} id 
          * @param {*} [options] Override http request option.
@@ -420,6 +458,44 @@ export const AIApiAxiosParamCreator = function (configuration?: Configuration) {
             assertParamExists('delete2', 'id', id)
             const localVarPath = `/api/ai/assistants/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 删除会话
+         * @param {number} sessionId 会话ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteSession: async (sessionId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'sessionId' is not null or undefined
+            assertParamExists('deleteSession', 'sessionId', sessionId)
+            const localVarPath = `/api/ai/chat/sessions/{sessionId}`
+                .replace(`{${"sessionId"}}`, encodeURIComponent(String(sessionId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -894,6 +970,44 @@ export const AIApiAxiosParamCreator = function (configuration?: Configuration) {
         },
         /**
          * 
+         * @summary 获取会话详情（含消息列表）
+         * @param {number} sessionId 会话ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getSessionDetail: async (sessionId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'sessionId' is not null or undefined
+            assertParamExists('getSessionDetail', 'sessionId', sessionId)
+            const localVarPath = `/api/ai/chat/sessions/{sessionId}`
+                .replace(`{${"sessionId"}}`, encodeURIComponent(String(sessionId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary 获取章节总结
          * @param {number} bookId 
          * @param {number} chapterId 
@@ -1033,6 +1147,40 @@ export const AIApiAxiosParamCreator = function (configuration?: Configuration) {
             };
         },
         /**
+         * 返回所有供应商的所有模型（含未启用的），标注 enabled/isDefault 状态
+         * @summary 获取全量模型配置
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listAllModels: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/ai/chat/models/all`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 
          * @summary 获取用户的AI助手列表
          * @param {number} userId 
@@ -1084,6 +1232,40 @@ export const AIApiAxiosParamCreator = function (configuration?: Configuration) {
             };
         },
         /**
+         * 仅返回已启用的模型，前端用于模型选择下拉框
+         * @summary 获取可用模型列表
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listModels: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/ai/chat/models`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 
          * @summary 获取公开的AI助手列表
          * @param {number} [page] 
@@ -1093,6 +1275,50 @@ export const AIApiAxiosParamCreator = function (configuration?: Configuration) {
          */
         listPublic1: async (page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/ai/assistants/public`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (size !== undefined) {
+                localVarQueryParameter['size'] = size;
+            }
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 获取会话列表
+         * @param {number} [page] 页码
+         * @param {number} [size] 每页大小
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listSessions: async (page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/ai/chat/sessions`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -1439,6 +1665,49 @@ export const AIApiAxiosParamCreator = function (configuration?: Configuration) {
             };
         },
         /**
+         * 基于会话的SSE对话，服务端自动管理记忆（滑动窗口+摘要压缩）
+         * @summary 会话级流式对话
+         * @param {number} sessionId 会话ID
+         * @param {SessionChatRequest} sessionChatRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        sessionStreamChat: async (sessionId: number, sessionChatRequest: SessionChatRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'sessionId' is not null or undefined
+            assertParamExists('sessionStreamChat', 'sessionId', sessionId)
+            // verify required parameter 'sessionChatRequest' is not null or undefined
+            assertParamExists('sessionStreamChat', 'sessionChatRequest', sessionChatRequest)
+            const localVarPath = `/api/ai/chat/sessions/{sessionId}/stream`
+                .replace(`{${"sessionId"}}`, encodeURIComponent(String(sessionId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json,text/event-stream';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(sessionChatRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 与文章内容进行AI流式对话，返回SSE事件流
          * @summary 流式对话
          * @param {ArticleChatRequest} articleChatRequest 
@@ -1478,8 +1747,8 @@ export const AIApiAxiosParamCreator = function (configuration?: Configuration) {
             };
         },
         /**
-         * 使用SSE推送方式进行AI对话
-         * @summary 流式对话
+         * 前端自行管理历史的SSE对话，支持图片URL
+         * @summary 无状态流式对话
          * @param {ChatRequest} chatRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -1861,6 +2130,18 @@ export const AIApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary 创建新会话
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async createSession(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseMapStringObject>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createSession(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AIApi.createSession']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @summary 删除AI助手
          * @param {number} id 
          * @param {*} [options] Override http request option.
@@ -1870,6 +2151,19 @@ export const AIApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.delete2(id, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['AIApi.delete2']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 删除会话
+         * @param {number} sessionId 会话ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deleteSession(sessionId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteSession(sessionId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AIApi.deleteSession']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -2019,6 +2313,19 @@ export const AIApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary 获取会话详情（含消息列表）
+         * @param {number} sessionId 会话ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getSessionDetail(sessionId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseMapStringObject>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getSessionDetail(sessionId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AIApi.getSessionDetail']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @summary 获取章节总结
          * @param {number} bookId 
          * @param {number} chapterId 
@@ -2062,6 +2369,18 @@ export const AIApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 返回所有供应商的所有模型（含未启用的），标注 enabled/isDefault 状态
+         * @summary 获取全量模型配置
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async listAllModels(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseListMapStringObject>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listAllModels(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AIApi.listAllModels']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 
          * @summary 获取用户的AI助手列表
          * @param {number} userId 
@@ -2077,6 +2396,18 @@ export const AIApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 仅返回已启用的模型，前端用于模型选择下拉框
+         * @summary 获取可用模型列表
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async listModels(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseListMapStringObject>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listModels(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AIApi.listModels']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 
          * @summary 获取公开的AI助手列表
          * @param {number} [page] 
@@ -2088,6 +2419,20 @@ export const AIApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.listPublic1(page, size, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['AIApi.listPublic1']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 获取会话列表
+         * @param {number} [page] 页码
+         * @param {number} [size] 每页大小
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async listSessions(page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseListMapStringObject>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listSessions(page, size, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AIApi.listSessions']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -2190,6 +2535,20 @@ export const AIApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 基于会话的SSE对话，服务端自动管理记忆（滑动窗口+摘要压缩）
+         * @summary 会话级流式对话
+         * @param {number} sessionId 会话ID
+         * @param {SessionChatRequest} sessionChatRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async sessionStreamChat(sessionId: number, sessionChatRequest: SessionChatRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SseEmitter>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.sessionStreamChat(sessionId, sessionChatRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AIApi.sessionStreamChat']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 与文章内容进行AI流式对话，返回SSE事件流
          * @summary 流式对话
          * @param {ArticleChatRequest} articleChatRequest 
@@ -2203,8 +2562,8 @@ export const AIApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * 使用SSE推送方式进行AI对话
-         * @summary 流式对话
+         * 前端自行管理历史的SSE对话，支持图片URL
+         * @summary 无状态流式对话
          * @param {ChatRequest} chatRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -2378,6 +2737,15 @@ export const AIApiFactory = function (configuration?: Configuration, basePath?: 
         },
         /**
          * 
+         * @summary 创建新会话
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createSession(options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringObject> {
+            return localVarFp.createSession(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary 删除AI助手
          * @param {AIApiDelete2Request} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
@@ -2385,6 +2753,16 @@ export const AIApiFactory = function (configuration?: Configuration, basePath?: 
          */
         delete2(requestParameters: AIApiDelete2Request, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid> {
             return localVarFp.delete2(requestParameters.id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 删除会话
+         * @param {AIApiDeleteSessionRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteSession(requestParameters: AIApiDeleteSessionRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid> {
+            return localVarFp.deleteSession(requestParameters.sessionId, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -2488,6 +2866,16 @@ export const AIApiFactory = function (configuration?: Configuration, basePath?: 
         },
         /**
          * 
+         * @summary 获取会话详情（含消息列表）
+         * @param {AIApiGetSessionDetailRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getSessionDetail(requestParameters: AIApiGetSessionDetailRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringObject> {
+            return localVarFp.getSessionDetail(requestParameters.sessionId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary 获取章节总结
          * @param {AIApiGetSummaryRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
@@ -2517,6 +2905,15 @@ export const AIApiFactory = function (configuration?: Configuration, basePath?: 
             return localVarFp.getWorkflows(requestParameters.id, options).then((request) => request(axios, basePath));
         },
         /**
+         * 返回所有供应商的所有模型（含未启用的），标注 enabled/isDefault 状态
+         * @summary 获取全量模型配置
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listAllModels(options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListMapStringObject> {
+            return localVarFp.listAllModels(options).then((request) => request(axios, basePath));
+        },
+        /**
          * 
          * @summary 获取用户的AI助手列表
          * @param {AIApiListByCreator1Request} requestParameters Request parameters.
@@ -2527,6 +2924,15 @@ export const AIApiFactory = function (configuration?: Configuration, basePath?: 
             return localVarFp.listByCreator1(requestParameters.userId, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
         },
         /**
+         * 仅返回已启用的模型，前端用于模型选择下拉框
+         * @summary 获取可用模型列表
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listModels(options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListMapStringObject> {
+            return localVarFp.listModels(options).then((request) => request(axios, basePath));
+        },
+        /**
          * 
          * @summary 获取公开的AI助手列表
          * @param {AIApiListPublic1Request} requestParameters Request parameters.
@@ -2535,6 +2941,16 @@ export const AIApiFactory = function (configuration?: Configuration, basePath?: 
          */
         listPublic1(requestParameters: AIApiListPublic1Request = {}, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListAiAssistantVO> {
             return localVarFp.listPublic1(requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 获取会话列表
+         * @param {AIApiListSessionsRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listSessions(requestParameters: AIApiListSessionsRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListMapStringObject> {
+            return localVarFp.listSessions(requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
         },
         /**
          * 预览AI处理结果，不保存到数据库
@@ -2607,6 +3023,16 @@ export const AIApiFactory = function (configuration?: Configuration, basePath?: 
             return localVarFp.searchKnowledgePoints(requestParameters.bookId, requestParameters.keyword, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
         },
         /**
+         * 基于会话的SSE对话，服务端自动管理记忆（滑动窗口+摘要压缩）
+         * @summary 会话级流式对话
+         * @param {AIApiSessionStreamChatRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        sessionStreamChat(requestParameters: AIApiSessionStreamChatRequest, options?: RawAxiosRequestConfig): AxiosPromise<SseEmitter> {
+            return localVarFp.sessionStreamChat(requestParameters.sessionId, requestParameters.sessionChatRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 与文章内容进行AI流式对话，返回SSE事件流
          * @summary 流式对话
          * @param {AIApiStreamChatRequest} requestParameters Request parameters.
@@ -2617,8 +3043,8 @@ export const AIApiFactory = function (configuration?: Configuration, basePath?: 
             return localVarFp.streamChat(requestParameters.articleChatRequest, options).then((request) => request(axios, basePath));
         },
         /**
-         * 使用SSE推送方式进行AI对话
-         * @summary 流式对话
+         * 前端自行管理历史的SSE对话，支持图片URL
+         * @summary 无状态流式对话
          * @param {AIApiStreamChat1Request} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -2757,12 +3183,29 @@ export interface AIApiInterface {
 
     /**
      * 
+     * @summary 创建新会话
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    createSession(options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringObject>;
+
+    /**
+     * 
      * @summary 删除AI助手
      * @param {AIApiDelete2Request} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     delete2(requestParameters: AIApiDelete2Request, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid>;
+
+    /**
+     * 
+     * @summary 删除会话
+     * @param {AIApiDeleteSessionRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    deleteSession(requestParameters: AIApiDeleteSessionRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid>;
 
     /**
      * 
@@ -2856,6 +3299,15 @@ export interface AIApiInterface {
 
     /**
      * 
+     * @summary 获取会话详情（含消息列表）
+     * @param {AIApiGetSessionDetailRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getSessionDetail(requestParameters: AIApiGetSessionDetailRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringObject>;
+
+    /**
+     * 
      * @summary 获取章节总结
      * @param {AIApiGetSummaryRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -2882,6 +3334,14 @@ export interface AIApiInterface {
     getWorkflows(requestParameters: AIApiGetWorkflowsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListLong>;
 
     /**
+     * 返回所有供应商的所有模型（含未启用的），标注 enabled/isDefault 状态
+     * @summary 获取全量模型配置
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    listAllModels(options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListMapStringObject>;
+
+    /**
      * 
      * @summary 获取用户的AI助手列表
      * @param {AIApiListByCreator1Request} requestParameters Request parameters.
@@ -2891,6 +3351,14 @@ export interface AIApiInterface {
     listByCreator1(requestParameters: AIApiListByCreator1Request, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListAiAssistantVO>;
 
     /**
+     * 仅返回已启用的模型，前端用于模型选择下拉框
+     * @summary 获取可用模型列表
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    listModels(options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListMapStringObject>;
+
+    /**
      * 
      * @summary 获取公开的AI助手列表
      * @param {AIApiListPublic1Request} requestParameters Request parameters.
@@ -2898,6 +3366,15 @@ export interface AIApiInterface {
      * @throws {RequiredError}
      */
     listPublic1(requestParameters?: AIApiListPublic1Request, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListAiAssistantVO>;
+
+    /**
+     * 
+     * @summary 获取会话列表
+     * @param {AIApiListSessionsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    listSessions(requestParameters?: AIApiListSessionsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListMapStringObject>;
 
     /**
      * 预览AI处理结果，不保存到数据库
@@ -2963,6 +3440,15 @@ export interface AIApiInterface {
     searchKnowledgePoints(requestParameters: AIApiSearchKnowledgePointsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListKnowledgePoint>;
 
     /**
+     * 基于会话的SSE对话，服务端自动管理记忆（滑动窗口+摘要压缩）
+     * @summary 会话级流式对话
+     * @param {AIApiSessionStreamChatRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    sessionStreamChat(requestParameters: AIApiSessionStreamChatRequest, options?: RawAxiosRequestConfig): AxiosPromise<SseEmitter>;
+
+    /**
      * 与文章内容进行AI流式对话，返回SSE事件流
      * @summary 流式对话
      * @param {AIApiStreamChatRequest} requestParameters Request parameters.
@@ -2972,8 +3458,8 @@ export interface AIApiInterface {
     streamChat(requestParameters: AIApiStreamChatRequest, options?: RawAxiosRequestConfig): AxiosPromise<SseEmitter>;
 
     /**
-     * 使用SSE推送方式进行AI对话
-     * @summary 流式对话
+     * 前端自行管理历史的SSE对话，支持图片URL
+     * @summary 无状态流式对话
      * @param {AIApiStreamChat1Request} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -3103,6 +3589,16 @@ export interface AIApiDelete2Request {
 }
 
 /**
+ * Request parameters for deleteSession operation in AIApi.
+ */
+export interface AIApiDeleteSessionRequest {
+    /**
+     * 会话ID
+     */
+    readonly sessionId: number
+}
+
+/**
  * Request parameters for executeWorkflow operation in AIApi.
  */
 export interface AIApiExecuteWorkflowRequest {
@@ -3203,6 +3699,16 @@ export interface AIApiGetQuizRequest {
 }
 
 /**
+ * Request parameters for getSessionDetail operation in AIApi.
+ */
+export interface AIApiGetSessionDetailRequest {
+    /**
+     * 会话ID
+     */
+    readonly sessionId: number
+}
+
+/**
  * Request parameters for getSummary operation in AIApi.
  */
 export interface AIApiGetSummaryRequest {
@@ -3250,6 +3756,21 @@ export interface AIApiListByCreator1Request {
 export interface AIApiListPublic1Request {
     readonly page?: number
 
+    readonly size?: number
+}
+
+/**
+ * Request parameters for listSessions operation in AIApi.
+ */
+export interface AIApiListSessionsRequest {
+    /**
+     * 页码
+     */
+    readonly page?: number
+
+    /**
+     * 每页大小
+     */
     readonly size?: number
 }
 
@@ -3316,6 +3837,18 @@ export interface AIApiSearchKnowledgePointsRequest {
     readonly page?: number
 
     readonly size?: number
+}
+
+/**
+ * Request parameters for sessionStreamChat operation in AIApi.
+ */
+export interface AIApiSessionStreamChatRequest {
+    /**
+     * 会话ID
+     */
+    readonly sessionId: number
+
+    readonly sessionChatRequest: SessionChatRequest
 }
 
 /**
@@ -3475,6 +4008,16 @@ export class AIApi extends BaseAPI implements AIApiInterface {
 
     /**
      * 
+     * @summary 创建新会话
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public createSession(options?: RawAxiosRequestConfig) {
+        return AIApiFp(this.configuration).createSession(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @summary 删除AI助手
      * @param {AIApiDelete2Request} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -3482,6 +4025,17 @@ export class AIApi extends BaseAPI implements AIApiInterface {
      */
     public delete2(requestParameters: AIApiDelete2Request, options?: RawAxiosRequestConfig) {
         return AIApiFp(this.configuration).delete2(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 删除会话
+     * @param {AIApiDeleteSessionRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public deleteSession(requestParameters: AIApiDeleteSessionRequest, options?: RawAxiosRequestConfig) {
+        return AIApiFp(this.configuration).deleteSession(requestParameters.sessionId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -3596,6 +4150,17 @@ export class AIApi extends BaseAPI implements AIApiInterface {
 
     /**
      * 
+     * @summary 获取会话详情（含消息列表）
+     * @param {AIApiGetSessionDetailRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getSessionDetail(requestParameters: AIApiGetSessionDetailRequest, options?: RawAxiosRequestConfig) {
+        return AIApiFp(this.configuration).getSessionDetail(requestParameters.sessionId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @summary 获取章节总结
      * @param {AIApiGetSummaryRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -3628,6 +4193,16 @@ export class AIApi extends BaseAPI implements AIApiInterface {
     }
 
     /**
+     * 返回所有供应商的所有模型（含未启用的），标注 enabled/isDefault 状态
+     * @summary 获取全量模型配置
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public listAllModels(options?: RawAxiosRequestConfig) {
+        return AIApiFp(this.configuration).listAllModels(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 
      * @summary 获取用户的AI助手列表
      * @param {AIApiListByCreator1Request} requestParameters Request parameters.
@@ -3639,6 +4214,16 @@ export class AIApi extends BaseAPI implements AIApiInterface {
     }
 
     /**
+     * 仅返回已启用的模型，前端用于模型选择下拉框
+     * @summary 获取可用模型列表
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public listModels(options?: RawAxiosRequestConfig) {
+        return AIApiFp(this.configuration).listModels(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 
      * @summary 获取公开的AI助手列表
      * @param {AIApiListPublic1Request} requestParameters Request parameters.
@@ -3647,6 +4232,17 @@ export class AIApi extends BaseAPI implements AIApiInterface {
      */
     public listPublic1(requestParameters: AIApiListPublic1Request = {}, options?: RawAxiosRequestConfig) {
         return AIApiFp(this.configuration).listPublic1(requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 获取会话列表
+     * @param {AIApiListSessionsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public listSessions(requestParameters: AIApiListSessionsRequest = {}, options?: RawAxiosRequestConfig) {
+        return AIApiFp(this.configuration).listSessions(requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -3727,6 +4323,17 @@ export class AIApi extends BaseAPI implements AIApiInterface {
     }
 
     /**
+     * 基于会话的SSE对话，服务端自动管理记忆（滑动窗口+摘要压缩）
+     * @summary 会话级流式对话
+     * @param {AIApiSessionStreamChatRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public sessionStreamChat(requestParameters: AIApiSessionStreamChatRequest, options?: RawAxiosRequestConfig) {
+        return AIApiFp(this.configuration).sessionStreamChat(requestParameters.sessionId, requestParameters.sessionChatRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 与文章内容进行AI流式对话，返回SSE事件流
      * @summary 流式对话
      * @param {AIApiStreamChatRequest} requestParameters Request parameters.
@@ -3738,8 +4345,8 @@ export class AIApi extends BaseAPI implements AIApiInterface {
     }
 
     /**
-     * 使用SSE推送方式进行AI对话
-     * @summary 流式对话
+     * 前端自行管理历史的SSE对话，支持图片URL
+     * @summary 无状态流式对话
      * @param {AIApiStreamChat1Request} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}

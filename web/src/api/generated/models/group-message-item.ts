@@ -26,5 +26,6 @@ export interface GroupMessageItem {
     'type'?: string;
     'replyTo'?: number;
     'createTime'?: string;
+    'readCount'?: number;
 }
 
