@@ -64,18 +64,23 @@ class _PrivateChatPageState extends State<PrivateChatPage> {
       // 只处理来自当前聊天对象的消息
       if (message.senderId == widget.partnerId) {
         setState(() {
-          _messages.insert(0, LocalChatMessage(
-            messageId: message.messageId,
-            senderId: message.senderId ?? 0,
-            senderName: message.senderName,
-            senderAvatar: message.senderAvatar,
-            receiverId: message.receiverId ?? 0,
-            content: message.content,
-            type: message.type ?? 'TEXT',
-            isRead: message.isRead ?? false,
-            isSent: true,
-            createTime: message.createTime ?? DateTime.now(),
-          ));
+          // 防重：如果该 messageId 已存在则不插入
+          final exists = message.messageId != null &&
+              _messages.any((m) => m.messageId == message.messageId);
+          if (!exists) {
+            _messages.insert(0, LocalChatMessage(
+              messageId: message.messageId,
+              senderId: message.senderId ?? 0,
+              senderName: message.senderName,
+              senderAvatar: message.senderAvatar,
+              receiverId: message.receiverId ?? 0,
+              content: message.content,
+              type: message.type ?? 'TEXT',
+              isRead: message.isRead ?? false,
+              isSent: true,
+              createTime: message.createTime ?? DateTime.now(),
+            ));
+          }
         });
         // 标记已读
         _syncService.markAsRead(widget.partnerId);

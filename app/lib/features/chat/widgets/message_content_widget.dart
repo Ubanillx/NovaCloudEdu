@@ -1,10 +1,9 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:open_filex/open_filex.dart';
 import '../../../config/app_theme.dart';
-import '../../../core/network/api_client.dart';
 import '../services/audio_service.dart';
+import '../services/file_cache_service.dart';
 
 /// 消息类型
 enum MessageType {
@@ -82,48 +81,40 @@ class MessageContentWidget extends StatelessWidget {
             maxWidth: 200,
             maxHeight: 200,
           ),
-          child: Image.network(
-            content,
+          child: CachedNetworkImage(
+            imageUrl: content,
+            cacheManager: ChatFileCacheManager.instance.cacheManager,
             fit: BoxFit.cover,
-            loadingBuilder: (context, child, loadingProgress) {
-              if (loadingProgress == null) return child;
-              return Container(
-                width: 150,
-                height: 150,
+            placeholder: (context, url) => Container(
+              width: 150,
+              height: 150,
+              color: colors.background,
+              child: Center(
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: AppTheme.brand,
+                ),
+              ),
+            ),
+            errorWidget: (context, url, error) => Container(
+              width: 150,
+              height: 100,
+              decoration: BoxDecoration(
                 color: colors.background,
-                child: Center(
-                  child: CircularProgressIndicator(
-                    value: loadingProgress.expectedTotalBytes != null
-                        ? loadingProgress.cumulativeBytesLoaded /
-                            loadingProgress.expectedTotalBytes!
-                        : null,
-                    strokeWidth: 2,
-                    color: AppTheme.brand,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.broken_image, color: colors.textTertiary, size: 32),
+                  const SizedBox(height: 4),
+                  Text(
+                    '图片加载失败',
+                    style: TextStyle(fontSize: 12, color: colors.textTertiary),
                   ),
-                ),
-              );
-            },
-            errorBuilder: (context, error, stackTrace) {
-              return Container(
-                width: 150,
-                height: 100,
-                decoration: BoxDecoration(
-                  color: colors.background,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.broken_image, color: colors.textTertiary, size: 32),
-                    const SizedBox(height: 4),
-                    Text(
-                      '图片加载失败',
-                      style: TextStyle(fontSize: 12, color: colors.textTertiary),
-                    ),
-                  ],
-                ),
-              );
-            },
+                ],
+              ),
+            ),
           ),
         ),
       ),
@@ -408,30 +399,10 @@ class _FileMessageWidgetState extends State<FileMessageWidget> {
     });
 
     try {
-      // 获取临时目录
-      final dir = await getTemporaryDirectory();
-      final filePath = '${dir.path}/${widget.fileName}';
-      final file = File(filePath);
-
-      // 如果文件已存在，直接打开
-      if (await file.exists()) {
-        await OpenFilex.open(filePath);
-        setState(() => _isDownloading = false);
-        return;
-      }
-
-      // 下载文件
-      final dio = ApiClient.instance.dio;
-      await dio.download(
+      // 使用缓存服务下载到持久化目录
+      final filePath = await ChatFileCacheManager.instance.downloadToPersistent(
         widget.fileUrl,
-        filePath,
-        onReceiveProgress: (received, total) {
-          if (total != -1) {
-            setState(() {
-              _downloadProgress = received / total;
-            });
-          }
-        },
+        widget.fileName,
       );
 
       // 打开文件
@@ -572,6 +543,26 @@ class ImagePreviewPage extends StatelessWidget {
 
   const ImagePreviewPage({super.key, required this.imageUrl});
 
+  Future<void> _saveImage(BuildContext context) async {
+    try {
+      final fileName = Uri.parse(imageUrl).pathSegments.isNotEmpty
+          ? Uri.parse(imageUrl).pathSegments.last
+          : 'image_${DateTime.now().millisecondsSinceEpoch}.jpg';
+      await ChatFileCacheManager.instance.downloadToPersistent(imageUrl, fileName);
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('图片已保存')),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('保存失败: $e')),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -586,9 +577,7 @@ class ImagePreviewPage extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.download, color: Colors.white),
-            onPressed: () {
-              // TODO: 下载图片
-            },
+            onPressed: () => _saveImage(context),
           ),
         ],
       ),
@@ -596,36 +585,26 @@ class ImagePreviewPage extends StatelessWidget {
         child: InteractiveViewer(
           minScale: 0.5,
           maxScale: 4.0,
-          child: Image.network(
-            imageUrl,
+          child: CachedNetworkImage(
+            imageUrl: imageUrl,
+            cacheManager: ChatFileCacheManager.instance.cacheManager,
             fit: BoxFit.contain,
-            loadingBuilder: (context, child, loadingProgress) {
-              if (loadingProgress == null) return child;
-              return Center(
-                child: CircularProgressIndicator(
-                  value: loadingProgress.expectedTotalBytes != null
-                      ? loadingProgress.cumulativeBytesLoaded /
-                          loadingProgress.expectedTotalBytes!
-                      : null,
-                  color: Colors.white,
-                ),
-              );
-            },
-            errorBuilder: (context, error, stackTrace) {
-              return const Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.broken_image, color: Colors.white54, size: 64),
-                    SizedBox(height: 16),
-                    Text(
-                      '图片加载失败',
-                      style: TextStyle(color: Colors.white54),
-                    ),
-                  ],
-                ),
-              );
-            },
+            placeholder: (context, url) => const Center(
+              child: CircularProgressIndicator(color: Colors.white),
+            ),
+            errorWidget: (context, url, error) => const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.broken_image, color: Colors.white54, size: 64),
+                  SizedBox(height: 16),
+                  Text(
+                    '图片加载失败',
+                    style: TextStyle(color: Colors.white54),
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
       ),

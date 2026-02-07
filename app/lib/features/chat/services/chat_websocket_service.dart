@@ -126,6 +126,41 @@ class WsGroupMessage {
   }
 }
 
+/// 群已读回执
+class WsGroupReadReceipt {
+  final int? messageId;
+  final int? groupId;
+  final int? readerId;
+  final String? readerName;
+  final String? readerAvatar;
+  final int? totalReadCount;
+  final DateTime? readTime;
+
+  WsGroupReadReceipt({
+    this.messageId,
+    this.groupId,
+    this.readerId,
+    this.readerName,
+    this.readerAvatar,
+    this.totalReadCount,
+    this.readTime,
+  });
+
+  factory WsGroupReadReceipt.fromJson(Map<String, dynamic> json) {
+    return WsGroupReadReceipt(
+      messageId: json['messageId'] as int?,
+      groupId: json['groupId'] as int?,
+      readerId: json['readerId'] as int?,
+      readerName: json['readerName'] as String?,
+      readerAvatar: json['readerAvatar'] as String?,
+      totalReadCount: json['totalReadCount'] as int?,
+      readTime: json['readTime'] != null
+          ? DateTime.tryParse(json['readTime'] as String)
+          : null,
+    );
+  }
+}
+
 /// WebSocket 聊天服务 - STOMP 协议
 class ChatWebSocketService {
   static ChatWebSocketService? _instance;
@@ -145,6 +180,8 @@ class ChatWebSocketService {
   final _groupMessageController = StreamController<WsGroupMessage>.broadcast();
   final _notificationController = StreamController<NotificationEvent>.broadcast();
   final _readReceiptController = StreamController<ReadReceipt>.broadcast();
+  final _groupReadReceiptController = StreamController<WsGroupReadReceipt>.broadcast();
+  final _groupMessageSentController = StreamController<WsGroupMessage>.broadcast();
   final _connectionStateController = StreamController<bool>.broadcast();
 
   // 已订阅的群组
@@ -161,6 +198,12 @@ class ChatWebSocketService {
 
   /// 已读回执流
   Stream<ReadReceipt> get readReceipts => _readReceiptController.stream;
+
+  /// 群已读回执流
+  Stream<WsGroupReadReceipt> get groupReadReceipts => _groupReadReceiptController.stream;
+
+  /// 群消息发送确认流（发送者专用，含服务端分配的 messageId）
+  Stream<WsGroupMessage> get groupMessagesSent => _groupMessageSentController.stream;
 
   /// 连接状态流
   Stream<bool> get connectionState => _connectionStateController.stream;
@@ -247,6 +290,40 @@ class ChatWebSocketService {
             debugPrint('收到通知: ${notification.type}');
           } catch (e) {
             debugPrint('解析通知失败: $e');
+          }
+        }
+      },
+    );
+
+    // 订阅群消息（后端逐个推送，排除发送者）
+    _stompClient!.subscribe(
+      destination: '/user/queue/group-messages',
+      callback: (frame) {
+        if (frame.body != null) {
+          try {
+            final json = jsonDecode(frame.body!) as Map<String, dynamic>;
+            final message = WsGroupMessage.fromJson(json);
+            _groupMessageController.add(message);
+            debugPrint('收到群消息(user queue): ${message.content}');
+          } catch (e) {
+            debugPrint('解析群消息失败: $e');
+          }
+        }
+      },
+    );
+
+    // 订阅群消息发送确认（发送者专用，含服务端分配的 messageId）
+    _stompClient!.subscribe(
+      destination: '/user/queue/group-message-sent',
+      callback: (frame) {
+        if (frame.body != null) {
+          try {
+            final json = jsonDecode(frame.body!) as Map<String, dynamic>;
+            final message = WsGroupMessage.fromJson(json);
+            _groupMessageSentController.add(message);
+            debugPrint('群消息发送确认: messageId=${message.messageId}');
+          } catch (e) {
+            debugPrint('解析群消息发送确认失败: $e');
           }
         }
       },
@@ -363,8 +440,26 @@ class ChatWebSocketService {
         }
       },
     );
+
+    // 订阅群已读回执
+    _stompClient!.subscribe(
+      destination: '/topic/group/$groupId/read-receipts',
+      callback: (frame) {
+        if (frame.body != null) {
+          try {
+            final json = jsonDecode(frame.body!) as Map<String, dynamic>;
+            final receipt = WsGroupReadReceipt.fromJson(json);
+            _groupReadReceiptController.add(receipt);
+            debugPrint('收到群已读回执: messageId=${receipt.messageId}, reader=${receipt.readerName}');
+          } catch (e) {
+            debugPrint('解析群已读回执失败: $e');
+          }
+        }
+      },
+    );
+
     _subscribedGroups.add(groupId);
-    debugPrint('已订阅群组 $groupId');
+    debugPrint('已订阅群组 $groupId (消息+已读回执)');
   }
 
   /// 取消订阅群组消息
@@ -435,6 +530,7 @@ class ChatWebSocketService {
     _groupMessageController.close();
     _notificationController.close();
     _readReceiptController.close();
+    _groupReadReceiptController.close();
     _connectionStateController.close();
     _subscribedGroups.clear();
     _instance = null;

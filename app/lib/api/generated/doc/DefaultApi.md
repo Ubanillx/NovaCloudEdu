@@ -173,6 +173,7 @@ Method | HTTP request | Description
 [**getPostListByType**](DefaultApi.md#getpostlistbytype) | **GET** /api/posts/type/{postType} | 根据类型获取帖子列表
 [**getReadArticles**](DefaultApi.md#getreadarticles) | **GET** /api/user/daily-article/read | 获取已阅读文章列表
 [**getReadCount**](DefaultApi.md#getreadcount) | **GET** /api/group-chat/messages/{messageId}/read-count | 获取消息已读人数
+[**getReadUsers**](DefaultApi.md#getreadusers) | **GET** /api/group-chat/messages/{messageId}/read-users | 获取消息已读用户列表（含昵称头像）
 [**getReceivedRequests**](DefaultApi.md#getreceivedrequests) | **POST** /api/friend/request/received | 获取收到的好友申请
 [**getReviewCount**](DefaultApi.md#getreviewcount) | **GET** /api/course/review/{courseId}/count | 获取课程评价数
 [**getScheduleBySetting**](DefaultApi.md#getschedulebysetting) | **GET** /api/schedule/setting/{settingId} | 获取特定配置的课表
@@ -7217,6 +7218,47 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**BaseResponseInteger**](BaseResponseInteger.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getReadUsers**
+> BaseResponseListMessageReadUserResponse getReadUsers(messageId)
+
+获取消息已读用户列表（含昵称头像）
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int messageId = 789; // int | 
+
+try {
+    final response = api.getReadUsers(messageId);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getReadUsers: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **messageId** | **int**|  | 
+
+### Return type
+
+[**BaseResponseListMessageReadUserResponse**](BaseResponseListMessageReadUserResponse.md)
 
 ### Authorization
 

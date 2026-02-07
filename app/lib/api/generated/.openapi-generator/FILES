@@ -99,6 +99,7 @@ doc/BaseResponseListKnowledgeDocumentVO.md
 doc/BaseResponseListKnowledgePoint.md
 doc/BaseResponseListLong.md
 doc/BaseResponseListMapStringObject.md
+doc/BaseResponseListMessageReadUserResponse.md
 doc/BaseResponseListNodeTypeResponse.md
 doc/BaseResponseListOrderResponse.md
 doc/BaseResponseListPostResponse.md
@@ -264,6 +265,7 @@ doc/KnowledgePointId.md
 doc/LearningStats.md
 doc/LoginUserResponse.md
 doc/MemberPage.md
+doc/MessageReadUserResponse.md
 doc/NodeTypeResponse.md
 doc/OptionDTO.md
 doc/OrderResponse.md
@@ -484,6 +486,7 @@ lib/src/model/base_response_list_knowledge_document_vo.dart
 lib/src/model/base_response_list_knowledge_point.dart
 lib/src/model/base_response_list_long.dart
 lib/src/model/base_response_list_map_string_object.dart
+lib/src/model/base_response_list_message_read_user_response.dart
 lib/src/model/base_response_list_node_type_response.dart
 lib/src/model/base_response_list_order_response.dart
 lib/src/model/base_response_list_post_response.dart
@@ -649,6 +652,7 @@ lib/src/model/knowledge_point_id.dart
 lib/src/model/learning_stats.dart
 lib/src/model/login_user_response.dart
 lib/src/model/member_page.dart
+lib/src/model/message_read_user_response.dart
 lib/src/model/node_type_response.dart
 lib/src/model/option_dto.dart
 lib/src/model/order_response.dart

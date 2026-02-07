@@ -229,6 +229,7 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**getPostListByType**](doc/DefaultApi.md#getpostlistbytype) | **GET** /api/posts/type/{postType} | 根据类型获取帖子列表
 [*DefaultApi*](doc/DefaultApi.md) | [**getReadArticles**](doc/DefaultApi.md#getreadarticles) | **GET** /api/user/daily-article/read | 获取已阅读文章列表
 [*DefaultApi*](doc/DefaultApi.md) | [**getReadCount**](doc/DefaultApi.md#getreadcount) | **GET** /api/group-chat/messages/{messageId}/read-count | 获取消息已读人数
+[*DefaultApi*](doc/DefaultApi.md) | [**getReadUsers**](doc/DefaultApi.md#getreadusers) | **GET** /api/group-chat/messages/{messageId}/read-users | 获取消息已读用户列表（含昵称头像）
 [*DefaultApi*](doc/DefaultApi.md) | [**getReceivedRequests**](doc/DefaultApi.md#getreceivedrequests) | **POST** /api/friend/request/received | 获取收到的好友申请
 [*DefaultApi*](doc/DefaultApi.md) | [**getReviewCount**](doc/DefaultApi.md#getreviewcount) | **GET** /api/course/review/{courseId}/count | 获取课程评价数
 [*DefaultApi*](doc/DefaultApi.md) | [**getScheduleBySetting**](doc/DefaultApi.md#getschedulebysetting) | **GET** /api/schedule/setting/{settingId} | 获取特定配置的课表
@@ -541,6 +542,7 @@ Class | Method | HTTP request | Description
  - [BaseResponseListKnowledgePoint](doc/BaseResponseListKnowledgePoint.md)
  - [BaseResponseListLong](doc/BaseResponseListLong.md)
  - [BaseResponseListMapStringObject](doc/BaseResponseListMapStringObject.md)
+ - [BaseResponseListMessageReadUserResponse](doc/BaseResponseListMessageReadUserResponse.md)
  - [BaseResponseListNodeTypeResponse](doc/BaseResponseListNodeTypeResponse.md)
  - [BaseResponseListOrderResponse](doc/BaseResponseListOrderResponse.md)
  - [BaseResponseListPostResponse](doc/BaseResponseListPostResponse.md)
@@ -705,6 +707,7 @@ Class | Method | HTTP request | Description
  - [LearningStats](doc/LearningStats.md)
  - [LoginUserResponse](doc/LoginUserResponse.md)
  - [MemberPage](doc/MemberPage.md)
+ - [MessageReadUserResponse](doc/MessageReadUserResponse.md)
  - [NodeTypeResponse](doc/NodeTypeResponse.md)
  - [OptionDTO](doc/OptionDTO.md)
  - [OrderResponse](doc/OrderResponse.md)

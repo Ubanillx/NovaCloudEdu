@@ -111,6 +111,7 @@ import 'package:nova_api/src/model/base_response_list_knowledge_document_vo.dart
 import 'package:nova_api/src/model/base_response_list_knowledge_point.dart';
 import 'package:nova_api/src/model/base_response_list_long.dart';
 import 'package:nova_api/src/model/base_response_list_map_string_object.dart';
+import 'package:nova_api/src/model/base_response_list_message_read_user_response.dart';
 import 'package:nova_api/src/model/base_response_list_node_type_response.dart';
 import 'package:nova_api/src/model/base_response_list_order_response.dart';
 import 'package:nova_api/src/model/base_response_list_post_response.dart';
@@ -275,6 +276,7 @@ import 'package:nova_api/src/model/knowledge_point_id.dart';
 import 'package:nova_api/src/model/learning_stats.dart';
 import 'package:nova_api/src/model/login_user_response.dart';
 import 'package:nova_api/src/model/member_page.dart';
+import 'package:nova_api/src/model/message_read_user_response.dart';
 import 'package:nova_api/src/model/node_type_response.dart';
 import 'package:nova_api/src/model/option_dto.dart';
 import 'package:nova_api/src/model/order_response.dart';
@@ -486,6 +488,7 @@ part 'serializers.g.dart';
   BaseResponseListKnowledgePoint,
   BaseResponseListLong,
   BaseResponseListMapStringObject,
+  BaseResponseListMessageReadUserResponse,
   BaseResponseListNodeTypeResponse,
   BaseResponseListOrderResponse,
   BaseResponseListPostResponse,
@@ -650,6 +653,7 @@ part 'serializers.g.dart';
   LearningStats,
   LoginUserResponse,
   MemberPage,
+  MessageReadUserResponse,
   NodeTypeResponse,
   OptionDTO,
   OrderResponse,

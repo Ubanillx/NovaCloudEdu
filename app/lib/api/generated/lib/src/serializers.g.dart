@@ -108,6 +108,7 @@ Serializers _$serializers =
           ..add(BaseResponseListKnowledgePoint.serializer)
           ..add(BaseResponseListLong.serializer)
           ..add(BaseResponseListMapStringObject.serializer)
+          ..add(BaseResponseListMessageReadUserResponse.serializer)
           ..add(BaseResponseListNodeTypeResponse.serializer)
           ..add(BaseResponseListOrderResponse.serializer)
           ..add(BaseResponseListPostResponse.serializer)
@@ -284,6 +285,7 @@ Serializers _$serializers =
           ..add(LearningStats.serializer)
           ..add(LoginUserResponse.serializer)
           ..add(MemberPage.serializer)
+          ..add(MessageReadUserResponse.serializer)
           ..add(NodeTypeResponse.serializer)
           ..add(OptionDTO.serializer)
           ..add(OrderResponse.serializer)
@@ -694,6 +696,12 @@ Serializers _$serializers =
           ..addBuilderFactory(
             const FullType(BuiltList, const [const FullType(KnowledgePoint)]),
             () => ListBuilder<KnowledgePoint>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [
+              const FullType(MessageReadUserResponse),
+            ]),
+            () => ListBuilder<MessageReadUserResponse>(),
           )
           ..addBuilderFactory(
             const FullType(BuiltList, const [const FullType(NodeTypeResponse)]),

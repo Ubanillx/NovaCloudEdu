@@ -45,11 +45,14 @@ class UserInfoService {
       }
     }
     
-    // 获取未缓存的用户信息
-    for (final userId in uncachedIds) {
-      final userInfo = await getUserInfo(userId);
-      if (userInfo != null) {
-        result[userId] = userInfo;
+    // 并行获取未缓存的用户信息（避免逐个串行的 N+1 问题）
+    if (uncachedIds.isNotEmpty) {
+      final futures = uncachedIds.map((userId) => getUserInfo(userId));
+      final responses = await Future.wait(futures);
+      for (int i = 0; i < uncachedIds.length; i++) {
+        if (responses[i] != null) {
+          result[uncachedIds[i]] = responses[i]!;
+        }
       }
     }
     
