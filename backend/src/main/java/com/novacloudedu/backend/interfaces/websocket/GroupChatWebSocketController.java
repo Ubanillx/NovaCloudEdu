@@ -1,7 +1,11 @@
 package com.novacloudedu.backend.interfaces.websocket;
 
 import com.novacloudedu.backend.application.service.GroupChatApplicationService;
+import com.novacloudedu.backend.domain.social.entity.ChatGroupMember;
 import com.novacloudedu.backend.domain.social.entity.GroupMessage;
+import com.novacloudedu.backend.domain.social.repository.ChatGroupMemberRepository;
+import com.novacloudedu.backend.domain.social.valueobject.GroupId;
+import com.novacloudedu.backend.domain.social.valueobject.MemberType;
 import com.novacloudedu.backend.domain.social.valueobject.MessageType;
 import com.novacloudedu.backend.domain.user.entity.User;
 import com.novacloudedu.backend.domain.user.repository.UserRepository;
@@ -9,6 +13,7 @@ import com.novacloudedu.backend.domain.user.valueobject.UserId;
 import com.novacloudedu.backend.interfaces.websocket.dto.GroupMessageDTO;
 import com.novacloudedu.backend.interfaces.websocket.dto.GroupMessageResponse;
 import com.novacloudedu.backend.interfaces.websocket.dto.GroupReadReceiptDTO;
+import com.novacloudedu.backend.interfaces.websocket.dto.GroupReadReceiptResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -18,6 +23,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.stereotype.Controller;
 
 import java.security.Principal;
+import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 群聊 WebSocket 控制器
@@ -28,6 +35,7 @@ import java.security.Principal;
 public class GroupChatWebSocketController {
 
     private final GroupChatApplicationService groupChatService;
+    private final ChatGroupMemberRepository memberRepository;
     private final UserRepository userRepository;
     private final SimpMessagingTemplate messagingTemplate;
 
@@ -63,12 +71,31 @@ public class GroupChatWebSocketController {
             GroupMessageResponse response = GroupMessageResponse.from(message)
                     .withSenderInfo(senderName, senderAvatar);
 
-            // 推送到群主题，所有订阅该群的用户都会收到
-            String destination = "/topic/group/" + messageDTO.getGroupId();
-            messagingTemplate.convertAndSend(destination, response);
+            // 逐个推送给群成员，排除发送者本人
+            List<ChatGroupMember> members = memberRepository.findByGroupId(GroupId.of(messageDTO.getGroupId()));
+            int pushCount = 0;
+            for (ChatGroupMember m : members) {
+                // 跳过发送者和AI成员
+                if (m.getMemberType() != MemberType.USER || m.getUserId() == null) continue;
+                if (m.getUserId().value().equals(senderId)) continue;
 
-            log.debug("群消息已推送: groupId={}, senderId={}, messageId={}",
-                    messageDTO.getGroupId(), senderId, message.getId().value());
+                messagingTemplate.convertAndSendToUser(
+                        m.getUserId().value().toString(),
+                        "/queue/group-messages",
+                        response
+                );
+                pushCount++;
+            }
+
+            // 给发送者推送确认（含服务端分配的 messageId，用于更新乐观消息）
+            messagingTemplate.convertAndSendToUser(
+                    senderId.toString(),
+                    "/queue/group-message-sent",
+                    response
+            );
+
+            log.debug("群消息已推送: groupId={}, senderId={}, messageId={}, 推送{}人(+发送者确认)",
+                    messageDTO.getGroupId(), senderId, message.getId().value(), pushCount);
 
         } catch (Exception e) {
             log.error("群消息发送失败: senderId={}, groupId={}, error={}",
@@ -94,6 +121,25 @@ public class GroupChatWebSocketController {
             groupChatService.markAsRead(receiptDTO.getGroupId(), userId, receiptDTO.getMessageId());
             log.debug("群消息已标记已读: groupId={}, userId={}, upToMessageId={}",
                     receiptDTO.getGroupId(), userId, receiptDTO.getMessageId());
+
+            // 获取读者信息并广播已读回执
+            User reader = userRepository.findById(UserId.of(userId)).orElse(null);
+            int totalReadCount = groupChatService.getReadCount(receiptDTO.getMessageId());
+
+            GroupReadReceiptResponse response = new GroupReadReceiptResponse();
+            response.setMessageId(receiptDTO.getMessageId());
+            response.setGroupId(receiptDTO.getGroupId());
+            response.setReaderId(userId);
+            response.setReaderName(reader != null ? reader.getUserName() : "未知用户");
+            response.setReaderAvatar(reader != null ? reader.getUserAvatar() : null);
+            response.setTotalReadCount(totalReadCount);
+            response.setReadTime(LocalDateTime.now());
+
+            String destination = "/topic/group/" + receiptDTO.getGroupId() + "/read-receipts";
+            messagingTemplate.convertAndSend(destination, response);
+
+            log.debug("已广播群已读回执: groupId={}, messageId={}, readerId={}, totalReadCount={}",
+                    receiptDTO.getGroupId(), receiptDTO.getMessageId(), userId, totalReadCount);
         } catch (Exception e) {
             log.error("已读标记失败: userId={}, groupId={}, error={}",
                     userId, receiptDTO.getGroupId(), e.getMessage());

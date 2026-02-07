@@ -15,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import com.novacloudedu.backend.interfaces.rest.social.dto.response.MessageReadUserResponse;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,6 +63,7 @@ public class GroupChatController {
                             item.setSenderAvatar(sender.getUserAvatar());
                         }
                     }
+                    item.setReadCount(groupChatService.getReadCount(msg.getId().value()));
                     return item;
                 })
                 .toList();
@@ -92,6 +95,7 @@ public class GroupChatController {
                             item.setSenderAvatar(sender.getUserAvatar());
                         }
                     }
+                    item.setReadCount(groupChatService.getReadCount(msg.getId().value()));
                     return item;
                 })
                 .toList();
@@ -121,6 +125,7 @@ public class GroupChatController {
                             item.setSenderAvatar(sender.getUserAvatar());
                         }
                     }
+                    item.setReadCount(groupChatService.getReadCount(msg.getId().value()));
                     return item;
                 })
                 .toList();
@@ -154,6 +159,13 @@ public class GroupChatController {
     public BaseResponse<Integer> getReadCount(@PathVariable Long messageId) {
         int count = groupChatService.getReadCount(messageId);
         return ResultUtils.success(count);
+    }
+
+    @GetMapping("/messages/{messageId}/read-users")
+    @Operation(summary = "获取消息已读用户列表（含昵称头像）")
+    public BaseResponse<List<MessageReadUserResponse>> getReadUsers(@PathVariable Long messageId) {
+        List<MessageReadUserResponse> users = groupChatService.getReadUsersDetail(messageId);
+        return ResultUtils.success(users);
     }
 
     @DeleteMapping("/{groupId}/messages/{messageId}")

@@ -19,6 +19,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.stereotype.Controller;
 
 import java.security.Principal;
+import java.time.LocalDateTime;
+import java.util.Map;
 
 /**
  * 私聊 WebSocket 控制器
@@ -110,11 +112,11 @@ public class PrivateChatWebSocketController {
         try {
             privateChatApplicationService.markMessagesAsRead(receiverId, readReceipt.getSenderId());
 
-            // 通知对方消息已读
+            // 通知对方消息已读（发送结构化对象，与前端 ReadReceipt 类型匹配）
             messagingTemplate.convertAndSendToUser(
                     String.valueOf(readReceipt.getSenderId()),
                     "/queue/read-receipt",
-                    receiverId
+                    Map.of("senderId", receiverId, "readTime", LocalDateTime.now().toString())
             );
 
             log.debug("消息已标记为已读: senderId={}, receiverId={}",

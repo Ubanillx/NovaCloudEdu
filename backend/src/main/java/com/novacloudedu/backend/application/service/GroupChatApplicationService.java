@@ -7,6 +7,7 @@ import com.novacloudedu.backend.domain.social.entity.GroupMessage;
 import com.novacloudedu.backend.domain.social.entity.GroupMessageRead;
 import com.novacloudedu.backend.domain.social.repository.*;
 import com.novacloudedu.backend.domain.social.valueobject.*;
+import com.novacloudedu.backend.interfaces.websocket.dto.NotificationEvent.EventType;
 import com.novacloudedu.backend.domain.user.entity.User;
 import com.novacloudedu.backend.domain.user.repository.UserRepository;
 import com.novacloudedu.backend.domain.user.valueobject.UserId;
@@ -16,7 +17,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.novacloudedu.backend.interfaces.rest.social.dto.response.MessageReadUserResponse;
+
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 群聊消息应用服务
@@ -69,10 +74,20 @@ public class GroupChatApplicationService {
         log.info("群消息发送成功: groupId={}, senderId={}, messageId={}", 
                 groupId, senderId, savedMessage.getId().value());
 
-        // 发送群消息通知（群成员通过 HTTP 获取详情）
+        // 发送群消息通知（排除发送者本人）
         User sender = userRepository.findById(senderIdVo).orElse(null);
         String senderName = sender != null ? sender.getUserName() : "未知用户";
-        notificationService.notifyNewGroupMessage(groupId, group.getGroupName(), senderId, senderName);
+        List<Long> recipientIds = memberRepository.findByGroupId(groupIdVo).stream()
+                .filter(m -> m.getMemberType() == MemberType.USER && m.getUserId() != null)
+                .map(m -> m.getUserId().value())
+                .filter(uid -> !uid.equals(senderId))
+                .collect(Collectors.toList());
+        notificationService.notifyUsers(recipientIds, EventType.NEW_GROUP_MESSAGE, Map.of(
+                "groupId", groupId,
+                "groupName", group.getGroupName(),
+                "senderId", senderId,
+                "senderName", senderName
+        ));
 
         return savedMessage;
     }
@@ -167,6 +182,36 @@ public class GroupChatApplicationService {
      */
     public List<GroupMessageRead> getReadUsers(Long messageId) {
         return readRepository.findByMessageId(GroupMessageId.of(messageId));
+    }
+
+    /**
+     * 获取消息已读用户详情列表（包含昵称、头像）
+     */
+    public List<MessageReadUserResponse> getReadUsersDetail(Long messageId) {
+        List<GroupMessageRead> reads = readRepository.findByMessageId(GroupMessageId.of(messageId));
+
+        // 批量查询用户信息
+        List<Long> userIds = reads.stream()
+                .map(r -> r.getUserId().value())
+                .toList();
+
+        Map<Long, User> userMap = userIds.stream()
+                .distinct()
+                .map(id -> userRepository.findById(UserId.of(id)).orElse(null))
+                .filter(java.util.Objects::nonNull)
+                .collect(Collectors.toMap(u -> u.getId().value(), u -> u));
+
+        return reads.stream().map(r -> {
+            MessageReadUserResponse resp = new MessageReadUserResponse();
+            resp.setUserId(r.getUserId().value());
+            resp.setReadTime(r.getReadTime());
+            User user = userMap.get(r.getUserId().value());
+            if (user != null) {
+                resp.setUserName(user.getUserName());
+                resp.setUserAvatar(user.getUserAvatar());
+            }
+            return resp;
+        }).toList();
     }
 
     /**

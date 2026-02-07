@@ -27,6 +27,7 @@ public interface GroupMessageReadMapper extends BaseMapper<GroupMessageReadPO> {
     @Insert("INSERT INTO group_message_read (message_id, user_id, read_time) " +
             "SELECT gm.id, #{userId}, CURRENT_TIMESTAMP FROM group_message gm " +
             "WHERE gm.group_id = #{groupId} AND gm.id <= #{upToMessageId} AND gm.is_delete = 0 " +
+            "AND gm.sender_id != #{userId} " +
             "AND NOT EXISTS (SELECT 1 FROM group_message_read gmr WHERE gmr.message_id = gm.id AND gmr.user_id = #{userId})")
     int markAllAsRead(@Param("groupId") Long groupId, @Param("userId") Long userId, @Param("upToMessageId") Long upToMessageId);
 }
