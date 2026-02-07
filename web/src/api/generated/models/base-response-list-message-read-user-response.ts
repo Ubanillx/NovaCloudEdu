@@ -13,12 +13,13 @@
  */
 
 
+// May contain unused imports in some cases
+// @ts-ignore
+import type { MessageReadUserResponse } from './message-read-user-response';
 
-export interface ChatRequest {
-    'message': string;
-    'history'?: Array<{ [key: string]: string; }>;
-    'systemPrompt'?: string;
-    'imageUrls'?: Array<string>;
-    'modelId'?: string;
+export interface BaseResponseListMessageReadUserResponse {
+    'code'?: number;
+    'data'?: Array<MessageReadUserResponse>;
+    'message'?: string;
 }
 

@@ -104,6 +104,8 @@ docs/BaseResponseListKnowledgeBaseVO.md
 docs/BaseResponseListKnowledgeDocumentVO.md
 docs/BaseResponseListKnowledgePoint.md
 docs/BaseResponseListLong.md
+docs/BaseResponseListMapStringObject.md
+docs/BaseResponseListMessageReadUserResponse.md
 docs/BaseResponseListNodeTypeResponse.md
 docs/BaseResponseListOrderResponse.md
 docs/BaseResponseListPostResponse.md
@@ -269,6 +271,7 @@ docs/KnowledgePointId.md
 docs/LearningStats.md
 docs/LoginUserResponse.md
 docs/MemberPage.md
+docs/MessageReadUserResponse.md
 docs/NodeTypeResponse.md
 docs/OptionDTO.md
 docs/OrderResponse.md
@@ -314,6 +317,7 @@ docs/SendCodeRequest.md
 docs/SendFriendRequestDTO.md
 docs/SendResult.md
 docs/SendSmsRequest.md
+docs/SessionChatRequest.md
 docs/SourceScrapeRequest.md
 docs/SseEmitter.md
 docs/TeacherApplicationResponse.md
@@ -477,6 +481,8 @@ models/base-response-list-knowledge-base-vo.ts
 models/base-response-list-knowledge-document-vo.ts
 models/base-response-list-knowledge-point.ts
 models/base-response-list-long.ts
+models/base-response-list-map-string-object.ts
+models/base-response-list-message-read-user-response.ts
 models/base-response-list-node-type-response.ts
 models/base-response-list-order-response.ts
 models/base-response-list-post-response.ts
@@ -642,6 +648,7 @@ models/knowledge-point.ts
 models/learning-stats.ts
 models/login-user-response.ts
 models/member-page.ts
+models/message-read-user-response.ts
 models/node-type-response.ts
 models/option-dto.ts
 models/order-response.ts
@@ -687,6 +694,7 @@ models/send-code-request.ts
 models/send-friend-request-dto.ts
 models/send-result.ts
 models/send-sms-request.ts
+models/session-chat-request.ts
 models/source-scrape-request.ts
 models/sse-emitter.ts
 models/teacher-application-response.ts

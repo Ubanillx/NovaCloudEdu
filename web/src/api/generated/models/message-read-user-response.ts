@@ -14,11 +14,10 @@
 
 
 
-export interface ChatRequest {
-    'message': string;
-    'history'?: Array<{ [key: string]: string; }>;
-    'systemPrompt'?: string;
-    'imageUrls'?: Array<string>;
-    'modelId'?: string;
+export interface MessageReadUserResponse {
+    'userId'?: number;
+    'userName'?: string;
+    'userAvatar'?: string;
+    'readTime'?: string;
 }
 

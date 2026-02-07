@@ -1,4 +1,4 @@
-# ChatRequest
+# SessionChatRequest
 
 
 ## Properties
@@ -6,21 +6,21 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **message** | **string** |  | [default to undefined]
-**history** | **Array&lt;{ [key: string]: string; }&gt;** |  | [optional] [default to undefined]
 **systemPrompt** | **string** |  | [optional] [default to undefined]
 **imageUrls** | **Array&lt;string&gt;** |  | [optional] [default to undefined]
+**documentUrls** | **Array&lt;string&gt;** |  | [optional] [default to undefined]
 **modelId** | **string** |  | [optional] [default to undefined]
 
 ## Example
 
 ```typescript
-import { ChatRequest } from './api';
+import { SessionChatRequest } from './api';
 
-const instance: ChatRequest = {
+const instance: SessionChatRequest = {
     message,
-    history,
     systemPrompt,
     imageUrls,
+    documentUrls,
     modelId,
 };
 ```

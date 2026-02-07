@@ -14,11 +14,9 @@
 
 
 
-export interface ChatRequest {
-    'message': string;
-    'history'?: Array<{ [key: string]: string; }>;
-    'systemPrompt'?: string;
-    'imageUrls'?: Array<string>;
-    'modelId'?: string;
+export interface BaseResponseListMapStringObject {
+    'code'?: number;
+    'data'?: Array<{ [key: string]: object; }>;
+    'message'?: string;
 }
 

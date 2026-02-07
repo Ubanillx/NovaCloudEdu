@@ -14,11 +14,11 @@
 
 
 
-export interface ChatRequest {
+export interface SessionChatRequest {
     'message': string;
-    'history'?: Array<{ [key: string]: string; }>;
     'systemPrompt'?: string;
     'imageUrls'?: Array<string>;
+    'documentUrls'?: Array<string>;
     'modelId'?: string;
 }
 

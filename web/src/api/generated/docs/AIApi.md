@@ -12,7 +12,9 @@ All URIs are relative to *http://localhost:8080*
 |[**chat**](#chat) | **POST** /api/articles/chat | 非流式对话|
 |[**continueConversation**](#continueconversation) | **POST** /api/books/{bookId}/ai/chat/{conversationId} | 继续对话|
 |[**create2**](#create2) | **POST** /api/ai/assistants | 创建AI助手|
+|[**createSession**](#createsession) | **POST** /api/ai/chat/sessions | 创建新会话|
 |[**delete2**](#delete2) | **DELETE** /api/ai/assistants/{id} | 删除AI助手|
+|[**deleteSession**](#deletesession) | **DELETE** /api/ai/chat/sessions/{sessionId} | 删除会话|
 |[**executeWorkflow**](#executeworkflow) | **POST** /api/ai/assistants/{id}/workflows/{workflowId}/execute | 执行AI助手绑定的工作流|
 |[**extractKnowledgePoints**](#extractknowledgepoints) | **POST** /api/books/{bookId}/ai/chapters/{chapterId}/knowledge-points | 提取章节知识点|
 |[**generateQuiz**](#generatequiz) | **POST** /api/books/{bookId}/ai/chapters/{chapterId}/quiz | 生成阅读测试|
@@ -23,11 +25,15 @@ All URIs are relative to *http://localhost:8080*
 |[**getKnowledgePoints**](#getknowledgepoints) | **GET** /api/books/{bookId}/ai/chapters/{chapterId}/knowledge-points | 获取章节知识点|
 |[**getLatestQuiz**](#getlatestquiz) | **GET** /api/books/{bookId}/ai/chapters/{chapterId}/quiz/latest | 获取章节最新测试|
 |[**getQuiz**](#getquiz) | **GET** /api/books/{bookId}/ai/quiz/{quizId} | 获取测试|
+|[**getSessionDetail**](#getsessiondetail) | **GET** /api/ai/chat/sessions/{sessionId} | 获取会话详情（含消息列表）|
 |[**getSummary**](#getsummary) | **GET** /api/books/{bookId}/ai/chapters/{chapterId}/summary | 获取章节总结|
 |[**getUserConversations**](#getuserconversations) | **GET** /api/books/{bookId}/ai/conversations | 获取用户对话列表|
 |[**getWorkflows**](#getworkflows) | **GET** /api/ai/assistants/{id}/workflows | 获取AI助手绑定的工作流列表|
+|[**listAllModels**](#listallmodels) | **GET** /api/ai/chat/models/all | 获取全量模型配置|
 |[**listByCreator1**](#listbycreator1) | **GET** /api/ai/assistants | 获取用户的AI助手列表|
+|[**listModels**](#listmodels) | **GET** /api/ai/chat/models | 获取可用模型列表|
 |[**listPublic1**](#listpublic1) | **GET** /api/ai/assistants/public | 获取公开的AI助手列表|
+|[**listSessions**](#listsessions) | **GET** /api/ai/chat/sessions | 获取会话列表|
 |[**previewAiProcess**](#previewaiprocess) | **POST** /api/admin/articles/ai/preview | 预览AI处理结果|
 |[**processArticle**](#processarticle) | **POST** /api/admin/articles/ai/process | AI处理单篇文章|
 |[**publish**](#publish) | **PUT** /api/ai/assistants/{id}/publish | 发布AI助手|
@@ -35,8 +41,9 @@ All URIs are relative to *http://localhost:8080*
 |[**regenerateSummary**](#regeneratesummary) | **POST** /api/books/{bookId}/ai/chapters/{chapterId}/summary/regenerate | 重新生成总结|
 |[**search1**](#search1) | **GET** /api/ai/assistants/search | 搜索AI助手|
 |[**searchKnowledgePoints**](#searchknowledgepoints) | **GET** /api/books/{bookId}/ai/knowledge-points/search | 搜索知识点|
+|[**sessionStreamChat**](#sessionstreamchat) | **POST** /api/ai/chat/sessions/{sessionId}/stream | 会话级流式对话|
 |[**streamChat**](#streamchat) | **POST** /api/articles/chat/stream | 流式对话|
-|[**streamChat1**](#streamchat1) | **POST** /api/ai/chat/stream | 流式对话|
+|[**streamChat1**](#streamchat1) | **POST** /api/ai/chat/stream | 无状态流式对话|
 |[**streamChatGet**](#streamchatget) | **GET** /api/articles/{articleId}/chat/stream | GET流式对话|
 |[**submitAnswers**](#submitanswers) | **POST** /api/books/{bookId}/ai/quiz/{quizId}/submit | 提交答案并评分|
 |[**unbindKnowledgeBase**](#unbindknowledgebase) | **DELETE** /api/ai/assistants/{id}/knowledge-bases/{kbId} | 解绑知识库|
@@ -474,6 +481,50 @@ const { status, data } = await apiInstance.create2(
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **createSession**
+> BaseResponseMapStringObject createSession()
+
+
+### Example
+
+```typescript
+import {
+    AIApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new AIApi(configuration);
+
+const { status, data } = await apiInstance.createSession();
+```
+
+### Parameters
+This endpoint does not have any parameters.
+
+
+### Return type
+
+**BaseResponseMapStringObject**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **delete2**
 > BaseResponseVoid delete2()
 
@@ -501,6 +552,57 @@ const { status, data } = await apiInstance.delete2(
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
 | **id** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseVoid**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **deleteSession**
+> BaseResponseVoid deleteSession()
+
+
+### Example
+
+```typescript
+import {
+    AIApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new AIApi(configuration);
+
+let sessionId: number; //会话ID (default to undefined)
+
+const { status, data } = await apiInstance.deleteSession(
+    sessionId
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **sessionId** | [**number**] | 会话ID | defaults to undefined|
 
 
 ### Return type
@@ -1080,6 +1182,57 @@ const { status, data } = await apiInstance.getQuiz(
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **getSessionDetail**
+> BaseResponseMapStringObject getSessionDetail()
+
+
+### Example
+
+```typescript
+import {
+    AIApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new AIApi(configuration);
+
+let sessionId: number; //会话ID (default to undefined)
+
+const { status, data } = await apiInstance.getSessionDetail(
+    sessionId
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **sessionId** | [**number**] | 会话ID | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseMapStringObject**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **getSummary**
 > BaseResponseChapterSummary getSummary()
 
@@ -1248,6 +1401,51 @@ const { status, data } = await apiInstance.getWorkflows(
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **listAllModels**
+> BaseResponseListMapStringObject listAllModels()
+
+返回所有供应商的所有模型（含未启用的），标注 enabled/isDefault 状态
+
+### Example
+
+```typescript
+import {
+    AIApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new AIApi(configuration);
+
+const { status, data } = await apiInstance.listAllModels();
+```
+
+### Parameters
+This endpoint does not have any parameters.
+
+
+### Return type
+
+**BaseResponseListMapStringObject**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **listByCreator1**
 > BaseResponseListAiAssistantVO listByCreator1()
 
@@ -1305,6 +1503,51 @@ const { status, data } = await apiInstance.listByCreator1(
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **listModels**
+> BaseResponseListMapStringObject listModels()
+
+仅返回已启用的模型，前端用于模型选择下拉框
+
+### Example
+
+```typescript
+import {
+    AIApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new AIApi(configuration);
+
+const { status, data } = await apiInstance.listModels();
+```
+
+### Parameters
+This endpoint does not have any parameters.
+
+
+### Return type
+
+**BaseResponseListMapStringObject**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **listPublic1**
 > BaseResponseListAiAssistantVO listPublic1()
 
@@ -1340,6 +1583,60 @@ const { status, data } = await apiInstance.listPublic1(
 ### Return type
 
 **BaseResponseListAiAssistantVO**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **listSessions**
+> BaseResponseListMapStringObject listSessions()
+
+
+### Example
+
+```typescript
+import {
+    AIApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new AIApi(configuration);
+
+let page: number; //页码 (optional) (default to 0)
+let size: number; //每页大小 (optional) (default to 20)
+
+const { status, data } = await apiInstance.listSessions(
+    page,
+    size
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **page** | [**number**] | 页码 | (optional) defaults to 0|
+| **size** | [**number**] | 每页大小 | (optional) defaults to 20|
+
+
+### Return type
+
+**BaseResponseListMapStringObject**
 
 ### Authorization
 
@@ -1744,6 +2041,62 @@ const { status, data } = await apiInstance.searchKnowledgePoints(
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **sessionStreamChat**
+> SseEmitter sessionStreamChat(sessionChatRequest)
+
+基于会话的SSE对话，服务端自动管理记忆（滑动窗口+摘要压缩）
+
+### Example
+
+```typescript
+import {
+    AIApi,
+    Configuration,
+    SessionChatRequest
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new AIApi(configuration);
+
+let sessionId: number; //会话ID (default to undefined)
+let sessionChatRequest: SessionChatRequest; //
+
+const { status, data } = await apiInstance.sessionStreamChat(
+    sessionId,
+    sessionChatRequest
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **sessionChatRequest** | **SessionChatRequest**|  | |
+| **sessionId** | [**number**] | 会话ID | defaults to undefined|
+
+
+### Return type
+
+**SseEmitter**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json, text/event-stream
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **streamChat**
 > SseEmitter streamChat(articleChatRequest)
 
@@ -1800,7 +2153,7 @@ const { status, data } = await apiInstance.streamChat(
 # **streamChat1**
 > SseEmitter streamChat1(chatRequest)
 
-使用SSE推送方式进行AI对话
+前端自行管理历史的SSE对话，支持图片URL
 
 ### Example
 
