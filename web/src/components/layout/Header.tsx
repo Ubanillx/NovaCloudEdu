@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Sun, Moon, LogOut, ShieldCheck, User } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Sun, Moon, LogOut, ShieldCheck, User, Bell } from 'lucide-react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useTheme } from '../../context/ThemeContext';
 import { getToken, clearTokens } from '../../api';
+import { useChat } from '../../context/ChatContext';
+import toast from '../ui/Toast';
 import logo from '../../assets/logo.svg';
 
 // 用户信息类型
@@ -17,9 +19,43 @@ interface UserInfo {
 
 const USER_INFO_KEY = 'user_info';
 
+// ============ 通知铃铛组件 ============
+
+const NotificationBell: React.FC = () => {
+  const navigate = useNavigate();
+  const { notifications, chatMessages, groupMessages } = useChat();
+
+  // 获取当前用户 ID（保持字符串，避免大整数精度丢失）
+  const currentUserId = (() => {
+    try { return String(JSON.parse(localStorage.getItem('user_info') || '{}')?.id ?? ''); } catch { return ''; }
+  })();
+
+  // 未读数 = 新通知 + 新私聊消息 + 非自己发的群消息
+  const otherGroupMessages = currentUserId
+    ? groupMessages.filter((m) => String(m.senderId) !== currentUserId)
+    : groupMessages;
+  const unreadCount = notifications.length + chatMessages.length + otherGroupMessages.length;
+
+  return (
+    <button
+      onClick={() => navigate('/chat')}
+      className="relative p-2 rounded-full text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+      aria-label="消息通知"
+    >
+      <Bell className="w-5 h-5" />
+      {unreadCount > 0 && (
+        <span className="absolute -top-0.5 -right-0.5 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold text-white bg-rose-500 rounded-full ring-2 ring-white dark:ring-gray-900 animate-in zoom-in duration-200">
+          {unreadCount > 99 ? '99+' : unreadCount}
+        </span>
+      )}
+    </button>
+  );
+};
+
 export const Header: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
+  const location = useLocation();
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -70,19 +106,32 @@ export const Header: React.FC = () => {
       {/* Navigation */}
       <nav className="hidden md:flex flex-1 items-center gap-6">
         {[
-          { name: '首页', href: '#home' },
-          { name: '课程', href: '#courses' },
-          { name: '学习圈', href: '#circle' },
-          { name: 'AI 助手', href: '#chat' }
-        ].map((item) => (
-          <a
-            key={item.name}
-            href={item.href}
-            className="text-gray-600 dark:text-gray-300 hover:text-brand-600 dark:hover:text-brand-400 transition-colors text-sm font-medium"
-          >
-            {item.name}
-          </a>
-        ))}
+          { name: '首页', path: '/' },
+          { name: '课程', path: null },
+          { name: '学习圈', path: '/circle' },
+          { name: 'AI 助手', path: null },
+        ].map((item) => {
+          const isActive = item.path === '/' ? location.pathname === '/' : item.path ? location.pathname.startsWith(item.path) : false;
+          return (
+            <button
+              key={item.name}
+              onClick={() => {
+                if (item.path) {
+                  navigate(item.path);
+                } else {
+                  toast.info(`「${item.name}」功能正在开发中，敬请期待`);
+                }
+              }}
+              className={`text-sm font-medium transition-colors ${
+                isActive
+                  ? 'text-brand-600 dark:text-brand-400'
+                  : 'text-gray-600 dark:text-gray-300 hover:text-brand-600 dark:hover:text-brand-400'
+              }`}
+            >
+              {item.name}
+            </button>
+          );
+        })}
       </nav>
 
       {/* Right Actions */}
@@ -110,6 +159,9 @@ export const Header: React.FC = () => {
         >
           {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
         </button>
+
+        {/* Notification Bell */}
+        {userInfo && <NotificationBell />}
 
         {/* User Area */}
         {userInfo ? (
@@ -162,7 +214,7 @@ export const Header: React.FC = () => {
                 <button
                   onClick={() => {
                     setShowDropdown(false);
-                    // navigate('/profile'); // 预留个人中心跳转
+                    navigate('/profile');
                   }}
                   className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors"
                 >

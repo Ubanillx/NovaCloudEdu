@@ -137,7 +137,7 @@ const AdminSider: React.FC<AdminSiderProps> = ({
         {/* Footer Actions */}
         <div className="p-4 space-y-2 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50 transition-colors duration-300">
           <Link
-            to="/home"
+            to="/"
             className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-white dark:hover:bg-gray-800 hover:text-brand-600 dark:hover:text-brand-400 transition-all duration-300 border border-transparent hover:border-gray-200 dark:hover:border-gray-700"
           >
             <Home size={20} className="flex-shrink-0" />
