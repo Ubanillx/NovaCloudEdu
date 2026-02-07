@@ -111,6 +111,7 @@ export 'package:nova_api/src/model/base_response_list_knowledge_document_vo.dart
 export 'package:nova_api/src/model/base_response_list_knowledge_point.dart';
 export 'package:nova_api/src/model/base_response_list_long.dart';
 export 'package:nova_api/src/model/base_response_list_map_string_object.dart';
+export 'package:nova_api/src/model/base_response_list_message_read_user_response.dart';
 export 'package:nova_api/src/model/base_response_list_node_type_response.dart';
 export 'package:nova_api/src/model/base_response_list_order_response.dart';
 export 'package:nova_api/src/model/base_response_list_post_response.dart';
@@ -275,6 +276,7 @@ export 'package:nova_api/src/model/knowledge_point_id.dart';
 export 'package:nova_api/src/model/learning_stats.dart';
 export 'package:nova_api/src/model/login_user_response.dart';
 export 'package:nova_api/src/model/member_page.dart';
+export 'package:nova_api/src/model/message_read_user_response.dart';
 export 'package:nova_api/src/model/node_type_response.dart';
 export 'package:nova_api/src/model/option_dto.dart';
 export 'package:nova_api/src/model/order_response.dart';

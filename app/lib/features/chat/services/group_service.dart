@@ -1,6 +1,25 @@
 import 'package:nova_api/nova_api.dart';
 import '../../../core/network/api_client.dart';
 
+/// 消息已读用户信息（本地模型，无需 OpenAPI 生成）
+class ReadUserInfo {
+  final int? userId;
+  final String? userName;
+  final String? userAvatar;
+  final String? readTime;
+
+  ReadUserInfo({this.userId, this.userName, this.userAvatar, this.readTime});
+
+  factory ReadUserInfo.fromJson(Map<String, dynamic> json) {
+    return ReadUserInfo(
+      userId: json['userId'] as int?,
+      userName: json['userName'] as String?,
+      userAvatar: json['userAvatar'] as String?,
+      readTime: json['readTime'] as String?,
+    );
+  }
+}
+
 /// 群组服务
 class GroupService {
   final _api = ApiClient.instance;
@@ -218,6 +237,22 @@ class GroupService {
       return true;
     } catch (e) {
       return false;
+    }
+  }
+
+  /// 获取消息已读用户列表（含昵称头像）
+  Future<List<ReadUserInfo>> getReadUsers(int messageId) async {
+    try {
+      final response = await _api.dio.get('/api/group-chat/messages/$messageId/read-users');
+      final data = response.data;
+      if (data != null && data['code'] == 0 && data['data'] is List) {
+        return (data['data'] as List)
+            .map((e) => ReadUserInfo.fromJson(e as Map<String, dynamic>))
+            .toList();
+      }
+      return [];
+    } catch (e) {
+      rethrow;
     }
   }
 

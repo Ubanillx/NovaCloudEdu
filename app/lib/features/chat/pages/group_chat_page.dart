@@ -46,11 +46,15 @@ class _GroupChatPageState extends State<GroupChatPage> {
   bool _isLoading = true;
   bool _isLoadingMore = false;
   int? _currentUserId;
+  String? _currentUserName;
+  String? _currentUserAvatar;
   
   // 用户信息缓存（用于补全群成员信息）
   final Map<int, UserPublicResponse> _userInfoCache = {};
 
   StreamSubscription<WsGroupMessage>? _messageSubscription;
+  StreamSubscription<WsGroupReadReceipt>? _readReceiptSubscription;
+  StreamSubscription<WsGroupMessage>? _sentConfirmSubscription;
 
   @override
   void initState() {
@@ -58,6 +62,8 @@ class _GroupChatPageState extends State<GroupChatPage> {
     _loadCurrentUser();
     _loadData();
     _subscribeToMessages();
+    _subscribeToReadReceipts();
+    _subscribeToSentConfirmation();
   }
 
   Future<void> _loadCurrentUser() async {
@@ -65,6 +71,8 @@ class _GroupChatPageState extends State<GroupChatPage> {
     if (userInfo != null && userInfo['id'] != null && mounted) {
       setState(() {
         _currentUserId = int.tryParse(userInfo['id'].toString());
+        _currentUserName = userInfo['userName'] as String?;
+        _currentUserAvatar = userInfo['userAvatar'] as String?;
       });
     }
   }
@@ -73,6 +81,8 @@ class _GroupChatPageState extends State<GroupChatPage> {
   void dispose() {
     _scrollController.dispose();
     _messageSubscription?.cancel();
+    _readReceiptSubscription?.cancel();
+    _sentConfirmSubscription?.cancel();
     _wsService.unsubscribeFromGroup(widget.groupId);
     super.dispose();
   }
@@ -83,68 +93,87 @@ class _GroupChatPageState extends State<GroupChatPage> {
       // 订阅群组消息
       _wsService.subscribeToGroup(widget.groupId);
 
-      // 加载群信息
-      final groupInfo = await _groupService.getGroupInfo(widget.groupId);
-      if (groupInfo != null && mounted) {
-        setState(() => _groupInfo = groupInfo);
+      // 第一步：先从本地加载消息（极快，毫秒级），立即展示给用户
+      final localMessages = await _syncService.getLocalMessages(widget.groupId);
+      if (mounted && localMessages.isNotEmpty) {
+        setState(() {
+          _messages = localMessages;
+          _isLoading = false; // 有本地消息就立即结束loading
+        });
       }
 
-      // 加载群成员（通过同步服务获取并补全用户信息）
-      await _loadMembers();
+      // 第二步：并行加载群信息、群成员（互不依赖）
+      final results = await Future.wait([
+        _groupService.getGroupInfo(widget.groupId),
+        _groupService.getGroupMembers(widget.groupId),
+      ]);
 
-      // 同步并加载消息
-      await _syncAndLoadMessages();
+      final groupInfo = results[0] as GroupResponse?;
+      final members = results[1] as List<GroupMemberResponse>;
+
+      if (mounted) {
+        setState(() {
+          if (groupInfo != null) _groupInfo = groupInfo;
+          _members = members;
+        });
+      }
+
+      // 第三步：后台补全用户信息（不阻塞UI）
+      _prefetchUserInfo(members);
+
+      // 第四步：后台同步服务器最新消息
+      _backgroundSyncMessages();
     } catch (e) {
       debugPrint('加载群聊数据失败: $e');
     } finally {
-      if (mounted) setState(() => _isLoading = false);
+      if (mounted && _isLoading) setState(() => _isLoading = false);
     }
   }
 
-  Future<void> _loadMembers() async {
+  /// 后台预取用户信息（不阻塞UI）
+  void _prefetchUserInfo(List<GroupMemberResponse> members) async {
     try {
-      // 先从API获取成员列表
-      final members = await _groupService.getGroupMembers(widget.groupId);
-      
-      // 收集缺少用户信息的成员ID
       final userIds = members
           .where((m) => m.userId != null && (m.userName == null || m.userAvatar == null))
           .map((m) => m.userId!)
           .toSet()
           .toList();
-      
+
       if (userIds.isNotEmpty) {
-        // 批量获取用户信息
         final userInfoMap = await _userInfoService.getUserInfoBatch(userIds);
-        
-        // 更新成员列表（由于GroupMemberResponse是不可变的，需要在显示时处理）
-        // 这里我们将用户信息缓存起来，在显示时使用
-        _userInfoCache.addAll(userInfoMap);
-      }
-      
-      if (mounted) {
-        setState(() => _members = members);
+        if (mounted) {
+          setState(() => _userInfoCache.addAll(userInfoMap));
+        }
       }
     } catch (e) {
-      debugPrint('加载群成员失败: $e');
+      debugPrint('预取用户信息失败: $e');
     }
   }
 
-  Future<void> _syncAndLoadMessages() async {
+  /// 后台同步服务器最新消息
+  void _backgroundSyncMessages() async {
     try {
-      // 先从本地加载
-      final localMessages = await _syncService.getLocalMessages(widget.groupId);
-      if (mounted && localMessages.isNotEmpty) {
-        setState(() => _messages = localMessages);
-      }
-      
-      // 后台同步服务器数据
       final syncedMessages = await _syncService.syncMessages(widget.groupId);
-      if (mounted) {
+      if (mounted && syncedMessages.isNotEmpty) {
         setState(() => _messages = syncedMessages);
       }
+
+      // 标记最后一条非自己发的消息为已读
+      final allMessages = syncedMessages.isNotEmpty ? syncedMessages : _messages;
+      if (allMessages.isNotEmpty && _currentUserId != null) {
+        final lastOtherMsg = allMessages.firstWhere(
+          (m) => m.senderId != _currentUserId,
+          orElse: () => allMessages.first,
+        );
+        if (lastOtherMsg.messageId != null && lastOtherMsg.senderId != _currentUserId) {
+          _wsService.markGroupMessageAsRead(
+            groupId: widget.groupId,
+            messageId: lastOtherMsg.messageId!,
+          );
+        }
+      }
     } catch (e) {
-      debugPrint('同步群消息失败: $e');
+      debugPrint('后台同步消息失败: $e');
     }
   }
 
@@ -184,11 +213,79 @@ class _GroupChatPageState extends State<GroupChatPage> {
           createTime: message.createTime,
         );
         
-        // 更新UI（使用已补全用户信息的消息）
+        // 更新UI（使用已补全用户信息的消息，先去重）
         if (mounted) {
-          setState(() => _messages.insert(0, localMessage));
+          setState(() {
+            // 防重：如果该 messageId 已存在则不插入
+            final exists = _messages.any((m) => m.messageId == localMessage.messageId);
+            if (!exists) {
+              _messages.insert(0, localMessage);
+            }
+          });
           _scrollToBottom();
         }
+
+        // 收到他人消息时，标记已读
+        if (message.messageId != null &&
+            _currentUserId != null &&
+            message.senderId != _currentUserId) {
+          _wsService.markGroupMessageAsRead(
+            groupId: widget.groupId,
+            messageId: message.messageId!,
+          );
+        }
+      }
+    });
+  }
+
+  void _subscribeToSentConfirmation() {
+    _sentConfirmSubscription = _wsService.groupMessagesSent.listen((confirmed) {
+      if (confirmed.groupId == widget.groupId && mounted) {
+        setState(() {
+          // 找到乐观消息（messageId == null，content 匹配）并更新为真实消息
+          final idx = _messages.indexWhere(
+            (m) => m.messageId == null && m.content == confirmed.content,
+          );
+          if (idx != -1) {
+            _messages[idx] = LocalGroupMessage(
+              messageId: confirmed.messageId,
+              groupId: widget.groupId,
+              senderId: _currentUserId ?? 0,
+              senderName: _currentUserName,
+              senderAvatar: _currentUserAvatar,
+              content: confirmed.content,
+              type: confirmed.type ?? 'TEXT',
+              replyTo: confirmed.replyTo,
+              createTime: confirmed.createTime ?? DateTime.now(),
+              syncStatus: 0,
+            );
+          }
+        });
+        // 保存到本地数据库
+        if (confirmed.messageId != null) {
+          _syncService.saveReceivedMessage(
+            messageId: confirmed.messageId!,
+            groupId: widget.groupId,
+            senderId: _currentUserId ?? 0,
+            senderName: _currentUserName,
+            senderAvatar: _currentUserAvatar,
+            content: confirmed.content,
+            type: confirmed.type,
+            replyTo: confirmed.replyTo,
+            createTime: confirmed.createTime,
+          );
+        }
+      }
+    });
+  }
+
+  void _subscribeToReadReceipts() {
+    _readReceiptSubscription = _wsService.groupReadReceipts.listen((receipt) {
+      if (receipt.groupId == widget.groupId && mounted) {
+        // 目前 Flutter 端没有 readCount 字段在本地消息中，
+        // 但当已读用户 BottomSheet 打开时可以实时刷新。
+        // 这里触发一次 setState 以便 UI 感知变化。
+        setState(() {});
       }
     });
   }
@@ -205,6 +302,23 @@ class _GroupChatPageState extends State<GroupChatPage> {
 
   Future<void> _sendMessage(String content, String type) async {
     if (content.isEmpty) return;
+
+    // 乐观更新：立即显示自己发的消息（后端不再回传给发送者）
+    if (_currentUserId != null && mounted) {
+      setState(() {
+        _messages.insert(0, LocalGroupMessage(
+          groupId: widget.groupId,
+          senderId: _currentUserId!,
+          senderName: _currentUserName,
+          senderAvatar: _currentUserAvatar,
+          content: content,
+          type: type,
+          createTime: DateTime.now(),
+          syncStatus: 1,
+        ));
+      });
+      _scrollToBottom();
+    }
 
     _wsService.sendGroupMessage(
       groupId: widget.groupId,
@@ -421,6 +535,33 @@ class _GroupChatPageState extends State<GroupChatPage> {
                         ),
                       ),
                     _buildMessageContent(message, isMe, colors),
+                    if (isMe)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 4, right: 4),
+                        child: GestureDetector(
+                          onTap: message.messageId != null
+                              ? () => _showReadUsers(context, message.messageId!)
+                              : null,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                message.messageId != null ? Icons.done_all : Icons.access_time,
+                                size: 14,
+                                color: AppTheme.brand.withOpacity(0.6),
+                              ),
+                              const SizedBox(width: 2),
+                              Text(
+                                message.messageId != null ? '查看已读' : '发送中',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: AppTheme.brand.withOpacity(0.6),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                   ],
                 ),
               ),
@@ -497,6 +638,22 @@ class _GroupChatPageState extends State<GroupChatPage> {
     } else {
       return '${time.month}/${time.day} $timeStr';
     }
+  }
+
+  void _showReadUsers(BuildContext context, int messageId) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: context.colors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) {
+        return _ReadUsersSheet(
+          messageId: messageId,
+          groupService: _groupService,
+        );
+      },
+    );
   }
 
   void _showMoreMenu(BuildContext context, AppColors colors) {
@@ -623,6 +780,146 @@ class _GroupChatPageState extends State<GroupChatPage> {
         NovaMessage.error(context, '退出失败');
       }
     }
+  }
+}
+
+/// 已读用户列表 BottomSheet
+class _ReadUsersSheet extends StatefulWidget {
+  final int messageId;
+  final GroupService groupService;
+
+  const _ReadUsersSheet({
+    required this.messageId,
+    required this.groupService,
+  });
+
+  @override
+  State<_ReadUsersSheet> createState() => _ReadUsersSheetState();
+}
+
+class _ReadUsersSheetState extends State<_ReadUsersSheet> {
+  List<ReadUserInfo> _users = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadReadUsers();
+  }
+
+  Future<void> _loadReadUsers() async {
+    try {
+      final users = await widget.groupService.getReadUsers(widget.messageId);
+      if (mounted) {
+        setState(() {
+          _users = users;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        NovaMessage.error(context, '加载已读列表失败');
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+
+    return SafeArea(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // 拖动条
+          Container(
+            margin: const EdgeInsets.only(top: 12),
+            width: 36,
+            height: 4,
+            decoration: BoxDecoration(
+              color: colors.divider,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          // 标题
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
+            child: Row(
+              children: [
+                Icon(Icons.done_all, size: 18, color: AppTheme.brand),
+                const SizedBox(width: 8),
+                Text(
+                  '${_users.length} 人已读',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: colors.textPrimary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Divider(height: 1, color: colors.divider),
+          // 列表
+          if (_isLoading)
+            const Padding(
+              padding: EdgeInsets.all(32),
+              child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+            )
+          else if (_users.isEmpty)
+            Padding(
+              padding: const EdgeInsets.all(32),
+              child: Text(
+                '暂无已读记录',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: colors.textTertiary,
+                ),
+              ),
+            )
+          else
+            ConstrainedBox(
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height * 0.4,
+              ),
+              child: ListView.builder(
+                shrinkWrap: true,
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                itemCount: _users.length,
+                itemBuilder: (context, index) {
+                  final user = _users[index];
+                  return ListTile(
+                    leading: CircleAvatar(
+                      radius: 20,
+                      backgroundColor: colors.surfaceVariant,
+                      backgroundImage: user.userAvatar != null &&
+                              user.userAvatar!.isNotEmpty
+                          ? NetworkImage(user.userAvatar!)
+                          : null,
+                      child: user.userAvatar == null ||
+                              user.userAvatar!.isEmpty
+                          ? Icon(Icons.person,
+                              color: colors.iconSecondary, size: 20)
+                          : null,
+                    ),
+                    title: Text(
+                      user.userName ?? '未知用户',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                        color: colors.textPrimary,
+                      ),
+                    ),
+                    dense: true,
+                  );
+                },
+              ),
+            ),
+          const SizedBox(height: 8),
+        ],
+      ),
+    );
   }
 }
 

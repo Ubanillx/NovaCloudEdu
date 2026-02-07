@@ -84,6 +84,10 @@ dependencies:
   open_filex: ^4.5.0
   url_launcher: ^6.2.5
 
+  # 图片/文件缓存
+  cached_network_image: ^3.4.1
+  flutter_cache_manager: ^3.4.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
