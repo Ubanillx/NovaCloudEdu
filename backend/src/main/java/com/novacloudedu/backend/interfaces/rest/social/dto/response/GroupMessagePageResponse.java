@@ -31,6 +31,7 @@ public class GroupMessagePageResponse {
         private String type;
         private Long replyTo;
         private LocalDateTime createTime;
+        private Integer readCount;
 
         public static GroupMessageItem from(GroupMessage message) {
             GroupMessageItem item = new GroupMessageItem();
