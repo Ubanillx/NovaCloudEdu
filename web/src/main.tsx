@@ -1,6 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import './index.css'
 import App from './App.tsx'
 import { ThemeProvider } from './context/ThemeContext.tsx'
@@ -17,6 +17,16 @@ import { BannerManagementPage } from './pages/admin/BannerManagementPage'
 import { FeedbackManagementPage } from './pages/admin/FeedbackManagementPage'
 import { PostManagementPage } from './pages/admin/PostManagementPage'
 import { getToken } from './api'
+import { useEffect } from 'react'
+
+// 路由切换时滚动到顶部
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+};
 
 // 初始重定向组件 - 仅在首次进入时根据角色分流
 const InitialRedirect = () => {
@@ -30,20 +40,20 @@ const InitialRedirect = () => {
   if (userRole?.toLowerCase() === 'admin') {
     return <Navigate to="/admin" replace />;
   }
-  return <Navigate to="/home" replace />;
+  return <Navigate to="/" replace />;
 };
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ThemeProvider>
       <BrowserRouter>
+        <ScrollToTop />
         <Routes>
           {/* 公开路由 */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           
           {/* 初始进入重定向 */}
-          <Route path="/" element={<InitialRedirect />} />
           <Route path="/entry" element={<InitialRedirect />} />
           
           {/* 管理员路由 */}
@@ -71,18 +81,15 @@ createRoot(document.getElementById('root')!).render(
             } 
           />
           
-          {/* 普通用户路由 - 管理员也可访问 */}
+          {/* 普通用户路由 - 管理员也可访问（主页为/） */}
           <Route 
-            path="/home/*" 
+            path="/*" 
             element={
               <ProtectedRoute>
                 <App />
               </ProtectedRoute>
             } 
           />
-          
-          {/* 兜底重定向到初始分流 */}
-          <Route path="/*" element={<Navigate to="/entry" replace />} />
         </Routes>
       </BrowserRouter>
     </ThemeProvider>
