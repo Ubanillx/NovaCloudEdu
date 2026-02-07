@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Markdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
 import { 
   Search, 
   Plus, 
@@ -482,7 +484,7 @@ const ArticleDetailModal: React.FC<ArticleDetailModalProps> = ({ isOpen, onClose
 
           {/* 正文内容 */}
           <div className="prose prose-sm dark:prose-invert max-w-none">
-            <Markdown>{article.content || ''}</Markdown>
+            <Markdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>{article.content || ''}</Markdown>
           </div>
 
           {/* 原文链接 */}
