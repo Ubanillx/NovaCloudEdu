@@ -74,6 +74,40 @@ class AiChatSession {
   }
 }
 
+/// 文生图任务状态
+class ImageGeneration {
+  final int index;
+  final String prompt;
+  String status; // 'generating' | 'done' | 'error'
+  String? url;
+  String? error;
+
+  ImageGeneration({
+    required this.index,
+    required this.prompt,
+    this.status = 'generating',
+    this.url,
+    this.error,
+  });
+}
+
+/// 文生视频任务状态
+class VideoGeneration {
+  final int index;
+  final String prompt;
+  String status; // 'generating' | 'done' | 'error'
+  String? url;
+  String? error;
+
+  VideoGeneration({
+    required this.index,
+    required this.prompt,
+    this.status = 'generating',
+    this.url,
+    this.error,
+  });
+}
+
 /// AI聊天服务 - 会话管理 + SSE流式对话
 class AiChatApiService {
   final _dio = ApiClient.instance.dio;
@@ -173,6 +207,12 @@ class AiChatApiService {
     required Function(String) onData,
     required VoidCallback onDone,
     required Function(dynamic) onError,
+    Function(ImageGeneration)? onImageGenerating,
+    Function(ImageGeneration)? onImageGenerated,
+    Function(ImageGeneration)? onImageError,
+    Function(VideoGeneration)? onVideoGenerating,
+    Function(VideoGeneration)? onVideoGenerated,
+    Function(VideoGeneration)? onVideoError,
   }) async {
     if (_isStreaming) {
       onError('正在等待上一条消息的回复');
@@ -216,6 +256,94 @@ class AiChatApiService {
           if (event.event == 'error') {
             _isStreaming = false;
             onError(event.data ?? '对话失败');
+            return;
+          }
+
+          // 文生图事件
+          if (event.event == 'image_generating' && event.data != null) {
+            try {
+              final payload = jsonDecode(event.data!) as Map<String, dynamic>;
+              onImageGenerating?.call(ImageGeneration(
+                index: payload['index'] as int,
+                prompt: payload['prompt'] as String,
+              ));
+            } catch (e) {
+              debugPrint('解析 image_generating 事件失败: $e');
+            }
+            return;
+          }
+
+          if (event.event == 'image_generated' && event.data != null) {
+            try {
+              final payload = jsonDecode(event.data!) as Map<String, dynamic>;
+              onImageGenerated?.call(ImageGeneration(
+                index: payload['index'] as int,
+                prompt: payload['prompt'] as String,
+                status: 'done',
+                url: payload['url'] as String?,
+              ));
+            } catch (e) {
+              debugPrint('解析 image_generated 事件失败: $e');
+            }
+            return;
+          }
+
+          if (event.event == 'image_error' && event.data != null) {
+            try {
+              final payload = jsonDecode(event.data!) as Map<String, dynamic>;
+              onImageError?.call(ImageGeneration(
+                index: payload['index'] as int,
+                prompt: payload['prompt'] as String,
+                status: 'error',
+                error: payload['error'] as String?,
+              ));
+            } catch (e) {
+              debugPrint('解析 image_error 事件失败: $e');
+            }
+            return;
+          }
+
+          // 文生视频事件
+          if (event.event == 'video_generating' && event.data != null) {
+            try {
+              final payload = jsonDecode(event.data!) as Map<String, dynamic>;
+              onVideoGenerating?.call(VideoGeneration(
+                index: payload['index'] as int,
+                prompt: payload['prompt'] as String,
+              ));
+            } catch (e) {
+              debugPrint('解析 video_generating 事件失败: $e');
+            }
+            return;
+          }
+
+          if (event.event == 'video_generated' && event.data != null) {
+            try {
+              final payload = jsonDecode(event.data!) as Map<String, dynamic>;
+              onVideoGenerated?.call(VideoGeneration(
+                index: payload['index'] as int,
+                prompt: payload['prompt'] as String,
+                status: 'done',
+                url: payload['url'] as String?,
+              ));
+            } catch (e) {
+              debugPrint('解析 video_generated 事件失败: $e');
+            }
+            return;
+          }
+
+          if (event.event == 'video_error' && event.data != null) {
+            try {
+              final payload = jsonDecode(event.data!) as Map<String, dynamic>;
+              onVideoError?.call(VideoGeneration(
+                index: payload['index'] as int,
+                prompt: payload['prompt'] as String,
+                status: 'error',
+                error: payload['error'] as String?,
+              ));
+            } catch (e) {
+              debugPrint('解析 video_error 事件失败: $e');
+            }
             return;
           }
 

@@ -29,6 +29,8 @@ class _$GroupMessageItem extends GroupMessageItem {
   final int? replyTo;
   @override
   final DateTime? createTime;
+  @override
+  final int? readCount;
 
   factory _$GroupMessageItem([
     void Function(GroupMessageItemBuilder)? updates,
@@ -46,6 +48,7 @@ class _$GroupMessageItem extends GroupMessageItem {
     this.type,
     this.replyTo,
     this.createTime,
+    this.readCount,
   }) : super._();
   @override
   GroupMessageItem rebuild(void Function(GroupMessageItemBuilder) updates) =>
@@ -69,7 +72,8 @@ class _$GroupMessageItem extends GroupMessageItem {
         content == other.content &&
         type == other.type &&
         replyTo == other.replyTo &&
-        createTime == other.createTime;
+        createTime == other.createTime &&
+        readCount == other.readCount;
   }
 
   @override
@@ -86,6 +90,7 @@ class _$GroupMessageItem extends GroupMessageItem {
     _$hash = $jc(_$hash, type.hashCode);
     _$hash = $jc(_$hash, replyTo.hashCode);
     _$hash = $jc(_$hash, createTime.hashCode);
+    _$hash = $jc(_$hash, readCount.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -103,7 +108,8 @@ class _$GroupMessageItem extends GroupMessageItem {
           ..add('content', content)
           ..add('type', type)
           ..add('replyTo', replyTo)
-          ..add('createTime', createTime))
+          ..add('createTime', createTime)
+          ..add('readCount', readCount))
         .toString();
   }
 }
@@ -156,6 +162,10 @@ class GroupMessageItemBuilder
   DateTime? get createTime => _$this._createTime;
   set createTime(DateTime? createTime) => _$this._createTime = createTime;
 
+  int? _readCount;
+  int? get readCount => _$this._readCount;
+  set readCount(int? readCount) => _$this._readCount = readCount;
+
   GroupMessageItemBuilder() {
     GroupMessageItem._defaults(this);
   }
@@ -174,6 +184,7 @@ class GroupMessageItemBuilder
       _type = $v.type;
       _replyTo = $v.replyTo;
       _createTime = $v.createTime;
+      _readCount = $v.readCount;
       _$v = null;
     }
     return this;
@@ -207,6 +218,7 @@ class GroupMessageItemBuilder
           type: type,
           replyTo: replyTo,
           createTime: createTime,
+          readCount: readCount,
         );
     replace(_$result);
     return _$result;

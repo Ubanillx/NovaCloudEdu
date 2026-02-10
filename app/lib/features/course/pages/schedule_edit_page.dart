@@ -581,7 +581,7 @@ class _ScheduleEditPageState extends State<ScheduleEditPage> {
           ..startWeek = _startWeek
           ..endWeek = _endWeek
           ..weekType = _weekType
-          ..courseType = _courseType
+          ..courseType = 1 // CUSTOM: 用户手动添加的课程固定为1
           ..color = colorHex
           ..remark = _remarkController.text.trim());
 

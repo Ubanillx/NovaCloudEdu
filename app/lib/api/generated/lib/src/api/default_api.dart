@@ -9,7 +9,6 @@ import 'package:built_value/serializer.dart';
 import 'package:dio/dio.dart';
 
 import 'package:built_collection/built_collection.dart';
-import 'package:built_value/json_object.dart';
 import 'package:nova_api/src/api_util.dart';
 import 'package:nova_api/src/model/add_class_course_request.dart';
 import 'package:nova_api/src/model/add_class_member_request.dart';
@@ -104,7 +103,6 @@ import 'package:nova_api/src/model/base_response_list_workflow_variable_response
 import 'package:nova_api/src/model/base_response_login_user_response.dart';
 import 'package:nova_api/src/model/base_response_long.dart';
 import 'package:nova_api/src/model/base_response_member_page.dart';
-import 'package:nova_api/src/model/base_response_object.dart';
 import 'package:nova_api/src/model/base_response_order_response.dart';
 import 'package:nova_api/src/model/base_response_order_statistics.dart';
 import 'package:nova_api/src/model/base_response_page_response_class_member_response.dart';
