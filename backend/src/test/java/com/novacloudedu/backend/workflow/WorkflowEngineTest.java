@@ -2,6 +2,7 @@ package com.novacloudedu.backend.workflow;
 
 import com.novacloudedu.backend.domain.ai.entity.Workflow;
 import com.novacloudedu.backend.domain.ai.entity.WorkflowExecution;
+import com.novacloudedu.backend.domain.ai.repository.WorkflowExecutionRepository;
 import com.novacloudedu.backend.domain.ai.service.NodeExecutor;
 import com.novacloudedu.backend.domain.ai.service.WorkflowLogService;
 import com.novacloudedu.backend.domain.ai.valueobject.*;
@@ -31,6 +32,9 @@ class WorkflowEngineTest {
     private WorkflowLogService logService;
 
     @Mock
+    private WorkflowExecutionRepository executionRepository;
+
+    @Mock
     private NodeExecutor llmExecutor;
 
     @Mock
@@ -47,7 +51,7 @@ class WorkflowEngineTest {
         when(conditionExecutor.getNodeType()).thenReturn(NodeType.CONDITION);
 
         List<NodeExecutor> executors = Arrays.asList(llmExecutor, conditionExecutor);
-        engine = new DefaultWorkflowEngine(logService, executors);
+        engine = new DefaultWorkflowEngine(logService, executors, executionRepository);
         engine.init();
 
         userId = UserId.of(1L);

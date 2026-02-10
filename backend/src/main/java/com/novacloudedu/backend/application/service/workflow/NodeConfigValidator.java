@@ -16,10 +16,6 @@ import java.util.Set;
 @Component
 public class NodeConfigValidator {
 
-    private static final Set<String> SUPPORTED_LLM_MODELS = Set.of(
-            "qwen-max", "qwen-plus", "qwen-turbo", "qwen-long", "qwen-vl-max", "qwen-vl-plus"
-    );
-
     private static final Set<String> SUPPORTED_EMBEDDING_MODELS = Set.of(
             "text-embedding-v2", "text-embedding-v1"
     );
@@ -49,23 +45,26 @@ public class NodeConfigValidator {
             case WEBHOOK -> validateWebhookConfig(config);
             case SCHEDULE -> validateScheduleConfig(config);
             case FILE_READ, FILE_WRITE -> validateFileConfig(config);
-            case END, MERGE -> ValidationResult.success();
+            case END, MERGE, LOOP_START, LOOP_END -> ValidationResult.success();
         };
     }
 
+    @SuppressWarnings("unchecked")
     private ValidationResult validateLlmConfig(Map<String, Object> config) {
         List<String> errors = new ArrayList<>();
 
+        // 模型验证：支持 "provider/model" 格式（如 dashscope/qwen-max），不再硬编码模型列表
         String model = (String) config.get("model");
         if (model == null || model.isBlank()) {
             errors.add("LLM节点必须指定模型");
-        } else if (!SUPPORTED_LLM_MODELS.contains(model)) {
-            errors.add("不支持的模型: " + model + "，当前仅支持千问系列: " + SUPPORTED_LLM_MODELS);
         }
 
+        // 用户提示词模板（兼容旧字段 userMessage）
         String userPromptTemplate = (String) config.get("userPromptTemplate");
-        if (userPromptTemplate == null || userPromptTemplate.isBlank()) {
-            errors.add("LLM节点必须指定用户提示词模板");
+        String userMessage = (String) config.get("userMessage");
+        if ((userPromptTemplate == null || userPromptTemplate.isBlank())
+                && (userMessage == null || userMessage.isBlank())) {
+            errors.add("LLM节点必须指定用户提示词模板(userPromptTemplate)或用户消息(userMessage)");
         }
 
         Double temperature = getDouble(config, "temperature");
@@ -74,8 +73,44 @@ public class NodeConfigValidator {
         }
 
         Integer maxTokens = getInteger(config, "maxTokens");
-        if (maxTokens != null && (maxTokens < 1 || maxTokens > 8192)) {
-            errors.add("最大token数必须在1-8192之间");
+        if (maxTokens != null && (maxTokens < 1 || maxTokens > 128000)) {
+            errors.add("最大token数必须在1-128000之间");
+        }
+
+        Double topP = getDouble(config, "topP");
+        if (topP != null && (topP < 0 || topP > 1)) {
+            errors.add("topP参数必须在0-1之间");
+        }
+
+        // 输入变量映射验证
+        Object inputMappingsObj = config.get("inputMappings");
+        if (inputMappingsObj instanceof List) {
+            List<Map<String, String>> mappings = (List<Map<String, String>>) inputMappingsObj;
+            for (int i = 0; i < mappings.size(); i++) {
+                Map<String, String> m = mappings.get(i);
+                if (m.get("variableName") == null || m.get("variableName").isBlank()) {
+                    errors.add("输入变量映射[" + i + "]的variableName不能为空");
+                }
+                if (m.get("mappedKey") == null || m.get("mappedKey").isBlank()) {
+                    errors.add("输入变量映射[" + i + "]的mappedKey不能为空");
+                }
+            }
+        }
+
+        // 知识库 RAG 参数验证
+        Integer ragTopK = getInteger(config, "ragTopK");
+        if (ragTopK != null && (ragTopK < 1 || ragTopK > 50)) {
+            errors.add("RAG检索数量必须在1-50之间");
+        }
+        Double ragThreshold = getDouble(config, "ragThreshold");
+        if (ragThreshold != null && (ragThreshold < 0 || ragThreshold > 1)) {
+            errors.add("RAG相似度阈值必须在0-1之间");
+        }
+
+        // 历史消息数量验证
+        Integer historyLimit = getInteger(config, "historyLimit");
+        if (historyLimit != null && (historyLimit < 1 || historyLimit > 100)) {
+            errors.add("历史消息数量必须在1-100之间");
         }
 
         return errors.isEmpty() ? ValidationResult.success() : ValidationResult.failure(errors);
@@ -213,30 +248,67 @@ public class NodeConfigValidator {
         String sql = (String) config.get("sql");
         if (sql == null || sql.isBlank()) {
             errors.add("数据库查询节点必须指定SQL语句");
+        } else {
+            // 检查是否包含危险操作关键字
+            if (sql.matches("(?i).*\\b(INSERT|UPDATE|DELETE|DROP|CREATE|ALTER|TRUNCATE|GRANT|REVOKE|EXECUTE|EXEC)\\b.*")) {
+                errors.add("数据库查询节点禁止执行修改操作（INSERT/UPDATE/DELETE/DROP等）");
+            }
         }
 
-        Long dataSourceId = getLong(config, "dataSourceId");
-        String dataSourceName = (String) config.get("dataSourceName");
-        if (dataSourceId == null && (dataSourceName == null || dataSourceName.isBlank())) {
-            errors.add("数据库查询节点必须指定数据源ID或数据源名称");
+        Integer maxRows = getInteger(config, "maxRows");
+        if (maxRows != null && (maxRows < 1 || maxRows > 1000)) {
+            errors.add("最大返回行数必须在1-1000之间");
         }
 
         return errors.isEmpty() ? ValidationResult.success() : ValidationResult.failure(errors);
     }
 
+    @SuppressWarnings("unchecked")
     private ValidationResult validateCodeConfig(Map<String, Object> config) {
         List<String> errors = new ArrayList<>();
 
         String language = (String) config.get("language");
         if (language == null || language.isBlank()) {
             errors.add("代码执行节点必须指定编程语言");
-        } else if (!Set.of("JAVASCRIPT", "PYTHON", "GROOVY").contains(language)) {
-            errors.add("不支持的编程语言: " + language);
+        } else if (!Set.of("JAVASCRIPT", "JS", "PYTHON", "PY").contains(language.toUpperCase())) {
+            errors.add("不支持的编程语言: " + language + "，当前支持: JAVASCRIPT, PYTHON");
         }
 
         String code = (String) config.get("code");
         if (code == null || code.isBlank()) {
             errors.add("代码执行节点必须指定代码内容");
+        } else if ("PYTHON".equalsIgnoreCase(language) || "PY".equalsIgnoreCase(language)) {
+            // Python 代码必须包含 main 函数
+            if (!code.contains("def main")) {
+                errors.add("Python 代码必须定义 def main(args) 函数作为入口");
+            }
+        }
+
+        // 验证输入变量映射
+        Object inputVars = config.get("inputVariables");
+        if (inputVars instanceof List) {
+            List<Map<String, Object>> inputList = (List<Map<String, Object>>) inputVars;
+            for (int i = 0; i < inputList.size(); i++) {
+                Map<String, Object> v = inputList.get(i);
+                if (v.get("name") == null || ((String) v.get("name")).isBlank()) {
+                    errors.add("输入变量[" + i + "]的脚本变量名(name)不能为空");
+                }
+                if (v.get("source") == null || ((String) v.get("source")).isBlank()) {
+                    errors.add("输入变量[" + i + "]的来源变量(source)不能为空");
+                }
+            }
+        }
+
+        // 验证输出变量声明
+        Object outputVars = config.get("outputVariables");
+        if (outputVars instanceof List) {
+            List<Map<String, Object>> outputList = (List<Map<String, Object>>) outputVars;
+            for (int i = 0; i < outputList.size(); i++) {
+                Map<String, Object> v = outputList.get(i);
+                if (v.get("name") == null || ((String) v.get("name")).isBlank()) {
+                    errors.add("输出变量[" + i + "]的变量名(name)不能为空");
+                }
+            }
         }
 
         return errors.isEmpty() ? ValidationResult.success() : ValidationResult.failure(errors);
@@ -268,20 +340,44 @@ public class NodeConfigValidator {
     private ValidationResult validateJsonParseConfig(Map<String, Object> config) {
         List<String> errors = new ArrayList<>();
 
+        // 兼容新旧字段名：inputVariable（新） / sourceVariable（旧）
         String inputVariable = (String) config.get("inputVariable");
-        if (inputVariable == null || inputVariable.isBlank()) {
-            errors.add("JSON解析节点必须指定输入变量名");
+        String sourceVariable = (String) config.get("sourceVariable");
+        if ((inputVariable == null || inputVariable.isBlank()) && (sourceVariable == null || sourceVariable.isBlank())) {
+            errors.add("JSON解析节点必须指定输入变量名（inputVariable 或 sourceVariable）");
         }
 
         return errors.isEmpty() ? ValidationResult.success() : ValidationResult.failure(errors);
     }
 
+    @SuppressWarnings("unchecked")
     private ValidationResult validateIntentRecognitionConfig(Map<String, Object> config) {
         List<String> errors = new ArrayList<>();
 
+        // 兼容新旧字段名
         String inputVariable = (String) config.get("inputVariable");
-        if (inputVariable == null || inputVariable.isBlank()) {
-            errors.add("意图识别节点必须指定输入变量名");
+        String textVariable = (String) config.get("textVariable");
+        if ((inputVariable == null || inputVariable.isBlank()) && (textVariable == null || textVariable.isBlank())) {
+            errors.add("意图识别节点必须指定输入变量名(inputVariable)");
+        }
+
+        Object intents = config.get("intents");
+        if (intents == null || (intents instanceof List && ((List<?>) intents).isEmpty())) {
+            errors.add("意图识别节点必须配置至少一个意图");
+        } else if (intents instanceof List) {
+            List<Map<String, Object>> intentList = (List<Map<String, Object>>) intents;
+            for (int i = 0; i < intentList.size(); i++) {
+                Map<String, Object> intent = intentList.get(i);
+                String name = (String) intent.get("name");
+                if (name == null || name.isBlank()) {
+                    errors.add("意图[" + i + "]的名称(name)不能为空");
+                }
+            }
+        }
+
+        Double threshold = getDouble(config, "confidenceThreshold");
+        if (threshold != null && (threshold < 0 || threshold > 1)) {
+            errors.add("置信度阈值必须在0-1之间");
         }
 
         return errors.isEmpty() ? ValidationResult.success() : ValidationResult.failure(errors);
@@ -290,9 +386,16 @@ public class NodeConfigValidator {
     private ValidationResult validateEntityExtractionConfig(Map<String, Object> config) {
         List<String> errors = new ArrayList<>();
 
+        // 兼容新旧字段名
         String inputVariable = (String) config.get("inputVariable");
-        if (inputVariable == null || inputVariable.isBlank()) {
-            errors.add("实体抽取节点必须指定输入变量名");
+        String textVariable = (String) config.get("textVariable");
+        if ((inputVariable == null || inputVariable.isBlank()) && (textVariable == null || textVariable.isBlank())) {
+            errors.add("实体抽取节点必须指定输入变量名(inputVariable)");
+        }
+
+        Object entityTypes = config.get("entityTypes");
+        if (entityTypes == null || (entityTypes instanceof List && ((List<?>) entityTypes).isEmpty())) {
+            errors.add("实体抽取节点必须指定至少一个实体类型(entityTypes)");
         }
 
         return errors.isEmpty() ? ValidationResult.success() : ValidationResult.failure(errors);

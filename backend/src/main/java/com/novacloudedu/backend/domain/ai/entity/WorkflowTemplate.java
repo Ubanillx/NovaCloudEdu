@@ -104,6 +104,9 @@ public class WorkflowTemplate {
      */
     public Workflow createWorkflow(String workflowName, String workflowDescription, 
                                     com.novacloudedu.backend.domain.user.valueobject.UserId userId) {
+        if (this.definition == null) {
+            throw new IllegalStateException("模板定义为空，无法创建工作流");
+        }
         Workflow workflow = Workflow.create(
                 workflowName != null ? workflowName : this.name,
                 workflowDescription != null ? workflowDescription : this.description,

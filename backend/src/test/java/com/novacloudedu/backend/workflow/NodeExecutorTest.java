@@ -6,13 +6,19 @@ import com.novacloudedu.backend.domain.ai.entity.Workflow;
 import com.novacloudedu.backend.domain.ai.valueobject.*;
 import com.novacloudedu.backend.domain.user.valueobject.UserId;
 import com.novacloudedu.backend.infrastructure.workflow.executor.*;
+import com.novacloudedu.backend.infrastructure.workflow.executor.code.DockerPythonExecutionService;
+import com.novacloudedu.backend.infrastructure.workflow.executor.code.GraalJsExecutionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.*;
+
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.when;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -310,13 +316,25 @@ class NodeExecutorTest {
         assertTrue(result.get("jsonString").toString().contains("test"));
     }
 
+    @Mock
+    private GraalJsExecutionService jsExecutor;
+
+    @Mock
+    private DockerPythonExecutionService pythonExecutor;
+
     @Test
     @DisplayName("测试代码节点执行器")
     void testCodeNodeExecutor() {
-        CodeNodeExecutor executor = new CodeNodeExecutor(objectMapper);
+        // Mock JS 执行器返回结果
+        Map<String, Object> jsResult = new HashMap<>();
+        jsResult.put("result", "test value");
+        when(jsExecutor.execute(anyString(), anyMap())).thenReturn(jsResult);
+
+        CodeNodeExecutor executor = new CodeNodeExecutor(jsExecutor, pythonExecutor);
 
         WorkflowNode node = new WorkflowNode();
         node.setId("code1");
+        node.setName("代码节点");
         node.setType(NodeType.CODE);
 
         Map<String, Object> config = new HashMap<>();
@@ -329,7 +347,9 @@ class NodeExecutorTest {
 
         Map<String, Object> result = executor.execute(node, input, context);
 
-        // 由于Nashorn可能不可用，验证结果不为空即可
         assertNotNull(result);
+        assertEquals("test value", result.get("result"));
+        assertEquals("JAVASCRIPT", result.get("_language"));
+        assertNotNull(result.get("_executionTime"));
     }
 }

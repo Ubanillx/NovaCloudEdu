@@ -4,24 +4,42 @@ import com.novacloudedu.backend.domain.ai.entity.WorkflowExecution;
 import com.novacloudedu.backend.domain.ai.service.NodeExecutor;
 import com.novacloudedu.backend.domain.ai.valueobject.NodeType;
 import com.novacloudedu.backend.domain.ai.valueobject.WorkflowNode;
-import com.novacloudedu.backend.infrastructure.ai.DashScopeLlmService;
+import com.novacloudedu.backend.domain.knowledge.service.KnowledgeSearchService;
+import com.novacloudedu.backend.infrastructure.ai.LangchainChatService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * LLM节点执行器
+ *
+ * 支持的配置项（与前端 LLMConfig 面板对应）：
+ * - model: 模型ID（如 "dashscope/qwen-max"）
+ * - systemPrompt: 系统提示词，支持 {{变量}} 占位符
+ * - userPromptTemplate: 用户提示词模板，支持 {{变量}} 占位符
+ * - temperature / topP / maxTokens: 模型参数
+ * - inputMappings: 输入变量映射 [{variableName, mappedKey}]，将工作流变量映射为模板占位符
+ * - outputVariable: 输出变量名（默认 "llmOutput"）
+ * - knowledgeBaseIds: 关联的知识库ID列表，自动做 RAG 检索
+ * - ragTopK / ragThreshold: RAG 检索参数
+ * - enabledCapabilities: 可选 AI 能力列表 ["vision","text2image","webSearch"]
+ * - historyVariable: 历史消息变量名（多轮对话）
+ * - historyLimit: 保留历史消息数量
+ * - parseJsonOutput / jsonSchema: JSON 输出解析
  */
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class LlmNodeExecutor implements NodeExecutor {
 
-    private final DashScopeLlmService llmService;
+    private final LangchainChatService langchainChatService;
+    private final KnowledgeSearchService knowledgeSearchService;
+
+    private static final Pattern VAR_PATTERN = Pattern.compile("\\{\\{([^}]+)}}");
 
     @Override
     public NodeType getNodeType() {
@@ -29,53 +47,284 @@ public class LlmNodeExecutor implements NodeExecutor {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Map<String, Object> execute(WorkflowNode node, Map<String, Object> input, WorkflowExecution context) {
         Map<String, Object> config = node.getConfig();
-        
-        String systemPrompt = (String) config.getOrDefault("systemPrompt", "");
-        String userMessage = (String) config.getOrDefault("userMessage", "");
-        
-        // 支持变量替换
-        userMessage = replaceVariables(userMessage, input);
-        systemPrompt = replaceVariables(systemPrompt, input);
-        
-        // 如果userMessage为空，尝试从input获取
-        if (userMessage.isEmpty()) {
-            userMessage = (String) input.getOrDefault("userInput", "");
+        if (config == null) config = Collections.emptyMap();
+
+        // ===== 1. 读取模型配置 =====
+        String model = (String) config.get("model");
+        Double temperature = toDouble(config.get("temperature"));
+        Double topP = toDouble(config.get("topP"));
+        Integer maxTokens = toInteger(config.get("maxTokens"));
+
+        // ===== 2. 构建输入变量上下文（合并 inputMappings + 工作流全量变量）=====
+        Map<String, Object> varContext = new HashMap<>(input);
+        List<Map<String, String>> inputMappings = (List<Map<String, String>>) config.get("inputMappings");
+        if (inputMappings != null) {
+            for (Map<String, String> mapping : inputMappings) {
+                String variableName = mapping.get("variableName");
+                String mappedKey = mapping.get("mappedKey");
+                if (variableName != null && mappedKey != null && input.containsKey(variableName)) {
+                    varContext.put(mappedKey, input.get(variableName));
+                }
+            }
         }
 
-        log.info("LLM节点执行: systemPrompt长度={}, userMessage长度={}", 
-                systemPrompt.length(), userMessage.length());
+        // ===== 3. 解析提示词模板 =====
+        String systemPrompt = replaceVariables(
+                (String) config.getOrDefault("systemPrompt", ""), varContext);
+        String userPromptTemplate = (String) config.getOrDefault("userPromptTemplate", "");
+        // 兼容旧字段 userMessage
+        if (userPromptTemplate.isEmpty()) {
+            userPromptTemplate = (String) config.getOrDefault("userMessage", "");
+        }
+        String userMessage = replaceVariables(userPromptTemplate, varContext);
 
-        // 调用LLM
-        String response = llmService.chatWithSystemPrompt(systemPrompt, userMessage);
+        // 如果用户消息仍为空，尝试从 input 获取
+        if (userMessage.isEmpty()) {
+            Object userInput = input.get("userInput");
+            if (userInput != null && !String.valueOf(userInput).isEmpty()) {
+                userMessage = String.valueOf(userInput);
+            }
+        }
 
+        // 如果用户消息仍为空但有系统提示词，使用通用指令避免空消息导致 API 报错
+        if (userMessage.isEmpty() && !systemPrompt.isEmpty()) {
+            userMessage = "请根据以上系统提示词的要求进行回答。";
+            log.info("LLM节点: userMessage为空，已使用默认用户消息");
+        }
+        // 如果两者都为空，直接报错
+        if (userMessage.isEmpty() && systemPrompt.isEmpty()) {
+            throw new IllegalArgumentException("LLM节点执行失败: 系统提示词和用户消息均为空，请至少配置其中一项");
+        }
+
+        // ===== 4. 知识库 RAG 检索 =====
+        List<?> knowledgeBaseIds = (List<?>) config.get("knowledgeBaseIds");
+        String ragContext = "";
+        List<Map<String, Object>> ragReferences = new ArrayList<>();
+        if (knowledgeBaseIds != null && !knowledgeBaseIds.isEmpty() && !userMessage.isEmpty()) {
+            Integer ragTopK = toInteger(config.getOrDefault("ragTopK", 5));
+            Double ragThreshold = toDouble(config.getOrDefault("ragThreshold", 0.5));
+            ragContext = performRag(knowledgeBaseIds, userMessage, ragTopK, ragThreshold, ragReferences);
+        } else if (knowledgeBaseIds != null && !knowledgeBaseIds.isEmpty()) {
+            log.warn("LLM节点: 跳过RAG检索，因为用户消息为空");
+        }
+
+        // ===== 5. 构建消息列表 =====
+        List<Map<String, String>> messages = new ArrayList<>();
+
+        // 系统提示词（拼接 RAG 上下文）
+        StringBuilder sysBuilder = new StringBuilder();
+        if (!systemPrompt.isEmpty()) {
+            sysBuilder.append(systemPrompt);
+        }
+        if (!ragContext.isEmpty()) {
+            if (sysBuilder.length() > 0) sysBuilder.append("\n\n");
+            sysBuilder.append(ragContext);
+        }
+        if (sysBuilder.length() > 0) {
+            messages.add(Map.of("role", "system", "content", sysBuilder.toString()));
+        }
+
+        // 历史消息（多轮对话）
+        String historyVariable = (String) config.get("historyVariable");
+        Integer historyLimit = toInteger(config.getOrDefault("historyLimit", 10));
+        if (historyVariable != null && !historyVariable.isEmpty()) {
+            Object historyObj = input.get(historyVariable);
+            if (historyObj instanceof List) {
+                List<Map<String, String>> history = (List<Map<String, String>>) historyObj;
+                int start = Math.max(0, history.size() - historyLimit);
+                for (int i = start; i < history.size(); i++) {
+                    messages.add(history.get(i));
+                }
+            }
+        }
+
+        // 用户消息
+        messages.add(Map.of("role", "user", "content", userMessage));
+
+        log.info("LLM节点执行: model={}, systemPrompt长度={}, userMessage长度={}, RAG上下文长度={}, 消息数={}",
+                model, sysBuilder.length(), userMessage.length(), ragContext.length(), messages.size());
+
+        // ===== 6. 解析 AI 能力开关 =====
+        List<String> enabledCapabilities = (List<String>) config.get("enabledCapabilities");
+        boolean enableSearch = enabledCapabilities != null && enabledCapabilities.contains("webSearch");
+
+        // ===== 7. 调用 LLM =====
+        String response;
+        if (temperature != null || topP != null || maxTokens != null || enableSearch) {
+            // 使用自定义参数调用（同步收集）
+            StringBuilder sb = new StringBuilder();
+            langchainChatService.streamChatWithParams(
+                    model, messages, temperature, topP, maxTokens, enableSearch, sb::append);
+            response = sb.toString();
+        } else {
+            // 使用模型默认参数
+            response = langchainChatService.chat(model,
+                    sysBuilder.toString().isEmpty() ? null : sysBuilder.toString(),
+                    userMessage);
+        }
+
+        // ===== 8. 构建输出 =====
+        String outputVariable = (String) config.getOrDefault("outputVariable", "llmOutput");
         Map<String, Object> result = new HashMap<>();
         result.put("response", response);
-        result.put("llmOutput", response);
-        
+        result.put(outputVariable, response);
+        result.put("model", model != null ? model : "default");
+        result.put("tokensUsed", response.length()); // 近似值
+
+        // RAG 引用
+        if (!ragReferences.isEmpty()) {
+            result.put("ragReferences", ragReferences);
+            result.put("ragReferenceCount", ragReferences.size());
+        }
+
+        // JSON 输出解析
+        Boolean parseJsonOutput = (Boolean) config.get("parseJsonOutput");
+        if (Boolean.TRUE.equals(parseJsonOutput)) {
+            try {
+                com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                // 尝试从 response 中提取 JSON
+                String jsonStr = extractJson(response);
+                Object parsed = mapper.readValue(jsonStr, Object.class);
+                result.put("parsedOutput", parsed);
+            } catch (Exception e) {
+                log.warn("LLM JSON输出解析失败: {}", e.getMessage());
+                result.put("parsedOutput", null);
+                result.put("parseError", e.getMessage());
+            }
+        }
+
+        // 可选 AI 能力标记（前端可据此做后处理，如文生图触发等）
+        if (enabledCapabilities != null && !enabledCapabilities.isEmpty()) {
+            result.put("enabledCapabilities", enabledCapabilities);
+        }
+
         return result;
     }
 
     @Override
     public void validate(WorkflowNode node) {
-        // 验证节点配置
         if (node.getConfig() == null) {
             throw new IllegalArgumentException("LLM节点缺少配置");
         }
     }
 
+    /**
+     * 执行 RAG 知识库检索
+     */
+    private String performRag(List<?> knowledgeBaseIds, String query,
+                              int topK, double threshold,
+                              List<Map<String, Object>> referencesOut) {
+        try {
+            List<Long> ids = knowledgeBaseIds.stream()
+                    .map(v -> {
+                        if (v instanceof Number n) return n.longValue();
+                        return Long.parseLong(String.valueOf(v));
+                    })
+                    .toList();
+
+            KnowledgeSearchService.SearchRequest request = KnowledgeSearchService.SearchRequest.builder()
+                    .knowledgeBaseIds(ids)
+                    .query(query)
+                    .topK(topK)
+                    .similarityThreshold(threshold)
+                    .retrievalMode("hybrid")
+                    .build();
+
+            KnowledgeSearchService.SearchResult searchResult = knowledgeSearchService.search(request);
+
+            if (searchResult.getDocuments() == null || searchResult.getDocuments().isEmpty()) {
+                log.info("LLM节点 RAG 检索无结果: knowledgeBaseIds={}", ids);
+                return "";
+            }
+
+            StringBuilder context = new StringBuilder("【知识库参考资料】\n\n");
+            int idx = 1;
+            for (KnowledgeSearchService.DocumentChunk doc : searchResult.getDocuments()) {
+                context.append(String.format("参考 %d（相关度: %.2f）：\n%s\n\n",
+                        idx, doc.getScore(), doc.getContent()));
+                Map<String, Object> ref = new LinkedHashMap<>();
+                ref.put("index", idx);
+                ref.put("score", doc.getScore());
+                ref.put("documentId", doc.getDocumentId());
+                ref.put("documentName", doc.getDocumentName());
+                ref.put("contentPreview", doc.getContent().substring(0, Math.min(100, doc.getContent().length())));
+                referencesOut.add(ref);
+                idx++;
+            }
+
+            log.info("LLM节点 RAG 检索完成: {}条参考, 上下文长度={}, 耗时{}ms",
+                    searchResult.getDocuments().size(), context.length(), searchResult.getSearchTimeMs());
+            return context.toString();
+
+        } catch (Exception e) {
+            log.error("LLM节点 RAG 检索异常", e);
+            return "";
+        }
+    }
+
+    /**
+     * 替换模板中的 {{变量}} 占位符
+     */
     private String replaceVariables(String template, Map<String, Object> variables) {
         if (template == null || template.isEmpty()) {
-            return template;
+            return template != null ? template : "";
         }
-        
-        String result = template;
-        for (Map.Entry<String, Object> entry : variables.entrySet()) {
-            String placeholder = "{{" + entry.getKey() + "}}";
-            String value = entry.getValue() != null ? String.valueOf(entry.getValue()) : "";
-            result = result.replace(placeholder, value);
+
+        StringBuffer result = new StringBuffer();
+        Matcher matcher = VAR_PATTERN.matcher(template);
+        while (matcher.find()) {
+            String varName = matcher.group(1).trim();
+            Object value = variables.get(varName);
+            String replacement = value != null ? String.valueOf(value) : "";
+            matcher.appendReplacement(result, Matcher.quoteReplacement(replacement));
         }
-        return result;
+        matcher.appendTail(result);
+        return result.toString();
+    }
+
+    /**
+     * 从 LLM 回复中提取 JSON 片段
+     */
+    private String extractJson(String text) {
+        if (text == null) return "{}";
+        // 尝试提取 ```json ... ``` 中的内容
+        int jsonStart = text.indexOf("```json");
+        if (jsonStart >= 0) {
+            int contentStart = text.indexOf('\n', jsonStart) + 1;
+            int jsonEnd = text.indexOf("```", contentStart);
+            if (jsonEnd > contentStart) {
+                return text.substring(contentStart, jsonEnd).trim();
+            }
+        }
+        // 尝试提取 { ... } 或 [ ... ]
+        int braceStart = text.indexOf('{');
+        int bracketStart = text.indexOf('[');
+        if (braceStart >= 0 || bracketStart >= 0) {
+            int start = braceStart >= 0 && (bracketStart < 0 || braceStart < bracketStart) ? braceStart : bracketStart;
+            char open = text.charAt(start);
+            char close = open == '{' ? '}' : ']';
+            int depth = 0;
+            for (int i = start; i < text.length(); i++) {
+                if (text.charAt(i) == open) depth++;
+                else if (text.charAt(i) == close) depth--;
+                if (depth == 0) return text.substring(start, i + 1);
+            }
+        }
+        return text.trim();
+    }
+
+    private Double toDouble(Object value) {
+        if (value == null) return null;
+        if (value instanceof Number) return ((Number) value).doubleValue();
+        try { return Double.parseDouble(String.valueOf(value)); } catch (Exception e) { return null; }
+    }
+
+    private Integer toInteger(Object value) {
+        if (value == null) return null;
+        if (value instanceof Number) return ((Number) value).intValue();
+        try { return Integer.parseInt(String.valueOf(value)); } catch (Exception e) { return null; }
     }
 }

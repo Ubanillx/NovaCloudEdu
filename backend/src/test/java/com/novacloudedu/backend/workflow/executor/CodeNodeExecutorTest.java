@@ -1,31 +1,42 @@
 package com.novacloudedu.backend.workflow.executor;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.novacloudedu.backend.domain.ai.valueobject.NodeType;
 import com.novacloudedu.backend.domain.ai.valueobject.WorkflowNode;
 import com.novacloudedu.backend.infrastructure.workflow.executor.CodeNodeExecutor;
+import com.novacloudedu.backend.infrastructure.workflow.executor.code.DockerPythonExecutionService;
+import com.novacloudedu.backend.infrastructure.workflow.executor.code.GraalJsExecutionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.when;
 
 /**
  * 代码执行节点执行器单元测试
  */
+@ExtendWith(MockitoExtension.class)
 @DisplayName("CodeNodeExecutor 单元测试")
 class CodeNodeExecutorTest {
 
+    @Mock
+    private GraalJsExecutionService jsExecutor;
+
+    @Mock
+    private DockerPythonExecutionService pythonExecutor;
+
     private CodeNodeExecutor executor;
-    private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {
-        objectMapper = new ObjectMapper();
-        executor = new CodeNodeExecutor(objectMapper);
+        executor = new CodeNodeExecutor(jsExecutor, pythonExecutor);
     }
 
     @Test
@@ -59,6 +70,11 @@ class CodeNodeExecutorTest {
     @Test
     @DisplayName("简单return语句 - 应返回变量值")
     void execute_simpleReturn_shouldReturnVariableValue() {
+        // Mock JS 执行返回结果
+        Map<String, Object> jsResult = new HashMap<>();
+        jsResult.put("result", "张三");
+        when(jsExecutor.execute(anyString(), anyMap())).thenReturn(jsResult);
+
         Map<String, Object> config = new HashMap<>();
         config.put("code", "return name;");
         config.put("language", "javascript");
@@ -77,11 +93,17 @@ class CodeNodeExecutorTest {
 
         assertNotNull(result);
         assertEquals("张三", result.get("result"));
+        assertEquals("JAVASCRIPT", result.get("_language"));
     }
 
     @Test
     @DisplayName("返回字面量 - 应返回字面量值")
     void execute_returnLiteral_shouldReturnLiteralValue() {
+        // Mock JS 执行返回结果
+        Map<String, Object> jsResult = new HashMap<>();
+        jsResult.put("result", "hello");
+        when(jsExecutor.execute(anyString(), anyMap())).thenReturn(jsResult);
+
         Map<String, Object> config = new HashMap<>();
         config.put("code", "return hello;");
         config.put("language", "javascript");
@@ -98,7 +120,6 @@ class CodeNodeExecutorTest {
         Map<String, Object> result = executor.execute(node, input, null);
 
         assertNotNull(result);
-        // 变量不存在时返回表达式本身
         assertEquals("hello", result.get("result"));
     }
 

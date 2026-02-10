@@ -24,7 +24,7 @@ public interface WorkflowTemplateRepository {
 
     List<WorkflowTemplate> findByCreatorId(Long creatorId);
 
-    List<WorkflowTemplate> search(String keyword, String category, int page, int size);
+    List<WorkflowTemplate> search(String keyword, String category, Long currentUserId, int page, int size);
 
     void delete(Long id);
 

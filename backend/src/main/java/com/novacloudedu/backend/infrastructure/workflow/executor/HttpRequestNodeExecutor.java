@@ -35,14 +35,14 @@ public class HttpRequestNodeExecutor implements NodeExecutor {
     public Map<String, Object> execute(WorkflowNode node, Map<String, Object> input, WorkflowExecution context) {
         Map<String, Object> config = node.getConfig();
         
-        String url = (String) config.getOrDefault("url", "");
+        String url = ((String) config.getOrDefault("url", "")).trim();
         String method = (String) config.getOrDefault("method", "GET");
         Map<String, String> headers = (Map<String, String>) config.getOrDefault("headers", new HashMap<>());
         Object body = config.get("body");
         int timeout = (int) config.getOrDefault("timeout", 30000);
 
         // 变量替换
-        url = replaceVariables(url, input);
+        url = replaceVariables(url, input).trim();
 
         log.info("HTTP请求节点执行: method={}, url={}", method, url);
 

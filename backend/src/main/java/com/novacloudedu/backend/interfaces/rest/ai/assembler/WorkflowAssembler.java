@@ -54,10 +54,30 @@ public class WorkflowAssembler {
         if (vo == null) {
             return null;
         }
+        // 映射节点执行详情
+        java.util.List<ExecutionResultResponse.NodeExecutionDTO> neDTOs = null;
+        if (vo.getNodeExecutions() != null) {
+            neDTOs = vo.getNodeExecutions().stream().map(ne ->
+                ExecutionResultResponse.NodeExecutionDTO.builder()
+                    .nodeId(ne.getNodeId())
+                    .nodeName(ne.getNodeName())
+                    .nodeType(ne.getNodeType())
+                    .status(ne.getStatus())
+                    .input(ne.getInput())
+                    .output(ne.getOutput())
+                    .errorMessage(ne.getErrorMessage())
+                    .startTime(ne.getStartTime())
+                    .endTime(ne.getEndTime())
+                    .durationMs(ne.getDurationMs())
+                    .build()
+            ).collect(java.util.stream.Collectors.toList());
+        }
+
         return ExecutionResultResponse.builder()
                 .executionId(vo.getExecutionId())
                 .workflowId(vo.getWorkflowId())
                 .workflowName(vo.getWorkflowName())
+                .workflowVersion(vo.getWorkflowVersion())
                 .status(vo.getStatus())
                 .input(vo.getInput())
                 .output(vo.getOutput())
@@ -67,6 +87,7 @@ public class WorkflowAssembler {
                 .startTime(vo.getStartTime())
                 .endTime(vo.getEndTime())
                 .durationMs(vo.getDurationMs())
+                .nodeExecutions(neDTOs)
                 .build();
     }
 
@@ -255,6 +276,69 @@ public class WorkflowAssembler {
                                 .nodeId(w.getNodeId())
                                 .build())
                         .collect(Collectors.toList()) : List.of())
+                .build();
+    }
+
+    /**
+     * 将WorkflowTemplateVO转换为WorkflowTemplateResponse
+     */
+    public WorkflowTemplateResponse toTemplateResponse(WorkflowApplicationService.WorkflowTemplateVO vo) {
+        if (vo == null) {
+            return null;
+        }
+        return WorkflowTemplateResponse.builder()
+                .id(vo.getId())
+                .name(vo.getName())
+                .description(vo.getDescription())
+                .category(vo.getCategory())
+                .icon(vo.getIcon())
+                .definition(vo.getDefinition())
+                .tags(vo.getTags())
+                .isSystem(vo.isSystem())
+                .isPublic(vo.isPublic())
+                .creatorId(vo.getCreatorId())
+                .usageCount(vo.getUsageCount())
+                .createTime(vo.getCreateTime())
+                .build();
+    }
+
+    /**
+     * 将WorkflowTriggerVO转换为WorkflowTriggerResponse
+     */
+    public WorkflowTriggerResponse toTriggerResponse(WorkflowApplicationService.WorkflowTriggerVO vo) {
+        if (vo == null) {
+            return null;
+        }
+        return WorkflowTriggerResponse.builder()
+                .id(vo.getId())
+                .workflowId(vo.getWorkflowId())
+                .type(vo.getType())
+                .name(vo.getName())
+                .enabled(vo.isEnabled())
+                .config(vo.getConfig())
+                .lastTriggeredAt(vo.getLastTriggeredAt())
+                .triggerCount(vo.getTriggerCount())
+                .createTime(vo.getCreateTime())
+                .build();
+    }
+
+    /**
+     * 将WorkflowVersionVO转换为WorkflowVersionResponse
+     */
+    public WorkflowVersionResponse toVersionResponse(WorkflowApplicationService.WorkflowVersionVO vo) {
+        if (vo == null) {
+            return null;
+        }
+        return WorkflowVersionResponse.builder()
+                .id(vo.getId())
+                .workflowId(vo.getWorkflowId())
+                .version(vo.getVersion())
+                .name(vo.getName())
+                .description(vo.getDescription())
+                .definition(vo.getDefinition())
+                .publishNote(vo.getPublishNote())
+                .publishedBy(vo.getPublishedBy())
+                .createTime(vo.getCreateTime())
                 .build();
     }
 }

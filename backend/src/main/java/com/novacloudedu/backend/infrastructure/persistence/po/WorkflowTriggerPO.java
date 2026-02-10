@@ -23,7 +23,6 @@ public class WorkflowTriggerPO {
 
     private Integer enabled;
 
-    @TableField(typeHandler = com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler.class)
     private String config;
 
     private LocalDateTime lastTriggeredAt;

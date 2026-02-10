@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -22,6 +24,9 @@ public class WorkflowNode {
     private Position position;
     private Map<String, Object> config;
     private ErrorHandlingConfig errorHandling;
+    private ChildrenDefinition children;
+    private Integer width;
+    private Integer height;
     
     @Data
     @Builder
@@ -51,5 +56,16 @@ public class WorkflowNode {
                     .timeoutMs(30000)
                     .build();
         }
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ChildrenDefinition {
+        @Builder.Default
+        private List<WorkflowNode> nodes = new ArrayList<>();
+        @Builder.Default
+        private List<WorkflowEdge> edges = new ArrayList<>();
     }
 }

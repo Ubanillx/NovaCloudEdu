@@ -174,11 +174,18 @@ public class WorkflowExecutionRepositoryImpl implements WorkflowExecutionReposit
             log.error("序列化执行数据失败", e);
         }
 
+        LocalDateTime now = LocalDateTime.now();
+        if (po.getCreateTime() == null) {
+            po.setCreateTime(now);
+        }
+        po.setUpdateTime(now);
+
         return po;
     }
 
     private WorkflowExecution toDomain(WorkflowExecutionPO po) {
         Map<String, Object> input = null, output = null, variables = null;
+        List<WorkflowExecution.NodeExecution> nodeExecutions = null;
         try {
             if (po.getInput() != null) {
                 input = objectMapper.readValue(po.getInput(), new TypeReference<>() {});
@@ -191,6 +198,16 @@ public class WorkflowExecutionRepositoryImpl implements WorkflowExecutionReposit
             }
         } catch (Exception e) {
             log.error("反序列化执行数据失败", e);
+        }
+
+        // 反序列化节点执行记录
+        try {
+            if (po.getNodeExecutions() != null) {
+                nodeExecutions = objectMapper.readValue(po.getNodeExecutions(),
+                        new TypeReference<List<WorkflowExecution.NodeExecution>>() {});
+            }
+        } catch (Exception e) {
+            log.error("反序列化节点执行记录失败", e);
         }
 
         return WorkflowExecution.reconstruct(
@@ -207,7 +224,8 @@ public class WorkflowExecutionRepositoryImpl implements WorkflowExecutionReposit
                 UserId.of(po.getUserId()),
                 po.getStartTime(),
                 po.getEndTime(),
-                po.getDurationMs()
+                po.getDurationMs(),
+                nodeExecutions
         );
     }
 }
