@@ -56,6 +56,8 @@ export const UpdateNodeRequestTypeEnum = {
     CONDITION: 'CONDITION',
     SWITCH: 'SWITCH',
     LOOP: 'LOOP',
+    LOOP_START: 'LOOP_START',
+    LOOP_END: 'LOOP_END',
     PARALLEL: 'PARALLEL',
     MERGE: 'MERGE',
     VARIABLE_SET: 'VARIABLE_SET',

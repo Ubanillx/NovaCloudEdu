@@ -11,6 +11,9 @@ Name | Type | Description | Notes
 **position** | [**Position**](Position.md) |  | [optional] [default to undefined]
 **config** | **{ [key: string]: object; }** |  | [optional] [default to undefined]
 **errorHandling** | [**ErrorHandlingConfig**](ErrorHandlingConfig.md) |  | [optional] [default to undefined]
+**children** | [**ChildrenDefinition**](ChildrenDefinition.md) |  | [optional] [default to undefined]
+**width** | **number** |  | [optional] [default to undefined]
+**height** | **number** |  | [optional] [default to undefined]
 
 ## Example
 
@@ -24,6 +27,9 @@ const instance: WorkflowNode = {
     position,
     config,
     errorHandling,
+    children,
+    width,
+    height,
 };
 ```
 

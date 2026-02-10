@@ -28,6 +28,7 @@ docs/ApplyTeacherRequest.md
 docs/ArticleChatRequest.md
 docs/ArticleResponse.md
 docs/ArticleSourceResponse.md
+docs/AssistantChatRequest.md
 docs/AsyncExecutionResponse.md
 docs/BannerListResponse.md
 docs/BannerPageResponse.md
@@ -63,6 +64,7 @@ docs/BaseResponseDailyArticleResponse.md
 docs/BaseResponseDailyWordPageResponse.md
 docs/BaseResponseDailyWordResponse.md
 docs/BaseResponseExecutionResultResponse.md
+docs/BaseResponseExecutionStatisticsResponse.md
 docs/BaseResponseFeedbackDetailResponse.md
 docs/BaseResponseFeedbackPageResponse.md
 docs/BaseResponseFollowPageResponse.md
@@ -93,6 +95,7 @@ docs/BaseResponseListCourseReviewResponse.md
 docs/BaseResponseListDailyArticleResponse.md
 docs/BaseResponseListDailyWordResponse.md
 docs/BaseResponseListExecutionLogResponse.md
+docs/BaseResponseListExecutionResultResponse.md
 docs/BaseResponseListFeedbackReplyResponse.md
 docs/BaseResponseListFileInfoResponse.md
 docs/BaseResponseListFriendResponse.md
@@ -122,7 +125,11 @@ docs/BaseResponseListUserWordBookResponse.md
 docs/BaseResponseListWorkflowEdgeResponse.md
 docs/BaseResponseListWorkflowNodeResponse.md
 docs/BaseResponseListWorkflowResponse.md
+docs/BaseResponseListWorkflowSkillVO.md
+docs/BaseResponseListWorkflowTemplateResponse.md
+docs/BaseResponseListWorkflowTriggerResponse.md
 docs/BaseResponseListWorkflowVariableResponse.md
+docs/BaseResponseListWorkflowVersionResponse.md
 docs/BaseResponseLoginUserResponse.md
 docs/BaseResponseLong.md
 docs/BaseResponseMapStringObject.md
@@ -168,8 +175,11 @@ docs/BaseResponseWorkflowEdgeResponse.md
 docs/BaseResponseWorkflowNodeResponse.md
 docs/BaseResponseWorkflowResponse.md
 docs/BaseResponseWorkflowSettingsDTO.md
+docs/BaseResponseWorkflowTemplateResponse.md
+docs/BaseResponseWorkflowTriggerResponse.md
 docs/BaseResponseWorkflowValidationResponse.md
 docs/BaseResponseWorkflowVariableResponse.md
+docs/BaseResponseWorkflowVersionResponse.md
 docs/BatchAiProcessRequest.md
 docs/BatchBanUserRequest.md
 docs/BatchCreateUserRequest.md
@@ -195,6 +205,7 @@ docs/ChatSessionResponse.md
 docs/CheckinRankingItem.md
 docs/CheckinResult.md
 docs/CheckinStatusResult.md
+docs/ChildrenDefinition.md
 docs/ClassMemberResponse.md
 docs/ClassResponse.md
 docs/ClassScheduleItemResponse.md
@@ -239,6 +250,7 @@ docs/ExecuteTaskRequest.md
 docs/ExecuteWorkflowRequest.md
 docs/ExecutionLogResponse.md
 docs/ExecutionResultResponse.md
+docs/ExecutionStatisticsResponse.md
 docs/FailedItem.md
 docs/FeedbackDetailResponse.md
 docs/FeedbackPageResponse.md
@@ -272,6 +284,7 @@ docs/LearningStats.md
 docs/LoginUserResponse.md
 docs/MemberPage.md
 docs/MessageReadUserResponse.md
+docs/NodeExecutionDTO.md
 docs/NodeTypeResponse.md
 docs/OptionDTO.md
 docs/OrderResponse.md
@@ -318,6 +331,8 @@ docs/SendFriendRequestDTO.md
 docs/SendResult.md
 docs/SendSmsRequest.md
 docs/SessionChatRequest.md
+docs/SkillOutputVO.md
+docs/SkillParamVO.md
 docs/SourceScrapeRequest.md
 docs/SseEmitter.md
 docs/TeacherApplicationResponse.md
@@ -381,8 +396,12 @@ docs/WorkflowNodeResponse.md
 docs/WorkflowResponse.md
 docs/WorkflowSettings.md
 docs/WorkflowSettingsDTO.md
+docs/WorkflowSkillVO.md
+docs/WorkflowTemplateResponse.md
+docs/WorkflowTriggerResponse.md
 docs/WorkflowValidationResponse.md
 docs/WorkflowVariableResponse.md
+docs/WorkflowVersionResponse.md
 git_push.sh
 index.ts
 models/add-class-course-request.ts
@@ -405,6 +424,7 @@ models/apply-teacher-request.ts
 models/article-chat-request.ts
 models/article-response.ts
 models/article-source-response.ts
+models/assistant-chat-request.ts
 models/async-execution-response.ts
 models/banner-list-response.ts
 models/banner-page-response.ts
@@ -440,6 +460,7 @@ models/base-response-daily-article-response.ts
 models/base-response-daily-word-page-response.ts
 models/base-response-daily-word-response.ts
 models/base-response-execution-result-response.ts
+models/base-response-execution-statistics-response.ts
 models/base-response-feedback-detail-response.ts
 models/base-response-feedback-page-response.ts
 models/base-response-follow-page-response.ts
@@ -470,6 +491,7 @@ models/base-response-list-course-review-response.ts
 models/base-response-list-daily-article-response.ts
 models/base-response-list-daily-word-response.ts
 models/base-response-list-execution-log-response.ts
+models/base-response-list-execution-result-response.ts
 models/base-response-list-feedback-reply-response.ts
 models/base-response-list-file-info-response.ts
 models/base-response-list-friend-response.ts
@@ -499,7 +521,11 @@ models/base-response-list-user-word-book-response.ts
 models/base-response-list-workflow-edge-response.ts
 models/base-response-list-workflow-node-response.ts
 models/base-response-list-workflow-response.ts
+models/base-response-list-workflow-skill-vo.ts
+models/base-response-list-workflow-template-response.ts
+models/base-response-list-workflow-trigger-response.ts
 models/base-response-list-workflow-variable-response.ts
+models/base-response-list-workflow-version-response.ts
 models/base-response-login-user-response.ts
 models/base-response-long.ts
 models/base-response-map-string-object.ts
@@ -545,8 +571,11 @@ models/base-response-workflow-edge-response.ts
 models/base-response-workflow-node-response.ts
 models/base-response-workflow-response.ts
 models/base-response-workflow-settings-dto.ts
+models/base-response-workflow-template-response.ts
+models/base-response-workflow-trigger-response.ts
 models/base-response-workflow-validation-response.ts
 models/base-response-workflow-variable-response.ts
+models/base-response-workflow-version-response.ts
 models/batch-ai-process-request.ts
 models/batch-ban-user-request.ts
 models/batch-create-user-request.ts
@@ -572,6 +601,7 @@ models/chat-session-response.ts
 models/checkin-ranking-item.ts
 models/checkin-result.ts
 models/checkin-status-result.ts
+models/children-definition.ts
 models/class-member-response.ts
 models/class-response.ts
 models/class-schedule-item-response.ts
@@ -615,6 +645,7 @@ models/execute-task-request.ts
 models/execute-workflow-request.ts
 models/execution-log-response.ts
 models/execution-result-response.ts
+models/execution-statistics-response.ts
 models/failed-item.ts
 models/feedback-detail-response.ts
 models/feedback-page-response.ts
@@ -649,6 +680,7 @@ models/learning-stats.ts
 models/login-user-response.ts
 models/member-page.ts
 models/message-read-user-response.ts
+models/node-execution-dto.ts
 models/node-type-response.ts
 models/option-dto.ts
 models/order-response.ts
@@ -695,6 +727,8 @@ models/send-friend-request-dto.ts
 models/send-result.ts
 models/send-sms-request.ts
 models/session-chat-request.ts
+models/skill-output-vo.ts
+models/skill-param-vo.ts
 models/source-scrape-request.ts
 models/sse-emitter.ts
 models/teacher-application-response.ts
@@ -757,5 +791,9 @@ models/workflow-node.ts
 models/workflow-response.ts
 models/workflow-settings-dto.ts
 models/workflow-settings.ts
+models/workflow-skill-vo.ts
+models/workflow-template-response.ts
+models/workflow-trigger-response.ts
 models/workflow-validation-response.ts
 models/workflow-variable-response.ts
+models/workflow-version-response.ts
