@@ -59,6 +59,38 @@ public class WorkflowDefinition {
         private boolean enableDebug = false;
     }
     
+    /**
+     * 展平 LOOP 容器节点的子节点和内部边到主列表，
+     * 使引擎可以通过 findNodeById / findOutgoingEdges 访问子节点。
+     */
+    public void flattenChildren() {
+        List<WorkflowNode> childNodesToAdd = new ArrayList<>();
+        List<WorkflowEdge> childEdgesToAdd = new ArrayList<>();
+        // Fix #12+: 递归展平所有层级的 LOOP / PARALLEL 容器子节点
+        collectChildrenRecursive(this.nodes, childNodesToAdd, childEdgesToAdd);
+        this.nodes.addAll(childNodesToAdd);
+        this.edges.addAll(childEdgesToAdd);
+    }
+
+    private void collectChildrenRecursive(List<WorkflowNode> nodesToScan,
+                                           List<WorkflowNode> outNodes,
+                                           List<WorkflowEdge> outEdges) {
+        for (WorkflowNode node : nodesToScan) {
+            if ((node.getType() == NodeType.LOOP || node.getType() == NodeType.PARALLEL)
+                    && node.getChildren() != null) {
+                WorkflowNode.ChildrenDefinition ch = node.getChildren();
+                if (ch.getNodes() != null) {
+                    outNodes.addAll(ch.getNodes());
+                    // 递归处理子节点中可能存在的嵌套容器
+                    collectChildrenRecursive(ch.getNodes(), outNodes, outEdges);
+                }
+                if (ch.getEdges() != null) {
+                    outEdges.addAll(ch.getEdges());
+                }
+            }
+        }
+    }
+
     public WorkflowNode findNodeById(String nodeId) {
         return nodes.stream()
                 .filter(n -> n.getId().equals(nodeId))
@@ -102,6 +134,9 @@ public class WorkflowDefinition {
                                     .build() : null)
                     .config(node.getConfig() != null ? new HashMap<>(node.getConfig()) : null)
                     .errorHandling(node.getErrorHandling())
+                    .children(node.getChildren())
+                    .width(node.getWidth())
+                    .height(node.getHeight())
                     .build());
         }
 

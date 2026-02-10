@@ -90,11 +90,18 @@ public class WorkflowTemplateRepositoryImpl implements WorkflowTemplateRepositor
     }
 
     @Override
-    public List<WorkflowTemplate> search(String keyword, String category, int page, int size) {
-        Page<WorkflowTemplatePO> pageParam = new Page<>(page, size);
+    public List<WorkflowTemplate> search(String keyword, String category, Long currentUserId, int page, int size) {
+        Page<WorkflowTemplatePO> pageParam = new Page<>(page + 1, size);
         LambdaQueryWrapper<WorkflowTemplatePO> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(WorkflowTemplatePO::getDeleted, 0)
-                .eq(WorkflowTemplatePO::getIsPublic, 1);
+        wrapper.eq(WorkflowTemplatePO::getDeleted, 0);
+
+        // 公开模板 OR 当前用户自己创建的模板
+        if (currentUserId != null) {
+            wrapper.and(w -> w.eq(WorkflowTemplatePO::getIsPublic, 1)
+                    .or().eq(WorkflowTemplatePO::getCreatorId, currentUserId));
+        } else {
+            wrapper.eq(WorkflowTemplatePO::getIsPublic, 1);
+        }
         
         if (keyword != null && !keyword.isBlank()) {
             wrapper.and(w -> w.like(WorkflowTemplatePO::getName, keyword)
@@ -153,16 +160,29 @@ public class WorkflowTemplateRepositoryImpl implements WorkflowTemplateRepositor
         
         try {
             if (po.getDefinition() != null) {
-                definition = objectMapper.readValue(po.getDefinition(), WorkflowDefinition.class);
+                String defJson = po.getDefinition();
+                // 兼容旧数据：如果被双重序列化（外层是JSON字符串），先去掉外层
+                if (defJson.startsWith("\"") && defJson.endsWith("\"")) {
+                    defJson = objectMapper.readValue(defJson, String.class);
+                }
+                definition = objectMapper.readValue(defJson, WorkflowDefinition.class);
+                definition.flattenChildren();
             }
+        } catch (Exception e) {
+            log.error("反序列化模板定义失败", e);
+        }
+        if (definition == null) {
+            definition = new WorkflowDefinition();
+        }
+
+        try {
             if (po.getTags() != null) {
                 tags = objectMapper.readValue(po.getTags(), new TypeReference<>() {});
             }
         } catch (Exception e) {
-            log.error("反序列化模板数据失败", e);
+            log.error("反序列化模板标签失败", e);
         }
 
-        // 使用反射或工厂方法重建实体
         return reconstructTemplate(po, definition, tags);
     }
 

@@ -1,10 +1,10 @@
 package com.novacloudedu.backend.infrastructure.workflow;
 
 import com.novacloudedu.backend.domain.ai.entity.WorkflowExecutionLog;
+import com.novacloudedu.backend.domain.ai.repository.WorkflowExecutionLogRepository;
 import com.novacloudedu.backend.domain.ai.service.WorkflowLogService;
 import com.novacloudedu.backend.domain.ai.valueobject.*;
 import com.novacloudedu.backend.domain.user.valueobject.UserId;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -16,13 +16,23 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 默认工作流日志服务实现
+ * <p>
+ * 写入时同时写数据库（持久化）和内存缓存（加速当前会话查询）。
+ * 查询时优先从内存缓存读取，缓存未命中则回退到数据库。
+ * 内存缓存仅保留最近的执行日志，避免内存泄漏。
  */
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class DefaultWorkflowLogService implements WorkflowLogService {
 
-    private final Map<String, List<WorkflowExecutionLog>> logStore = new ConcurrentHashMap<>();
+    private static final int MAX_CACHE_EXECUTIONS = 100;
+
+    private final WorkflowExecutionLogRepository logRepository;
+    private final Map<String, List<WorkflowExecutionLog>> logCache = new ConcurrentHashMap<>();
+
+    public DefaultWorkflowLogService(WorkflowExecutionLogRepository logRepository) {
+        this.logRepository = logRepository;
+    }
 
     @Override
     public void log(WorkflowExecutionId executionId,
@@ -40,7 +50,7 @@ public class DefaultWorkflowLogService implements WorkflowLogService {
                 level, message, userId
         );
         
-        storeLog(executionId.value(), logEntry);
+        persistAndCache(executionId.value(), logEntry);
         
         // 同时输出到系统日志
         switch (level) {
@@ -72,7 +82,7 @@ public class DefaultWorkflowLogService implements WorkflowLogService {
                 LogLevel.INFO, "节点开始执行", userId
         ).withInput(input);
         
-        storeLog(executionId.value(), logEntry);
+        persistAndCache(executionId.value(), logEntry);
         log.info("[Workflow] {} - 节点[{}]开始执行", executionId.value(), node.getName());
     }
 
@@ -90,7 +100,7 @@ public class DefaultWorkflowLogService implements WorkflowLogService {
                 LogLevel.INFO, "节点执行完成", userId
         ).withOutput(output).withDuration(durationMs);
         
-        storeLog(executionId.value(), logEntry);
+        persistAndCache(executionId.value(), logEntry);
         log.info("[Workflow] {} - 节点[{}]执行完成, 耗时{}ms", 
                 executionId.value(), node.getName(), durationMs);
     }
@@ -109,14 +119,20 @@ public class DefaultWorkflowLogService implements WorkflowLogService {
                 LogLevel.ERROR, errorMessage, userId
         ).withError(errorStack);
         
-        storeLog(executionId.value(), logEntry);
+        persistAndCache(executionId.value(), logEntry);
         log.error("[Workflow] {} - 节点[{}]执行失败: {}", 
                 executionId.value(), node.getName(), errorMessage);
     }
 
     @Override
     public List<WorkflowExecutionLog> findByExecutionId(WorkflowExecutionId executionId) {
-        return logStore.getOrDefault(executionId.value(), new ArrayList<>());
+        // 优先内存缓存
+        List<WorkflowExecutionLog> cached = logCache.get(executionId.value());
+        if (cached != null && !cached.isEmpty()) {
+            return new ArrayList<>(cached);
+        }
+        // 回退到数据库
+        return logRepository.findByExecutionId(executionId);
     }
 
     @Override
@@ -125,36 +141,39 @@ public class DefaultWorkflowLogService implements WorkflowLogService {
                                                         LocalDateTime endTime,
                                                         int page,
                                                         int size) {
-        List<WorkflowExecutionLog> result = new ArrayList<>();
-        for (List<WorkflowExecutionLog> logs : logStore.values()) {
-            for (WorkflowExecutionLog logEntry : logs) {
-                if (logEntry.getWorkflowId().equals(workflowId)) {
-                    LocalDateTime ts = logEntry.getTimestamp();
-                    if ((startTime == null || !ts.isBefore(startTime)) &&
-                        (endTime == null || !ts.isAfter(endTime))) {
-                        result.add(logEntry);
-                    }
-                }
-            }
-        }
-        
-        int start = page * size;
-        int end = Math.min(start + size, result.size());
-        if (start >= result.size()) {
-            return new ArrayList<>();
-        }
-        return result.subList(start, end);
+        // 跨执行查询直接走数据库
+        return logRepository.findByWorkflowId(workflowId, startTime, endTime, page, size);
     }
 
     @Override
     public List<WorkflowExecutionLog> findByLevel(WorkflowExecutionId executionId, LogLevel level) {
-        List<WorkflowExecutionLog> logs = logStore.getOrDefault(executionId.value(), new ArrayList<>());
-        return logs.stream()
-                .filter(l -> l.getLevel() == level || l.getLevel().getLevel() >= level.getLevel())
-                .toList();
+        // 优先内存缓存
+        List<WorkflowExecutionLog> cached = logCache.get(executionId.value());
+        if (cached != null && !cached.isEmpty()) {
+            return cached.stream()
+                    .filter(l -> l.getLevel() == level || l.getLevel().getLevel() >= level.getLevel())
+                    .toList();
+        }
+        // 回退到数据库
+        return logRepository.findByLevel(executionId, level);
     }
 
-    private void storeLog(String executionId, WorkflowExecutionLog logEntry) {
-        logStore.computeIfAbsent(executionId, k -> new ArrayList<>()).add(logEntry);
+    /**
+     * 同时写入数据库和内存缓存
+     */
+    private void persistAndCache(String executionId, WorkflowExecutionLog logEntry) {
+        // 1. 持久化到数据库
+        try {
+            logRepository.save(logEntry);
+        } catch (Exception e) {
+            log.warn("持久化执行日志失败(不影响执行): executionId={}", executionId, e);
+        }
+        // 2. 写入内存缓存
+        logCache.computeIfAbsent(executionId, k -> new ArrayList<>()).add(logEntry);
+        // 3. 防止内存泄漏：缓存超过上限时淘汰最早的执行
+        if (logCache.size() > MAX_CACHE_EXECUTIONS) {
+            String oldest = logCache.keySet().iterator().next();
+            logCache.remove(oldest);
+        }
     }
 }

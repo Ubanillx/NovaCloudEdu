@@ -46,6 +46,13 @@ public class WorkflowRepositoryImpl implements WorkflowRepository {
     }
 
     @Override
+    public void update(Workflow workflow) {
+        WorkflowPO po = toPO(workflow);
+        po.setUpdateTime(LocalDateTime.now());
+        mapper.updateById(po);
+    }
+
+    @Override
     public Optional<Workflow> findById(WorkflowId id) {
         WorkflowPO po = mapper.selectById(id.value());
         if (po == null || po.getIsDelete() == 1) {
@@ -112,6 +119,7 @@ public class WorkflowRepositoryImpl implements WorkflowRepository {
         WorkflowDefinition definition;
         try {
             definition = objectMapper.readValue(po.getFlowData(), WorkflowDefinition.class);
+            definition.flattenChildren();
         } catch (Exception e) {
             log.error("反序列化工作流定义失败", e);
             definition = new WorkflowDefinition();

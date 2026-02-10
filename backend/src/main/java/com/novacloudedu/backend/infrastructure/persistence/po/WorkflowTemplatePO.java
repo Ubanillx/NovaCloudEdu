@@ -23,10 +23,8 @@ public class WorkflowTemplatePO {
 
     private String icon;
 
-    @TableField(typeHandler = com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler.class)
     private String definition;
 
-    @TableField(typeHandler = com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler.class)
     private String tags;
 
     private Integer isSystem;

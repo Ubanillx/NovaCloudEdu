@@ -2,6 +2,7 @@ package com.novacloudedu.backend.workflow.executor;
 
 import com.novacloudedu.backend.domain.ai.valueobject.NodeType;
 import com.novacloudedu.backend.domain.ai.valueobject.WorkflowNode;
+import com.novacloudedu.backend.infrastructure.workflow.DatabaseMetadataService;
 import com.novacloudedu.backend.infrastructure.workflow.executor.DatabaseQueryNodeExecutor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -27,12 +28,18 @@ class DatabaseQueryNodeExecutorTest {
     @Mock
     private JdbcTemplate jdbcTemplate;
 
+    @Mock
+    private DatabaseMetadataService metadataService;
+
     private DatabaseQueryNodeExecutor executor;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        executor = new DatabaseQueryNodeExecutor(jdbcTemplate);
+        executor = new DatabaseQueryNodeExecutor(jdbcTemplate, metadataService);
+        // 默认：所有表都通过白名单校验
+        when(metadataService.validateSqlTables(anyString())).thenReturn(List.of());
+        when(metadataService.getAllowedTableNames()).thenReturn(List.of("user_info", "course", "post"));
     }
 
     @Test
@@ -51,7 +58,7 @@ class DatabaseQueryNodeExecutorTest {
         when(jdbcTemplate.queryForList(anyString())).thenReturn(mockResults);
 
         Map<String, Object> config = new HashMap<>();
-        config.put("sql", "SELECT * FROM users WHERE status = 'active'");
+        config.put("sql", "SELECT * FROM user_info WHERE status = 'active'");
         config.put("outputVariable", "users");
 
         WorkflowNode node = WorkflowNode.builder()
@@ -156,7 +163,7 @@ class DatabaseQueryNodeExecutorTest {
     @DisplayName("验证 - SELECT语句应通过")
     void validate_selectStatement_shouldPass() {
         Map<String, Object> config = new HashMap<>();
-        config.put("sql", "SELECT * FROM users WHERE id = 1");
+        config.put("sql", "SELECT * FROM user_info WHERE id = 1");
 
         WorkflowNode node = WorkflowNode.builder()
                 .id("db_1")

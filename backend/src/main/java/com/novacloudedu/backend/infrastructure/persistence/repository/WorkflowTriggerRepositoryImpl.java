@@ -1,6 +1,7 @@
 package com.novacloudedu.backend.infrastructure.persistence.repository;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.novacloudedu.backend.domain.ai.entity.WorkflowTrigger;
@@ -68,10 +69,10 @@ public class WorkflowTriggerRepositoryImpl implements WorkflowTriggerRepository 
 
     @Override
     public Optional<WorkflowTrigger> findByWebhookPath(String webhookPath) {
-        LambdaQueryWrapper<WorkflowTriggerPO> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(WorkflowTriggerPO::getType, "WEBHOOK")
-                .eq(WorkflowTriggerPO::getDeleted, 0)
-                .like(WorkflowTriggerPO::getConfig, webhookPath);
+        QueryWrapper<WorkflowTriggerPO> wrapper = new QueryWrapper<>();
+        wrapper.eq("type", "WEBHOOK")
+                .eq("deleted", 0)
+                .apply("CAST(config AS TEXT) LIKE {0}", "%" + webhookPath + "%");
         
         List<WorkflowTriggerPO> list = mapper.selectList(wrapper);
         for (WorkflowTriggerPO po : list) {
@@ -124,10 +125,17 @@ public class WorkflowTriggerRepositoryImpl implements WorkflowTriggerRepository 
         Map<String, Object> config = null;
         try {
             if (po.getConfig() != null) {
-                config = objectMapper.readValue(po.getConfig(), new TypeReference<>() {});
+                String raw = po.getConfig().trim();
+                // 兼容历史数据：JacksonTypeHandler 可能导致双重序列化（外层是引号包裹的字符串）
+                if (raw.startsWith("\"")) {
+                    String inner = objectMapper.readValue(raw, String.class);
+                    config = objectMapper.readValue(inner, new TypeReference<>() {});
+                } else {
+                    config = objectMapper.readValue(raw, new TypeReference<>() {});
+                }
             }
         } catch (Exception e) {
-            log.error("反序列化触发器配置失败", e);
+            log.error("反序列化触发器配置失败: id={}, config={}", po.getId(), po.getConfig(), e);
         }
 
         WorkflowTrigger.TriggerType type = WorkflowTrigger.TriggerType.valueOf(po.getType());

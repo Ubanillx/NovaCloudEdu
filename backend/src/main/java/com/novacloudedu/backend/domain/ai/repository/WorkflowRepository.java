@@ -15,6 +15,8 @@ public interface WorkflowRepository {
 
     Workflow save(Workflow workflow);
 
+    void update(Workflow workflow);
+
     Optional<Workflow> findById(WorkflowId id);
 
     List<Workflow> findByCreatorId(UserId creatorId, int page, int size);

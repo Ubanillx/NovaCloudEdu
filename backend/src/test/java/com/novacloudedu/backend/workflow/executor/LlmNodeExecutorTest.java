@@ -2,7 +2,8 @@ package com.novacloudedu.backend.workflow.executor;
 
 import com.novacloudedu.backend.domain.ai.valueobject.NodeType;
 import com.novacloudedu.backend.domain.ai.valueobject.WorkflowNode;
-import com.novacloudedu.backend.infrastructure.ai.DashScopeLlmService;
+import com.novacloudedu.backend.domain.knowledge.service.KnowledgeSearchService;
+import com.novacloudedu.backend.infrastructure.ai.LangchainChatService;
 import com.novacloudedu.backend.infrastructure.workflow.executor.LlmNodeExecutor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -14,7 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 /**
@@ -24,14 +25,17 @@ import static org.mockito.Mockito.when;
 class LlmNodeExecutorTest {
 
     @Mock
-    private DashScopeLlmService llmService;
+    private LangchainChatService langchainChatService;
+
+    @Mock
+    private KnowledgeSearchService knowledgeSearchService;
 
     private LlmNodeExecutor executor;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        executor = new LlmNodeExecutor(llmService);
+        executor = new LlmNodeExecutor(langchainChatService, knowledgeSearchService);
     }
 
     @Test
@@ -43,7 +47,7 @@ class LlmNodeExecutorTest {
     @Test
     @DisplayName("执行 - 应调用LLM服务并返回响应")
     void execute_shouldCallLlmServiceAndReturnResponse() {
-        when(llmService.chatWithSystemPrompt(anyString(), anyString()))
+        when(langchainChatService.chat(any(), anyString(), anyString()))
                 .thenReturn("这是LLM的回复");
 
         Map<String, Object> config = new HashMap<>();
@@ -69,7 +73,7 @@ class LlmNodeExecutorTest {
     @Test
     @DisplayName("执行 - 应支持变量替换")
     void execute_shouldSupportVariableReplacement() {
-        when(llmService.chatWithSystemPrompt(anyString(), anyString()))
+        when(langchainChatService.chat(any(), anyString(), anyString()))
                 .thenReturn("你好，张三");
 
         Map<String, Object> config = new HashMap<>();
@@ -94,7 +98,7 @@ class LlmNodeExecutorTest {
     @Test
     @DisplayName("执行 - 空userMessage时应从input获取")
     void execute_emptyUserMessage_shouldGetFromInput() {
-        when(llmService.chatWithSystemPrompt(anyString(), anyString()))
+        when(langchainChatService.chat(any(), anyString(), anyString()))
                 .thenReturn("收到你的输入");
 
         Map<String, Object> config = new HashMap<>();
