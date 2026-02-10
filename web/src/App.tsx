@@ -2,7 +2,7 @@ import { Routes, Route } from 'react-router-dom';
 import { Header, Footer, Sider, Content } from './components/layout';
 import { SiderProvider } from './context/SiderContext';
 import { ChatProvider } from './context/ChatContext';
-import { BannerCarousel, AnnouncementSection, DailyWordSection, DailyArticleSection } from './components/home';
+import { BannerCarousel, AnnouncementSection, DailyWordSection, DailyArticleSection, CourseScheduleCard } from './components/home';
 import { StudyStatsCard } from './components/home/StudyStatsCard';
 import { StudyPlanCard } from './components/home/StudyPlanCard';
 import { MockData } from './data/mock';
@@ -17,6 +17,8 @@ import PostDetailPage from './pages/PostDetailPage';
 import PostEditPage from './pages/PostEditPage';
 import ProfilePage from './pages/ProfilePage';
 import ChatPage from './pages/ChatPage';
+import SchedulePage from './pages/SchedulePage';
+import WordBookPage from './pages/WordBookPage';
 
 /** 主页内容 */
 const HomePage: React.FC = () => (
@@ -67,8 +69,11 @@ const HomePage: React.FC = () => (
 
     {/* Grid 布局：左栏（宽）放课程+美文，右栏（窄）放小组件 */}
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-      {/* 左栏 - 热门课程 + 每日美文 */}
+      {/* 左栏 - 课程表 + 热门课程 + 每日美文 */}
       <div className="lg:col-span-8 xl:col-span-9 space-y-8">
+        {/* 我的课表 */}
+        <CourseScheduleCard />
+
         {/* 热门课程 */}
         <div>
           <div className="flex items-center justify-between mb-6">
@@ -140,6 +145,8 @@ function App() {
               <Route path="circle/edit/:postId" element={<PostEditPage />} />
               <Route path="profile" element={<ProfilePage />} />
               <Route path="chat" element={<ChatPage />} />
+              <Route path="schedule" element={<SchedulePage />} />
+              <Route path="word-book" element={<WordBookPage />} />
             </Routes>
           </Content>
         </div>
