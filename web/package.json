@@ -15,8 +15,10 @@
     "@stomp/stompjs": "^7.3.0",
     "@tailwindcss/typography": "^0.5.19",
     "@tailwindcss/vite": "^4.1.18",
+    "@xyflow/react": "^12.10.0",
     "axios": "^1.7.7",
     "china-division": "^2.7.0",
+    "dagre": "^0.8.5",
     "json-bigint": "^1.0.0",
     "lucide-react": "^0.562.0",
     "react": "^19.2.0",
@@ -26,11 +28,13 @@
     "rehype-raw": "^7.0.0",
     "remark-gfm": "^4.0.1",
     "sockjs-client": "^1.6.1",
-    "tailwindcss": "^4.1.18"
+    "tailwindcss": "^4.1.18",
+    "zustand": "^5.0.11"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
     "@openapitools/openapi-generator-cli": "^2.7.0",
+    "@types/dagre": "^0.7.53",
     "@types/json-bigint": "^1.0.4",
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.5",

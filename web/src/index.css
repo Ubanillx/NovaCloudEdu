@@ -167,3 +167,10 @@ table.admin-table td {
 .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #6b7280;
 }
+
+/* ========================================
+   ReactFlow: 循环容器内边线可见性修复
+   ======================================== */
+.react-flow__node-loopContainer {
+  z-index: -1 !important;
+}

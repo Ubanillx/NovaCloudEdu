@@ -16,6 +16,10 @@ import { AnnouncementManagementPage } from './pages/admin/AnnouncementManagement
 import { BannerManagementPage } from './pages/admin/BannerManagementPage'
 import { FeedbackManagementPage } from './pages/admin/FeedbackManagementPage'
 import { PostManagementPage } from './pages/admin/PostManagementPage'
+import { KnowledgeBaseManagementPage } from './pages/admin/KnowledgeBaseManagementPage'
+import { AiAssistantManagementPage } from './pages/admin/AiAssistantManagementPage'
+import { WorkflowManagementPage } from './pages/admin/WorkflowManagementPage'
+import { WorkflowEditorPage } from './pages/admin/workflow/WorkflowEditorPage'
 import { getToken } from './api'
 import { useEffect } from 'react'
 
@@ -56,6 +60,16 @@ createRoot(document.getElementById('root')!).render(
           {/* 初始进入重定向 */}
           <Route path="/entry" element={<InitialRedirect />} />
           
+          {/* 工作流编辑器 - 全屏画布，不套 AdminLayout */}
+          <Route
+            path="/admin/workflows/:id/edit"
+            element={
+              <ProtectedRoute requireAdmin>
+                <WorkflowEditorPage />
+              </ProtectedRoute>
+            }
+          />
+          
           {/* 管理员路由 */}
           <Route 
             path="/admin/*" 
@@ -74,6 +88,9 @@ createRoot(document.getElementById('root')!).render(
                     <Route path="banners" element={<BannerManagementPage />} />
                     <Route path="feedbacks" element={<FeedbackManagementPage />} />
                     <Route path="posts" element={<PostManagementPage />} />
+                    <Route path="ai-assistants" element={<AiAssistantManagementPage />} />
+                    <Route path="knowledge-bases" element={<KnowledgeBaseManagementPage />} />
+                    <Route path="workflows" element={<WorkflowManagementPage />} />
                     <Route path="settings" element={<div className="p-8 bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm"><h2 className="text-2xl font-bold">系统设置 (开发中...)</h2></div>} />
                   </Routes>
                 </AdminLayout>

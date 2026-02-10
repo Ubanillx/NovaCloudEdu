@@ -2,8 +2,9 @@ import React, { useState, useEffect, useCallback } from 'react';
 import {
   Users, UsersRound, Search, UserPlus,
   Check, X, Clock, Send, ArrowLeft,
-  MailPlus, UserCheck, Loader2, RefreshCw, MessageCircle, WifiOff,
+  MailPlus, UserCheck, Loader2, RefreshCw, MessageCircle, WifiOff, Bot,
 } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
 import { apiClient, DefaultApi, Configuration } from '../api';
 import type {
   FriendResponse,
@@ -15,6 +16,7 @@ import { Avatar } from '../components/ui/Avatar';
 import { useChat } from '../context/ChatContext';
 import PrivateChatPanel from '../components/chat/PrivateChatPanel';
 import GroupChatPanel from '../components/chat/GroupChatPanel';
+import AiChatPanel from '../components/chat/AiChatPanel';
 
 const api = new DefaultApi(new Configuration(), '', apiClient);
 
@@ -65,7 +67,7 @@ const StatusBadge: React.FC<{ status?: string }> = ({ status }) => {
 
 // ============ Tab 类型 ============
 
-type MainTab = 'messages' | 'friends' | 'requests' | 'groups';
+type MainTab = 'messages' | 'friends' | 'requests' | 'groups' | 'intelligence';
 type RequestTab = 'received' | 'sent';
 
 // ============ 好友列表 Tab ============
@@ -103,8 +105,12 @@ const FriendsTab: React.FC<{ onChatWith?: (userId: number, userName?: string, us
 
   return (
     <div className="flex flex-col h-full">
-      {/* 顶部操作栏 */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-100 dark:border-gray-800">
+      {/* 标题栏 */}
+      <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800">
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-white">好友</h3>
+      </div>
+      {/* 搜索与操作栏 */}
+      <div className="flex items-center gap-3 px-4 py-2.5 border-b border-gray-100 dark:border-gray-800">
         <div className="relative flex-1">
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           <input
@@ -395,6 +401,10 @@ const RequestsTab: React.FC = () => {
 
   return (
     <div className="flex flex-col h-full">
+      {/* 标题栏 */}
+      <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800">
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-white">好友申请</h3>
+      </div>
       {/* 子 Tab */}
       <div className="flex items-center gap-1 px-4 py-2 border-b border-gray-100 dark:border-gray-800">
         <button
@@ -563,10 +573,25 @@ const TABS: { key: MainTab; label: string; icon: React.ElementType }[] = [
   { key: 'friends', label: '好友', icon: Users },
   { key: 'requests', label: '好友申请', icon: MailPlus },
   { key: 'groups', label: '群聊', icon: UsersRound },
+  { key: 'intelligence', label: '智慧体', icon: Bot },
 ];
 
 const ChatPage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<MainTab>('messages');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialTab = (searchParams.get('tab') as MainTab) || 'messages';
+  const [activeTab, setActiveTab] = useState<MainTab>(
+    ['messages', 'friends', 'requests', 'groups', 'intelligence'].includes(initialTab) ? initialTab : 'messages'
+  );
+
+  // URL 参数变化时同步 tab
+  useEffect(() => {
+    const tab = searchParams.get('tab') as MainTab;
+    if (tab && ['messages', 'friends', 'requests', 'groups', 'intelligence'].includes(tab)) {
+      setActiveTab(tab);
+      // 清除 URL 参数，避免污染
+      setSearchParams({}, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
   const [pendingCount, setPendingCount] = useState(0);
   const [chatTarget, setChatTarget] = useState<{ partnerId: number; partnerName?: string; partnerAvatar?: string } | null>(null);
   const { connectionState, connect, notifications } = useChat();
@@ -673,6 +698,7 @@ const ChatPage: React.FC = () => {
         {activeTab === 'friends' && <FriendsTab onChatWith={handleChatWithFriend} />}
         {activeTab === 'requests' && <RequestsTab />}
         {activeTab === 'groups' && <GroupChatPanel />}
+        {activeTab === 'intelligence' && <AiChatPanel />}
       </div>
     </div>
   );
