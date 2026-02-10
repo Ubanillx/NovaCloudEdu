@@ -9,6 +9,7 @@ Name | Type | Description | Notes
 **executionId** | **string** | 执行ID | [optional] [default to undefined]
 **workflowId** | **number** | 工作流ID | [optional] [default to undefined]
 **workflowName** | **string** | 工作流名称 | [optional] [default to undefined]
+**workflowVersion** | **number** | 工作流版本 | [optional] [default to undefined]
 **status** | **string** | 执行状态 | [optional] [default to undefined]
 **input** | **{ [key: string]: object; }** | 输入参数 | [optional] [default to undefined]
 **output** | **{ [key: string]: object; }** | 输出结果 | [optional] [default to undefined]
@@ -18,6 +19,7 @@ Name | Type | Description | Notes
 **startTime** | **string** | 开始时间 | [optional] [default to undefined]
 **endTime** | **string** | 结束时间 | [optional] [default to undefined]
 **durationMs** | **number** | 执行耗时（毫秒） | [optional] [default to undefined]
+**nodeExecutions** | [**Array&lt;NodeExecutionDTO&gt;**](NodeExecutionDTO.md) | 各节点执行详情（调试数据） | [optional] [default to undefined]
 
 ## Example
 
@@ -28,6 +30,7 @@ const instance: ExecutionResultResponse = {
     executionId,
     workflowId,
     workflowName,
+    workflowVersion,
     status,
     input,
     output,
@@ -37,6 +40,7 @@ const instance: ExecutionResultResponse = {
     startTime,
     endTime,
     durationMs,
+    nodeExecutions,
 };
 ```
 

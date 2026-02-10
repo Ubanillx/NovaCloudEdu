@@ -92,6 +92,8 @@ import type { BaseResponseDailyWordResponse } from '../models';
 // @ts-ignore
 import type { BaseResponseExecutionResultResponse } from '../models';
 // @ts-ignore
+import type { BaseResponseExecutionStatisticsResponse } from '../models';
+// @ts-ignore
 import type { BaseResponseFeedbackDetailResponse } from '../models';
 // @ts-ignore
 import type { BaseResponseFeedbackPageResponse } from '../models';
@@ -146,6 +148,8 @@ import type { BaseResponseListDailyWordResponse } from '../models';
 // @ts-ignore
 import type { BaseResponseListExecutionLogResponse } from '../models';
 // @ts-ignore
+import type { BaseResponseListExecutionResultResponse } from '../models';
+// @ts-ignore
 import type { BaseResponseListFeedbackReplyResponse } from '../models';
 // @ts-ignore
 import type { BaseResponseListFileInfoResponse } from '../models';
@@ -165,6 +169,8 @@ import type { BaseResponseListKnowledgeBaseVO } from '../models';
 import type { BaseResponseListKnowledgeDocumentVO } from '../models';
 // @ts-ignore
 import type { BaseResponseListLong } from '../models';
+// @ts-ignore
+import type { BaseResponseListMapStringObject } from '../models';
 // @ts-ignore
 import type { BaseResponseListMessageReadUserResponse } from '../models';
 // @ts-ignore
@@ -200,11 +206,19 @@ import type { BaseResponseListWorkflowNodeResponse } from '../models';
 // @ts-ignore
 import type { BaseResponseListWorkflowResponse } from '../models';
 // @ts-ignore
+import type { BaseResponseListWorkflowTemplateResponse } from '../models';
+// @ts-ignore
+import type { BaseResponseListWorkflowTriggerResponse } from '../models';
+// @ts-ignore
 import type { BaseResponseListWorkflowVariableResponse } from '../models';
+// @ts-ignore
+import type { BaseResponseListWorkflowVersionResponse } from '../models';
 // @ts-ignore
 import type { BaseResponseLoginUserResponse } from '../models';
 // @ts-ignore
 import type { BaseResponseLong } from '../models';
+// @ts-ignore
+import type { BaseResponseMapStringObject } from '../models';
 // @ts-ignore
 import type { BaseResponseMemberPage } from '../models';
 // @ts-ignore
@@ -282,9 +296,15 @@ import type { BaseResponseWorkflowResponse } from '../models';
 // @ts-ignore
 import type { BaseResponseWorkflowSettingsDTO } from '../models';
 // @ts-ignore
+import type { BaseResponseWorkflowTemplateResponse } from '../models';
+// @ts-ignore
+import type { BaseResponseWorkflowTriggerResponse } from '../models';
+// @ts-ignore
 import type { BaseResponseWorkflowValidationResponse } from '../models';
 // @ts-ignore
 import type { BaseResponseWorkflowVariableResponse } from '../models';
+// @ts-ignore
+import type { BaseResponseWorkflowVersionResponse } from '../models';
 // @ts-ignore
 import type { BatchBanUserRequest } from '../models';
 // @ts-ignore
@@ -1439,6 +1459,48 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
+         * @summary 绑定工作流到AI助手
+         * @param {number} id 工作流ID
+         * @param {number} assistantId AI助手ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        bindToAssistant: async (id: number, assistantId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('bindToAssistant', 'id', id)
+            // verify required parameter 'assistantId' is not null or undefined
+            assertParamExists('bindToAssistant', 'assistantId', assistantId)
+            const localVarPath = `/api/workflows/{id}/assistants/{assistantId}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)))
+                .replace(`{${"assistantId"}}`, encodeURIComponent(String(assistantId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary 取消执行
          * @param {string} executionId 执行ID
          * @param {*} [options] Override http request option.
@@ -2245,6 +2307,61 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
+         * @summary 从模板创建工作流
+         * @param {number} templateId 模板ID
+         * @param {number} userId 
+         * @param {string} [name] 
+         * @param {string} [description] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createFromTemplate: async (templateId: number, userId: number, name?: string, description?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'templateId' is not null or undefined
+            assertParamExists('createFromTemplate', 'templateId', templateId)
+            // verify required parameter 'userId' is not null or undefined
+            assertParamExists('createFromTemplate', 'userId', userId)
+            const localVarPath = `/api/workflows/templates/{templateId}/create-workflow`
+                .replace(`{${"templateId"}}`, encodeURIComponent(String(templateId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (name !== undefined) {
+                localVarQueryParameter['name'] = name;
+            }
+
+            if (description !== undefined) {
+                localVarQueryParameter['description'] = description;
+            }
+
+            if (userId !== undefined) {
+                localVarQueryParameter['userId'] = userId;
+            }
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary 创建群聊
          * @param {CreateGroupRequest} createGroupRequest 
          * @param {*} [options] Override http request option.
@@ -2443,6 +2560,63 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
+         * @summary 创建定时触发器
+         * @param {number} id 工作流ID
+         * @param {string} name 
+         * @param {string} cronExpression 
+         * @param {string} [timezone] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createScheduleTrigger: async (id: number, name: string, cronExpression: string, timezone?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('createScheduleTrigger', 'id', id)
+            // verify required parameter 'name' is not null or undefined
+            assertParamExists('createScheduleTrigger', 'name', name)
+            // verify required parameter 'cronExpression' is not null or undefined
+            assertParamExists('createScheduleTrigger', 'cronExpression', cronExpression)
+            const localVarPath = `/api/workflows/{id}/triggers/schedule`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (name !== undefined) {
+                localVarQueryParameter['name'] = name;
+            }
+
+            if (cronExpression !== undefined) {
+                localVarQueryParameter['cronExpression'] = cronExpression;
+            }
+
+            if (timezone !== undefined) {
+                localVarQueryParameter['timezone'] = timezone;
+            }
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary 创建小节（管理员）
          * @param {number} courseId 课程ID
          * @param {CreateSectionRequest} createSectionRequest 
@@ -2524,6 +2698,68 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 
+         * @summary 从工作流创建模板
+         * @param {number} workflowId 工作流ID
+         * @param {string} name 
+         * @param {number} userId 
+         * @param {string} [description] 
+         * @param {string} [category] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createTemplate: async (workflowId: number, name: string, userId: number, description?: string, category?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'workflowId' is not null or undefined
+            assertParamExists('createTemplate', 'workflowId', workflowId)
+            // verify required parameter 'name' is not null or undefined
+            assertParamExists('createTemplate', 'name', name)
+            // verify required parameter 'userId' is not null or undefined
+            assertParamExists('createTemplate', 'userId', userId)
+            const localVarPath = `/api/workflows/templates/from-workflow/{workflowId}`
+                .replace(`{${"workflowId"}}`, encodeURIComponent(String(workflowId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (name !== undefined) {
+                localVarQueryParameter['name'] = name;
+            }
+
+            if (description !== undefined) {
+                localVarQueryParameter['description'] = description;
+            }
+
+            if (category !== undefined) {
+                localVarQueryParameter['category'] = category;
+            }
+
+            if (userId !== undefined) {
+                localVarQueryParameter['userId'] = userId;
+            }
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 管理员创建单个用户
          * @summary 创建用户
          * @param {CreateUserRequest} createUserRequest 
@@ -2556,6 +2792,111 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(createUserRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 创建版本快照（发布时）
+         * @param {number} id 工作流ID
+         * @param {number} userId 
+         * @param {string} [publishNote] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createVersionSnapshot: async (id: number, userId: number, publishNote?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('createVersionSnapshot', 'id', id)
+            // verify required parameter 'userId' is not null or undefined
+            assertParamExists('createVersionSnapshot', 'userId', userId)
+            const localVarPath = `/api/workflows/{id}/versions`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (publishNote !== undefined) {
+                localVarQueryParameter['publishNote'] = publishNote;
+            }
+
+            if (userId !== undefined) {
+                localVarQueryParameter['userId'] = userId;
+            }
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 创建Webhook触发器
+         * @param {number} id 工作流ID
+         * @param {string} name 
+         * @param {string} [secret] 
+         * @param {boolean} [validateSignature] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createWebhookTrigger: async (id: number, name: string, secret?: string, validateSignature?: boolean, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('createWebhookTrigger', 'id', id)
+            // verify required parameter 'name' is not null or undefined
+            assertParamExists('createWebhookTrigger', 'name', name)
+            const localVarPath = `/api/workflows/{id}/triggers/webhook`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (name !== undefined) {
+                localVarQueryParameter['name'] = name;
+            }
+
+            if (secret !== undefined) {
+                localVarQueryParameter['secret'] = secret;
+            }
+
+            if (validateSignature !== undefined) {
+                localVarQueryParameter['validateSignature'] = validateSignature;
+            }
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -3462,6 +3803,82 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
+         * @summary 删除模板
+         * @param {number} templateId 模板ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteTemplate: async (templateId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'templateId' is not null or undefined
+            assertParamExists('deleteTemplate', 'templateId', templateId)
+            const localVarPath = `/api/workflows/templates/{templateId}`
+                .replace(`{${"templateId"}}`, encodeURIComponent(String(templateId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 删除触发器
+         * @param {number} triggerId 触发器ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteTrigger: async (triggerId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'triggerId' is not null or undefined
+            assertParamExists('deleteTrigger', 'triggerId', triggerId)
+            const localVarPath = `/api/workflows/triggers/{triggerId}`
+                .replace(`{${"triggerId"}}`, encodeURIComponent(String(triggerId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary 删除变量
          * @param {number} id 工作流ID
          * @param {string} variableName 变量名称
@@ -3542,6 +3959,44 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
+         * @summary 禁用触发器
+         * @param {number} triggerId 触发器ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        disableTrigger: async (triggerId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'triggerId' is not null or undefined
+            assertParamExists('disableTrigger', 'triggerId', triggerId)
+            const localVarPath = `/api/workflows/triggers/{triggerId}/disable`
+                .replace(`{${"triggerId"}}`, encodeURIComponent(String(triggerId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary 解散群
          * @param {number} groupId 
          * @param {*} [options] Override http request option.
@@ -3590,6 +4045,44 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('enableConfig', 'id', id)
             const localVarPath = `/api/admin/scraper/config/{id}/enable`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 启用触发器
+         * @param {number} triggerId 触发器ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        enableTrigger: async (triggerId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'triggerId' is not null or undefined
+            assertParamExists('enableTrigger', 'triggerId', triggerId)
+            const localVarPath = `/api/workflows/triggers/{triggerId}/enable`
+                .replace(`{${"triggerId"}}`, encodeURIComponent(String(triggerId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -5233,14 +5726,57 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * 
          * @summary 获取执行日志
          * @param {string} executionId 执行ID
+         * @param {string} [level] 日志级别过滤（可选）：DEBUG/INFO/WARN/ERROR
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getExecutionLogs: async (executionId: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getExecutionLogs: async (executionId: string, level?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'executionId' is not null or undefined
             assertParamExists('getExecutionLogs', 'executionId', executionId)
             const localVarPath = `/api/workflows/executions/{executionId}/logs`
                 .replace(`{${"executionId"}}`, encodeURIComponent(String(executionId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (level !== undefined) {
+                localVarQueryParameter['level'] = level;
+            }
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 获取工作流执行统计
+         * @param {number} id 工作流ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getExecutionStatistics: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('getExecutionStatistics', 'id', id)
+            const localVarPath = `/api/workflows/{id}/execution-statistics`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -7558,6 +8094,44 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 返回白名单内指定表的字段名、类型等元数据
+         * @summary 获取指定表的字段信息
+         * @param {string} tableName 表名
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getTableColumns: async (tableName: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'tableName' is not null or undefined
+            assertParamExists('getTableColumns', 'tableName', tableName)
+            const localVarPath = `/api/workflows/database/tables/{tableName}/columns`
+                .replace(`{${"tableName"}}`, encodeURIComponent(String(tableName)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 获取指定抓取任务的详细信息
          * @summary 获取任务详情
          * @param {number} taskId 
@@ -7693,6 +8267,44 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('getTeacherByUserId', 'userId', userId)
             const localVarPath = `/api/teacher/user/{userId}`
                 .replace(`{${"userId"}}`, encodeURIComponent(String(userId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 获取模板详情
+         * @param {number} templateId 模板ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getTemplate: async (templateId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'templateId' is not null or undefined
+            assertParamExists('getTemplate', 'templateId', templateId)
+            const localVarPath = `/api/workflows/templates/{templateId}`
+                .replace(`{${"templateId"}}`, encodeURIComponent(String(templateId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -8409,6 +9021,48 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
+         * @summary 获取指定版本详情
+         * @param {number} id 工作流ID
+         * @param {number} versionNumber 版本号
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getVersion: async (id: number, versionNumber: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('getVersion', 'id', id)
+            // verify required parameter 'versionNumber' is not null or undefined
+            assertParamExists('getVersion', 'versionNumber', versionNumber)
+            const localVarPath = `/api/workflows/{id}/versions/{versionNumber}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)))
+                .replace(`{${"versionNumber"}}`, encodeURIComponent(String(versionNumber)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary 获取生词本列表
          * @param {number} [status] 学习状态：0-未学习，1-已学习，2-已掌握
          * @param {number} [page] 页码
@@ -8468,6 +9122,44 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('getWordsByDate', 'date', date)
             const localVarPath = `/api/daily-word/date/{date}`
                 .replace(`{${"date"}}`, encodeURIComponent(String(date)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 获取使用该工作流的AI助手ID列表
+         * @param {number} id 工作流ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getWorkflowAssistants: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('getWorkflowAssistants', 'id', id)
+            const localVarPath = `/api/workflows/{id}/assistants`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -8732,6 +9424,40 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 返回工作流数据库查询节点允许访问的安全表名及字段信息
+         * @summary 获取可查询的数据库表列表
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listAllowedTables: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/workflows/database/tables`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 
          * @summary 获取申请列表（管理员）
          * @param {number} [status] 状态：0-待审核，1-已通过，2-已拒绝
@@ -8822,6 +9548,40 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             if (size !== undefined) {
                 localVarQueryParameter['size'] = size;
             }
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 返回所有已启用的AI模型，供工作流LLM节点选择
+         * @summary 获取可用模型列表
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listAvailableModels: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/workflows/models`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
             localVarHeaderParameter['Accept'] = 'application/json';
 
@@ -9020,6 +9780,58 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
+         * @summary 获取文档分块列表
+         * @param {number} id 
+         * @param {number} docId 
+         * @param {number} [page] 
+         * @param {number} [size] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listChunks: async (id: number, docId: number, page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('listChunks', 'id', id)
+            // verify required parameter 'docId' is not null or undefined
+            assertParamExists('listChunks', 'docId', docId)
+            const localVarPath = `/api/ai/knowledge-bases/{id}/documents/{docId}/chunks`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)))
+                .replace(`{${"docId"}}`, encodeURIComponent(String(docId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (size !== undefined) {
+                localVarQueryParameter['size'] = size;
+            }
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary 获取课程列表
          * @param {number} [status] 状态：0-未发布，1-已发布，2-已下架
          * @param {number} [page] 页码
@@ -9128,6 +9940,54 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             // verify required parameter 'id' is not null or undefined
             assertParamExists('listDocuments', 'id', id)
             const localVarPath = `/api/ai/knowledge-bases/{id}/documents`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (size !== undefined) {
+                localVarQueryParameter['size'] = size;
+            }
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 获取工作流执行历史列表
+         * @param {number} id 工作流ID
+         * @param {number} [page] 页码，从0开始
+         * @param {number} [size] 每页数量
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listExecutions: async (id: number, page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('listExecutions', 'id', id)
+            const localVarPath = `/api/workflows/{id}/executions`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -9344,6 +10204,40 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
+         * @summary 获取系统预置模板
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listSystemTemplates: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/workflows/templates/system`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary 获取讲师列表
          * @param {number} [page] 页码
          * @param {number} [size] 每页数量
@@ -9374,6 +10268,82 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             if (size !== undefined) {
                 localVarQueryParameter['size'] = size;
             }
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 获取工作流触发器列表
+         * @param {number} id 工作流ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listTriggers: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('listTriggers', 'id', id)
+            const localVarPath = `/api/workflows/{id}/triggers`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 获取工作流版本列表
+         * @param {number} id 工作流ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listVersions: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('listVersions', 'id', id)
+            const localVarPath = `/api/workflows/{id}/versions`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
             localVarHeaderParameter['Accept'] = 'application/json';
 
@@ -10760,6 +11730,48 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 
+         * @summary 回滚到指定版本
+         * @param {number} id 工作流ID
+         * @param {number} versionNumber 版本号
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rollbackToVersion: async (id: number, versionNumber: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('rollbackToVersion', 'id', id)
+            // verify required parameter 'versionNumber' is not null or undefined
+            assertParamExists('rollbackToVersion', 'versionNumber', versionNumber)
+            const localVarPath = `/api/workflows/{id}/versions/{versionNumber}/rollback`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)))
+                .replace(`{${"versionNumber"}}`, encodeURIComponent(String(versionNumber)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 从列表页获取所有文章链接
          * @summary 获取文章链接
          * @param {ScrapeRequest} scrapeRequest 
@@ -11505,6 +12517,60 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
 
             if (pageSize !== undefined) {
                 localVarQueryParameter['pageSize'] = pageSize;
+            }
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 返回公开模板 + 当前用户自己创建的私有模板
+         * @summary 搜索工作流模板
+         * @param {string} [keyword] 关键词
+         * @param {string} [category] 分类
+         * @param {number} [page] 页码
+         * @param {number} [size] 每页数量
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        searchTemplates: async (keyword?: string, category?: string, page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/workflows/templates`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (keyword !== undefined) {
+                localVarQueryParameter['keyword'] = keyword;
+            }
+
+            if (category !== undefined) {
+                localVarQueryParameter['category'] = category;
+            }
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (size !== undefined) {
+                localVarQueryParameter['size'] = size;
             }
 
             localVarHeaderParameter['Accept'] = 'application/json';
@@ -12345,6 +13411,48 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
+         * @summary 解绑工作流与AI助手
+         * @param {number} id 工作流ID
+         * @param {number} assistantId AI助手ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        unbindFromAssistant: async (id: number, assistantId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('unbindFromAssistant', 'id', id)
+            // verify required parameter 'assistantId' is not null or undefined
+            assertParamExists('unbindFromAssistant', 'assistantId', assistantId)
+            const localVarPath = `/api/workflows/{id}/assistants/{assistantId}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)))
+                .replace(`{${"assistantId"}}`, encodeURIComponent(String(assistantId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary 取消收藏
          * @param {number} courseId 课程ID
          * @param {*} [options] Override http request option.
@@ -12882,6 +13990,53 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(updateWorkflowDefinitionRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 更新文档元信息
+         * @param {number} id 
+         * @param {number} docId 
+         * @param {{ [key: string]: string; }} requestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateDocument: async (id: number, docId: number, requestBody: { [key: string]: string; }, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('updateDocument', 'id', id)
+            // verify required parameter 'docId' is not null or undefined
+            assertParamExists('updateDocument', 'docId', docId)
+            // verify required parameter 'requestBody' is not null or undefined
+            assertParamExists('updateDocument', 'requestBody', requestBody)
+            const localVarPath = `/api/ai/knowledge-bases/{id}/documents/{docId}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)))
+                .replace(`{${"docId"}}`, encodeURIComponent(String(docId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(requestBody, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -14204,6 +15359,20 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary 绑定工作流到AI助手
+         * @param {number} id 工作流ID
+         * @param {number} assistantId AI助手ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async bindToAssistant(id: number, assistantId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.bindToAssistant(id, assistantId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.bindToAssistant']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @summary 取消执行
          * @param {string} executionId 执行ID
          * @param {*} [options] Override http request option.
@@ -14469,6 +15638,22 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary 从模板创建工作流
+         * @param {number} templateId 模板ID
+         * @param {number} userId 
+         * @param {string} [name] 
+         * @param {string} [description] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async createFromTemplate(templateId: number, userId: number, name?: string, description?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseWorkflowResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createFromTemplate(templateId, userId, name, description, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.createFromTemplate']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @summary 创建群聊
          * @param {CreateGroupRequest} createGroupRequest 
          * @param {*} [options] Override http request option.
@@ -14535,6 +15720,22 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary 创建定时触发器
+         * @param {number} id 工作流ID
+         * @param {string} name 
+         * @param {string} cronExpression 
+         * @param {string} [timezone] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async createScheduleTrigger(id: number, name: string, cronExpression: string, timezone?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseWorkflowTriggerResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createScheduleTrigger(id, name, cronExpression, timezone, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.createScheduleTrigger']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @summary 创建小节（管理员）
          * @param {number} courseId 课程ID
          * @param {CreateSectionRequest} createSectionRequest 
@@ -14561,6 +15762,23 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 
+         * @summary 从工作流创建模板
+         * @param {number} workflowId 工作流ID
+         * @param {string} name 
+         * @param {number} userId 
+         * @param {string} [description] 
+         * @param {string} [category] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async createTemplate(workflowId: number, name: string, userId: number, description?: string, category?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseWorkflowTemplateResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createTemplate(workflowId, name, userId, description, category, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.createTemplate']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 管理员创建单个用户
          * @summary 创建用户
          * @param {CreateUserRequest} createUserRequest 
@@ -14571,6 +15789,37 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.createUser(createUserRequest, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.createUser']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 创建版本快照（发布时）
+         * @param {number} id 工作流ID
+         * @param {number} userId 
+         * @param {string} [publishNote] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async createVersionSnapshot(id: number, userId: number, publishNote?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseWorkflowVersionResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createVersionSnapshot(id, userId, publishNote, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.createVersionSnapshot']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 创建Webhook触发器
+         * @param {number} id 工作流ID
+         * @param {string} name 
+         * @param {string} [secret] 
+         * @param {boolean} [validateSignature] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async createWebhookTrigger(id: number, name: string, secret?: string, validateSignature?: boolean, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseWorkflowTriggerResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createWebhookTrigger(id, name, secret, validateSignature, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.createWebhookTrigger']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -14880,6 +16129,32 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary 删除模板
+         * @param {number} templateId 模板ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deleteTemplate(templateId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteTemplate(templateId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.deleteTemplate']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 删除触发器
+         * @param {number} triggerId 触发器ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deleteTrigger(triggerId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteTrigger(triggerId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.deleteTrigger']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @summary 删除变量
          * @param {number} id 工作流ID
          * @param {string} variableName 变量名称
@@ -14907,6 +16182,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary 禁用触发器
+         * @param {number} triggerId 触发器ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async disableTrigger(triggerId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseWorkflowTriggerResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.disableTrigger(triggerId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.disableTrigger']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @summary 解散群
          * @param {number} groupId 
          * @param {*} [options] Override http request option.
@@ -14929,6 +16217,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.enableConfig(id, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.enableConfig']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 启用触发器
+         * @param {number} triggerId 触发器ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async enableTrigger(triggerId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseWorkflowTriggerResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.enableTrigger(triggerId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.enableTrigger']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -15477,13 +16778,27 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * 
          * @summary 获取执行日志
          * @param {string} executionId 执行ID
+         * @param {string} [level] 日志级别过滤（可选）：DEBUG/INFO/WARN/ERROR
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getExecutionLogs(executionId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseListExecutionLogResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getExecutionLogs(executionId, options);
+        async getExecutionLogs(executionId: string, level?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseListExecutionLogResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getExecutionLogs(executionId, level, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.getExecutionLogs']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 获取工作流执行统计
+         * @param {number} id 工作流ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getExecutionStatistics(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseExecutionStatisticsResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getExecutionStatistics(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getExecutionStatistics']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -16252,6 +17567,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 返回白名单内指定表的字段名、类型等元数据
+         * @summary 获取指定表的字段信息
+         * @param {string} tableName 表名
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getTableColumns(tableName: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseListMapStringObject>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getTableColumns(tableName, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getTableColumns']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 获取指定抓取任务的详细信息
          * @summary 获取任务详情
          * @param {number} taskId 
@@ -16303,6 +17631,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getTeacherByUserId(userId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.getTeacherByUserId']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 获取模板详情
+         * @param {number} templateId 模板ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getTemplate(templateId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseWorkflowTemplateResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getTemplate(templateId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getTemplate']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -16535,6 +17876,20 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary 获取指定版本详情
+         * @param {number} id 工作流ID
+         * @param {number} versionNumber 版本号
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getVersion(id: number, versionNumber: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseWorkflowVersionResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getVersion(id, versionNumber, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getVersion']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @summary 获取生词本列表
          * @param {number} [status] 学习状态：0-未学习，1-已学习，2-已掌握
          * @param {number} [page] 页码
@@ -16559,6 +17914,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getWordsByDate(date, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.getWordsByDate']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 获取使用该工作流的AI助手ID列表
+         * @param {number} id 工作流ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getWorkflowAssistants(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseListLong>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getWorkflowAssistants(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getWorkflowAssistants']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -16641,6 +18009,18 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 返回工作流数据库查询节点允许访问的安全表名及字段信息
+         * @summary 获取可查询的数据库表列表
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async listAllowedTables(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseListMapStringObject>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listAllowedTables(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.listAllowedTables']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 
          * @summary 获取申请列表（管理员）
          * @param {number} [status] 状态：0-待审核，1-已通过，2-已拒绝
@@ -16669,6 +18049,18 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.listArticles(category, difficulty, page, size, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.listArticles']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 返回所有已启用的AI模型，供工作流LLM节点选择
+         * @summary 获取可用模型列表
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async listAvailableModels(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseListMapStringObject>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listAvailableModels(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.listAvailableModels']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -16730,6 +18122,22 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary 获取文档分块列表
+         * @param {number} id 
+         * @param {number} docId 
+         * @param {number} [page] 
+         * @param {number} [size] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async listChunks(id: number, docId: number, page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseMapStringObject>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listChunks(id, docId, page, size, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.listChunks']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @summary 获取课程列表
          * @param {number} [status] 状态：0-未发布，1-已发布，2-已下架
          * @param {number} [page] 页码
@@ -16771,6 +18179,21 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.listDocuments(id, page, size, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.listDocuments']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 获取工作流执行历史列表
+         * @param {number} id 工作流ID
+         * @param {number} [page] 页码，从0开始
+         * @param {number} [size] 每页数量
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async listExecutions(id: number, page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseListExecutionResultResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listExecutions(id, page, size, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.listExecutions']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -16832,6 +18255,18 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary 获取系统预置模板
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async listSystemTemplates(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseListWorkflowTemplateResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listSystemTemplates(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.listSystemTemplates']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @summary 获取讲师列表
          * @param {number} [page] 页码
          * @param {number} [size] 每页数量
@@ -16842,6 +18277,32 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.listTeachers(page, size, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.listTeachers']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 获取工作流触发器列表
+         * @param {number} id 工作流ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async listTriggers(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseListWorkflowTriggerResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listTriggers(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.listTriggers']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 获取工作流版本列表
+         * @param {number} id 工作流ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async listVersions(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseListWorkflowVersionResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listVersions(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.listVersions']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -17299,6 +18760,20 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 
+         * @summary 回滚到指定版本
+         * @param {number} id 工作流ID
+         * @param {number} versionNumber 版本号
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async rollbackToVersion(id: number, versionNumber: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseWorkflowResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.rollbackToVersion(id, versionNumber, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.rollbackToVersion']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 从列表页获取所有文章链接
          * @summary 获取文章链接
          * @param {ScrapeRequest} scrapeRequest 
@@ -17533,6 +19008,22 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.searchPostsByTag(tag, pageNum, pageSize, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.searchPostsByTag']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 返回公开模板 + 当前用户自己创建的私有模板
+         * @summary 搜索工作流模板
+         * @param {string} [keyword] 关键词
+         * @param {string} [category] 分类
+         * @param {number} [page] 页码
+         * @param {number} [size] 每页数量
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async searchTemplates(keyword?: string, category?: string, page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseListWorkflowTemplateResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.searchTemplates(keyword, category, page, size, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.searchTemplates']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -17806,6 +19297,20 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary 解绑工作流与AI助手
+         * @param {number} id 工作流ID
+         * @param {number} assistantId AI助手ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async unbindFromAssistant(id: number, assistantId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.unbindFromAssistant(id, assistantId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.unbindFromAssistant']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @summary 取消收藏
          * @param {number} courseId 课程ID
          * @param {*} [options] Override http request option.
@@ -17981,6 +19486,21 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.updateDefinition(id, updateWorkflowDefinitionRequest, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.updateDefinition']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 更新文档元信息
+         * @param {number} id 
+         * @param {number} docId 
+         * @param {{ [key: string]: string; }} requestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async updateDocument(id: number, docId: number, requestBody: { [key: string]: string; }, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseKnowledgeDocumentVO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateDocument(id, docId, requestBody, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.updateDocument']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -18552,6 +20072,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
+         * @summary 绑定工作流到AI助手
+         * @param {DefaultApiBindToAssistantRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        bindToAssistant(requestParameters: DefaultApiBindToAssistantRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid> {
+            return localVarFp.bindToAssistant(requestParameters.id, requestParameters.assistantId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary 取消执行
          * @param {DefaultApiCancelExecutionRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
@@ -18751,6 +20281,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
+         * @summary 从模板创建工作流
+         * @param {DefaultApiCreateFromTemplateRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createFromTemplate(requestParameters: DefaultApiCreateFromTemplateRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseWorkflowResponse> {
+            return localVarFp.createFromTemplate(requestParameters.templateId, requestParameters.userId, requestParameters.name, requestParameters.description, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary 创建群聊
          * @param {DefaultApiCreateGroupRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
@@ -18801,6 +20341,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
+         * @summary 创建定时触发器
+         * @param {DefaultApiCreateScheduleTriggerRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createScheduleTrigger(requestParameters: DefaultApiCreateScheduleTriggerRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseWorkflowTriggerResponse> {
+            return localVarFp.createScheduleTrigger(requestParameters.id, requestParameters.name, requestParameters.cronExpression, requestParameters.timezone, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary 创建小节（管理员）
          * @param {DefaultApiCreateSectionRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
@@ -18820,6 +20370,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.createSetting(requestParameters.createScheduleSettingRequest, options).then((request) => request(axios, basePath));
         },
         /**
+         * 
+         * @summary 从工作流创建模板
+         * @param {DefaultApiCreateTemplateRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createTemplate(requestParameters: DefaultApiCreateTemplateRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseWorkflowTemplateResponse> {
+            return localVarFp.createTemplate(requestParameters.workflowId, requestParameters.name, requestParameters.userId, requestParameters.description, requestParameters.category, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 管理员创建单个用户
          * @summary 创建用户
          * @param {DefaultApiCreateUserRequest} requestParameters Request parameters.
@@ -18828,6 +20388,26 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         createUser(requestParameters: DefaultApiCreateUserRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseLong> {
             return localVarFp.createUser(requestParameters.createUserRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 创建版本快照（发布时）
+         * @param {DefaultApiCreateVersionSnapshotRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createVersionSnapshot(requestParameters: DefaultApiCreateVersionSnapshotRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseWorkflowVersionResponse> {
+            return localVarFp.createVersionSnapshot(requestParameters.id, requestParameters.userId, requestParameters.publishNote, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 创建Webhook触发器
+         * @param {DefaultApiCreateWebhookTriggerRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createWebhookTrigger(requestParameters: DefaultApiCreateWebhookTriggerRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseWorkflowTriggerResponse> {
+            return localVarFp.createWebhookTrigger(requestParameters.id, requestParameters.name, requestParameters.secret, requestParameters.validateSignature, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -19061,6 +20641,26 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
+         * @summary 删除模板
+         * @param {DefaultApiDeleteTemplateRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteTemplate(requestParameters: DefaultApiDeleteTemplateRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid> {
+            return localVarFp.deleteTemplate(requestParameters.templateId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 删除触发器
+         * @param {DefaultApiDeleteTriggerRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteTrigger(requestParameters: DefaultApiDeleteTriggerRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid> {
+            return localVarFp.deleteTrigger(requestParameters.triggerId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary 删除变量
          * @param {DefaultApiDeleteVariableRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
@@ -19081,6 +20681,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
+         * @summary 禁用触发器
+         * @param {DefaultApiDisableTriggerRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        disableTrigger(requestParameters: DefaultApiDisableTriggerRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseWorkflowTriggerResponse> {
+            return localVarFp.disableTrigger(requestParameters.triggerId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary 解散群
          * @param {DefaultApiDissolveGroupRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
@@ -19098,6 +20708,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         enableConfig(requestParameters: DefaultApiEnableConfigRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid> {
             return localVarFp.enableConfig(requestParameters.id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 启用触发器
+         * @param {DefaultApiEnableTriggerRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        enableTrigger(requestParameters: DefaultApiEnableTriggerRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseWorkflowTriggerResponse> {
+            return localVarFp.enableTrigger(requestParameters.triggerId, options).then((request) => request(axios, basePath));
         },
         /**
          * 对指定章节的内容进行AES加密存储
@@ -19512,7 +21132,17 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @throws {RequiredError}
          */
         getExecutionLogs(requestParameters: DefaultApiGetExecutionLogsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListExecutionLogResponse> {
-            return localVarFp.getExecutionLogs(requestParameters.executionId, options).then((request) => request(axios, basePath));
+            return localVarFp.getExecutionLogs(requestParameters.executionId, requestParameters.level, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 获取工作流执行统计
+         * @param {DefaultApiGetExecutionStatisticsRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getExecutionStatistics(requestParameters: DefaultApiGetExecutionStatisticsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseExecutionStatisticsResponse> {
+            return localVarFp.getExecutionStatistics(requestParameters.id, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -20079,6 +21709,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.getSupportedVoices(options).then((request) => request(axios, basePath));
         },
         /**
+         * 返回白名单内指定表的字段名、类型等元数据
+         * @summary 获取指定表的字段信息
+         * @param {DefaultApiGetTableColumnsRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getTableColumns(requestParameters: DefaultApiGetTableColumnsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListMapStringObject> {
+            return localVarFp.getTableColumns(requestParameters.tableName, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 获取指定抓取任务的详细信息
          * @summary 获取任务详情
          * @param {DefaultApiGetTaskRequest} requestParameters Request parameters.
@@ -20117,6 +21757,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         getTeacherByUserId(requestParameters: DefaultApiGetTeacherByUserIdRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseTeacherResponse> {
             return localVarFp.getTeacherByUserId(requestParameters.userId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 获取模板详情
+         * @param {DefaultApiGetTemplateRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getTemplate(requestParameters: DefaultApiGetTemplateRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseWorkflowTemplateResponse> {
+            return localVarFp.getTemplate(requestParameters.templateId, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -20287,6 +21937,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
+         * @summary 获取指定版本详情
+         * @param {DefaultApiGetVersionRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getVersion(requestParameters: DefaultApiGetVersionRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseWorkflowVersionResponse> {
+            return localVarFp.getVersion(requestParameters.id, requestParameters.versionNumber, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary 获取生词本列表
          * @param {DefaultApiGetWordBookListRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
@@ -20304,6 +21964,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         getWordsByDate(requestParameters: DefaultApiGetWordsByDateRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListDailyWordResponse> {
             return localVarFp.getWordsByDate(requestParameters.date, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 获取使用该工作流的AI助手ID列表
+         * @param {DefaultApiGetWorkflowAssistantsRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getWorkflowAssistants(requestParameters: DefaultApiGetWorkflowAssistantsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListLong> {
+            return localVarFp.getWorkflowAssistants(requestParameters.id, options).then((request) => request(axios, basePath));
         },
         /**
          * 接受或拒绝好友申请
@@ -20365,6 +22035,15 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.leaveGroup(requestParameters.groupId, options).then((request) => request(axios, basePath));
         },
         /**
+         * 返回工作流数据库查询节点允许访问的安全表名及字段信息
+         * @summary 获取可查询的数据库表列表
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listAllowedTables(options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListMapStringObject> {
+            return localVarFp.listAllowedTables(options).then((request) => request(axios, basePath));
+        },
+        /**
          * 
          * @summary 获取申请列表（管理员）
          * @param {DefaultApiListApplicationsRequest} requestParameters Request parameters.
@@ -20383,6 +22062,15 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         listArticles(requestParameters: DefaultApiListArticlesRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseDailyArticlePageResponse> {
             return localVarFp.listArticles(requestParameters.category, requestParameters.difficulty, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 返回所有已启用的AI模型，供工作流LLM节点选择
+         * @summary 获取可用模型列表
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listAvailableModels(options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListMapStringObject> {
+            return localVarFp.listAvailableModels(options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -20426,6 +22114,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
+         * @summary 获取文档分块列表
+         * @param {DefaultApiListChunksRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listChunks(requestParameters: DefaultApiListChunksRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringObject> {
+            return localVarFp.listChunks(requestParameters.id, requestParameters.docId, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary 获取课程列表
          * @param {DefaultApiListCoursesRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
@@ -20453,6 +22151,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         listDocuments(requestParameters: DefaultApiListDocumentsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListKnowledgeDocumentVO> {
             return localVarFp.listDocuments(requestParameters.id, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 获取工作流执行历史列表
+         * @param {DefaultApiListExecutionsRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listExecutions(requestParameters: DefaultApiListExecutionsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListExecutionResultResponse> {
+            return localVarFp.listExecutions(requestParameters.id, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -20496,6 +22204,15 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
+         * @summary 获取系统预置模板
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listSystemTemplates(options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListWorkflowTemplateResponse> {
+            return localVarFp.listSystemTemplates(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary 获取讲师列表
          * @param {DefaultApiListTeachersRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
@@ -20503,6 +22220,26 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         listTeachers(requestParameters: DefaultApiListTeachersRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListTeacherResponse> {
             return localVarFp.listTeachers(requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 获取工作流触发器列表
+         * @param {DefaultApiListTriggersRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listTriggers(requestParameters: DefaultApiListTriggersRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListWorkflowTriggerResponse> {
+            return localVarFp.listTriggers(requestParameters.id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 获取工作流版本列表
+         * @param {DefaultApiListVersionsRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listVersions(requestParameters: DefaultApiListVersionsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListWorkflowVersionResponse> {
+            return localVarFp.listVersions(requestParameters.id, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -20845,6 +22582,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.reviewCourse(requestParameters.courseId, requestParameters.reviewCourseRequest, options).then((request) => request(axios, basePath));
         },
         /**
+         * 
+         * @summary 回滚到指定版本
+         * @param {DefaultApiRollbackToVersionRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rollbackToVersion(requestParameters: DefaultApiRollbackToVersionRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseWorkflowResponse> {
+            return localVarFp.rollbackToVersion(requestParameters.id, requestParameters.versionNumber, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 从列表页获取所有文章链接
          * @summary 获取文章链接
          * @param {DefaultApiScrapeArticleLinksRequest} requestParameters Request parameters.
@@ -21013,6 +22760,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         searchPostsByTag(requestParameters: DefaultApiSearchPostsByTagRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponsePostPageResponse> {
             return localVarFp.searchPostsByTag(requestParameters.tag, requestParameters.pageNum, requestParameters.pageSize, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 返回公开模板 + 当前用户自己创建的私有模板
+         * @summary 搜索工作流模板
+         * @param {DefaultApiSearchTemplatesRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        searchTemplates(requestParameters: DefaultApiSearchTemplatesRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListWorkflowTemplateResponse> {
+            return localVarFp.searchTemplates(requestParameters.keyword, requestParameters.category, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
         },
         /**
          * 根据关键词搜索用户，用于添加好友
@@ -21216,6 +22973,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
+         * @summary 解绑工作流与AI助手
+         * @param {DefaultApiUnbindFromAssistantRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        unbindFromAssistant(requestParameters: DefaultApiUnbindFromAssistantRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid> {
+            return localVarFp.unbindFromAssistant(requestParameters.id, requestParameters.assistantId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary 取消收藏
          * @param {DefaultApiUnfavouriteCourseRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
@@ -21343,6 +23110,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         updateDefinition(requestParameters: DefaultApiUpdateDefinitionRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseWorkflowResponse> {
             return localVarFp.updateDefinition(requestParameters.id, requestParameters.updateWorkflowDefinitionRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 更新文档元信息
+         * @param {DefaultApiUpdateDocumentRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateDocument(requestParameters: DefaultApiUpdateDocumentRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseKnowledgeDocumentVO> {
+            return localVarFp.updateDocument(requestParameters.id, requestParameters.docId, requestParameters.requestBody, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -21799,6 +23576,15 @@ export interface DefaultApiInterface {
 
     /**
      * 
+     * @summary 绑定工作流到AI助手
+     * @param {DefaultApiBindToAssistantRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    bindToAssistant(requestParameters: DefaultApiBindToAssistantRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid>;
+
+    /**
+     * 
      * @summary 取消执行
      * @param {DefaultApiCancelExecutionRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -21978,6 +23764,15 @@ export interface DefaultApiInterface {
 
     /**
      * 
+     * @summary 从模板创建工作流
+     * @param {DefaultApiCreateFromTemplateRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    createFromTemplate(requestParameters: DefaultApiCreateFromTemplateRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseWorkflowResponse>;
+
+    /**
+     * 
      * @summary 创建群聊
      * @param {DefaultApiCreateGroupRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -22023,6 +23818,15 @@ export interface DefaultApiInterface {
 
     /**
      * 
+     * @summary 创建定时触发器
+     * @param {DefaultApiCreateScheduleTriggerRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    createScheduleTrigger(requestParameters: DefaultApiCreateScheduleTriggerRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseWorkflowTriggerResponse>;
+
+    /**
+     * 
      * @summary 创建小节（管理员）
      * @param {DefaultApiCreateSectionRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -22040,6 +23844,15 @@ export interface DefaultApiInterface {
     createSetting(requestParameters: DefaultApiCreateSettingRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseLong>;
 
     /**
+     * 
+     * @summary 从工作流创建模板
+     * @param {DefaultApiCreateTemplateRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    createTemplate(requestParameters: DefaultApiCreateTemplateRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseWorkflowTemplateResponse>;
+
+    /**
      * 管理员创建单个用户
      * @summary 创建用户
      * @param {DefaultApiCreateUserRequest} requestParameters Request parameters.
@@ -22047,6 +23860,24 @@ export interface DefaultApiInterface {
      * @throws {RequiredError}
      */
     createUser(requestParameters: DefaultApiCreateUserRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseLong>;
+
+    /**
+     * 
+     * @summary 创建版本快照（发布时）
+     * @param {DefaultApiCreateVersionSnapshotRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    createVersionSnapshot(requestParameters: DefaultApiCreateVersionSnapshotRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseWorkflowVersionResponse>;
+
+    /**
+     * 
+     * @summary 创建Webhook触发器
+     * @param {DefaultApiCreateWebhookTriggerRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    createWebhookTrigger(requestParameters: DefaultApiCreateWebhookTriggerRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseWorkflowTriggerResponse>;
 
     /**
      * 
@@ -22257,6 +24088,24 @@ export interface DefaultApiInterface {
 
     /**
      * 
+     * @summary 删除模板
+     * @param {DefaultApiDeleteTemplateRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    deleteTemplate(requestParameters: DefaultApiDeleteTemplateRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid>;
+
+    /**
+     * 
+     * @summary 删除触发器
+     * @param {DefaultApiDeleteTriggerRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    deleteTrigger(requestParameters: DefaultApiDeleteTriggerRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid>;
+
+    /**
+     * 
      * @summary 删除变量
      * @param {DefaultApiDeleteVariableRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -22275,6 +24124,15 @@ export interface DefaultApiInterface {
 
     /**
      * 
+     * @summary 禁用触发器
+     * @param {DefaultApiDisableTriggerRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    disableTrigger(requestParameters: DefaultApiDisableTriggerRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseWorkflowTriggerResponse>;
+
+    /**
+     * 
      * @summary 解散群
      * @param {DefaultApiDissolveGroupRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -22290,6 +24148,15 @@ export interface DefaultApiInterface {
      * @throws {RequiredError}
      */
     enableConfig(requestParameters: DefaultApiEnableConfigRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid>;
+
+    /**
+     * 
+     * @summary 启用触发器
+     * @param {DefaultApiEnableTriggerRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    enableTrigger(requestParameters: DefaultApiEnableTriggerRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseWorkflowTriggerResponse>;
 
     /**
      * 对指定章节的内容进行AES加密存储
@@ -22663,6 +24530,15 @@ export interface DefaultApiInterface {
      * @throws {RequiredError}
      */
     getExecutionLogs(requestParameters: DefaultApiGetExecutionLogsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListExecutionLogResponse>;
+
+    /**
+     * 
+     * @summary 获取工作流执行统计
+     * @param {DefaultApiGetExecutionStatisticsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getExecutionStatistics(requestParameters: DefaultApiGetExecutionStatisticsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseExecutionStatisticsResponse>;
 
     /**
      * 
@@ -23171,6 +25047,15 @@ export interface DefaultApiInterface {
     getSupportedVoices(options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseString>;
 
     /**
+     * 返回白名单内指定表的字段名、类型等元数据
+     * @summary 获取指定表的字段信息
+     * @param {DefaultApiGetTableColumnsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getTableColumns(requestParameters: DefaultApiGetTableColumnsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListMapStringObject>;
+
+    /**
      * 获取指定抓取任务的详细信息
      * @summary 获取任务详情
      * @param {DefaultApiGetTaskRequest} requestParameters Request parameters.
@@ -23205,6 +25090,15 @@ export interface DefaultApiInterface {
      * @throws {RequiredError}
      */
     getTeacherByUserId(requestParameters: DefaultApiGetTeacherByUserIdRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseTeacherResponse>;
+
+    /**
+     * 
+     * @summary 获取模板详情
+     * @param {DefaultApiGetTemplateRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getTemplate(requestParameters: DefaultApiGetTemplateRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseWorkflowTemplateResponse>;
 
     /**
      * 
@@ -23358,6 +25252,15 @@ export interface DefaultApiInterface {
 
     /**
      * 
+     * @summary 获取指定版本详情
+     * @param {DefaultApiGetVersionRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getVersion(requestParameters: DefaultApiGetVersionRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseWorkflowVersionResponse>;
+
+    /**
+     * 
      * @summary 获取生词本列表
      * @param {DefaultApiGetWordBookListRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -23373,6 +25276,15 @@ export interface DefaultApiInterface {
      * @throws {RequiredError}
      */
     getWordsByDate(requestParameters: DefaultApiGetWordsByDateRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListDailyWordResponse>;
+
+    /**
+     * 
+     * @summary 获取使用该工作流的AI助手ID列表
+     * @param {DefaultApiGetWorkflowAssistantsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getWorkflowAssistants(requestParameters: DefaultApiGetWorkflowAssistantsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListLong>;
 
     /**
      * 接受或拒绝好友申请
@@ -23428,6 +25340,14 @@ export interface DefaultApiInterface {
     leaveGroup(requestParameters: DefaultApiLeaveGroupRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid>;
 
     /**
+     * 返回工作流数据库查询节点允许访问的安全表名及字段信息
+     * @summary 获取可查询的数据库表列表
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    listAllowedTables(options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListMapStringObject>;
+
+    /**
      * 
      * @summary 获取申请列表（管理员）
      * @param {DefaultApiListApplicationsRequest} requestParameters Request parameters.
@@ -23444,6 +25364,14 @@ export interface DefaultApiInterface {
      * @throws {RequiredError}
      */
     listArticles(requestParameters?: DefaultApiListArticlesRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseDailyArticlePageResponse>;
+
+    /**
+     * 返回所有已启用的AI模型，供工作流LLM节点选择
+     * @summary 获取可用模型列表
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    listAvailableModels(options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListMapStringObject>;
 
     /**
      * 
@@ -23483,6 +25411,15 @@ export interface DefaultApiInterface {
 
     /**
      * 
+     * @summary 获取文档分块列表
+     * @param {DefaultApiListChunksRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    listChunks(requestParameters: DefaultApiListChunksRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringObject>;
+
+    /**
+     * 
      * @summary 获取课程列表
      * @param {DefaultApiListCoursesRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -23507,6 +25444,15 @@ export interface DefaultApiInterface {
      * @throws {RequiredError}
      */
     listDocuments(requestParameters: DefaultApiListDocumentsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListKnowledgeDocumentVO>;
+
+    /**
+     * 
+     * @summary 获取工作流执行历史列表
+     * @param {DefaultApiListExecutionsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    listExecutions(requestParameters: DefaultApiListExecutionsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListExecutionResultResponse>;
 
     /**
      * 
@@ -23546,12 +25492,38 @@ export interface DefaultApiInterface {
 
     /**
      * 
+     * @summary 获取系统预置模板
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    listSystemTemplates(options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListWorkflowTemplateResponse>;
+
+    /**
+     * 
      * @summary 获取讲师列表
      * @param {DefaultApiListTeachersRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     listTeachers(requestParameters?: DefaultApiListTeachersRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListTeacherResponse>;
+
+    /**
+     * 
+     * @summary 获取工作流触发器列表
+     * @param {DefaultApiListTriggersRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    listTriggers(requestParameters: DefaultApiListTriggersRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListWorkflowTriggerResponse>;
+
+    /**
+     * 
+     * @summary 获取工作流版本列表
+     * @param {DefaultApiListVersionsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    listVersions(requestParameters: DefaultApiListVersionsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListWorkflowVersionResponse>;
 
     /**
      * 
@@ -23860,6 +25832,15 @@ export interface DefaultApiInterface {
     reviewCourse(requestParameters: DefaultApiReviewCourseRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseLong>;
 
     /**
+     * 
+     * @summary 回滚到指定版本
+     * @param {DefaultApiRollbackToVersionRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    rollbackToVersion(requestParameters: DefaultApiRollbackToVersionRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseWorkflowResponse>;
+
+    /**
      * 从列表页获取所有文章链接
      * @summary 获取文章链接
      * @param {DefaultApiScrapeArticleLinksRequest} requestParameters Request parameters.
@@ -24011,6 +25992,15 @@ export interface DefaultApiInterface {
      * @throws {RequiredError}
      */
     searchPostsByTag(requestParameters: DefaultApiSearchPostsByTagRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponsePostPageResponse>;
+
+    /**
+     * 返回公开模板 + 当前用户自己创建的私有模板
+     * @summary 搜索工作流模板
+     * @param {DefaultApiSearchTemplatesRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    searchTemplates(requestParameters?: DefaultApiSearchTemplatesRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListWorkflowTemplateResponse>;
 
     /**
      * 根据关键词搜索用户，用于添加好友
@@ -24194,6 +26184,15 @@ export interface DefaultApiInterface {
 
     /**
      * 
+     * @summary 解绑工作流与AI助手
+     * @param {DefaultApiUnbindFromAssistantRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    unbindFromAssistant(requestParameters: DefaultApiUnbindFromAssistantRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid>;
+
+    /**
+     * 
      * @summary 取消收藏
      * @param {DefaultApiUnfavouriteCourseRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -24308,6 +26307,15 @@ export interface DefaultApiInterface {
      * @throws {RequiredError}
      */
     updateDefinition(requestParameters: DefaultApiUpdateDefinitionRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseWorkflowResponse>;
+
+    /**
+     * 
+     * @summary 更新文档元信息
+     * @param {DefaultApiUpdateDocumentRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    updateDocument(requestParameters: DefaultApiUpdateDocumentRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseKnowledgeDocumentVO>;
 
     /**
      * 
@@ -24746,6 +26754,21 @@ export interface DefaultApiBatchUpdateRequest {
 }
 
 /**
+ * Request parameters for bindToAssistant operation in DefaultApi.
+ */
+export interface DefaultApiBindToAssistantRequest {
+    /**
+     * 工作流ID
+     */
+    readonly id: number
+
+    /**
+     * AI助手ID
+     */
+    readonly assistantId: number
+}
+
+/**
  * Request parameters for cancelExecution operation in DefaultApi.
  */
 export interface DefaultApiCancelExecutionRequest {
@@ -24915,6 +26938,22 @@ export interface DefaultApiCreateFeedbackRequest {
 }
 
 /**
+ * Request parameters for createFromTemplate operation in DefaultApi.
+ */
+export interface DefaultApiCreateFromTemplateRequest {
+    /**
+     * 模板ID
+     */
+    readonly templateId: number
+
+    readonly userId: number
+
+    readonly name?: string
+
+    readonly description?: string
+}
+
+/**
  * Request parameters for createGroup operation in DefaultApi.
  */
 export interface DefaultApiCreateGroupRequest {
@@ -24952,6 +26991,22 @@ export interface DefaultApiCreateReplyRequest {
 }
 
 /**
+ * Request parameters for createScheduleTrigger operation in DefaultApi.
+ */
+export interface DefaultApiCreateScheduleTriggerRequest {
+    /**
+     * 工作流ID
+     */
+    readonly id: number
+
+    readonly name: string
+
+    readonly cronExpression: string
+
+    readonly timezone?: string
+}
+
+/**
  * Request parameters for createSection operation in DefaultApi.
  */
 export interface DefaultApiCreateSectionRequest {
@@ -24971,10 +27026,58 @@ export interface DefaultApiCreateSettingRequest {
 }
 
 /**
+ * Request parameters for createTemplate operation in DefaultApi.
+ */
+export interface DefaultApiCreateTemplateRequest {
+    /**
+     * 工作流ID
+     */
+    readonly workflowId: number
+
+    readonly name: string
+
+    readonly userId: number
+
+    readonly description?: string
+
+    readonly category?: string
+}
+
+/**
  * Request parameters for createUser operation in DefaultApi.
  */
 export interface DefaultApiCreateUserRequest {
     readonly createUserRequest: CreateUserRequest
+}
+
+/**
+ * Request parameters for createVersionSnapshot operation in DefaultApi.
+ */
+export interface DefaultApiCreateVersionSnapshotRequest {
+    /**
+     * 工作流ID
+     */
+    readonly id: number
+
+    readonly userId: number
+
+    readonly publishNote?: string
+}
+
+/**
+ * Request parameters for createWebhookTrigger operation in DefaultApi.
+ */
+export interface DefaultApiCreateWebhookTriggerRequest {
+    /**
+     * 工作流ID
+     */
+    readonly id: number
+
+    readonly name: string
+
+    readonly secret?: string
+
+    readonly validateSignature?: boolean
 }
 
 /**
@@ -25187,6 +27290,26 @@ export interface DefaultApiDeleteSectionRequest {
 }
 
 /**
+ * Request parameters for deleteTemplate operation in DefaultApi.
+ */
+export interface DefaultApiDeleteTemplateRequest {
+    /**
+     * 模板ID
+     */
+    readonly templateId: number
+}
+
+/**
+ * Request parameters for deleteTrigger operation in DefaultApi.
+ */
+export interface DefaultApiDeleteTriggerRequest {
+    /**
+     * 触发器ID
+     */
+    readonly triggerId: number
+}
+
+/**
  * Request parameters for deleteVariable operation in DefaultApi.
  */
 export interface DefaultApiDeleteVariableRequest {
@@ -25209,6 +27332,16 @@ export interface DefaultApiDisableConfigRequest {
 }
 
 /**
+ * Request parameters for disableTrigger operation in DefaultApi.
+ */
+export interface DefaultApiDisableTriggerRequest {
+    /**
+     * 触发器ID
+     */
+    readonly triggerId: number
+}
+
+/**
  * Request parameters for dissolveGroup operation in DefaultApi.
  */
 export interface DefaultApiDissolveGroupRequest {
@@ -25220,6 +27353,16 @@ export interface DefaultApiDissolveGroupRequest {
  */
 export interface DefaultApiEnableConfigRequest {
     readonly id: number
+}
+
+/**
+ * Request parameters for enableTrigger operation in DefaultApi.
+ */
+export interface DefaultApiEnableTriggerRequest {
+    /**
+     * 触发器ID
+     */
+    readonly triggerId: number
 }
 
 /**
@@ -25570,6 +27713,21 @@ export interface DefaultApiGetExecutionLogsRequest {
      * 执行ID
      */
     readonly executionId: string
+
+    /**
+     * 日志级别过滤（可选）：DEBUG/INFO/WARN/ERROR
+     */
+    readonly level?: string
+}
+
+/**
+ * Request parameters for getExecutionStatistics operation in DefaultApi.
+ */
+export interface DefaultApiGetExecutionStatisticsRequest {
+    /**
+     * 工作流ID
+     */
+    readonly id: number
 }
 
 /**
@@ -25999,6 +28157,16 @@ export interface DefaultApiGetStudiedWordsRequest {
 }
 
 /**
+ * Request parameters for getTableColumns operation in DefaultApi.
+ */
+export interface DefaultApiGetTableColumnsRequest {
+    /**
+     * 表名
+     */
+    readonly tableName: string
+}
+
+/**
  * Request parameters for getTask operation in DefaultApi.
  */
 export interface DefaultApiGetTaskRequest {
@@ -26034,6 +28202,16 @@ export interface DefaultApiGetTeacherByUserIdRequest {
      * 用户ID
      */
     readonly userId: number
+}
+
+/**
+ * Request parameters for getTemplate operation in DefaultApi.
+ */
+export interface DefaultApiGetTemplateRequest {
+    /**
+     * 模板ID
+     */
+    readonly templateId: number
 }
 
 /**
@@ -26167,6 +28345,21 @@ export interface DefaultApiGetVariablesRequest {
 }
 
 /**
+ * Request parameters for getVersion operation in DefaultApi.
+ */
+export interface DefaultApiGetVersionRequest {
+    /**
+     * 工作流ID
+     */
+    readonly id: number
+
+    /**
+     * 版本号
+     */
+    readonly versionNumber: number
+}
+
+/**
  * Request parameters for getWordBookList operation in DefaultApi.
  */
 export interface DefaultApiGetWordBookListRequest {
@@ -26194,6 +28387,16 @@ export interface DefaultApiGetWordsByDateRequest {
      * 日期
      */
     readonly date: string
+}
+
+/**
+ * Request parameters for getWorkflowAssistants operation in DefaultApi.
+ */
+export interface DefaultApiGetWorkflowAssistantsRequest {
+    /**
+     * 工作流ID
+     */
+    readonly id: number
 }
 
 /**
@@ -26331,6 +28534,19 @@ export interface DefaultApiListChaptersRequest {
 }
 
 /**
+ * Request parameters for listChunks operation in DefaultApi.
+ */
+export interface DefaultApiListChunksRequest {
+    readonly id: number
+
+    readonly docId: number
+
+    readonly page?: number
+
+    readonly size?: number
+}
+
+/**
  * Request parameters for listCourses operation in DefaultApi.
  */
 export interface DefaultApiListCoursesRequest {
@@ -26378,6 +28594,26 @@ export interface DefaultApiListDocumentsRequest {
 
     readonly page?: number
 
+    readonly size?: number
+}
+
+/**
+ * Request parameters for listExecutions operation in DefaultApi.
+ */
+export interface DefaultApiListExecutionsRequest {
+    /**
+     * 工作流ID
+     */
+    readonly id: number
+
+    /**
+     * 页码，从0开始
+     */
+    readonly page?: number
+
+    /**
+     * 每页数量
+     */
     readonly size?: number
 }
 
@@ -26459,6 +28695,26 @@ export interface DefaultApiListTeachersRequest {
      * 每页数量
      */
     readonly size?: number
+}
+
+/**
+ * Request parameters for listTriggers operation in DefaultApi.
+ */
+export interface DefaultApiListTriggersRequest {
+    /**
+     * 工作流ID
+     */
+    readonly id: number
+}
+
+/**
+ * Request parameters for listVersions operation in DefaultApi.
+ */
+export interface DefaultApiListVersionsRequest {
+    /**
+     * 工作流ID
+     */
+    readonly id: number
 }
 
 /**
@@ -26757,6 +29013,21 @@ export interface DefaultApiReviewCourseRequest {
 }
 
 /**
+ * Request parameters for rollbackToVersion operation in DefaultApi.
+ */
+export interface DefaultApiRollbackToVersionRequest {
+    /**
+     * 工作流ID
+     */
+    readonly id: number
+
+    /**
+     * 版本号
+     */
+    readonly versionNumber: number
+}
+
+/**
  * Request parameters for scrapeArticleLinks operation in DefaultApi.
  */
 export interface DefaultApiScrapeArticleLinksRequest {
@@ -26923,6 +29194,31 @@ export interface DefaultApiSearchPostsByTagRequest {
     readonly pageNum?: number
 
     readonly pageSize?: number
+}
+
+/**
+ * Request parameters for searchTemplates operation in DefaultApi.
+ */
+export interface DefaultApiSearchTemplatesRequest {
+    /**
+     * 关键词
+     */
+    readonly keyword?: string
+
+    /**
+     * 分类
+     */
+    readonly category?: string
+
+    /**
+     * 页码
+     */
+    readonly page?: number
+
+    /**
+     * 每页数量
+     */
+    readonly size?: number
 }
 
 /**
@@ -27108,6 +29404,21 @@ export interface DefaultApiTransferOwnershipRequest {
 }
 
 /**
+ * Request parameters for unbindFromAssistant operation in DefaultApi.
+ */
+export interface DefaultApiUnbindFromAssistantRequest {
+    /**
+     * 工作流ID
+     */
+    readonly id: number
+
+    /**
+     * AI助手ID
+     */
+    readonly assistantId: number
+}
+
+/**
  * Request parameters for unfavouriteCourse operation in DefaultApi.
  */
 export interface DefaultApiUnfavouriteCourseRequest {
@@ -27240,6 +29551,17 @@ export interface DefaultApiUpdateDefinitionRequest {
     readonly id: number
 
     readonly updateWorkflowDefinitionRequest: UpdateWorkflowDefinitionRequest
+}
+
+/**
+ * Request parameters for updateDocument operation in DefaultApi.
+ */
+export interface DefaultApiUpdateDocumentRequest {
+    readonly id: number
+
+    readonly docId: number
+
+    readonly requestBody: { [key: string]: string; }
 }
 
 /**
@@ -27765,6 +30087,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
 
     /**
      * 
+     * @summary 绑定工作流到AI助手
+     * @param {DefaultApiBindToAssistantRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public bindToAssistant(requestParameters: DefaultApiBindToAssistantRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).bindToAssistant(requestParameters.id, requestParameters.assistantId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @summary 取消执行
      * @param {DefaultApiCancelExecutionRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -27984,6 +30317,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
 
     /**
      * 
+     * @summary 从模板创建工作流
+     * @param {DefaultApiCreateFromTemplateRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public createFromTemplate(requestParameters: DefaultApiCreateFromTemplateRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).createFromTemplate(requestParameters.templateId, requestParameters.userId, requestParameters.name, requestParameters.description, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @summary 创建群聊
      * @param {DefaultApiCreateGroupRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -28039,6 +30383,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
 
     /**
      * 
+     * @summary 创建定时触发器
+     * @param {DefaultApiCreateScheduleTriggerRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public createScheduleTrigger(requestParameters: DefaultApiCreateScheduleTriggerRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).createScheduleTrigger(requestParameters.id, requestParameters.name, requestParameters.cronExpression, requestParameters.timezone, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @summary 创建小节（管理员）
      * @param {DefaultApiCreateSectionRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -28060,6 +30415,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * 
+     * @summary 从工作流创建模板
+     * @param {DefaultApiCreateTemplateRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public createTemplate(requestParameters: DefaultApiCreateTemplateRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).createTemplate(requestParameters.workflowId, requestParameters.name, requestParameters.userId, requestParameters.description, requestParameters.category, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 管理员创建单个用户
      * @summary 创建用户
      * @param {DefaultApiCreateUserRequest} requestParameters Request parameters.
@@ -28068,6 +30434,28 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public createUser(requestParameters: DefaultApiCreateUserRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).createUser(requestParameters.createUserRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 创建版本快照（发布时）
+     * @param {DefaultApiCreateVersionSnapshotRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public createVersionSnapshot(requestParameters: DefaultApiCreateVersionSnapshotRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).createVersionSnapshot(requestParameters.id, requestParameters.userId, requestParameters.publishNote, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 创建Webhook触发器
+     * @param {DefaultApiCreateWebhookTriggerRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public createWebhookTrigger(requestParameters: DefaultApiCreateWebhookTriggerRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).createWebhookTrigger(requestParameters.id, requestParameters.name, requestParameters.secret, requestParameters.validateSignature, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -28325,6 +30713,28 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
 
     /**
      * 
+     * @summary 删除模板
+     * @param {DefaultApiDeleteTemplateRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public deleteTemplate(requestParameters: DefaultApiDeleteTemplateRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).deleteTemplate(requestParameters.templateId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 删除触发器
+     * @param {DefaultApiDeleteTriggerRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public deleteTrigger(requestParameters: DefaultApiDeleteTriggerRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).deleteTrigger(requestParameters.triggerId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @summary 删除变量
      * @param {DefaultApiDeleteVariableRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -28347,6 +30757,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
 
     /**
      * 
+     * @summary 禁用触发器
+     * @param {DefaultApiDisableTriggerRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public disableTrigger(requestParameters: DefaultApiDisableTriggerRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).disableTrigger(requestParameters.triggerId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @summary 解散群
      * @param {DefaultApiDissolveGroupRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -28365,6 +30786,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public enableConfig(requestParameters: DefaultApiEnableConfigRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).enableConfig(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 启用触发器
+     * @param {DefaultApiEnableTriggerRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public enableTrigger(requestParameters: DefaultApiEnableTriggerRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).enableTrigger(requestParameters.triggerId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -28821,7 +31253,18 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      * @throws {RequiredError}
      */
     public getExecutionLogs(requestParameters: DefaultApiGetExecutionLogsRequest, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).getExecutionLogs(requestParameters.executionId, options).then((request) => request(this.axios, this.basePath));
+        return DefaultApiFp(this.configuration).getExecutionLogs(requestParameters.executionId, requestParameters.level, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 获取工作流执行统计
+     * @param {DefaultApiGetExecutionStatisticsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getExecutionStatistics(requestParameters: DefaultApiGetExecutionStatisticsRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getExecutionStatistics(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -29447,6 +31890,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * 返回白名单内指定表的字段名、类型等元数据
+     * @summary 获取指定表的字段信息
+     * @param {DefaultApiGetTableColumnsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getTableColumns(requestParameters: DefaultApiGetTableColumnsRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getTableColumns(requestParameters.tableName, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 获取指定抓取任务的详细信息
      * @summary 获取任务详情
      * @param {DefaultApiGetTaskRequest} requestParameters Request parameters.
@@ -29488,6 +31942,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public getTeacherByUserId(requestParameters: DefaultApiGetTeacherByUserIdRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).getTeacherByUserId(requestParameters.userId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 获取模板详情
+     * @param {DefaultApiGetTemplateRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getTemplate(requestParameters: DefaultApiGetTemplateRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getTemplate(requestParameters.templateId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -29676,6 +32141,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
 
     /**
      * 
+     * @summary 获取指定版本详情
+     * @param {DefaultApiGetVersionRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getVersion(requestParameters: DefaultApiGetVersionRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getVersion(requestParameters.id, requestParameters.versionNumber, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @summary 获取生词本列表
      * @param {DefaultApiGetWordBookListRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -29694,6 +32170,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public getWordsByDate(requestParameters: DefaultApiGetWordsByDateRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).getWordsByDate(requestParameters.date, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 获取使用该工作流的AI助手ID列表
+     * @param {DefaultApiGetWorkflowAssistantsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getWorkflowAssistants(requestParameters: DefaultApiGetWorkflowAssistantsRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getWorkflowAssistants(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -29762,6 +32249,16 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * 返回工作流数据库查询节点允许访问的安全表名及字段信息
+     * @summary 获取可查询的数据库表列表
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public listAllowedTables(options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).listAllowedTables(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 
      * @summary 获取申请列表（管理员）
      * @param {DefaultApiListApplicationsRequest} requestParameters Request parameters.
@@ -29781,6 +32278,16 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public listArticles(requestParameters: DefaultApiListArticlesRequest = {}, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).listArticles(requestParameters.category, requestParameters.difficulty, requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 返回所有已启用的AI模型，供工作流LLM节点选择
+     * @summary 获取可用模型列表
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public listAvailableModels(options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).listAvailableModels(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -29829,6 +32336,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
 
     /**
      * 
+     * @summary 获取文档分块列表
+     * @param {DefaultApiListChunksRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public listChunks(requestParameters: DefaultApiListChunksRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).listChunks(requestParameters.id, requestParameters.docId, requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @summary 获取课程列表
      * @param {DefaultApiListCoursesRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -29858,6 +32376,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public listDocuments(requestParameters: DefaultApiListDocumentsRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).listDocuments(requestParameters.id, requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 获取工作流执行历史列表
+     * @param {DefaultApiListExecutionsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public listExecutions(requestParameters: DefaultApiListExecutionsRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).listExecutions(requestParameters.id, requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -29906,6 +32435,16 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
 
     /**
      * 
+     * @summary 获取系统预置模板
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public listSystemTemplates(options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).listSystemTemplates(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @summary 获取讲师列表
      * @param {DefaultApiListTeachersRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -29913,6 +32452,28 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public listTeachers(requestParameters: DefaultApiListTeachersRequest = {}, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).listTeachers(requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 获取工作流触发器列表
+     * @param {DefaultApiListTriggersRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public listTriggers(requestParameters: DefaultApiListTriggersRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).listTriggers(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 获取工作流版本列表
+     * @param {DefaultApiListVersionsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public listVersions(requestParameters: DefaultApiListVersionsRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).listVersions(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -30290,6 +32851,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * 
+     * @summary 回滚到指定版本
+     * @param {DefaultApiRollbackToVersionRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public rollbackToVersion(requestParameters: DefaultApiRollbackToVersionRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).rollbackToVersion(requestParameters.id, requestParameters.versionNumber, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 从列表页获取所有文章链接
      * @summary 获取文章链接
      * @param {DefaultApiScrapeArticleLinksRequest} requestParameters Request parameters.
@@ -30474,6 +33046,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public searchPostsByTag(requestParameters: DefaultApiSearchPostsByTagRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).searchPostsByTag(requestParameters.tag, requestParameters.pageNum, requestParameters.pageSize, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 返回公开模板 + 当前用户自己创建的私有模板
+     * @summary 搜索工作流模板
+     * @param {DefaultApiSearchTemplatesRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public searchTemplates(requestParameters: DefaultApiSearchTemplatesRequest = {}, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).searchTemplates(requestParameters.keyword, requestParameters.category, requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -30698,6 +33281,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
 
     /**
      * 
+     * @summary 解绑工作流与AI助手
+     * @param {DefaultApiUnbindFromAssistantRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public unbindFromAssistant(requestParameters: DefaultApiUnbindFromAssistantRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).unbindFromAssistant(requestParameters.id, requestParameters.assistantId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @summary 取消收藏
      * @param {DefaultApiUnfavouriteCourseRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -30837,6 +33431,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public updateDefinition(requestParameters: DefaultApiUpdateDefinitionRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).updateDefinition(requestParameters.id, requestParameters.updateWorkflowDefinitionRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 更新文档元信息
+     * @param {DefaultApiUpdateDocumentRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public updateDocument(requestParameters: DefaultApiUpdateDocumentRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).updateDocument(requestParameters.id, requestParameters.docId, requestParameters.requestBody, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

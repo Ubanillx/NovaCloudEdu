@@ -26,6 +26,8 @@ import type { AiProcessArticleRequest } from '../models';
 // @ts-ignore
 import type { ArticleChatRequest } from '../models';
 // @ts-ignore
+import type { AssistantChatRequest } from '../models';
+// @ts-ignore
 import type { BaseResponseAiAssistantVO } from '../models';
 // @ts-ignore
 import type { BaseResponseAiConversation } from '../models';
@@ -47,6 +49,8 @@ import type { BaseResponseListKnowledgePoint } from '../models';
 import type { BaseResponseListLong } from '../models';
 // @ts-ignore
 import type { BaseResponseListMapStringObject } from '../models';
+// @ts-ignore
+import type { BaseResponseListWorkflowSkillVO } from '../models';
 // @ts-ignore
 import type { BaseResponseMapStringObject } from '../models';
 // @ts-ignore
@@ -151,6 +155,49 @@ export const AIApiAxiosParamCreator = function (configuration?: Configuration) {
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(requestBody, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 通过助手ID与配置好的AI助手进行SSE流式对话。自动使用助手的systemPrompt和modelConfig，自动从绑定的知识库进行RAG检索，支持文档解析、多模态图片理解、文生图、图参生图、文生视频等全部外部技能。如不传sessionId则自动创建新会话，支持会话级记忆管理。
+         * @summary AI助手流式对话
+         * @param {number} id AI助手ID
+         * @param {AssistantChatRequest} assistantChatRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assistantChat: async (id: number, assistantChatRequest: AssistantChatRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('assistantChat', 'id', id)
+            // verify required parameter 'assistantChatRequest' is not null or undefined
+            assertParamExists('assistantChat', 'assistantChatRequest', assistantChatRequest)
+            const localVarPath = `/api/ai/assistants/{id}/chat/stream`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json,text/event-stream';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(assistantChatRequest, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -1109,6 +1156,44 @@ export const AIApiAxiosParamCreator = function (configuration?: Configuration) {
             };
         },
         /**
+         * 返回绑定的工作流详情，包含描述、输入参数、输出参数，供前端展示或 AI 助手对话时使用
+         * @summary 获取AI助手的工作流技能列表
+         * @param {number} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getWorkflowSkills: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('getWorkflowSkills', 'id', id)
+            const localVarPath = `/api/ai/assistants/{id}/workflow-skills`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 
          * @summary 获取AI助手绑定的工作流列表
          * @param {number} id 
@@ -2046,6 +2131,20 @@ export const AIApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 通过助手ID与配置好的AI助手进行SSE流式对话。自动使用助手的systemPrompt和modelConfig，自动从绑定的知识库进行RAG检索，支持文档解析、多模态图片理解、文生图、图参生图、文生视频等全部外部技能。如不传sessionId则自动创建新会话，支持会话级记忆管理。
+         * @summary AI助手流式对话
+         * @param {number} id AI助手ID
+         * @param {AssistantChatRequest} assistantChatRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async assistantChat(id: number, assistantChatRequest: AssistantChatRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SseEmitter>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.assistantChat(id, assistantChatRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AIApi.assistantChat']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 批量对多篇文章进行AI处理
          * @summary 批量AI处理文章
          * @param {BatchAiProcessRequest} batchAiProcessRequest 
@@ -2353,6 +2452,19 @@ export const AIApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getUserConversations(bookId, userId, page, size, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['AIApi.getUserConversations']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 返回绑定的工作流详情，包含描述、输入参数、输出参数，供前端展示或 AI 助手对话时使用
+         * @summary 获取AI助手的工作流技能列表
+         * @param {number} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getWorkflowSkills(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseListWorkflowSkillVO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getWorkflowSkills(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AIApi.getWorkflowSkills']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -2676,6 +2788,16 @@ export const AIApiFactory = function (configuration?: Configuration, basePath?: 
             return localVarFp.askQuestion(requestParameters.bookId, requestParameters.requestBody, options).then((request) => request(axios, basePath));
         },
         /**
+         * 通过助手ID与配置好的AI助手进行SSE流式对话。自动使用助手的systemPrompt和modelConfig，自动从绑定的知识库进行RAG检索，支持文档解析、多模态图片理解、文生图、图参生图、文生视频等全部外部技能。如不传sessionId则自动创建新会话，支持会话级记忆管理。
+         * @summary AI助手流式对话
+         * @param {AIApiAssistantChatRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assistantChat(requestParameters: AIApiAssistantChatRequest, options?: RawAxiosRequestConfig): AxiosPromise<SseEmitter> {
+            return localVarFp.assistantChat(requestParameters.id, requestParameters.assistantChatRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 批量对多篇文章进行AI处理
          * @summary 批量AI处理文章
          * @param {AIApiBatchProcessArticlesRequest} requestParameters Request parameters.
@@ -2893,6 +3015,16 @@ export const AIApiFactory = function (configuration?: Configuration, basePath?: 
          */
         getUserConversations(requestParameters: AIApiGetUserConversationsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListAiConversation> {
             return localVarFp.getUserConversations(requestParameters.bookId, requestParameters.userId, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 返回绑定的工作流详情，包含描述、输入参数、输出参数，供前端展示或 AI 助手对话时使用
+         * @summary 获取AI助手的工作流技能列表
+         * @param {AIApiGetWorkflowSkillsRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getWorkflowSkills(requestParameters: AIApiGetWorkflowSkillsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListWorkflowSkillVO> {
+            return localVarFp.getWorkflowSkills(requestParameters.id, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -3128,6 +3260,15 @@ export interface AIApiInterface {
     askQuestion(requestParameters: AIApiAskQuestionRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringObject>;
 
     /**
+     * 通过助手ID与配置好的AI助手进行SSE流式对话。自动使用助手的systemPrompt和modelConfig，自动从绑定的知识库进行RAG检索，支持文档解析、多模态图片理解、文生图、图参生图、文生视频等全部外部技能。如不传sessionId则自动创建新会话，支持会话级记忆管理。
+     * @summary AI助手流式对话
+     * @param {AIApiAssistantChatRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    assistantChat(requestParameters: AIApiAssistantChatRequest, options?: RawAxiosRequestConfig): AxiosPromise<SseEmitter>;
+
+    /**
      * 批量对多篇文章进行AI处理
      * @summary 批量AI处理文章
      * @param {AIApiBatchProcessArticlesRequest} requestParameters Request parameters.
@@ -3323,6 +3464,15 @@ export interface AIApiInterface {
      * @throws {RequiredError}
      */
     getUserConversations(requestParameters: AIApiGetUserConversationsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListAiConversation>;
+
+    /**
+     * 返回绑定的工作流详情，包含描述、输入参数、输出参数，供前端展示或 AI 助手对话时使用
+     * @summary 获取AI助手的工作流技能列表
+     * @param {AIApiGetWorkflowSkillsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getWorkflowSkills(requestParameters: AIApiGetWorkflowSkillsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListWorkflowSkillVO>;
 
     /**
      * 
@@ -3530,6 +3680,18 @@ export interface AIApiAskQuestionRequest {
 }
 
 /**
+ * Request parameters for assistantChat operation in AIApi.
+ */
+export interface AIApiAssistantChatRequest {
+    /**
+     * AI助手ID
+     */
+    readonly id: number
+
+    readonly assistantChatRequest: AssistantChatRequest
+}
+
+/**
  * Request parameters for batchProcessArticles operation in AIApi.
  */
 export interface AIApiBatchProcessArticlesRequest {
@@ -3730,6 +3892,13 @@ export interface AIApiGetUserConversationsRequest {
     readonly page?: number
 
     readonly size?: number
+}
+
+/**
+ * Request parameters for getWorkflowSkills operation in AIApi.
+ */
+export interface AIApiGetWorkflowSkillsRequest {
+    readonly id: number
 }
 
 /**
@@ -3938,6 +4107,17 @@ export class AIApi extends BaseAPI implements AIApiInterface {
      */
     public askQuestion(requestParameters: AIApiAskQuestionRequest, options?: RawAxiosRequestConfig) {
         return AIApiFp(this.configuration).askQuestion(requestParameters.bookId, requestParameters.requestBody, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 通过助手ID与配置好的AI助手进行SSE流式对话。自动使用助手的systemPrompt和modelConfig，自动从绑定的知识库进行RAG检索，支持文档解析、多模态图片理解、文生图、图参生图、文生视频等全部外部技能。如不传sessionId则自动创建新会话，支持会话级记忆管理。
+     * @summary AI助手流式对话
+     * @param {AIApiAssistantChatRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public assistantChat(requestParameters: AIApiAssistantChatRequest, options?: RawAxiosRequestConfig) {
+        return AIApiFp(this.configuration).assistantChat(requestParameters.id, requestParameters.assistantChatRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -4179,6 +4359,17 @@ export class AIApi extends BaseAPI implements AIApiInterface {
      */
     public getUserConversations(requestParameters: AIApiGetUserConversationsRequest, options?: RawAxiosRequestConfig) {
         return AIApiFp(this.configuration).getUserConversations(requestParameters.bookId, requestParameters.userId, requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 返回绑定的工作流详情，包含描述、输入参数、输出参数，供前端展示或 AI 助手对话时使用
+     * @summary 获取AI助手的工作流技能列表
+     * @param {AIApiGetWorkflowSkillsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getWorkflowSkills(requestParameters: AIApiGetWorkflowSkillsRequest, options?: RawAxiosRequestConfig) {
+        return AIApiFp(this.configuration).getWorkflowSkills(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

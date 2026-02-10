@@ -13,6 +13,9 @@
  */
 
 
+// May contain unused imports in some cases
+// @ts-ignore
+import type { NodeExecutionDTO } from './node-execution-dto';
 
 /**
  * 工作流执行结果响应
@@ -30,6 +33,10 @@ export interface ExecutionResultResponse {
      * 工作流名称
      */
     'workflowName'?: string;
+    /**
+     * 工作流版本
+     */
+    'workflowVersion'?: number;
     /**
      * 执行状态
      */
@@ -66,6 +73,10 @@ export interface ExecutionResultResponse {
      * 执行耗时（毫秒）
      */
     'durationMs'?: number;
+    /**
+     * 各节点执行详情（调试数据）
+     */
+    'nodeExecutions'?: Array<NodeExecutionDTO>;
 }
 
 export const ExecutionResultResponseStatusEnum = {

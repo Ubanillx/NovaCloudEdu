@@ -15,6 +15,9 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
+import type { ChildrenDefinition } from './children-definition';
+// May contain unused imports in some cases
+// @ts-ignore
 import type { ErrorHandlingConfig } from './error-handling-config';
 // May contain unused imports in some cases
 // @ts-ignore
@@ -27,6 +30,9 @@ export interface WorkflowNode {
     'position'?: Position;
     'config'?: { [key: string]: object; };
     'errorHandling'?: ErrorHandlingConfig;
+    'children'?: ChildrenDefinition;
+    'width'?: number;
+    'height'?: number;
 }
 
 export const WorkflowNodeTypeEnum = {
@@ -41,6 +47,8 @@ export const WorkflowNodeTypeEnum = {
     CONDITION: 'CONDITION',
     SWITCH: 'SWITCH',
     LOOP: 'LOOP',
+    LOOP_START: 'LOOP_START',
+    LOOP_END: 'LOOP_END',
     PARALLEL: 'PARALLEL',
     MERGE: 'MERGE',
     VARIABLE_SET: 'VARIABLE_SET',

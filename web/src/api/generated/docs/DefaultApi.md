@@ -28,6 +28,7 @@ All URIs are relative to *http://localhost:8080*
 |[**batchSyncArticles**](#batchsyncarticles) | **POST** /api/dailylearning/graph-sync/articles/batch | 批量同步每日文章到知识图谱（高效批量导入）|
 |[**batchSyncWords**](#batchsyncwords) | **POST** /api/dailylearning/graph-sync/words/batch | 批量同步每日单词到知识图谱（高效批量导入）|
 |[**batchUpdate**](#batchupdate) | **POST** /api/workflows/{id}/batch-update | 批量更新节点和连接线|
+|[**bindToAssistant**](#bindtoassistant) | **POST** /api/workflows/{id}/assistants/{assistantId} | 绑定工作流到AI助手|
 |[**cancelExecution**](#cancelexecution) | **POST** /api/workflows/executions/{executionId}/cancel | 取消执行|
 |[**changePassword**](#changepassword) | **POST** /api/user/password | 修改密码|
 |[**checkFavourite**](#checkfavourite) | **GET** /api/course/favourite/{courseId}/check | 检查是否已收藏|
@@ -48,14 +49,19 @@ All URIs are relative to *http://localhost:8080*
 |[**createDailyArticle**](#createdailyarticle) | **POST** /api/daily-article | 创建每日文章（管理员）|
 |[**createDailyWord**](#createdailyword) | **POST** /api/daily-word | 创建每日单词（管理员）|
 |[**createFeedback**](#createfeedback) | **POST** /api/feedback | 创建反馈|
+|[**createFromTemplate**](#createfromtemplate) | **POST** /api/workflows/templates/{templateId}/create-workflow | 从模板创建工作流|
 |[**createGroup**](#creategroup) | **POST** /api/groups | 创建群聊|
 |[**createGroupFromClass**](#creategroupfromclass) | **POST** /api/classes/{classId}/chat-group | 基于班级创建群聊|
 |[**createOrder**](#createorder) | **POST** /api/order | 创建订单（用户下单）|
 |[**createPost**](#createpost) | **POST** /api/posts | 发布帖子|
 |[**createReply**](#createreply) | **POST** /api/posts/comments/{commentId}/replies | 发表回复|
+|[**createScheduleTrigger**](#createscheduletrigger) | **POST** /api/workflows/{id}/triggers/schedule | 创建定时触发器|
 |[**createSection**](#createsection) | **POST** /api/course/{courseId}/section | 创建小节（管理员）|
 |[**createSetting**](#createsetting) | **POST** /api/schedule/setting | 创建课表配置|
+|[**createTemplate**](#createtemplate) | **POST** /api/workflows/templates/from-workflow/{workflowId} | 从工作流创建模板|
 |[**createUser**](#createuser) | **POST** /api/user/admin/create | 创建用户|
+|[**createVersionSnapshot**](#createversionsnapshot) | **POST** /api/workflows/{id}/versions | 创建版本快照（发布时）|
+|[**createWebhookTrigger**](#createwebhooktrigger) | **POST** /api/workflows/{id}/triggers/webhook | 创建Webhook触发器|
 |[**delete1**](#delete1) | **DELETE** /api/ai/knowledge-bases/{id} | 删除知识库|
 |[**deleteAnnouncement**](#deleteannouncement) | **DELETE** /api/announcement/admin/delete/{id} | 删除公告|
 |[**deleteBanner**](#deletebanner) | **DELETE** /api/admin/banner/{id} | 删除轮播图|
@@ -79,10 +85,14 @@ All URIs are relative to *http://localhost:8080*
 |[**deletePost**](#deletepost) | **DELETE** /api/posts/{postId} | 删除帖子|
 |[**deleteReply**](#deletereply) | **DELETE** /api/posts/replies/{replyId} | 删除回复|
 |[**deleteSection**](#deletesection) | **DELETE** /api/course/{courseId}/section/{sectionId} | 删除小节（管理员）|
+|[**deleteTemplate**](#deletetemplate) | **DELETE** /api/workflows/templates/{templateId} | 删除模板|
+|[**deleteTrigger**](#deletetrigger) | **DELETE** /api/workflows/triggers/{triggerId} | 删除触发器|
 |[**deleteVariable**](#deletevariable) | **DELETE** /api/workflows/{id}/variables/{variableName} | 删除变量|
 |[**disableConfig**](#disableconfig) | **POST** /api/admin/scraper/config/{id}/disable | 禁用配置|
+|[**disableTrigger**](#disabletrigger) | **POST** /api/workflows/triggers/{triggerId}/disable | 禁用触发器|
 |[**dissolveGroup**](#dissolvegroup) | **DELETE** /api/groups/{groupId} | 解散群|
 |[**enableConfig**](#enableconfig) | **POST** /api/admin/scraper/config/{id}/enable | 启用配置|
+|[**enableTrigger**](#enabletrigger) | **POST** /api/workflows/triggers/{triggerId}/enable | 启用触发器|
 |[**encryptChapterContent**](#encryptchaptercontent) | **POST** /api/books/{bookId}/chapters/{chapterIndex}/encrypt | 加密章节内容|
 |[**execute**](#execute) | **POST** /api/workflows/{id}/execute | 执行工作流|
 |[**executeAllTasks**](#executealltasks) | **POST** /api/admin/scraper/config/execute-all | 触发所有抓取|
@@ -125,6 +135,7 @@ All URIs are relative to *http://localhost:8080*
 |[**getDefinition**](#getdefinition) | **GET** /api/workflows/{id}/definition | 获取工作流定义详情|
 |[**getEdges**](#getedges) | **GET** /api/workflows/{id}/edges | 获取工作流所有连接线|
 |[**getExecutionLogs**](#getexecutionlogs) | **GET** /api/workflows/executions/{executionId}/logs | 获取执行日志|
+|[**getExecutionStatistics**](#getexecutionstatistics) | **GET** /api/workflows/{id}/execution-statistics | 获取工作流执行统计|
 |[**getExecutionStatus**](#getexecutionstatus) | **GET** /api/workflows/executions/{executionId} | 获取执行状态|
 |[**getFavouriteCount**](#getfavouritecount) | **GET** /api/course/favourite/{courseId}/count | 获取课程收藏数|
 |[**getFeedbackDetail**](#getfeedbackdetail) | **GET** /api/feedback/{id} | 获取反馈详情|
@@ -183,10 +194,12 @@ All URIs are relative to *http://localhost:8080*
 |[**getStudiedWords**](#getstudiedwords) | **GET** /api/user/daily-word/studied | 获取已学习单词列表|
 |[**getSupportedSources**](#getsupportedsources) | **GET** /api/scraper/sources | 获取预设来源列表|
 |[**getSupportedVoices**](#getsupportedvoices) | **GET** /api/speech/tts/voices | 获取支持的发音人列表|
+|[**getTableColumns**](#gettablecolumns) | **GET** /api/workflows/database/tables/{tableName}/columns | 获取指定表的字段信息|
 |[**getTask**](#gettask) | **GET** /api/admin/scraper/config/task/{taskId} | 获取任务详情|
 |[**getTasksByConfig**](#gettasksbyconfig) | **GET** /api/admin/scraper/config/{configId}/tasks | 获取配置的任务列表|
 |[**getTeacher**](#getteacher) | **GET** /api/teacher/{id} | 获取讲师信息|
 |[**getTeacherByUserId**](#getteacherbyuserid) | **GET** /api/teacher/user/{userId} | 根据用户ID获取讲师信息|
+|[**getTemplate**](#gettemplate) | **GET** /api/workflows/templates/{templateId} | 获取模板详情|
 |[**getTodayArticles**](#gettodayarticles) | **GET** /api/daily-article/today | 获取今日推荐文章（个性化推荐）|
 |[**getTodayWords**](#gettodaywords) | **GET** /api/daily-word/today | 获取今日推荐单词（个性化推荐）|
 |[**getTopPosts**](#gettopposts) | **GET** /api/posts/top | 获取点赞排行榜（全部时间）|
@@ -204,28 +217,37 @@ All URIs are relative to *http://localhost:8080*
 |[**getUserShelf**](#getusershelf) | **GET** /api/reading/shelf/{userId} | 获取用户书架|
 |[**getUserStats**](#getuserstats) | **GET** /api/user/stats | 获取用户统计数据|
 |[**getVariables**](#getvariables) | **GET** /api/workflows/{id}/variables | 获取工作流所有变量|
+|[**getVersion**](#getversion) | **GET** /api/workflows/{id}/versions/{versionNumber} | 获取指定版本详情|
 |[**getWordBookList**](#getwordbooklist) | **GET** /api/user/word-book/list | 获取生词本列表|
 |[**getWordsByDate**](#getwordsbydate) | **GET** /api/daily-word/date/{date} | 获取指定日期单词|
+|[**getWorkflowAssistants**](#getworkflowassistants) | **GET** /api/workflows/{id}/assistants | 获取使用该工作流的AI助手ID列表|
 |[**handleFriendRequest**](#handlefriendrequest) | **POST** /api/friend/request/handle | 处理好友申请|
 |[**handleJoinRequest**](#handlejoinrequest) | **POST** /api/groups/requests/{requestId}/handle | 处理加入申请|
 |[**health**](#health) | **GET** /api/health | 健康检查|
 |[**inviteMember**](#invitemember) | **POST** /api/groups/{groupId}/invite | 邀请用户加入群|
 |[**isFollowing**](#isfollowing) | **GET** /api/follow/check/{targetUserId} | 检查是否已关注|
 |[**leaveGroup**](#leavegroup) | **POST** /api/groups/{groupId}/leave | 退出群|
+|[**listAllowedTables**](#listallowedtables) | **GET** /api/workflows/database/tables | 获取可查询的数据库表列表|
 |[**listApplications**](#listapplications) | **GET** /api/teacher/application/list | 获取申请列表（管理员）|
 |[**listArticles**](#listarticles) | **GET** /api/daily-article/list | 获取文章列表|
+|[**listAvailableModels**](#listavailablemodels) | **GET** /api/workflows/models | 获取可用模型列表|
 |[**listBooks**](#listbooks) | **GET** /api/books | 获取书籍列表|
 |[**listByCreator**](#listbycreator) | **GET** /api/ai/knowledge-bases | 获取用户的知识库列表|
 |[**listByUser**](#listbyuser) | **GET** /api/workflows | 获取用户的工作流列表|
 |[**listChapters**](#listchapters) | **GET** /api/course/{courseId}/chapter | 获取课程的章节列表|
+|[**listChunks**](#listchunks) | **GET** /api/ai/knowledge-bases/{id}/documents/{docId}/chunks | 获取文档分块列表|
 |[**listCourses**](#listcourses) | **GET** /api/course/list | 获取课程列表|
 |[**listCoursesByTeacher**](#listcoursesbyteacher) | **GET** /api/course/teacher/{teacherId} | 获取讲师的课程列表|
 |[**listDocuments**](#listdocuments) | **GET** /api/ai/knowledge-bases/{id}/documents | 获取文档列表|
+|[**listExecutions**](#listexecutions) | **GET** /api/workflows/{id}/executions | 获取工作流执行历史列表|
 |[**listOrders**](#listorders) | **GET** /api/admin/order/list | 获取订单列表（管理员）|
 |[**listPublic**](#listpublic) | **GET** /api/workflows/public | 获取公开的工作流列表|
 |[**listReviews**](#listreviews) | **GET** /api/course/review/{courseId}/list | 获取课程评价列表|
 |[**listSections**](#listsections) | **GET** /api/course/{courseId}/section | 获取课程的所有小节|
+|[**listSystemTemplates**](#listsystemtemplates) | **GET** /api/workflows/templates/system | 获取系统预置模板|
 |[**listTeachers**](#listteachers) | **GET** /api/teacher/list | 获取讲师列表|
+|[**listTriggers**](#listtriggers) | **GET** /api/workflows/{id}/triggers | 获取工作流触发器列表|
+|[**listVersions**](#listversions) | **GET** /api/workflows/{id}/versions | 获取工作流版本列表|
 |[**listWords**](#listwords) | **GET** /api/daily-word/list | 获取单词列表|
 |[**markAsRead**](#markasread) | **POST** /api/user/daily-article/{articleId}/read | 标记文章为已阅读|
 |[**markAsRead1**](#markasread1) | **POST** /api/group-chat/{groupId}/messages/{messageId}/read | 标记消息已读|
@@ -260,6 +282,7 @@ All URIs are relative to *http://localhost:8080*
 |[**resetProgress**](#resetprogress) | **POST** /api/progress/section/{sectionId}/reset | 重置小节进度|
 |[**reviewApplication**](#reviewapplication) | **POST** /api/teacher/application/review | 审核讲师申请（管理员）|
 |[**reviewCourse**](#reviewcourse) | **POST** /api/course/review/{courseId} | 评价课程|
+|[**rollbackToVersion**](#rollbacktoversion) | **POST** /api/workflows/{id}/versions/{versionNumber}/rollback | 回滚到指定版本|
 |[**scrapeArticleLinks**](#scrapearticlelinks) | **POST** /api/scraper/links | 获取文章链接|
 |[**scrapeDynamicArticleLinks**](#scrapedynamicarticlelinks) | **POST** /api/scraper/dynamic/links | 动态获取文章链接|
 |[**scrapeDynamicMultiplePages**](#scrapedynamicmultiplepages) | **POST** /api/scraper/dynamic/batch | 批量动态抓取|
@@ -277,6 +300,7 @@ All URIs are relative to *http://localhost:8080*
 |[**searchGroups**](#searchgroups) | **GET** /api/groups/search | 搜索群|
 |[**searchPosts**](#searchposts) | **GET** /api/posts/search | 搜索帖子|
 |[**searchPostsByTag**](#searchpostsbytag) | **GET** /api/posts/tag | 根据标签搜索帖子|
+|[**searchTemplates**](#searchtemplates) | **GET** /api/workflows/templates | 搜索工作流模板|
 |[**searchUsers**](#searchusers) | **POST** /api/friend/search | 搜索用户|
 |[**searchWords**](#searchwords) | **GET** /api/daily-word/search | 搜索单词|
 |[**sendFriendRequest**](#sendfriendrequest) | **POST** /api/friend/request/send | 发送好友申请|
@@ -297,6 +321,7 @@ All URIs are relative to *http://localhost:8080*
 |[**toggleLike**](#togglelike) | **POST** /api/user/daily-article/{articleId}/like | 点赞/取消点赞文章|
 |[**toggleThumb**](#togglethumb) | **POST** /api/posts/{postId}/thumb | 点赞/取消点赞帖子|
 |[**transferOwnership**](#transferownership) | **POST** /api/groups/{groupId}/transfer | 转让群主|
+|[**unbindFromAssistant**](#unbindfromassistant) | **DELETE** /api/workflows/{id}/assistants/{assistantId} | 解绑工作流与AI助手|
 |[**unfavouriteCourse**](#unfavouritecourse) | **DELETE** /api/course/favourite/{courseId} | 取消收藏|
 |[**unfollow**](#unfollow) | **DELETE** /api/follow/{targetUserId} | 取消关注|
 |[**update**](#update) | **PUT** /api/workflows/{id} | 更新工作流基本信息|
@@ -310,6 +335,7 @@ All URIs are relative to *http://localhost:8080*
 |[**updateDailyArticle**](#updatedailyarticle) | **PUT** /api/daily-article/{id} | 更新每日文章（管理员）|
 |[**updateDailyWord**](#updatedailyword) | **PUT** /api/daily-word/{id} | 更新每日单词（管理员）|
 |[**updateDefinition**](#updatedefinition) | **PUT** /api/workflows/{id}/definition | 更新工作流定义|
+|[**updateDocument**](#updatedocument) | **PUT** /api/ai/knowledge-bases/{id}/documents/{docId} | 更新文档元信息|
 |[**updateEdge**](#updateedge) | **PUT** /api/workflows/{id}/edges/{edgeId} | 更新连接线|
 |[**updateFeedbackStatus**](#updatefeedbackstatus) | **PUT** /api/feedback/admin/status | 更新反馈状态|
 |[**updateGroupInfo**](#updategroupinfo) | **PUT** /api/groups/{groupId} | 更新群信息|
@@ -1613,6 +1639,60 @@ const { status, data } = await apiInstance.batchUpdate(
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **bindToAssistant**
+> BaseResponseVoid bindToAssistant()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let id: number; //工作流ID (default to undefined)
+let assistantId: number; //AI助手ID (default to undefined)
+
+const { status, data } = await apiInstance.bindToAssistant(
+    id,
+    assistantId
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **id** | [**number**] | 工作流ID | defaults to undefined|
+| **assistantId** | [**number**] | AI助手ID | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseVoid**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **cancelExecution**
 > BaseResponseVoid cancelExecution()
 
@@ -2665,6 +2745,66 @@ const { status, data } = await apiInstance.createFeedback(
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **createFromTemplate**
+> BaseResponseWorkflowResponse createFromTemplate()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let templateId: number; //模板ID (default to undefined)
+let userId: number; // (default to undefined)
+let name: string; // (optional) (default to undefined)
+let description: string; // (optional) (default to undefined)
+
+const { status, data } = await apiInstance.createFromTemplate(
+    templateId,
+    userId,
+    name,
+    description
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **templateId** | [**number**] | 模板ID | defaults to undefined|
+| **userId** | [**number**] |  | defaults to undefined|
+| **name** | [**string**] |  | (optional) defaults to undefined|
+| **description** | [**string**] |  | (optional) defaults to undefined|
+
+
+### Return type
+
+**BaseResponseWorkflowResponse**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **createGroup**
 > BaseResponseGroupResponse createGroup(createGroupRequest)
 
@@ -2927,6 +3067,66 @@ const { status, data } = await apiInstance.createReply(
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **createScheduleTrigger**
+> BaseResponseWorkflowTriggerResponse createScheduleTrigger()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let id: number; //工作流ID (default to undefined)
+let name: string; // (default to undefined)
+let cronExpression: string; // (default to undefined)
+let timezone: string; // (optional) (default to undefined)
+
+const { status, data } = await apiInstance.createScheduleTrigger(
+    id,
+    name,
+    cronExpression,
+    timezone
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **id** | [**number**] | 工作流ID | defaults to undefined|
+| **name** | [**string**] |  | defaults to undefined|
+| **cronExpression** | [**string**] |  | defaults to undefined|
+| **timezone** | [**string**] |  | (optional) defaults to undefined|
+
+
+### Return type
+
+**BaseResponseWorkflowTriggerResponse**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **createSection**
 > BaseResponseLong createSection(createSectionRequest)
 
@@ -3035,6 +3235,69 @@ const { status, data } = await apiInstance.createSetting(
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **createTemplate**
+> BaseResponseWorkflowTemplateResponse createTemplate()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let workflowId: number; //工作流ID (default to undefined)
+let name: string; // (default to undefined)
+let userId: number; // (default to undefined)
+let description: string; // (optional) (default to undefined)
+let category: string; // (optional) (default to undefined)
+
+const { status, data } = await apiInstance.createTemplate(
+    workflowId,
+    name,
+    userId,
+    description,
+    category
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **workflowId** | [**number**] | 工作流ID | defaults to undefined|
+| **name** | [**string**] |  | defaults to undefined|
+| **userId** | [**number**] |  | defaults to undefined|
+| **description** | [**string**] |  | (optional) defaults to undefined|
+| **category** | [**string**] |  | (optional) defaults to undefined|
+
+
+### Return type
+
+**BaseResponseWorkflowTemplateResponse**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **createUser**
 > BaseResponseLong createUser(createUserRequest)
 
@@ -3077,6 +3340,123 @@ const { status, data } = await apiInstance.createUser(
 ### HTTP request headers
 
  - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **createVersionSnapshot**
+> BaseResponseWorkflowVersionResponse createVersionSnapshot()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let id: number; //工作流ID (default to undefined)
+let userId: number; // (default to undefined)
+let publishNote: string; // (optional) (default to undefined)
+
+const { status, data } = await apiInstance.createVersionSnapshot(
+    id,
+    userId,
+    publishNote
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **id** | [**number**] | 工作流ID | defaults to undefined|
+| **userId** | [**number**] |  | defaults to undefined|
+| **publishNote** | [**string**] |  | (optional) defaults to undefined|
+
+
+### Return type
+
+**BaseResponseWorkflowVersionResponse**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **createWebhookTrigger**
+> BaseResponseWorkflowTriggerResponse createWebhookTrigger()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let id: number; //工作流ID (default to undefined)
+let name: string; // (default to undefined)
+let secret: string; // (optional) (default to undefined)
+let validateSignature: boolean; // (optional) (default to false)
+
+const { status, data } = await apiInstance.createWebhookTrigger(
+    id,
+    name,
+    secret,
+    validateSignature
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **id** | [**number**] | 工作流ID | defaults to undefined|
+| **name** | [**string**] |  | defaults to undefined|
+| **secret** | [**string**] |  | (optional) defaults to undefined|
+| **validateSignature** | [**boolean**] |  | (optional) defaults to false|
+
+
+### Return type
+
+**BaseResponseWorkflowTriggerResponse**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
  - **Accept**: application/json
 
 
@@ -4286,6 +4666,108 @@ const { status, data } = await apiInstance.deleteSection(
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **deleteTemplate**
+> BaseResponseVoid deleteTemplate()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let templateId: number; //模板ID (default to undefined)
+
+const { status, data } = await apiInstance.deleteTemplate(
+    templateId
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **templateId** | [**number**] | 模板ID | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseVoid**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **deleteTrigger**
+> BaseResponseVoid deleteTrigger()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let triggerId: number; //触发器ID (default to undefined)
+
+const { status, data } = await apiInstance.deleteTrigger(
+    triggerId
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **triggerId** | [**number**] | 触发器ID | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseVoid**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **deleteVariable**
 > BaseResponseVoid deleteVariable()
 
@@ -4392,6 +4874,57 @@ const { status, data } = await apiInstance.disableConfig(
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **disableTrigger**
+> BaseResponseWorkflowTriggerResponse disableTrigger()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let triggerId: number; //触发器ID (default to undefined)
+
+const { status, data } = await apiInstance.disableTrigger(
+    triggerId
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **triggerId** | [**number**] | 触发器ID | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseWorkflowTriggerResponse**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **dissolveGroup**
 > BaseResponseVoid dissolveGroup()
 
@@ -4476,6 +5009,57 @@ const { status, data } = await apiInstance.enableConfig(
 ### Return type
 
 **BaseResponseVoid**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **enableTrigger**
+> BaseResponseWorkflowTriggerResponse enableTrigger()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let triggerId: number; //触发器ID (default to undefined)
+
+const { status, data } = await apiInstance.enableTrigger(
+    triggerId
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **triggerId** | [**number**] | 触发器ID | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseWorkflowTriggerResponse**
 
 ### Authorization
 
@@ -6629,9 +7213,11 @@ const configuration = new Configuration();
 const apiInstance = new DefaultApi(configuration);
 
 let executionId: string; //执行ID (default to undefined)
+let level: string; //日志级别过滤（可选）：DEBUG/INFO/WARN/ERROR (optional) (default to undefined)
 
 const { status, data } = await apiInstance.getExecutionLogs(
-    executionId
+    executionId,
+    level
 );
 ```
 
@@ -6640,11 +7226,63 @@ const { status, data } = await apiInstance.getExecutionLogs(
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
 | **executionId** | [**string**] | 执行ID | defaults to undefined|
+| **level** | [**string**] | 日志级别过滤（可选）：DEBUG/INFO/WARN/ERROR | (optional) defaults to undefined|
 
 
 ### Return type
 
 **BaseResponseListExecutionLogResponse**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getExecutionStatistics**
+> BaseResponseExecutionStatisticsResponse getExecutionStatistics()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let id: number; //工作流ID (default to undefined)
+
+const { status, data } = await apiInstance.getExecutionStatistics(
+    id
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **id** | [**number**] | 工作流ID | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseExecutionStatisticsResponse**
 
 ### Authorization
 
@@ -9607,6 +10245,58 @@ This endpoint does not have any parameters.
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **getTableColumns**
+> BaseResponseListMapStringObject getTableColumns()
+
+返回白名单内指定表的字段名、类型等元数据
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let tableName: string; //表名 (default to undefined)
+
+const { status, data } = await apiInstance.getTableColumns(
+    tableName
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **tableName** | [**string**] | 表名 | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseListMapStringObject**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **getTask**
 > BaseResponseScraperTaskResponse getTask()
 
@@ -9800,6 +10490,57 @@ const { status, data } = await apiInstance.getTeacherByUserId(
 ### Return type
 
 **BaseResponseTeacherResponse**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getTemplate**
+> BaseResponseWorkflowTemplateResponse getTemplate()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let templateId: number; //模板ID (default to undefined)
+
+const { status, data } = await apiInstance.getTemplate(
+    templateId
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **templateId** | [**number**] | 模板ID | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseWorkflowTemplateResponse**
 
 ### Authorization
 
@@ -10701,6 +11442,60 @@ const { status, data } = await apiInstance.getVariables(
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **getVersion**
+> BaseResponseWorkflowVersionResponse getVersion()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let id: number; //工作流ID (default to undefined)
+let versionNumber: number; //版本号 (default to undefined)
+
+const { status, data } = await apiInstance.getVersion(
+    id,
+    versionNumber
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **id** | [**number**] | 工作流ID | defaults to undefined|
+| **versionNumber** | [**number**] | 版本号 | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseWorkflowVersionResponse**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **getWordBookList**
 > BaseResponseListUserWordBookResponse getWordBookList()
 
@@ -10790,6 +11585,57 @@ const { status, data } = await apiInstance.getWordsByDate(
 ### Return type
 
 **BaseResponseListDailyWordResponse**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getWorkflowAssistants**
+> BaseResponseListLong getWorkflowAssistants()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let id: number; //工作流ID (default to undefined)
+
+const { status, data } = await apiInstance.getWorkflowAssistants(
+    id
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **id** | [**number**] | 工作流ID | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseListLong**
 
 ### Authorization
 
@@ -11118,6 +11964,51 @@ const { status, data } = await apiInstance.leaveGroup(
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **listAllowedTables**
+> BaseResponseListMapStringObject listAllowedTables()
+
+返回工作流数据库查询节点允许访问的安全表名及字段信息
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+const { status, data } = await apiInstance.listAllowedTables();
+```
+
+### Parameters
+This endpoint does not have any parameters.
+
+
+### Return type
+
+**BaseResponseListMapStringObject**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **listApplications**
 > BaseResponseListTeacherApplicationResponse listApplications()
 
@@ -11216,6 +12107,51 @@ const { status, data } = await apiInstance.listArticles(
 ### Return type
 
 **BaseResponseDailyArticlePageResponse**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **listAvailableModels**
+> BaseResponseListMapStringObject listAvailableModels()
+
+返回所有已启用的AI模型，供工作流LLM节点选择
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+const { status, data } = await apiInstance.listAvailableModels();
+```
+
+### Parameters
+This endpoint does not have any parameters.
+
+
+### Return type
+
+**BaseResponseListMapStringObject**
 
 ### Authorization
 
@@ -11454,6 +12390,66 @@ const { status, data } = await apiInstance.listChapters(
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **listChunks**
+> BaseResponseMapStringObject listChunks()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let id: number; // (default to undefined)
+let docId: number; // (default to undefined)
+let page: number; // (optional) (default to 0)
+let size: number; // (optional) (default to 20)
+
+const { status, data } = await apiInstance.listChunks(
+    id,
+    docId,
+    page,
+    size
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **id** | [**number**] |  | defaults to undefined|
+| **docId** | [**number**] |  | defaults to undefined|
+| **page** | [**number**] |  | (optional) defaults to 0|
+| **size** | [**number**] |  | (optional) defaults to 20|
+
+
+### Return type
+
+**BaseResponseMapStringObject**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **listCourses**
 > BaseResponseListCourseResponse listCourses()
 
@@ -11606,6 +12602,63 @@ const { status, data } = await apiInstance.listDocuments(
 ### Return type
 
 **BaseResponseListKnowledgeDocumentVO**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **listExecutions**
+> BaseResponseListExecutionResultResponse listExecutions()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let id: number; //工作流ID (default to undefined)
+let page: number; //页码，从0开始 (optional) (default to 0)
+let size: number; //每页数量 (optional) (default to 20)
+
+const { status, data } = await apiInstance.listExecutions(
+    id,
+    page,
+    size
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **id** | [**number**] | 工作流ID | defaults to undefined|
+| **page** | [**number**] | 页码，从0开始 | (optional) defaults to 0|
+| **size** | [**number**] | 每页数量 | (optional) defaults to 20|
+
+
+### Return type
+
+**BaseResponseListExecutionResultResponse**
 
 ### Authorization
 
@@ -11844,6 +12897,50 @@ const { status, data } = await apiInstance.listSections(
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **listSystemTemplates**
+> BaseResponseListWorkflowTemplateResponse listSystemTemplates()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+const { status, data } = await apiInstance.listSystemTemplates();
+```
+
+### Parameters
+This endpoint does not have any parameters.
+
+
+### Return type
+
+**BaseResponseListWorkflowTemplateResponse**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **listTeachers**
 > BaseResponseListTeacherResponse listTeachers()
 
@@ -11879,6 +12976,108 @@ const { status, data } = await apiInstance.listTeachers(
 ### Return type
 
 **BaseResponseListTeacherResponse**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **listTriggers**
+> BaseResponseListWorkflowTriggerResponse listTriggers()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let id: number; //工作流ID (default to undefined)
+
+const { status, data } = await apiInstance.listTriggers(
+    id
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **id** | [**number**] | 工作流ID | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseListWorkflowTriggerResponse**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **listVersions**
+> BaseResponseListWorkflowVersionResponse listVersions()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let id: number; //工作流ID (default to undefined)
+
+const { status, data } = await apiInstance.listVersions(
+    id
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **id** | [**number**] | 工作流ID | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseListWorkflowVersionResponse**
 
 ### Authorization
 
@@ -13697,6 +14896,60 @@ const { status, data } = await apiInstance.reviewCourse(
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **rollbackToVersion**
+> BaseResponseWorkflowResponse rollbackToVersion()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let id: number; //工作流ID (default to undefined)
+let versionNumber: number; //版本号 (default to undefined)
+
+const { status, data } = await apiInstance.rollbackToVersion(
+    id,
+    versionNumber
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **id** | [**number**] | 工作流ID | defaults to undefined|
+| **versionNumber** | [**number**] | 版本号 | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseWorkflowResponse**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **scrapeArticleLinks**
 > BaseResponseListString scrapeArticleLinks(scrapeRequest)
 
@@ -14613,6 +15866,67 @@ const { status, data } = await apiInstance.searchPostsByTag(
 ### Return type
 
 **BaseResponsePostPageResponse**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **searchTemplates**
+> BaseResponseListWorkflowTemplateResponse searchTemplates()
+
+返回公开模板 + 当前用户自己创建的私有模板
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let keyword: string; //关键词 (optional) (default to undefined)
+let category: string; //分类 (optional) (default to undefined)
+let page: number; //页码 (optional) (default to 0)
+let size: number; //每页数量 (optional) (default to 20)
+
+const { status, data } = await apiInstance.searchTemplates(
+    keyword,
+    category,
+    page,
+    size
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **keyword** | [**string**] | 关键词 | (optional) defaults to undefined|
+| **category** | [**string**] | 分类 | (optional) defaults to undefined|
+| **page** | [**number**] | 页码 | (optional) defaults to 0|
+| **size** | [**number**] | 每页数量 | (optional) defaults to 20|
+
+
+### Return type
+
+**BaseResponseListWorkflowTemplateResponse**
 
 ### Authorization
 
@@ -15694,6 +17008,60 @@ const { status, data } = await apiInstance.transferOwnership(
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **unbindFromAssistant**
+> BaseResponseVoid unbindFromAssistant()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let id: number; //工作流ID (default to undefined)
+let assistantId: number; //AI助手ID (default to undefined)
+
+const { status, data } = await apiInstance.unbindFromAssistant(
+    id,
+    assistantId
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **id** | [**number**] | 工作流ID | defaults to undefined|
+| **assistantId** | [**number**] | AI助手ID | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseVoid**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **unfavouriteCourse**
 > BaseResponseVoid unfavouriteCourse()
 
@@ -16382,6 +17750,63 @@ const { status, data } = await apiInstance.updateDefinition(
 ### Return type
 
 **BaseResponseWorkflowResponse**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **updateDocument**
+> BaseResponseKnowledgeDocumentVO updateDocument(requestBody)
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let id: number; // (default to undefined)
+let docId: number; // (default to undefined)
+let requestBody: { [key: string]: string; }; //
+
+const { status, data } = await apiInstance.updateDocument(
+    id,
+    docId,
+    requestBody
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **requestBody** | **{ [key: string]: string; }**|  | |
+| **id** | [**number**] |  | defaults to undefined|
+| **docId** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseKnowledgeDocumentVO**
 
 ### Authorization
 

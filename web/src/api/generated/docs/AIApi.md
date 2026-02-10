@@ -6,6 +6,7 @@ All URIs are relative to *http://localhost:8080*
 |------------- | ------------- | -------------|
 |[**archive**](#archive) | **PUT** /api/ai/assistants/{id}/archive | 归档AI助手|
 |[**askQuestion**](#askquestion) | **POST** /api/books/{bookId}/ai/chat | 提问（新对话）|
+|[**assistantChat**](#assistantchat) | **POST** /api/ai/assistants/{id}/chat/stream | AI助手流式对话|
 |[**batchProcessArticles**](#batchprocessarticles) | **POST** /api/admin/articles/ai/batch-process | 批量AI处理文章|
 |[**bindKnowledgeBase**](#bindknowledgebase) | **POST** /api/ai/assistants/{id}/knowledge-bases/{kbId} | 绑定知识库|
 |[**bindWorkflow**](#bindworkflow) | **POST** /api/ai/assistants/{id}/workflows/{workflowId} | 绑定工作流到AI助手|
@@ -28,6 +29,7 @@ All URIs are relative to *http://localhost:8080*
 |[**getSessionDetail**](#getsessiondetail) | **GET** /api/ai/chat/sessions/{sessionId} | 获取会话详情（含消息列表）|
 |[**getSummary**](#getsummary) | **GET** /api/books/{bookId}/ai/chapters/{chapterId}/summary | 获取章节总结|
 |[**getUserConversations**](#getuserconversations) | **GET** /api/books/{bookId}/ai/conversations | 获取用户对话列表|
+|[**getWorkflowSkills**](#getworkflowskills) | **GET** /api/ai/assistants/{id}/workflow-skills | 获取AI助手的工作流技能列表|
 |[**getWorkflows**](#getworkflows) | **GET** /api/ai/assistants/{id}/workflows | 获取AI助手绑定的工作流列表|
 |[**listAllModels**](#listallmodels) | **GET** /api/ai/chat/models/all | 获取全量模型配置|
 |[**listByCreator1**](#listbycreator1) | **GET** /api/ai/assistants | 获取用户的AI助手列表|
@@ -145,6 +147,62 @@ const { status, data } = await apiInstance.askQuestion(
 
  - **Content-Type**: application/json
  - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **assistantChat**
+> SseEmitter assistantChat(assistantChatRequest)
+
+通过助手ID与配置好的AI助手进行SSE流式对话。自动使用助手的systemPrompt和modelConfig，自动从绑定的知识库进行RAG检索，支持文档解析、多模态图片理解、文生图、图参生图、文生视频等全部外部技能。如不传sessionId则自动创建新会话，支持会话级记忆管理。
+
+### Example
+
+```typescript
+import {
+    AIApi,
+    Configuration,
+    AssistantChatRequest
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new AIApi(configuration);
+
+let id: number; //AI助手ID (default to undefined)
+let assistantChatRequest: AssistantChatRequest; //
+
+const { status, data } = await apiInstance.assistantChat(
+    id,
+    assistantChatRequest
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **assistantChatRequest** | **AssistantChatRequest**|  | |
+| **id** | [**number**] | AI助手ID | defaults to undefined|
+
+
+### Return type
+
+**SseEmitter**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json, text/event-stream
 
 
 ### HTTP response details
@@ -1331,6 +1389,58 @@ const { status, data } = await apiInstance.getUserConversations(
 ### Return type
 
 **BaseResponseListAiConversation**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getWorkflowSkills**
+> BaseResponseListWorkflowSkillVO getWorkflowSkills()
+
+返回绑定的工作流详情，包含描述、输入参数、输出参数，供前端展示或 AI 助手对话时使用
+
+### Example
+
+```typescript
+import {
+    AIApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new AIApi(configuration);
+
+let id: number; // (default to undefined)
+
+const { status, data } = await apiInstance.getWorkflowSkills(
+    id
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **id** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseListWorkflowSkillVO**
 
 ### Authorization
 
