@@ -5,6 +5,7 @@
 /// - 文章详情（Markdown渲染）
 /// - 点赞、收藏、评论
 /// - 与AI讨论文章（SSE流式对话）
+library;
 
 export 'pages/daily_article_page.dart';
 export 'pages/article_detail_page.dart';

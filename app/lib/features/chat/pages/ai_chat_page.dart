@@ -41,6 +41,17 @@ class _AiChatPageState extends State<AiChatPage> {
   int? _currentSessionId;
   String _title = '';
 
+  // 文生图状态追踪
+  List<ImageGeneration> _imageGenerations = [];
+  final Map<int, ImageGeneration> _imageResultsMap = {};
+
+  // 文生视频状态追踪
+  List<VideoGeneration> _videoGenerations = [];
+  final Map<int, VideoGeneration> _videoResultsMap = {};
+
+  // 生成卡片展开状态（key 格式: "img_1", "vid_2"）
+  final Set<String> _expandedGenCards = {};
+
   // 待发送的图片（本地路径）
   final List<XFile> _pendingImages = [];
   static const int _maxImages = 3;
@@ -252,6 +263,10 @@ class _AiChatPageState extends State<AiChatPage> {
       _pendingDocuments.clear();
       _isLoading = true;
       _streamingContent = '';
+      _imageGenerations = [];
+      _imageResultsMap.clear();
+      _videoGenerations = [];
+      _videoResultsMap.clear();
     });
     _scrollToBottom();
 
@@ -312,17 +327,118 @@ class _AiChatPageState extends State<AiChatPage> {
           _scrollToBottom();
         }
       },
+      onImageGenerating: (ig) {
+        if (mounted) {
+          setState(() => _imageGenerations.add(ig));
+          _scrollToBottom();
+        }
+      },
+      onImageGenerated: (ig) {
+        if (mounted) {
+          _imageResultsMap[ig.index] = ig;
+          setState(() {
+            final idx = _imageGenerations.indexWhere((e) => e.index == ig.index);
+            if (idx >= 0) {
+              _imageGenerations[idx].status = 'done';
+              _imageGenerations[idx].url = ig.url;
+            }
+          });
+          _scrollToBottom();
+        }
+      },
+      onImageError: (ig) {
+        if (mounted) {
+          _imageResultsMap[ig.index] = ig;
+          setState(() {
+            final idx = _imageGenerations.indexWhere((e) => e.index == ig.index);
+            if (idx >= 0) {
+              _imageGenerations[idx].status = 'error';
+              _imageGenerations[idx].error = ig.error;
+            }
+          });
+        }
+      },
+      onVideoGenerating: (vg) {
+        if (mounted) {
+          setState(() => _videoGenerations.add(vg));
+          _scrollToBottom();
+        }
+      },
+      onVideoGenerated: (vg) {
+        if (mounted) {
+          _videoResultsMap[vg.index] = vg;
+          setState(() {
+            final idx = _videoGenerations.indexWhere((e) => e.index == vg.index);
+            if (idx >= 0) {
+              _videoGenerations[idx].status = 'done';
+              _videoGenerations[idx].url = vg.url;
+            }
+          });
+          _scrollToBottom();
+        }
+      },
+      onVideoError: (vg) {
+        if (mounted) {
+          _videoResultsMap[vg.index] = vg;
+          setState(() {
+            final idx = _videoGenerations.indexWhere((e) => e.index == vg.index);
+            if (idx >= 0) {
+              _videoGenerations[idx].status = 'error';
+              _videoGenerations[idx].error = vg.error;
+            }
+          });
+        }
+      },
       onDone: () {
         if (mounted) {
           setState(() {
             if (_streamingContent.isNotEmpty) {
+              // 用实际图片URL替换 <<IMAGE_GEN:...>> 和 <<IMAGE_REF:...>> 标记
+              String finalContent = _streamingContent;
+              if (_imageResultsMap.isNotEmpty) {
+                int idx = 0;
+                finalContent = finalContent.replaceAllMapped(
+                  RegExp(r'<<IMAGE_(?:GEN|REF):(.+?)>>'),
+                  (match) {
+                    idx++;
+                    final result = _imageResultsMap[idx];
+                    if (result?.url != null) {
+                      return '\n![AI生成图片](${result!.url})\n';
+                    } else if (result?.error != null) {
+                      return '\n[图片生成失败: ${result!.error}]\n';
+                    }
+                    return '\n[图片生成中: ${match.group(1)?.trim()}]\n';
+                  },
+                );
+              }
+              // 用实际视频URL替换 <<VIDEO_GEN:...>> 标记
+              if (_videoResultsMap.isNotEmpty) {
+                int vidIdx = 0;
+                finalContent = finalContent.replaceAllMapped(
+                  RegExp(r'<<VIDEO_GEN:(.+?)>>'),
+                  (match) {
+                    vidIdx++;
+                    final result = _videoResultsMap[vidIdx];
+                    if (result?.url != null) {
+                      return '\n[点击播放 AI 生成视频](${result!.url})\n';
+                    } else if (result?.error != null) {
+                      return '\n[视频生成失败: ${result!.error}]\n';
+                    }
+                    return '\n[视频生成中: ${match.group(1)?.trim()}]\n';
+                  },
+                );
+              }
               _messages.add(AiChatMessage(
                 role: 'assistant',
-                content: _streamingContent,
+                content: finalContent,
               ));
             }
             _streamingContent = '';
             _isLoading = false;
+            _imageGenerations = [];
+            _imageResultsMap.clear();
+            _videoGenerations = [];
+            _videoResultsMap.clear();
           });
           _scrollToBottom();
           if (_messages.length <= 3) {
@@ -341,6 +457,10 @@ class _AiChatPageState extends State<AiChatPage> {
               ));
               _streamingContent = '';
             }
+            _imageGenerations = [];
+            _imageResultsMap.clear();
+            _videoGenerations = [];
+            _videoResultsMap.clear();
           });
           NovaMessage.error(context, '请求失败，请重试');
         }
@@ -455,7 +575,12 @@ class _AiChatPageState extends State<AiChatPage> {
   }
 
   Widget _buildMessageList(AppColors colors) {
-    final itemCount = _messages.length + (_streamingContent.isNotEmpty ? 1 : 0);
+    // 计算总 item 数：消息 + 流式消息 + 生成卡片
+    final hasStreaming = _streamingContent.isNotEmpty;
+    final hasGenCards = (_imageGenerations.isNotEmpty || _videoGenerations.isNotEmpty) && hasStreaming;
+    int itemCount = _messages.length;
+    if (hasStreaming) itemCount++;
+    if (hasGenCards) itemCount++;
 
     if (itemCount == 0) {
       return _buildEmptyState(colors);
@@ -467,7 +592,12 @@ class _AiChatPageState extends State<AiChatPage> {
       itemCount: itemCount,
       physics: const BouncingScrollPhysics(),
       itemBuilder: (context, index) {
-        if (index == _messages.length && _streamingContent.isNotEmpty) {
+        // 正常消息
+        if (index < _messages.length) {
+          return _buildMessageItem(_messages[index], colors);
+        }
+        // 流式消息
+        if (hasStreaming && index == _messages.length) {
           return _buildMessageItem(
             AiChatMessage(
               role: 'assistant',
@@ -477,7 +607,11 @@ class _AiChatPageState extends State<AiChatPage> {
             colors,
           );
         }
-        return _buildMessageItem(_messages[index], colors);
+        // 生成卡片（图片 + 视频）
+        if (hasGenCards) {
+          return _buildGenerationCards(colors);
+        }
+        return const SizedBox.shrink();
       },
     );
   }
@@ -849,6 +983,480 @@ class _AiChatPageState extends State<AiChatPage> {
         ),
       ],
     );
+  }
+
+  // ==================== 生成状态卡片（图片 + 视频） ====================
+
+  Widget _buildGenerationCards(AppColors colors) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 36, bottom: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ..._imageGenerations.map((ig) => _buildImageGenCard(ig, colors)),
+          ..._videoGenerations.map((vg) => _buildVideoGenCard(vg, colors)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildImageGenCard(ImageGeneration ig, AppColors colors) {
+    final isDark = context.isDarkMode;
+    final cardKey = 'img_${ig.index}';
+    final isExpanded = _expandedGenCards.contains(cardKey);
+
+    if (ig.status == 'generating') {
+      return Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            GestureDetector(
+              onTap: () => setState(() {
+                isExpanded ? _expandedGenCards.remove(cardKey) : _expandedGenCards.add(cardKey);
+              }),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                decoration: BoxDecoration(
+                  color: AppTheme.brand.withOpacity(isDark ? 0.15 : 0.06),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: AppTheme.brand.withOpacity(isDark ? 0.3 : 0.15)),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 32,
+                      height: 32,
+                      decoration: BoxDecoration(
+                        color: AppTheme.brand.withOpacity(isDark ? 0.25 : 0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Center(
+                        child: SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(AppTheme.brand),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        '正在生成图片...',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: AppTheme.brand,
+                        ),
+                      ),
+                    ),
+                    Icon(
+                      isExpanded ? Icons.expand_less : Icons.expand_more,
+                      size: 18,
+                      color: AppTheme.brand.withOpacity(0.6),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            if (isExpanded)
+              Padding(
+                padding: const EdgeInsets.only(left: 14, top: 6, right: 14),
+                child: Text(
+                  ig.prompt,
+                  style: TextStyle(fontSize: 11, color: colors.textTertiary),
+                ),
+              ),
+          ],
+        ),
+      );
+    }
+
+    if (ig.status == 'done' && ig.url != null) {
+      return Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(14),
+              child: Image.network(
+                ig.url!,
+                width: 260,
+                fit: BoxFit.cover,
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Container(
+                    width: 260,
+                    height: 180,
+                    decoration: BoxDecoration(
+                      color: colors.surfaceVariant,
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        value: loadingProgress.expectedTotalBytes != null
+                            ? loadingProgress.cumulativeBytesLoaded /
+                                loadingProgress.expectedTotalBytes!
+                            : null,
+                        valueColor: AlwaysStoppedAnimation<Color>(AppTheme.brand),
+                      ),
+                    ),
+                  );
+                },
+                errorBuilder: (_, __, ___) => Container(
+                  width: 260,
+                  height: 120,
+                  decoration: BoxDecoration(
+                    color: colors.surfaceVariant,
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Center(
+                    child: Icon(Icons.broken_image_outlined,
+                        color: colors.textTertiary, size: 32),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 4),
+            GestureDetector(
+              onTap: () => setState(() {
+                isExpanded ? _expandedGenCards.remove(cardKey) : _expandedGenCards.add(cardKey);
+              }),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 2),
+                child: Row(
+                  children: [
+                    Icon(Icons.palette_outlined,
+                        size: 12, color: colors.textTertiary),
+                    const SizedBox(width: 4),
+                    Text(
+                      '图片提示词',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: colors.textTertiary,
+                      ),
+                    ),
+                    Icon(
+                      isExpanded ? Icons.expand_less : Icons.expand_more,
+                      size: 14,
+                      color: colors.textTertiary,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            if (isExpanded)
+              Padding(
+                padding: const EdgeInsets.only(left: 2, top: 4),
+                child: Text(
+                  ig.prompt,
+                  style: TextStyle(fontSize: 11, color: colors.textTertiary),
+                ),
+              ),
+          ],
+        ),
+      );
+    }
+
+    if (ig.status == 'error') {
+      return Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            GestureDetector(
+              onTap: () => setState(() {
+                isExpanded ? _expandedGenCards.remove(cardKey) : _expandedGenCards.add(cardKey);
+              }),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                decoration: BoxDecoration(
+                  color: colors.error.withOpacity(isDark ? 0.15 : 0.06),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: colors.error.withOpacity(isDark ? 0.3 : 0.15)),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 32,
+                      height: 32,
+                      decoration: BoxDecoration(
+                        color: colors.error.withOpacity(isDark ? 0.25 : 0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(Icons.palette_outlined,
+                          color: colors.error, size: 16),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '图片生成失败',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: colors.error,
+                            ),
+                          ),
+                          Text(
+                            ig.error ?? '未知错误',
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: colors.error.withOpacity(0.7),
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                    Icon(
+                      isExpanded ? Icons.expand_less : Icons.expand_more,
+                      size: 18,
+                      color: colors.error.withOpacity(0.6),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            if (isExpanded)
+              Padding(
+                padding: const EdgeInsets.only(left: 14, top: 6, right: 14),
+                child: Text(
+                  ig.prompt,
+                  style: TextStyle(fontSize: 11, color: colors.textTertiary),
+                ),
+              ),
+          ],
+        ),
+      );
+    }
+
+    return const SizedBox.shrink();
+  }
+
+  Widget _buildVideoGenCard(VideoGeneration vg, AppColors colors) {
+    final isDark = context.isDarkMode;
+    const videoColor = Colors.purple;
+    final cardKey = 'vid_${vg.index}';
+    final isExpanded = _expandedGenCards.contains(cardKey);
+
+    if (vg.status == 'generating') {
+      return Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            GestureDetector(
+              onTap: () => setState(() {
+                isExpanded ? _expandedGenCards.remove(cardKey) : _expandedGenCards.add(cardKey);
+              }),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                decoration: BoxDecoration(
+                  color: videoColor.withOpacity(isDark ? 0.15 : 0.06),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: videoColor.withOpacity(isDark ? 0.3 : 0.15)),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 32,
+                      height: 32,
+                      decoration: BoxDecoration(
+                        color: videoColor.withOpacity(isDark ? 0.25 : 0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Center(
+                        child: SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(videoColor),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        '正在生成视频...',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: videoColor,
+                        ),
+                      ),
+                    ),
+                    Icon(
+                      isExpanded ? Icons.expand_less : Icons.expand_more,
+                      size: 18,
+                      color: videoColor.withOpacity(0.6),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            if (isExpanded)
+              Padding(
+                padding: const EdgeInsets.only(left: 14, top: 6, right: 14),
+                child: Text(
+                  vg.prompt,
+                  style: TextStyle(fontSize: 11, color: colors.textTertiary),
+                ),
+              ),
+          ],
+        ),
+      );
+    }
+
+    if (vg.status == 'done' && vg.url != null) {
+      return Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            GestureDetector(
+              onTap: () => setState(() {
+                isExpanded ? _expandedGenCards.remove(cardKey) : _expandedGenCards.add(cardKey);
+              }),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                decoration: BoxDecoration(
+                  color: videoColor.withOpacity(isDark ? 0.15 : 0.06),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: videoColor.withOpacity(isDark ? 0.3 : 0.15)),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 32,
+                      height: 32,
+                      decoration: BoxDecoration(
+                        color: videoColor.withOpacity(isDark ? 0.25 : 0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(Icons.play_circle_outline,
+                          color: videoColor, size: 18),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        '视频生成完成',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: videoColor,
+                        ),
+                      ),
+                    ),
+                    Icon(
+                      isExpanded ? Icons.expand_less : Icons.expand_more,
+                      size: 18,
+                      color: videoColor.withOpacity(0.6),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            if (isExpanded)
+              Padding(
+                padding: const EdgeInsets.only(left: 14, top: 6, right: 14),
+                child: Text(
+                  vg.prompt,
+                  style: TextStyle(fontSize: 11, color: colors.textTertiary),
+                ),
+              ),
+          ],
+        ),
+      );
+    }
+
+    if (vg.status == 'error') {
+      return Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            GestureDetector(
+              onTap: () => setState(() {
+                isExpanded ? _expandedGenCards.remove(cardKey) : _expandedGenCards.add(cardKey);
+              }),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                decoration: BoxDecoration(
+                  color: colors.error.withOpacity(isDark ? 0.15 : 0.06),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: colors.error.withOpacity(isDark ? 0.3 : 0.15)),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 32,
+                      height: 32,
+                      decoration: BoxDecoration(
+                        color: colors.error.withOpacity(isDark ? 0.25 : 0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(Icons.videocam_off_outlined,
+                          color: colors.error, size: 16),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '视频生成失败',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: colors.error,
+                            ),
+                          ),
+                          Text(
+                            vg.error ?? '未知错误',
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: colors.error.withOpacity(0.7),
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                    Icon(
+                      isExpanded ? Icons.expand_less : Icons.expand_more,
+                      size: 18,
+                      color: colors.error.withOpacity(0.6),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            if (isExpanded)
+              Padding(
+                padding: const EdgeInsets.only(left: 14, top: 6, right: 14),
+                child: Text(
+                  vg.prompt,
+                  style: TextStyle(fontSize: 11, color: colors.textTertiary),
+                ),
+              ),
+          ],
+        ),
+      );
+    }
+
+    return const SizedBox.shrink();
   }
 
   Widget _buildInputArea(AppColors colors) {

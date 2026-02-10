@@ -22,6 +22,7 @@ part 'group_message_item.g.dart';
 /// * [type]
 /// * [replyTo]
 /// * [createTime]
+/// * [readCount]
 @BuiltValue()
 abstract class GroupMessageItem
     implements Built<GroupMessageItem, GroupMessageItemBuilder> {
@@ -57,6 +58,9 @@ abstract class GroupMessageItem
 
   @BuiltValueField(wireName: r'createTime')
   DateTime? get createTime;
+
+  @BuiltValueField(wireName: r'readCount')
+  int? get readCount;
 
   GroupMessageItem._();
 
@@ -161,6 +165,13 @@ class _$GroupMessageItemSerializer
         specifiedType: const FullType(DateTime),
       );
     }
+    if (object.readCount != null) {
+      yield r'readCount';
+      yield serializers.serialize(
+        object.readCount,
+        specifiedType: const FullType(int),
+      );
+    }
   }
 
   @override
@@ -262,6 +273,13 @@ class _$GroupMessageItemSerializer
             specifiedType: const FullType(DateTime),
           ) as DateTime;
           result.createTime = valueDes;
+          break;
+        case r'readCount':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(int),
+          ) as int;
+          result.readCount = valueDes;
           break;
         default:
           unhandled.add(key);

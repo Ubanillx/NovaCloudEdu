@@ -17,7 +17,6 @@ import '../daily_word/services/daily_word_storage_service.dart';
 import 'announcement_list_page.dart';
 import '../daily_word/pages/daily_word_page.dart';
 import '../daily_article/daily_article.dart';
-import '../daily_article/services/daily_article_service.dart';
 
 /// 首页 - 参考smartclass Home.vue
 class HomePage extends StatefulWidget {
