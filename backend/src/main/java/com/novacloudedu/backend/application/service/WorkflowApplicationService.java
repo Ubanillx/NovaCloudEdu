@@ -1,10 +1,8 @@
 package com.novacloudedu.backend.application.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.novacloudedu.backend.domain.ai.entity.Workflow;
-import com.novacloudedu.backend.domain.ai.entity.WorkflowExecution;
-import com.novacloudedu.backend.domain.ai.entity.WorkflowExecutionLog;
-import com.novacloudedu.backend.domain.ai.repository.WorkflowRepository;
+import com.novacloudedu.backend.domain.ai.entity.*;
+import com.novacloudedu.backend.domain.ai.repository.*;
 import com.novacloudedu.backend.domain.ai.service.WorkflowEngine;
 import com.novacloudedu.backend.domain.ai.service.WorkflowLogService;
 import com.novacloudedu.backend.domain.ai.valueobject.*;
@@ -27,6 +25,11 @@ import java.util.stream.Collectors;
 public class WorkflowApplicationService {
 
     private final WorkflowRepository workflowRepository;
+    private final WorkflowExecutionRepository executionRepository;
+    private final WorkflowTemplateRepository templateRepository;
+    private final WorkflowTriggerRepository triggerRepository;
+    private final WorkflowVersionRepository versionRepository;
+    private final AiAssistantWorkflowRepository assistantWorkflowRepository;
     private final WorkflowEngine workflowEngine;
     private final WorkflowLogService logService;
     private final ObjectMapper objectMapper;
@@ -197,6 +200,38 @@ public class WorkflowApplicationService {
         return logs.stream().map(this::toLogVO).collect(Collectors.toList());
     }
 
+    /**
+     * 获取执行日志（按级别过滤）
+     */
+    public List<ExecutionLogVO> getExecutionLogsByLevel(String executionId, String level) {
+        LogLevel logLevel = LogLevel.valueOf(level.toUpperCase());
+        List<WorkflowExecutionLog> logs = logService.findByLevel(WorkflowExecutionId.of(executionId), logLevel);
+        return logs.stream().map(this::toLogVO).collect(Collectors.toList());
+    }
+
+    /**
+     * 获取工作流的执行历史列表
+     */
+    public List<ExecutionResultVO> listExecutions(Long workflowId, int page, int size) {
+        List<WorkflowExecution> executions = executionRepository.findByWorkflowId(WorkflowId.of(workflowId), page, size);
+        return executions.stream().map(this::toExecutionResultVO).collect(Collectors.toList());
+    }
+
+    /**
+     * 获取工作流的执行统计
+     */
+    public ExecutionStatisticsVO getExecutionStatistics(Long workflowId) {
+        WorkflowExecutionRepository.ExecutionStatistics stats = executionRepository.getStatistics(WorkflowId.of(workflowId));
+        ExecutionStatisticsVO vo = new ExecutionStatisticsVO();
+        vo.setTotalCount(stats.totalCount());
+        vo.setSuccessCount(stats.successCount());
+        vo.setFailedCount(stats.failedCount());
+        vo.setCancelledCount(stats.cancelledCount());
+        vo.setAvgDurationMs(stats.avgDurationMs());
+        vo.setSuccessRate(stats.successRate());
+        return vo;
+    }
+
     // ==================== 工作流定义编辑方法 ====================
 
     /**
@@ -225,7 +260,7 @@ public class WorkflowApplicationService {
         return switch (type) {
             case START, WEBHOOK, SCHEDULE -> "触发节点";
             case LLM, KNOWLEDGE_RETRIEVAL, TEXT_EMBEDDING, INTENT_RECOGNITION, ENTITY_EXTRACTION -> "AI节点";
-            case CONDITION, SWITCH, LOOP, PARALLEL, MERGE -> "逻辑节点";
+            case CONDITION, SWITCH, LOOP, LOOP_START, LOOP_END, PARALLEL, MERGE -> "\u903b\u8f91\u8282\u70b9";
             case VARIABLE_SET, VARIABLE_GET, JSON_PARSE, TEMPLATE, CODE -> "数据处理节点";
             case HTTP_REQUEST, DATABASE_QUERY, FILE_READ, FILE_WRITE -> "集成节点";
             case RESPONSE, END -> "输出节点";
@@ -764,6 +799,7 @@ public class WorkflowApplicationService {
         vo.setExecutionId(execution.getId().value());
         vo.setWorkflowId(execution.getWorkflowId().value());
         vo.setWorkflowName(execution.getWorkflowName());
+        vo.setWorkflowVersion(execution.getWorkflowVersion());
         vo.setStatus(execution.getStatus().name());
         vo.setInput(execution.getInput());
         vo.setOutput(execution.getOutput());
@@ -773,6 +809,26 @@ public class WorkflowApplicationService {
         vo.setStartTime(execution.getStartTime());
         vo.setEndTime(execution.getEndTime());
         vo.setDurationMs(execution.getDurationMs());
+
+        // 映射节点执行详情（调试数据）
+        if (execution.getNodeExecutions() != null) {
+            java.util.List<NodeExecutionVO> neList = new java.util.ArrayList<>();
+            for (com.novacloudedu.backend.domain.ai.entity.WorkflowExecution.NodeExecution ne : execution.getNodeExecutions()) {
+                NodeExecutionVO neVO = new NodeExecutionVO();
+                neVO.setNodeId(ne.getNodeId());
+                neVO.setNodeName(ne.getNodeName());
+                neVO.setNodeType(ne.getNodeType() != null ? ne.getNodeType().name() : null);
+                neVO.setStatus(ne.getStatus() != null ? ne.getStatus().name() : null);
+                neVO.setInput(ne.getInput());
+                neVO.setOutput(ne.getOutput());
+                neVO.setErrorMessage(ne.getErrorMessage());
+                neVO.setStartTime(ne.getStartTime());
+                neVO.setEndTime(ne.getEndTime());
+                neVO.setDurationMs(ne.getDurationMs());
+                neList.add(neVO);
+            }
+            vo.setNodeExecutions(neList);
+        }
         return vo;
     }
 
@@ -808,11 +864,27 @@ public class WorkflowApplicationService {
         private String executionId;
         private Long workflowId;
         private String workflowName;
+        private int workflowVersion;
         private String status;
         private Map<String, Object> input;
         private Map<String, Object> output;
         private Map<String, Object> variables;
         private String currentNodeId;
+        private String errorMessage;
+        private java.time.LocalDateTime startTime;
+        private java.time.LocalDateTime endTime;
+        private long durationMs;
+        private java.util.List<NodeExecutionVO> nodeExecutions;
+    }
+
+    @lombok.Data
+    public static class NodeExecutionVO {
+        private String nodeId;
+        private String nodeName;
+        private String nodeType;
+        private String status;
+        private Map<String, Object> input;
+        private Map<String, Object> output;
         private String errorMessage;
         private java.time.LocalDateTime startTime;
         private java.time.LocalDateTime endTime;
@@ -910,5 +982,393 @@ public class WorkflowApplicationService {
         private String code;
         private String message;
         private String nodeId;
+    }
+
+    @lombok.Data
+    public static class ExecutionStatisticsVO {
+        private long totalCount;
+        private long successCount;
+        private long failedCount;
+        private long cancelledCount;
+        private double avgDurationMs;
+        private double successRate;
+    }
+
+    // ==================== 工作流模板 ====================
+
+    /**
+     * 获取公开模板列表
+     */
+    public List<WorkflowTemplateVO> listPublicTemplates(int page, int size) {
+        return templateRepository.findPublicTemplates(page, size).stream()
+                .map(this::toTemplateVO).collect(Collectors.toList());
+    }
+
+    /**
+     * 获取系统预置模板
+     */
+    public List<WorkflowTemplateVO> listSystemTemplates() {
+        return templateRepository.findSystemTemplates().stream()
+                .map(this::toTemplateVO).collect(Collectors.toList());
+    }
+
+    /**
+     * 搜索模板
+     */
+    public List<WorkflowTemplateVO> searchTemplates(String keyword, String category, Long currentUserId, int page, int size) {
+        return templateRepository.search(keyword, category, currentUserId, page, size).stream()
+                .map(this::toTemplateVO).collect(Collectors.toList());
+    }
+
+    /**
+     * 获取模板详情
+     */
+    public WorkflowTemplateVO getTemplate(Long id) {
+        WorkflowTemplate template = templateRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("模板不存在: " + id));
+        return toTemplateVO(template);
+    }
+
+    /**
+     * 从模板创建工作流
+     */
+    @Transactional
+    public WorkflowVO createFromTemplate(Long templateId, String name, String description, Long userId) {
+        log.info("从模板创建工作流: templateId={}, userId={}", templateId, userId);
+        WorkflowTemplate template = templateRepository.findById(templateId)
+                .orElseThrow(() -> new IllegalArgumentException("模板不存在: " + templateId));
+        Workflow workflow = template.createWorkflow(name, description, UserId.of(userId));
+        workflowRepository.save(workflow);
+        templateRepository.update(template);
+        return toVO(workflow);
+    }
+
+    /**
+     * 创建模板（用户自建）
+     */
+    @Transactional
+    public WorkflowTemplateVO createTemplate(String name, String description, String category,
+                                              Long fromWorkflowId, Long userId) {
+        log.info("创建模板: name={}, fromWorkflowId={}", name, fromWorkflowId);
+        Workflow workflow = workflowRepository.findById(WorkflowId.of(fromWorkflowId))
+                .orElseThrow(() -> new IllegalArgumentException("工作流不存在: " + fromWorkflowId));
+        WorkflowTemplate template = WorkflowTemplate.create(
+                name, description, category, workflow.getDefinition().copy(), userId);
+        templateRepository.save(template);
+        return toTemplateVO(template);
+    }
+
+    /**
+     * 更新模板
+     */
+    @Transactional
+    public WorkflowTemplateVO updateTemplate(Long id, String name, String description,
+                                              String category, List<String> tags) {
+        WorkflowTemplate template = templateRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("模板不存在: " + id));
+        template.update(name, description, category, tags);
+        templateRepository.update(template);
+        return toTemplateVO(template);
+    }
+
+    /**
+     * 删除模板
+     */
+    @Transactional
+    public void deleteTemplate(Long id) {
+        templateRepository.delete(id);
+    }
+
+    private WorkflowTemplateVO toTemplateVO(WorkflowTemplate t) {
+        WorkflowTemplateVO vo = new WorkflowTemplateVO();
+        vo.setId(t.getId());
+        vo.setName(t.getName());
+        vo.setDescription(t.getDescription());
+        vo.setCategory(t.getCategory());
+        vo.setIcon(t.getIcon());
+        vo.setTags(t.getTags());
+        vo.setSystem(t.isSystem());
+        vo.setPublic(t.isPublic());
+        vo.setCreatorId(t.getCreatorId());
+        vo.setUsageCount(t.getUsageCount());
+        vo.setCreateTime(t.getCreateTime());
+        try {
+            vo.setDefinition(objectMapper.writeValueAsString(t.getDefinition()));
+        } catch (Exception e) {
+            vo.setDefinition("{}");
+        }
+        return vo;
+    }
+
+    @lombok.Data
+    public static class WorkflowTemplateVO {
+        private Long id;
+        private String name;
+        private String description;
+        private String category;
+        private String icon;
+        private String definition;
+        private List<String> tags;
+        private boolean isSystem;
+        private boolean isPublic;
+        private Long creatorId;
+        private int usageCount;
+        private java.time.LocalDateTime createTime;
+    }
+
+    // ==================== 工作流触发器 ====================
+
+    /**
+     * 获取工作流的触发器列表
+     */
+    public List<WorkflowTriggerVO> listTriggers(Long workflowId) {
+        return triggerRepository.findByWorkflowId(WorkflowId.of(workflowId)).stream()
+                .map(this::toTriggerVO).collect(Collectors.toList());
+    }
+
+    /**
+     * 获取触发器详情
+     */
+    public WorkflowTriggerVO getTrigger(Long id) {
+        WorkflowTrigger trigger = triggerRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("触发器不存在: " + id));
+        return toTriggerVO(trigger);
+    }
+
+    /**
+     * 创建定时触发器
+     */
+    @Transactional
+    public WorkflowTriggerVO createScheduleTrigger(Long workflowId, String name,
+                                                     String cronExpression, String timezone) {
+        log.info("创建定时触发器: workflowId={}, name={}", workflowId, name);
+        WorkflowTrigger trigger = WorkflowTrigger.createScheduleTrigger(
+                WorkflowId.of(workflowId), name, cronExpression, timezone);
+        triggerRepository.save(trigger);
+        return toTriggerVO(trigger);
+    }
+
+    /**
+     * 创建 Webhook 触发器
+     */
+    @Transactional
+    public WorkflowTriggerVO createWebhookTrigger(Long workflowId, String name,
+                                                    String secret, boolean validateSignature) {
+        log.info("创建Webhook触发器: workflowId={}, name={}", workflowId, name);
+        WorkflowTrigger trigger = WorkflowTrigger.createWebhookTrigger(
+                WorkflowId.of(workflowId), name, secret, validateSignature);
+        triggerRepository.save(trigger);
+        return toTriggerVO(trigger);
+    }
+
+    /**
+     * 创建事件触发器
+     */
+    @Transactional
+    public WorkflowTriggerVO createEventTrigger(Long workflowId, String name,
+                                                  String eventType, Map<String, Object> filter) {
+        log.info("创建事件触发器: workflowId={}, name={}", workflowId, name);
+        WorkflowTrigger trigger = WorkflowTrigger.createEventTrigger(
+                WorkflowId.of(workflowId), name, eventType, filter);
+        triggerRepository.save(trigger);
+        return toTriggerVO(trigger);
+    }
+
+    /**
+     * 启用触发器
+     */
+    @Transactional
+    public WorkflowTriggerVO enableTrigger(Long id) {
+        WorkflowTrigger trigger = triggerRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("触发器不存在: " + id));
+        trigger.enable();
+        triggerRepository.update(trigger);
+        return toTriggerVO(trigger);
+    }
+
+    /**
+     * 禁用触发器
+     */
+    @Transactional
+    public WorkflowTriggerVO disableTrigger(Long id) {
+        WorkflowTrigger trigger = triggerRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("触发器不存在: " + id));
+        trigger.disable();
+        triggerRepository.update(trigger);
+        return toTriggerVO(trigger);
+    }
+
+    /**
+     * 更新触发器配置
+     */
+    @Transactional
+    public WorkflowTriggerVO updateTriggerConfig(Long id, Map<String, Object> config) {
+        WorkflowTrigger trigger = triggerRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("触发器不存在: " + id));
+        trigger.updateConfig(config);
+        triggerRepository.update(trigger);
+        return toTriggerVO(trigger);
+    }
+
+    /**
+     * 删除触发器
+     */
+    @Transactional
+    public void deleteTrigger(Long id) {
+        triggerRepository.delete(id);
+    }
+
+    private WorkflowTriggerVO toTriggerVO(WorkflowTrigger t) {
+        WorkflowTriggerVO vo = new WorkflowTriggerVO();
+        vo.setId(t.getId());
+        vo.setWorkflowId(t.getWorkflowId().value());
+        vo.setType(t.getType().name());
+        vo.setName(t.getName());
+        vo.setEnabled(t.isEnabled());
+        vo.setConfig(t.getConfig());
+        vo.setLastTriggeredAt(t.getLastTriggeredAt());
+        vo.setTriggerCount(t.getTriggerCount());
+        vo.setCreateTime(t.getCreateTime());
+        return vo;
+    }
+
+    @lombok.Data
+    public static class WorkflowTriggerVO {
+        private Long id;
+        private Long workflowId;
+        private String type;
+        private String name;
+        private boolean enabled;
+        private Map<String, Object> config;
+        private java.time.LocalDateTime lastTriggeredAt;
+        private int triggerCount;
+        private java.time.LocalDateTime createTime;
+    }
+
+    // ==================== 工作流版本历史 ====================
+
+    /**
+     * 获取工作流的版本列表
+     */
+    public List<WorkflowVersionVO> listVersions(Long workflowId) {
+        return versionRepository.findByWorkflowId(WorkflowId.of(workflowId)).stream()
+                .map(this::toVersionVO).collect(Collectors.toList());
+    }
+
+    /**
+     * 获取版本详情
+     */
+    public WorkflowVersionVO getVersion(Long id) {
+        WorkflowVersion version = versionRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("版本不存在: " + id));
+        return toVersionVO(version);
+    }
+
+    /**
+     * 获取指定工作流的指定版本
+     */
+    public WorkflowVersionVO getVersionByNumber(Long workflowId, int versionNumber) {
+        WorkflowVersion version = versionRepository.findByWorkflowIdAndVersion(
+                        WorkflowId.of(workflowId), versionNumber)
+                .orElseThrow(() -> new IllegalArgumentException("版本不存在: workflowId=" + workflowId + ", version=" + versionNumber));
+        return toVersionVO(version);
+    }
+
+    /**
+     * 发布工作流时创建版本快照
+     */
+    @Transactional
+    public WorkflowVersionVO createVersionSnapshot(Long workflowId, String publishNote, Long userId) {
+        log.info("创建版本快照: workflowId={}, userId={}", workflowId, userId);
+        Workflow workflow = workflowRepository.findById(WorkflowId.of(workflowId))
+                .orElseThrow(() -> new IllegalArgumentException("工作流不存在: " + workflowId));
+        WorkflowVersion version = WorkflowVersion.create(
+                workflow.getId(), workflow.getVersion(),
+                workflow.getName(), workflow.getDescription(),
+                workflow.getDefinition().copy(),
+                publishNote, UserId.of(userId));
+        versionRepository.save(version);
+        return toVersionVO(version);
+    }
+
+    /**
+     * 回滚到指定版本
+     */
+    @Transactional
+    public WorkflowVO rollbackToVersion(Long workflowId, int versionNumber) {
+        log.info("回滚工作流版本: workflowId={}, version={}", workflowId, versionNumber);
+        Workflow workflow = workflowRepository.findById(WorkflowId.of(workflowId))
+                .orElseThrow(() -> new IllegalArgumentException("工作流不存在: " + workflowId));
+        WorkflowVersion version = versionRepository.findByWorkflowIdAndVersion(
+                        WorkflowId.of(workflowId), versionNumber)
+                .orElseThrow(() -> new IllegalArgumentException("版本不存在: " + versionNumber));
+        workflow.updateDefinition(version.getDefinition().copy());
+        workflowRepository.update(workflow);
+        return toVO(workflow);
+    }
+
+    private WorkflowVersionVO toVersionVO(WorkflowVersion v) {
+        WorkflowVersionVO vo = new WorkflowVersionVO();
+        vo.setId(v.getId());
+        vo.setWorkflowId(v.getWorkflowId().value());
+        vo.setVersion(v.getVersion());
+        vo.setName(v.getName());
+        vo.setDescription(v.getDescription());
+        vo.setPublishNote(v.getPublishNote());
+        vo.setPublishedBy(v.getPublishedBy().value());
+        vo.setCreateTime(v.getCreateTime());
+        try {
+            vo.setDefinition(objectMapper.writeValueAsString(v.getDefinition()));
+        } catch (Exception e) {
+            vo.setDefinition("{}");
+        }
+        return vo;
+    }
+
+    @lombok.Data
+    public static class WorkflowVersionVO {
+        private Long id;
+        private Long workflowId;
+        private int version;
+        private String name;
+        private String description;
+        private String definition;
+        private String publishNote;
+        private Long publishedBy;
+        private java.time.LocalDateTime createTime;
+    }
+
+    // ==================== AI助手工作流关联 ====================
+
+    /**
+     * 绑定工作流到 AI 助手
+     */
+    @Transactional
+    public void bindWorkflowToAssistant(Long assistantId, Long workflowId) {
+        log.info("绑定工作流到AI助手: assistantId={}, workflowId={}", assistantId, workflowId);
+        assistantWorkflowRepository.bindWorkflow(assistantId, workflowId);
+    }
+
+    /**
+     * 解绑工作流
+     */
+    @Transactional
+    public void unbindWorkflowFromAssistant(Long assistantId, Long workflowId) {
+        log.info("解绑AI助手工作流: assistantId={}, workflowId={}", assistantId, workflowId);
+        assistantWorkflowRepository.unbindWorkflow(assistantId, workflowId);
+    }
+
+    /**
+     * 获取AI助手关联的工作流ID列表
+     */
+    public List<Long> getAssistantWorkflowIds(Long assistantId) {
+        return assistantWorkflowRepository.findWorkflowIdsByAssistantId(assistantId);
+    }
+
+    /**
+     * 获取使用指定工作流的助手ID列表
+     */
+    public List<Long> getWorkflowAssistantIds(Long workflowId) {
+        return assistantWorkflowRepository.findAssistantIdsByWorkflowId(workflowId);
     }
 }
