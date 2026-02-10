@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, User, Mail, Phone, Calendar, Edit3, Save,
   Shield, Clock, Flame, Heart, Camera, Loader2, MapPin, Cake,
-  X, Hash, UserCheck, Ban, RefreshCw,
+  X, Hash, UserCheck, Ban, RefreshCw, BookMarked, ChevronRight,
 } from 'lucide-react';
 import { apiClient, DefaultApi, Configuration } from '../api';
 import type { UserDetailResponse, UpdateProfileRequest, UserStatsResult } from '../api/generated/models';
@@ -436,6 +436,42 @@ const ProfilePage: React.FC = () => {
           <StatCard icon={<Flame size={18} className="text-red-500" />} label="累计打卡" value={`${stats?.totalCheckinDays ?? 0}`} unit="天" color="red" />
           <StatCard icon={<Flame size={18} className="text-amber-500" />} label="连续打卡" value={`${stats?.currentStreak ?? 0}`} unit="天" color="amber" />
           <StatCard icon={<Heart size={18} className="text-pink-500" />} label="获赞总数" value={`${stats?.totalLikes ?? 0}`} unit="" color="pink" />
+        </div>
+      </div>
+
+      {/* ==================== 快捷入口 ==================== */}
+      <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm p-5">
+        <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+          <span className="w-1 h-4 bg-brand-600 rounded-full" />
+          我的工具
+        </h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <button
+            onClick={() => navigate('/word-book')}
+            className="flex items-center gap-3 p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-colors text-left group"
+          >
+            <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-800/30 flex items-center justify-center flex-shrink-0">
+              <BookMarked size={20} className="text-amber-600 dark:text-amber-400" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-bold text-gray-900 dark:text-white">生词本</p>
+              <p className="text-[11px] text-gray-500 dark:text-gray-400">收藏的单词，随时复习</p>
+            </div>
+            <ChevronRight size={16} className="text-gray-400 group-hover:text-amber-600 dark:group-hover:text-amber-400 group-hover:translate-x-0.5 transition-all" />
+          </button>
+          <button
+            onClick={() => navigate('/daily-words')}
+            className="flex items-center gap-3 p-3 rounded-xl bg-brand-50 dark:bg-brand-900/20 hover:bg-brand-100 dark:hover:bg-brand-900/30 transition-colors text-left group"
+          >
+            <div className="w-10 h-10 rounded-xl bg-brand-100 dark:bg-brand-800/30 flex items-center justify-center flex-shrink-0">
+              <BookMarked size={20} className="text-brand-600 dark:text-brand-400" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-bold text-gray-900 dark:text-white">每日单词</p>
+              <p className="text-[11px] text-gray-500 dark:text-gray-400">每天学习新单词</p>
+            </div>
+            <ChevronRight size={16} className="text-gray-400 group-hover:text-brand-600 dark:group-hover:text-brand-400 group-hover:translate-x-0.5 transition-all" />
+          </button>
         </div>
       </div>
 

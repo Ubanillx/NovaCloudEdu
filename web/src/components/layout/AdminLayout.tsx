@@ -19,7 +19,10 @@ import {
   Megaphone,
   Image,
   MessageSquare,
-  Newspaper
+  Newspaper,
+  BrainCircuit,
+  Bot,
+  Workflow
 } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { clearTokens } from '../../api';
@@ -62,6 +65,9 @@ const AdminSider: React.FC<AdminSiderProps> = ({
     { icon: Image, label: '轮播图管理', path: '/admin/banners' },
     { icon: MessageSquare, label: '反馈管理', path: '/admin/feedbacks' },
     { icon: Newspaper, label: '帖子管理', path: '/admin/posts' },
+    { icon: Bot, label: 'AI 助手管理', path: '/admin/ai-assistants' },
+    { icon: BrainCircuit, label: '知识库管理', path: '/admin/knowledge-bases' },
+    { icon: Workflow, label: '工作流管理', path: '/admin/workflows' },
     { icon: Globe, label: '抓取配置', path: '/admin/scraper/config' },
     { icon: ListTodo, label: '抓取任务', path: '/admin/scraper/tasks' },
     { icon: Settings, label: '系统设置', path: '/admin/settings' },
