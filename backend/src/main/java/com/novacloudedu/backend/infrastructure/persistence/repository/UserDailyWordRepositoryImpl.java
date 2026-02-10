@@ -102,4 +102,15 @@ public class UserDailyWordRepositoryImpl implements UserDailyWordRepository {
                 .eq(UserDailyWordPO::getIsStudied, 1);
         return userDailyWordMapper.selectCount(wrapper);
     }
+
+    @Override
+    public List<Long> findStudiedWordIdsByUserId(UserId userId) {
+        LambdaQueryWrapper<UserDailyWordPO> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(UserDailyWordPO::getUserId, userId.value())
+                .eq(UserDailyWordPO::getIsStudied, 1)
+                .select(UserDailyWordPO::getWordId);
+        return userDailyWordMapper.selectList(wrapper).stream()
+                .map(UserDailyWordPO::getWordId)
+                .collect(Collectors.toList());
+    }
 }

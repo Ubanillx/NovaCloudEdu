@@ -48,13 +48,14 @@ public class ClassScheduleItem {
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
 
-    public static ClassScheduleItem createCustom(Long settingId, ClassId classId, String courseName, String teacherName, 
+    public static ClassScheduleItem createCustom(Long settingId, ClassId classId, UserId userId, String courseName, String teacherName, 
                                                  String location, Integer dayOfWeek, Integer startSection, 
                                                  Integer endSection, Integer startWeek, Integer endWeek, 
                                                  ScheduleWeekType weekType, String color, String remark) {
         ClassScheduleItem item = new ClassScheduleItem();
         item.settingId = settingId;
         item.classId = classId;
+        item.userId = userId;
         item.courseType = ScheduleCourseType.CUSTOM;
         item.courseName = courseName;
         item.teacherName = teacherName;
@@ -72,13 +73,14 @@ public class ClassScheduleItem {
         return item;
     }
 
-    public static ClassScheduleItem createPlatform(Long settingId, ClassId classId, CourseId courseId, TeacherId teacherId,
+    public static ClassScheduleItem createPlatform(Long settingId, ClassId classId, UserId userId, CourseId courseId, TeacherId teacherId,
                                                    String location, Integer dayOfWeek, Integer startSection,
                                                    Integer endSection, Integer startWeek, Integer endWeek,
                                                    ScheduleWeekType weekType, String color, String remark) {
         ClassScheduleItem item = new ClassScheduleItem();
         item.settingId = settingId;
         item.classId = classId;
+        item.userId = userId;
         item.courseType = ScheduleCourseType.PLATFORM;
         item.courseId = courseId;
         item.teacherId = teacherId;

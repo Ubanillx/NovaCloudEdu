@@ -4,6 +4,7 @@ import com.novacloudedu.backend.application.service.KnowledgeBaseApplicationServ
 import com.novacloudedu.backend.application.ai.command.CreateKnowledgeBaseCommand;
 import com.novacloudedu.backend.application.ai.command.UpdateKnowledgeBaseCommand;
 import com.novacloudedu.backend.application.ai.dto.KnowledgeBaseVO;
+import com.novacloudedu.backend.application.ai.dto.KnowledgeChunkVO;
 import com.novacloudedu.backend.application.ai.dto.KnowledgeDocumentVO;
 import com.novacloudedu.backend.common.BaseResponse;
 import com.novacloudedu.backend.common.ResultUtils;
@@ -220,6 +221,46 @@ public class KnowledgeBaseController {
         } catch (Exception e) {
             log.error("提交异步批量向量化失败", e);
             return (BaseResponse<String>) (BaseResponse<?>) ResultUtils.error(50000, e.getMessage());
+        }
+    }
+
+    @GetMapping("/{id}/documents/{docId}/chunks")
+    @Operation(summary = "获取文档分块列表")
+    public BaseResponse<Map<String, Object>> listChunks(
+            @PathVariable Long id,
+            @PathVariable Long docId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        try {
+            List<KnowledgeChunkVO> chunks = knowledgeBaseService.listChunks(docId, page, size);
+            long total = knowledgeBaseService.countChunks(docId);
+            Map<String, Object> result = Map.of(
+                    "chunks", chunks,
+                    "total", total,
+                    "page", page,
+                    "size", size
+            );
+            return ResultUtils.success(result);
+        } catch (Exception e) {
+            log.error("获取文档分块列表失败", e);
+            return (BaseResponse<Map<String, Object>>) (BaseResponse<?>) ResultUtils.error(50000, e.getMessage());
+        }
+    }
+
+    @PutMapping("/{id}/documents/{docId}")
+    @Operation(summary = "更新文档元信息")
+    public BaseResponse<KnowledgeDocumentVO> updateDocument(
+            @PathVariable Long id,
+            @PathVariable Long docId,
+            @RequestBody Map<String, String> request) {
+        try {
+            String name = request.get("name");
+            String fileType = request.get("fileType");
+            KnowledgeDocumentVO vo = knowledgeBaseService.updateDocument(docId, name, fileType);
+            return ResultUtils.success(vo);
+        } catch (Exception e) {
+            log.error("更新文档元信息失败", e);
+            return (BaseResponse<KnowledgeDocumentVO>) (BaseResponse<?>) ResultUtils.error(50000, e.getMessage());
         }
     }
 }

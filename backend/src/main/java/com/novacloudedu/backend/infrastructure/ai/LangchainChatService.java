@@ -47,6 +47,49 @@ public class LangchainChatService {
     }
 
     /**
+     * 流式对话（带自定义模型参数，用于 AI 助手）
+     * 不走模型缓存，每次根据参数新建模型实例
+     */
+    public void streamChatWithParams(String modelId, List<Map<String, String>> messages,
+                                      Double temperature, Double topP, Integer maxTokens,
+                                      StreamCallback callback) {
+        streamChatWithParams(modelId, messages, temperature, topP, maxTokens, false, callback);
+    }
+
+    /**
+     * 流式对话（带自定义模型参数 + 联网搜索开关）
+     *
+     * @param enableSearch 是否启用联网搜索（仅 DashScope 模型支持）
+     */
+    public void streamChatWithParams(String modelId, List<Map<String, String>> messages,
+                                      Double temperature, Double topP, Integer maxTokens,
+                                      boolean enableSearch, StreamCallback callback) {
+        StreamingChatLanguageModel model = chatModelFactory.createStreamingModelWithParams(
+                modelId, temperature, topP, maxTokens, enableSearch);
+        List<ChatMessage> chatMessages = convertMessages(messages, null);
+
+        log.info("Langchain4j 流式对话(自定义参数): modelId={}, temperature={}, topP={}, maxTokens={}, enableSearch={}, 消息数={}",
+                modelId, temperature, topP, maxTokens, enableSearch, chatMessages.size());
+        doStreamChat(model, chatMessages, callback);
+    }
+
+    /**
+     * 流式多模态对话（带自定义模型参数，用于 AI 助手）
+     */
+    public void streamChatWithImagesAndParams(String modelId, List<Map<String, String>> messages,
+                                               List<String> imageUrls,
+                                               Double temperature, Double topP, Integer maxTokens,
+                                               StreamCallback callback) {
+        StreamingChatLanguageModel model = chatModelFactory.createStreamingModelWithParams(
+                modelId, temperature, topP, maxTokens);
+        List<ChatMessage> chatMessages = convertMessages(messages, imageUrls);
+
+        log.info("Langchain4j 多模态流式对话(自定义参数): modelId={}, temperature={}, topP={}, maxTokens={}, 消息数={}, 图片数={}",
+                modelId, temperature, topP, maxTokens, chatMessages.size(), imageUrls != null ? imageUrls.size() : 0);
+        doStreamChat(model, chatMessages, callback);
+    }
+
+    /**
      * 流式多模态对话（图片+文本）
      *
      * @param modelId   模型ID，null 则用默认视觉模型

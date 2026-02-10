@@ -109,6 +109,28 @@ public class KnowledgeDocument {
     }
 
     /**
+     * 更新文档名称
+     */
+    public void updateName(String name) {
+        if (name == null || name.trim().isEmpty()) {
+            throw new IllegalArgumentException("文档名称不能为空");
+        }
+        this.name = name.trim();
+        this.updateTime = LocalDateTime.now();
+    }
+
+    /**
+     * 更新文件类型
+     */
+    public void updateFileType(DocumentType fileType) {
+        if (fileType == null) {
+            throw new IllegalArgumentException("文件类型不能为空");
+        }
+        this.fileType = fileType;
+        this.updateTime = LocalDateTime.now();
+    }
+
+    /**
      * 设置内容
      */
     public void setContent(String content, String contentHash) {

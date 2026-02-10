@@ -24,4 +24,6 @@ public interface UserDailyWordRepository {
     long countByUserId(UserId userId);
 
     long countStudiedByUserId(UserId userId);
+
+    List<Long> findStudiedWordIdsByUserId(UserId userId);
 }

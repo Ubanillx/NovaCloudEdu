@@ -131,6 +131,7 @@ CREATE TABLE IF NOT EXISTS ai_workflow
     name         VARCHAR(128)                            NOT NULL,
     description  TEXT                                    NULL,
     flow_data    JSONB                                   NOT NULL,
+    status       VARCHAR(32)   DEFAULT 'DRAFT'           NOT NULL,
     version      INT           DEFAULT 1                 NOT NULL,
     is_public    SMALLINT      DEFAULT 0                 NOT NULL,
     creator_id   BIGINT                                  NOT NULL,
@@ -145,6 +146,7 @@ COMMENT ON COLUMN ai_workflow.id IS 'id';
 COMMENT ON COLUMN ai_workflow.name IS '工作流名称';
 COMMENT ON COLUMN ai_workflow.description IS '工作流描述';
 COMMENT ON COLUMN ai_workflow.flow_data IS '流程定义JSON，包含nodes和edges，如：{"nodes":[{"id":"1","type":"start","data":{}}],"edges":[{"source":"1","target":"2"}]}';
+COMMENT ON COLUMN ai_workflow.status IS '工作流状态：DRAFT/PUBLISHED/ARCHIVED';
 COMMENT ON COLUMN ai_workflow.creator_id IS '创建者id';
 COMMENT ON COLUMN ai_workflow.create_time IS '创建时间';
 COMMENT ON COLUMN ai_workflow.update_time IS '更新时间';
