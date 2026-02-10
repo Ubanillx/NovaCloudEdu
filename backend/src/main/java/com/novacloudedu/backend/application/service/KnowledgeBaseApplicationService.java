@@ -3,6 +3,7 @@ package com.novacloudedu.backend.application.service;
 import com.novacloudedu.backend.application.ai.command.CreateKnowledgeBaseCommand;
 import com.novacloudedu.backend.application.ai.command.UpdateKnowledgeBaseCommand;
 import com.novacloudedu.backend.application.ai.dto.KnowledgeBaseVO;
+import com.novacloudedu.backend.application.ai.dto.KnowledgeChunkVO;
 import com.novacloudedu.backend.application.ai.dto.KnowledgeDocumentVO;
 import com.novacloudedu.backend.domain.ai.entity.KnowledgeBase;
 import com.novacloudedu.backend.domain.ai.entity.KnowledgeDocument;
@@ -13,6 +14,7 @@ import com.novacloudedu.backend.domain.ai.valueobject.*;
 import com.novacloudedu.backend.domain.book.service.VectorEmbeddingService;
 import com.novacloudedu.backend.domain.book.valueobject.ChapterVector;
 import com.novacloudedu.backend.domain.user.valueobject.UserId;
+import com.novacloudedu.backend.infrastructure.ai.DocumentContentExtractor;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +46,7 @@ public class KnowledgeBaseApplicationService {
     private final KnowledgeDocumentRepository documentRepository;
     private final KnowledgeChunkRepository chunkRepository;
     private final VectorEmbeddingService embeddingService;
+    private final DocumentContentExtractor contentExtractor;
 
     private ExecutorService documentProcessExecutor;
 
@@ -251,8 +254,15 @@ public class KnowledgeBaseApplicationService {
             documentRepository.save(doc);
 
             String content = doc.getContent();
+            if ((content == null || content.isEmpty()) && doc.getFileUrl() != null && !doc.getFileUrl().isEmpty()) {
+                log.info("文档内容为空，从文件URL提取: fileType={}, url={}", doc.getFileType(), doc.getFileUrl());
+                content = contentExtractor.extractContent(doc.getFileUrl(), doc.getFileType().name());
+                String hash = computeHash(content);
+                doc.setContent(content, hash);
+                documentRepository.save(doc);
+            }
             if (content == null || content.isEmpty()) {
-                throw new IllegalStateException("文档内容为空");
+                throw new IllegalStateException("文档内容为空，且无法从文件URL提取");
             }
 
             // 分块
@@ -390,8 +400,15 @@ public class KnowledgeBaseApplicationService {
 
         try {
             String content = doc.getContent();
+            if ((content == null || content.isEmpty()) && doc.getFileUrl() != null && !doc.getFileUrl().isEmpty()) {
+                log.info("异步处理: 文档内容为空，从文件URL提取: fileType={}, url={}", doc.getFileType(), doc.getFileUrl());
+                content = contentExtractor.extractContent(doc.getFileUrl(), doc.getFileType().name());
+                String hash = computeHash(content);
+                doc.setContent(content, hash);
+                documentRepository.save(doc);
+            }
             if (content == null || content.isEmpty()) {
-                doc.failProcessing("文档内容为空");
+                doc.failProcessing("文档内容为空，且无法从文件URL提取");
                 documentRepository.save(doc);
                 return;
             }
@@ -507,6 +524,55 @@ public class KnowledgeBaseApplicationService {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    /**
+     * 获取文档的分块列表（分页）
+     */
+    public List<KnowledgeChunkVO> listChunks(Long documentId, int page, int size) {
+        List<KnowledgeChunkRepository.ChunkDetail> chunks = 
+                chunkRepository.findByDocumentId(KnowledgeDocumentId.of(documentId), page, size);
+        return chunks.stream().map(this::toChunkVO).collect(Collectors.toList());
+    }
+
+    /**
+     * 统计文档的分块数量
+     */
+    public long countChunks(Long documentId) {
+        return chunkRepository.countByDocumentId(KnowledgeDocumentId.of(documentId));
+    }
+
+    /**
+     * 更新文档元信息
+     */
+    @Transactional
+    public KnowledgeDocumentVO updateDocument(Long documentId, String name, String fileType) {
+        log.info("更新文档元信息: documentId={}, name={}, fileType={}", documentId, name, fileType);
+
+        KnowledgeDocument doc = documentRepository.findById(KnowledgeDocumentId.of(documentId))
+                .orElseThrow(() -> new IllegalArgumentException("文档不存在: " + documentId));
+
+        if (name != null && !name.trim().isEmpty()) {
+            doc.updateName(name.trim());
+        }
+        if (fileType != null && !fileType.trim().isEmpty()) {
+            doc.updateFileType(DocumentType.valueOf(fileType.toUpperCase()));
+        }
+
+        KnowledgeDocument saved = documentRepository.save(doc);
+        return toDocumentVO(saved);
+    }
+
+    private KnowledgeChunkVO toChunkVO(KnowledgeChunkRepository.ChunkDetail chunk) {
+        KnowledgeChunkVO vo = new KnowledgeChunkVO();
+        vo.setId(chunk.id());
+        vo.setKnowledgeBaseId(chunk.knowledgeBaseId());
+        vo.setDocumentId(chunk.documentId());
+        vo.setContent(chunk.content());
+        vo.setChunkIndex(chunk.chunkIndex());
+        vo.setMetadata(chunk.metadata());
+        vo.setCreateTime(chunk.createTime());
+        return vo;
     }
 
     private KnowledgeBaseVO toVO(KnowledgeBase kb) {

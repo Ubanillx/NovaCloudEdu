@@ -83,10 +83,11 @@ public class ScheduleController {
 
     @Operation(summary = "添加课程项", description = "向课表中添加课程")
     @PostMapping("/item")
-    @AuthCheck(mustRole = "admin")
-    public BaseResponse<Long> addItem(@RequestBody @Valid AddScheduleItemRequest request) {
+    public BaseResponse<Long> addItem(@RequestBody @Valid AddScheduleItemRequest request, Authentication authentication) {
+        Long userId = Long.parseLong(authentication.getName());
         Long id = addScheduleItemCommand.execute(
                 request.getSettingId(),
+                userId,
                 request.getCourseType(),
                 request.getCourseName(),
                 request.getTeacherName(),
@@ -107,7 +108,6 @@ public class ScheduleController {
 
     @Operation(summary = "更新课程项", description = "更新课程项信息")
     @PutMapping("/item/{id}")
-    @AuthCheck(mustRole = "admin")
     public BaseResponse<Boolean> updateItem(@PathVariable Long id, @RequestBody @Valid UpdateScheduleItemRequest request) {
         updateScheduleItemCommand.execute(
                 id,
@@ -128,7 +128,6 @@ public class ScheduleController {
 
     @Operation(summary = "删除课程项", description = "删除课程项")
     @DeleteMapping("/item/{id}")
-    @AuthCheck(mustRole = "admin")
     public BaseResponse<Boolean> deleteItem(@PathVariable Long id) {
         deleteScheduleItemCommand.execute(id);
         return ResultUtils.success(true);

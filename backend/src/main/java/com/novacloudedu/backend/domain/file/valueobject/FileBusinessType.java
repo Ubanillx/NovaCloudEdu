@@ -18,7 +18,9 @@ public enum FileBusinessType {
     GROUP_CHAT_FILE("chat/group", "群聊文件", 50 * 1024 * 1024),
     AI_CHAT_FILE("chat/ai", "AI聊天文件", 50 * 1024 * 1024),
     BOOK_FILE("book/file", "书籍文件", 200 * 1024 * 1024),
-    BOOK_COVER("book/cover", "书籍封面", 5 * 1024 * 1024);
+    BOOK_COVER("book/cover", "书籍封面", 5 * 1024 * 1024),
+    AI_GENERATED_IMAGE("ai/generated", "AI生成图片", 20 * 1024 * 1024),
+    AI_GENERATED_VIDEO("ai/video", "AI生成视频", 200 * 1024 * 1024);
 
     private final String folder;
     private final String description;

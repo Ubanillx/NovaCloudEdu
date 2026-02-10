@@ -43,6 +43,16 @@ public interface KnowledgeChunkRepository {
     void deleteByKnowledgeBaseId(KnowledgeBaseId knowledgeBaseId);
 
     /**
+     * 根据文档ID查询分块列表（分页）
+     */
+    List<ChunkDetail> findByDocumentId(KnowledgeDocumentId documentId, int page, int size);
+
+    /**
+     * 统计文档的分块数量
+     */
+    long countByDocumentId(KnowledgeDocumentId documentId);
+
+    /**
      * 统计知识库的分块数量
      */
     long countByKnowledgeBaseId(KnowledgeBaseId knowledgeBaseId);
@@ -57,5 +67,18 @@ public interface KnowledgeChunkRepository {
             String content,
             double similarity,
             String metadata
+    ) {}
+
+    /**
+     * 分块详情（不含向量数据）
+     */
+    record ChunkDetail(
+            Long id,
+            Long knowledgeBaseId,
+            Long documentId,
+            String content,
+            Integer chunkIndex,
+            String metadata,
+            java.time.LocalDateTime createTime
     ) {}
 }

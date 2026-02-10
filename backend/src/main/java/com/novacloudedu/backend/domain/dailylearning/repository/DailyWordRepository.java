@@ -45,6 +45,10 @@ public interface DailyWordRepository {
 
     DailyWordPage searchByWordPaged(String keyword, int page, int size);
 
+    List<DailyWord> findRandomByCategory(String category, List<Long> excludeIds, int size);
+
+    List<DailyWord> findRandom(List<Long> excludeIds, int size);
+
     /**
      * 单词分页结果
      */

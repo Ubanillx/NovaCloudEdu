@@ -25,6 +25,20 @@ mybatis-plus:
       logic-delete-value: 1
       logic-not-delete-value: 0
 
+# 代码执行沙箱配置
+workflow:
+  code-sandbox:
+    docker-enabled: ${CODE_SANDBOX_DOCKER_ENABLED:true}
+    docker-host: ${CODE_SANDBOX_DOCKER_HOST:unix:///var/run/docker.sock}
+    python-image: ${CODE_SANDBOX_PYTHON_IMAGE:python:3.11-slim}
+    memory-limit: ${CODE_SANDBOX_MEMORY_LIMIT:268435456}  # 256MB
+    cpu-count: ${CODE_SANDBOX_CPU_COUNT:1}
+    timeout-seconds: ${CODE_SANDBOX_TIMEOUT:120}
+    js-timeout-seconds: ${CODE_SANDBOX_JS_TIMEOUT:10}
+    network-disabled: ${CODE_SANDBOX_NETWORK_DISABLED:false}
+    venv-cache-dir: ${CODE_SANDBOX_VENV_DIR:${user.home}/.novacloudedu/venvs}
+    temp-dir: ${CODE_SANDBOX_TEMP_DIR:${java.io.tmpdir}/novacloudedu-sandbox}
+
 # 日志配置
 logging:
   level:

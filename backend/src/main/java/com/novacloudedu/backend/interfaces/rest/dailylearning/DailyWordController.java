@@ -113,7 +113,7 @@ public class DailyWordController {
         int limitedSize = Math.max(1, Math.min(size, 100));
         List<DailyWord> words;
         if (type != null && !type.isEmpty()) {
-            words = getDailyWordQuery.executeByCategory(type, 1, limitedSize);
+            words = knowledgeGraphRecommendationService.recommendWordsByCategory(userId, type, limitedSize);
         } else {
             words = knowledgeGraphRecommendationService.recommendWords(userId, limitedSize);
         }

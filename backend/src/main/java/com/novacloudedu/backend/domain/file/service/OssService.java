@@ -37,4 +37,13 @@ public interface OssService {
      * @return 是否存在
      */
     boolean fileExists(String fileUrl);
+
+    /**
+     * 上传字节数组（用于AI生成图片等场景）
+     * @param data 文件字节数据
+     * @param extension 文件扩展名（如 ".png"）
+     * @param businessType 业务类型
+     * @return 文件访问URL
+     */
+    String uploadBytes(byte[] data, String extension, FileBusinessType businessType);
 }

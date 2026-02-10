@@ -171,6 +171,31 @@ public class DailyWordRepositoryImpl implements DailyWordRepository {
     }
 
     @Override
+    public List<DailyWord> findRandomByCategory(String category, List<Long> excludeIds, int size) {
+        LambdaQueryWrapper<DailyWordPO> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(DailyWordPO::getCategory, category);
+        if (excludeIds != null && !excludeIds.isEmpty()) {
+            wrapper.notIn(DailyWordPO::getId, excludeIds);
+        }
+        wrapper.last("ORDER BY RANDOM() LIMIT " + size);
+        return dailyWordMapper.selectList(wrapper).stream()
+                .map(dailyWordConverter::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<DailyWord> findRandom(List<Long> excludeIds, int size) {
+        LambdaQueryWrapper<DailyWordPO> wrapper = new LambdaQueryWrapper<>();
+        if (excludeIds != null && !excludeIds.isEmpty()) {
+            wrapper.notIn(DailyWordPO::getId, excludeIds);
+        }
+        wrapper.last("ORDER BY RANDOM() LIMIT " + size);
+        return dailyWordMapper.selectList(wrapper).stream()
+                .map(dailyWordConverter::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public DailyWordPage searchByWordPaged(String keyword, int page, int size) {
         Page<DailyWordPO> pageParam = new Page<>(page, size);
         LambdaQueryWrapper<DailyWordPO> wrapper = new LambdaQueryWrapper<>();

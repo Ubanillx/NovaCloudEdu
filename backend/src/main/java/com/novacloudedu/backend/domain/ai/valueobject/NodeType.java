@@ -20,6 +20,8 @@ public enum NodeType {
     CONDITION("条件分支"),
     SWITCH("多路分支"),
     LOOP("循环"),
+    LOOP_START("循环开始"),
+    LOOP_END("循环结束"),
     PARALLEL("并行执行"),
     MERGE("合并"),
     

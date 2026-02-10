@@ -9,14 +9,24 @@ import com.novacloudedu.backend.domain.book.valueobject.ChapterVector;
 public interface VectorEmbeddingService {
     
     /**
-     * 将文本转换为向量
+     * 将文本转换为向量（文档入库时使用，text_type=document）
      * @param text 文本内容
      * @return 向量表示
      */
     ChapterVector embedText(String text);
+
+    /**
+     * 将查询文本转换为向量（RAG检索时使用，text_type=query）
+     * DashScope 等非对称 embedding 模型要求 query 和 document 使用不同的 text_type
+     * @param query 查询文本
+     * @return 向量表示
+     */
+    default ChapterVector embedQuery(String query) {
+        return embedText(query);
+    }
     
     /**
-     * 批量将文本转换为向量
+     * 批量将文本转换为向量（文档入库，text_type=document）
      * @param texts 文本列表
      * @return 向量列表
      */

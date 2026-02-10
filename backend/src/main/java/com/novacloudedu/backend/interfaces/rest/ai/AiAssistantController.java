@@ -2,17 +2,23 @@ package com.novacloudedu.backend.interfaces.rest.ai;
 
 import com.novacloudedu.backend.application.service.AiAssistantApplicationService;
 import com.novacloudedu.backend.application.service.AiAssistantWorkflowService;
+import com.novacloudedu.backend.application.service.AiChatApplicationService;
 import com.novacloudedu.backend.application.ai.command.CreateAiAssistantCommand;
 import com.novacloudedu.backend.application.ai.command.UpdateAiAssistantCommand;
 import com.novacloudedu.backend.application.ai.dto.AiAssistantVO;
 import com.novacloudedu.backend.common.BaseResponse;
 import com.novacloudedu.backend.common.ResultUtils;
+import com.novacloudedu.backend.interfaces.rest.ai.dto.AssistantChatRequest;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.List;
 
@@ -28,6 +34,7 @@ public class AiAssistantController {
 
     private final AiAssistantApplicationService assistantService;
     private final AiAssistantWorkflowService workflowService;
+    private final AiChatApplicationService aiChatApplicationService;
 
     @PostMapping
     @Operation(summary = "创建AI助手")
@@ -189,6 +196,19 @@ public class AiAssistantController {
         }
     }
 
+    @GetMapping("/{id}/workflow-skills")
+    @Operation(summary = "获取AI助手的工作流技能列表",
+            description = "返回绑定的工作流详情，包含描述、输入参数、输出参数，供前端展示或 AI 助手对话时使用")
+    public BaseResponse<List<AiAssistantWorkflowService.WorkflowSkillVO>> getWorkflowSkills(@PathVariable Long id) {
+        try {
+            List<AiAssistantWorkflowService.WorkflowSkillVO> skills = workflowService.getWorkflowSkills(id);
+            return ResultUtils.success(skills);
+        } catch (Exception e) {
+            log.error("获取工作流技能列表失败", e);
+            return (BaseResponse<List<AiAssistantWorkflowService.WorkflowSkillVO>>) (BaseResponse<?>) ResultUtils.error(50000, e.getMessage());
+        }
+    }
+
     @PostMapping("/{id}/workflows/{workflowId}")
     @Operation(summary = "绑定工作流到AI助手")
     public BaseResponse<Void> bindWorkflow(
@@ -231,5 +251,34 @@ public class AiAssistantController {
             log.error("执行工作流失败", e);
             return (BaseResponse<java.util.Map<String, Object>>) (BaseResponse<?>) ResultUtils.error(50000, e.getMessage());
         }
+    }
+
+    // ==================== AI助手对话 ====================
+
+    @PostMapping(value = "/{id}/chat/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @Operation(summary = "AI助手流式对话",
+            description = "通过助手ID与配置好的AI助手进行SSE流式对话。" +
+                    "自动使用助手的systemPrompt和modelConfig，" +
+                    "自动从绑定的知识库进行RAG检索，" +
+                    "支持文档解析、多模态图片理解、文生图、图参生图、文生视频等全部外部技能。" +
+                    "如不传sessionId则自动创建新会话，支持会话级记忆管理。")
+    public SseEmitter assistantChat(
+            @PathVariable @Parameter(description = "AI助手ID") Long id,
+            @Valid @RequestBody AssistantChatRequest request,
+            Authentication authentication) {
+        Long userId = Long.parseLong(authentication.getName());
+        log.info("AI助手对话请求: assistantId={}, sessionId={}, msg={}, 图片数: {}, 文档数: {}",
+                id, request.getSessionId(), request.getMessage(),
+                request.getImageUrls() != null ? request.getImageUrls().size() : 0,
+                request.getDocumentUrls() != null ? request.getDocumentUrls().size() : 0);
+
+        java.util.Map<String, Object> result = aiChatApplicationService.assistantStreamChat(
+                id, userId, request.getSessionId(),
+                request.getMessage(),
+                request.getImageUrls(),
+                request.getDocumentUrls()
+        );
+
+        return (SseEmitter) result.get("emitter");
     }
 }

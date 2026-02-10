@@ -60,4 +60,16 @@ public interface KnowledgeChunkMapper extends BaseMapper<KnowledgeChunkPO> {
 
     @Select("SELECT COUNT(*) FROM knowledge_chunk WHERE knowledge_base_id = #{knowledgeBaseId} AND is_delete = 0")
     long countByKnowledgeBaseId(@Param("knowledgeBaseId") Long knowledgeBaseId);
+
+    @Select("SELECT id, knowledge_base_id, document_id, content, chunk_index, metadata, create_time " +
+            "FROM knowledge_chunk " +
+            "WHERE document_id = #{documentId} AND is_delete = 0 " +
+            "ORDER BY chunk_index ASC " +
+            "LIMIT #{size} OFFSET #{offset}")
+    List<Map<String, Object>> findByDocumentId(@Param("documentId") Long documentId,
+                                                @Param("offset") int offset,
+                                                @Param("size") int size);
+
+    @Select("SELECT COUNT(*) FROM knowledge_chunk WHERE document_id = #{documentId} AND is_delete = 0")
+    long countByDocumentId(@Param("documentId") Long documentId);
 }

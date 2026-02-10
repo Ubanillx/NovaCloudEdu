@@ -7,6 +7,7 @@ import com.novacloudedu.backend.domain.schedule.repository.ScheduleRepository;
 import com.novacloudedu.backend.domain.schedule.valueobject.ScheduleCourseType;
 import com.novacloudedu.backend.domain.schedule.valueobject.ScheduleWeekType;
 import com.novacloudedu.backend.domain.teacher.valueobject.TeacherId;
+import com.novacloudedu.backend.domain.user.valueobject.UserId;
 import com.novacloudedu.backend.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,7 +20,7 @@ public class AddScheduleItemCommand {
     private final ScheduleRepository scheduleRepository;
 
     @Transactional
-    public Long execute(Long settingId, Integer courseType,
+    public Long execute(Long settingId, Long userId, Integer courseType,
                         String courseName, String teacherName, String location,
                         Long courseId, Long teacherId,
                         Integer dayOfWeek, Integer startSection, Integer endSection,
@@ -32,17 +33,18 @@ public class AddScheduleItemCommand {
         ScheduleCourseType type = ScheduleCourseType.fromCode(courseType);
         ScheduleWeekType wType = ScheduleWeekType.fromCode(weekType);
         ClassId cId = setting.getClassId();
+        UserId uid = UserId.of(userId);
 
         ClassScheduleItem item;
         if (type == ScheduleCourseType.CUSTOM) {
             item = ClassScheduleItem.createCustom(
-                    settingId, cId, courseName, teacherName, location,
+                    settingId, cId, uid, courseName, teacherName, location,
                     dayOfWeek, startSection, endSection, startWeek, endWeek, wType,
                     color, remark
             );
         } else {
             item = ClassScheduleItem.createPlatform(
-                    settingId, cId, CourseId.of(courseId), TeacherId.of(teacherId), location,
+                    settingId, cId, uid, CourseId.of(courseId), TeacherId.of(teacherId), location,
                     dayOfWeek, startSection, endSection, startWeek, endWeek, wType,
                     color, remark
             );

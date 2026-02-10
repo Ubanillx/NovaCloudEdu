@@ -70,6 +70,20 @@ public class KnowledgeChunkRepositoryImpl implements KnowledgeChunkRepository {
     }
 
     @Override
+    public List<ChunkDetail> findByDocumentId(KnowledgeDocumentId documentId, int page, int size) {
+        int offset = page * size;
+        List<Map<String, Object>> results = mapper.findByDocumentId(documentId.value(), offset, size);
+        return results.stream()
+                .map(this::mapToChunkDetail)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public long countByDocumentId(KnowledgeDocumentId documentId) {
+        return mapper.countByDocumentId(documentId.value());
+    }
+
+    @Override
     public long countByKnowledgeBaseId(KnowledgeBaseId knowledgeBaseId) {
         return mapper.countByKnowledgeBaseId(knowledgeBaseId.value());
     }
@@ -89,6 +103,18 @@ public class KnowledgeChunkRepositoryImpl implements KnowledgeChunkRepository {
         return sb.toString();
     }
 
+    private ChunkDetail mapToChunkDetail(Map<String, Object> map) {
+        return new ChunkDetail(
+                ((Number) map.get("id")).longValue(),
+                ((Number) map.get("knowledge_base_id")).longValue(),
+                ((Number) map.get("document_id")).longValue(),
+                (String) map.get("content"),
+                map.get("chunk_index") != null ? ((Number) map.get("chunk_index")).intValue() : 0,
+                convertMetadataToString(map.get("metadata")),
+                map.get("create_time") != null ? ((java.sql.Timestamp) map.get("create_time")).toLocalDateTime() : null
+        );
+    }
+
     private ChunkSearchResult mapToResult(Map<String, Object> map) {
         return new ChunkSearchResult(
                 ((Number) map.get("id")).longValue(),
@@ -96,7 +122,25 @@ public class KnowledgeChunkRepositoryImpl implements KnowledgeChunkRepository {
                 ((Number) map.get("document_id")).longValue(),
                 (String) map.get("content"),
                 ((Number) map.get("similarity")).doubleValue(),
-                (String) map.get("metadata")
+                convertMetadataToString(map.get("metadata"))
         );
+    }
+
+    /**
+     * 将 metadata 转为 String（PostgreSQL jsonb 类型被 MyBatis 解析为 LinkedHashMap）
+     */
+    private String convertMetadataToString(Object metadata) {
+        if (metadata == null) {
+            return null;
+        }
+        if (metadata instanceof String) {
+            return (String) metadata;
+        }
+        // jsonb 被 MyBatis 解析为 Map/List，需要序列化为 JSON 字符串
+        try {
+            return new com.google.gson.Gson().toJson(metadata);
+        } catch (Exception e) {
+            return metadata.toString();
+        }
     }
 }

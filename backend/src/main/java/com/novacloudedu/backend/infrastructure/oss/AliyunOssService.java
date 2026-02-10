@@ -139,6 +139,41 @@ public class AliyunOssService implements OssService {
         }
     }
 
+    @Override
+    public String uploadBytes(byte[] data, String extension, FileBusinessType businessType) {
+        if (data == null || data.length == 0) {
+            throw new BusinessException(40000, "文件数据不能为空");
+        }
+
+        OSS ossClient = null;
+        try {
+            ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
+
+            String dateFolder = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+            String fileName = UUID.randomUUID().toString().replace("-", "") + extension;
+            String objectName = businessType.getFolder() + "/" + dateFolder + "/" + fileName;
+
+            InputStream inputStream = new java.io.ByteArrayInputStream(data);
+            PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, objectName, inputStream);
+            ossClient.putObject(putObjectRequest);
+
+            String fileUrl = customDomain.isEmpty()
+                    ? "https://" + bucketName + "." + endpoint + "/" + objectName
+                    : customDomain + "/" + objectName;
+
+            log.info("字节数据上传成功: {}, 大小: {}KB", fileUrl, data.length / 1024);
+            return fileUrl;
+
+        } catch (Exception e) {
+            log.error("字节数据上传失败", e);
+            throw new BusinessException(50000, "文件上传失败: " + e.getMessage());
+        } finally {
+            if (ossClient != null) {
+                ossClient.shutdown();
+            }
+        }
+    }
+
     private String extractObjectName(String fileUrl) {
         if (fileUrl.contains(bucketName + "." + endpoint)) {
             return fileUrl.substring(fileUrl.indexOf(bucketName + "." + endpoint) + bucketName.length() + endpoint.length() + 2);

@@ -4,8 +4,10 @@ import com.novacloudedu.backend.domain.dailylearning.entity.DailyArticle;
 import com.novacloudedu.backend.domain.dailylearning.entity.DailyWord;
 import com.novacloudedu.backend.domain.dailylearning.repository.DailyArticleRepository;
 import com.novacloudedu.backend.domain.dailylearning.repository.DailyWordRepository;
+import com.novacloudedu.backend.domain.dailylearning.repository.UserDailyWordRepository;
 import com.novacloudedu.backend.domain.dailylearning.valueobject.DailyArticleId;
 import com.novacloudedu.backend.domain.dailylearning.valueobject.DailyWordId;
+import com.novacloudedu.backend.domain.user.valueobject.UserId;
 import com.novacloudedu.backend.infrastructure.neo4j.node.ArticleNode;
 import com.novacloudedu.backend.infrastructure.neo4j.node.WordNode;
 import com.novacloudedu.backend.infrastructure.neo4j.repository.ArticleNodeRepository;
@@ -26,11 +28,13 @@ public class KnowledgeGraphRecommendationService {
     private final ArticleNodeRepository articleNodeRepository;
     private final DailyWordRepository dailyWordRepository;
     private final DailyArticleRepository dailyArticleRepository;
+    private final UserDailyWordRepository userDailyWordRepository;
 
     private static final int DEFAULT_LIMIT = 10;
 
     public List<DailyWord> recommendWords(Long userId, int size) {
         int limit = size > 0 ? size : DEFAULT_LIMIT;
+        List<Long> studiedWordIds = userDailyWordRepository.findStudiedWordIdsByUserId(UserId.of(userId));
         Set<Long> recommendedIds = new LinkedHashSet<>();
 
         try {
@@ -52,15 +56,30 @@ public class KnowledgeGraphRecommendationService {
                 unstudiedWords.forEach(w -> recommendedIds.add(w.getId()));
             }
         } catch (Exception e) {
-            log.warn("Neo4j查询失败，使用默认推荐: {}", e.getMessage());
-            return getDefaultWords(limit);
+            log.warn("Neo4j查询失败，使用随机推荐: {}", e.getMessage());
+            return dailyWordRepository.findRandom(studiedWordIds, limit);
         }
 
-        return recommendedIds.stream()
+        List<DailyWord> result = recommendedIds.stream()
                 .limit(limit)
                 .map(id -> dailyWordRepository.findById(DailyWordId.of(id)).orElse(null))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
+
+        if (result.size() < limit) {
+            List<Long> allExcludeIds = new ArrayList<>(studiedWordIds);
+            result.stream().map(w -> w.getId().value()).forEach(allExcludeIds::add);
+            List<DailyWord> extra = dailyWordRepository.findRandom(allExcludeIds, limit - result.size());
+            result.addAll(extra);
+        }
+
+        return result;
+    }
+
+    public List<DailyWord> recommendWordsByCategory(Long userId, String category, int size) {
+        int limit = size > 0 ? size : DEFAULT_LIMIT;
+        List<Long> studiedWordIds = userDailyWordRepository.findStudiedWordIdsByUserId(UserId.of(userId));
+        return dailyWordRepository.findRandomByCategory(category, studiedWordIds, limit);
     }
 
     public List<DailyArticle> recommendArticles(Long userId, int size) {
@@ -103,7 +122,7 @@ public class KnowledgeGraphRecommendationService {
     }
 
     private List<DailyWord> getDefaultWords(int limit) {
-        return dailyWordRepository.findAll(1, limit);
+        return dailyWordRepository.findRandom(Collections.emptyList(), limit);
     }
 
     private List<DailyArticle> getDefaultArticles(int limit) {

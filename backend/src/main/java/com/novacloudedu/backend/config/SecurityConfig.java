@@ -54,7 +54,8 @@ public class SecurityConfig {
             "/api/announcement/list", // 公告列表
             "/api/announcement/*", // 公告详情
             "/api/banner/list", // 轮播图列表
-            "/api/user/checkin/ranking" // 打卡排行榜（公开）
+            "/api/user/checkin/ranking", // 打卡排行榜（公开）
+            "/api/v1/webhook/**"        // Webhook 触发端点（外部调用，无需认证）
     };
 
     /**

@@ -95,6 +95,70 @@ public class ChatModelFactory {
     }
 
     /**
+     * 创建带自定义参数的流式聊天模型（不缓存，每次新建）
+     * 用于 AI 助手等需要自定义 temperature/topP/maxTokens 的场景
+     */
+    public StreamingChatLanguageModel createStreamingModelWithParams(
+            String modelId, Double temperature, Double topP, Integer maxTokens) {
+        return createStreamingModelWithParams(modelId, temperature, topP, maxTokens, false);
+    }
+
+    /**
+     * 创建带自定义参数和能力开关的流式聊天模型（不缓存，每次新建）
+     *
+     * @param enableSearch 是否启用联网搜索（仅 DashScope 供应商支持）
+     */
+    public StreamingChatLanguageModel createStreamingModelWithParams(
+            String modelId, Double temperature, Double topP, Integer maxTokens,
+            boolean enableSearch) {
+        ProviderAndModel pm = properties.parseModelId(modelId);
+        ProviderConfig providerConfig = properties.getProviderConfig(pm.provider());
+
+        log.info("创建自定义参数模型: provider={}, model={}, temperature={}, topP={}, maxTokens={}, enableSearch={}",
+                pm.provider(), pm.model(), temperature, topP, maxTokens, enableSearch);
+
+        return switch (pm.provider()) {
+            case "dashscope" -> {
+                var builder = QwenStreamingChatModel.builder()
+                        .apiKey(providerConfig.getApiKey())
+                        .modelName(pm.model())
+                        .temperature(temperature != null ? temperature.floatValue() : 0.7f)
+                        .maxTokens(maxTokens != null ? maxTokens : 2000)
+                        .topP(topP);
+                if (enableSearch) {
+                    builder.enableSearch(true);
+                }
+                yield builder.build();
+            }
+            case "openai", "deepseek", "moonshot", "siliconflow" -> {
+                var builder = OpenAiStreamingChatModel.builder()
+                        .apiKey(providerConfig.getApiKey())
+                        .modelName(pm.model())
+                        .temperature(temperature)
+                        .maxTokens(maxTokens)
+                        .topP(topP);
+                if (providerConfig.getBaseUrl() != null && !providerConfig.getBaseUrl().isEmpty()) {
+                    builder.baseUrl(providerConfig.getBaseUrl());
+                }
+                yield builder.build();
+            }
+            case "zhipu" -> ZhipuAiStreamingChatModel.builder()
+                    .apiKey(providerConfig.getApiKey())
+                    .model(pm.model())
+                    .temperature(temperature)
+                    .maxToken(maxTokens != null ? maxTokens : 2000)
+                    .topP(topP)
+                    .build();
+            case "ollama" -> OllamaStreamingChatModel.builder()
+                    .baseUrl(providerConfig.getBaseUrl())
+                    .modelName(pm.model())
+                    .temperature(temperature)
+                    .build();
+            default -> throw new IllegalArgumentException("不支持的模型供应商: " + pm.provider());
+        };
+    }
+
+    /**
      * 清除缓存（配置变更后调用）
      */
     public void clearCache() {
