@@ -1,9 +1,9 @@
 spring:
   data:
     redis:
-      host: your-redis-host
-      port: 6379
-      password: your-redis-password
+      host: ${REDIS_HOST:your-redis-host}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:your-redis-password}
       database: 0
       timeout: 3000ms
       lettuce:
@@ -13,9 +13,9 @@ spring:
           min-idle: 0
           max-wait: -1ms
   datasource:
-    url: jdbc:postgresql://your-db-host:5432/NovaCloudEdu?stringtype=unspecified
-    username: your-db-username
-    password: your-db-password
+    url: jdbc:postgresql://${DB_HOST:your-db-host}:${DB_PORT:5432}/NovaCloudEdu?stringtype=unspecified
+    username: ${DB_USERNAME:your-db-username}
+    password: ${DB_PASSWORD:your-db-password}
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 10
@@ -26,10 +26,14 @@ spring:
       
   # Neo4j 知识图谱数据库配置
   neo4j:
-    uri: bolt://your-neo4j-host:7687
+    uri: bolt://${NEO4J_HOST:your-neo4j-host}:7687
     authentication:
-      username: neo4j
-      password: your-neo4j-password
+      username: ${NEO4J_USERNAME:neo4j}
+      password: ${NEO4J_PASSWORD:your-neo4j-password}
+  # Docker Compose 由 ppt-service/docker-compose.yml 统一管理，禁用 Spring Boot 自动启动
+  docker:
+    compose:
+      enabled: false
 
 mybatis-plus:
   mapper-locations: classpath:mapper/*.xml
@@ -50,9 +54,9 @@ logging:
     org.mybatis: DEBUG
   
 sms:
-  url: https://push.spug.cc/sms/your-sms-key
+  url: ${SMS_URL:https://push.spug.cc/sms/your-sms-key}
   query-url: https://push.spug.cc/request/query
-  token: your-sms-token
+  token: ${SMS_TOKEN:your-sms-token}
   app-name: 智云星课
   expire-minutes: 5 
 
@@ -60,11 +64,11 @@ sms:
 aliyun:
   oss:
     endpoint: oss-cn-hangzhou.aliyuncs.com
-    access-key-id: your-oss-access-key-id
-    access-key-secret: your-oss-access-key-secret
-    bucket-name: your-bucket-name
+    access-key-id: ${ALIYUN_OSS_ACCESS_KEY_ID:your-oss-access-key-id}
+    access-key-secret: ${ALIYUN_OSS_ACCESS_KEY_SECRET:your-oss-access-key-secret}
+    bucket-name: ${ALIYUN_OSS_BUCKET_NAME:your-bucket-name}
     # 自定义域名（可选，如果配置了CDN加速域名）
-    domain: https://your-oss-domain.example.com
+    domain: ${ALIYUN_OSS_DOMAIN:https://your-oss-domain.example.com}
   # 智能语音交互 (NLS) 配置
   nls:
     access-key-id: ${ALIYUN_ACCESS_KEY_ID:your-nls-access-key-id}
@@ -98,7 +102,7 @@ aliyun:
 ai:
   # ----- DashScope 基础配置（供旧服务 + Embedding 使用）-----
   dashscope:
-    api-key: your-dashscope-api-key
+    api-key: ${DASHSCOPE_API_KEY:your-dashscope-api-key}
     llm:
       model-name: qwen-max
       vision-model-name: qwen-vl-max
@@ -110,6 +114,9 @@ ai:
       model-name: ${DASHSCOPE_EMBEDDING_MODEL:text-embedding-v2}
       dimension: 1536
       text-type: document
+    rerank:
+      model-name: ${DASHSCOPE_RERANK_MODEL:gte-rerank}
+      enabled: true
 
   # ----- 对话记忆配置 -----
   conversation:
@@ -129,7 +136,7 @@ ai:
       # ── 阿里云通义千问 ──
       dashscope:
         enabled: true
-        api-key: ${ai.dashscope.api-key}
+        api-key: ${DASHSCOPE_API_KEY:your-dashscope-api-key}
         models:
           qwen-max:
             type: text
@@ -144,6 +151,11 @@ ai:
             type: text
             temperature: 0.7
             max-tokens: 2000
+          qwen-long:
+            type: text
+            temperature: 0.7
+            max-tokens: 6000
+            top-p: 0.8
           qwen-vl-max:
             type: vision
             temperature: 0.7
@@ -239,6 +251,67 @@ ai:
             type: vision
             temperature: 0.7
 
+  # ----- 文生图模型配置 -----
+  image-models:
+    enabled: true
+    default-model: dashscope/wan2.6-t2i
+    upload-to-oss: true       # 将生成的图片上传到OSS持久化
+    providers:
+
+      # ── 阿里云通义万相（异步任务模式） ──
+      dashscope:
+        enabled: true
+        api-key: ${DASHSCOPE_API_KEY:your-dashscope-api-key}
+        type: dashscope
+        models:
+          # wan2.6 新版（推荐，质量最好，用新端点 image-generation/generation）
+          wan2.6-t2i:
+            size: "1280*1280"
+            n: 1
+            prompt-extend: true
+          # wanx2.1 旧版（用于图参生图回退，用旧端点 text2image/image-synthesis）
+          wanx2.1-t2i-plus:
+            size: "1024*1024"
+            n: 1
+
+      # ── SiliconFlow FLUX（OpenAI 兼容协议，同步模式） ──
+      siliconflow:
+        enabled: false          # 填入 API Key 后改为 true
+        api-key: ${SILICONFLOW_API_KEY:}
+        base-url: https://api.siliconflow.cn/v1
+        type: openai
+        models:
+          black-forest-labs/FLUX.1-schnell:
+            size: "1024*1024"
+            steps: 4
+            n: 1
+
+  # ----- 文生视频模型配置 -----
+  video-models:
+    enabled: true
+    default-model: dashscope/wan2.6-t2v
+    upload-to-oss: true
+    providers:
+
+      # ── 阿里云通义万相视频生成（异步任务模式） ──
+      # 端点: POST /api/v1/services/aigc/video-generation/video-synthesis
+      # 文档: https://help.aliyun.com/zh/model-studio/text-to-video-api-reference
+      dashscope:
+        enabled: true
+        api-key: ${DASHSCOPE_API_KEY:your-dashscope-api-key}
+        type: dashscope
+        models:
+          # wan2.6 推荐（有声视频+多镜头叙事，720P/1080P，时长2~15秒）
+          wan2.6-t2v:
+            size: "1280*720"
+            duration: 5
+            prompt-extend: true
+          # wan2.2 备选（无声视频，480P/1080P，时长固定5秒）
+          wan2.2-t2v-plus:
+            size: "832*480"
+            duration: 5
+            prompt-extend: true
+
   # ----- RAG 配置 -----
   rag:
     enabled: true
@@ -272,4 +345,13 @@ book:
   content:
     encryption:
       enabled: false  # 开发环境默认关闭加密
-      secret-key: your-book-encryption-key  # AES密钥，需要16/24/32字节
+      secret-key: ${BOOK_ENCRYPTION_KEY:your-book-encryption-key}  # AES密钥，需要16/24/32字节
+
+# PPT模板服务配置
+ppt-service:
+  url: ${PPT_SERVICE_URL:http://localhost:8100}
+
+# OnlyOffice 文档服务器配置
+onlyoffice:
+  document-server-url: ${ONLYOFFICE_URL:http://localhost:9980}
+  callback-url: ${ONLYOFFICE_CALLBACK_URL:http://host.docker.internal:8080/api/onlyoffice/callback}
