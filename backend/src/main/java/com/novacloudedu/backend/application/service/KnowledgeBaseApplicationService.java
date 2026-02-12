@@ -268,24 +268,34 @@ public class KnowledgeBaseApplicationService {
             // 分块
             List<String> chunks = splitContent(content, kb.getChunkSize(), kb.getChunkOverlap());
             
-            // 向量化
-            String[] chunkArray = chunks.toArray(new String[0]);
-            ChapterVector[] vectors = embeddingService.embedTexts(chunkArray);
-
-            // 保存分块
-            List<float[]> embeddings = new ArrayList<>();
-            for (ChapterVector v : vectors) {
-                embeddings.add(v.getEmbedding());
-            }
-
             String metadata = String.format("{\"documentId\": %d, \"documentName\": \"%s\"}", 
                     doc.getId().value(), doc.getName());
-            
+
+            // 分批向量化（每200条一轮）并保存
+            int embeddingBatchSize = 200;
+            List<String> allChunkContents = new ArrayList<>();
+            List<float[]> allEmbeddings = new ArrayList<>();
+
+            for (int batchStart = 0; batchStart < chunks.size(); batchStart += embeddingBatchSize) {
+                int batchEnd = Math.min(batchStart + embeddingBatchSize, chunks.size());
+                List<String> batchChunks = chunks.subList(batchStart, batchEnd);
+                log.info("向量化批次 {}-{}/{}", batchStart + 1, batchEnd, chunks.size());
+
+                String[] batchArray = batchChunks.toArray(new String[0]);
+                ChapterVector[] vectors = embeddingService.embedTexts(batchArray);
+
+                for (ChapterVector v : vectors) {
+                    allEmbeddings.add(v.getEmbedding());
+                }
+                allChunkContents.addAll(batchChunks);
+            }
+
+            // 批量保存分块（Repository内部按1000条一轮插入数据库）
             chunkRepository.saveChunks(
                     doc.getKnowledgeBaseId(),
                     doc.getId(),
-                    chunks,
-                    embeddings,
+                    allChunkContents,
+                    allEmbeddings,
                     metadata
             );
 
@@ -416,24 +426,34 @@ public class KnowledgeBaseApplicationService {
             // 分块
             List<String> chunks = splitContent(content, kb.getChunkSize(), kb.getChunkOverlap());
             
-            // 向量化
-            String[] chunkArray = chunks.toArray(new String[0]);
-            ChapterVector[] vectors = embeddingService.embedTexts(chunkArray);
-
-            // 保存分块
-            List<float[]> embeddings = new ArrayList<>();
-            for (ChapterVector v : vectors) {
-                embeddings.add(v.getEmbedding());
-            }
-
             String metadata = String.format("{\"documentId\": %d, \"documentName\": \"%s\"}", 
                     doc.getId().value(), doc.getName());
-            
+
+            // 分批向量化（每200条一轮）并保存
+            int embeddingBatchSize = 200;
+            List<String> allChunkContents = new ArrayList<>();
+            List<float[]> allEmbeddings = new ArrayList<>();
+
+            for (int batchStart = 0; batchStart < chunks.size(); batchStart += embeddingBatchSize) {
+                int batchEnd = Math.min(batchStart + embeddingBatchSize, chunks.size());
+                List<String> batchChunks = chunks.subList(batchStart, batchEnd);
+                log.info("异步向量化批次 {}-{}/{}", batchStart + 1, batchEnd, chunks.size());
+
+                String[] batchArray = batchChunks.toArray(new String[0]);
+                ChapterVector[] vectors = embeddingService.embedTexts(batchArray);
+
+                for (ChapterVector v : vectors) {
+                    allEmbeddings.add(v.getEmbedding());
+                }
+                allChunkContents.addAll(batchChunks);
+            }
+
+            // 批量保存分块（Repository内部按1000条一轮插入数据库）
             chunkRepository.saveChunks(
                     doc.getKnowledgeBaseId(),
                     doc.getId(),
-                    chunks,
-                    embeddings,
+                    allChunkContents,
+                    allEmbeddings,
                     metadata
             );
 
@@ -488,7 +508,13 @@ public class KnowledgeBaseApplicationService {
     }
 
     /**
-     * 分块内容
+     * 段落感知分块
+     *
+     * 策略：
+     * 1. 从 start 开始取 chunkSize 个字符作为基准切割点
+     * 2. 从基准切割点向后搜索最近的 \n，延伸到该段落结尾（最多额外延伸 chunkSize * 0.2）
+     * 3. 如果向后找不到 \n，则向前搜索最近的 \n，在段落边界处切割
+     * 4. overlap 起始位置也对齐到最近的 \n 边界，保证重叠部分从段落开头开始
      */
     private List<String> splitContent(String content, int chunkSize, int overlap) {
         List<String> chunks = new ArrayList<>();
@@ -496,14 +522,53 @@ public class KnowledgeBaseApplicationService {
             return chunks;
         }
 
+        int maxExtend = Math.max(chunkSize / 5, 100);
+        int len = content.length();
         int start = 0;
-        while (start < content.length()) {
-            int end = Math.min(start + chunkSize, content.length());
-            chunks.add(content.substring(start, end));
-            start = end - overlap;
-            if (start >= content.length() - overlap) {
+
+        while (start < len) {
+            int baseEnd = Math.min(start + chunkSize, len);
+
+            // 已经到达末尾，直接收尾
+            if (baseEnd >= len) {
+                chunks.add(content.substring(start).trim());
                 break;
             }
+
+            // 向后找最近的 \n（最多延伸 maxExtend 个字符）
+            int end = baseEnd;
+            int forwardNewline = content.indexOf('\n', baseEnd);
+            if (forwardNewline != -1 && forwardNewline <= baseEnd + maxExtend) {
+                end = forwardNewline + 1;
+            } else {
+                // 向前找最近的 \n
+                int backwardNewline = content.lastIndexOf('\n', baseEnd);
+                if (backwardNewline > start) {
+                    end = backwardNewline + 1;
+                }
+                // 都找不到则保持 baseEnd
+            }
+
+            String chunk = content.substring(start, end).trim();
+            if (!chunk.isEmpty()) {
+                chunks.add(chunk);
+            }
+
+            // 计算下一个 start：end - overlap，然后对齐到最近的 \n 边界
+            int nextStart = end - overlap;
+            if (nextStart <= start) {
+                nextStart = end;
+            }
+            // 从 nextStart 向前找 \n 对齐到段落开头
+            int alignNewline = content.lastIndexOf('\n', nextStart);
+            if (alignNewline > start && alignNewline >= nextStart - overlap) {
+                nextStart = alignNewline + 1;
+            }
+
+            if (nextStart >= len) {
+                break;
+            }
+            start = nextStart;
         }
 
         return chunks;

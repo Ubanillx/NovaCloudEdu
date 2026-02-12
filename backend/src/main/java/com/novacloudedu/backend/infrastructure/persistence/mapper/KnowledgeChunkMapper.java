@@ -72,4 +72,12 @@ public interface KnowledgeChunkMapper extends BaseMapper<KnowledgeChunkPO> {
 
     @Select("SELECT COUNT(*) FROM knowledge_chunk WHERE document_id = #{documentId} AND is_delete = 0")
     long countByDocumentId(@Param("documentId") Long documentId);
+
+    @Insert("<script>" +
+            "INSERT INTO knowledge_chunk (knowledge_base_id, document_id, content, chunk_index, embedding, metadata, create_time, is_delete) VALUES " +
+            "<foreach item='item' collection='chunks' separator=','>" +
+            "(#{item.knowledgeBaseId}, #{item.documentId}, #{item.content}, #{item.chunkIndex}, #{item.embedding}::vector, #{item.metadata}::jsonb, NOW(), 0)" +
+            "</foreach>" +
+            "</script>")
+    void batchInsertChunks(@Param("chunks") List<Map<String, Object>> chunks);
 }

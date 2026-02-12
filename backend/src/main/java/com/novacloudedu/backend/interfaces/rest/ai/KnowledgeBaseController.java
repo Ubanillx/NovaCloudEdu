@@ -8,6 +8,7 @@ import com.novacloudedu.backend.application.ai.dto.KnowledgeChunkVO;
 import com.novacloudedu.backend.application.ai.dto.KnowledgeDocumentVO;
 import com.novacloudedu.backend.common.BaseResponse;
 import com.novacloudedu.backend.common.ResultUtils;
+import com.novacloudedu.backend.domain.knowledge.service.KnowledgeSearchService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -29,9 +30,10 @@ import java.util.Map;
 public class KnowledgeBaseController {
 
     private final KnowledgeBaseApplicationService knowledgeBaseService;
+    private final KnowledgeSearchService knowledgeSearchService;
 
     @PostMapping
-    @Operation(summary = "创建知识库")
+    @Operation(summary = "创建知识库", operationId = "kbCreate")
     public BaseResponse<KnowledgeBaseVO> create(
             @RequestParam Long userId,
             @Valid @RequestBody CreateKnowledgeBaseCommand dto) {
@@ -45,7 +47,7 @@ public class KnowledgeBaseController {
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "更新知识库")
+    @Operation(summary = "更新知识库", operationId = "kbUpdate")
     public BaseResponse<KnowledgeBaseVO> update(
             @PathVariable Long id,
             @Valid @RequestBody UpdateKnowledgeBaseCommand dto) {
@@ -59,7 +61,7 @@ public class KnowledgeBaseController {
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "获取知识库详情")
+    @Operation(summary = "获取知识库详情", operationId = "kbGetById")
     public BaseResponse<KnowledgeBaseVO> getById(@PathVariable Long id) {
         try {
             KnowledgeBaseVO vo = knowledgeBaseService.getById(id);
@@ -71,7 +73,7 @@ public class KnowledgeBaseController {
     }
 
     @GetMapping
-    @Operation(summary = "获取用户的知识库列表")
+    @Operation(summary = "获取用户的知识库列表", operationId = "kbListByCreator")
     public BaseResponse<List<KnowledgeBaseVO>> listByCreator(
             @RequestParam Long userId,
             @RequestParam(defaultValue = "0") int page,
@@ -86,7 +88,7 @@ public class KnowledgeBaseController {
     }
 
     @GetMapping("/search")
-    @Operation(summary = "搜索知识库")
+    @Operation(summary = "搜索知识库", operationId = "kbSearch")
     public BaseResponse<List<KnowledgeBaseVO>> search(
             @RequestParam String keyword,
             @RequestParam Long userId,
@@ -102,7 +104,7 @@ public class KnowledgeBaseController {
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "删除知识库")
+    @Operation(summary = "删除知识库", operationId = "kbDelete")
     public BaseResponse<Void> delete(@PathVariable Long id) {
         try {
             knowledgeBaseService.delete(id);
@@ -114,7 +116,7 @@ public class KnowledgeBaseController {
     }
 
     @PostMapping("/{id}/documents")
-    @Operation(summary = "添加文档")
+    @Operation(summary = "添加文档", operationId = "kbAddDocument")
     public BaseResponse<KnowledgeDocumentVO> addDocument(
             @PathVariable Long id,
             @RequestParam Long userId,
@@ -137,7 +139,7 @@ public class KnowledgeBaseController {
     }
 
     @GetMapping("/{id}/documents")
-    @Operation(summary = "获取文档列表")
+    @Operation(summary = "获取文档列表", operationId = "kbListDocuments")
     public BaseResponse<List<KnowledgeDocumentVO>> listDocuments(
             @PathVariable Long id,
             @RequestParam(defaultValue = "0") int page,
@@ -152,7 +154,7 @@ public class KnowledgeBaseController {
     }
 
     @DeleteMapping("/{id}/documents/{docId}")
-    @Operation(summary = "删除文档")
+    @Operation(summary = "删除文档", operationId = "kbDeleteDocument")
     public BaseResponse<Void> deleteDocument(
             @PathVariable Long id,
             @PathVariable Long docId) {
@@ -166,7 +168,7 @@ public class KnowledgeBaseController {
     }
 
     @PostMapping("/{id}/documents/{docId}/embed")
-    @Operation(summary = "触发文档向量化")
+    @Operation(summary = "触发文档向量化", operationId = "kbProcessDocument")
     public BaseResponse<Void> processDocument(
             @PathVariable Long id,
             @PathVariable Long docId) {
@@ -180,7 +182,7 @@ public class KnowledgeBaseController {
     }
 
     @PostMapping("/{id}/documents/batch-embed")
-    @Operation(summary = "批量文档向量化")
+    @Operation(summary = "批量文档向量化", operationId = "kbBatchProcessDocuments")
     public BaseResponse<KnowledgeBaseApplicationService.BatchProcessResult> batchProcessDocuments(
             @PathVariable Long id,
             @RequestBody List<Long> documentIds) {
@@ -196,7 +198,7 @@ public class KnowledgeBaseController {
     }
 
     @PostMapping("/{id}/embed-all")
-    @Operation(summary = "向量化知识库所有待处理文档")
+    @Operation(summary = "向量化知识库所有待处理文档", operationId = "kbBatchProcessByKnowledgeBase")
     public BaseResponse<KnowledgeBaseApplicationService.BatchProcessResult> batchProcessByKnowledgeBase(
             @PathVariable Long id) {
         try {
@@ -211,7 +213,7 @@ public class KnowledgeBaseController {
     }
 
     @PostMapping("/{id}/documents/batch-embed-async")
-    @Operation(summary = "异步批量文档向量化")
+    @Operation(summary = "异步批量文档向量化", operationId = "kbBatchProcessDocumentsAsync")
     public BaseResponse<String> batchProcessDocumentsAsync(
             @PathVariable Long id,
             @RequestBody List<Long> documentIds) {
@@ -225,7 +227,7 @@ public class KnowledgeBaseController {
     }
 
     @GetMapping("/{id}/documents/{docId}/chunks")
-    @Operation(summary = "获取文档分块列表")
+    @Operation(summary = "获取文档分块列表", operationId = "kbListChunks")
     public BaseResponse<Map<String, Object>> listChunks(
             @PathVariable Long id,
             @PathVariable Long docId,
@@ -248,7 +250,7 @@ public class KnowledgeBaseController {
     }
 
     @PutMapping("/{id}/documents/{docId}")
-    @Operation(summary = "更新文档元信息")
+    @Operation(summary = "更新文档元信息", operationId = "kbUpdateDocument")
     public BaseResponse<KnowledgeDocumentVO> updateDocument(
             @PathVariable Long id,
             @PathVariable Long docId,
@@ -261,6 +263,61 @@ public class KnowledgeBaseController {
         } catch (Exception e) {
             log.error("更新文档元信息失败", e);
             return (BaseResponse<KnowledgeDocumentVO>) (BaseResponse<?>) ResultUtils.error(50000, e.getMessage());
+        }
+    }
+
+    @PostMapping("/{id}/recall-test")
+    @Operation(summary = "知识库召回测试", operationId = "kbRecallTest",
+            description = "输入查询文本，返回向量检索+Rerank后的召回结果，用于调试知识库检索效果")
+    public BaseResponse<Map<String, Object>> recallTest(
+            @PathVariable Long id,
+            @RequestBody Map<String, Object> request) {
+        try {
+            String query = (String) request.get("query");
+            Integer topK = request.get("topK") != null ? ((Number) request.get("topK")).intValue() : 5;
+            Double threshold = request.get("similarityThreshold") != null
+                    ? ((Number) request.get("similarityThreshold")).doubleValue() : 0.3;
+
+            if (query == null || query.trim().isEmpty()) {
+                return (BaseResponse<Map<String, Object>>) (BaseResponse<?>) ResultUtils.error(40000, "查询文本不能为空");
+            }
+
+            KnowledgeSearchService.SearchRequest searchRequest = KnowledgeSearchService.SearchRequest.builder()
+                    .knowledgeBaseIds(List.of(id))
+                    .query(query.trim())
+                    .topK(topK)
+                    .similarityThreshold(threshold)
+                    .retrievalMode("hybrid")
+                    .build();
+
+            KnowledgeSearchService.SearchResult result = knowledgeSearchService.search(searchRequest);
+
+            List<Map<String, Object>> chunks = new java.util.ArrayList<>();
+            int idx = 1;
+            for (KnowledgeSearchService.DocumentChunk doc : result.getDocuments()) {
+                Map<String, Object> chunk = new java.util.LinkedHashMap<>();
+                chunk.put("index", idx++);
+                chunk.put("score", doc.getScore());
+                chunk.put("documentId", doc.getDocumentId());
+                chunk.put("documentName", doc.getDocumentName());
+                chunk.put("content", doc.getContent());
+                chunk.put("chunkIndex", doc.getChunkIndex());
+                chunk.put("metadata", doc.getMetadata());
+                chunks.add(chunk);
+            }
+
+            Map<String, Object> response = new java.util.LinkedHashMap<>();
+            response.put("query", query);
+            response.put("topK", topK);
+            response.put("similarityThreshold", threshold);
+            response.put("totalResults", result.getTotalCount());
+            response.put("searchTimeMs", result.getSearchTimeMs());
+            response.put("chunks", chunks);
+
+            return ResultUtils.success(response);
+        } catch (Exception e) {
+            log.error("知识库召回测试失败: kbId={}", id, e);
+            return (BaseResponse<Map<String, Object>>) (BaseResponse<?>) ResultUtils.error(50000, e.getMessage());
         }
     }
 }
