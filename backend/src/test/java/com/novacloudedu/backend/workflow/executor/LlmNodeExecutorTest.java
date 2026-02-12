@@ -3,7 +3,10 @@ package com.novacloudedu.backend.workflow.executor;
 import com.novacloudedu.backend.domain.ai.valueobject.NodeType;
 import com.novacloudedu.backend.domain.ai.valueobject.WorkflowNode;
 import com.novacloudedu.backend.domain.knowledge.service.KnowledgeSearchService;
+import com.novacloudedu.backend.domain.ai.repository.McpServerRepository;
+import com.novacloudedu.backend.infrastructure.ai.ChatModelFactory;
 import com.novacloudedu.backend.infrastructure.ai.LangchainChatService;
+import com.novacloudedu.backend.infrastructure.ai.McpClientService;
 import com.novacloudedu.backend.infrastructure.workflow.executor.LlmNodeExecutor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -30,12 +33,21 @@ class LlmNodeExecutorTest {
     @Mock
     private KnowledgeSearchService knowledgeSearchService;
 
+    @Mock
+    private McpClientService mcpClientService;
+
+    @Mock
+    private ChatModelFactory chatModelFactory;
+
+    @Mock
+    private McpServerRepository mcpServerRepository;
+
     private LlmNodeExecutor executor;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        executor = new LlmNodeExecutor(langchainChatService, knowledgeSearchService);
+        executor = new LlmNodeExecutor(langchainChatService, knowledgeSearchService, mcpClientService, chatModelFactory, mcpServerRepository);
     }
 
     @Test
