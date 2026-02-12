@@ -37,7 +37,7 @@ public class AiAssistantController {
     private final AiChatApplicationService aiChatApplicationService;
 
     @PostMapping
-    @Operation(summary = "创建AI助手")
+    @Operation(summary = "创建AI助手", operationId = "assistantCreate")
     public BaseResponse<AiAssistantVO> create(
             @RequestParam Long userId,
             @Valid @RequestBody CreateAiAssistantCommand dto) {
@@ -51,7 +51,7 @@ public class AiAssistantController {
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "更新AI助手")
+    @Operation(summary = "更新AI助手", operationId = "assistantUpdate")
     public BaseResponse<AiAssistantVO> update(
             @PathVariable Long id,
             @Valid @RequestBody UpdateAiAssistantCommand dto) {
@@ -65,7 +65,7 @@ public class AiAssistantController {
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "获取AI助手详情")
+    @Operation(summary = "获取AI助手详情", operationId = "assistantGetById")
     public BaseResponse<AiAssistantVO> getById(@PathVariable Long id) {
         try {
             AiAssistantVO vo = assistantService.getById(id);
@@ -77,7 +77,7 @@ public class AiAssistantController {
     }
 
     @GetMapping
-    @Operation(summary = "获取用户的AI助手列表")
+    @Operation(summary = "获取用户的AI助手列表", operationId = "assistantListByCreator")
     public BaseResponse<List<AiAssistantVO>> listByCreator(
             @RequestParam Long userId,
             @RequestParam(defaultValue = "0") int page,
@@ -92,7 +92,7 @@ public class AiAssistantController {
     }
 
     @GetMapping("/public")
-    @Operation(summary = "获取公开的AI助手列表")
+    @Operation(summary = "获取公开的AI助手列表", operationId = "assistantListPublic")
     public BaseResponse<List<AiAssistantVO>> listPublic(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
@@ -106,7 +106,7 @@ public class AiAssistantController {
     }
 
     @GetMapping("/search")
-    @Operation(summary = "搜索AI助手")
+    @Operation(summary = "搜索AI助手", operationId = "assistantSearch")
     public BaseResponse<List<AiAssistantVO>> search(
             @RequestParam String keyword,
             @RequestParam(defaultValue = "0") int page,
@@ -121,7 +121,7 @@ public class AiAssistantController {
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "删除AI助手")
+    @Operation(summary = "删除AI助手", operationId = "assistantDelete")
     public BaseResponse<Void> delete(@PathVariable Long id) {
         try {
             assistantService.delete(id);
@@ -133,7 +133,7 @@ public class AiAssistantController {
     }
 
     @PutMapping("/{id}/publish")
-    @Operation(summary = "发布AI助手")
+    @Operation(summary = "发布AI助手", operationId = "assistantPublish")
     public BaseResponse<AiAssistantVO> publish(@PathVariable Long id) {
         try {
             AiAssistantVO vo = assistantService.publish(id);
@@ -145,7 +145,7 @@ public class AiAssistantController {
     }
 
     @PutMapping("/{id}/archive")
-    @Operation(summary = "归档AI助手")
+    @Operation(summary = "归档AI助手", operationId = "assistantArchive")
     public BaseResponse<AiAssistantVO> archive(@PathVariable Long id) {
         try {
             AiAssistantVO vo = assistantService.archive(id);
@@ -157,7 +157,7 @@ public class AiAssistantController {
     }
 
     @PostMapping("/{id}/knowledge-bases/{kbId}")
-    @Operation(summary = "绑定知识库")
+    @Operation(summary = "绑定知识库", operationId = "assistantBindKnowledgeBase")
     public BaseResponse<Void> bindKnowledgeBase(
             @PathVariable Long id,
             @PathVariable Long kbId) {
@@ -171,7 +171,7 @@ public class AiAssistantController {
     }
 
     @DeleteMapping("/{id}/knowledge-bases/{kbId}")
-    @Operation(summary = "解绑知识库")
+    @Operation(summary = "解绑知识库", operationId = "assistantUnbindKnowledgeBase")
     public BaseResponse<Void> unbindKnowledgeBase(
             @PathVariable Long id,
             @PathVariable Long kbId) {
@@ -185,7 +185,7 @@ public class AiAssistantController {
     }
 
     @GetMapping("/{id}/workflows")
-    @Operation(summary = "获取AI助手绑定的工作流列表")
+    @Operation(summary = "获取AI助手绑定的工作流列表", operationId = "assistantGetWorkflows")
     public BaseResponse<List<Long>> getWorkflows(@PathVariable Long id) {
         try {
             List<Long> workflowIds = workflowService.getWorkflowIds(id);
@@ -197,7 +197,7 @@ public class AiAssistantController {
     }
 
     @GetMapping("/{id}/workflow-skills")
-    @Operation(summary = "获取AI助手的工作流技能列表",
+    @Operation(summary = "获取AI助手的工作流技能列表", operationId = "assistantGetWorkflowSkills",
             description = "返回绑定的工作流详情，包含描述、输入参数、输出参数，供前端展示或 AI 助手对话时使用")
     public BaseResponse<List<AiAssistantWorkflowService.WorkflowSkillVO>> getWorkflowSkills(@PathVariable Long id) {
         try {
@@ -210,7 +210,7 @@ public class AiAssistantController {
     }
 
     @PostMapping("/{id}/workflows/{workflowId}")
-    @Operation(summary = "绑定工作流到AI助手")
+    @Operation(summary = "绑定工作流到AI助手", operationId = "assistantBindWorkflow")
     public BaseResponse<Void> bindWorkflow(
             @PathVariable Long id,
             @PathVariable Long workflowId) {
@@ -224,7 +224,7 @@ public class AiAssistantController {
     }
 
     @DeleteMapping("/{id}/workflows/{workflowId}")
-    @Operation(summary = "解绑工作流")
+    @Operation(summary = "解绑工作流", operationId = "assistantUnbindWorkflow")
     public BaseResponse<Void> unbindWorkflow(
             @PathVariable Long id,
             @PathVariable Long workflowId) {
@@ -238,7 +238,7 @@ public class AiAssistantController {
     }
 
     @PostMapping("/{id}/workflows/{workflowId}/execute")
-    @Operation(summary = "执行AI助手绑定的工作流")
+    @Operation(summary = "执行AI助手绑定的工作流", operationId = "assistantExecuteWorkflow")
     public BaseResponse<java.util.Map<String, Object>> executeWorkflow(
             @PathVariable Long id,
             @PathVariable Long workflowId,
@@ -256,7 +256,7 @@ public class AiAssistantController {
     // ==================== AI助手对话 ====================
 
     @PostMapping(value = "/{id}/chat/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    @Operation(summary = "AI助手流式对话",
+    @Operation(summary = "AI助手流式对话", operationId = "assistantChat",
             description = "通过助手ID与配置好的AI助手进行SSE流式对话。" +
                     "自动使用助手的systemPrompt和modelConfig，" +
                     "自动从绑定的知识库进行RAG检索，" +

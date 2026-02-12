@@ -4,9 +4,10 @@ package com.novacloudedu.backend.domain.post.valueobject;
  * 帖子类型枚举
  */
 public enum PostType {
-    STUDY("study", "学习"),
-    LIFE("life", "生活"),
-    SKILL("skill", "技巧"),
+    DISCUSSION("discussion", "讨论"),
+    QUESTION("question", "提问"),
+    SHARE("share", "分享"),
+    ANNOUNCEMENT("announcement", "公告"),
     OTHER("other", "其他");
 
     private final String code;

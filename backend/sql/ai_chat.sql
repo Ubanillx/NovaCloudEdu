@@ -24,6 +24,9 @@ CREATE TABLE IF NOT EXISTS ai_assistant
     top_p           DECIMAL(3,2)    DEFAULT 0.8             NOT NULL,
     max_tokens      INT             DEFAULT 2000            NOT NULL,
     
+    -- MCP 服务器绑定
+    mcp_server_ids  JSONB           DEFAULT '[]'            NOT NULL,
+    
     -- 状态与版本
     status          VARCHAR(32)     DEFAULT 'DRAFT'         NOT NULL,
     version         INT             DEFAULT 1               NOT NULL,
@@ -62,6 +65,7 @@ COMMENT ON COLUMN ai_assistant.model_name IS '模型名称';
 COMMENT ON COLUMN ai_assistant.temperature IS '温度参数';
 COMMENT ON COLUMN ai_assistant.top_p IS 'Top-P参数';
 COMMENT ON COLUMN ai_assistant.max_tokens IS '最大Token数';
+COMMENT ON COLUMN ai_assistant.mcp_server_ids IS '绑定的MCP服务器ID列表，JSON数组格式';
 COMMENT ON COLUMN ai_assistant.status IS '状态：DRAFT-草稿，PUBLISHED-已发布，ARCHIVED-已归档';
 COMMENT ON COLUMN ai_assistant.version IS '当前版本号';
 COMMENT ON COLUMN ai_assistant.published_version IS '已发布版本号';
@@ -635,3 +639,35 @@ COMMENT ON COLUMN workflow_version.definition IS '工作流定义快照';
 COMMENT ON COLUMN workflow_version.publish_note IS '发布说明';
 COMMENT ON COLUMN workflow_version.published_by IS '发布者ID';
 COMMENT ON COLUMN workflow_version.create_time IS '创建时间';
+
+-- =====================================================
+-- MCP服务器配置表
+-- =====================================================
+CREATE TABLE IF NOT EXISTS mcp_server
+(
+    id              BIGSERIAL PRIMARY KEY,
+    name            VARCHAR(128)                            NOT NULL,
+    description     VARCHAR(512)                            NULL,
+    url             VARCHAR(512)                            NULL,
+    config_json     TEXT                                    NULL,
+    enabled         SMALLINT        DEFAULT 1               NOT NULL,
+    creator_id      BIGINT                                  NOT NULL,
+    create_time     TIMESTAMP       DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    update_time     TIMESTAMP       DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    is_delete       SMALLINT        DEFAULT 0               NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_ms_creator_id ON mcp_server(creator_id);
+CREATE INDEX IF NOT EXISTS idx_ms_enabled ON mcp_server(enabled);
+
+COMMENT ON TABLE mcp_server IS 'MCP服务器配置';
+COMMENT ON COLUMN mcp_server.id IS 'id';
+COMMENT ON COLUMN mcp_server.name IS '服务器名称';
+COMMENT ON COLUMN mcp_server.description IS '描述';
+COMMENT ON COLUMN mcp_server.url IS 'MCP服务器URL（HTTP模式用，stdio模式为空）';
+COMMENT ON COLUMN mcp_server.config_json IS 'JSON配置（stdio: command/args/env; HTTP: headers等）';
+COMMENT ON COLUMN mcp_server.enabled IS '是否启用：0-否，1-是';
+COMMENT ON COLUMN mcp_server.creator_id IS '创建者用户ID';
+COMMENT ON COLUMN mcp_server.create_time IS '创建时间';
+COMMENT ON COLUMN mcp_server.update_time IS '更新时间';
+COMMENT ON COLUMN mcp_server.is_delete IS '是否删除';

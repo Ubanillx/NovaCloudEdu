@@ -41,4 +41,6 @@ public class CreateAiAssistantCommand {
     private Integer maxTokens;
 
     private List<Long> knowledgeBaseIds;
+
+    private List<Long> mcpServerIds;
 }

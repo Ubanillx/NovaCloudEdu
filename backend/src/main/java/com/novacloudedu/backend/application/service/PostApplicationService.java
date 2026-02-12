@@ -87,11 +87,27 @@ public class PostApplicationService {
         replyRepository.deleteByPostId(PostId.of(postId));
         // 删除相关评论
         commentRepository.deleteByPostId(PostId.of(postId));
-        // 删除帖子（逻辑删除）
-        post.delete();
-        postRepository.update(post);
+        // 删除帖子（逻辑删除，通过 @TableLogic 将 is_delete 置为 1）
+        postRepository.delete(PostId.of(postId));
 
         log.info("帖子删除成功: postId={}, userId={}", postId, userId);
+    }
+
+    /**
+     * 管理员删除帖子（跳过作者检查）
+     */
+    @Transactional
+    public void adminDeletePost(Long postId) {
+        getPostOrThrow(postId);
+
+        // 删除相关评论回复
+        replyRepository.deleteByPostId(PostId.of(postId));
+        // 删除相关评论
+        commentRepository.deleteByPostId(PostId.of(postId));
+        // 删除帖子（逻辑删除，通过 @TableLogic 将 is_delete 置为 1）
+        postRepository.delete(PostId.of(postId));
+
+        log.info("管理员删除帖子成功: postId={}", postId);
     }
 
     /**

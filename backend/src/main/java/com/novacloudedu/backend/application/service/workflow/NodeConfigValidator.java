@@ -44,7 +44,8 @@ public class NodeConfigValidator {
             case START -> validateStartConfig(config);
             case WEBHOOK -> validateWebhookConfig(config);
             case SCHEDULE -> validateScheduleConfig(config);
-            case FILE_READ, FILE_WRITE -> validateFileConfig(config);
+            case FILE_READ -> validateFileReadConfig(config);
+            case FILE_WRITE -> validateFileWriteConfig(config);
             case END, MERGE, LOOP_START, LOOP_END -> ValidationResult.success();
         };
     }
@@ -111,6 +112,21 @@ public class NodeConfigValidator {
         Integer historyLimit = getInteger(config, "historyLimit");
         if (historyLimit != null && (historyLimit < 1 || historyLimit > 100)) {
             errors.add("历史消息数量必须在1-100之间");
+        }
+
+        // MCP 服务器配置验证
+        Object mcpServersObj = config.get("mcpServers");
+        if (mcpServersObj instanceof List) {
+            List<Map<String, Object>> mcpServers = (List<Map<String, Object>>) mcpServersObj;
+            for (int i = 0; i < mcpServers.size(); i++) {
+                Map<String, Object> server = mcpServers.get(i);
+                String url = (String) server.get("url");
+                if (url == null || url.isBlank()) {
+                    errors.add("MCP服务器[" + i + "]的URL不能为空");
+                } else if (!url.startsWith("http://") && !url.startsWith("https://")) {
+                    errors.add("MCP服务器[" + i + "]的URL必须以http://或https://开头");
+                }
+            }
         }
 
         return errors.isEmpty() ? ValidationResult.success() : ValidationResult.failure(errors);
@@ -455,18 +471,25 @@ public class NodeConfigValidator {
         return errors.isEmpty() ? ValidationResult.success() : ValidationResult.failure(errors);
     }
 
-    private ValidationResult validateFileConfig(Map<String, Object> config) {
+    private ValidationResult validateFileReadConfig(Map<String, Object> config) {
         List<String> errors = new ArrayList<>();
 
-        String operation = (String) config.get("operation");
-        if (operation == null || operation.isBlank()) {
-            errors.add("文件操作节点必须指定操作类型");
+        String fileUrl = (String) config.get("fileUrl");
+        String fileUrlVariable = (String) config.get("fileUrlVariable");
+        if ((fileUrl == null || fileUrl.isBlank()) && (fileUrlVariable == null || fileUrlVariable.isBlank())) {
+            errors.add("文件读取节点必须指定文件URL(fileUrl)或文件URL变量(fileUrlVariable)");
         }
 
-        String filePath = (String) config.get("filePath");
-        String filePathVariable = (String) config.get("filePathVariable");
-        if ((filePath == null || filePath.isBlank()) && (filePathVariable == null || filePathVariable.isBlank())) {
-            errors.add("文件操作节点必须指定文件路径或文件路径变量");
+        return errors.isEmpty() ? ValidationResult.success() : ValidationResult.failure(errors);
+    }
+
+    private ValidationResult validateFileWriteConfig(Map<String, Object> config) {
+        List<String> errors = new ArrayList<>();
+
+        String contentVariable = (String) config.get("contentVariable");
+        String content = (String) config.get("content");
+        if ((contentVariable == null || contentVariable.isBlank()) && (content == null || content.isBlank())) {
+            errors.add("文件写入节点必须指定内容变量(contentVariable)或内容模板(content)");
         }
 
         return errors.isEmpty() ? ValidationResult.success() : ValidationResult.failure(errors);
