@@ -21,6 +21,7 @@ Name | Type | Description | Notes
 **topP** | **num** |  | [optional] 
 **maxTokens** | **int** |  | [optional] 
 **knowledgeBaseIds** | **BuiltList&lt;int&gt;** |  | [optional] 
+**mcpServerIds** | **BuiltList&lt;int&gt;** |  | [optional] 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

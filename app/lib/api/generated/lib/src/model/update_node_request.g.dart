@@ -29,6 +29,10 @@ const UpdateNodeRequestTypeEnum _$updateNodeRequestTypeEnum_SWITCH =
     const UpdateNodeRequestTypeEnum._('SWITCH');
 const UpdateNodeRequestTypeEnum _$updateNodeRequestTypeEnum_LOOP =
     const UpdateNodeRequestTypeEnum._('LOOP');
+const UpdateNodeRequestTypeEnum _$updateNodeRequestTypeEnum_LOOP_START =
+    const UpdateNodeRequestTypeEnum._('LOOP_START');
+const UpdateNodeRequestTypeEnum _$updateNodeRequestTypeEnum_LOOP_END =
+    const UpdateNodeRequestTypeEnum._('LOOP_END');
 const UpdateNodeRequestTypeEnum _$updateNodeRequestTypeEnum_PARALLEL =
     const UpdateNodeRequestTypeEnum._('PARALLEL');
 const UpdateNodeRequestTypeEnum _$updateNodeRequestTypeEnum_MERGE =
@@ -80,6 +84,10 @@ UpdateNodeRequestTypeEnum _$updateNodeRequestTypeEnumValueOf(String name) {
       return _$updateNodeRequestTypeEnum_SWITCH;
     case 'LOOP':
       return _$updateNodeRequestTypeEnum_LOOP;
+    case 'LOOP_START':
+      return _$updateNodeRequestTypeEnum_LOOP_START;
+    case 'LOOP_END':
+      return _$updateNodeRequestTypeEnum_LOOP_END;
     case 'PARALLEL':
       return _$updateNodeRequestTypeEnum_PARALLEL;
     case 'MERGE':
@@ -124,6 +132,8 @@ final BuiltSet<UpdateNodeRequestTypeEnum> _$updateNodeRequestTypeEnumValues =
       _$updateNodeRequestTypeEnum_CONDITION,
       _$updateNodeRequestTypeEnum_SWITCH,
       _$updateNodeRequestTypeEnum_LOOP,
+      _$updateNodeRequestTypeEnum_LOOP_START,
+      _$updateNodeRequestTypeEnum_LOOP_END,
       _$updateNodeRequestTypeEnum_PARALLEL,
       _$updateNodeRequestTypeEnum_MERGE,
       _$updateNodeRequestTypeEnum_VARIABLE_SET,
@@ -156,6 +166,8 @@ class _$UpdateNodeRequestTypeEnumSerializer
     'CONDITION': 'CONDITION',
     'SWITCH': 'SWITCH',
     'LOOP': 'LOOP',
+    'LOOP_START': 'LOOP_START',
+    'LOOP_END': 'LOOP_END',
     'PARALLEL': 'PARALLEL',
     'MERGE': 'MERGE',
     'VARIABLE_SET': 'VARIABLE_SET',
@@ -182,6 +194,8 @@ class _$UpdateNodeRequestTypeEnumSerializer
     'CONDITION': 'CONDITION',
     'SWITCH': 'SWITCH',
     'LOOP': 'LOOP',
+    'LOOP_START': 'LOOP_START',
+    'LOOP_END': 'LOOP_END',
     'PARALLEL': 'PARALLEL',
     'MERGE': 'MERGE',
     'VARIABLE_SET': 'VARIABLE_SET',

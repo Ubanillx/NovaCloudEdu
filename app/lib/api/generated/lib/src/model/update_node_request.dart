@@ -26,7 +26,7 @@ abstract class UpdateNodeRequest
   /// 节点类型
   @BuiltValueField(wireName: r'type')
   UpdateNodeRequestTypeEnum? get type;
-  // enum typeEnum {  START,  WEBHOOK,  SCHEDULE,  LLM,  KNOWLEDGE_RETRIEVAL,  TEXT_EMBEDDING,  INTENT_RECOGNITION,  ENTITY_EXTRACTION,  CONDITION,  SWITCH,  LOOP,  PARALLEL,  MERGE,  VARIABLE_SET,  VARIABLE_GET,  JSON_PARSE,  TEMPLATE,  CODE,  HTTP_REQUEST,  DATABASE_QUERY,  FILE_READ,  FILE_WRITE,  RESPONSE,  END,  };
+  // enum typeEnum {  START,  WEBHOOK,  SCHEDULE,  LLM,  KNOWLEDGE_RETRIEVAL,  TEXT_EMBEDDING,  INTENT_RECOGNITION,  ENTITY_EXTRACTION,  CONDITION,  SWITCH,  LOOP,  LOOP_START,  LOOP_END,  PARALLEL,  MERGE,  VARIABLE_SET,  VARIABLE_GET,  JSON_PARSE,  TEMPLATE,  CODE,  HTTP_REQUEST,  DATABASE_QUERY,  FILE_READ,  FILE_WRITE,  RESPONSE,  END,  };
 
   /// 节点名称
   @BuiltValueField(wireName: r'name')
@@ -267,6 +267,16 @@ class UpdateNodeRequestTypeEnum extends EnumClass {
   @BuiltValueEnumConst(wireName: r'LOOP')
   static const UpdateNodeRequestTypeEnum LOOP =
       _$updateNodeRequestTypeEnum_LOOP;
+
+  /// 节点类型
+  @BuiltValueEnumConst(wireName: r'LOOP_START')
+  static const UpdateNodeRequestTypeEnum LOOP_START =
+      _$updateNodeRequestTypeEnum_LOOP_START;
+
+  /// 节点类型
+  @BuiltValueEnumConst(wireName: r'LOOP_END')
+  static const UpdateNodeRequestTypeEnum LOOP_END =
+      _$updateNodeRequestTypeEnum_LOOP_END;
 
   /// 节点类型
   @BuiltValueEnumConst(wireName: r'PARALLEL')

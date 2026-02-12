@@ -33,6 +33,7 @@ part 'ai_assistant_vo.g.dart';
 /// * [usageCount]
 /// * [rating]
 /// * [knowledgeBases]
+/// * [mcpServerIds]
 /// * [creatorId]
 /// * [sort]
 /// * [createTime]
@@ -99,6 +100,9 @@ abstract class AiAssistantVO
 
   @BuiltValueField(wireName: r'knowledgeBases')
   BuiltList<KnowledgeBaseVO>? get knowledgeBases;
+
+  @BuiltValueField(wireName: r'mcpServerIds')
+  BuiltList<int>? get mcpServerIds;
 
   @BuiltValueField(wireName: r'creatorId')
   int? get creatorId;
@@ -275,6 +279,13 @@ class _$AiAssistantVOSerializer implements PrimitiveSerializer<AiAssistantVO> {
       yield serializers.serialize(
         object.knowledgeBases,
         specifiedType: const FullType(BuiltList, [FullType(KnowledgeBaseVO)]),
+      );
+    }
+    if (object.mcpServerIds != null) {
+      yield r'mcpServerIds';
+      yield serializers.serialize(
+        object.mcpServerIds,
+        specifiedType: const FullType(BuiltList, [FullType(int)]),
       );
     }
     if (object.creatorId != null) {
@@ -470,6 +481,13 @@ class _$AiAssistantVOSerializer implements PrimitiveSerializer<AiAssistantVO> {
                 const FullType(BuiltList, [FullType(KnowledgeBaseVO)]),
           ) as BuiltList<KnowledgeBaseVO>;
           result.knowledgeBases.replace(valueDes);
+          break;
+        case r'mcpServerIds':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(BuiltList, [FullType(int)]),
+          ) as BuiltList<int>;
+          result.mcpServerIds.replace(valueDes);
           break;
         case r'creatorId':
           final valueDes = serializers.deserialize(

@@ -104,6 +104,8 @@ class _$ExecutionResultResponse extends ExecutionResultResponse {
   @override
   final String? workflowName;
   @override
+  final int? workflowVersion;
+  @override
   final ExecutionResultResponseStatusEnum? status;
   @override
   final BuiltMap<String, JsonObject>? input;
@@ -121,6 +123,8 @@ class _$ExecutionResultResponse extends ExecutionResultResponse {
   final DateTime? endTime;
   @override
   final int? durationMs;
+  @override
+  final BuiltList<NodeExecutionDTO>? nodeExecutions;
 
   factory _$ExecutionResultResponse([
     void Function(ExecutionResultResponseBuilder)? updates,
@@ -130,6 +134,7 @@ class _$ExecutionResultResponse extends ExecutionResultResponse {
     this.executionId,
     this.workflowId,
     this.workflowName,
+    this.workflowVersion,
     this.status,
     this.input,
     this.output,
@@ -139,6 +144,7 @@ class _$ExecutionResultResponse extends ExecutionResultResponse {
     this.startTime,
     this.endTime,
     this.durationMs,
+    this.nodeExecutions,
   }) : super._();
   @override
   ExecutionResultResponse rebuild(
@@ -156,6 +162,7 @@ class _$ExecutionResultResponse extends ExecutionResultResponse {
         executionId == other.executionId &&
         workflowId == other.workflowId &&
         workflowName == other.workflowName &&
+        workflowVersion == other.workflowVersion &&
         status == other.status &&
         input == other.input &&
         output == other.output &&
@@ -164,7 +171,8 @@ class _$ExecutionResultResponse extends ExecutionResultResponse {
         errorMessage == other.errorMessage &&
         startTime == other.startTime &&
         endTime == other.endTime &&
-        durationMs == other.durationMs;
+        durationMs == other.durationMs &&
+        nodeExecutions == other.nodeExecutions;
   }
 
   @override
@@ -173,6 +181,7 @@ class _$ExecutionResultResponse extends ExecutionResultResponse {
     _$hash = $jc(_$hash, executionId.hashCode);
     _$hash = $jc(_$hash, workflowId.hashCode);
     _$hash = $jc(_$hash, workflowName.hashCode);
+    _$hash = $jc(_$hash, workflowVersion.hashCode);
     _$hash = $jc(_$hash, status.hashCode);
     _$hash = $jc(_$hash, input.hashCode);
     _$hash = $jc(_$hash, output.hashCode);
@@ -182,6 +191,7 @@ class _$ExecutionResultResponse extends ExecutionResultResponse {
     _$hash = $jc(_$hash, startTime.hashCode);
     _$hash = $jc(_$hash, endTime.hashCode);
     _$hash = $jc(_$hash, durationMs.hashCode);
+    _$hash = $jc(_$hash, nodeExecutions.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -192,6 +202,7 @@ class _$ExecutionResultResponse extends ExecutionResultResponse {
           ..add('executionId', executionId)
           ..add('workflowId', workflowId)
           ..add('workflowName', workflowName)
+          ..add('workflowVersion', workflowVersion)
           ..add('status', status)
           ..add('input', input)
           ..add('output', output)
@@ -200,7 +211,8 @@ class _$ExecutionResultResponse extends ExecutionResultResponse {
           ..add('errorMessage', errorMessage)
           ..add('startTime', startTime)
           ..add('endTime', endTime)
-          ..add('durationMs', durationMs))
+          ..add('durationMs', durationMs)
+          ..add('nodeExecutions', nodeExecutions))
         .toString();
   }
 }
@@ -221,6 +233,11 @@ class ExecutionResultResponseBuilder
   String? _workflowName;
   String? get workflowName => _$this._workflowName;
   set workflowName(String? workflowName) => _$this._workflowName = workflowName;
+
+  int? _workflowVersion;
+  int? get workflowVersion => _$this._workflowVersion;
+  set workflowVersion(int? workflowVersion) =>
+      _$this._workflowVersion = workflowVersion;
 
   ExecutionResultResponseStatusEnum? _status;
   ExecutionResultResponseStatusEnum? get status => _$this._status;
@@ -264,6 +281,12 @@ class ExecutionResultResponseBuilder
   int? get durationMs => _$this._durationMs;
   set durationMs(int? durationMs) => _$this._durationMs = durationMs;
 
+  ListBuilder<NodeExecutionDTO>? _nodeExecutions;
+  ListBuilder<NodeExecutionDTO> get nodeExecutions =>
+      _$this._nodeExecutions ??= ListBuilder<NodeExecutionDTO>();
+  set nodeExecutions(ListBuilder<NodeExecutionDTO>? nodeExecutions) =>
+      _$this._nodeExecutions = nodeExecutions;
+
   ExecutionResultResponseBuilder() {
     ExecutionResultResponse._defaults(this);
   }
@@ -274,6 +297,7 @@ class ExecutionResultResponseBuilder
       _executionId = $v.executionId;
       _workflowId = $v.workflowId;
       _workflowName = $v.workflowName;
+      _workflowVersion = $v.workflowVersion;
       _status = $v.status;
       _input = $v.input?.toBuilder();
       _output = $v.output?.toBuilder();
@@ -283,6 +307,7 @@ class ExecutionResultResponseBuilder
       _startTime = $v.startTime;
       _endTime = $v.endTime;
       _durationMs = $v.durationMs;
+      _nodeExecutions = $v.nodeExecutions?.toBuilder();
       _$v = null;
     }
     return this;
@@ -310,6 +335,7 @@ class ExecutionResultResponseBuilder
             executionId: executionId,
             workflowId: workflowId,
             workflowName: workflowName,
+            workflowVersion: workflowVersion,
             status: status,
             input: _input?.build(),
             output: _output?.build(),
@@ -319,6 +345,7 @@ class ExecutionResultResponseBuilder
             startTime: startTime,
             endTime: endTime,
             durationMs: durationMs,
+            nodeExecutions: _nodeExecutions?.build(),
           );
     } catch (_) {
       late String _$failedField;
@@ -329,6 +356,9 @@ class ExecutionResultResponseBuilder
         _output?.build();
         _$failedField = 'variables';
         _variables?.build();
+
+        _$failedField = 'nodeExecutions';
+        _nodeExecutions?.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
           r'ExecutionResultResponse',

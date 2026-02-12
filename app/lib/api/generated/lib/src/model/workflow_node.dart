@@ -4,6 +4,7 @@
 
 // ignore_for_file: unused_element
 import 'package:nova_api/src/model/error_handling_config.dart';
+import 'package:nova_api/src/model/children_definition.dart';
 import 'package:built_collection/built_collection.dart';
 import 'package:built_value/json_object.dart';
 import 'package:nova_api/src/model/position.dart';
@@ -21,6 +22,9 @@ part 'workflow_node.g.dart';
 /// * [position]
 /// * [config]
 /// * [errorHandling]
+/// * [children]
+/// * [width]
+/// * [height]
 @BuiltValue()
 abstract class WorkflowNode
     implements Built<WorkflowNode, WorkflowNodeBuilder> {
@@ -29,7 +33,7 @@ abstract class WorkflowNode
 
   @BuiltValueField(wireName: r'type')
   WorkflowNodeTypeEnum? get type;
-  // enum typeEnum {  START,  WEBHOOK,  SCHEDULE,  LLM,  KNOWLEDGE_RETRIEVAL,  TEXT_EMBEDDING,  INTENT_RECOGNITION,  ENTITY_EXTRACTION,  CONDITION,  SWITCH,  LOOP,  PARALLEL,  MERGE,  VARIABLE_SET,  VARIABLE_GET,  JSON_PARSE,  TEMPLATE,  CODE,  HTTP_REQUEST,  DATABASE_QUERY,  FILE_READ,  FILE_WRITE,  RESPONSE,  END,  };
+  // enum typeEnum {  START,  WEBHOOK,  SCHEDULE,  LLM,  KNOWLEDGE_RETRIEVAL,  TEXT_EMBEDDING,  INTENT_RECOGNITION,  ENTITY_EXTRACTION,  CONDITION,  SWITCH,  LOOP,  LOOP_START,  LOOP_END,  PARALLEL,  MERGE,  VARIABLE_SET,  VARIABLE_GET,  JSON_PARSE,  TEMPLATE,  CODE,  HTTP_REQUEST,  DATABASE_QUERY,  FILE_READ,  FILE_WRITE,  RESPONSE,  END,  };
 
   @BuiltValueField(wireName: r'name')
   String? get name;
@@ -42,6 +46,15 @@ abstract class WorkflowNode
 
   @BuiltValueField(wireName: r'errorHandling')
   ErrorHandlingConfig? get errorHandling;
+
+  @BuiltValueField(wireName: r'children')
+  ChildrenDefinition? get children;
+
+  @BuiltValueField(wireName: r'width')
+  int? get width;
+
+  @BuiltValueField(wireName: r'height')
+  int? get height;
 
   WorkflowNode._();
 
@@ -107,6 +120,27 @@ class _$WorkflowNodeSerializer implements PrimitiveSerializer<WorkflowNode> {
       yield serializers.serialize(
         object.errorHandling,
         specifiedType: const FullType(ErrorHandlingConfig),
+      );
+    }
+    if (object.children != null) {
+      yield r'children';
+      yield serializers.serialize(
+        object.children,
+        specifiedType: const FullType(ChildrenDefinition),
+      );
+    }
+    if (object.width != null) {
+      yield r'width';
+      yield serializers.serialize(
+        object.width,
+        specifiedType: const FullType(int),
+      );
+    }
+    if (object.height != null) {
+      yield r'height';
+      yield serializers.serialize(
+        object.height,
+        specifiedType: const FullType(int),
       );
     }
   }
@@ -177,6 +211,27 @@ class _$WorkflowNodeSerializer implements PrimitiveSerializer<WorkflowNode> {
           ) as ErrorHandlingConfig;
           result.errorHandling.replace(valueDes);
           break;
+        case r'children':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(ChildrenDefinition),
+          ) as ChildrenDefinition;
+          result.children.replace(valueDes);
+          break;
+        case r'width':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(int),
+          ) as int;
+          result.width = valueDes;
+          break;
+        case r'height':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(int),
+          ) as int;
+          result.height = valueDes;
+          break;
         default:
           unhandled.add(key);
           unhandled.add(value);
@@ -234,6 +289,11 @@ class WorkflowNodeTypeEnum extends EnumClass {
   static const WorkflowNodeTypeEnum SWITCH = _$workflowNodeTypeEnum_SWITCH;
   @BuiltValueEnumConst(wireName: r'LOOP')
   static const WorkflowNodeTypeEnum LOOP = _$workflowNodeTypeEnum_LOOP;
+  @BuiltValueEnumConst(wireName: r'LOOP_START')
+  static const WorkflowNodeTypeEnum LOOP_START =
+      _$workflowNodeTypeEnum_LOOP_START;
+  @BuiltValueEnumConst(wireName: r'LOOP_END')
+  static const WorkflowNodeTypeEnum LOOP_END = _$workflowNodeTypeEnum_LOOP_END;
   @BuiltValueEnumConst(wireName: r'PARALLEL')
   static const WorkflowNodeTypeEnum PARALLEL = _$workflowNodeTypeEnum_PARALLEL;
   @BuiltValueEnumConst(wireName: r'MERGE')

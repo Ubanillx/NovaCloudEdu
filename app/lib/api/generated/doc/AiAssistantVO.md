@@ -28,6 +28,7 @@ Name | Type | Description | Notes
 **usageCount** | **int** |  | [optional] 
 **rating** | **double** |  | [optional] 
 **knowledgeBases** | [**BuiltList&lt;KnowledgeBaseVO&gt;**](KnowledgeBaseVO.md) |  | [optional] 
+**mcpServerIds** | **BuiltList&lt;int&gt;** |  | [optional] 
 **creatorId** | **int** |  | [optional] 
 **sort** | **int** |  | [optional] 
 **createTime** | [**DateTime**](DateTime.md) |  | [optional] 

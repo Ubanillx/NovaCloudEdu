@@ -31,6 +31,7 @@ Serializers _$serializers =
           ..add(ArticleChatRequest.serializer)
           ..add(ArticleResponse.serializer)
           ..add(ArticleSourceResponse.serializer)
+          ..add(AssistantChatRequest.serializer)
           ..add(AsyncExecutionResponse.serializer)
           ..add(BannerListResponse.serializer)
           ..add(BannerPageResponse.serializer)
@@ -66,6 +67,7 @@ Serializers _$serializers =
           ..add(BaseResponseDailyWordPageResponse.serializer)
           ..add(BaseResponseDailyWordResponse.serializer)
           ..add(BaseResponseExecutionResultResponse.serializer)
+          ..add(BaseResponseExecutionStatisticsResponse.serializer)
           ..add(BaseResponseFeedbackDetailResponse.serializer)
           ..add(BaseResponseFeedbackPageResponse.serializer)
           ..add(BaseResponseFollowPageResponse.serializer)
@@ -96,6 +98,7 @@ Serializers _$serializers =
           ..add(BaseResponseListDailyArticleResponse.serializer)
           ..add(BaseResponseListDailyWordResponse.serializer)
           ..add(BaseResponseListExecutionLogResponse.serializer)
+          ..add(BaseResponseListExecutionResultResponse.serializer)
           ..add(BaseResponseListFeedbackReplyResponse.serializer)
           ..add(BaseResponseListFileInfoResponse.serializer)
           ..add(BaseResponseListFriendResponse.serializer)
@@ -125,7 +128,11 @@ Serializers _$serializers =
           ..add(BaseResponseListWorkflowEdgeResponse.serializer)
           ..add(BaseResponseListWorkflowNodeResponse.serializer)
           ..add(BaseResponseListWorkflowResponse.serializer)
+          ..add(BaseResponseListWorkflowSkillVO.serializer)
+          ..add(BaseResponseListWorkflowTemplateResponse.serializer)
+          ..add(BaseResponseListWorkflowTriggerResponse.serializer)
           ..add(BaseResponseListWorkflowVariableResponse.serializer)
+          ..add(BaseResponseListWorkflowVersionResponse.serializer)
           ..add(BaseResponseLoginUserResponse.serializer)
           ..add(BaseResponseLong.serializer)
           ..add(BaseResponseMapStringObject.serializer)
@@ -171,8 +178,11 @@ Serializers _$serializers =
           ..add(BaseResponseWorkflowNodeResponse.serializer)
           ..add(BaseResponseWorkflowResponse.serializer)
           ..add(BaseResponseWorkflowSettingsDTO.serializer)
+          ..add(BaseResponseWorkflowTemplateResponse.serializer)
+          ..add(BaseResponseWorkflowTriggerResponse.serializer)
           ..add(BaseResponseWorkflowValidationResponse.serializer)
           ..add(BaseResponseWorkflowVariableResponse.serializer)
+          ..add(BaseResponseWorkflowVersionResponse.serializer)
           ..add(BatchAiProcessRequest.serializer)
           ..add(BatchBanUserRequest.serializer)
           ..add(BatchCreateUserRequest.serializer)
@@ -203,6 +213,7 @@ Serializers _$serializers =
           ..add(CheckinRankingItem.serializer)
           ..add(CheckinResult.serializer)
           ..add(CheckinStatusResult.serializer)
+          ..add(ChildrenDefinition.serializer)
           ..add(ClassMemberResponse.serializer)
           ..add(ClassResponse.serializer)
           ..add(ClassScheduleItemResponse.serializer)
@@ -252,6 +263,7 @@ Serializers _$serializers =
           ..add(ExecutionLogResponseNodeTypeEnum.serializer)
           ..add(ExecutionResultResponse.serializer)
           ..add(ExecutionResultResponseStatusEnum.serializer)
+          ..add(ExecutionStatisticsResponse.serializer)
           ..add(FailedItem.serializer)
           ..add(FeedbackDetailResponse.serializer)
           ..add(FeedbackPageResponse.serializer)
@@ -286,6 +298,7 @@ Serializers _$serializers =
           ..add(LoginUserResponse.serializer)
           ..add(MemberPage.serializer)
           ..add(MessageReadUserResponse.serializer)
+          ..add(NodeExecutionDTO.serializer)
           ..add(NodeTypeResponse.serializer)
           ..add(OptionDTO.serializer)
           ..add(OrderResponse.serializer)
@@ -334,6 +347,8 @@ Serializers _$serializers =
           ..add(SendResult.serializer)
           ..add(SendSmsRequest.serializer)
           ..add(SessionChatRequest.serializer)
+          ..add(SkillOutputVO.serializer)
+          ..add(SkillParamVO.serializer)
           ..add(SourceScrapeRequest.serializer)
           ..add(SseEmitter.serializer)
           ..add(TeacherApplicationResponse.serializer)
@@ -402,8 +417,12 @@ Serializers _$serializers =
           ..add(WorkflowSettings.serializer)
           ..add(WorkflowSettingsDTO.serializer)
           ..add(WorkflowSettingsLogLevelEnum.serializer)
+          ..add(WorkflowSkillVO.serializer)
+          ..add(WorkflowTemplateResponse.serializer)
+          ..add(WorkflowTriggerResponse.serializer)
           ..add(WorkflowValidationResponse.serializer)
           ..add(WorkflowVariableResponse.serializer)
+          ..add(WorkflowVersionResponse.serializer)
           ..addBuilderFactory(
             const FullType(BuiltList, const [const FullType(AddNodeRequest)]),
             () => ListBuilder<AddNodeRequest>(),
@@ -621,6 +640,12 @@ Serializers _$serializers =
           )
           ..addBuilderFactory(
             const FullType(BuiltList, const [
+              const FullType(ExecutionResultResponse),
+            ]),
+            () => ListBuilder<ExecutionResultResponse>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [
               const FullType(FeedbackReplyResponse),
             ]),
             () => ListBuilder<FeedbackReplyResponse>(),
@@ -775,6 +800,18 @@ Serializers _$serializers =
             () => ListBuilder<SectionResponse>(),
           )
           ..addBuilderFactory(
+            const FullType(BuiltList, const [const FullType(SkillParamVO)]),
+            () => ListBuilder<SkillParamVO>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [const FullType(SkillOutputVO)]),
+            () => ListBuilder<SkillOutputVO>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [const FullType(String)]),
+            () => ListBuilder<String>(),
+          )
+          ..addBuilderFactory(
             const FullType(BuiltList, const [const FullType(String)]),
             () => ListBuilder<String>(),
           )
@@ -883,12 +920,32 @@ Serializers _$serializers =
             () => ListBuilder<KnowledgeBaseVO>(),
           )
           ..addBuilderFactory(
+            const FullType(BuiltList, const [const FullType(int)]),
+            () => ListBuilder<int>(),
+          )
+          ..addBuilderFactory(
             const FullType(BuiltList, const [const FullType(String)]),
             () => ListBuilder<String>(),
           )
           ..addBuilderFactory(
             const FullType(BuiltList, const [const FullType(String)]),
             () => ListBuilder<String>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [const FullType(int)]),
+            () => ListBuilder<int>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [const FullType(String)]),
+            () => ListBuilder<String>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [const FullType(String)]),
+            () => ListBuilder<String>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [const FullType(int)]),
+            () => ListBuilder<int>(),
           )
           ..addBuilderFactory(
             const FullType(BuiltList, const [const FullType(int)]),
@@ -957,6 +1014,10 @@ Serializers _$serializers =
             () => ListBuilder<ValidationWarningDTO>(),
           )
           ..addBuilderFactory(
+            const FullType(BuiltList, const [const FullType(WorkflowEdge)]),
+            () => ListBuilder<WorkflowEdge>(),
+          )
+          ..addBuilderFactory(
             const FullType(BuiltList, const [
               const FullType(WorkflowEdgeResponse),
             ]),
@@ -1007,10 +1068,32 @@ Serializers _$serializers =
             () => ListBuilder<WorkflowResponse>(),
           )
           ..addBuilderFactory(
+            const FullType(BuiltList, const [const FullType(WorkflowSkillVO)]),
+            () => ListBuilder<WorkflowSkillVO>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [
+              const FullType(WorkflowTemplateResponse),
+            ]),
+            () => ListBuilder<WorkflowTemplateResponse>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [
+              const FullType(WorkflowTriggerResponse),
+            ]),
+            () => ListBuilder<WorkflowTriggerResponse>(),
+          )
+          ..addBuilderFactory(
             const FullType(BuiltList, const [
               const FullType(WorkflowVariableResponse),
             ]),
             () => ListBuilder<WorkflowVariableResponse>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [
+              const FullType(WorkflowVersionResponse),
+            ]),
+            () => ListBuilder<WorkflowVersionResponse>(),
           )
           ..addBuilderFactory(
             const FullType(BuiltList, const [const FullType(int)]),
@@ -1113,6 +1196,31 @@ Serializers _$serializers =
               const FullType(JsonObject),
             ]),
             () => MapBuilder<String, JsonObject>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltMap, const [
+              const FullType(String),
+              const FullType(JsonObject),
+            ]),
+            () => MapBuilder<String, JsonObject>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltMap, const [
+              const FullType(String),
+              const FullType(JsonObject),
+            ]),
+            () => MapBuilder<String, JsonObject>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltMap, const [
+              const FullType(String),
+              const FullType(JsonObject),
+            ]),
+            () => MapBuilder<String, JsonObject>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [const FullType(NodeExecutionDTO)]),
+            () => ListBuilder<NodeExecutionDTO>(),
           )
           ..addBuilderFactory(
             const FullType(BuiltMap, const [

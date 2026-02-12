@@ -33,6 +33,8 @@ class _$CreateAiAssistantCommand extends CreateAiAssistantCommand {
   final int? maxTokens;
   @override
   final BuiltList<int>? knowledgeBaseIds;
+  @override
+  final BuiltList<int>? mcpServerIds;
 
   factory _$CreateAiAssistantCommand([
     void Function(CreateAiAssistantCommandBuilder)? updates,
@@ -52,6 +54,7 @@ class _$CreateAiAssistantCommand extends CreateAiAssistantCommand {
     this.topP,
     this.maxTokens,
     this.knowledgeBaseIds,
+    this.mcpServerIds,
   }) : super._();
   @override
   CreateAiAssistantCommand rebuild(
@@ -78,7 +81,8 @@ class _$CreateAiAssistantCommand extends CreateAiAssistantCommand {
         temperature == other.temperature &&
         topP == other.topP &&
         maxTokens == other.maxTokens &&
-        knowledgeBaseIds == other.knowledgeBaseIds;
+        knowledgeBaseIds == other.knowledgeBaseIds &&
+        mcpServerIds == other.mcpServerIds;
   }
 
   @override
@@ -97,6 +101,7 @@ class _$CreateAiAssistantCommand extends CreateAiAssistantCommand {
     _$hash = $jc(_$hash, topP.hashCode);
     _$hash = $jc(_$hash, maxTokens.hashCode);
     _$hash = $jc(_$hash, knowledgeBaseIds.hashCode);
+    _$hash = $jc(_$hash, mcpServerIds.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -116,7 +121,8 @@ class _$CreateAiAssistantCommand extends CreateAiAssistantCommand {
           ..add('temperature', temperature)
           ..add('topP', topP)
           ..add('maxTokens', maxTokens)
-          ..add('knowledgeBaseIds', knowledgeBaseIds))
+          ..add('knowledgeBaseIds', knowledgeBaseIds)
+          ..add('mcpServerIds', mcpServerIds))
         .toString();
   }
 }
@@ -183,6 +189,12 @@ class CreateAiAssistantCommandBuilder
   set knowledgeBaseIds(ListBuilder<int>? knowledgeBaseIds) =>
       _$this._knowledgeBaseIds = knowledgeBaseIds;
 
+  ListBuilder<int>? _mcpServerIds;
+  ListBuilder<int> get mcpServerIds =>
+      _$this._mcpServerIds ??= ListBuilder<int>();
+  set mcpServerIds(ListBuilder<int>? mcpServerIds) =>
+      _$this._mcpServerIds = mcpServerIds;
+
   CreateAiAssistantCommandBuilder() {
     CreateAiAssistantCommand._defaults(this);
   }
@@ -203,6 +215,7 @@ class CreateAiAssistantCommandBuilder
       _topP = $v.topP;
       _maxTokens = $v.maxTokens;
       _knowledgeBaseIds = $v.knowledgeBaseIds?.toBuilder();
+      _mcpServerIds = $v.mcpServerIds?.toBuilder();
       _$v = null;
     }
     return this;
@@ -244,6 +257,7 @@ class CreateAiAssistantCommandBuilder
             topP: topP,
             maxTokens: maxTokens,
             knowledgeBaseIds: _knowledgeBaseIds?.build(),
+            mcpServerIds: _mcpServerIds?.build(),
           );
     } catch (_) {
       late String _$failedField;
@@ -256,6 +270,8 @@ class CreateAiAssistantCommandBuilder
 
         _$failedField = 'knowledgeBaseIds';
         _knowledgeBaseIds?.build();
+        _$failedField = 'mcpServerIds';
+        _mcpServerIds?.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
           r'CreateAiAssistantCommand',
