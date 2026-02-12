@@ -34,6 +34,7 @@ import 'package:nova_api/src/model/apply_teacher_request.dart';
 import 'package:nova_api/src/model/article_chat_request.dart';
 import 'package:nova_api/src/model/article_response.dart';
 import 'package:nova_api/src/model/article_source_response.dart';
+import 'package:nova_api/src/model/assistant_chat_request.dart';
 import 'package:nova_api/src/model/async_execution_response.dart';
 import 'package:nova_api/src/model/banner_list_response.dart';
 import 'package:nova_api/src/model/banner_page_response.dart';
@@ -69,6 +70,7 @@ import 'package:nova_api/src/model/base_response_daily_article_response.dart';
 import 'package:nova_api/src/model/base_response_daily_word_page_response.dart';
 import 'package:nova_api/src/model/base_response_daily_word_response.dart';
 import 'package:nova_api/src/model/base_response_execution_result_response.dart';
+import 'package:nova_api/src/model/base_response_execution_statistics_response.dart';
 import 'package:nova_api/src/model/base_response_feedback_detail_response.dart';
 import 'package:nova_api/src/model/base_response_feedback_page_response.dart';
 import 'package:nova_api/src/model/base_response_follow_page_response.dart';
@@ -99,6 +101,7 @@ import 'package:nova_api/src/model/base_response_list_course_review_response.dar
 import 'package:nova_api/src/model/base_response_list_daily_article_response.dart';
 import 'package:nova_api/src/model/base_response_list_daily_word_response.dart';
 import 'package:nova_api/src/model/base_response_list_execution_log_response.dart';
+import 'package:nova_api/src/model/base_response_list_execution_result_response.dart';
 import 'package:nova_api/src/model/base_response_list_feedback_reply_response.dart';
 import 'package:nova_api/src/model/base_response_list_file_info_response.dart';
 import 'package:nova_api/src/model/base_response_list_friend_response.dart';
@@ -128,7 +131,11 @@ import 'package:nova_api/src/model/base_response_list_user_word_book_response.da
 import 'package:nova_api/src/model/base_response_list_workflow_edge_response.dart';
 import 'package:nova_api/src/model/base_response_list_workflow_node_response.dart';
 import 'package:nova_api/src/model/base_response_list_workflow_response.dart';
+import 'package:nova_api/src/model/base_response_list_workflow_skill_vo.dart';
+import 'package:nova_api/src/model/base_response_list_workflow_template_response.dart';
+import 'package:nova_api/src/model/base_response_list_workflow_trigger_response.dart';
 import 'package:nova_api/src/model/base_response_list_workflow_variable_response.dart';
+import 'package:nova_api/src/model/base_response_list_workflow_version_response.dart';
 import 'package:nova_api/src/model/base_response_login_user_response.dart';
 import 'package:nova_api/src/model/base_response_long.dart';
 import 'package:nova_api/src/model/base_response_map_string_object.dart';
@@ -174,8 +181,11 @@ import 'package:nova_api/src/model/base_response_workflow_edge_response.dart';
 import 'package:nova_api/src/model/base_response_workflow_node_response.dart';
 import 'package:nova_api/src/model/base_response_workflow_response.dart';
 import 'package:nova_api/src/model/base_response_workflow_settings_dto.dart';
+import 'package:nova_api/src/model/base_response_workflow_template_response.dart';
+import 'package:nova_api/src/model/base_response_workflow_trigger_response.dart';
 import 'package:nova_api/src/model/base_response_workflow_validation_response.dart';
 import 'package:nova_api/src/model/base_response_workflow_variable_response.dart';
+import 'package:nova_api/src/model/base_response_workflow_version_response.dart';
 import 'package:nova_api/src/model/batch_ai_process_request.dart';
 import 'package:nova_api/src/model/batch_ban_user_request.dart';
 import 'package:nova_api/src/model/batch_create_user_request.dart';
@@ -201,6 +211,7 @@ import 'package:nova_api/src/model/chat_session_response.dart';
 import 'package:nova_api/src/model/checkin_ranking_item.dart';
 import 'package:nova_api/src/model/checkin_result.dart';
 import 'package:nova_api/src/model/checkin_status_result.dart';
+import 'package:nova_api/src/model/children_definition.dart';
 import 'package:nova_api/src/model/class_member_response.dart';
 import 'package:nova_api/src/model/class_response.dart';
 import 'package:nova_api/src/model/class_schedule_item_response.dart';
@@ -244,6 +255,7 @@ import 'package:nova_api/src/model/execute_task_request.dart';
 import 'package:nova_api/src/model/execute_workflow_request.dart';
 import 'package:nova_api/src/model/execution_log_response.dart';
 import 'package:nova_api/src/model/execution_result_response.dart';
+import 'package:nova_api/src/model/execution_statistics_response.dart';
 import 'package:nova_api/src/model/failed_item.dart';
 import 'package:nova_api/src/model/feedback_detail_response.dart';
 import 'package:nova_api/src/model/feedback_page_response.dart';
@@ -277,6 +289,7 @@ import 'package:nova_api/src/model/learning_stats.dart';
 import 'package:nova_api/src/model/login_user_response.dart';
 import 'package:nova_api/src/model/member_page.dart';
 import 'package:nova_api/src/model/message_read_user_response.dart';
+import 'package:nova_api/src/model/node_execution_dto.dart';
 import 'package:nova_api/src/model/node_type_response.dart';
 import 'package:nova_api/src/model/option_dto.dart';
 import 'package:nova_api/src/model/order_response.dart';
@@ -323,6 +336,8 @@ import 'package:nova_api/src/model/send_friend_request_dto.dart';
 import 'package:nova_api/src/model/send_result.dart';
 import 'package:nova_api/src/model/send_sms_request.dart';
 import 'package:nova_api/src/model/session_chat_request.dart';
+import 'package:nova_api/src/model/skill_output_vo.dart';
+import 'package:nova_api/src/model/skill_param_vo.dart';
 import 'package:nova_api/src/model/source_scrape_request.dart';
 import 'package:nova_api/src/model/sse_emitter.dart';
 import 'package:nova_api/src/model/teacher_application_response.dart';
@@ -385,8 +400,12 @@ import 'package:nova_api/src/model/workflow_node_response.dart';
 import 'package:nova_api/src/model/workflow_response.dart';
 import 'package:nova_api/src/model/workflow_settings.dart';
 import 'package:nova_api/src/model/workflow_settings_dto.dart';
+import 'package:nova_api/src/model/workflow_skill_vo.dart';
+import 'package:nova_api/src/model/workflow_template_response.dart';
+import 'package:nova_api/src/model/workflow_trigger_response.dart';
 import 'package:nova_api/src/model/workflow_validation_response.dart';
 import 'package:nova_api/src/model/workflow_variable_response.dart';
+import 'package:nova_api/src/model/workflow_version_response.dart';
 
 part 'serializers.g.dart';
 
@@ -411,6 +430,7 @@ part 'serializers.g.dart';
   ArticleChatRequest,
   ArticleResponse,
   ArticleSourceResponse,
+  AssistantChatRequest,
   AsyncExecutionResponse,
   BannerListResponse,
   BannerPageResponse,
@@ -446,6 +466,7 @@ part 'serializers.g.dart';
   BaseResponseDailyWordPageResponse,
   BaseResponseDailyWordResponse,
   BaseResponseExecutionResultResponse,
+  BaseResponseExecutionStatisticsResponse,
   BaseResponseFeedbackDetailResponse,
   BaseResponseFeedbackPageResponse,
   BaseResponseFollowPageResponse,
@@ -476,6 +497,7 @@ part 'serializers.g.dart';
   BaseResponseListDailyArticleResponse,
   BaseResponseListDailyWordResponse,
   BaseResponseListExecutionLogResponse,
+  BaseResponseListExecutionResultResponse,
   BaseResponseListFeedbackReplyResponse,
   BaseResponseListFileInfoResponse,
   BaseResponseListFriendResponse,
@@ -505,7 +527,11 @@ part 'serializers.g.dart';
   BaseResponseListWorkflowEdgeResponse,
   BaseResponseListWorkflowNodeResponse,
   BaseResponseListWorkflowResponse,
+  BaseResponseListWorkflowSkillVO,
+  BaseResponseListWorkflowTemplateResponse,
+  BaseResponseListWorkflowTriggerResponse,
   BaseResponseListWorkflowVariableResponse,
+  BaseResponseListWorkflowVersionResponse,
   BaseResponseLoginUserResponse,
   BaseResponseLong,
   BaseResponseMapStringObject,
@@ -551,8 +577,11 @@ part 'serializers.g.dart';
   BaseResponseWorkflowNodeResponse,
   BaseResponseWorkflowResponse,
   BaseResponseWorkflowSettingsDTO,
+  BaseResponseWorkflowTemplateResponse,
+  BaseResponseWorkflowTriggerResponse,
   BaseResponseWorkflowValidationResponse,
   BaseResponseWorkflowVariableResponse,
+  BaseResponseWorkflowVersionResponse,
   BatchAiProcessRequest,
   BatchBanUserRequest,
   BatchCreateUserRequest,
@@ -578,6 +607,7 @@ part 'serializers.g.dart';
   CheckinRankingItem,
   CheckinResult,
   CheckinStatusResult,
+  ChildrenDefinition,
   ClassMemberResponse,
   ClassResponse,
   ClassScheduleItemResponse,
@@ -621,6 +651,7 @@ part 'serializers.g.dart';
   ExecuteWorkflowRequest,
   ExecutionLogResponse,
   ExecutionResultResponse,
+  ExecutionStatisticsResponse,
   FailedItem,
   FeedbackDetailResponse,
   FeedbackPageResponse,
@@ -654,6 +685,7 @@ part 'serializers.g.dart';
   LoginUserResponse,
   MemberPage,
   MessageReadUserResponse,
+  NodeExecutionDTO,
   NodeTypeResponse,
   OptionDTO,
   OrderResponse,
@@ -700,6 +732,8 @@ part 'serializers.g.dart';
   SendResult,
   SendSmsRequest,
   SessionChatRequest,
+  SkillOutputVO,
+  SkillParamVO,
   SourceScrapeRequest,
   SseEmitter,
   TeacherApplicationResponse,
@@ -762,8 +796,12 @@ part 'serializers.g.dart';
   WorkflowResponse,
   WorkflowSettings,
   WorkflowSettingsDTO,
+  WorkflowSkillVO,
+  WorkflowTemplateResponse,
+  WorkflowTriggerResponse,
   WorkflowValidationResponse,
   WorkflowVariableResponse,
+  WorkflowVersionResponse,
 ])
 Serializers serializers = (_$serializers.toBuilder()
       ..addBuilderFactory(

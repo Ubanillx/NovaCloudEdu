@@ -28,6 +28,10 @@ const WorkflowNodeTypeEnum _$workflowNodeTypeEnum_SWITCH =
     const WorkflowNodeTypeEnum._('SWITCH');
 const WorkflowNodeTypeEnum _$workflowNodeTypeEnum_LOOP =
     const WorkflowNodeTypeEnum._('LOOP');
+const WorkflowNodeTypeEnum _$workflowNodeTypeEnum_LOOP_START =
+    const WorkflowNodeTypeEnum._('LOOP_START');
+const WorkflowNodeTypeEnum _$workflowNodeTypeEnum_LOOP_END =
+    const WorkflowNodeTypeEnum._('LOOP_END');
 const WorkflowNodeTypeEnum _$workflowNodeTypeEnum_PARALLEL =
     const WorkflowNodeTypeEnum._('PARALLEL');
 const WorkflowNodeTypeEnum _$workflowNodeTypeEnum_MERGE =
@@ -79,6 +83,10 @@ WorkflowNodeTypeEnum _$workflowNodeTypeEnumValueOf(String name) {
       return _$workflowNodeTypeEnum_SWITCH;
     case 'LOOP':
       return _$workflowNodeTypeEnum_LOOP;
+    case 'LOOP_START':
+      return _$workflowNodeTypeEnum_LOOP_START;
+    case 'LOOP_END':
+      return _$workflowNodeTypeEnum_LOOP_END;
     case 'PARALLEL':
       return _$workflowNodeTypeEnum_PARALLEL;
     case 'MERGE':
@@ -123,6 +131,8 @@ final BuiltSet<WorkflowNodeTypeEnum> _$workflowNodeTypeEnumValues =
       _$workflowNodeTypeEnum_CONDITION,
       _$workflowNodeTypeEnum_SWITCH,
       _$workflowNodeTypeEnum_LOOP,
+      _$workflowNodeTypeEnum_LOOP_START,
+      _$workflowNodeTypeEnum_LOOP_END,
       _$workflowNodeTypeEnum_PARALLEL,
       _$workflowNodeTypeEnum_MERGE,
       _$workflowNodeTypeEnum_VARIABLE_SET,
@@ -155,6 +165,8 @@ class _$WorkflowNodeTypeEnumSerializer
     'CONDITION': 'CONDITION',
     'SWITCH': 'SWITCH',
     'LOOP': 'LOOP',
+    'LOOP_START': 'LOOP_START',
+    'LOOP_END': 'LOOP_END',
     'PARALLEL': 'PARALLEL',
     'MERGE': 'MERGE',
     'VARIABLE_SET': 'VARIABLE_SET',
@@ -181,6 +193,8 @@ class _$WorkflowNodeTypeEnumSerializer
     'CONDITION': 'CONDITION',
     'SWITCH': 'SWITCH',
     'LOOP': 'LOOP',
+    'LOOP_START': 'LOOP_START',
+    'LOOP_END': 'LOOP_END',
     'PARALLEL': 'PARALLEL',
     'MERGE': 'MERGE',
     'VARIABLE_SET': 'VARIABLE_SET',
@@ -231,6 +245,12 @@ class _$WorkflowNode extends WorkflowNode {
   final BuiltMap<String, JsonObject>? config;
   @override
   final ErrorHandlingConfig? errorHandling;
+  @override
+  final ChildrenDefinition? children;
+  @override
+  final int? width;
+  @override
+  final int? height;
 
   factory _$WorkflowNode([void Function(WorkflowNodeBuilder)? updates]) =>
       (WorkflowNodeBuilder()..update(updates))._build();
@@ -242,6 +262,9 @@ class _$WorkflowNode extends WorkflowNode {
     this.position,
     this.config,
     this.errorHandling,
+    this.children,
+    this.width,
+    this.height,
   }) : super._();
   @override
   WorkflowNode rebuild(void Function(WorkflowNodeBuilder) updates) =>
@@ -259,7 +282,10 @@ class _$WorkflowNode extends WorkflowNode {
         name == other.name &&
         position == other.position &&
         config == other.config &&
-        errorHandling == other.errorHandling;
+        errorHandling == other.errorHandling &&
+        children == other.children &&
+        width == other.width &&
+        height == other.height;
   }
 
   @override
@@ -271,6 +297,9 @@ class _$WorkflowNode extends WorkflowNode {
     _$hash = $jc(_$hash, position.hashCode);
     _$hash = $jc(_$hash, config.hashCode);
     _$hash = $jc(_$hash, errorHandling.hashCode);
+    _$hash = $jc(_$hash, children.hashCode);
+    _$hash = $jc(_$hash, width.hashCode);
+    _$hash = $jc(_$hash, height.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -283,7 +312,10 @@ class _$WorkflowNode extends WorkflowNode {
           ..add('name', name)
           ..add('position', position)
           ..add('config', config)
-          ..add('errorHandling', errorHandling))
+          ..add('errorHandling', errorHandling)
+          ..add('children', children)
+          ..add('width', width)
+          ..add('height', height))
         .toString();
   }
 }
@@ -319,6 +351,20 @@ class WorkflowNodeBuilder
   set errorHandling(ErrorHandlingConfigBuilder? errorHandling) =>
       _$this._errorHandling = errorHandling;
 
+  ChildrenDefinitionBuilder? _children;
+  ChildrenDefinitionBuilder get children =>
+      _$this._children ??= ChildrenDefinitionBuilder();
+  set children(ChildrenDefinitionBuilder? children) =>
+      _$this._children = children;
+
+  int? _width;
+  int? get width => _$this._width;
+  set width(int? width) => _$this._width = width;
+
+  int? _height;
+  int? get height => _$this._height;
+  set height(int? height) => _$this._height = height;
+
   WorkflowNodeBuilder() {
     WorkflowNode._defaults(this);
   }
@@ -332,6 +378,9 @@ class WorkflowNodeBuilder
       _position = $v.position?.toBuilder();
       _config = $v.config?.toBuilder();
       _errorHandling = $v.errorHandling?.toBuilder();
+      _children = $v.children?.toBuilder();
+      _width = $v.width;
+      _height = $v.height;
       _$v = null;
     }
     return this;
@@ -362,6 +411,9 @@ class WorkflowNodeBuilder
             position: _position?.build(),
             config: _config?.build(),
             errorHandling: _errorHandling?.build(),
+            children: _children?.build(),
+            width: width,
+            height: height,
           );
     } catch (_) {
       late String _$failedField;
@@ -372,6 +424,8 @@ class WorkflowNodeBuilder
         _config?.build();
         _$failedField = 'errorHandling';
         _errorHandling?.build();
+        _$failedField = 'children';
+        _children?.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
           r'WorkflowNode',

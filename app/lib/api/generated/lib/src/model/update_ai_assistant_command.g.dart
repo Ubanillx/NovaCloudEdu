@@ -35,6 +35,8 @@ class _$UpdateAiAssistantCommand extends UpdateAiAssistantCommand {
   final bool? isPublic;
   @override
   final int? sort;
+  @override
+  final BuiltList<int>? mcpServerIds;
 
   factory _$UpdateAiAssistantCommand([
     void Function(UpdateAiAssistantCommandBuilder)? updates,
@@ -55,6 +57,7 @@ class _$UpdateAiAssistantCommand extends UpdateAiAssistantCommand {
     this.maxTokens,
     this.isPublic,
     this.sort,
+    this.mcpServerIds,
   }) : super._();
   @override
   UpdateAiAssistantCommand rebuild(
@@ -82,7 +85,8 @@ class _$UpdateAiAssistantCommand extends UpdateAiAssistantCommand {
         topP == other.topP &&
         maxTokens == other.maxTokens &&
         isPublic == other.isPublic &&
-        sort == other.sort;
+        sort == other.sort &&
+        mcpServerIds == other.mcpServerIds;
   }
 
   @override
@@ -102,6 +106,7 @@ class _$UpdateAiAssistantCommand extends UpdateAiAssistantCommand {
     _$hash = $jc(_$hash, maxTokens.hashCode);
     _$hash = $jc(_$hash, isPublic.hashCode);
     _$hash = $jc(_$hash, sort.hashCode);
+    _$hash = $jc(_$hash, mcpServerIds.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -122,7 +127,8 @@ class _$UpdateAiAssistantCommand extends UpdateAiAssistantCommand {
           ..add('topP', topP)
           ..add('maxTokens', maxTokens)
           ..add('isPublic', isPublic)
-          ..add('sort', sort))
+          ..add('sort', sort)
+          ..add('mcpServerIds', mcpServerIds))
         .toString();
   }
 }
@@ -191,6 +197,12 @@ class UpdateAiAssistantCommandBuilder
   int? get sort => _$this._sort;
   set sort(int? sort) => _$this._sort = sort;
 
+  ListBuilder<int>? _mcpServerIds;
+  ListBuilder<int> get mcpServerIds =>
+      _$this._mcpServerIds ??= ListBuilder<int>();
+  set mcpServerIds(ListBuilder<int>? mcpServerIds) =>
+      _$this._mcpServerIds = mcpServerIds;
+
   UpdateAiAssistantCommandBuilder() {
     UpdateAiAssistantCommand._defaults(this);
   }
@@ -212,6 +224,7 @@ class UpdateAiAssistantCommandBuilder
       _maxTokens = $v.maxTokens;
       _isPublic = $v.isPublic;
       _sort = $v.sort;
+      _mcpServerIds = $v.mcpServerIds?.toBuilder();
       _$v = null;
     }
     return this;
@@ -250,6 +263,7 @@ class UpdateAiAssistantCommandBuilder
             maxTokens: maxTokens,
             isPublic: isPublic,
             sort: sort,
+            mcpServerIds: _mcpServerIds?.build(),
           );
     } catch (_) {
       late String _$failedField;
@@ -259,6 +273,9 @@ class UpdateAiAssistantCommandBuilder
 
         _$failedField = 'suggestedQuestions';
         _suggestedQuestions?.build();
+
+        _$failedField = 'mcpServerIds';
+        _mcpServerIds?.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
           r'UpdateAiAssistantCommand',

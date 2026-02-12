@@ -4,6 +4,7 @@
 
 // ignore_for_file: unused_element
 import 'package:built_collection/built_collection.dart';
+import 'package:nova_api/src/model/node_execution_dto.dart';
 import 'package:built_value/json_object.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
@@ -16,6 +17,7 @@ part 'execution_result_response.g.dart';
 /// * [executionId] - 执行ID
 /// * [workflowId] - 工作流ID
 /// * [workflowName] - 工作流名称
+/// * [workflowVersion] - 工作流版本
 /// * [status] - 执行状态
 /// * [input] - 输入参数
 /// * [output] - 输出结果
@@ -25,6 +27,7 @@ part 'execution_result_response.g.dart';
 /// * [startTime] - 开始时间
 /// * [endTime] - 结束时间
 /// * [durationMs] - 执行耗时（毫秒）
+/// * [nodeExecutions] - 各节点执行详情（调试数据）
 @BuiltValue()
 abstract class ExecutionResultResponse
     implements Built<ExecutionResultResponse, ExecutionResultResponseBuilder> {
@@ -39,6 +42,10 @@ abstract class ExecutionResultResponse
   /// 工作流名称
   @BuiltValueField(wireName: r'workflowName')
   String? get workflowName;
+
+  /// 工作流版本
+  @BuiltValueField(wireName: r'workflowVersion')
+  int? get workflowVersion;
 
   /// 执行状态
   @BuiltValueField(wireName: r'status')
@@ -76,6 +83,10 @@ abstract class ExecutionResultResponse
   /// 执行耗时（毫秒）
   @BuiltValueField(wireName: r'durationMs')
   int? get durationMs;
+
+  /// 各节点执行详情（调试数据）
+  @BuiltValueField(wireName: r'nodeExecutions')
+  BuiltList<NodeExecutionDTO>? get nodeExecutions;
 
   ExecutionResultResponse._();
 
@@ -126,6 +137,13 @@ class _$ExecutionResultResponseSerializer
       yield serializers.serialize(
         object.workflowName,
         specifiedType: const FullType(String),
+      );
+    }
+    if (object.workflowVersion != null) {
+      yield r'workflowVersion';
+      yield serializers.serialize(
+        object.workflowVersion,
+        specifiedType: const FullType(int),
       );
     }
     if (object.status != null) {
@@ -194,6 +212,13 @@ class _$ExecutionResultResponseSerializer
         specifiedType: const FullType(int),
       );
     }
+    if (object.nodeExecutions != null) {
+      yield r'nodeExecutions';
+      yield serializers.serialize(
+        object.nodeExecutions,
+        specifiedType: const FullType(BuiltList, [FullType(NodeExecutionDTO)]),
+      );
+    }
   }
 
   @override
@@ -239,6 +264,13 @@ class _$ExecutionResultResponseSerializer
             specifiedType: const FullType(String),
           ) as String;
           result.workflowName = valueDes;
+          break;
+        case r'workflowVersion':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(int),
+          ) as int;
+          result.workflowVersion = valueDes;
           break;
         case r'status':
           final valueDes = serializers.deserialize(
@@ -305,6 +337,14 @@ class _$ExecutionResultResponseSerializer
             specifiedType: const FullType(int),
           ) as int;
           result.durationMs = valueDes;
+          break;
+        case r'nodeExecutions':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType:
+                const FullType(BuiltList, [FullType(NodeExecutionDTO)]),
+          ) as BuiltList<NodeExecutionDTO>;
+          result.nodeExecutions.replace(valueDes);
           break;
         default:
           unhandled.add(key);

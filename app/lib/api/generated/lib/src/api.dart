@@ -11,6 +11,7 @@ import 'package:nova_api/src/auth/bearer_auth.dart';
 import 'package:nova_api/src/auth/oauth.dart';
 import 'package:nova_api/src/api/default_api.dart';
 import 'package:nova_api/src/api/ai_api.dart';
+import 'package:nova_api/src/api/mcp_api.dart';
 import 'package:nova_api/src/api/webhook_api.dart';
 
 class NovaApi {
@@ -88,6 +89,12 @@ class NovaApi {
   /// by doing that all interceptors will not be executed
   AIApi getAIApi() {
     return AIApi(dio, serializers);
+  }
+
+  /// Get MCPApi instance, base route and serializer can be overridden by a given but be careful,
+  /// by doing that all interceptors will not be executed
+  MCPApi getMCPApi() {
+    return MCPApi(dio, serializers);
   }
 
   /// Get WebhookApi instance, base route and serializer can be overridden by a given but be careful,

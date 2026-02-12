@@ -26,6 +26,7 @@ part 'update_ai_assistant_command.g.dart';
 /// * [maxTokens]
 /// * [isPublic]
 /// * [sort]
+/// * [mcpServerIds]
 @BuiltValue()
 abstract class UpdateAiAssistantCommand
     implements
@@ -71,6 +72,9 @@ abstract class UpdateAiAssistantCommand
 
   @BuiltValueField(wireName: r'sort')
   int? get sort;
+
+  @BuiltValueField(wireName: r'mcpServerIds')
+  BuiltList<int>? get mcpServerIds;
 
   UpdateAiAssistantCommand._();
 
@@ -200,6 +204,13 @@ class _$UpdateAiAssistantCommandSerializer
         specifiedType: const FullType(int),
       );
     }
+    if (object.mcpServerIds != null) {
+      yield r'mcpServerIds';
+      yield serializers.serialize(
+        object.mcpServerIds,
+        specifiedType: const FullType(BuiltList, [FullType(int)]),
+      );
+    }
   }
 
   @override
@@ -322,6 +333,13 @@ class _$UpdateAiAssistantCommandSerializer
             specifiedType: const FullType(int),
           ) as int;
           result.sort = valueDes;
+          break;
+        case r'mcpServerIds':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(BuiltList, [FullType(int)]),
+          ) as BuiltList<int>;
+          result.mcpServerIds.replace(valueDes);
           break;
         default:
           unhandled.add(key);

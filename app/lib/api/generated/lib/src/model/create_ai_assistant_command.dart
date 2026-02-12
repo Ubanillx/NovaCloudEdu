@@ -25,6 +25,7 @@ part 'create_ai_assistant_command.g.dart';
 /// * [topP]
 /// * [maxTokens]
 /// * [knowledgeBaseIds]
+/// * [mcpServerIds]
 @BuiltValue()
 abstract class CreateAiAssistantCommand
     implements
@@ -67,6 +68,9 @@ abstract class CreateAiAssistantCommand
 
   @BuiltValueField(wireName: r'knowledgeBaseIds')
   BuiltList<int>? get knowledgeBaseIds;
+
+  @BuiltValueField(wireName: r'mcpServerIds')
+  BuiltList<int>? get mcpServerIds;
 
   CreateAiAssistantCommand._();
 
@@ -187,6 +191,13 @@ class _$CreateAiAssistantCommandSerializer
         specifiedType: const FullType(BuiltList, [FullType(int)]),
       );
     }
+    if (object.mcpServerIds != null) {
+      yield r'mcpServerIds';
+      yield serializers.serialize(
+        object.mcpServerIds,
+        specifiedType: const FullType(BuiltList, [FullType(int)]),
+      );
+    }
   }
 
   @override
@@ -302,6 +313,13 @@ class _$CreateAiAssistantCommandSerializer
             specifiedType: const FullType(BuiltList, [FullType(int)]),
           ) as BuiltList<int>;
           result.knowledgeBaseIds.replace(valueDes);
+          break;
+        case r'mcpServerIds':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(BuiltList, [FullType(int)]),
+          ) as BuiltList<int>;
+          result.mcpServerIds.replace(valueDes);
           break;
         default:
           unhandled.add(key);

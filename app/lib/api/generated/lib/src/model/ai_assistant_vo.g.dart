@@ -48,6 +48,8 @@ class _$AiAssistantVO extends AiAssistantVO {
   @override
   final BuiltList<KnowledgeBaseVO>? knowledgeBases;
   @override
+  final BuiltList<int>? mcpServerIds;
+  @override
   final int? creatorId;
   @override
   final int? sort;
@@ -80,6 +82,7 @@ class _$AiAssistantVO extends AiAssistantVO {
     this.usageCount,
     this.rating,
     this.knowledgeBases,
+    this.mcpServerIds,
     this.creatorId,
     this.sort,
     this.createTime,
@@ -116,6 +119,7 @@ class _$AiAssistantVO extends AiAssistantVO {
         usageCount == other.usageCount &&
         rating == other.rating &&
         knowledgeBases == other.knowledgeBases &&
+        mcpServerIds == other.mcpServerIds &&
         creatorId == other.creatorId &&
         sort == other.sort &&
         createTime == other.createTime &&
@@ -145,6 +149,7 @@ class _$AiAssistantVO extends AiAssistantVO {
     _$hash = $jc(_$hash, usageCount.hashCode);
     _$hash = $jc(_$hash, rating.hashCode);
     _$hash = $jc(_$hash, knowledgeBases.hashCode);
+    _$hash = $jc(_$hash, mcpServerIds.hashCode);
     _$hash = $jc(_$hash, creatorId.hashCode);
     _$hash = $jc(_$hash, sort.hashCode);
     _$hash = $jc(_$hash, createTime.hashCode);
@@ -176,6 +181,7 @@ class _$AiAssistantVO extends AiAssistantVO {
           ..add('usageCount', usageCount)
           ..add('rating', rating)
           ..add('knowledgeBases', knowledgeBases)
+          ..add('mcpServerIds', mcpServerIds)
           ..add('creatorId', creatorId)
           ..add('sort', sort)
           ..add('createTime', createTime)
@@ -274,6 +280,12 @@ class AiAssistantVOBuilder
   set knowledgeBases(ListBuilder<KnowledgeBaseVO>? knowledgeBases) =>
       _$this._knowledgeBases = knowledgeBases;
 
+  ListBuilder<int>? _mcpServerIds;
+  ListBuilder<int> get mcpServerIds =>
+      _$this._mcpServerIds ??= ListBuilder<int>();
+  set mcpServerIds(ListBuilder<int>? mcpServerIds) =>
+      _$this._mcpServerIds = mcpServerIds;
+
   int? _creatorId;
   int? get creatorId => _$this._creatorId;
   set creatorId(int? creatorId) => _$this._creatorId = creatorId;
@@ -317,6 +329,7 @@ class AiAssistantVOBuilder
       _usageCount = $v.usageCount;
       _rating = $v.rating;
       _knowledgeBases = $v.knowledgeBases?.toBuilder();
+      _mcpServerIds = $v.mcpServerIds?.toBuilder();
       _creatorId = $v.creatorId;
       _sort = $v.sort;
       _createTime = $v.createTime;
@@ -365,6 +378,7 @@ class AiAssistantVOBuilder
             usageCount: usageCount,
             rating: rating,
             knowledgeBases: _knowledgeBases?.build(),
+            mcpServerIds: _mcpServerIds?.build(),
             creatorId: creatorId,
             sort: sort,
             createTime: createTime,
@@ -381,6 +395,8 @@ class AiAssistantVOBuilder
 
         _$failedField = 'knowledgeBases';
         _knowledgeBases?.build();
+        _$failedField = 'mcpServerIds';
+        _mcpServerIds?.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
           r'AiAssistantVO',

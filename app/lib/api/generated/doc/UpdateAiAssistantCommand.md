@@ -22,6 +22,7 @@ Name | Type | Description | Notes
 **maxTokens** | **int** |  | [optional] 
 **isPublic** | **bool** |  | [optional] 
 **sort** | **int** |  | [optional] 
+**mcpServerIds** | **BuiltList&lt;int&gt;** |  | [optional] 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

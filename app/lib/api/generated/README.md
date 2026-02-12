@@ -68,7 +68,6 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**activateSetting**](doc/DefaultApi.md#activatesetting) | **POST** /api/schedule/setting/{id}/activate | 激活课表配置
 [*DefaultApi*](doc/DefaultApi.md) | [**addComment**](doc/DefaultApi.md#addcomment) | **POST** /api/user/daily-article/{articleId}/comment | 添加评论
 [*DefaultApi*](doc/DefaultApi.md) | [**addCourse**](doc/DefaultApi.md#addcourse) | **POST** /api/classes/{classId}/courses | 添加课程
-[*DefaultApi*](doc/DefaultApi.md) | [**addDocument**](doc/DefaultApi.md#adddocument) | **POST** /api/ai/knowledge-bases/{id}/documents | 添加文档
 [*DefaultApi*](doc/DefaultApi.md) | [**addEdge**](doc/DefaultApi.md#addedge) | **POST** /api/workflows/{id}/edges | 添加连接线
 [*DefaultApi*](doc/DefaultApi.md) | [**addItem**](doc/DefaultApi.md#additem) | **POST** /api/schedule/item | 添加课程项
 [*DefaultApi*](doc/DefaultApi.md) | [**addMember**](doc/DefaultApi.md#addmember) | **POST** /api/classes/{classId}/members | 添加成员
@@ -76,18 +75,17 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**addToShelf**](doc/DefaultApi.md#addtoshelf) | **POST** /api/reading/shelf | 添加书籍到书架
 [*DefaultApi*](doc/DefaultApi.md) | [**addToWordBook**](doc/DefaultApi.md#addtowordbook) | **POST** /api/user/word-book/add/{wordId} | 添加单词到生词本
 [*DefaultApi*](doc/DefaultApi.md) | [**addVariable**](doc/DefaultApi.md#addvariable) | **POST** /api/workflows/{id}/variables | 添加变量
+[*DefaultApi*](doc/DefaultApi.md) | [**adminDeletePost**](doc/DefaultApi.md#admindeletepost) | **DELETE** /api/posts/admin/{postId} | 管理员删除帖子
 [*DefaultApi*](doc/DefaultApi.md) | [**applyTeacher**](doc/DefaultApi.md#applyteacher) | **POST** /api/teacher/apply | 申请成为讲师
 [*DefaultApi*](doc/DefaultApi.md) | [**applyToJoin**](doc/DefaultApi.md#applytojoin) | **POST** /api/groups/{groupId}/join | 申请加入群
-[*DefaultApi*](doc/DefaultApi.md) | [**archive1**](doc/DefaultApi.md#archive1) | **POST** /api/workflows/{id}/archive | 归档工作流
+[*DefaultApi*](doc/DefaultApi.md) | [**archive**](doc/DefaultApi.md#archive) | **POST** /api/workflows/{id}/archive | 归档工作流
 [*DefaultApi*](doc/DefaultApi.md) | [**batchBanUsers**](doc/DefaultApi.md#batchbanusers) | **POST** /api/user/admin/ban | 批量封禁/解封用户
 [*DefaultApi*](doc/DefaultApi.md) | [**batchCreateUsers**](doc/DefaultApi.md#batchcreateusers) | **POST** /api/user/admin/batch-create | 批量创建用户
-[*DefaultApi*](doc/DefaultApi.md) | [**batchProcessByKnowledgeBase**](doc/DefaultApi.md#batchprocessbyknowledgebase) | **POST** /api/ai/knowledge-bases/{id}/embed-all | 向量化知识库所有待处理文档
-[*DefaultApi*](doc/DefaultApi.md) | [**batchProcessDocuments**](doc/DefaultApi.md#batchprocessdocuments) | **POST** /api/ai/knowledge-bases/{id}/documents/batch-embed | 批量文档向量化
-[*DefaultApi*](doc/DefaultApi.md) | [**batchProcessDocumentsAsync**](doc/DefaultApi.md#batchprocessdocumentsasync) | **POST** /api/ai/knowledge-bases/{id}/documents/batch-embed-async | 异步批量文档向量化
 [*DefaultApi*](doc/DefaultApi.md) | [**batchSyncAll**](doc/DefaultApi.md#batchsyncall) | **POST** /api/dailylearning/graph-sync/all/batch | 批量同步所有数据到知识图谱（高效批量导入）
 [*DefaultApi*](doc/DefaultApi.md) | [**batchSyncArticles**](doc/DefaultApi.md#batchsyncarticles) | **POST** /api/dailylearning/graph-sync/articles/batch | 批量同步每日文章到知识图谱（高效批量导入）
 [*DefaultApi*](doc/DefaultApi.md) | [**batchSyncWords**](doc/DefaultApi.md#batchsyncwords) | **POST** /api/dailylearning/graph-sync/words/batch | 批量同步每日单词到知识图谱（高效批量导入）
 [*DefaultApi*](doc/DefaultApi.md) | [**batchUpdate**](doc/DefaultApi.md#batchupdate) | **POST** /api/workflows/{id}/batch-update | 批量更新节点和连接线
+[*DefaultApi*](doc/DefaultApi.md) | [**bindToAssistant**](doc/DefaultApi.md#bindtoassistant) | **POST** /api/workflows/{id}/assistants/{assistantId} | 绑定工作流到AI助手
 [*DefaultApi*](doc/DefaultApi.md) | [**cancelExecution**](doc/DefaultApi.md#cancelexecution) | **POST** /api/workflows/executions/{executionId}/cancel | 取消执行
 [*DefaultApi*](doc/DefaultApi.md) | [**changePassword**](doc/DefaultApi.md#changepassword) | **POST** /api/user/password | 修改密码
 [*DefaultApi*](doc/DefaultApi.md) | [**checkFavourite**](doc/DefaultApi.md#checkfavourite) | **GET** /api/course/favourite/{courseId}/check | 检查是否已收藏
@@ -97,7 +95,6 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**confirmPayment**](doc/DefaultApi.md#confirmpayment) | **POST** /api/admin/order/confirm | 确认收款（管理员手动确认）
 [*DefaultApi*](doc/DefaultApi.md) | [**copy**](doc/DefaultApi.md#copy) | **POST** /api/workflows/{id}/copy | 复制工作流
 [*DefaultApi*](doc/DefaultApi.md) | [**create**](doc/DefaultApi.md#create) | **POST** /api/workflows | 创建工作流
-[*DefaultApi*](doc/DefaultApi.md) | [**create1**](doc/DefaultApi.md#create1) | **POST** /api/ai/knowledge-bases | 创建知识库
 [*DefaultApi*](doc/DefaultApi.md) | [**createAnnouncement**](doc/DefaultApi.md#createannouncement) | **POST** /api/announcement/admin/create | 创建公告
 [*DefaultApi*](doc/DefaultApi.md) | [**createBanner**](doc/DefaultApi.md#createbanner) | **POST** /api/admin/banner | 创建轮播图
 [*DefaultApi*](doc/DefaultApi.md) | [**createChapter**](doc/DefaultApi.md#createchapter) | **POST** /api/course/{courseId}/chapter | 创建章节（管理员）
@@ -108,16 +105,20 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**createDailyArticle**](doc/DefaultApi.md#createdailyarticle) | **POST** /api/daily-article | 创建每日文章（管理员）
 [*DefaultApi*](doc/DefaultApi.md) | [**createDailyWord**](doc/DefaultApi.md#createdailyword) | **POST** /api/daily-word | 创建每日单词（管理员）
 [*DefaultApi*](doc/DefaultApi.md) | [**createFeedback**](doc/DefaultApi.md#createfeedback) | **POST** /api/feedback | 创建反馈
+[*DefaultApi*](doc/DefaultApi.md) | [**createFromTemplate**](doc/DefaultApi.md#createfromtemplate) | **POST** /api/workflows/templates/{templateId}/create-workflow | 从模板创建工作流
 [*DefaultApi*](doc/DefaultApi.md) | [**createGroup**](doc/DefaultApi.md#creategroup) | **POST** /api/groups | 创建群聊
 [*DefaultApi*](doc/DefaultApi.md) | [**createGroupFromClass**](doc/DefaultApi.md#creategroupfromclass) | **POST** /api/classes/{classId}/chat-group | 基于班级创建群聊
 [*DefaultApi*](doc/DefaultApi.md) | [**createOrder**](doc/DefaultApi.md#createorder) | **POST** /api/order | 创建订单（用户下单）
 [*DefaultApi*](doc/DefaultApi.md) | [**createPost**](doc/DefaultApi.md#createpost) | **POST** /api/posts | 发布帖子
 [*DefaultApi*](doc/DefaultApi.md) | [**createReply**](doc/DefaultApi.md#createreply) | **POST** /api/posts/comments/{commentId}/replies | 发表回复
+[*DefaultApi*](doc/DefaultApi.md) | [**createScheduleTrigger**](doc/DefaultApi.md#createscheduletrigger) | **POST** /api/workflows/{id}/triggers/schedule | 创建定时触发器
 [*DefaultApi*](doc/DefaultApi.md) | [**createSection**](doc/DefaultApi.md#createsection) | **POST** /api/course/{courseId}/section | 创建小节（管理员）
 [*DefaultApi*](doc/DefaultApi.md) | [**createSetting**](doc/DefaultApi.md#createsetting) | **POST** /api/schedule/setting | 创建课表配置
+[*DefaultApi*](doc/DefaultApi.md) | [**createTemplate**](doc/DefaultApi.md#createtemplate) | **POST** /api/workflows/templates/from-workflow/{workflowId} | 从工作流创建模板
 [*DefaultApi*](doc/DefaultApi.md) | [**createUser**](doc/DefaultApi.md#createuser) | **POST** /api/user/admin/create | 创建用户
+[*DefaultApi*](doc/DefaultApi.md) | [**createVersionSnapshot**](doc/DefaultApi.md#createversionsnapshot) | **POST** /api/workflows/{id}/versions | 创建版本快照（发布时）
+[*DefaultApi*](doc/DefaultApi.md) | [**createWebhookTrigger**](doc/DefaultApi.md#createwebhooktrigger) | **POST** /api/workflows/{id}/triggers/webhook | 创建Webhook触发器
 [*DefaultApi*](doc/DefaultApi.md) | [**delete**](doc/DefaultApi.md#delete) | **DELETE** /api/workflows/{id} | 删除工作流
-[*DefaultApi*](doc/DefaultApi.md) | [**delete1**](doc/DefaultApi.md#delete1) | **DELETE** /api/ai/knowledge-bases/{id} | 删除知识库
 [*DefaultApi*](doc/DefaultApi.md) | [**deleteAnnouncement**](doc/DefaultApi.md#deleteannouncement) | **DELETE** /api/announcement/admin/delete/{id} | 删除公告
 [*DefaultApi*](doc/DefaultApi.md) | [**deleteBanner**](doc/DefaultApi.md#deletebanner) | **DELETE** /api/admin/banner/{id} | 删除轮播图
 [*DefaultApi*](doc/DefaultApi.md) | [**deleteBook**](doc/DefaultApi.md#deletebook) | **DELETE** /api/books/{bookId} | 删除书籍
@@ -128,7 +129,6 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**deleteCourse**](doc/DefaultApi.md#deletecourse) | **DELETE** /api/course/{id} | 删除课程（管理员）
 [*DefaultApi*](doc/DefaultApi.md) | [**deleteDailyArticle**](doc/DefaultApi.md#deletedailyarticle) | **DELETE** /api/daily-article/{id} | 删除每日文章（管理员）
 [*DefaultApi*](doc/DefaultApi.md) | [**deleteDailyWord**](doc/DefaultApi.md#deletedailyword) | **DELETE** /api/daily-word/{id} | 删除每日单词（管理员）
-[*DefaultApi*](doc/DefaultApi.md) | [**deleteDocument**](doc/DefaultApi.md#deletedocument) | **DELETE** /api/ai/knowledge-bases/{id}/documents/{docId} | 删除文档
 [*DefaultApi*](doc/DefaultApi.md) | [**deleteEdge**](doc/DefaultApi.md#deleteedge) | **DELETE** /api/workflows/{id}/edges/{edgeId} | 删除连接线
 [*DefaultApi*](doc/DefaultApi.md) | [**deleteFeedback**](doc/DefaultApi.md#deletefeedback) | **DELETE** /api/feedback/{id} | 删除反馈
 [*DefaultApi*](doc/DefaultApi.md) | [**deleteFeedback1**](doc/DefaultApi.md#deletefeedback1) | **DELETE** /api/feedback/admin/{id} | 删除反馈
@@ -140,10 +140,14 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**deletePost**](doc/DefaultApi.md#deletepost) | **DELETE** /api/posts/{postId} | 删除帖子
 [*DefaultApi*](doc/DefaultApi.md) | [**deleteReply**](doc/DefaultApi.md#deletereply) | **DELETE** /api/posts/replies/{replyId} | 删除回复
 [*DefaultApi*](doc/DefaultApi.md) | [**deleteSection**](doc/DefaultApi.md#deletesection) | **DELETE** /api/course/{courseId}/section/{sectionId} | 删除小节（管理员）
+[*DefaultApi*](doc/DefaultApi.md) | [**deleteTemplate**](doc/DefaultApi.md#deletetemplate) | **DELETE** /api/workflows/templates/{templateId} | 删除模板
+[*DefaultApi*](doc/DefaultApi.md) | [**deleteTrigger**](doc/DefaultApi.md#deletetrigger) | **DELETE** /api/workflows/triggers/{triggerId} | 删除触发器
 [*DefaultApi*](doc/DefaultApi.md) | [**deleteVariable**](doc/DefaultApi.md#deletevariable) | **DELETE** /api/workflows/{id}/variables/{variableName} | 删除变量
 [*DefaultApi*](doc/DefaultApi.md) | [**disableConfig**](doc/DefaultApi.md#disableconfig) | **POST** /api/admin/scraper/config/{id}/disable | 禁用配置
+[*DefaultApi*](doc/DefaultApi.md) | [**disableTrigger**](doc/DefaultApi.md#disabletrigger) | **POST** /api/workflows/triggers/{triggerId}/disable | 禁用触发器
 [*DefaultApi*](doc/DefaultApi.md) | [**dissolveGroup**](doc/DefaultApi.md#dissolvegroup) | **DELETE** /api/groups/{groupId} | 解散群
 [*DefaultApi*](doc/DefaultApi.md) | [**enableConfig**](doc/DefaultApi.md#enableconfig) | **POST** /api/admin/scraper/config/{id}/enable | 启用配置
+[*DefaultApi*](doc/DefaultApi.md) | [**enableTrigger**](doc/DefaultApi.md#enabletrigger) | **POST** /api/workflows/triggers/{triggerId}/enable | 启用触发器
 [*DefaultApi*](doc/DefaultApi.md) | [**encryptChapterContent**](doc/DefaultApi.md#encryptchaptercontent) | **POST** /api/books/{bookId}/chapters/{chapterIndex}/encrypt | 加密章节内容
 [*DefaultApi*](doc/DefaultApi.md) | [**execute**](doc/DefaultApi.md#execute) | **POST** /api/workflows/{id}/execute | 执行工作流
 [*DefaultApi*](doc/DefaultApi.md) | [**executeAllTasks**](doc/DefaultApi.md#executealltasks) | **POST** /api/admin/scraper/config/execute-all | 触发所有抓取
@@ -164,7 +168,6 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**getBook**](doc/DefaultApi.md#getbook) | **GET** /api/books/{bookId} | 获取书籍详情
 [*DefaultApi*](doc/DefaultApi.md) | [**getBookChapters**](doc/DefaultApi.md#getbookchapters) | **GET** /api/books/{bookId}/chapters | 获取书籍章节列表
 [*DefaultApi*](doc/DefaultApi.md) | [**getById**](doc/DefaultApi.md#getbyid) | **GET** /api/workflows/{id} | 获取工作流详情
-[*DefaultApi*](doc/DefaultApi.md) | [**getById1**](doc/DefaultApi.md#getbyid1) | **GET** /api/ai/knowledge-bases/{id} | 获取知识库详情
 [*DefaultApi*](doc/DefaultApi.md) | [**getChapter**](doc/DefaultApi.md#getchapter) | **GET** /api/course/{courseId}/chapter/{chapterId} | 获取章节详情
 [*DefaultApi*](doc/DefaultApi.md) | [**getChapterContent**](doc/DefaultApi.md#getchaptercontent) | **GET** /api/books/{bookId}/chapters/{chapterIndex} | 获取章节内容
 [*DefaultApi*](doc/DefaultApi.md) | [**getChatHistory**](doc/DefaultApi.md#getchathistory) | **POST** /api/chat/history | 获取聊天历史
@@ -186,6 +189,7 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**getDefinition**](doc/DefaultApi.md#getdefinition) | **GET** /api/workflows/{id}/definition | 获取工作流定义详情
 [*DefaultApi*](doc/DefaultApi.md) | [**getEdges**](doc/DefaultApi.md#getedges) | **GET** /api/workflows/{id}/edges | 获取工作流所有连接线
 [*DefaultApi*](doc/DefaultApi.md) | [**getExecutionLogs**](doc/DefaultApi.md#getexecutionlogs) | **GET** /api/workflows/executions/{executionId}/logs | 获取执行日志
+[*DefaultApi*](doc/DefaultApi.md) | [**getExecutionStatistics**](doc/DefaultApi.md#getexecutionstatistics) | **GET** /api/workflows/{id}/execution-statistics | 获取工作流执行统计
 [*DefaultApi*](doc/DefaultApi.md) | [**getExecutionStatus**](doc/DefaultApi.md#getexecutionstatus) | **GET** /api/workflows/executions/{executionId} | 获取执行状态
 [*DefaultApi*](doc/DefaultApi.md) | [**getFavouriteCount**](doc/DefaultApi.md#getfavouritecount) | **GET** /api/course/favourite/{courseId}/count | 获取课程收藏数
 [*DefaultApi*](doc/DefaultApi.md) | [**getFeedbackDetail**](doc/DefaultApi.md#getfeedbackdetail) | **GET** /api/feedback/{id} | 获取反馈详情
@@ -244,10 +248,12 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**getStudiedWords**](doc/DefaultApi.md#getstudiedwords) | **GET** /api/user/daily-word/studied | 获取已学习单词列表
 [*DefaultApi*](doc/DefaultApi.md) | [**getSupportedSources**](doc/DefaultApi.md#getsupportedsources) | **GET** /api/scraper/sources | 获取预设来源列表
 [*DefaultApi*](doc/DefaultApi.md) | [**getSupportedVoices**](doc/DefaultApi.md#getsupportedvoices) | **GET** /api/speech/tts/voices | 获取支持的发音人列表
+[*DefaultApi*](doc/DefaultApi.md) | [**getTableColumns**](doc/DefaultApi.md#gettablecolumns) | **GET** /api/workflows/database/tables/{tableName}/columns | 获取指定表的字段信息
 [*DefaultApi*](doc/DefaultApi.md) | [**getTask**](doc/DefaultApi.md#gettask) | **GET** /api/admin/scraper/config/task/{taskId} | 获取任务详情
 [*DefaultApi*](doc/DefaultApi.md) | [**getTasksByConfig**](doc/DefaultApi.md#gettasksbyconfig) | **GET** /api/admin/scraper/config/{configId}/tasks | 获取配置的任务列表
 [*DefaultApi*](doc/DefaultApi.md) | [**getTeacher**](doc/DefaultApi.md#getteacher) | **GET** /api/teacher/{id} | 获取讲师信息
 [*DefaultApi*](doc/DefaultApi.md) | [**getTeacherByUserId**](doc/DefaultApi.md#getteacherbyuserid) | **GET** /api/teacher/user/{userId} | 根据用户ID获取讲师信息
+[*DefaultApi*](doc/DefaultApi.md) | [**getTemplate**](doc/DefaultApi.md#gettemplate) | **GET** /api/workflows/templates/{templateId} | 获取模板详情
 [*DefaultApi*](doc/DefaultApi.md) | [**getTodayArticles**](doc/DefaultApi.md#gettodayarticles) | **GET** /api/daily-article/today | 获取今日推荐文章（个性化推荐）
 [*DefaultApi*](doc/DefaultApi.md) | [**getTodayWords**](doc/DefaultApi.md#gettodaywords) | **GET** /api/daily-word/today | 获取今日推荐单词（个性化推荐）
 [*DefaultApi*](doc/DefaultApi.md) | [**getTopPosts**](doc/DefaultApi.md#gettopposts) | **GET** /api/posts/top | 获取点赞排行榜（全部时间）
@@ -265,28 +271,50 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**getUserShelf**](doc/DefaultApi.md#getusershelf) | **GET** /api/reading/shelf/{userId} | 获取用户书架
 [*DefaultApi*](doc/DefaultApi.md) | [**getUserStats**](doc/DefaultApi.md#getuserstats) | **GET** /api/user/stats | 获取用户统计数据
 [*DefaultApi*](doc/DefaultApi.md) | [**getVariables**](doc/DefaultApi.md#getvariables) | **GET** /api/workflows/{id}/variables | 获取工作流所有变量
+[*DefaultApi*](doc/DefaultApi.md) | [**getVersion**](doc/DefaultApi.md#getversion) | **GET** /api/workflows/{id}/versions/{versionNumber} | 获取指定版本详情
 [*DefaultApi*](doc/DefaultApi.md) | [**getWordBookList**](doc/DefaultApi.md#getwordbooklist) | **GET** /api/user/word-book/list | 获取生词本列表
 [*DefaultApi*](doc/DefaultApi.md) | [**getWordsByDate**](doc/DefaultApi.md#getwordsbydate) | **GET** /api/daily-word/date/{date} | 获取指定日期单词
+[*DefaultApi*](doc/DefaultApi.md) | [**getWorkflowAssistants**](doc/DefaultApi.md#getworkflowassistants) | **GET** /api/workflows/{id}/assistants | 获取使用该工作流的AI助手ID列表
 [*DefaultApi*](doc/DefaultApi.md) | [**handleFriendRequest**](doc/DefaultApi.md#handlefriendrequest) | **POST** /api/friend/request/handle | 处理好友申请
 [*DefaultApi*](doc/DefaultApi.md) | [**handleJoinRequest**](doc/DefaultApi.md#handlejoinrequest) | **POST** /api/groups/requests/{requestId}/handle | 处理加入申请
 [*DefaultApi*](doc/DefaultApi.md) | [**health**](doc/DefaultApi.md#health) | **GET** /api/health | 健康检查
 [*DefaultApi*](doc/DefaultApi.md) | [**inviteMember**](doc/DefaultApi.md#invitemember) | **POST** /api/groups/{groupId}/invite | 邀请用户加入群
 [*DefaultApi*](doc/DefaultApi.md) | [**isFollowing**](doc/DefaultApi.md#isfollowing) | **GET** /api/follow/check/{targetUserId} | 检查是否已关注
+[*DefaultApi*](doc/DefaultApi.md) | [**kbAddDocument**](doc/DefaultApi.md#kbadddocument) | **POST** /api/ai/knowledge-bases/{id}/documents | 添加文档
+[*DefaultApi*](doc/DefaultApi.md) | [**kbBatchProcessByKnowledgeBase**](doc/DefaultApi.md#kbbatchprocessbyknowledgebase) | **POST** /api/ai/knowledge-bases/{id}/embed-all | 向量化知识库所有待处理文档
+[*DefaultApi*](doc/DefaultApi.md) | [**kbBatchProcessDocuments**](doc/DefaultApi.md#kbbatchprocessdocuments) | **POST** /api/ai/knowledge-bases/{id}/documents/batch-embed | 批量文档向量化
+[*DefaultApi*](doc/DefaultApi.md) | [**kbBatchProcessDocumentsAsync**](doc/DefaultApi.md#kbbatchprocessdocumentsasync) | **POST** /api/ai/knowledge-bases/{id}/documents/batch-embed-async | 异步批量文档向量化
+[*DefaultApi*](doc/DefaultApi.md) | [**kbCreate**](doc/DefaultApi.md#kbcreate) | **POST** /api/ai/knowledge-bases | 创建知识库
+[*DefaultApi*](doc/DefaultApi.md) | [**kbDelete**](doc/DefaultApi.md#kbdelete) | **DELETE** /api/ai/knowledge-bases/{id} | 删除知识库
+[*DefaultApi*](doc/DefaultApi.md) | [**kbDeleteDocument**](doc/DefaultApi.md#kbdeletedocument) | **DELETE** /api/ai/knowledge-bases/{id}/documents/{docId} | 删除文档
+[*DefaultApi*](doc/DefaultApi.md) | [**kbGetById**](doc/DefaultApi.md#kbgetbyid) | **GET** /api/ai/knowledge-bases/{id} | 获取知识库详情
+[*DefaultApi*](doc/DefaultApi.md) | [**kbListByCreator**](doc/DefaultApi.md#kblistbycreator) | **GET** /api/ai/knowledge-bases | 获取用户的知识库列表
+[*DefaultApi*](doc/DefaultApi.md) | [**kbListChunks**](doc/DefaultApi.md#kblistchunks) | **GET** /api/ai/knowledge-bases/{id}/documents/{docId}/chunks | 获取文档分块列表
+[*DefaultApi*](doc/DefaultApi.md) | [**kbListDocuments**](doc/DefaultApi.md#kblistdocuments) | **GET** /api/ai/knowledge-bases/{id}/documents | 获取文档列表
+[*DefaultApi*](doc/DefaultApi.md) | [**kbProcessDocument**](doc/DefaultApi.md#kbprocessdocument) | **POST** /api/ai/knowledge-bases/{id}/documents/{docId}/embed | 触发文档向量化
+[*DefaultApi*](doc/DefaultApi.md) | [**kbRecallTest**](doc/DefaultApi.md#kbrecalltest) | **POST** /api/ai/knowledge-bases/{id}/recall-test | 知识库召回测试
+[*DefaultApi*](doc/DefaultApi.md) | [**kbSearch**](doc/DefaultApi.md#kbsearch) | **GET** /api/ai/knowledge-bases/search | 搜索知识库
+[*DefaultApi*](doc/DefaultApi.md) | [**kbUpdate**](doc/DefaultApi.md#kbupdate) | **PUT** /api/ai/knowledge-bases/{id} | 更新知识库
+[*DefaultApi*](doc/DefaultApi.md) | [**kbUpdateDocument**](doc/DefaultApi.md#kbupdatedocument) | **PUT** /api/ai/knowledge-bases/{id}/documents/{docId} | 更新文档元信息
 [*DefaultApi*](doc/DefaultApi.md) | [**leaveGroup**](doc/DefaultApi.md#leavegroup) | **POST** /api/groups/{groupId}/leave | 退出群
+[*DefaultApi*](doc/DefaultApi.md) | [**listAllowedTables**](doc/DefaultApi.md#listallowedtables) | **GET** /api/workflows/database/tables | 获取可查询的数据库表列表
 [*DefaultApi*](doc/DefaultApi.md) | [**listApplications**](doc/DefaultApi.md#listapplications) | **GET** /api/teacher/application/list | 获取申请列表（管理员）
 [*DefaultApi*](doc/DefaultApi.md) | [**listArticles**](doc/DefaultApi.md#listarticles) | **GET** /api/daily-article/list | 获取文章列表
+[*DefaultApi*](doc/DefaultApi.md) | [**listAvailableModels**](doc/DefaultApi.md#listavailablemodels) | **GET** /api/workflows/models | 获取可用模型列表
 [*DefaultApi*](doc/DefaultApi.md) | [**listBooks**](doc/DefaultApi.md#listbooks) | **GET** /api/books | 获取书籍列表
-[*DefaultApi*](doc/DefaultApi.md) | [**listByCreator**](doc/DefaultApi.md#listbycreator) | **GET** /api/ai/knowledge-bases | 获取用户的知识库列表
 [*DefaultApi*](doc/DefaultApi.md) | [**listByUser**](doc/DefaultApi.md#listbyuser) | **GET** /api/workflows | 获取用户的工作流列表
 [*DefaultApi*](doc/DefaultApi.md) | [**listChapters**](doc/DefaultApi.md#listchapters) | **GET** /api/course/{courseId}/chapter | 获取课程的章节列表
 [*DefaultApi*](doc/DefaultApi.md) | [**listCourses**](doc/DefaultApi.md#listcourses) | **GET** /api/course/list | 获取课程列表
 [*DefaultApi*](doc/DefaultApi.md) | [**listCoursesByTeacher**](doc/DefaultApi.md#listcoursesbyteacher) | **GET** /api/course/teacher/{teacherId} | 获取讲师的课程列表
-[*DefaultApi*](doc/DefaultApi.md) | [**listDocuments**](doc/DefaultApi.md#listdocuments) | **GET** /api/ai/knowledge-bases/{id}/documents | 获取文档列表
+[*DefaultApi*](doc/DefaultApi.md) | [**listExecutions**](doc/DefaultApi.md#listexecutions) | **GET** /api/workflows/{id}/executions | 获取工作流执行历史列表
 [*DefaultApi*](doc/DefaultApi.md) | [**listOrders**](doc/DefaultApi.md#listorders) | **GET** /api/admin/order/list | 获取订单列表（管理员）
 [*DefaultApi*](doc/DefaultApi.md) | [**listPublic**](doc/DefaultApi.md#listpublic) | **GET** /api/workflows/public | 获取公开的工作流列表
 [*DefaultApi*](doc/DefaultApi.md) | [**listReviews**](doc/DefaultApi.md#listreviews) | **GET** /api/course/review/{courseId}/list | 获取课程评价列表
 [*DefaultApi*](doc/DefaultApi.md) | [**listSections**](doc/DefaultApi.md#listsections) | **GET** /api/course/{courseId}/section | 获取课程的所有小节
+[*DefaultApi*](doc/DefaultApi.md) | [**listSystemTemplates**](doc/DefaultApi.md#listsystemtemplates) | **GET** /api/workflows/templates/system | 获取系统预置模板
 [*DefaultApi*](doc/DefaultApi.md) | [**listTeachers**](doc/DefaultApi.md#listteachers) | **GET** /api/teacher/list | 获取讲师列表
+[*DefaultApi*](doc/DefaultApi.md) | [**listTriggers**](doc/DefaultApi.md#listtriggers) | **GET** /api/workflows/{id}/triggers | 获取工作流触发器列表
+[*DefaultApi*](doc/DefaultApi.md) | [**listVersions**](doc/DefaultApi.md#listversions) | **GET** /api/workflows/{id}/versions | 获取工作流版本列表
 [*DefaultApi*](doc/DefaultApi.md) | [**listWords**](doc/DefaultApi.md#listwords) | **GET** /api/daily-word/list | 获取单词列表
 [*DefaultApi*](doc/DefaultApi.md) | [**markAsRead**](doc/DefaultApi.md#markasread) | **POST** /api/user/daily-article/{articleId}/read | 标记文章为已阅读
 [*DefaultApi*](doc/DefaultApi.md) | [**markAsRead1**](doc/DefaultApi.md#markasread1) | **POST** /api/group-chat/{groupId}/messages/{messageId}/read | 标记消息已读
@@ -296,8 +324,7 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**offlineAnnouncement**](doc/DefaultApi.md#offlineannouncement) | **POST** /api/announcement/admin/offline/{id} | 下线公告
 [*DefaultApi*](doc/DefaultApi.md) | [**offlineBanner**](doc/DefaultApi.md#offlinebanner) | **POST** /api/admin/banner/{id}/offline | 下线轮播图
 [*DefaultApi*](doc/DefaultApi.md) | [**phoneLogin**](doc/DefaultApi.md#phonelogin) | **POST** /api/auth/login/phone | 手机验证码登录
-[*DefaultApi*](doc/DefaultApi.md) | [**processDocument**](doc/DefaultApi.md#processdocument) | **POST** /api/ai/knowledge-bases/{id}/documents/{docId}/embed | 触发文档向量化
-[*DefaultApi*](doc/DefaultApi.md) | [**publish1**](doc/DefaultApi.md#publish1) | **POST** /api/workflows/{id}/publish | 发布工作流
+[*DefaultApi*](doc/DefaultApi.md) | [**publish**](doc/DefaultApi.md#publish) | **POST** /api/workflows/{id}/publish | 发布工作流
 [*DefaultApi*](doc/DefaultApi.md) | [**publishAnnouncement**](doc/DefaultApi.md#publishannouncement) | **PUT** /api/groups/{groupId}/announcement | 发布群公告
 [*DefaultApi*](doc/DefaultApi.md) | [**publishAnnouncement1**](doc/DefaultApi.md#publishannouncement1) | **POST** /api/announcement/admin/publish/{id} | 发布公告
 [*DefaultApi*](doc/DefaultApi.md) | [**publishBanner**](doc/DefaultApi.md#publishbanner) | **POST** /api/admin/banner/{id}/publish | 发布轮播图
@@ -321,6 +348,7 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**resetProgress**](doc/DefaultApi.md#resetprogress) | **POST** /api/progress/section/{sectionId}/reset | 重置小节进度
 [*DefaultApi*](doc/DefaultApi.md) | [**reviewApplication**](doc/DefaultApi.md#reviewapplication) | **POST** /api/teacher/application/review | 审核讲师申请（管理员）
 [*DefaultApi*](doc/DefaultApi.md) | [**reviewCourse**](doc/DefaultApi.md#reviewcourse) | **POST** /api/course/review/{courseId} | 评价课程
+[*DefaultApi*](doc/DefaultApi.md) | [**rollbackToVersion**](doc/DefaultApi.md#rollbacktoversion) | **POST** /api/workflows/{id}/versions/{versionNumber}/rollback | 回滚到指定版本
 [*DefaultApi*](doc/DefaultApi.md) | [**scrapeArticleLinks**](doc/DefaultApi.md#scrapearticlelinks) | **POST** /api/scraper/links | 获取文章链接
 [*DefaultApi*](doc/DefaultApi.md) | [**scrapeDynamicArticleLinks**](doc/DefaultApi.md#scrapedynamicarticlelinks) | **POST** /api/scraper/dynamic/links | 动态获取文章链接
 [*DefaultApi*](doc/DefaultApi.md) | [**scrapeDynamicMultiplePages**](doc/DefaultApi.md#scrapedynamicmultiplepages) | **POST** /api/scraper/dynamic/batch | 批量动态抓取
@@ -331,13 +359,13 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**scrapeMultiplePages**](doc/DefaultApi.md#scrapemultiplepages) | **POST** /api/scraper/batch | 批量抓取
 [*DefaultApi*](doc/DefaultApi.md) | [**scrapeRecursively**](doc/DefaultApi.md#scraperecursively) | **POST** /api/scraper/recursive | 递归抓取
 [*DefaultApi*](doc/DefaultApi.md) | [**scrapeSinglePage**](doc/DefaultApi.md#scrapesinglepage) | **POST** /api/scraper/single | 抓取单个页面
-[*DefaultApi*](doc/DefaultApi.md) | [**search**](doc/DefaultApi.md#search) | **GET** /api/ai/knowledge-bases/search | 搜索知识库
 [*DefaultApi*](doc/DefaultApi.md) | [**searchArticles**](doc/DefaultApi.md#searcharticles) | **GET** /api/daily-article/search | 搜索文章
 [*DefaultApi*](doc/DefaultApi.md) | [**searchBooks**](doc/DefaultApi.md#searchbooks) | **GET** /api/books/search | 搜索书籍
 [*DefaultApi*](doc/DefaultApi.md) | [**searchCourses**](doc/DefaultApi.md#searchcourses) | **GET** /api/course/search | 搜索课程
 [*DefaultApi*](doc/DefaultApi.md) | [**searchGroups**](doc/DefaultApi.md#searchgroups) | **GET** /api/groups/search | 搜索群
 [*DefaultApi*](doc/DefaultApi.md) | [**searchPosts**](doc/DefaultApi.md#searchposts) | **GET** /api/posts/search | 搜索帖子
 [*DefaultApi*](doc/DefaultApi.md) | [**searchPostsByTag**](doc/DefaultApi.md#searchpostsbytag) | **GET** /api/posts/tag | 根据标签搜索帖子
+[*DefaultApi*](doc/DefaultApi.md) | [**searchTemplates**](doc/DefaultApi.md#searchtemplates) | **GET** /api/workflows/templates | 搜索工作流模板
 [*DefaultApi*](doc/DefaultApi.md) | [**searchUsers**](doc/DefaultApi.md#searchusers) | **POST** /api/friend/search | 搜索用户
 [*DefaultApi*](doc/DefaultApi.md) | [**searchWords**](doc/DefaultApi.md#searchwords) | **GET** /api/daily-word/search | 搜索单词
 [*DefaultApi*](doc/DefaultApi.md) | [**sendFriendRequest**](doc/DefaultApi.md#sendfriendrequest) | **POST** /api/friend/request/send | 发送好友申请
@@ -358,10 +386,10 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**toggleLike**](doc/DefaultApi.md#togglelike) | **POST** /api/user/daily-article/{articleId}/like | 点赞/取消点赞文章
 [*DefaultApi*](doc/DefaultApi.md) | [**toggleThumb**](doc/DefaultApi.md#togglethumb) | **POST** /api/posts/{postId}/thumb | 点赞/取消点赞帖子
 [*DefaultApi*](doc/DefaultApi.md) | [**transferOwnership**](doc/DefaultApi.md#transferownership) | **POST** /api/groups/{groupId}/transfer | 转让群主
+[*DefaultApi*](doc/DefaultApi.md) | [**unbindFromAssistant**](doc/DefaultApi.md#unbindfromassistant) | **DELETE** /api/workflows/{id}/assistants/{assistantId} | 解绑工作流与AI助手
 [*DefaultApi*](doc/DefaultApi.md) | [**unfavouriteCourse**](doc/DefaultApi.md#unfavouritecourse) | **DELETE** /api/course/favourite/{courseId} | 取消收藏
 [*DefaultApi*](doc/DefaultApi.md) | [**unfollow**](doc/DefaultApi.md#unfollow) | **DELETE** /api/follow/{targetUserId} | 取消关注
 [*DefaultApi*](doc/DefaultApi.md) | [**update**](doc/DefaultApi.md#update) | **PUT** /api/workflows/{id} | 更新工作流基本信息
-[*DefaultApi*](doc/DefaultApi.md) | [**update1**](doc/DefaultApi.md#update1) | **PUT** /api/ai/knowledge-bases/{id} | 更新知识库
 [*DefaultApi*](doc/DefaultApi.md) | [**updateAnnouncement**](doc/DefaultApi.md#updateannouncement) | **PUT** /api/announcement/admin/update | 更新公告
 [*DefaultApi*](doc/DefaultApi.md) | [**updateBanner**](doc/DefaultApi.md#updatebanner) | **PUT** /api/admin/banner | 更新轮播图
 [*DefaultApi*](doc/DefaultApi.md) | [**updateChapter**](doc/DefaultApi.md#updatechapter) | **PUT** /api/course/{courseId}/chapter/{chapterId} | 更新章节（管理员）
@@ -394,23 +422,33 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**userLogin**](doc/DefaultApi.md#userlogin) | **POST** /api/auth/login | 用户登录
 [*DefaultApi*](doc/DefaultApi.md) | [**userRegister**](doc/DefaultApi.md#userregister) | **POST** /api/auth/register | 用户注册
 [*DefaultApi*](doc/DefaultApi.md) | [**validate**](doc/DefaultApi.md#validate) | **POST** /api/workflows/{id}/validate | 验证工作流定义
-[*AIApi*](doc/AIApi.md) | [**archive**](doc/AIApi.md#archive) | **PUT** /api/ai/assistants/{id}/archive | 归档AI助手
 [*AIApi*](doc/AIApi.md) | [**askQuestion**](doc/AIApi.md#askquestion) | **POST** /api/books/{bookId}/ai/chat | 提问（新对话）
+[*AIApi*](doc/AIApi.md) | [**assistantArchive**](doc/AIApi.md#assistantarchive) | **PUT** /api/ai/assistants/{id}/archive | 归档AI助手
+[*AIApi*](doc/AIApi.md) | [**assistantBindKnowledgeBase**](doc/AIApi.md#assistantbindknowledgebase) | **POST** /api/ai/assistants/{id}/knowledge-bases/{kbId} | 绑定知识库
+[*AIApi*](doc/AIApi.md) | [**assistantBindWorkflow**](doc/AIApi.md#assistantbindworkflow) | **POST** /api/ai/assistants/{id}/workflows/{workflowId} | 绑定工作流到AI助手
+[*AIApi*](doc/AIApi.md) | [**assistantChat**](doc/AIApi.md#assistantchat) | **POST** /api/ai/assistants/{id}/chat/stream | AI助手流式对话
+[*AIApi*](doc/AIApi.md) | [**assistantCreate**](doc/AIApi.md#assistantcreate) | **POST** /api/ai/assistants | 创建AI助手
+[*AIApi*](doc/AIApi.md) | [**assistantDelete**](doc/AIApi.md#assistantdelete) | **DELETE** /api/ai/assistants/{id} | 删除AI助手
+[*AIApi*](doc/AIApi.md) | [**assistantExecuteWorkflow**](doc/AIApi.md#assistantexecuteworkflow) | **POST** /api/ai/assistants/{id}/workflows/{workflowId}/execute | 执行AI助手绑定的工作流
+[*AIApi*](doc/AIApi.md) | [**assistantGetById**](doc/AIApi.md#assistantgetbyid) | **GET** /api/ai/assistants/{id} | 获取AI助手详情
+[*AIApi*](doc/AIApi.md) | [**assistantGetWorkflowSkills**](doc/AIApi.md#assistantgetworkflowskills) | **GET** /api/ai/assistants/{id}/workflow-skills | 获取AI助手的工作流技能列表
+[*AIApi*](doc/AIApi.md) | [**assistantGetWorkflows**](doc/AIApi.md#assistantgetworkflows) | **GET** /api/ai/assistants/{id}/workflows | 获取AI助手绑定的工作流列表
+[*AIApi*](doc/AIApi.md) | [**assistantListByCreator**](doc/AIApi.md#assistantlistbycreator) | **GET** /api/ai/assistants | 获取用户的AI助手列表
+[*AIApi*](doc/AIApi.md) | [**assistantListPublic**](doc/AIApi.md#assistantlistpublic) | **GET** /api/ai/assistants/public | 获取公开的AI助手列表
+[*AIApi*](doc/AIApi.md) | [**assistantPublish**](doc/AIApi.md#assistantpublish) | **PUT** /api/ai/assistants/{id}/publish | 发布AI助手
+[*AIApi*](doc/AIApi.md) | [**assistantSearch**](doc/AIApi.md#assistantsearch) | **GET** /api/ai/assistants/search | 搜索AI助手
+[*AIApi*](doc/AIApi.md) | [**assistantUnbindKnowledgeBase**](doc/AIApi.md#assistantunbindknowledgebase) | **DELETE** /api/ai/assistants/{id}/knowledge-bases/{kbId} | 解绑知识库
+[*AIApi*](doc/AIApi.md) | [**assistantUnbindWorkflow**](doc/AIApi.md#assistantunbindworkflow) | **DELETE** /api/ai/assistants/{id}/workflows/{workflowId} | 解绑工作流
+[*AIApi*](doc/AIApi.md) | [**assistantUpdate**](doc/AIApi.md#assistantupdate) | **PUT** /api/ai/assistants/{id} | 更新AI助手
 [*AIApi*](doc/AIApi.md) | [**batchProcessArticles**](doc/AIApi.md#batchprocessarticles) | **POST** /api/admin/articles/ai/batch-process | 批量AI处理文章
-[*AIApi*](doc/AIApi.md) | [**bindKnowledgeBase**](doc/AIApi.md#bindknowledgebase) | **POST** /api/ai/assistants/{id}/knowledge-bases/{kbId} | 绑定知识库
-[*AIApi*](doc/AIApi.md) | [**bindWorkflow**](doc/AIApi.md#bindworkflow) | **POST** /api/ai/assistants/{id}/workflows/{workflowId} | 绑定工作流到AI助手
 [*AIApi*](doc/AIApi.md) | [**chat**](doc/AIApi.md#chat) | **POST** /api/articles/chat | 非流式对话
 [*AIApi*](doc/AIApi.md) | [**continueConversation**](doc/AIApi.md#continueconversation) | **POST** /api/books/{bookId}/ai/chat/{conversationId} | 继续对话
-[*AIApi*](doc/AIApi.md) | [**create2**](doc/AIApi.md#create2) | **POST** /api/ai/assistants | 创建AI助手
 [*AIApi*](doc/AIApi.md) | [**createSession**](doc/AIApi.md#createsession) | **POST** /api/ai/chat/sessions | 创建新会话
-[*AIApi*](doc/AIApi.md) | [**delete2**](doc/AIApi.md#delete2) | **DELETE** /api/ai/assistants/{id} | 删除AI助手
 [*AIApi*](doc/AIApi.md) | [**deleteSession**](doc/AIApi.md#deletesession) | **DELETE** /api/ai/chat/sessions/{sessionId} | 删除会话
-[*AIApi*](doc/AIApi.md) | [**executeWorkflow**](doc/AIApi.md#executeworkflow) | **POST** /api/ai/assistants/{id}/workflows/{workflowId}/execute | 执行AI助手绑定的工作流
 [*AIApi*](doc/AIApi.md) | [**extractKnowledgePoints**](doc/AIApi.md#extractknowledgepoints) | **POST** /api/books/{bookId}/ai/chapters/{chapterId}/knowledge-points | 提取章节知识点
 [*AIApi*](doc/AIApi.md) | [**generateQuiz**](doc/AIApi.md#generatequiz) | **POST** /api/books/{bookId}/ai/chapters/{chapterId}/quiz | 生成阅读测试
 [*AIApi*](doc/AIApi.md) | [**generateSummary**](doc/AIApi.md#generatesummary) | **POST** /api/books/{bookId}/ai/chapters/{chapterId}/summary | 生成章节总结
 [*AIApi*](doc/AIApi.md) | [**getAllSummaries**](doc/AIApi.md#getallsummaries) | **GET** /api/books/{bookId}/ai/chapters/{chapterId}/summaries | 获取章节所有总结
-[*AIApi*](doc/AIApi.md) | [**getById2**](doc/AIApi.md#getbyid2) | **GET** /api/ai/assistants/{id} | 获取AI助手详情
 [*AIApi*](doc/AIApi.md) | [**getConversation**](doc/AIApi.md#getconversation) | **GET** /api/books/{bookId}/ai/chat/{conversationId} | 获取对话历史
 [*AIApi*](doc/AIApi.md) | [**getKnowledgePoints**](doc/AIApi.md#getknowledgepoints) | **GET** /api/books/{bookId}/ai/chapters/{chapterId}/knowledge-points | 获取章节知识点
 [*AIApi*](doc/AIApi.md) | [**getLatestQuiz**](doc/AIApi.md#getlatestquiz) | **GET** /api/books/{bookId}/ai/chapters/{chapterId}/quiz/latest | 获取章节最新测试
@@ -418,27 +456,27 @@ Class | Method | HTTP request | Description
 [*AIApi*](doc/AIApi.md) | [**getSessionDetail**](doc/AIApi.md#getsessiondetail) | **GET** /api/ai/chat/sessions/{sessionId} | 获取会话详情（含消息列表）
 [*AIApi*](doc/AIApi.md) | [**getSummary**](doc/AIApi.md#getsummary) | **GET** /api/books/{bookId}/ai/chapters/{chapterId}/summary | 获取章节总结
 [*AIApi*](doc/AIApi.md) | [**getUserConversations**](doc/AIApi.md#getuserconversations) | **GET** /api/books/{bookId}/ai/conversations | 获取用户对话列表
-[*AIApi*](doc/AIApi.md) | [**getWorkflows**](doc/AIApi.md#getworkflows) | **GET** /api/ai/assistants/{id}/workflows | 获取AI助手绑定的工作流列表
 [*AIApi*](doc/AIApi.md) | [**listAllModels**](doc/AIApi.md#listallmodels) | **GET** /api/ai/chat/models/all | 获取全量模型配置
-[*AIApi*](doc/AIApi.md) | [**listByCreator1**](doc/AIApi.md#listbycreator1) | **GET** /api/ai/assistants | 获取用户的AI助手列表
 [*AIApi*](doc/AIApi.md) | [**listModels**](doc/AIApi.md#listmodels) | **GET** /api/ai/chat/models | 获取可用模型列表
-[*AIApi*](doc/AIApi.md) | [**listPublic1**](doc/AIApi.md#listpublic1) | **GET** /api/ai/assistants/public | 获取公开的AI助手列表
 [*AIApi*](doc/AIApi.md) | [**listSessions**](doc/AIApi.md#listsessions) | **GET** /api/ai/chat/sessions | 获取会话列表
 [*AIApi*](doc/AIApi.md) | [**previewAiProcess**](doc/AIApi.md#previewaiprocess) | **POST** /api/admin/articles/ai/preview | 预览AI处理结果
 [*AIApi*](doc/AIApi.md) | [**processArticle**](doc/AIApi.md#processarticle) | **POST** /api/admin/articles/ai/process | AI处理单篇文章
-[*AIApi*](doc/AIApi.md) | [**publish**](doc/AIApi.md#publish) | **PUT** /api/ai/assistants/{id}/publish | 发布AI助手
 [*AIApi*](doc/AIApi.md) | [**regenerateKnowledgePoints**](doc/AIApi.md#regenerateknowledgepoints) | **POST** /api/books/{bookId}/ai/chapters/{chapterId}/knowledge-points/regenerate | 重新提取知识点
 [*AIApi*](doc/AIApi.md) | [**regenerateSummary**](doc/AIApi.md#regeneratesummary) | **POST** /api/books/{bookId}/ai/chapters/{chapterId}/summary/regenerate | 重新生成总结
-[*AIApi*](doc/AIApi.md) | [**search1**](doc/AIApi.md#search1) | **GET** /api/ai/assistants/search | 搜索AI助手
 [*AIApi*](doc/AIApi.md) | [**searchKnowledgePoints**](doc/AIApi.md#searchknowledgepoints) | **GET** /api/books/{bookId}/ai/knowledge-points/search | 搜索知识点
 [*AIApi*](doc/AIApi.md) | [**sessionStreamChat**](doc/AIApi.md#sessionstreamchat) | **POST** /api/ai/chat/sessions/{sessionId}/stream | 会话级流式对话
 [*AIApi*](doc/AIApi.md) | [**streamChat**](doc/AIApi.md#streamchat) | **POST** /api/articles/chat/stream | 流式对话
 [*AIApi*](doc/AIApi.md) | [**streamChat1**](doc/AIApi.md#streamchat1) | **POST** /api/ai/chat/stream | 无状态流式对话
 [*AIApi*](doc/AIApi.md) | [**streamChatGet**](doc/AIApi.md#streamchatget) | **GET** /api/articles/{articleId}/chat/stream | GET流式对话
 [*AIApi*](doc/AIApi.md) | [**submitAnswers**](doc/AIApi.md#submitanswers) | **POST** /api/books/{bookId}/ai/quiz/{quizId}/submit | 提交答案并评分
-[*AIApi*](doc/AIApi.md) | [**unbindKnowledgeBase**](doc/AIApi.md#unbindknowledgebase) | **DELETE** /api/ai/assistants/{id}/knowledge-bases/{kbId} | 解绑知识库
-[*AIApi*](doc/AIApi.md) | [**unbindWorkflow**](doc/AIApi.md#unbindworkflow) | **DELETE** /api/ai/assistants/{id}/workflows/{workflowId} | 解绑工作流
-[*AIApi*](doc/AIApi.md) | [**update2**](doc/AIApi.md#update2) | **PUT** /api/ai/assistants/{id} | 更新AI助手
+[*MCPApi*](doc/MCPApi.md) | [**mcpServerCreate**](doc/MCPApi.md#mcpservercreate) | **POST** /api/ai/mcp-servers | 创建MCP服务器
+[*MCPApi*](doc/MCPApi.md) | [**mcpServerDelete**](doc/MCPApi.md#mcpserverdelete) | **DELETE** /api/ai/mcp-servers/{id} | 删除MCP服务器
+[*MCPApi*](doc/MCPApi.md) | [**mcpServerGetById**](doc/MCPApi.md#mcpservergetbyid) | **GET** /api/ai/mcp-servers/{id} | 获取MCP服务器详情
+[*MCPApi*](doc/MCPApi.md) | [**mcpServerListByCreator**](doc/MCPApi.md#mcpserverlistbycreator) | **GET** /api/ai/mcp-servers | 获取用户的MCP服务器列表
+[*MCPApi*](doc/MCPApi.md) | [**mcpServerListTools**](doc/MCPApi.md#mcpserverlisttools) | **GET** /api/ai/mcp-servers/{id}/tools | 获取MCP服务器提供的工具列表
+[*MCPApi*](doc/MCPApi.md) | [**mcpServerSetEnabled**](doc/MCPApi.md#mcpserversetenabled) | **PATCH** /api/ai/mcp-servers/{id}/enabled | 启用/禁用MCP服务器
+[*MCPApi*](doc/MCPApi.md) | [**mcpServerTestConnection**](doc/MCPApi.md#mcpservertestconnection) | **POST** /api/ai/mcp-servers/{id}/test | 测试MCP服务器连接
+[*MCPApi*](doc/MCPApi.md) | [**mcpServerUpdate**](doc/MCPApi.md#mcpserverupdate) | **PUT** /api/ai/mcp-servers/{id} | 更新MCP服务器
 [*WebhookApi*](doc/WebhookApi.md) | [**getWebhookInfo**](doc/WebhookApi.md#getwebhookinfo) | **GET** /api/v1/webhook/workflow/{webhookId}/info | 获取Webhook信息
 [*WebhookApi*](doc/WebhookApi.md) | [**triggerWorkflow**](doc/WebhookApi.md#triggerworkflow) | **POST** /api/v1/webhook/workflow/{webhookId} | Webhook触发工作流
 
@@ -465,6 +503,7 @@ Class | Method | HTTP request | Description
  - [ArticleChatRequest](doc/ArticleChatRequest.md)
  - [ArticleResponse](doc/ArticleResponse.md)
  - [ArticleSourceResponse](doc/ArticleSourceResponse.md)
+ - [AssistantChatRequest](doc/AssistantChatRequest.md)
  - [AsyncExecutionResponse](doc/AsyncExecutionResponse.md)
  - [BannerListResponse](doc/BannerListResponse.md)
  - [BannerPageResponse](doc/BannerPageResponse.md)
@@ -500,6 +539,7 @@ Class | Method | HTTP request | Description
  - [BaseResponseDailyWordPageResponse](doc/BaseResponseDailyWordPageResponse.md)
  - [BaseResponseDailyWordResponse](doc/BaseResponseDailyWordResponse.md)
  - [BaseResponseExecutionResultResponse](doc/BaseResponseExecutionResultResponse.md)
+ - [BaseResponseExecutionStatisticsResponse](doc/BaseResponseExecutionStatisticsResponse.md)
  - [BaseResponseFeedbackDetailResponse](doc/BaseResponseFeedbackDetailResponse.md)
  - [BaseResponseFeedbackPageResponse](doc/BaseResponseFeedbackPageResponse.md)
  - [BaseResponseFollowPageResponse](doc/BaseResponseFollowPageResponse.md)
@@ -530,6 +570,7 @@ Class | Method | HTTP request | Description
  - [BaseResponseListDailyArticleResponse](doc/BaseResponseListDailyArticleResponse.md)
  - [BaseResponseListDailyWordResponse](doc/BaseResponseListDailyWordResponse.md)
  - [BaseResponseListExecutionLogResponse](doc/BaseResponseListExecutionLogResponse.md)
+ - [BaseResponseListExecutionResultResponse](doc/BaseResponseListExecutionResultResponse.md)
  - [BaseResponseListFeedbackReplyResponse](doc/BaseResponseListFeedbackReplyResponse.md)
  - [BaseResponseListFileInfoResponse](doc/BaseResponseListFileInfoResponse.md)
  - [BaseResponseListFriendResponse](doc/BaseResponseListFriendResponse.md)
@@ -559,7 +600,11 @@ Class | Method | HTTP request | Description
  - [BaseResponseListWorkflowEdgeResponse](doc/BaseResponseListWorkflowEdgeResponse.md)
  - [BaseResponseListWorkflowNodeResponse](doc/BaseResponseListWorkflowNodeResponse.md)
  - [BaseResponseListWorkflowResponse](doc/BaseResponseListWorkflowResponse.md)
+ - [BaseResponseListWorkflowSkillVO](doc/BaseResponseListWorkflowSkillVO.md)
+ - [BaseResponseListWorkflowTemplateResponse](doc/BaseResponseListWorkflowTemplateResponse.md)
+ - [BaseResponseListWorkflowTriggerResponse](doc/BaseResponseListWorkflowTriggerResponse.md)
  - [BaseResponseListWorkflowVariableResponse](doc/BaseResponseListWorkflowVariableResponse.md)
+ - [BaseResponseListWorkflowVersionResponse](doc/BaseResponseListWorkflowVersionResponse.md)
  - [BaseResponseLoginUserResponse](doc/BaseResponseLoginUserResponse.md)
  - [BaseResponseLong](doc/BaseResponseLong.md)
  - [BaseResponseMapStringObject](doc/BaseResponseMapStringObject.md)
@@ -605,8 +650,11 @@ Class | Method | HTTP request | Description
  - [BaseResponseWorkflowNodeResponse](doc/BaseResponseWorkflowNodeResponse.md)
  - [BaseResponseWorkflowResponse](doc/BaseResponseWorkflowResponse.md)
  - [BaseResponseWorkflowSettingsDTO](doc/BaseResponseWorkflowSettingsDTO.md)
+ - [BaseResponseWorkflowTemplateResponse](doc/BaseResponseWorkflowTemplateResponse.md)
+ - [BaseResponseWorkflowTriggerResponse](doc/BaseResponseWorkflowTriggerResponse.md)
  - [BaseResponseWorkflowValidationResponse](doc/BaseResponseWorkflowValidationResponse.md)
  - [BaseResponseWorkflowVariableResponse](doc/BaseResponseWorkflowVariableResponse.md)
+ - [BaseResponseWorkflowVersionResponse](doc/BaseResponseWorkflowVersionResponse.md)
  - [BatchAiProcessRequest](doc/BatchAiProcessRequest.md)
  - [BatchBanUserRequest](doc/BatchBanUserRequest.md)
  - [BatchCreateUserRequest](doc/BatchCreateUserRequest.md)
@@ -632,6 +680,7 @@ Class | Method | HTTP request | Description
  - [CheckinRankingItem](doc/CheckinRankingItem.md)
  - [CheckinResult](doc/CheckinResult.md)
  - [CheckinStatusResult](doc/CheckinStatusResult.md)
+ - [ChildrenDefinition](doc/ChildrenDefinition.md)
  - [ClassMemberResponse](doc/ClassMemberResponse.md)
  - [ClassResponse](doc/ClassResponse.md)
  - [ClassScheduleItemResponse](doc/ClassScheduleItemResponse.md)
@@ -675,6 +724,7 @@ Class | Method | HTTP request | Description
  - [ExecuteWorkflowRequest](doc/ExecuteWorkflowRequest.md)
  - [ExecutionLogResponse](doc/ExecutionLogResponse.md)
  - [ExecutionResultResponse](doc/ExecutionResultResponse.md)
+ - [ExecutionStatisticsResponse](doc/ExecutionStatisticsResponse.md)
  - [FailedItem](doc/FailedItem.md)
  - [FeedbackDetailResponse](doc/FeedbackDetailResponse.md)
  - [FeedbackPageResponse](doc/FeedbackPageResponse.md)
@@ -708,6 +758,7 @@ Class | Method | HTTP request | Description
  - [LoginUserResponse](doc/LoginUserResponse.md)
  - [MemberPage](doc/MemberPage.md)
  - [MessageReadUserResponse](doc/MessageReadUserResponse.md)
+ - [NodeExecutionDTO](doc/NodeExecutionDTO.md)
  - [NodeTypeResponse](doc/NodeTypeResponse.md)
  - [OptionDTO](doc/OptionDTO.md)
  - [OrderResponse](doc/OrderResponse.md)
@@ -754,6 +805,8 @@ Class | Method | HTTP request | Description
  - [SendResult](doc/SendResult.md)
  - [SendSmsRequest](doc/SendSmsRequest.md)
  - [SessionChatRequest](doc/SessionChatRequest.md)
+ - [SkillOutputVO](doc/SkillOutputVO.md)
+ - [SkillParamVO](doc/SkillParamVO.md)
  - [SourceScrapeRequest](doc/SourceScrapeRequest.md)
  - [SseEmitter](doc/SseEmitter.md)
  - [TeacherApplicationResponse](doc/TeacherApplicationResponse.md)
@@ -816,8 +869,12 @@ Class | Method | HTTP request | Description
  - [WorkflowResponse](doc/WorkflowResponse.md)
  - [WorkflowSettings](doc/WorkflowSettings.md)
  - [WorkflowSettingsDTO](doc/WorkflowSettingsDTO.md)
+ - [WorkflowSkillVO](doc/WorkflowSkillVO.md)
+ - [WorkflowTemplateResponse](doc/WorkflowTemplateResponse.md)
+ - [WorkflowTriggerResponse](doc/WorkflowTriggerResponse.md)
  - [WorkflowValidationResponse](doc/WorkflowValidationResponse.md)
  - [WorkflowVariableResponse](doc/WorkflowVariableResponse.md)
+ - [WorkflowVersionResponse](doc/WorkflowVersionResponse.md)
 
 
 ## Documentation For Authorization

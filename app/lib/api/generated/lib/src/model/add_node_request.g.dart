@@ -28,6 +28,10 @@ const AddNodeRequestTypeEnum _$addNodeRequestTypeEnum_SWITCH =
     const AddNodeRequestTypeEnum._('SWITCH');
 const AddNodeRequestTypeEnum _$addNodeRequestTypeEnum_LOOP =
     const AddNodeRequestTypeEnum._('LOOP');
+const AddNodeRequestTypeEnum _$addNodeRequestTypeEnum_LOOP_START =
+    const AddNodeRequestTypeEnum._('LOOP_START');
+const AddNodeRequestTypeEnum _$addNodeRequestTypeEnum_LOOP_END =
+    const AddNodeRequestTypeEnum._('LOOP_END');
 const AddNodeRequestTypeEnum _$addNodeRequestTypeEnum_PARALLEL =
     const AddNodeRequestTypeEnum._('PARALLEL');
 const AddNodeRequestTypeEnum _$addNodeRequestTypeEnum_MERGE =
@@ -79,6 +83,10 @@ AddNodeRequestTypeEnum _$addNodeRequestTypeEnumValueOf(String name) {
       return _$addNodeRequestTypeEnum_SWITCH;
     case 'LOOP':
       return _$addNodeRequestTypeEnum_LOOP;
+    case 'LOOP_START':
+      return _$addNodeRequestTypeEnum_LOOP_START;
+    case 'LOOP_END':
+      return _$addNodeRequestTypeEnum_LOOP_END;
     case 'PARALLEL':
       return _$addNodeRequestTypeEnum_PARALLEL;
     case 'MERGE':
@@ -123,6 +131,8 @@ final BuiltSet<AddNodeRequestTypeEnum> _$addNodeRequestTypeEnumValues =
       _$addNodeRequestTypeEnum_CONDITION,
       _$addNodeRequestTypeEnum_SWITCH,
       _$addNodeRequestTypeEnum_LOOP,
+      _$addNodeRequestTypeEnum_LOOP_START,
+      _$addNodeRequestTypeEnum_LOOP_END,
       _$addNodeRequestTypeEnum_PARALLEL,
       _$addNodeRequestTypeEnum_MERGE,
       _$addNodeRequestTypeEnum_VARIABLE_SET,
@@ -155,6 +165,8 @@ class _$AddNodeRequestTypeEnumSerializer
     'CONDITION': 'CONDITION',
     'SWITCH': 'SWITCH',
     'LOOP': 'LOOP',
+    'LOOP_START': 'LOOP_START',
+    'LOOP_END': 'LOOP_END',
     'PARALLEL': 'PARALLEL',
     'MERGE': 'MERGE',
     'VARIABLE_SET': 'VARIABLE_SET',
@@ -181,6 +193,8 @@ class _$AddNodeRequestTypeEnumSerializer
     'CONDITION': 'CONDITION',
     'SWITCH': 'SWITCH',
     'LOOP': 'LOOP',
+    'LOOP_START': 'LOOP_START',
+    'LOOP_END': 'LOOP_END',
     'PARALLEL': 'PARALLEL',
     'MERGE': 'MERGE',
     'VARIABLE_SET': 'VARIABLE_SET',

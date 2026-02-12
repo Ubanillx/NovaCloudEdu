@@ -29,8 +29,8 @@ part 'chat_group.g.dart';
 /// * [announcementTime]
 /// * [createTime]
 /// * [updateTime]
-/// * [full]
 /// * [mute]
+/// * [full]
 /// * [delete]
 @BuiltValue()
 abstract class ChatGroup implements Built<ChatGroup, ChatGroupBuilder> {
@@ -81,11 +81,11 @@ abstract class ChatGroup implements Built<ChatGroup, ChatGroupBuilder> {
   @BuiltValueField(wireName: r'updateTime')
   DateTime? get updateTime;
 
-  @BuiltValueField(wireName: r'full')
-  bool? get full;
-
   @BuiltValueField(wireName: r'mute')
   bool? get mute;
+
+  @BuiltValueField(wireName: r'full')
+  bool? get full;
 
   @BuiltValueField(wireName: r'delete')
   bool? get delete;
@@ -218,17 +218,17 @@ class _$ChatGroupSerializer implements PrimitiveSerializer<ChatGroup> {
         specifiedType: const FullType(DateTime),
       );
     }
-    if (object.full != null) {
-      yield r'full';
-      yield serializers.serialize(
-        object.full,
-        specifiedType: const FullType(bool),
-      );
-    }
     if (object.mute != null) {
       yield r'mute';
       yield serializers.serialize(
         object.mute,
+        specifiedType: const FullType(bool),
+      );
+    }
+    if (object.full != null) {
+      yield r'full';
+      yield serializers.serialize(
+        object.full,
         specifiedType: const FullType(bool),
       );
     }
@@ -369,19 +369,19 @@ class _$ChatGroupSerializer implements PrimitiveSerializer<ChatGroup> {
           ) as DateTime;
           result.updateTime = valueDes;
           break;
-        case r'full':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(bool),
-          ) as bool;
-          result.full = valueDes;
-          break;
         case r'mute':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(bool),
           ) as bool;
           result.mute = valueDes;
+          break;
+        case r'full':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(bool),
+          ) as bool;
+          result.full = valueDes;
           break;
         case r'delete':
           final valueDes = serializers.deserialize(
