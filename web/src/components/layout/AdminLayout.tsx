@@ -22,7 +22,12 @@ import {
   Newspaper,
   BrainCircuit,
   Bot,
-  Workflow
+  Workflow,
+  Plug2,
+  Presentation,
+  Sparkles,
+  Maximize,
+  Minimize
 } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { clearTokens } from '../../api';
@@ -68,6 +73,9 @@ const AdminSider: React.FC<AdminSiderProps> = ({
     { icon: Bot, label: 'AI 助手管理', path: '/admin/ai-assistants' },
     { icon: BrainCircuit, label: '知识库管理', path: '/admin/knowledge-bases' },
     { icon: Workflow, label: '工作流管理', path: '/admin/workflows' },
+    { icon: Plug2, label: 'MCP 服务器', path: '/admin/mcp-servers' },
+    { icon: Presentation, label: 'PPT 模板', path: '/admin/ppt-templates' },
+    { icon: Sparkles, label: 'PPT 生成助手', path: '/admin/ppt-generator' },
     { icon: Globe, label: '抓取配置', path: '/admin/scraper/config' },
     { icon: ListTodo, label: '抓取任务', path: '/admin/scraper/tasks' },
     { icon: Settings, label: '系统设置', path: '/admin/settings' },
@@ -173,71 +181,154 @@ const AdminSider: React.FC<AdminSiderProps> = ({
 export const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isCollapsed, setIsCollapsed] = React.useState(false);
   const [isMobileOpen, setIsMobileOpen] = React.useState(false);
+  const [isFullscreen, setIsFullscreen] = React.useState(false);
+  const [showExitBar, setShowExitBar] = React.useState(false);
+  const exitBarTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   const { theme, toggleTheme } = useTheme();
+
+  const toggleFullscreen = React.useCallback(async () => {
+    try {
+      if (!document.fullscreenElement) {
+        await document.documentElement.requestFullscreen();
+      } else {
+        await document.exitFullscreen();
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  React.useEffect(() => {
+    const handleChange = () => {
+      const fs = !!document.fullscreenElement;
+      setIsFullscreen(fs);
+      if (!fs) setShowExitBar(false);
+    };
+    document.addEventListener('fullscreenchange', handleChange);
+    return () => document.removeEventListener('fullscreenchange', handleChange);
+  }, []);
+
+  React.useEffect(() => {
+    if (!isFullscreen) return;
+    const handleMouseMove = (e: MouseEvent) => {
+      if (e.clientY <= 6) {
+        setShowExitBar(true);
+        if (exitBarTimer.current) clearTimeout(exitBarTimer.current);
+      } else if (e.clientY > 60) {
+        if (exitBarTimer.current) clearTimeout(exitBarTimer.current);
+        exitBarTimer.current = setTimeout(() => setShowExitBar(false), 300);
+      }
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      if (exitBarTimer.current) clearTimeout(exitBarTimer.current);
+    };
+  }, [isFullscreen]);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-300">
-      <AdminSider 
-        isCollapsed={isCollapsed} 
-        isMobileOpen={isMobileOpen}
-        setIsMobileOpen={setIsMobileOpen}
-      />
+      {!isFullscreen && (
+        <AdminSider 
+          isCollapsed={isCollapsed} 
+          isMobileOpen={isMobileOpen}
+          setIsMobileOpen={setIsMobileOpen}
+        />
+      )}
       
-      <div className={`transition-all duration-300 ${isCollapsed ? 'lg:pl-20' : 'lg:pl-64'}`}>
+      <div className={`transition-all duration-300 ${isFullscreen ? '' : isCollapsed ? 'lg:pl-20' : 'lg:pl-64'}`}>
         {/* Header */}
-        <header className="sticky top-0 z-30 flex items-center justify-between h-20 px-8 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-b border-gray-100 dark:border-gray-800 transition-colors duration-300">
-          <div className="flex items-center gap-4">
-            <button 
-              className="p-2 -ml-2 text-gray-500 lg:hidden"
-              onClick={() => setIsMobileOpen(true)}
-            >
-              <Menu size={24} />
-            </button>
-            
-            {/* Collapse Toggle (Desktop) */}
-            <button
-              onClick={() => setIsCollapsed(!isCollapsed)}
-              className="hidden lg:flex p-2 -ml-2 text-gray-500 hover:text-brand-600 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-all"
-              title={isCollapsed ? "展开菜单" : "折叠菜单"}
-            >
-              {isCollapsed ? <PanelLeftOpen size={22} /> : <PanelLeftClose size={22} />}
-            </button>
+        {!isFullscreen && (
+          <header className="sticky top-0 z-30 flex items-center justify-between h-20 px-8 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-b border-gray-100 dark:border-gray-800 transition-colors duration-300">
+            <div className="flex items-center gap-4">
+              <button 
+                className="p-2 -ml-2 text-gray-500 lg:hidden"
+                onClick={() => setIsMobileOpen(true)}
+              >
+                <Menu size={24} />
+              </button>
+              
+              {/* Collapse Toggle (Desktop) */}
+              <button
+                onClick={() => setIsCollapsed(!isCollapsed)}
+                className="hidden lg:flex p-2 -ml-2 text-gray-500 hover:text-brand-600 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-all"
+                title={isCollapsed ? "展开菜单" : "折叠菜单"}
+              >
+                {isCollapsed ? <PanelLeftOpen size={22} /> : <PanelLeftClose size={22} />}
+              </button>
 
-            <div className="h-6 w-[1px] bg-gray-200 dark:bg-gray-700 mx-2 hidden sm:block transition-colors duration-300" />
+              <div className="h-6 w-[1px] bg-gray-200 dark:bg-gray-700 mx-2 hidden sm:block transition-colors duration-300" />
 
-            <div className="text-sm font-medium text-gray-400 hidden sm:block transition-colors duration-300">
-              管理后台 / <span className="text-gray-900 dark:text-white transition-colors duration-300">仪表盘</span>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-4">
-            {/* Theme Toggle */}
-            <button
-              onClick={toggleTheme}
-              className="p-2.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:text-brand-600 transition-all hover:scale-105"
-            >
-              {theme === 'dark' ? <Sun size={20} className="text-yellow-500" /> : <Moon size={20} className="text-brand-600" />}
-            </button>
-            
-            <div className="h-8 w-[1px] bg-gray-200 dark:bg-gray-700 mx-2 transition-colors duration-300" />
-            
-            {/* User Profile */}
-            <div className="flex items-center gap-3 pl-2 group cursor-pointer">
-              <div className="text-right hidden sm:block">
-                <div className="text-sm font-bold text-gray-900 dark:text-white group-hover:text-brand-600 transition-colors duration-300">管理员</div>
-                <div className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">系统管理员</div>
+              <div className="text-sm font-medium text-gray-400 hidden sm:block transition-colors duration-300">
+                管理后台 / <span className="text-gray-900 dark:text-white transition-colors duration-300">仪表盘</span>
               </div>
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-indigo-600 p-0.5 shadow-lg shadow-brand-500/20 transition-all duration-300">
-                <div className="w-full h-full rounded-[10px] bg-white dark:bg-gray-800 flex items-center justify-center overflow-hidden transition-colors duration-300">
-                  <Users size={20} className="text-brand-600" />
+            </div>
+
+            <div className="flex items-center gap-4">
+              {/* Fullscreen Toggle */}
+              <button
+                onClick={toggleFullscreen}
+                className="p-2.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:text-brand-600 transition-all hover:scale-105"
+                title="进入全屏"
+              >
+                <Maximize size={20} />
+              </button>
+
+              {/* Theme Toggle */}
+              <button
+                onClick={toggleTheme}
+                className="p-2.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:text-brand-600 transition-all hover:scale-105"
+              >
+                {theme === 'dark' ? <Sun size={20} className="text-yellow-500" /> : <Moon size={20} className="text-brand-600" />}
+              </button>
+              
+              <div className="h-8 w-[1px] bg-gray-200 dark:bg-gray-700 mx-2 transition-colors duration-300" />
+              
+              {/* User Profile */}
+              <div className="flex items-center gap-3 pl-2 group cursor-pointer">
+                <div className="text-right hidden sm:block">
+                  <div className="text-sm font-bold text-gray-900 dark:text-white group-hover:text-brand-600 transition-colors duration-300">管理员</div>
+                  <div className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">系统管理员</div>
+                </div>
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-indigo-600 p-0.5 shadow-lg shadow-brand-500/20 transition-all duration-300">
+                  <div className="w-full h-full rounded-[10px] bg-white dark:bg-gray-800 flex items-center justify-center overflow-hidden transition-colors duration-300">
+                    <Users size={20} className="text-brand-600" />
+                  </div>
                 </div>
               </div>
             </div>
+          </header>
+        )}
+
+        {/* Fullscreen Exit Bar — appears when mouse near top edge */}
+        {isFullscreen && (
+          <div
+            className="fixed top-0 left-0 right-0 z-50 h-14 flex items-start justify-center"
+            onMouseEnter={() => {
+              if (exitBarTimer.current) clearTimeout(exitBarTimer.current);
+              setShowExitBar(true);
+            }}
+            onMouseLeave={() => {
+              exitBarTimer.current = setTimeout(() => setShowExitBar(false), 400);
+            }}
+            style={{ pointerEvents: showExitBar ? 'auto' : 'none' }}
+          >
+            <button
+              onClick={toggleFullscreen}
+              className={`flex items-center gap-2 px-6 py-2 mt-2 rounded-full bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl shadow-lg border border-gray-200 dark:border-gray-700 text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-brand-600 dark:hover:text-brand-400 hover:shadow-xl transition-all duration-300 ease-in-out ${
+                showExitBar
+                  ? 'opacity-100 translate-y-0 pointer-events-auto'
+                  : 'opacity-0 -translate-y-4 pointer-events-none'
+              }`}
+            >
+              <Minimize size={16} />
+              退出全屏
+            </button>
           </div>
-        </header>
+        )}
 
         {/* Content */}
-        <main className="p-8 max-w-[1600px] mx-auto">
+        <main className={`max-w-[1600px] mx-auto ${isFullscreen ? 'p-4' : 'p-8'}`}>
           {children}
         </main>
       </div>

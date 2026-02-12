@@ -19,6 +19,7 @@
     "axios": "^1.7.7",
     "china-division": "^2.7.0",
     "dagre": "^0.8.5",
+    "fabric": "^7.1.0",
     "json-bigint": "^1.0.0",
     "lucide-react": "^0.562.0",
     "react": "^19.2.0",

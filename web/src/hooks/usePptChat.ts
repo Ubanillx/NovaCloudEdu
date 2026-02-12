@@ -1,0 +1,820 @@
+import { useState, useRef, useCallback } from 'react';
+import JSONBig from 'json-bigint';
+import { apiClient, getToken } from '../api';
+import type {
+  PptPhase, PptGenerationState, GeneratedSlide, SlideImage,
+  TemplateSlide,
+} from './usePptGeneration';
+
+const JSONBigString = JSONBig({ storeAsString: true });
+
+// ==================== Chat Message Types ====================
+
+export type PptChatMessageType =
+  | 'user'
+  | 'ai-text'
+  | 'outline-card'
+  | 'progress-card'
+  | 'download-card'
+  | 'status'
+  | 'action-card'
+  | 'error';
+
+export interface PptChatMessage {
+  id: string;
+  type: PptChatMessageType;
+  content: string;
+  timestamp: string;
+  isStreaming?: boolean;
+  outlineMarkdown?: string;
+  progress?: { current: number; total: number };
+  downloadUrl?: string;
+  downloadFileName?: string;
+  actionType?: 'confirm-outline';
+  actionDone?: boolean;
+}
+
+// ==================== Session Types ====================
+
+export interface PptSessionSummary {
+  id: string;
+  topic: string;
+  state: string;
+  resultUrl?: string;
+  createTime: string;
+  updateTime: string;
+}
+
+export interface PptSessionDetail {
+  id: string;
+  topic: string;
+  state: string;
+  outlineMarkdown?: string;
+  templateId?: string;
+  templateUrl?: string;
+  templateJson?: string;
+  slidesJson?: string;
+  resultUrl?: string;
+  createTime: string;
+  updateTime: string;
+}
+
+// ==================== Constants ====================
+
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
+
+let msgIdCounter = 0;
+function nextMsgId(): string {
+  return `msg-${Date.now()}-${++msgIdCounter}`;
+}
+
+function nowTimestamp(): string {
+  return new Date().toISOString();
+}
+
+// ==================== Hook ====================
+
+export function usePptChat() {
+  // ---- Session list state ----
+  const [sessions, setSessions] = useState<PptSessionSummary[]>([]);
+  const [isLoadingSessions, setIsLoadingSessions] = useState(false);
+  const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
+
+  // ---- Chat messages ----
+  const [messages, setMessages] = useState<PptChatMessage[]>([]);
+  const streamingMsgIdRef = useRef<string | null>(null);
+
+  // ---- PPT generation state (mirrors usePptGeneration) ----
+  const [pptState, setPptState] = useState<PptGenerationState>({
+    phase: 'idle',
+    sessionId: null,
+    statusMessage: '',
+    aiMessage: '',
+    intentDetected: null,
+    intentTopic: '',
+    outlineMarkdown: '',
+    templateUrl: '',
+    slideImages: [],
+    templateSlides: [],
+    generatedSlides: [],
+    currentSlide: 0,
+    totalSlides: 0,
+    selectedSlideIndex: 0,
+    resultUrl: '',
+    resultFileName: '',
+    errorMessage: '',
+  });
+
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const sessionIdRef = useRef<string | null>(null);
+
+  const updatePpt = useCallback((patch: Partial<PptGenerationState>) => {
+    if (patch.sessionId !== undefined) {
+      sessionIdRef.current = patch.sessionId;
+    }
+    setPptState(prev => ({ ...prev, ...patch }));
+  }, []);
+
+  // ---- Helper: append chat message ----
+  const appendMessage = useCallback((msg: Omit<PptChatMessage, 'id' | 'timestamp'>) => {
+    const full: PptChatMessage = { ...msg, id: nextMsgId(), timestamp: nowTimestamp() };
+    setMessages(prev => [...prev, full]);
+    return full.id;
+  }, []);
+
+  const updateMessage = useCallback((id: string, patch: Partial<PptChatMessage>) => {
+    setMessages(prev => prev.map(m => m.id === id ? { ...m, ...patch } : m));
+  }, []);
+
+  // ---- Session API ----
+
+  const loadSessions = useCallback(async () => {
+    setIsLoadingSessions(true);
+    try {
+      const res = await apiClient.get('/api/ppt/generation/sessions');
+      if (res.data?.code === 0 && Array.isArray(res.data.data)) {
+        setSessions(res.data.data.map((s: Record<string, unknown>) => ({
+          id: String(s.id),
+          topic: s.topic as string || '',
+          state: s.state as string || '',
+          resultUrl: s.resultUrl as string || undefined,
+          createTime: s.createTime as string || '',
+          updateTime: s.updateTime as string || '',
+        })));
+      }
+    } catch (e) {
+      console.error('加载PPT会话列表失败:', e);
+    } finally {
+      setIsLoadingSessions(false);
+    }
+  }, []);
+
+  const loadSessionDetail = useCallback(async (sessionId: string) => {
+    try {
+      const res = await apiClient.get(`/api/ppt/generation/sessions/${sessionId}`);
+      if (res.data?.code === 0 && res.data.data) {
+        return res.data.data as PptSessionDetail;
+      }
+    } catch (e) {
+      console.error('加载PPT会话详情失败:', e);
+    }
+    return null;
+  }, []);
+
+  const deleteSession = useCallback(async (sessionId: string) => {
+    try {
+      await apiClient.delete(`/api/ppt/generation/sessions/${sessionId}`);
+      setSessions(prev => prev.filter(s => s.id !== sessionId));
+      if (currentSessionId === sessionId) {
+        setCurrentSessionId(null);
+        setMessages([]);
+        setPptState(prev => ({ ...prev, phase: 'idle', sessionId: null }));
+      }
+      return true;
+    } catch (e) {
+      console.error('删除PPT会话失败:', e);
+      return false;
+    }
+  }, [currentSessionId]);
+
+  // ---- Reconstruct messages from session detail ----
+  const reconstructMessages = useCallback((detail: PptSessionDetail) => {
+    const msgs: PptChatMessage[] = [];
+
+    // 1. User message (topic)
+    msgs.push({
+      id: nextMsgId(),
+      type: 'user',
+      content: detail.topic,
+      timestamp: detail.createTime,
+    });
+
+    // 2. Outline
+    if (detail.outlineMarkdown) {
+      msgs.push({
+        id: nextMsgId(),
+        type: 'ai-text',
+        content: '好的，我来为你生成一份大纲。',
+        timestamp: detail.createTime,
+      });
+      msgs.push({
+        id: nextMsgId(),
+        type: 'outline-card',
+        content: '',
+        outlineMarkdown: detail.outlineMarkdown,
+        timestamp: detail.createTime,
+        actionDone: true,
+      });
+    }
+
+    // 3. Result
+    if (detail.resultUrl) {
+      msgs.push({
+        id: nextMsgId(),
+        type: 'ai-text',
+        content: 'PPT 生成完毕！',
+        timestamp: detail.updateTime,
+      });
+      msgs.push({
+        id: nextMsgId(),
+        type: 'download-card',
+        content: '',
+        downloadUrl: detail.resultUrl,
+        downloadFileName: `${detail.topic}.pptx`,
+        timestamp: detail.updateTime,
+      });
+    }
+
+    return msgs;
+  }, []);
+
+  // ---- Open existing session ----
+  const openSession = useCallback(async (sessionId: string) => {
+    abortControllerRef.current?.abort();
+    setCurrentSessionId(sessionId);
+
+    const detail = await loadSessionDetail(sessionId);
+    if (!detail) return;
+
+    const msgs = reconstructMessages(detail);
+    setMessages(msgs);
+
+    // Reconstruct PPT state from detail
+    let phase: PptPhase = 'idle';
+    const stateStr = detail.state?.toLowerCase();
+    if (stateStr === 'completed') phase = 'completed';
+    else if (stateStr === 'generating_outline') phase = 'generating_outline';
+    else if (stateStr === 'outline_ready') phase = 'outline_ready';
+    else if (stateStr === 'awaiting_template') phase = 'awaiting_template';
+    else if (stateStr === 'template_ready') phase = 'template_ready';
+    else if (stateStr === 'generating_slides') phase = 'generating_slides';
+    else if (stateStr === 'assembling') phase = 'assembling';
+    else if (stateStr === 'failed') phase = 'error';
+
+    // Parse slidesJson & templateJson if available
+    let generatedSlides: GeneratedSlide[] = [];
+    let templateSlides: TemplateSlide[] = [];
+    let slideImages: SlideImage[] = [];
+
+    if (detail.slidesJson) {
+      try {
+        const parsed = JSONBigString.parse(detail.slidesJson);
+        if (Array.isArray(parsed)) {
+          generatedSlides = parsed.map((item: Record<string, unknown>) => ({
+            previewImageUrl: (item.previewImageUrl as string) || '',
+            isNew: false,
+          }));
+        }
+      } catch { /* ignore */ }
+    }
+
+    if (detail.templateJson) {
+      try {
+        const parsed = JSONBigString.parse(detail.templateJson);
+        if (parsed.slides) templateSlides = parsed.slides;
+        if (parsed.slideImages) slideImages = parsed.slideImages;
+      } catch { /* ignore */ }
+    }
+
+    sessionIdRef.current = detail.id;
+    setPptState({
+      phase,
+      sessionId: detail.id,
+      statusMessage: '',
+      aiMessage: '',
+      intentDetected: null,
+      intentTopic: detail.topic,
+      outlineMarkdown: detail.outlineMarkdown || '',
+      templateUrl: detail.templateUrl || '',
+      slideImages,
+      templateSlides,
+      generatedSlides,
+      currentSlide: generatedSlides.length,
+      totalSlides: generatedSlides.length,
+      selectedSlideIndex: 0,
+      resultUrl: detail.resultUrl || '',
+      resultFileName: detail.resultUrl ? `${detail.topic}.pptx` : '',
+      errorMessage: '',
+    });
+
+  }, [loadSessionDetail, reconstructMessages]);
+
+  // ---- SSE helper ----
+  const sendAction = useCallback(
+    async (
+      action: string,
+      extra: Record<string, unknown> = {},
+      onEvent?: (eventName: string, data: string) => void
+    ) => {
+      abortControllerRef.current?.abort();
+      const controller = new AbortController();
+      abortControllerRef.current = controller;
+
+      const token = getToken();
+      const body: Record<string, unknown> = { action, ...extra };
+
+      // Read sessionId from ref (synchronous, avoids React batching issues)
+      if (sessionIdRef.current) {
+        body.sessionId = sessionIdRef.current;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE}/api/ppt/generation/stream`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'text/event-stream',
+            'Cache-Control': 'no-cache',
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          body: JSON.stringify(body),
+          signal: controller.signal,
+        });
+
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+        const reader = response.body?.getReader();
+        if (!reader) throw new Error('No response body');
+
+        const decoder = new TextDecoder();
+        let buffer = '';
+        let currentEventType = 'message';
+        let dataLines: string[] = [];
+
+        const dispatchEvent = () => {
+          if (dataLines.length === 0) return;
+          const data = dataLines.join('\n');
+          dataLines = [];
+          const evtType = currentEventType;
+          currentEventType = 'message';
+          if (evtType === 'done') {
+            if (onEvent) onEvent('done', data);
+            return;
+          }
+          if (data === '[DONE]') return;
+          if (onEvent) onEvent(evtType, data);
+        };
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop() || '';
+
+          for (const line of lines) {
+            const stripped = line.endsWith('\r') ? line.slice(0, -1) : line;
+
+            // 空行 = SSE 事件分隔符，派发已缓冲的事件
+            if (stripped === '') {
+              dispatchEvent();
+              continue;
+            }
+
+            const colonIdx = stripped.indexOf(':');
+            if (colonIdx === 0) continue; // SSE 注释行
+
+            let field: string;
+            let val: string;
+            if (colonIdx > 0) {
+              field = stripped.substring(0, colonIdx);
+              val = stripped.substring(colonIdx + 1);
+              if (val.startsWith(' ')) val = val.substring(1);
+            } else {
+              field = stripped;
+              val = '';
+            }
+
+            if (field === 'event') {
+              currentEventType = val.trim();
+            } else if (field === 'data') {
+              dataLines.push(val);
+            }
+          }
+        }
+        // 流结束时派发剩余缓冲
+        dispatchEvent();
+      } catch (err: unknown) {
+        if (err instanceof DOMException && err.name === 'AbortError') return;
+        const msg = err instanceof Error ? err.message : '未知错误';
+        updatePpt({ phase: 'error', errorMessage: msg });
+        appendMessage({ type: 'error', content: msg });
+      }
+    },
+    [updatePpt, appendMessage]
+  );
+
+  // ==================== Chat Actions ====================
+
+  /** 发送用户消息（自动意图识别 → 生成大纲） */
+  const sendMessage = useCallback((content: string) => {
+    // Append user message
+    appendMessage({ type: 'user', content });
+
+    // Start intent detection + outline generation
+    updatePpt({ phase: 'detecting', aiMessage: '', intentDetected: null, errorMessage: '' });
+
+    const streamMsgId = appendMessage({ type: 'ai-text', content: '', isStreaming: true });
+    streamingMsgIdRef.current = streamMsgId;
+
+    sendAction('detect_intent', { message: content }, (evt, data) => {
+      if (evt === 'message') {
+        setMessages(prev => prev.map(m =>
+          m.id === streamMsgId ? { ...m, content: m.content + data } : m
+        ));
+      } else if (evt === 'status') {
+        try {
+          const payload = JSONBigString.parse(data);
+          updatePpt({ statusMessage: payload.message || '' });
+        } catch { /* ignore */ }
+      } else if (evt === 'intent') {
+        try {
+          const payload = JSONBigString.parse(data);
+
+          // Finish streaming message & strip <<PPT_INTENT:...>> tag from displayed text
+          setMessages(prev => prev.map(m =>
+            m.id === streamMsgId
+              ? { ...m, isStreaming: false, content: m.content.replace(/<<PPT_INTENT:.*?>>\s*/g, '').trim() }
+              : m
+          ));
+
+          if (payload.detected) {
+            const sessionId = payload.sessionId ? String(payload.sessionId) : null;
+            const topic = payload.topic || content;
+
+            updatePpt({
+              phase: 'awaiting_template',
+              intentDetected: true,
+              intentTopic: topic,
+              ...(sessionId ? { sessionId } : {}),
+            });
+            if (sessionId) {
+              sessionIdRef.current = sessionId;
+              setCurrentSessionId(sessionId);
+            }
+
+            // 新流程：意图识别后先选模板
+            appendMessage({ type: 'status', content: '已识别 PPT 主题，请选择模板。' });
+          } else {
+            updatePpt({ phase: 'idle', intentDetected: false });
+          }
+        } catch { /* ignore */ }
+      } else if (evt === 'error') {
+        updatePpt({ phase: 'error', errorMessage: data });
+        setMessages(prev => prev.map(m =>
+          m.id === streamMsgId ? { ...m, isStreaming: false } : m
+        ));
+        appendMessage({ type: 'error', content: data });
+      }
+    });
+  }, [appendMessage, sendAction, updatePpt]);
+
+  /** Internal: generate outline (called after intent detected) */
+  const generateOutlineInternal = useCallback((topic: string, requirements?: string) => {
+    updatePpt({ phase: 'generating_outline', outlineMarkdown: '', aiMessage: '', errorMessage: '' });
+
+    const streamMsgId = appendMessage({ type: 'ai-text', content: '', isStreaming: true });
+    streamingMsgIdRef.current = streamMsgId;
+
+    const extra: Record<string, unknown> = { topic };
+    if (requirements) extra.requirements = requirements;
+
+    sendAction('generate_outline', extra, (evt, data) => {
+      if (evt === 'message') {
+        setMessages(prev => prev.map(m =>
+          m.id === streamMsgId ? { ...m, content: m.content + data } : m
+        ));
+        setPptState(prev => ({ ...prev, aiMessage: prev.aiMessage + data }));
+      } else if (evt === 'status') {
+        try {
+          const payload = JSONBigString.parse(data);
+          updatePpt({ statusMessage: payload.message || '', phase: payload.phase || 'generating_outline' });
+        } catch { /* ignore */ }
+      } else if (evt === 'outline') {
+        try {
+          const payload = JSONBigString.parse(data);
+          const markdown = payload.outline || payload.markdown || data;
+          const sessionId = payload.sessionId ? String(payload.sessionId) : undefined;
+
+          updatePpt({
+            outlineMarkdown: markdown,
+            phase: 'outline_ready',
+            ...(sessionId ? { sessionId } : {}),
+          });
+          if (sessionId) setCurrentSessionId(sessionId);
+
+          // Finish streaming: replace streamed text with short summary, then add outline card
+          setMessages(prev => prev.map(m =>
+            m.id === streamMsgId ? { ...m, isStreaming: false, content: '大纲已生成，请查看下方内容。' } : m
+          ));
+          appendMessage({
+            type: 'outline-card',
+            content: '',
+            outlineMarkdown: markdown,
+          });
+        } catch {
+          updatePpt({ outlineMarkdown: data, phase: 'outline_ready' });
+        }
+      } else if (evt === 'error') {
+        updatePpt({ phase: 'error', errorMessage: data });
+        setMessages(prev => prev.map(m =>
+          m.id === streamMsgId ? { ...m, isStreaming: false } : m
+        ));
+        appendMessage({ type: 'error', content: data });
+      }
+    });
+  }, [appendMessage, sendAction, updatePpt]);
+
+  /** Revise outline with user feedback */
+  const reviseOutline = useCallback((feedback: string) => {
+    appendMessage({ type: 'user', content: feedback });
+    updatePpt({ phase: 'generating_outline', aiMessage: '', errorMessage: '' });
+
+    const streamMsgId = appendMessage({ type: 'ai-text', content: '', isStreaming: true });
+
+    sendAction('revise_outline', { feedback }, (evt, data) => {
+      if (evt === 'message') {
+        setMessages(prev => prev.map(m =>
+          m.id === streamMsgId ? { ...m, content: m.content + data } : m
+        ));
+      } else if (evt === 'status') {
+        try {
+          const payload = JSONBigString.parse(data);
+          updatePpt({ statusMessage: payload.message || '', phase: payload.phase || 'generating_outline' });
+        } catch { /* ignore */ }
+      } else if (evt === 'outline') {
+        try {
+          const payload = JSONBigString.parse(data);
+          const markdown = payload.outline || payload.markdown || data;
+          updatePpt({ outlineMarkdown: markdown, phase: 'outline_ready' });
+
+          setMessages(prev => prev.map(m =>
+            m.id === streamMsgId ? { ...m, isStreaming: false, content: '大纲已修改，请查看下方内容。' } : m
+          ));
+          appendMessage({
+            type: 'outline-card',
+            content: '',
+            outlineMarkdown: markdown,
+          });
+        } catch {
+          updatePpt({ outlineMarkdown: data, phase: 'outline_ready' });
+        }
+      } else if (evt === 'error') {
+        updatePpt({ phase: 'error', errorMessage: data });
+        setMessages(prev => prev.map(m =>
+          m.id === streamMsgId ? { ...m, isStreaming: false } : m
+        ));
+        appendMessage({ type: 'error', content: data });
+      }
+    });
+  }, [appendMessage, sendAction, updatePpt]);
+
+  /** Confirm outline → trigger slides generation (template already selected) */
+  const confirmOutline = useCallback(() => {
+    // Mark outline card as done
+    setMessages(prev => prev.map(m =>
+      m.type === 'outline-card' && !m.actionDone ? { ...m, actionDone: true } : m
+    ));
+    updatePpt({ errorMessage: '' });
+    appendMessage({ type: 'status', content: '大纲已确认，开始生成幻灯片...' });
+
+    sendAction('confirm_outline', {}, (evt, data) => {
+      if (evt === 'status') {
+        try {
+          const payload = JSONBigString.parse(data);
+          updatePpt({ statusMessage: payload.message || '' });
+        } catch { /* ignore */ }
+      } else if (evt === 'outline_confirmed') {
+        try {
+          const payload = JSONBigString.parse(data);
+          const sessionId = payload.sessionId ? String(payload.sessionId) : undefined;
+          if (sessionId) {
+            sessionIdRef.current = sessionId;
+            setCurrentSessionId(sessionId);
+          }
+        } catch { /* ignore */ }
+      } else if (evt === 'done') {
+        // 新流程：确认大纲后自动开始生成 slides
+        setTimeout(() => {
+          generatePptInternal();
+        }, 300);
+      } else if (evt === 'error') {
+        updatePpt({ phase: 'error', errorMessage: data });
+        appendMessage({ type: 'error', content: data });
+      }
+    });
+  }, [appendMessage, sendAction, updatePpt]);
+
+  /** Select template */
+  const selectTemplate = useCallback((templateId?: string, templateUrl?: string) => {
+    updatePpt({ phase: 'parsing_template', statusMessage: '正在解析模板...', errorMessage: '' });
+    appendMessage({ type: 'status', content: '正在解析模板...' });
+
+    const extra: Record<string, unknown> = {};
+    if (templateId) extra.templateId = templateId;
+    if (templateUrl) extra.templateUrl = templateUrl;
+
+    sendAction('select_template', extra, (evt, data) => {
+      if (evt === 'status') {
+        try {
+          const payload = JSONBigString.parse(data);
+          updatePpt({ statusMessage: payload.message || '', phase: payload.phase || 'parsing_template' });
+        } catch { /* ignore */ }
+      } else if (evt === 'template_parsed') {
+        try {
+          const payload = JSONBigString.parse(data);
+          const tplUrl = payload.templateUrl || '';
+          updatePpt({
+            phase: 'template_ready',
+            templateUrl: tplUrl,
+            templateSlides: payload.slides || [],
+            slideImages: (payload.slideImages || []).map((img: { index: number; imageUrl: string }) => ({
+              index: img.index,
+              imageUrl: img.imageUrl,
+            })),
+            statusMessage: '模板就绪',
+          });
+
+          appendMessage({ type: 'status', content: '模板就绪，开始生成大纲...' });
+
+          // 新流程：模板就绪后自动生成大纲（大纲 AI 会感知模板结构）
+          setTimeout(() => {
+            setPptState(prev => {
+              generateOutlineInternal(prev.intentTopic || '');
+              return prev;
+            });
+          }, 500);
+        } catch { /* ignore */ }
+      } else if (evt === 'error') {
+        updatePpt({ phase: 'error', errorMessage: data });
+        appendMessage({ type: 'error', content: data });
+      }
+    });
+  }, [appendMessage, sendAction, updatePpt]);
+
+  /** Internal: generate PPT slides */
+  const generatePptInternal = useCallback(() => {
+    updatePpt({
+      phase: 'generating_slides',
+      generatedSlides: [],
+      currentSlide: 0,
+      totalSlides: 0,
+      errorMessage: '',
+      statusMessage: '正在生成幻灯片内容...',
+    });
+
+    const progressMsgId = appendMessage({
+      type: 'progress-card',
+      content: '',
+      progress: { current: 0, total: 0 },
+    });
+
+    sendAction('generate_ppt', {}, (evt, data) => {
+      if (evt === 'status') {
+        try {
+          const payload = JSONBigString.parse(data);
+          updatePpt({ statusMessage: payload.message || '' });
+          if (payload.phase === 'assembling') {
+            updatePpt({ phase: 'assembling' });
+          }
+        } catch { /* ignore */ }
+      } else if (evt === 'slide_progress') {
+        try {
+          const payload = JSONBigString.parse(data);
+          const newSlide: GeneratedSlide = {
+            previewImageUrl: payload.previewImageUrl || '',
+            isNew: true,
+          };
+
+          setPptState(prev => {
+            const slides = [...prev.generatedSlides, newSlide];
+            return {
+              ...prev,
+              generatedSlides: slides,
+              currentSlide: payload.current || slides.length,
+              totalSlides: payload.total || prev.totalSlides,
+              selectedSlideIndex: slides.length - 1,
+            };
+          });
+
+          // Update progress message
+          updateMessage(progressMsgId, {
+            progress: {
+              current: payload.current || 0,
+              total: payload.total || 0,
+            },
+          });
+
+          // Clear isNew animation flag
+          setTimeout(() => {
+            setPptState(prev => ({
+              ...prev,
+              generatedSlides: prev.generatedSlides.map((s, i) =>
+                i === prev.generatedSlides.length - 1 ? { ...s, isNew: false } : s
+              ),
+            }));
+          }, 600);
+        } catch { /* ignore */ }
+      } else if (evt === 'result') {
+        try {
+          const payload = JSONBigString.parse(data);
+          const url = payload.fileUrl || payload.file_url || '';
+          const name = payload.fileName || payload.file_name || '';
+          updatePpt({
+            phase: 'completed',
+            resultUrl: url,
+            resultFileName: name,
+            statusMessage: 'PPT 生成完毕！',
+          });
+          appendMessage({
+            type: 'download-card',
+            content: '',
+            downloadUrl: url,
+            downloadFileName: name,
+          });
+          loadSessions();
+        } catch { /* ignore */ }
+      } else if (evt === 'done') {
+        setPptState(prev => {
+          if (prev.resultUrl) {
+            return { ...prev, phase: 'completed', statusMessage: 'PPT 生成完毕！' };
+          }
+          return prev;
+        });
+      } else if (evt === 'error') {
+        updatePpt({ phase: 'error', errorMessage: data });
+        appendMessage({ type: 'error', content: data });
+      }
+    });
+  }, [appendMessage, updateMessage, sendAction, updatePpt, loadSessions]);
+
+  const setSelectedSlide = useCallback((index: number) => {
+    updatePpt({ selectedSlideIndex: index });
+  }, [updatePpt]);
+
+  /** Start a new session (clear state) */
+  const startNewSession = useCallback(() => {
+    abortControllerRef.current?.abort();
+    sessionIdRef.current = null;
+    setCurrentSessionId(null);
+    setMessages([]);
+    setPptState({
+      phase: 'idle',
+      sessionId: null,
+      statusMessage: '',
+      aiMessage: '',
+      intentDetected: null,
+      intentTopic: '',
+      outlineMarkdown: '',
+      templateUrl: '',
+      slideImages: [],
+      templateSlides: [],
+      generatedSlides: [],
+      currentSlide: 0,
+      totalSlides: 0,
+      selectedSlideIndex: 0,
+      resultUrl: '',
+      resultFileName: '',
+      errorMessage: '',
+    });
+  }, []);
+
+  const abort = useCallback(() => {
+    abortControllerRef.current?.abort();
+    updatePpt({ phase: 'idle', statusMessage: '' });
+  }, [updatePpt]);
+
+  // ---- Derived state ----
+  const showPreview = ['generating_slides', 'assembling', 'completed'].includes(pptState.phase);
+  const showTemplateSelector = pptState.phase === 'awaiting_template';
+  const isGenerating = ['detecting', 'generating_outline', 'parsing_template', 'generating_slides', 'assembling'].includes(pptState.phase);
+
+  return {
+    // Session management
+    sessions,
+    isLoadingSessions,
+    currentSessionId,
+    loadSessions,
+    openSession,
+    deleteSession,
+    startNewSession,
+
+    // Chat messages
+    messages,
+
+    // PPT state
+    pptState,
+    showPreview,
+    showTemplateSelector,
+    isGenerating,
+
+    // Actions
+    sendMessage,
+    reviseOutline,
+    confirmOutline,
+    selectTemplate,
+    setSelectedSlide,
+    abort,
+  };
+}

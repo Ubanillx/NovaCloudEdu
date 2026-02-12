@@ -20,6 +20,10 @@ import { KnowledgeBaseManagementPage } from './pages/admin/KnowledgeBaseManageme
 import { AiAssistantManagementPage } from './pages/admin/AiAssistantManagementPage'
 import { WorkflowManagementPage } from './pages/admin/WorkflowManagementPage'
 import { WorkflowEditorPage } from './pages/admin/workflow/WorkflowEditorPage'
+import { McpServerManagementPage } from './pages/admin/McpServerManagementPage'
+import PptTemplateManagementPage from './pages/admin/PptTemplateManagementPage'
+import PptGeneratorPage from './pages/admin/PptGeneratorPage'
+import PptEditorPage from './pages/admin/PptEditorPage'
 import { getToken } from './api'
 import { useEffect } from 'react'
 
@@ -70,6 +74,16 @@ createRoot(document.getElementById('root')!).render(
             }
           />
           
+          {/* PPT在线编辑器 - 全屏，不套 AdminLayout */}
+          <Route
+            path="/admin/ppt-editor"
+            element={
+              <ProtectedRoute requireAdmin>
+                <PptEditorPage />
+              </ProtectedRoute>
+            }
+          />
+          
           {/* 管理员路由 */}
           <Route 
             path="/admin/*" 
@@ -91,6 +105,9 @@ createRoot(document.getElementById('root')!).render(
                     <Route path="ai-assistants" element={<AiAssistantManagementPage />} />
                     <Route path="knowledge-bases" element={<KnowledgeBaseManagementPage />} />
                     <Route path="workflows" element={<WorkflowManagementPage />} />
+                    <Route path="mcp-servers" element={<McpServerManagementPage />} />
+                    <Route path="ppt-templates" element={<PptTemplateManagementPage />} />
+                    <Route path="ppt-generator" element={<PptGeneratorPage />} />
                     <Route path="settings" element={<div className="p-8 bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm"><h2 className="text-2xl font-bold">系统设置 (开发中...)</h2></div>} />
                   </Routes>
                 </AdminLayout>
