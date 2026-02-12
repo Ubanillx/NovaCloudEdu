@@ -167,6 +167,7 @@ public class AiAssistantRepositoryImpl implements AiAssistantRepository {
         po.setIsPublic(assistant.getIsPublic() ? 1 : 0);
         po.setUsageCount(assistant.getUsageCount());
         po.setRating(BigDecimal.valueOf(assistant.getRating()));
+        po.setMcpServerIds(toJson(assistant.getMcpServerIds()));
         po.setCreatorId(assistant.getCreatorId().value());
         po.setSort(assistant.getSort());
         
@@ -203,6 +204,7 @@ public class AiAssistantRepositoryImpl implements AiAssistantRepository {
                 po.getUsageCount(),
                 po.getRating() != null ? po.getRating().doubleValue() : 0.0,
                 kbIds,
+                fromJson(po.getMcpServerIds(), new TypeReference<List<Long>>() {}),
                 UserId.of(po.getCreatorId()),
                 po.getSort(),
                 po.getCreateTime(),

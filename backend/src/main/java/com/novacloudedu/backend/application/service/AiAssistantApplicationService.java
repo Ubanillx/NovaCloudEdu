@@ -74,6 +74,11 @@ public class AiAssistantApplicationService {
             assistant.updateModelConfig(modelConfig);
         }
 
+        // 更新 MCP 服务器绑定
+        if (dto.getMcpServerIds() != null && !dto.getMcpServerIds().isEmpty()) {
+            assistant.updateMcpServerIds(dto.getMcpServerIds());
+        }
+
         // 保存
         AiAssistant saved = assistantRepository.save(assistant);
 
@@ -140,6 +145,11 @@ public class AiAssistantApplicationService {
         // 更新排序
         if (dto.getSort() != null) {
             assistant.setSort(dto.getSort());
+        }
+
+        // 更新 MCP 服务器绑定
+        if (dto.getMcpServerIds() != null) {
+            assistant.updateMcpServerIds(dto.getMcpServerIds());
         }
 
         AiAssistant saved = assistantRepository.save(assistant);
@@ -280,6 +290,7 @@ public class AiAssistantApplicationService {
                     .ifPresent(kb -> knowledgeBases.add(toKnowledgeBaseVO(kb)));
         }
         vo.setKnowledgeBases(knowledgeBases);
+        vo.setMcpServerIds(assistant.getMcpServerIds());
 
         vo.setCreatorId(assistant.getCreatorId().value());
         vo.setSort(assistant.getSort());

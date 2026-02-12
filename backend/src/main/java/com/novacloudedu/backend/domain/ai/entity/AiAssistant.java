@@ -35,6 +35,9 @@ public class AiAssistant {
     // 模型配置
     private ModelConfig modelConfig;
     
+    // MCP 服务器绑定
+    private List<Long> mcpServerIds;
+    
     // 状态与版本
     private AiAssistantStatus status;
     private Integer version;
@@ -72,6 +75,7 @@ public class AiAssistant {
         assistant.tags = new ArrayList<>();
         assistant.suggestedQuestions = new ArrayList<>();
         assistant.knowledgeBaseIds = new ArrayList<>();
+        assistant.mcpServerIds = new ArrayList<>();
         assistant.modelConfig = ModelConfig.defaultConfig();
         assistant.status = AiAssistantStatus.DRAFT;
         assistant.version = 1;
@@ -106,6 +110,7 @@ public class AiAssistant {
             Integer usageCount,
             Double rating,
             List<KnowledgeBaseId> knowledgeBaseIds,
+            List<Long> mcpServerIds,
             UserId creatorId,
             Integer sort,
             LocalDateTime createTime,
@@ -129,6 +134,7 @@ public class AiAssistant {
         assistant.usageCount = usageCount;
         assistant.rating = rating;
         assistant.knowledgeBaseIds = knowledgeBaseIds != null ? new ArrayList<>(knowledgeBaseIds) : new ArrayList<>();
+        assistant.mcpServerIds = mcpServerIds != null ? new ArrayList<>(mcpServerIds) : new ArrayList<>();
         assistant.creatorId = creatorId;
         assistant.sort = sort;
         assistant.createTime = createTime;
@@ -172,6 +178,15 @@ public class AiAssistant {
             throw new IllegalArgumentException("模型配置不能为空");
         }
         this.modelConfig = modelConfig;
+        this.updateTime = LocalDateTime.now();
+        incrementVersion();
+    }
+
+    /**
+     * 更新 MCP 服务器绑定
+     */
+    public void updateMcpServerIds(List<Long> mcpServerIds) {
+        this.mcpServerIds = mcpServerIds != null ? new ArrayList<>(mcpServerIds) : new ArrayList<>();
         this.updateTime = LocalDateTime.now();
         incrementVersion();
     }

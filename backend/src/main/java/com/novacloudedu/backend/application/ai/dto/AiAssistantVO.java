@@ -38,6 +38,8 @@ public class AiAssistantVO {
 
     private List<KnowledgeBaseVO> knowledgeBases;
 
+    private List<Long> mcpServerIds;
+
     private Long creatorId;
     private Integer sort;
     private LocalDateTime createTime;

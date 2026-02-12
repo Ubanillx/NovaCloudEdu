@@ -1,5 +1,6 @@
 package com.novacloudedu.backend.interfaces.rest.post;
 
+import com.novacloudedu.backend.annotation.AuthCheck;
 import com.novacloudedu.backend.application.service.PostApplicationService;
 import com.novacloudedu.backend.common.BaseResponse;
 import com.novacloudedu.backend.common.ResultUtils;
@@ -63,6 +64,14 @@ public class PostController {
             @AuthenticationPrincipal Long userId,
             @PathVariable Long postId) {
         postService.deletePost(postId, userId);
+        return ResultUtils.success(null);
+    }
+
+    @DeleteMapping("/admin/{postId}")
+    @Operation(summary = "管理员删除帖子")
+    @AuthCheck(mustRole = "admin")
+    public BaseResponse<Void> adminDeletePost(@PathVariable Long postId) {
+        postService.adminDeletePost(postId);
         return ResultUtils.success(null);
     }
 

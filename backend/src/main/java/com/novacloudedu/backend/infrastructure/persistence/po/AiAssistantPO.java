@@ -31,6 +31,9 @@ public class AiAssistantPO {
     private BigDecimal topP;
     private Integer maxTokens;
 
+    /** 绑定的MCP服务器ID列表，JSON数组格式 */
+    private String mcpServerIds;
+
     private String status;
     private Integer version;
     private Integer publishedVersion;

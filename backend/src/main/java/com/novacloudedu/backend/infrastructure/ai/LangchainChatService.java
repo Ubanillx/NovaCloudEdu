@@ -167,6 +167,78 @@ public class LangchainChatService {
     }
 
     /**
+     * 同步多模态对话（图片+文本，用于视觉模型场景）
+     *
+     * @param modelId      模型ID（如 "dashscope/qwen-vl-max"），null 则用默认视觉模型
+     * @param systemPrompt 系统提示词
+     * @param userMessage  用户消息文本
+     * @param imageUrl     图片URL
+     */
+    public String chatWithImage(String modelId, String systemPrompt,
+                                 String userMessage, String imageUrl) {
+        StreamingChatLanguageModel model = resolveModel(modelId, true);
+
+        List<ChatMessage> messages = new ArrayList<>();
+        if (systemPrompt != null && !systemPrompt.trim().isEmpty()) {
+            messages.add(SystemMessage.from(systemPrompt));
+        }
+
+        // 构建包含图片的 UserMessage
+        List<Content> contents = new ArrayList<>();
+        if (imageUrl != null && !imageUrl.isBlank()) {
+            contents.add(ImageContent.from(URI.create(imageUrl)));
+        }
+        contents.add(TextContent.from(userMessage));
+        messages.add(UserMessage.from(contents));
+
+        StringBuilder result = new StringBuilder();
+        final Object lock = new Object();
+        final boolean[] done = {false};
+        final Throwable[] error = {null};
+
+        model.generate(messages, new StreamingResponseHandler<AiMessage>() {
+            @Override
+            public void onNext(String token) {
+                result.append(token);
+            }
+
+            @Override
+            public void onComplete(Response<AiMessage> response) {
+                synchronized (lock) {
+                    done[0] = true;
+                    lock.notifyAll();
+                }
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                synchronized (lock) {
+                    error[0] = throwable;
+                    done[0] = true;
+                    lock.notifyAll();
+                }
+            }
+        });
+
+        synchronized (lock) {
+            while (!done[0]) {
+                try {
+                    lock.wait(120000);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    throw new RuntimeException("视觉对话被中断", e);
+                }
+            }
+        }
+
+        if (error[0] != null) {
+            throw new RuntimeException("视觉模型对话失败: " + error[0].getMessage(), error[0]);
+        }
+
+        return result.toString();
+    }
+
+    /**
      * 获取可用模型列表（仅启用的）
      */
     public List<Map<String, Object>> listAvailableModels() {

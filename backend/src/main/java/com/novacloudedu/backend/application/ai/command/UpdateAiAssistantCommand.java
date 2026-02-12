@@ -41,4 +41,6 @@ public class UpdateAiAssistantCommand {
     private Boolean isPublic;
 
     private Integer sort;
+
+    private List<Long> mcpServerIds;
 }

@@ -4,10 +4,15 @@ import com.novacloudedu.backend.config.ChatModelProperties;
 import com.novacloudedu.backend.config.ChatModelProperties.ModelConfig;
 import com.novacloudedu.backend.config.ChatModelProperties.ProviderAndModel;
 import com.novacloudedu.backend.config.ChatModelProperties.ProviderConfig;
+import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.chat.StreamingChatLanguageModel;
+import dev.langchain4j.model.dashscope.QwenChatModel;
 import dev.langchain4j.model.dashscope.QwenStreamingChatModel;
+import dev.langchain4j.model.ollama.OllamaChatModel;
 import dev.langchain4j.model.ollama.OllamaStreamingChatModel;
+import dev.langchain4j.model.openai.OpenAiChatModel;
 import dev.langchain4j.model.openai.OpenAiStreamingChatModel;
+import dev.langchain4j.model.zhipu.ZhipuAiChatModel;
 import dev.langchain4j.model.zhipu.ZhipuAiStreamingChatModel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,8 +41,10 @@ public class ChatModelFactory {
 
     private final ChatModelProperties properties;
 
-    /** 模型实例缓存 */
+    /** 流式模型实例缓存 */
     private final Map<String, StreamingChatLanguageModel> modelCache = new ConcurrentHashMap<>();
+    /** 非流式模型实例缓存（用于 tool calling） */
+    private final Map<String, ChatLanguageModel> chatModelCache = new ConcurrentHashMap<>();
 
     /**
      * 获取流式聊天模型（带缓存）
@@ -158,11 +165,68 @@ public class ChatModelFactory {
         };
     }
 
+    // ==================== 非流式模型（Tool Calling 场景） ====================
+
+    /**
+     * 获取非流式聊天模型（带缓存），用于 tool calling 等需要同步响应的场景
+     */
+    public ChatLanguageModel getChatModel(String modelId) {
+        return chatModelCache.computeIfAbsent(modelId, this::createChatModel);
+    }
+
+    /**
+     * 创建带自定义参数的非流式聊天模型（不缓存），用于 tool calling
+     */
+    public ChatLanguageModel createChatModelWithParams(
+            String modelId, Double temperature, Double topP, Integer maxTokens) {
+        ProviderAndModel pm = properties.parseModelId(modelId);
+        ProviderConfig providerConfig = properties.getProviderConfig(pm.provider());
+
+        log.info("创建非流式模型(tool calling): provider={}, model={}, temperature={}, topP={}, maxTokens={}",
+                pm.provider(), pm.model(), temperature, topP, maxTokens);
+
+        return switch (pm.provider()) {
+            case "dashscope" -> QwenChatModel.builder()
+                    .apiKey(providerConfig.getApiKey())
+                    .modelName(pm.model())
+                    .temperature(temperature != null ? temperature.floatValue() : 0.7f)
+                    .maxTokens(maxTokens != null ? maxTokens : 4096)
+                    .topP(topP)
+                    .build();
+            case "openai", "deepseek", "moonshot", "siliconflow" -> {
+                var builder = OpenAiChatModel.builder()
+                        .apiKey(providerConfig.getApiKey())
+                        .modelName(pm.model())
+                        .temperature(temperature)
+                        .maxTokens(maxTokens)
+                        .topP(topP);
+                if (providerConfig.getBaseUrl() != null && !providerConfig.getBaseUrl().isEmpty()) {
+                    builder.baseUrl(providerConfig.getBaseUrl());
+                }
+                yield builder.build();
+            }
+            case "zhipu" -> ZhipuAiChatModel.builder()
+                    .apiKey(providerConfig.getApiKey())
+                    .model(pm.model())
+                    .temperature(temperature)
+                    .maxToken(maxTokens != null ? maxTokens : 4096)
+                    .topP(topP)
+                    .build();
+            case "ollama" -> OllamaChatModel.builder()
+                    .baseUrl(providerConfig.getBaseUrl())
+                    .modelName(pm.model())
+                    .temperature(temperature)
+                    .build();
+            default -> throw new IllegalArgumentException("不支持的模型供应商: " + pm.provider());
+        };
+    }
+
     /**
      * 清除缓存（配置变更后调用）
      */
     public void clearCache() {
         modelCache.clear();
+        chatModelCache.clear();
         log.info("模型缓存已清除");
     }
 
@@ -226,5 +290,50 @@ public class ChatModelFactory {
                 .modelName(modelName)
                 .temperature(model.getTemperature())
                 .build();
+    }
+
+    // ==================== 非流式模型创建 ====================
+
+    private ChatLanguageModel createChatModel(String modelId) {
+        ProviderAndModel pm = properties.parseModelId(modelId);
+        ProviderConfig providerConfig = properties.getProviderConfig(pm.provider());
+        ModelConfig modelConfig = properties.getModelConfig(pm.provider(), pm.model());
+
+        log.info("创建非流式聊天模型: provider={}, model={}", pm.provider(), pm.model());
+
+        return switch (pm.provider()) {
+            case "dashscope" -> QwenChatModel.builder()
+                    .apiKey(providerConfig.getApiKey())
+                    .modelName(pm.model())
+                    .temperature(modelConfig.getTemperature().floatValue())
+                    .maxTokens(modelConfig.getMaxTokens())
+                    .topP(modelConfig.getTopP())
+                    .build();
+            case "openai", "deepseek", "moonshot", "siliconflow" -> {
+                var builder = OpenAiChatModel.builder()
+                        .apiKey(providerConfig.getApiKey())
+                        .modelName(pm.model())
+                        .temperature(modelConfig.getTemperature())
+                        .maxTokens(modelConfig.getMaxTokens())
+                        .topP(modelConfig.getTopP());
+                if (providerConfig.getBaseUrl() != null && !providerConfig.getBaseUrl().isEmpty()) {
+                    builder.baseUrl(providerConfig.getBaseUrl());
+                }
+                yield builder.build();
+            }
+            case "zhipu" -> ZhipuAiChatModel.builder()
+                    .apiKey(providerConfig.getApiKey())
+                    .model(pm.model())
+                    .temperature(modelConfig.getTemperature())
+                    .maxToken(modelConfig.getMaxTokens())
+                    .topP(modelConfig.getTopP())
+                    .build();
+            case "ollama" -> OllamaChatModel.builder()
+                    .baseUrl(providerConfig.getBaseUrl())
+                    .modelName(pm.model())
+                    .temperature(modelConfig.getTemperature())
+                    .build();
+            default -> throw new IllegalArgumentException("不支持的模型供应商: " + pm.provider());
+        };
     }
 }

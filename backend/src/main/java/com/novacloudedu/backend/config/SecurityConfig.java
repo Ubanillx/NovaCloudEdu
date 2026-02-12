@@ -55,7 +55,8 @@ public class SecurityConfig {
             "/api/announcement/*", // 公告详情
             "/api/banner/list", // 轮播图列表
             "/api/user/checkin/ranking", // 打卡排行榜（公开）
-            "/api/v1/webhook/**"        // Webhook 触发端点（外部调用，无需认证）
+            "/api/v1/webhook/**",       // Webhook 触发端点（外部调用，无需认证）
+            "/api/onlyoffice/callback"  // OnlyOffice 文档保存回调（外部调用，无需认证）
     };
 
     /**
