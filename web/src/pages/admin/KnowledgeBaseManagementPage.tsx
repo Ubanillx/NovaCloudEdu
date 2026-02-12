@@ -26,7 +26,10 @@ import {
   Eye,
   Save,
   Hash,
-  type LucideIcon
+  type LucideIcon,
+  SearchCheck,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
 import { apiClient, DefaultApi, Configuration } from '../../api';
 import type {
@@ -144,7 +147,7 @@ const KBFormModal: React.FC<KBFormModalProps> = ({ isOpen, onClose, onSuccess, k
           chunkSize: formData.chunkSize,
           chunkOverlap: formData.chunkOverlap,
         };
-        const response = await api.update1({
+        const response = await api.kbUpdate({
           id: knowledgeBase.id,
           updateKnowledgeBaseCommand: updateData,
         });
@@ -157,7 +160,7 @@ const KBFormModal: React.FC<KBFormModalProps> = ({ isOpen, onClose, onSuccess, k
         }
       } else {
         const userId = getCurrentUserId();
-        const response = await api.create1({
+        const response = await api.kbCreate({
           userId,
           createKnowledgeBaseCommand: formData,
         });
@@ -400,7 +403,7 @@ const AddDocumentModal: React.FC<AddDocumentModalProps> = ({ isOpen, onClose, on
       setSubmitting(true);
       try {
         const userId = getCurrentUserId();
-        const response = await api.addDocument({
+        const response = await api.kbAddDocument({
           id: knowledgeBaseId,
           userId,
           requestBody: {
@@ -443,7 +446,7 @@ const AddDocumentModal: React.FC<AddDocumentModalProps> = ({ isOpen, onClose, on
         it.uid === item.uid ? { ...it, status: 'submitting' } : it
       ));
       try {
-        const response = await api.addDocument({
+        const response = await api.kbAddDocument({
           id: knowledgeBaseId,
           userId,
           requestBody: {
@@ -984,7 +987,7 @@ const DocumentPanel: React.FC<DocumentPanelProps> = ({ knowledgeBase, onBack }) 
     if (!knowledgeBase.id) return;
     setLoading(true);
     try {
-      const response = await api.listDocuments({ id: knowledgeBase.id, page, size: 20 });
+      const response = await api.kbListDocuments({ id: knowledgeBase.id, page, size: 20 });
       if (response.data.code === 0) {
         setDocuments(response.data.data || []);
       } else {
@@ -1006,7 +1009,7 @@ const DocumentPanel: React.FC<DocumentPanelProps> = ({ knowledgeBase, onBack }) 
     if (!window.confirm(`确定要删除文档 "${doc.name}" 吗？此操作不可恢复。`)) return;
 
     try {
-      const response = await api.deleteDocument({ id: knowledgeBase.id, docId: doc.id });
+      const response = await api.kbDeleteDocument({ id: knowledgeBase.id, docId: doc.id });
       if (response.data.code === 0) {
         toast.success('删除成功');
         fetchDocuments();
@@ -1023,7 +1026,7 @@ const DocumentPanel: React.FC<DocumentPanelProps> = ({ knowledgeBase, onBack }) 
     const docIdStr = String(doc.id);
     setProcessingIds(prev => new Set(prev).add(docIdStr));
     try {
-      const response = await api.processDocument({ id: knowledgeBase.id, docId: doc.id });
+      const response = await api.kbProcessDocument({ id: knowledgeBase.id, docId: doc.id });
       if (response.data.code === 0) {
         toast.success('向量化成功');
         fetchDocuments();
@@ -1045,7 +1048,7 @@ const DocumentPanel: React.FC<DocumentPanelProps> = ({ knowledgeBase, onBack }) 
     if (!knowledgeBase.id) return;
     setBatchProcessing(true);
     try {
-      const response = await api.batchProcessByKnowledgeBase({ id: knowledgeBase.id });
+      const response = await api.kbBatchProcessByKnowledgeBase({ id: knowledgeBase.id });
       if (response.data.code === 0) {
         const result = response.data.data;
         toast.success(`批量向量化完成: 成功 ${result?.successCount || 0} / 共 ${result?.total || 0}`);
@@ -1340,6 +1343,263 @@ const DocumentPanel: React.FC<DocumentPanelProps> = ({ knowledgeBase, onBack }) 
   );
 };
 
+// ==================== 召回测试弹窗 ====================
+interface RecallChunk {
+  index: number;
+  score: number;
+  documentId: number;
+  documentName: string | null;
+  content: string;
+  chunkIndex: number | null;
+  metadata: Record<string, unknown> | null;
+}
+
+interface RecallTestResult {
+  query: string;
+  topK: number;
+  similarityThreshold: number;
+  totalResults: number;
+  searchTimeMs: number;
+  chunks: RecallChunk[];
+}
+
+interface RecallTestModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  knowledgeBase: KnowledgeBaseVO | null;
+}
+
+const RecallTestModal: React.FC<RecallTestModalProps> = ({ isOpen, onClose, knowledgeBase }) => {
+  const [query, setQuery] = useState('');
+  const [topK, setTopK] = useState(5);
+  const [threshold, setThreshold] = useState(0.3);
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<RecallTestResult | null>(null);
+  const [expandedChunks, setExpandedChunks] = useState<Set<number>>(new Set());
+  const [showAdvanced, setShowAdvanced] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setResult(null);
+      setExpandedChunks(new Set());
+    }
+  }, [isOpen]);
+
+  const handleTest = async () => {
+    if (!knowledgeBase?.id || !query.trim()) return;
+    setLoading(true);
+    setResult(null);
+    try {
+      const response = await apiClient.post(`/api/ai/knowledge-bases/${knowledgeBase.id}/recall-test`, {
+        query: query.trim(),
+        topK,
+        similarityThreshold: threshold,
+      });
+      if (response.data.code === 0) {
+        setResult(response.data.data);
+      } else {
+        toast.error(response.data.message || '召回测试失败');
+      }
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || '召回测试请求失败');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const toggleChunk = (index: number) => {
+    setExpandedChunks(prev => {
+      const next = new Set(prev);
+      if (next.has(index)) next.delete(index);
+      else next.add(index);
+      return next;
+    });
+  };
+
+  const getScoreColor = (score: number) => {
+    if (score >= 0.8) return 'text-green-600 bg-green-50 border-green-200 dark:text-green-400 dark:bg-green-900/20 dark:border-green-800';
+    if (score >= 0.6) return 'text-blue-600 bg-blue-50 border-blue-200 dark:text-blue-400 dark:bg-blue-900/20 dark:border-blue-800';
+    if (score >= 0.4) return 'text-amber-600 bg-amber-50 border-amber-200 dark:text-amber-400 dark:bg-amber-900/20 dark:border-amber-800';
+    return 'text-red-600 bg-red-50 border-red-200 dark:text-red-400 dark:bg-red-900/20 dark:border-red-800';
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={onClose}>
+      <div
+        className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 w-full max-w-3xl max-h-[85vh] flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-800">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-50 to-accent-50 dark:from-brand-900/20 dark:to-accent-900/20 flex items-center justify-center border border-brand-100 dark:border-brand-800">
+              <SearchCheck size={20} className="text-brand-600 dark:text-brand-400" />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-gray-900 dark:text-white">召回测试</h2>
+              <p className="text-sm text-gray-500 dark:text-gray-400">{knowledgeBase?.name}</p>
+            </div>
+          </div>
+          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-all">
+            <X size={20} />
+          </button>
+        </div>
+
+        {/* Query Input */}
+        <div className="p-6 space-y-4 border-b border-gray-100 dark:border-gray-800">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">查询文本</label>
+            <textarea
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="输入要测试的查询文本..."
+              rows={3}
+              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:border-brand-500/50 focus:ring-2 focus:ring-brand-500/20 transition-all resize-none"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  handleTest();
+                }
+              }}
+            />
+          </div>
+
+          {/* Advanced Settings */}
+          <div>
+            <button
+              onClick={() => setShowAdvanced(!showAdvanced)}
+              className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-brand-600 dark:hover:text-brand-400 transition-colors"
+            >
+              <Settings2 size={14} />
+              <span>高级设置</span>
+              {showAdvanced ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+            </button>
+            {showAdvanced && (
+              <div className="mt-3 grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">返回条数 (TopK)</label>
+                  <input
+                    type="number"
+                    value={topK}
+                    onChange={(e) => setTopK(Math.max(1, Math.min(20, Number(e.target.value))))}
+                    min={1}
+                    max={20}
+                    className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg text-sm text-gray-900 dark:text-white outline-none focus:border-brand-500/50 transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">相似度阈值</label>
+                  <input
+                    type="number"
+                    value={threshold}
+                    onChange={(e) => setThreshold(Math.max(0, Math.min(1, Number(e.target.value))))}
+                    min={0}
+                    max={1}
+                    step={0.05}
+                    className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg text-sm text-gray-900 dark:text-white outline-none focus:border-brand-500/50 transition-all"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+
+          <button
+            onClick={handleTest}
+            disabled={loading || !query.trim()}
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-brand-600 text-white rounded-xl text-sm font-bold hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-brand-600/20 transition-all active:scale-[0.98]"
+          >
+            {loading ? <Loader2 size={16} className="animate-spin" /> : <SearchCheck size={16} />}
+            <span>{loading ? '检索中...' : '开始召回测试'}</span>
+          </button>
+        </div>
+
+        {/* Results */}
+        <div className="flex-1 overflow-y-auto p-6">
+          {result ? (
+            <div className="space-y-4">
+              {/* Stats Bar */}
+              <div className="flex items-center justify-between px-4 py-3 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-100 dark:border-gray-800">
+                <div className="flex items-center gap-4 text-sm">
+                  <span className="text-gray-500">召回 <b className="text-gray-900 dark:text-white">{result.totalResults}</b> 条</span>
+                  <span className="text-gray-500">耗时 <b className="text-gray-900 dark:text-white">{result.searchTimeMs}</b>ms</span>
+                </div>
+                <span className="text-xs text-gray-400">TopK={result.topK} · 阈值={result.similarityThreshold}</span>
+              </div>
+
+              {/* Chunks */}
+              {result.chunks.length > 0 ? (
+                <div className="space-y-3">
+                  {result.chunks.map((chunk) => {
+                    const expanded = expandedChunks.has(chunk.index);
+                    return (
+                      <div
+                        key={chunk.index}
+                        className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden hover:border-brand-300 dark:hover:border-brand-700 transition-colors"
+                      >
+                        {/* Chunk Header */}
+                        <div
+                          className="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+                          onClick={() => toggleChunk(chunk.index)}
+                        >
+                          <div className="flex items-center gap-3">
+                            <span className="w-7 h-7 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800 text-xs font-bold text-gray-500">
+                              {chunk.index}
+                            </span>
+                            <span className={`px-2 py-0.5 rounded-md text-xs font-bold border ${getScoreColor(chunk.score)}`}>
+                              {(chunk.score * 100).toFixed(1)}%
+                            </span>
+                            <span className="text-sm text-gray-500 dark:text-gray-400 truncate max-w-[300px]">
+                              {chunk.documentName || `文档 #${String(chunk.documentId)}`}
+                            </span>
+                          </div>
+                          {expanded ? <ChevronUp size={16} className="text-gray-400" /> : <ChevronDown size={16} className="text-gray-400" />}
+                        </div>
+
+                        {/* Chunk Content (expandable) */}
+                        {expanded && (
+                          <div className="px-4 pb-4 border-t border-gray-100 dark:border-gray-800">
+                            <pre className="mt-3 text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap font-sans leading-relaxed bg-gray-50 dark:bg-gray-800/30 rounded-lg p-4 max-h-64 overflow-y-auto">
+                              {chunk.content}
+                            </pre>
+                            {chunk.metadata && Object.keys(chunk.metadata).length > 0 && (
+                              <div className="mt-2 text-xs text-gray-400">
+                                <span className="font-medium">元数据：</span>
+                                {JSON.stringify(chunk.metadata)}
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <div className="w-16 h-16 bg-gray-50 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Search size={28} className="text-gray-300" />
+                  </div>
+                  <p className="text-gray-500 font-medium">未找到相关内容</p>
+                  <p className="text-gray-400 text-sm mt-1">尝试调整查询文本或降低相似度阈值</p>
+                </div>
+              )}
+            </div>
+          ) : !loading ? (
+            <div className="text-center py-12">
+              <div className="w-16 h-16 bg-gray-50 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                <SearchCheck size={28} className="text-gray-300" />
+              </div>
+              <p className="text-gray-500 font-medium">输入查询文本开始测试</p>
+              <p className="text-gray-400 text-sm mt-1">测试知识库的向量检索 + Rerank 召回效果</p>
+            </div>
+          ) : null}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // ==================== 主页面 ====================
 export const KnowledgeBaseManagementPage: React.FC = () => {
   const [knowledgeBases, setKnowledgeBases] = useState<KnowledgeBaseVO[]>([]);
@@ -1349,6 +1609,7 @@ export const KnowledgeBaseManagementPage: React.FC = () => {
   const [selectedKB, setSelectedKB] = useState<KnowledgeBaseVO | null>(null);
   const [searchKeyword, setSearchKeyword] = useState('');
   const [page, setPage] = useState(0);
+  const [recallTestKB, setRecallTestKB] = useState<KnowledgeBaseVO | null>(null);
 
   const fetchKnowledgeBases = useCallback(async () => {
     setLoading(true);
@@ -1356,9 +1617,9 @@ export const KnowledgeBaseManagementPage: React.FC = () => {
       const userId = getCurrentUserId();
       let response;
       if (searchKeyword.trim()) {
-        response = await api.search({ keyword: searchKeyword, userId, page, size: 20 });
+        response = await api.kbSearch({ keyword: searchKeyword, userId, page, size: 20 });
       } else {
-        response = await api.listByCreator({ userId, page, size: 20 });
+        response = await api.kbListByCreator({ userId, page, size: 20 });
       }
       if (response.data.code === 0) {
         setKnowledgeBases(response.data.data || []);
@@ -1387,7 +1648,7 @@ export const KnowledgeBaseManagementPage: React.FC = () => {
     if (!window.confirm(`确定要删除知识库 "${kb.name}" 吗？\n将同时删除所有文档和向量数据，此操作不可恢复。`)) return;
 
     try {
-      const response = await api.delete1({ id: kb.id });
+      const response = await api.kbDelete({ id: kb.id });
       if (response.data.code === 0) {
         toast.success('删除成功');
         fetchKnowledgeBases();
@@ -1503,6 +1764,13 @@ export const KnowledgeBaseManagementPage: React.FC = () => {
                   </div>
                   <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
                     <button
+                      onClick={() => setRecallTestKB(kb)}
+                      className="p-1.5 text-gray-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded-lg transition-all"
+                      title="召回测试"
+                    >
+                      <SearchCheck size={16} />
+                    </button>
+                    <button
                       onClick={() => { setEditingKB(kb); setModalOpen(true); }}
                       className="p-1.5 text-gray-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded-lg transition-all"
                       title="编辑"
@@ -1587,6 +1855,13 @@ export const KnowledgeBaseManagementPage: React.FC = () => {
         onClose={() => { setModalOpen(false); setEditingKB(null); }}
         onSuccess={fetchKnowledgeBases}
         knowledgeBase={editingKB}
+      />
+
+      {/* Recall Test Modal */}
+      <RecallTestModal
+        isOpen={!!recallTestKB}
+        onClose={() => setRecallTestKB(null)}
+        knowledgeBase={recallTestKB}
       />
     </div>
   );

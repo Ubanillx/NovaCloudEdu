@@ -61,6 +61,7 @@ const getDefaultNodeConfig = (nodeType: NodeType): Record<string, unknown> => {
       enabledCapabilities: [],
       parseJsonOutput: false, jsonSchema: '',
       historyVariable: '', historyLimit: 10,
+      mcpServerIds: [],
     };
     case NodeType.DATABASE_QUERY: return {
       sql: '', outputVariable: 'queryResult', maxRows: 100,
@@ -72,6 +73,21 @@ const getDefaultNodeConfig = (nodeType: NodeType): Record<string, unknown> => {
       inputVariables: [],
       outputVariables: [],
       requirements: '',
+    };
+    case NodeType.FILE_READ: return {
+      fileUrl: '',
+      fileUrlVariable: '',
+      parseMode: 'PARSE',
+      encoding: 'UTF-8',
+      outputVariable: 'fileContent',
+    };
+    case NodeType.FILE_WRITE: return {
+      contentVariable: '',
+      content: '',
+      fileName: 'output.txt',
+      encoding: 'UTF-8',
+      append: false,
+      appendToUrlVariable: '',
     };
     default: return {};
   }
@@ -346,7 +362,7 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
         nodeType,
         label: info?.label || nodeType,
         icon: info?.icon || Package,
-        config: {},
+        config: getDefaultNodeConfig(nodeType),
       },
     };
     get().pushHistory();

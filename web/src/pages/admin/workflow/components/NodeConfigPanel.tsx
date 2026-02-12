@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { X, Trash2, Settings2, Plus, GripVertical, Loader2, BookOpen, Sparkles, ChevronDown, ChevronRight, Eye, Image, Globe, Code2 } from 'lucide-react';
+import { X, Trash2, Settings2, Plus, GripVertical, Loader2, BookOpen, Sparkles, ChevronDown, ChevronRight, Eye, Image, Globe, Code2, Plug2 } from 'lucide-react';
 import { useWorkflowStore } from '../store/useWorkflowStore';
 import { NodeType, getNodeCategoryInfo } from '../types';
 import { apiClient, DefaultApi, Configuration } from '../../../../api';
@@ -136,6 +136,10 @@ function renderNodeConfig(
       return <TemplateConfig config={config} onUpdate={onUpdate} />;
     case NodeType.DATABASE_QUERY:
       return <DatabaseQueryConfig config={config} onUpdate={onUpdate} />;
+    case NodeType.FILE_READ:
+      return <FileReadConfig config={config} onUpdate={onUpdate} />;
+    case NodeType.FILE_WRITE:
+      return <FileWriteConfig config={config} onUpdate={onUpdate} />;
     default:
       return <GenericConfig config={config} onUpdate={onUpdate} />;
   }
@@ -442,6 +446,8 @@ const LLMConfig: React.FC<{ config: Record<string, unknown>; onUpdate: (c: Recor
   const [loadingModels, setLoadingModels] = useState(true);
   const [knowledgeBases, setKnowledgeBases] = useState<KbInfo[]>([]);
   const [loadingKb, setLoadingKb] = useState(false);
+  const [mcpServerList, setMcpServerList] = useState<Array<{ id: string; name: string; url: string; enabled: boolean }>>([]);
+  const [loadingMcp, setLoadingMcp] = useState(false);
   const upstreamVars = useUpstreamVars();
 
   // 加载模型列表
@@ -482,10 +488,28 @@ const LLMConfig: React.FC<{ config: Record<string, unknown>; onUpdate: (c: Recor
     return () => { cancelled = true; };
   }, []);
 
+  // 加载 MCP 服务器列表
+  useEffect(() => {
+    let cancelled = false;
+    const userInfoStr = localStorage.getItem('user_info');
+    const userId = userInfoStr ? String(JSON.parse(userInfoStr)?.id ?? '') : '';
+    if (!userId) return;
+    setLoadingMcp(true);
+    apiClient.get(`/api/ai/mcp-servers?userId=${userId}`).then((res) => {
+      if (cancelled) return;
+      const data = res.data;
+      if (data.code === 0 && Array.isArray(data.data)) {
+        setMcpServerList(data.data.map((s: any) => ({ id: String(s.id), name: s.name, url: s.url, enabled: s.enabled })));
+      }
+    }).catch(() => {}).finally(() => { if (!cancelled) setLoadingMcp(false); });
+    return () => { cancelled = true; };
+  }, []);
+
   // 类型安全辅助
   const inputMappings = (config.inputMappings as InputMapping[]) || [];
   const knowledgeBaseIds = (config.knowledgeBaseIds as string[]) || [];
   const enabledCapabilities = (config.enabledCapabilities as string[]) || [];
+  const mcpServerIds = (config.mcpServerIds as string[]) || [];
 
   const addMapping = () => onUpdate({ inputMappings: [...inputMappings, { variableName: '', mappedKey: '' }] });
   const updateMapping = (idx: number, field: keyof InputMapping, value: string) => {
@@ -691,6 +715,59 @@ const LLMConfig: React.FC<{ config: Record<string, unknown>; onUpdate: (c: Recor
             );
           })}
         </div>
+      </Section>
+
+      {/* ===== MCP 工具服务器（多选绑定） ===== */}
+      <Section title="MCP 工具服务器" icon={<Plug2 size={13} />}>
+        <p className="text-[11px] text-gray-400 dark:text-gray-500 mb-2">
+          绑定已配置的 MCP 服务器，LLM 可自主调用其提供的工具。
+          <a href="/admin/mcp-servers" target="_blank" className="text-brand-500 hover:underline ml-1">前往管理 →</a>
+        </p>
+        {loadingMcp ? (
+          <div className="flex items-center gap-1.5 text-xs text-gray-400 py-2"><Loader2 size={12} className="animate-spin" /> 加载中...</div>
+        ) : mcpServerList.length === 0 ? (
+          <div className="text-[11px] text-gray-400 py-3 text-center border border-dashed border-gray-200 dark:border-gray-700 rounded-lg">
+            暂无 MCP 服务器，<a href="/admin/mcp-servers" target="_blank" className="text-brand-500 hover:underline">去创建</a>
+          </div>
+        ) : (
+          <div className="space-y-1.5">
+            {mcpServerList.map((server) => {
+              const selected = mcpServerIds.includes(String(server.id));
+              return (
+                <button key={server.id} onClick={() => {
+                  const current = [...mcpServerIds];
+                  const sid = String(server.id);
+                  const updated = selected ? current.filter((id) => String(id) !== sid) : [...current, sid];
+                  onUpdate({ mcpServerIds: updated });
+                }} className={`w-full flex items-center gap-2.5 p-2.5 rounded-xl border transition-all text-left ${
+                  selected
+                    ? 'border-violet-400 dark:border-violet-600 bg-violet-50 dark:bg-violet-900/20'
+                    : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                }`}>
+                  <div className={`w-4 h-4 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
+                    selected ? 'bg-violet-500 border-violet-500' : 'border-gray-300 dark:border-gray-600'
+                  }`}>
+                    {selected && <span className="text-white text-[10px] font-bold">✓</span>}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-[11px] font-bold text-gray-700 dark:text-gray-300 truncate flex items-center gap-1">
+                      <Plug2 size={10} /> {server.name || '未命名'}
+                      {!server.enabled && <span className="text-[9px] text-orange-500">(已禁用)</span>}
+                    </div>
+                    <div className="text-[10px] text-gray-400 truncate font-mono">{server.url}</div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        )}
+        {mcpServerIds.length > 0 && (
+          <div className="p-2 bg-violet-50 dark:bg-violet-900/10 rounded-lg border border-violet-200 dark:border-violet-800/50 mt-1.5">
+            <p className="text-[10px] text-violet-700 dark:text-violet-400 leading-relaxed">
+              已绑定 <b>{mcpServerIds.length}</b> 个 MCP 服务器。启用后将使用同步模式调用模型，最多 10 轮工具调用。
+            </p>
+          </div>
+        )}
       </Section>
 
       {/* ===== 模型参数 ===== */}
@@ -1086,7 +1163,7 @@ const OPERATORS = [
 // 根据节点类型推断可能的输出变量
 const NODE_OUTPUT_VARS: Record<string, string[]> = {
   START: [],
-  LLM: ['response', 'llmOutput', 'model', 'tokensUsed', 'ragReferences', 'parsedOutput'],
+  LLM: ['response', 'llmOutput', 'model', 'tokensUsed', 'ragReferences', 'parsedOutput', 'toolCalls', 'toolCallCount'],
   TEMPLATE: ['renderedTemplate', 'templateOutput'],
   HTTP_REQUEST: ['statusCode', 'body', 'headers', 'jsonBody'],
   CODE: ['result', 'output'],
@@ -3326,6 +3403,250 @@ const DatabaseQueryConfig: React.FC<{ config: Record<string, unknown>; onUpdate:
             </p>
           </div>
         )}
+      </div>
+    </div>
+  );
+};
+
+// ===== 文件读取配置 =====
+const ENCODING_OPTIONS = [
+  { value: 'UTF-8', label: 'UTF-8' },
+  { value: 'GBK', label: 'GBK' },
+  { value: 'GB2312', label: 'GB2312' },
+  { value: 'ISO-8859-1', label: 'ISO-8859-1' },
+  { value: 'ASCII', label: 'ASCII' },
+];
+
+const FileReadConfig: React.FC<{ config: Record<string, unknown>; onUpdate: (c: Record<string, unknown>) => void }> = ({ config, onUpdate }) => {
+  const upstreamVars = useUpstreamVars();
+
+  // 切换来源模式：直接URL / 上游变量
+  const hasUrlVar = !!(config.fileUrlVariable as string);
+  const [useVariable, setUseVariable] = useState(hasUrlVar);
+
+  const parseMode = ((config.parseMode as string) || 'PARSE').toUpperCase();
+
+  return (
+    <div className="space-y-4">
+      {/* 解析模式 */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">解析模式</label>
+        <div className="flex rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden text-xs font-bold">
+          <button onClick={() => onUpdate({ parseMode: 'URL_ONLY' })}
+            className={`flex-1 px-2 py-2 transition-colors ${parseMode === 'URL_ONLY' ? 'bg-brand-500 text-white' : 'bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'}`}>
+            仅传递URL
+          </button>
+          <button onClick={() => onUpdate({ parseMode: 'PARSE' })}
+            className={`flex-1 px-2 py-2 transition-colors ${parseMode === 'PARSE' ? 'bg-brand-500 text-white' : 'bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'}`}>
+            解析为文字
+          </button>
+          <button onClick={() => onUpdate({ parseMode: 'RAW_TEXT' })}
+            className={`flex-1 px-2 py-2 transition-colors ${parseMode === 'RAW_TEXT' ? 'bg-brand-500 text-white' : 'bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'}`}>
+            读取原始文本
+          </button>
+        </div>
+        <p className="text-[10px] text-gray-400 mt-1.5">
+          {parseMode === 'URL_ONLY' && '不下载文件，仅将 URL 传递给后续节点处理（适合图片、视频等）'}
+          {parseMode === 'PARSE' && '自动识别文件类型并提取文字内容（支持 PDF/DOCX/TXT/MD/HTML/CSV/JSON 等）'}
+          {parseMode === 'RAW_TEXT' && '通过 OSS 直接读取文件原始文本（适合纯文本文件，可指定编码）'}
+        </p>
+      </div>
+
+      {/* 文件来源模式切换 */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">文件来源</label>
+        <div className="flex rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden text-xs font-bold">
+          <button onClick={() => { setUseVariable(false); onUpdate({ fileUrlVariable: '' }); }}
+            className={`flex-1 px-3 py-2 transition-colors ${!useVariable ? 'bg-brand-500 text-white' : 'bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'}`}>
+            直接指定 URL
+          </button>
+          <button onClick={() => { setUseVariable(true); onUpdate({ fileUrl: '' }); }}
+            className={`flex-1 px-3 py-2 transition-colors ${useVariable ? 'bg-brand-500 text-white' : 'bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'}`}>
+            从上游变量获取
+          </button>
+        </div>
+      </div>
+
+      {/* URL / 变量选择 */}
+      {useVariable ? (
+        <ConfigField label="文件URL变量">
+          {upstreamVars.length > 0 ? (
+            <select value={(config.fileUrlVariable as string) || ''} onChange={(e) => onUpdate({ fileUrlVariable: e.target.value })} className={selectClass}>
+              <option value="">选择包含文件URL的变量...</option>
+              {upstreamVars.map((v, i) => <option key={i} value={v.value}>{v.label}</option>)}
+            </select>
+          ) : (
+            <input type="text" value={(config.fileUrlVariable as string) || ''} onChange={(e) => onUpdate({ fileUrlVariable: e.target.value })}
+              placeholder="输入包含文件URL的变量名" className={inputClass} />
+          )}
+          <p className="text-[10px] text-gray-400 mt-1">从上游节点的输出变量中获取文件 URL</p>
+        </ConfigField>
+      ) : (
+        <ConfigField label="文件 URL">
+          <input type="text" value={(config.fileUrl as string) || ''} onChange={(e) => onUpdate({ fileUrl: e.target.value })}
+            placeholder="https://your-bucket.oss-cn-xxx.aliyuncs.com/path/file.pdf" className={inputClass} />
+          <p className="text-[10px] text-gray-400 mt-1">文件的完整 URL（OSS 或任意可访问地址），支持 {'{{变量名}}'} 占位符</p>
+        </ConfigField>
+      )}
+
+      {/* RAW_TEXT 模式下的编码选择 */}
+      {parseMode === 'RAW_TEXT' && (
+        <ConfigField label="文件编码">
+          <select value={(config.encoding as string) || 'UTF-8'} onChange={(e) => onUpdate({ encoding: e.target.value })} className={selectClass}>
+            {ENCODING_OPTIONS.map((e) => <option key={e.value} value={e.value}>{e.label}</option>)}
+          </select>
+        </ConfigField>
+      )}
+
+      {/* 输出变量名 */}
+      <ConfigField label="输出变量名">
+        <input type="text" value={(config.outputVariable as string) || 'fileContent'} onChange={(e) => onUpdate({ outputVariable: e.target.value })}
+          placeholder="fileContent" className={`${inputClass} font-mono`} />
+        <p className="text-[10px] text-gray-400 mt-1">
+          {parseMode === 'URL_ONLY' ? '文件URL存入此变量' : '文件内容存入此变量'}
+        </p>
+      </ConfigField>
+
+      {/* 提示 */}
+      <div className="p-2.5 bg-cyan-50 dark:bg-cyan-900/10 rounded-lg border border-cyan-200 dark:border-cyan-800/50">
+        <p className="text-[10px] text-cyan-700 dark:text-cyan-400 leading-relaxed">
+          {parseMode === 'URL_ONLY' && (
+            <>
+              <b>仅传递URL：</b>不下载和解析文件，将URL传递给后续节点。<br />
+              <b>适用场景：</b>图片传给 LLM 视觉模型、视频/音频传给处理节点等。<br />
+              <b>输出：</b><code className="bg-cyan-100 dark:bg-cyan-900/30 px-1 rounded">fileUrl</code>、
+              <code className="bg-cyan-100 dark:bg-cyan-900/30 px-1 rounded">fileName</code>、
+              <code className="bg-cyan-100 dark:bg-cyan-900/30 px-1 rounded">fileExtension</code>
+            </>
+          )}
+          {parseMode === 'PARSE' && (
+            <>
+              <b>文档解析：</b>自动识别文件类型，提取文字内容。<br />
+              <b>支持格式：</b>PDF、DOCX、TXT、MD、HTML、CSV、JSON、XML 等。<br />
+              <b>输出：</b><code className="bg-cyan-100 dark:bg-cyan-900/30 px-1 rounded">{'{{outputVariable}}'}</code>（提取的文字）、
+              <code className="bg-cyan-100 dark:bg-cyan-900/30 px-1 rounded">documentType</code>、
+              <code className="bg-cyan-100 dark:bg-cyan-900/30 px-1 rounded">title</code>、
+              <code className="bg-cyan-100 dark:bg-cyan-900/30 px-1 rounded">pageCount</code>、
+              <code className="bg-cyan-100 dark:bg-cyan-900/30 px-1 rounded">fileSize</code>
+            </>
+          )}
+          {parseMode === 'RAW_TEXT' && (
+            <>
+              <b>原始文本读取：</b>通过 OSS 直接读取文件的原始文本内容。<br />
+              <b>适用场景：</b>纯文本文件，需要保留原始格式和编码。<br />
+              <b>输出：</b><code className="bg-cyan-100 dark:bg-cyan-900/30 px-1 rounded">{'{{outputVariable}}'}</code>（原始文本）、
+              <code className="bg-cyan-100 dark:bg-cyan-900/30 px-1 rounded">fileUrl</code>、
+              <code className="bg-cyan-100 dark:bg-cyan-900/30 px-1 rounded">fileSize</code>
+            </>
+          )}
+        </p>
+      </div>
+    </div>
+  );
+};
+
+// ===== 文件写入配置 =====
+const FileWriteConfig: React.FC<{ config: Record<string, unknown>; onUpdate: (c: Record<string, unknown>) => void }> = ({ config, onUpdate }) => {
+  const upstreamVars = useUpstreamVars();
+
+  // 切换内容来源：变量引用 / 直接输入
+  const hasContentVar = !!(config.contentVariable as string);
+  const [useVariable, setUseVariable] = useState(hasContentVar);
+
+  return (
+    <div className="space-y-4">
+      {/* 内容来源模式切换 */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">写入内容来源</label>
+        <div className="flex rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden text-xs font-bold">
+          <button onClick={() => { setUseVariable(true); onUpdate({ content: '' }); }}
+            className={`flex-1 px-3 py-2 transition-colors ${useVariable ? 'bg-brand-500 text-white' : 'bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'}`}>
+            从上游变量获取
+          </button>
+          <button onClick={() => { setUseVariable(false); onUpdate({ contentVariable: '' }); }}
+            className={`flex-1 px-3 py-2 transition-colors ${!useVariable ? 'bg-brand-500 text-white' : 'bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'}`}>
+            直接输入内容
+          </button>
+        </div>
+      </div>
+
+      {/* 内容来源 */}
+      {useVariable ? (
+        <ConfigField label="内容变量">
+          {upstreamVars.length > 0 ? (
+            <select value={(config.contentVariable as string) || ''} onChange={(e) => onUpdate({ contentVariable: e.target.value })} className={selectClass}>
+              <option value="">选择包含文件内容的变量...</option>
+              {upstreamVars.map((v, i) => <option key={i} value={v.value}>{v.label}</option>)}
+            </select>
+          ) : (
+            <input type="text" value={(config.contentVariable as string) || ''} onChange={(e) => onUpdate({ contentVariable: e.target.value })}
+              placeholder="输入包含写入内容的变量名" className={inputClass} />
+          )}
+          <p className="text-[10px] text-gray-400 mt-1">从上游节点的输出变量获取要写入的文本内容</p>
+        </ConfigField>
+      ) : (
+        <ConfigField label="写入内容">
+          <textarea value={(config.content as string) || ''} onChange={(e) => onUpdate({ content: e.target.value })}
+            rows={5} placeholder={'直接输入文件内容...\n支持 {{变量名}} 引用上游变量'} className={textareaClass} />
+          {upstreamVars.length > 0 && (
+            <div className="flex flex-wrap gap-1 mt-1.5">
+              {upstreamVars.slice(0, 8).map((v, i) => (
+                <button key={i} onClick={() => onUpdate({ content: ((config.content as string) || '') + `{{${v.value}}}` })}
+                  className="px-1.5 py-0.5 text-[10px] bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800 rounded-md hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors font-mono"
+                  title={`插入 {{${v.value}}}`}>
+                  +{v.value}
+                </button>
+              ))}
+            </div>
+          )}
+        </ConfigField>
+      )}
+
+      {/* 文件名 */}
+      <ConfigField label="文件名">
+        <input type="text" value={(config.fileName as string) || 'output.txt'} onChange={(e) => onUpdate({ fileName: e.target.value })}
+          placeholder="output.txt" className={inputClass} />
+        <p className="text-[10px] text-gray-400 mt-1">输出文件的名称，支持 {'{{变量名}}'} 占位符</p>
+      </ConfigField>
+
+      {/* 编码 */}
+      <ConfigField label="文件编码">
+        <select value={(config.encoding as string) || 'UTF-8'} onChange={(e) => onUpdate({ encoding: e.target.value })} className={selectClass}>
+          {ENCODING_OPTIONS.map((e) => <option key={e.value} value={e.value}>{e.label}</option>)}
+        </select>
+      </ConfigField>
+
+      {/* 追加模式 */}
+      <div className="space-y-2">
+        <ConfigCheckbox checked={(config.append as boolean) || false}
+          onChange={(v) => onUpdate({ append: v })}
+          label="追加模式（将新内容追加到已有文件末尾）" />
+        {(config.append as boolean) && (
+          <ConfigField label="追加目标文件URL变量">
+            {upstreamVars.length > 0 ? (
+              <select value={(config.appendToUrlVariable as string) || ''} onChange={(e) => onUpdate({ appendToUrlVariable: e.target.value })} className={selectClass}>
+                <option value="">选择包含已有文件URL的变量...</option>
+                {upstreamVars.map((v, i) => <option key={i} value={v.value}>{v.label}</option>)}
+              </select>
+            ) : (
+              <input type="text" value={(config.appendToUrlVariable as string) || ''} onChange={(e) => onUpdate({ appendToUrlVariable: e.target.value })}
+                placeholder="包含已有文件URL的变量名" className={inputClass} />
+            )}
+            <p className="text-[10px] text-gray-400 mt-1">先读取该URL文件的内容，再追加新内容后上传</p>
+          </ConfigField>
+        )}
+      </div>
+
+      {/* 提示 */}
+      <div className="p-2.5 bg-cyan-50 dark:bg-cyan-900/10 rounded-lg border border-cyan-200 dark:border-cyan-800/50">
+        <p className="text-[10px] text-cyan-700 dark:text-cyan-400 leading-relaxed">
+          <b>文件写入：</b>将文本内容上传到 OSS 对象存储，生成可访问的文件 URL。<br />
+          <b>输出变量：</b><code className="bg-cyan-100 dark:bg-cyan-900/30 px-1 rounded">fileUrl</code>（文件访问地址）、
+          <code className="bg-cyan-100 dark:bg-cyan-900/30 px-1 rounded">fileName</code>、
+          <code className="bg-cyan-100 dark:bg-cyan-900/30 px-1 rounded">fileSize</code>、
+          <code className="bg-cyan-100 dark:bg-cyan-900/30 px-1 rounded">success</code><br />
+          <b>追加模式：</b>需指定已有文件的 URL 变量，系统会先读取旧内容再拼接新内容上传。
+        </p>
       </div>
     </div>
   );

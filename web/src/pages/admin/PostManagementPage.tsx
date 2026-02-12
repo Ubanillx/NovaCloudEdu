@@ -265,7 +265,7 @@ export const PostManagementPage: React.FC = () => {
       return;
     }
     try {
-      const response = await api.deletePost({ postId: post.id });
+      const response = await apiClient.delete(`/api/posts/admin/${post.id}`);
       if (response.data.code === 0) {
         toast.success('删除成功');
         fetchPosts();

@@ -28,6 +28,7 @@ import {
   GitBranch,
   ChevronDown,
   ChevronUp,
+  Terminal,
 } from 'lucide-react';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -160,7 +161,7 @@ const AssistantFormModal: React.FC<AssistantFormModalProps> = ({ isOpen, onClose
           maxTokens: formData.maxTokens ? Number(formData.maxTokens) : undefined,
         };
         // assistant.id 运行时为字符串（雪花ID），不使用 Number() 转换
-        const response = await aiApi.update2({ id: assistant.id as unknown as number, updateAiAssistantCommand: updateData });
+        const response = await aiApi.assistantUpdate({ id: assistant.id as unknown as number, updateAiAssistantCommand: updateData });
         if (response.data.code === 0) {
           toast.success('更新成功');
           onSuccess();
@@ -184,7 +185,7 @@ const AssistantFormModal: React.FC<AssistantFormModalProps> = ({ isOpen, onClose
           maxTokens: formData.maxTokens ? Number(formData.maxTokens) : undefined,
         };
         const userId = getCurrentUserId();
-        const response = await aiApi.create2({ userId, createAiAssistantCommand: createData });
+        const response = await aiApi.assistantCreate({ userId, createAiAssistantCommand: createData });
         if (response.data.code === 0) {
           toast.success('创建成功');
           onSuccess();
@@ -626,7 +627,7 @@ const KnowledgeBaseBindModal: React.FC<KnowledgeBaseBindModalProps> = ({ isOpen,
       setLoading(true);
       try {
         const userId = getCurrentUserId();
-        const response = await defaultApi.listByCreator({ userId, page: 0, size: 100 });
+        const response = await defaultApi.kbListByCreator({ userId, page: 0, size: 100 });
         if (response.data.code === 0) {
           setAllKbs(response.data.data || []);
         }
@@ -643,7 +644,7 @@ const KnowledgeBaseBindModal: React.FC<KnowledgeBaseBindModalProps> = ({ isOpen,
     if (!assistant?.id) return;
     setBindingId(kbId);
     try {
-      const response = await aiApi.bindKnowledgeBase({
+      const response = await aiApi.assistantBindKnowledgeBase({
         id: assistant.id as unknown as number,
         kbId: kbId as unknown as number,
       });
@@ -664,7 +665,7 @@ const KnowledgeBaseBindModal: React.FC<KnowledgeBaseBindModalProps> = ({ isOpen,
     if (!assistant?.id) return;
     setBindingId(kbId);
     try {
-      const response = await aiApi.unbindKnowledgeBase({
+      const response = await aiApi.assistantUnbindKnowledgeBase({
         id: assistant.id as unknown as number,
         kbId: kbId as unknown as number,
       });
@@ -826,7 +827,7 @@ const WorkflowSkillBindModal: React.FC<WorkflowSkillBindModalProps> = ({ isOpen,
         // 并行加载：所有工作流 + 已绑定技能详情
         const [workflowsRes, skillsRes] = await Promise.all([
           defaultApi.listByUser({ userId, page: 0, size: 100 }),
-          aiApi.getWorkflowSkills({ id: assistant.id as unknown as number }),
+          aiApi.assistantGetWorkflowSkills({ id: assistant.id as unknown as number }),
         ]);
         if (workflowsRes.data.code === 0) {
           setAllWorkflows(workflowsRes.data.data || []);
@@ -847,14 +848,14 @@ const WorkflowSkillBindModal: React.FC<WorkflowSkillBindModalProps> = ({ isOpen,
     if (!assistant?.id) return;
     setBindingId(workflowId);
     try {
-      const response = await aiApi.bindWorkflow({
+      const response = await aiApi.assistantBindWorkflow({
         id: assistant.id as unknown as number,
         workflowId: workflowId as unknown as number,
       });
       if (response.data.code === 0) {
         toast.success('绑定成功');
         // 重新加载技能详情
-        const skillsRes = await aiApi.getWorkflowSkills({ id: assistant.id as unknown as number });
+        const skillsRes = await aiApi.assistantGetWorkflowSkills({ id: assistant.id as unknown as number });
         if (skillsRes.data.code === 0) {
           setBoundSkills(skillsRes.data.data || []);
         }
@@ -873,7 +874,7 @@ const WorkflowSkillBindModal: React.FC<WorkflowSkillBindModalProps> = ({ isOpen,
     if (!assistant?.id) return;
     setBindingId(workflowId);
     try {
-      const response = await aiApi.unbindWorkflow({
+      const response = await aiApi.assistantUnbindWorkflow({
         id: assistant.id as unknown as number,
         workflowId: workflowId as unknown as number,
       });
@@ -1078,6 +1079,233 @@ const WorkflowSkillBindModal: React.FC<WorkflowSkillBindModalProps> = ({ isOpen,
           >
             完成
           </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ======================== MCP 服务器绑定管理弹窗组件 ========================
+interface McpServerBindModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSuccess: () => void;
+  assistant: AiAssistantVO | null;
+}
+
+interface McpServerItem {
+  id: number;
+  name: string;
+  description?: string;
+  url?: string;
+  configJson?: string;
+  enabled?: boolean;
+}
+
+const McpServerBindModal: React.FC<McpServerBindModalProps> = ({ isOpen, onClose, onSuccess, assistant }) => {
+  const [allServers, setAllServers] = useState<McpServerItem[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
+  // 初始化已绑定的 ID
+  useEffect(() => {
+    if (!isOpen || !assistant) return;
+    const boundIds = new Set<string>((assistant.mcpServerIds || []).map((id: number) => String(id)));
+    setSelectedIds(boundIds);
+  }, [isOpen, assistant]);
+
+  // 加载所有 MCP 服务器
+  useEffect(() => {
+    if (!isOpen) return;
+    const fetchServers = async () => {
+      setLoading(true);
+      try {
+        const userId = getCurrentUserId();
+        const res = await apiClient.get(`/api/ai/mcp-servers?userId=${userId}`);
+        if (res.data.code === 0) {
+          setAllServers(res.data.data || []);
+        }
+      } catch (error: any) {
+        toast.error(error?.response?.data?.message || '获取 MCP 服务器列表失败');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchServers();
+  }, [isOpen]);
+
+  const toggleServer = (serverId: number) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      const key = String(serverId);
+      if (next.has(key)) {
+        next.delete(key);
+      } else {
+        next.add(key);
+      }
+      return next;
+    });
+  };
+
+  const handleSave = async () => {
+    if (!assistant?.id) return;
+    setSaving(true);
+    try {
+      // mcpServerIds 是雪花 ID，运行时为字符串，使用 as unknown as number 断言
+      const mcpServerIds = Array.from(selectedIds).map(id => id as unknown as number);
+      const res = await aiApi.assistantUpdate({
+        id: assistant.id as unknown as number,
+        updateAiAssistantCommand: { mcpServerIds },
+      });
+      if (res.data.code === 0) {
+        toast.success('MCP 服务器绑定已更新');
+        onSuccess();
+        onClose();
+      } else {
+        toast.error(res.data.message || '更新失败');
+      }
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || '更新失败');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // 解析传输方式
+  const getTransportInfo = (server: McpServerItem) => {
+    try {
+      let cfg = JSON.parse(server.configJson || '{}');
+      if (cfg.mcpServers && typeof cfg.mcpServers === 'object') {
+        const keys = Object.keys(cfg.mcpServers);
+        if (keys.length > 0) cfg = cfg.mcpServers[keys[0]];
+      }
+      if (cfg.command) {
+        return { type: 'stdio' as const, label: `${cfg.command} ${(cfg.args || []).join(' ')}` };
+      }
+      return { type: 'http' as const, label: server.url || cfg.url || '-' };
+    } catch {
+      return { type: 'http' as const, label: server.url || '-' };
+    }
+  };
+
+  if (!isOpen || !assistant) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden animate-in zoom-in-95 duration-200 max-h-[80vh] flex flex-col">
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800">
+          <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+            <Terminal size={20} className="text-emerald-600" />
+            MCP 服务器绑定
+          </h3>
+          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+            <X size={20} />
+          </button>
+        </div>
+
+        {/* 当前助手信息 */}
+        <div className="px-6 py-3 bg-gray-50/50 dark:bg-gray-800/30 border-b border-gray-100 dark:border-gray-800">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-indigo-600 flex items-center justify-center shadow-sm">
+              <Bot size={16} className="text-white" />
+            </div>
+            <div>
+              <p className="text-sm font-bold text-gray-900 dark:text-white">{assistant.name}</p>
+              <p className="text-[10px] text-gray-400">已选择 {selectedIds.size} 个 MCP 服务器</p>
+            </div>
+          </div>
+        </div>
+
+        {/* MCP 服务器列表 */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-2">
+          {loading ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 size={24} className="animate-spin text-brand-500" />
+            </div>
+          ) : allServers.length === 0 ? (
+            <div className="flex flex-col items-center py-12">
+              <Terminal size={32} className="text-gray-300 dark:text-gray-600 mb-3" />
+              <p className="text-sm text-gray-500 dark:text-gray-400">暂无可用 MCP 服务器</p>
+              <p className="text-xs text-gray-400 mt-1">请先在 MCP 服务器管理中添加服务器</p>
+            </div>
+          ) : (
+            allServers.map((server) => {
+              const isSelected = selectedIds.has(String(server.id));
+              const transport = getTransportInfo(server);
+              return (
+                <button
+                  key={server.id}
+                  type="button"
+                  onClick={() => toggleServer(server.id)}
+                  className={`w-full flex items-center justify-between p-3 rounded-xl border transition-all text-left ${
+                    isSelected
+                      ? 'bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800/40'
+                      : 'bg-white dark:bg-gray-800/50 border-gray-100 dark:border-gray-700 hover:border-gray-200 dark:hover:border-gray-600'
+                  }`}
+                >
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                    <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                      isSelected
+                        ? 'bg-emerald-100 dark:bg-emerald-900/30'
+                        : 'bg-gray-100 dark:bg-gray-700'
+                    }`}>
+                      <Terminal size={16} className={isSelected ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400'} />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{server.name}</p>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${
+                          transport.type === 'stdio'
+                            ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400'
+                            : 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
+                        }`}>
+                          {transport.type === 'stdio' ? 'stdio' : 'HTTP'}
+                        </span>
+                        <span className="text-[10px] text-gray-400 truncate max-w-[200px] font-mono">{transport.label}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 ml-3 transition-all ${
+                    isSelected
+                      ? 'bg-emerald-500 border-emerald-500'
+                      : 'border-gray-300 dark:border-gray-600'
+                  }`}>
+                    {isSelected && (
+                      <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    )}
+                  </div>
+                </button>
+              );
+            })
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="flex items-center justify-between px-6 py-3 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/50">
+          <p className="text-xs text-gray-400">
+            绑定 MCP 服务器后，助手对话时可调用外部工具
+          </p>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={onClose}
+              className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+            >
+              取消
+            </button>
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              className="px-4 py-2 bg-emerald-600 text-white text-sm font-bold rounded-xl hover:bg-emerald-700 shadow-lg shadow-emerald-600/20 disabled:opacity-50 transition-all active:scale-95 flex items-center gap-2"
+            >
+              {saving && <Loader2 size={14} className="animate-spin" />}
+              保存绑定
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -1538,6 +1766,8 @@ export const AiAssistantManagementPage: React.FC = () => {
   const [kbBindAssistant, setKbBindAssistant] = useState<AiAssistantVO | null>(null);
   const [wfBindOpen, setWfBindOpen] = useState(false);
   const [wfBindAssistant, setWfBindAssistant] = useState<AiAssistantVO | null>(null);
+  const [mcpBindOpen, setMcpBindOpen] = useState(false);
+  const [mcpBindAssistant, setMcpBindAssistant] = useState<AiAssistantVO | null>(null);
   const [searchKeyword, setSearchKeyword] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
@@ -1549,10 +1779,10 @@ export const AiAssistantManagementPage: React.FC = () => {
     try {
       let response;
       if (searchKeyword.trim()) {
-        response = await aiApi.search1({ keyword: searchKeyword, page, size: pageSize });
+        response = await aiApi.assistantSearch({ keyword: searchKeyword, page, size: pageSize });
       } else {
         const userId = getCurrentUserId();
-        response = await aiApi.listByCreator1({ userId, page, size: pageSize });
+        response = await aiApi.assistantListByCreator({ userId, page, size: pageSize });
       }
       if (response.data.code === 0) {
         let list = response.data.data || [];
@@ -1589,7 +1819,7 @@ export const AiAssistantManagementPage: React.FC = () => {
     if (!window.confirm(`确定要删除助手「${assistant.name}」吗？此操作不可恢复。`)) return;
 
     try {
-      const response = await aiApi.delete2({ id: assistant.id as unknown as number });
+      const response = await aiApi.assistantDelete({ id: assistant.id as unknown as number });
       if (response.data.code === 0) {
         toast.success('删除成功');
         fetchAssistants();
@@ -1604,7 +1834,7 @@ export const AiAssistantManagementPage: React.FC = () => {
   const handlePublish = async (assistant: AiAssistantVO) => {
     if (!assistant.id) return;
     try {
-      const response = await aiApi.publish({ id: assistant.id as unknown as number });
+      const response = await aiApi.assistantPublish({ id: assistant.id as unknown as number });
       if (response.data.code === 0) {
         toast.success('发布成功');
         fetchAssistants();
@@ -1619,7 +1849,7 @@ export const AiAssistantManagementPage: React.FC = () => {
   const handleArchive = async (assistant: AiAssistantVO) => {
     if (!assistant.id) return;
     try {
-      const response = await aiApi.archive({ id: assistant.id as unknown as number });
+      const response = await aiApi.assistantArchive({ id: assistant.id as unknown as number });
       if (response.data.code === 0) {
         toast.success('归档成功');
         fetchAssistants();
@@ -1634,7 +1864,7 @@ export const AiAssistantManagementPage: React.FC = () => {
   const handleTogglePublic = async (assistant: AiAssistantVO) => {
     if (!assistant.id) return;
     try {
-      const response = await aiApi.update2({
+      const response = await aiApi.assistantUpdate({
         id: assistant.id as unknown as number,
         updateAiAssistantCommand: { isPublic: !assistant.isPublic },
       });
@@ -1871,6 +2101,17 @@ export const AiAssistantManagementPage: React.FC = () => {
                           <GitBranch size={18} />
                         </button>
                         <button
+                          onClick={() => { setMcpBindAssistant(assistant); setMcpBindOpen(true); }}
+                          className={`p-2 rounded-lg transition-all ${
+                            assistant.mcpServerIds && assistant.mcpServerIds.length > 0
+                              ? 'text-emerald-500 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-900/20'
+                              : 'text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20'
+                          }`}
+                          title={`MCP 服务器 (${assistant.mcpServerIds?.length || 0})`}
+                        >
+                          <Terminal size={18} />
+                        </button>
+                        <button
                           onClick={() => { setEditingAssistant(assistant); setModalOpen(true); }}
                           className="p-2 text-gray-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded-lg transition-all"
                           title="编辑"
@@ -1988,6 +2229,14 @@ export const AiAssistantManagementPage: React.FC = () => {
         onClose={() => { setWfBindOpen(false); setWfBindAssistant(null); }}
         onSuccess={fetchAssistants}
         assistant={wfBindAssistant}
+      />
+
+      {/* MCP 服务器绑定弹窗 */}
+      <McpServerBindModal
+        isOpen={mcpBindOpen}
+        onClose={() => { setMcpBindOpen(false); setMcpBindAssistant(null); }}
+        onSuccess={fetchAssistants}
+        assistant={mcpBindAssistant}
       />
 
       {/* 测试对话弹窗 */}
