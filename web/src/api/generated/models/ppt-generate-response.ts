@@ -14,9 +14,21 @@
 
 
 
-export * from './api/default-api';
-export * from './api/aiapi';
-export * from './api/mcpapi';
-export * from './api/pptapi';
-export * from './api/webhook-api';
+/**
+ * PPT生成结果
+ */
+export interface PptGenerateResponse {
+    /**
+     * 生成的PPTX文件URL
+     */
+    'fileUrl'?: string;
+    /**
+     * 文件名
+     */
+    'fileName'?: string;
+    /**
+     * 页数
+     */
+    'slideCount'?: number;
+}
 

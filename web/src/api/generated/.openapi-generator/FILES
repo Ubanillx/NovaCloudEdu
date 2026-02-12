@@ -3,6 +3,8 @@
 api.ts
 api/aiapi.ts
 api/default-api.ts
+api/mcpapi.ts
+api/pptapi.ts
 api/webhook-api.ts
 base.ts
 common.ts
@@ -112,6 +114,7 @@ docs/BaseResponseListMessageReadUserResponse.md
 docs/BaseResponseListNodeTypeResponse.md
 docs/BaseResponseListOrderResponse.md
 docs/BaseResponseListPostResponse.md
+docs/BaseResponseListPptTemplateListResponse.md
 docs/BaseResponseListProgressResponse.md
 docs/BaseResponseListScraperConfigResponse.md
 docs/BaseResponseListSectionResponse.md
@@ -142,6 +145,8 @@ docs/BaseResponsePageResponseClassMemberResponse.md
 docs/BaseResponsePostDetailResponse.md
 docs/BaseResponsePostPageResponse.md
 docs/BaseResponsePostResponse.md
+docs/BaseResponsePptGenerateResponse.md
+docs/BaseResponsePptTemplateDetailResponse.md
 docs/BaseResponseProgressResponse.md
 docs/BaseResponseReadingQuiz.md
 docs/BaseResponseReadingStats.md
@@ -266,6 +271,7 @@ docs/FriendRequestListDTO.md
 docs/FriendRequestPageResponse.md
 docs/FriendRequestResponse.md
 docs/FriendResponse.md
+docs/GeneratePptRequest.md
 docs/GroupId.md
 docs/GroupMemberResponse.md
 docs/GroupMessageItem.md
@@ -282,6 +288,7 @@ docs/KnowledgePoint.md
 docs/KnowledgePointId.md
 docs/LearningStats.md
 docs/LoginUserResponse.md
+docs/MCPApi.md
 docs/MemberPage.md
 docs/MessageReadUserResponse.md
 docs/NodeExecutionDTO.md
@@ -289,6 +296,7 @@ docs/NodeTypeResponse.md
 docs/OptionDTO.md
 docs/OrderResponse.md
 docs/OrderStatistics.md
+docs/PPTApi.md
 docs/PageResponseClassMemberResponse.md
 docs/PhoneLoginRequest.md
 docs/Position.md
@@ -296,6 +304,10 @@ docs/PositionDTO.md
 docs/PostDetailResponse.md
 docs/PostPageResponse.md
 docs/PostResponse.md
+docs/PptGenerateResponse.md
+docs/PptGenerationRequest.md
+docs/PptTemplateDetailResponse.md
+docs/PptTemplateListResponse.md
 docs/PreviewAiProcessRequest.md
 docs/ProgressResponse.md
 docs/QueryAnnouncementRequest.md
@@ -368,6 +380,7 @@ docs/UpdateWorkflowDefinitionRequest.md
 docs/UpdateWorkflowRequest.md
 docs/UpdateWorkflowSettingsRequest.md
 docs/UploadBookCommand.md
+docs/UploadTemplateRequest.md
 docs/UserAnnouncementPageResponse.md
 docs/UserDailyArticleResponse.md
 docs/UserDailyWordResponse.md
@@ -508,6 +521,7 @@ models/base-response-list-message-read-user-response.ts
 models/base-response-list-node-type-response.ts
 models/base-response-list-order-response.ts
 models/base-response-list-post-response.ts
+models/base-response-list-ppt-template-list-response.ts
 models/base-response-list-progress-response.ts
 models/base-response-list-scraper-config-response.ts
 models/base-response-list-section-response.ts
@@ -538,6 +552,8 @@ models/base-response-page-response-class-member-response.ts
 models/base-response-post-detail-response.ts
 models/base-response-post-page-response.ts
 models/base-response-post-response.ts
+models/base-response-ppt-generate-response.ts
+models/base-response-ppt-template-detail-response.ts
 models/base-response-progress-response.ts
 models/base-response-reading-quiz.ts
 models/base-response-reading-stats.ts
@@ -661,6 +677,7 @@ models/friend-request-list-dto.ts
 models/friend-request-page-response.ts
 models/friend-request-response.ts
 models/friend-response.ts
+models/generate-ppt-request.ts
 models/group-id.ts
 models/group-member-response.ts
 models/group-message-item.ts
@@ -692,6 +709,10 @@ models/position.ts
 models/post-detail-response.ts
 models/post-page-response.ts
 models/post-response.ts
+models/ppt-generate-response.ts
+models/ppt-generation-request.ts
+models/ppt-template-detail-response.ts
+models/ppt-template-list-response.ts
 models/preview-ai-process-request.ts
 models/progress-response.ts
 models/query-announcement-request.ts
@@ -764,6 +785,7 @@ models/update-workflow-definition-request.ts
 models/update-workflow-request.ts
 models/update-workflow-settings-request.ts
 models/upload-book-command.ts
+models/upload-template-request.ts
 models/user-announcement-page-response.ts
 models/user-daily-article-response.ts
 models/user-daily-word-response.ts

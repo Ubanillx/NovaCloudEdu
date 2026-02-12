@@ -29,5 +29,6 @@ export interface UpdateAiAssistantCommand {
     'maxTokens'?: number;
     'isPublic'?: boolean;
     'sort'?: number;
+    'mcpServerIds'?: Array<number>;
 }
 

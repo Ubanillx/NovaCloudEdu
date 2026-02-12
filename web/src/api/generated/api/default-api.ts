@@ -632,56 +632,6 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
-         * @summary 添加文档
-         * @param {number} id 
-         * @param {number} userId 
-         * @param {{ [key: string]: object; }} requestBody 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        addDocument: async (id: number, userId: number, requestBody: { [key: string]: object; }, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'id' is not null or undefined
-            assertParamExists('addDocument', 'id', id)
-            // verify required parameter 'userId' is not null or undefined
-            assertParamExists('addDocument', 'userId', userId)
-            // verify required parameter 'requestBody' is not null or undefined
-            assertParamExists('addDocument', 'requestBody', requestBody)
-            const localVarPath = `/api/ai/knowledge-bases/{id}/documents`
-                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication Bearer Token required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            if (userId !== undefined) {
-                localVarQueryParameter['userId'] = userId;
-            }
-
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-            localVarHeaderParameter['Accept'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(requestBody, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
          * @summary 添加连接线
          * @param {number} id 工作流ID
          * @param {AddEdgeRequest} addEdgeRequest 
@@ -979,6 +929,44 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
+         * @summary 管理员删除帖子
+         * @param {number} postId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        adminDeletePost: async (postId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'postId' is not null or undefined
+            assertParamExists('adminDeletePost', 'postId', postId)
+            const localVarPath = `/api/posts/admin/{postId}`
+                .replace(`{${"postId"}}`, encodeURIComponent(String(postId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary 申请成为讲师
          * @param {ApplyTeacherRequest} applyTeacherRequest 
          * @param {*} [options] Override http request option.
@@ -1064,9 +1052,9 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        archive1: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        archive: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
-            assertParamExists('archive1', 'id', id)
+            assertParamExists('archive', 'id', id)
             const localVarPath = `/api/workflows/{id}/archive`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -1167,130 +1155,6 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(batchCreateUserRequest, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @summary 向量化知识库所有待处理文档
-         * @param {number} id 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        batchProcessByKnowledgeBase: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'id' is not null or undefined
-            assertParamExists('batchProcessByKnowledgeBase', 'id', id)
-            const localVarPath = `/api/ai/knowledge-bases/{id}/embed-all`
-                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication Bearer Token required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            localVarHeaderParameter['Accept'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @summary 批量文档向量化
-         * @param {number} id 
-         * @param {Array<number>} requestBody 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        batchProcessDocuments: async (id: number, requestBody: Array<number>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'id' is not null or undefined
-            assertParamExists('batchProcessDocuments', 'id', id)
-            // verify required parameter 'requestBody' is not null or undefined
-            assertParamExists('batchProcessDocuments', 'requestBody', requestBody)
-            const localVarPath = `/api/ai/knowledge-bases/{id}/documents/batch-embed`
-                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication Bearer Token required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-            localVarHeaderParameter['Accept'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(requestBody, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @summary 异步批量文档向量化
-         * @param {number} id 
-         * @param {Array<number>} requestBody 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        batchProcessDocumentsAsync: async (id: number, requestBody: Array<number>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'id' is not null or undefined
-            assertParamExists('batchProcessDocumentsAsync', 'id', id)
-            // verify required parameter 'requestBody' is not null or undefined
-            assertParamExists('batchProcessDocumentsAsync', 'requestBody', requestBody)
-            const localVarPath = `/api/ai/knowledge-bases/{id}/documents/batch-embed-async`
-                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication Bearer Token required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-            localVarHeaderParameter['Accept'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(requestBody, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -1855,52 +1719,6 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(createWorkflowRequest, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @summary 创建知识库
-         * @param {number} userId 
-         * @param {CreateKnowledgeBaseCommand} createKnowledgeBaseCommand 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        create1: async (userId: number, createKnowledgeBaseCommand: CreateKnowledgeBaseCommand, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'userId' is not null or undefined
-            assertParamExists('create1', 'userId', userId)
-            // verify required parameter 'createKnowledgeBaseCommand' is not null or undefined
-            assertParamExists('create1', 'createKnowledgeBaseCommand', createKnowledgeBaseCommand)
-            const localVarPath = `/api/ai/knowledge-bases`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication Bearer Token required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            if (userId !== undefined) {
-                localVarQueryParameter['userId'] = userId;
-            }
-
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-            localVarHeaderParameter['Accept'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(createKnowledgeBaseCommand, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -2904,44 +2722,6 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * 
-         * @summary 删除知识库
-         * @param {number} id 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        delete1: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'id' is not null or undefined
-            assertParamExists('delete1', 'id', id)
-            const localVarPath = `/api/ai/knowledge-bases/{id}`
-                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication Bearer Token required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            localVarHeaderParameter['Accept'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
          * 逻辑删除公告
          * @summary 删除公告
          * @param {number} id 
@@ -3299,48 +3079,6 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('deleteDailyWord', 'id', id)
             const localVarPath = `/api/daily-word/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication Bearer Token required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            localVarHeaderParameter['Accept'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @summary 删除文档
-         * @param {number} id 
-         * @param {number} docId 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        deleteDocument: async (id: number, docId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'id' is not null or undefined
-            assertParamExists('deleteDocument', 'id', id)
-            // verify required parameter 'docId' is not null or undefined
-            assertParamExists('deleteDocument', 'docId', docId)
-            const localVarPath = `/api/ai/knowledge-bases/{id}/documents/{docId}`
-                .replace(`{${"id"}}`, encodeURIComponent(String(id)))
-                .replace(`{${"docId"}}`, encodeURIComponent(String(docId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -4853,44 +4591,6 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             // verify required parameter 'id' is not null or undefined
             assertParamExists('getById', 'id', id)
             const localVarPath = `/api/workflows/{id}`
-                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication Bearer Token required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            localVarHeaderParameter['Accept'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @summary 获取知识库详情
-         * @param {number} id 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getById1: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'id' is not null or undefined
-            assertParamExists('getById1', 'id', id)
-            const localVarPath = `/api/ai/knowledge-bases/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -9387,6 +9087,728 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
+         * @summary 添加文档
+         * @param {number} id 
+         * @param {number} userId 
+         * @param {{ [key: string]: object; }} requestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        kbAddDocument: async (id: number, userId: number, requestBody: { [key: string]: object; }, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('kbAddDocument', 'id', id)
+            // verify required parameter 'userId' is not null or undefined
+            assertParamExists('kbAddDocument', 'userId', userId)
+            // verify required parameter 'requestBody' is not null or undefined
+            assertParamExists('kbAddDocument', 'requestBody', requestBody)
+            const localVarPath = `/api/ai/knowledge-bases/{id}/documents`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (userId !== undefined) {
+                localVarQueryParameter['userId'] = userId;
+            }
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(requestBody, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 向量化知识库所有待处理文档
+         * @param {number} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        kbBatchProcessByKnowledgeBase: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('kbBatchProcessByKnowledgeBase', 'id', id)
+            const localVarPath = `/api/ai/knowledge-bases/{id}/embed-all`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 批量文档向量化
+         * @param {number} id 
+         * @param {Array<number>} requestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        kbBatchProcessDocuments: async (id: number, requestBody: Array<number>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('kbBatchProcessDocuments', 'id', id)
+            // verify required parameter 'requestBody' is not null or undefined
+            assertParamExists('kbBatchProcessDocuments', 'requestBody', requestBody)
+            const localVarPath = `/api/ai/knowledge-bases/{id}/documents/batch-embed`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(requestBody, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 异步批量文档向量化
+         * @param {number} id 
+         * @param {Array<number>} requestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        kbBatchProcessDocumentsAsync: async (id: number, requestBody: Array<number>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('kbBatchProcessDocumentsAsync', 'id', id)
+            // verify required parameter 'requestBody' is not null or undefined
+            assertParamExists('kbBatchProcessDocumentsAsync', 'requestBody', requestBody)
+            const localVarPath = `/api/ai/knowledge-bases/{id}/documents/batch-embed-async`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(requestBody, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 创建知识库
+         * @param {number} userId 
+         * @param {CreateKnowledgeBaseCommand} createKnowledgeBaseCommand 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        kbCreate: async (userId: number, createKnowledgeBaseCommand: CreateKnowledgeBaseCommand, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'userId' is not null or undefined
+            assertParamExists('kbCreate', 'userId', userId)
+            // verify required parameter 'createKnowledgeBaseCommand' is not null or undefined
+            assertParamExists('kbCreate', 'createKnowledgeBaseCommand', createKnowledgeBaseCommand)
+            const localVarPath = `/api/ai/knowledge-bases`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (userId !== undefined) {
+                localVarQueryParameter['userId'] = userId;
+            }
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(createKnowledgeBaseCommand, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 删除知识库
+         * @param {number} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        kbDelete: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('kbDelete', 'id', id)
+            const localVarPath = `/api/ai/knowledge-bases/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 删除文档
+         * @param {number} id 
+         * @param {number} docId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        kbDeleteDocument: async (id: number, docId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('kbDeleteDocument', 'id', id)
+            // verify required parameter 'docId' is not null or undefined
+            assertParamExists('kbDeleteDocument', 'docId', docId)
+            const localVarPath = `/api/ai/knowledge-bases/{id}/documents/{docId}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)))
+                .replace(`{${"docId"}}`, encodeURIComponent(String(docId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 获取知识库详情
+         * @param {number} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        kbGetById: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('kbGetById', 'id', id)
+            const localVarPath = `/api/ai/knowledge-bases/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 获取用户的知识库列表
+         * @param {number} userId 
+         * @param {number} [page] 
+         * @param {number} [size] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        kbListByCreator: async (userId: number, page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'userId' is not null or undefined
+            assertParamExists('kbListByCreator', 'userId', userId)
+            const localVarPath = `/api/ai/knowledge-bases`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (userId !== undefined) {
+                localVarQueryParameter['userId'] = userId;
+            }
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (size !== undefined) {
+                localVarQueryParameter['size'] = size;
+            }
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 获取文档分块列表
+         * @param {number} id 
+         * @param {number} docId 
+         * @param {number} [page] 
+         * @param {number} [size] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        kbListChunks: async (id: number, docId: number, page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('kbListChunks', 'id', id)
+            // verify required parameter 'docId' is not null or undefined
+            assertParamExists('kbListChunks', 'docId', docId)
+            const localVarPath = `/api/ai/knowledge-bases/{id}/documents/{docId}/chunks`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)))
+                .replace(`{${"docId"}}`, encodeURIComponent(String(docId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (size !== undefined) {
+                localVarQueryParameter['size'] = size;
+            }
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 获取文档列表
+         * @param {number} id 
+         * @param {number} [page] 
+         * @param {number} [size] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        kbListDocuments: async (id: number, page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('kbListDocuments', 'id', id)
+            const localVarPath = `/api/ai/knowledge-bases/{id}/documents`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (size !== undefined) {
+                localVarQueryParameter['size'] = size;
+            }
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 触发文档向量化
+         * @param {number} id 
+         * @param {number} docId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        kbProcessDocument: async (id: number, docId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('kbProcessDocument', 'id', id)
+            // verify required parameter 'docId' is not null or undefined
+            assertParamExists('kbProcessDocument', 'docId', docId)
+            const localVarPath = `/api/ai/knowledge-bases/{id}/documents/{docId}/embed`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)))
+                .replace(`{${"docId"}}`, encodeURIComponent(String(docId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 输入查询文本，返回向量检索+Rerank后的召回结果，用于调试知识库检索效果
+         * @summary 知识库召回测试
+         * @param {number} id 
+         * @param {{ [key: string]: object; }} requestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        kbRecallTest: async (id: number, requestBody: { [key: string]: object; }, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('kbRecallTest', 'id', id)
+            // verify required parameter 'requestBody' is not null or undefined
+            assertParamExists('kbRecallTest', 'requestBody', requestBody)
+            const localVarPath = `/api/ai/knowledge-bases/{id}/recall-test`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(requestBody, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 搜索知识库
+         * @param {string} keyword 
+         * @param {number} userId 
+         * @param {number} [page] 
+         * @param {number} [size] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        kbSearch: async (keyword: string, userId: number, page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'keyword' is not null or undefined
+            assertParamExists('kbSearch', 'keyword', keyword)
+            // verify required parameter 'userId' is not null or undefined
+            assertParamExists('kbSearch', 'userId', userId)
+            const localVarPath = `/api/ai/knowledge-bases/search`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (keyword !== undefined) {
+                localVarQueryParameter['keyword'] = keyword;
+            }
+
+            if (userId !== undefined) {
+                localVarQueryParameter['userId'] = userId;
+            }
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (size !== undefined) {
+                localVarQueryParameter['size'] = size;
+            }
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 更新知识库
+         * @param {number} id 
+         * @param {UpdateKnowledgeBaseCommand} updateKnowledgeBaseCommand 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        kbUpdate: async (id: number, updateKnowledgeBaseCommand: UpdateKnowledgeBaseCommand, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('kbUpdate', 'id', id)
+            // verify required parameter 'updateKnowledgeBaseCommand' is not null or undefined
+            assertParamExists('kbUpdate', 'updateKnowledgeBaseCommand', updateKnowledgeBaseCommand)
+            const localVarPath = `/api/ai/knowledge-bases/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(updateKnowledgeBaseCommand, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 更新文档元信息
+         * @param {number} id 
+         * @param {number} docId 
+         * @param {{ [key: string]: string; }} requestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        kbUpdateDocument: async (id: number, docId: number, requestBody: { [key: string]: string; }, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('kbUpdateDocument', 'id', id)
+            // verify required parameter 'docId' is not null or undefined
+            assertParamExists('kbUpdateDocument', 'docId', docId)
+            // verify required parameter 'requestBody' is not null or undefined
+            assertParamExists('kbUpdateDocument', 'requestBody', requestBody)
+            const localVarPath = `/api/ai/knowledge-bases/{id}/documents/{docId}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)))
+                .replace(`{${"docId"}}`, encodeURIComponent(String(docId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(requestBody, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary 退出群
          * @param {number} groupId 
          * @param {*} [options] Override http request option.
@@ -9640,57 +10062,6 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
-         * @summary 获取用户的知识库列表
-         * @param {number} userId 
-         * @param {number} [page] 
-         * @param {number} [size] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        listByCreator: async (userId: number, page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'userId' is not null or undefined
-            assertParamExists('listByCreator', 'userId', userId)
-            const localVarPath = `/api/ai/knowledge-bases`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication Bearer Token required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            if (userId !== undefined) {
-                localVarQueryParameter['userId'] = userId;
-            }
-
-            if (page !== undefined) {
-                localVarQueryParameter['page'] = page;
-            }
-
-            if (size !== undefined) {
-                localVarQueryParameter['size'] = size;
-            }
-
-            localVarHeaderParameter['Accept'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
          * @summary 获取用户的工作流列表
          * @param {number} userId 用户ID
          * @param {number} [page] 页码，从0开始
@@ -9780,58 +10151,6 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
-         * @summary 获取文档分块列表
-         * @param {number} id 
-         * @param {number} docId 
-         * @param {number} [page] 
-         * @param {number} [size] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        listChunks: async (id: number, docId: number, page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'id' is not null or undefined
-            assertParamExists('listChunks', 'id', id)
-            // verify required parameter 'docId' is not null or undefined
-            assertParamExists('listChunks', 'docId', docId)
-            const localVarPath = `/api/ai/knowledge-bases/{id}/documents/{docId}/chunks`
-                .replace(`{${"id"}}`, encodeURIComponent(String(id)))
-                .replace(`{${"docId"}}`, encodeURIComponent(String(docId)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication Bearer Token required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            if (page !== undefined) {
-                localVarQueryParameter['page'] = page;
-            }
-
-            if (size !== undefined) {
-                localVarQueryParameter['size'] = size;
-            }
-
-            localVarHeaderParameter['Accept'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
          * @summary 获取课程列表
          * @param {number} [status] 状态：0-未发布，1-已发布，2-已下架
          * @param {number} [page] 页码
@@ -9893,54 +10212,6 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('listCoursesByTeacher', 'teacherId', teacherId)
             const localVarPath = `/api/course/teacher/{teacherId}`
                 .replace(`{${"teacherId"}}`, encodeURIComponent(String(teacherId)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication Bearer Token required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            if (page !== undefined) {
-                localVarQueryParameter['page'] = page;
-            }
-
-            if (size !== undefined) {
-                localVarQueryParameter['size'] = size;
-            }
-
-            localVarHeaderParameter['Accept'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @summary 获取文档列表
-         * @param {number} id 
-         * @param {number} [page] 
-         * @param {number} [size] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        listDocuments: async (id: number, page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'id' is not null or undefined
-            assertParamExists('listDocuments', 'id', id)
-            const localVarPath = `/api/ai/knowledge-bases/{id}/documents`
-                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -10721,56 +10992,14 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
-         * @summary 触发文档向量化
-         * @param {number} id 
-         * @param {number} docId 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        processDocument: async (id: number, docId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'id' is not null or undefined
-            assertParamExists('processDocument', 'id', id)
-            // verify required parameter 'docId' is not null or undefined
-            assertParamExists('processDocument', 'docId', docId)
-            const localVarPath = `/api/ai/knowledge-bases/{id}/documents/{docId}/embed`
-                .replace(`{${"id"}}`, encodeURIComponent(String(id)))
-                .replace(`{${"docId"}}`, encodeURIComponent(String(docId)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication Bearer Token required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            localVarHeaderParameter['Accept'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
          * @summary 发布工作流
          * @param {number} id 工作流ID
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        publish1: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        publish: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
-            assertParamExists('publish1', 'id', id)
+            assertParamExists('publish', 'id', id)
             const localVarPath = `/api/workflows/{id}/publish`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -12168,64 +12397,6 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
-         * @summary 搜索知识库
-         * @param {string} keyword 
-         * @param {number} userId 
-         * @param {number} [page] 
-         * @param {number} [size] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        search: async (keyword: string, userId: number, page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'keyword' is not null or undefined
-            assertParamExists('search', 'keyword', keyword)
-            // verify required parameter 'userId' is not null or undefined
-            assertParamExists('search', 'userId', userId)
-            const localVarPath = `/api/ai/knowledge-bases/search`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication Bearer Token required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            if (keyword !== undefined) {
-                localVarQueryParameter['keyword'] = keyword;
-            }
-
-            if (userId !== undefined) {
-                localVarQueryParameter['userId'] = userId;
-            }
-
-            if (page !== undefined) {
-                localVarQueryParameter['page'] = page;
-            }
-
-            if (size !== undefined) {
-                localVarQueryParameter['size'] = size;
-            }
-
-            localVarHeaderParameter['Accept'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
          * @summary 搜索文章
          * @param {string} keyword 关键词
          * @param {number} [page] 页码
@@ -13571,49 +13742,6 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * 
-         * @summary 更新知识库
-         * @param {number} id 
-         * @param {UpdateKnowledgeBaseCommand} updateKnowledgeBaseCommand 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        update1: async (id: number, updateKnowledgeBaseCommand: UpdateKnowledgeBaseCommand, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'id' is not null or undefined
-            assertParamExists('update1', 'id', id)
-            // verify required parameter 'updateKnowledgeBaseCommand' is not null or undefined
-            assertParamExists('update1', 'updateKnowledgeBaseCommand', updateKnowledgeBaseCommand)
-            const localVarPath = `/api/ai/knowledge-bases/{id}`
-                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication Bearer Token required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-            localVarHeaderParameter['Accept'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(updateKnowledgeBaseCommand, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
          * 更新公告信息
          * @summary 更新公告
          * @param {UpdateAnnouncementRequest} updateAnnouncementRequest 
@@ -13990,53 +14118,6 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(updateWorkflowDefinitionRequest, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @summary 更新文档元信息
-         * @param {number} id 
-         * @param {number} docId 
-         * @param {{ [key: string]: string; }} requestBody 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        updateDocument: async (id: number, docId: number, requestBody: { [key: string]: string; }, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'id' is not null or undefined
-            assertParamExists('updateDocument', 'id', id)
-            // verify required parameter 'docId' is not null or undefined
-            assertParamExists('updateDocument', 'docId', docId)
-            // verify required parameter 'requestBody' is not null or undefined
-            assertParamExists('updateDocument', 'requestBody', requestBody)
-            const localVarPath = `/api/ai/knowledge-bases/{id}/documents/{docId}`
-                .replace(`{${"id"}}`, encodeURIComponent(String(id)))
-                .replace(`{${"docId"}}`, encodeURIComponent(String(docId)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication Bearer Token required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-            localVarHeaderParameter['Accept'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(requestBody, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -15088,21 +15169,6 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
-         * @summary 添加文档
-         * @param {number} id 
-         * @param {number} userId 
-         * @param {{ [key: string]: object; }} requestBody 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async addDocument(id: number, userId: number, requestBody: { [key: string]: object; }, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseKnowledgeDocumentVO>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.addDocument(id, userId, requestBody, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.addDocument']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * 
          * @summary 添加连接线
          * @param {number} id 工作流ID
          * @param {AddEdgeRequest} addEdgeRequest 
@@ -15199,6 +15265,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary 管理员删除帖子
+         * @param {number} postId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async adminDeletePost(postId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.adminDeletePost(postId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.adminDeletePost']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @summary 申请成为讲师
          * @param {ApplyTeacherRequest} applyTeacherRequest 
          * @param {*} [options] Override http request option.
@@ -15231,10 +15310,10 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async archive1(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseWorkflowResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.archive1(id, options);
+        async archive(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseWorkflowResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.archive(id, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.archive1']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.archive']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -15261,47 +15340,6 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.batchCreateUsers(batchCreateUserRequest, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.batchCreateUsers']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * 
-         * @summary 向量化知识库所有待处理文档
-         * @param {number} id 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async batchProcessByKnowledgeBase(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseBatchProcessResult>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.batchProcessByKnowledgeBase(id, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.batchProcessByKnowledgeBase']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * 
-         * @summary 批量文档向量化
-         * @param {number} id 
-         * @param {Array<number>} requestBody 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async batchProcessDocuments(id: number, requestBody: Array<number>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseBatchProcessResult>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.batchProcessDocuments(id, requestBody, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.batchProcessDocuments']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * 
-         * @summary 异步批量文档向量化
-         * @param {number} id 
-         * @param {Array<number>} requestBody 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async batchProcessDocumentsAsync(id: number, requestBody: Array<number>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseString>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.batchProcessDocumentsAsync(id, requestBody, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.batchProcessDocumentsAsync']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -15488,20 +15526,6 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.create(createWorkflowRequest, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.create']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * 
-         * @summary 创建知识库
-         * @param {number} userId 
-         * @param {CreateKnowledgeBaseCommand} createKnowledgeBaseCommand 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async create1(userId: number, createKnowledgeBaseCommand: CreateKnowledgeBaseCommand, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseKnowledgeBaseVO>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.create1(userId, createKnowledgeBaseCommand, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.create1']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -15823,19 +15847,6 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * 
-         * @summary 删除知识库
-         * @param {number} id 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async delete1(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseVoid>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.delete1(id, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.delete1']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
          * 逻辑删除公告
          * @summary 删除公告
          * @param {number} id 
@@ -15964,20 +15975,6 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.deleteDailyWord(id, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.deleteDailyWord']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * 
-         * @summary 删除文档
-         * @param {number} id 
-         * @param {number} docId 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async deleteDocument(id: number, docId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseVoid>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteDocument(id, docId, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.deleteDocument']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -16491,19 +16488,6 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getById(id, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.getById']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * 
-         * @summary 获取知识库详情
-         * @param {number} id 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async getById1(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseKnowledgeBaseVO>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getById1(id, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getById1']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -17997,6 +17981,235 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary 添加文档
+         * @param {number} id 
+         * @param {number} userId 
+         * @param {{ [key: string]: object; }} requestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async kbAddDocument(id: number, userId: number, requestBody: { [key: string]: object; }, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseKnowledgeDocumentVO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.kbAddDocument(id, userId, requestBody, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.kbAddDocument']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 向量化知识库所有待处理文档
+         * @param {number} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async kbBatchProcessByKnowledgeBase(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseBatchProcessResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.kbBatchProcessByKnowledgeBase(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.kbBatchProcessByKnowledgeBase']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 批量文档向量化
+         * @param {number} id 
+         * @param {Array<number>} requestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async kbBatchProcessDocuments(id: number, requestBody: Array<number>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseBatchProcessResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.kbBatchProcessDocuments(id, requestBody, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.kbBatchProcessDocuments']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 异步批量文档向量化
+         * @param {number} id 
+         * @param {Array<number>} requestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async kbBatchProcessDocumentsAsync(id: number, requestBody: Array<number>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseString>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.kbBatchProcessDocumentsAsync(id, requestBody, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.kbBatchProcessDocumentsAsync']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 创建知识库
+         * @param {number} userId 
+         * @param {CreateKnowledgeBaseCommand} createKnowledgeBaseCommand 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async kbCreate(userId: number, createKnowledgeBaseCommand: CreateKnowledgeBaseCommand, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseKnowledgeBaseVO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.kbCreate(userId, createKnowledgeBaseCommand, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.kbCreate']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 删除知识库
+         * @param {number} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async kbDelete(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.kbDelete(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.kbDelete']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 删除文档
+         * @param {number} id 
+         * @param {number} docId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async kbDeleteDocument(id: number, docId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.kbDeleteDocument(id, docId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.kbDeleteDocument']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 获取知识库详情
+         * @param {number} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async kbGetById(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseKnowledgeBaseVO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.kbGetById(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.kbGetById']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 获取用户的知识库列表
+         * @param {number} userId 
+         * @param {number} [page] 
+         * @param {number} [size] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async kbListByCreator(userId: number, page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseListKnowledgeBaseVO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.kbListByCreator(userId, page, size, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.kbListByCreator']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 获取文档分块列表
+         * @param {number} id 
+         * @param {number} docId 
+         * @param {number} [page] 
+         * @param {number} [size] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async kbListChunks(id: number, docId: number, page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseMapStringObject>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.kbListChunks(id, docId, page, size, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.kbListChunks']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 获取文档列表
+         * @param {number} id 
+         * @param {number} [page] 
+         * @param {number} [size] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async kbListDocuments(id: number, page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseListKnowledgeDocumentVO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.kbListDocuments(id, page, size, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.kbListDocuments']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 触发文档向量化
+         * @param {number} id 
+         * @param {number} docId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async kbProcessDocument(id: number, docId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.kbProcessDocument(id, docId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.kbProcessDocument']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 输入查询文本，返回向量检索+Rerank后的召回结果，用于调试知识库检索效果
+         * @summary 知识库召回测试
+         * @param {number} id 
+         * @param {{ [key: string]: object; }} requestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async kbRecallTest(id: number, requestBody: { [key: string]: object; }, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseMapStringObject>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.kbRecallTest(id, requestBody, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.kbRecallTest']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 搜索知识库
+         * @param {string} keyword 
+         * @param {number} userId 
+         * @param {number} [page] 
+         * @param {number} [size] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async kbSearch(keyword: string, userId: number, page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseListKnowledgeBaseVO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.kbSearch(keyword, userId, page, size, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.kbSearch']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 更新知识库
+         * @param {number} id 
+         * @param {UpdateKnowledgeBaseCommand} updateKnowledgeBaseCommand 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async kbUpdate(id: number, updateKnowledgeBaseCommand: UpdateKnowledgeBaseCommand, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseKnowledgeBaseVO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.kbUpdate(id, updateKnowledgeBaseCommand, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.kbUpdate']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 更新文档元信息
+         * @param {number} id 
+         * @param {number} docId 
+         * @param {{ [key: string]: string; }} requestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async kbUpdateDocument(id: number, docId: number, requestBody: { [key: string]: string; }, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseKnowledgeDocumentVO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.kbUpdateDocument(id, docId, requestBody, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.kbUpdateDocument']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @summary 退出群
          * @param {number} groupId 
          * @param {*} [options] Override http request option.
@@ -18079,21 +18292,6 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
-         * @summary 获取用户的知识库列表
-         * @param {number} userId 
-         * @param {number} [page] 
-         * @param {number} [size] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async listByCreator(userId: number, page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseListKnowledgeBaseVO>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listByCreator(userId, page, size, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.listByCreator']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * 
          * @summary 获取用户的工作流列表
          * @param {number} userId 用户ID
          * @param {number} [page] 页码，从0开始
@@ -18118,22 +18316,6 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.listChapters(courseId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.listChapters']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * 
-         * @summary 获取文档分块列表
-         * @param {number} id 
-         * @param {number} docId 
-         * @param {number} [page] 
-         * @param {number} [size] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async listChunks(id: number, docId: number, page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseMapStringObject>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listChunks(id, docId, page, size, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.listChunks']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -18164,21 +18346,6 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.listCoursesByTeacher(teacherId, page, size, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.listCoursesByTeacher']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * 
-         * @summary 获取文档列表
-         * @param {number} id 
-         * @param {number} [page] 
-         * @param {number} [size] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async listDocuments(id: number, page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseListKnowledgeDocumentVO>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listDocuments(id, page, size, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.listDocuments']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -18428,29 +18595,15 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
-         * @summary 触发文档向量化
-         * @param {number} id 
-         * @param {number} docId 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async processDocument(id: number, docId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseVoid>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.processDocument(id, docId, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.processDocument']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * 
          * @summary 发布工作流
          * @param {number} id 工作流ID
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async publish1(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseWorkflowResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.publish1(id, options);
+        async publish(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseWorkflowResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.publish(id, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.publish1']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.publish']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -18906,22 +19059,6 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
-         * @summary 搜索知识库
-         * @param {string} keyword 
-         * @param {number} userId 
-         * @param {number} [page] 
-         * @param {number} [size] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async search(keyword: string, userId: number, page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseListKnowledgeBaseVO>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.search(keyword, userId, page, size, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.search']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * 
          * @summary 搜索文章
          * @param {string} keyword 关键词
          * @param {number} [page] 页码
@@ -19350,20 +19487,6 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * 
-         * @summary 更新知识库
-         * @param {number} id 
-         * @param {UpdateKnowledgeBaseCommand} updateKnowledgeBaseCommand 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async update1(id: number, updateKnowledgeBaseCommand: UpdateKnowledgeBaseCommand, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseKnowledgeBaseVO>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.update1(id, updateKnowledgeBaseCommand, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.update1']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
          * 更新公告信息
          * @summary 更新公告
          * @param {UpdateAnnouncementRequest} updateAnnouncementRequest 
@@ -19486,21 +19609,6 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.updateDefinition(id, updateWorkflowDefinitionRequest, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.updateDefinition']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * 
-         * @summary 更新文档元信息
-         * @param {number} id 
-         * @param {number} docId 
-         * @param {{ [key: string]: string; }} requestBody 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async updateDocument(id: number, docId: number, requestBody: { [key: string]: string; }, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseKnowledgeDocumentVO>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.updateDocument(id, docId, requestBody, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.updateDocument']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -19872,16 +19980,6 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
-         * @summary 添加文档
-         * @param {DefaultApiAddDocumentRequest} requestParameters Request parameters.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        addDocument(requestParameters: DefaultApiAddDocumentRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseKnowledgeDocumentVO> {
-            return localVarFp.addDocument(requestParameters.id, requestParameters.userId, requestParameters.requestBody, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
          * @summary 添加连接线
          * @param {DefaultApiAddEdgeRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
@@ -19952,6 +20050,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
+         * @summary 管理员删除帖子
+         * @param {DefaultApiAdminDeletePostRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        adminDeletePost(requestParameters: DefaultApiAdminDeletePostRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid> {
+            return localVarFp.adminDeletePost(requestParameters.postId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary 申请成为讲师
          * @param {DefaultApiApplyTeacherRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
@@ -19973,12 +20081,12 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         /**
          * 
          * @summary 归档工作流
-         * @param {DefaultApiArchive1Request} requestParameters Request parameters.
+         * @param {DefaultApiArchiveRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        archive1(requestParameters: DefaultApiArchive1Request, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseWorkflowResponse> {
-            return localVarFp.archive1(requestParameters.id, options).then((request) => request(axios, basePath));
+        archive(requestParameters: DefaultApiArchiveRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseWorkflowResponse> {
+            return localVarFp.archive(requestParameters.id, options).then((request) => request(axios, basePath));
         },
         /**
          * 管理员批量封禁或解封用户
@@ -19999,36 +20107,6 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         batchCreateUsers(requestParameters: DefaultApiBatchCreateUsersRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListLong> {
             return localVarFp.batchCreateUsers(requestParameters.batchCreateUserRequest, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @summary 向量化知识库所有待处理文档
-         * @param {DefaultApiBatchProcessByKnowledgeBaseRequest} requestParameters Request parameters.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        batchProcessByKnowledgeBase(requestParameters: DefaultApiBatchProcessByKnowledgeBaseRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseBatchProcessResult> {
-            return localVarFp.batchProcessByKnowledgeBase(requestParameters.id, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @summary 批量文档向量化
-         * @param {DefaultApiBatchProcessDocumentsRequest} requestParameters Request parameters.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        batchProcessDocuments(requestParameters: DefaultApiBatchProcessDocumentsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseBatchProcessResult> {
-            return localVarFp.batchProcessDocuments(requestParameters.id, requestParameters.requestBody, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @summary 异步批量文档向量化
-         * @param {DefaultApiBatchProcessDocumentsAsyncRequest} requestParameters Request parameters.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        batchProcessDocumentsAsync(requestParameters: DefaultApiBatchProcessDocumentsAsyncRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseString> {
-            return localVarFp.batchProcessDocumentsAsync(requestParameters.id, requestParameters.requestBody, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -20168,16 +20246,6 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         create(requestParameters: DefaultApiCreateRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseWorkflowResponse> {
             return localVarFp.create(requestParameters.createWorkflowRequest, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @summary 创建知识库
-         * @param {DefaultApiCreate1Request} requestParameters Request parameters.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        create1(requestParameters: DefaultApiCreate1Request, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseKnowledgeBaseVO> {
-            return localVarFp.create1(requestParameters.userId, requestParameters.createKnowledgeBaseCommand, options).then((request) => request(axios, basePath));
         },
         /**
          * 创建新公告，初始状态为草稿
@@ -20410,16 +20478,6 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.createWebhookTrigger(requestParameters.id, requestParameters.name, requestParameters.secret, requestParameters.validateSignature, options).then((request) => request(axios, basePath));
         },
         /**
-         * 
-         * @summary 删除知识库
-         * @param {DefaultApiDelete1Request} requestParameters Request parameters.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        delete1(requestParameters: DefaultApiDelete1Request, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid> {
-            return localVarFp.delete1(requestParameters.id, options).then((request) => request(axios, basePath));
-        },
-        /**
          * 逻辑删除公告
          * @summary 删除公告
          * @param {DefaultApiDeleteAnnouncementRequest} requestParameters Request parameters.
@@ -20518,16 +20576,6 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         deleteDailyWord(requestParameters: DefaultApiDeleteDailyWordRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid> {
             return localVarFp.deleteDailyWord(requestParameters.id, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @summary 删除文档
-         * @param {DefaultApiDeleteDocumentRequest} requestParameters Request parameters.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        deleteDocument(requestParameters: DefaultApiDeleteDocumentRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid> {
-            return localVarFp.deleteDocument(requestParameters.id, requestParameters.docId, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -20914,16 +20962,6 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         getById(requestParameters: DefaultApiGetByIdRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseWorkflowResponse> {
             return localVarFp.getById(requestParameters.id, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @summary 获取知识库详情
-         * @param {DefaultApiGetById1Request} requestParameters Request parameters.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getById1(requestParameters: DefaultApiGetById1Request, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseKnowledgeBaseVO> {
-            return localVarFp.getById1(requestParameters.id, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -22026,6 +22064,166 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
+         * @summary 添加文档
+         * @param {DefaultApiKbAddDocumentRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        kbAddDocument(requestParameters: DefaultApiKbAddDocumentRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseKnowledgeDocumentVO> {
+            return localVarFp.kbAddDocument(requestParameters.id, requestParameters.userId, requestParameters.requestBody, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 向量化知识库所有待处理文档
+         * @param {DefaultApiKbBatchProcessByKnowledgeBaseRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        kbBatchProcessByKnowledgeBase(requestParameters: DefaultApiKbBatchProcessByKnowledgeBaseRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseBatchProcessResult> {
+            return localVarFp.kbBatchProcessByKnowledgeBase(requestParameters.id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 批量文档向量化
+         * @param {DefaultApiKbBatchProcessDocumentsRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        kbBatchProcessDocuments(requestParameters: DefaultApiKbBatchProcessDocumentsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseBatchProcessResult> {
+            return localVarFp.kbBatchProcessDocuments(requestParameters.id, requestParameters.requestBody, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 异步批量文档向量化
+         * @param {DefaultApiKbBatchProcessDocumentsAsyncRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        kbBatchProcessDocumentsAsync(requestParameters: DefaultApiKbBatchProcessDocumentsAsyncRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseString> {
+            return localVarFp.kbBatchProcessDocumentsAsync(requestParameters.id, requestParameters.requestBody, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 创建知识库
+         * @param {DefaultApiKbCreateRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        kbCreate(requestParameters: DefaultApiKbCreateRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseKnowledgeBaseVO> {
+            return localVarFp.kbCreate(requestParameters.userId, requestParameters.createKnowledgeBaseCommand, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 删除知识库
+         * @param {DefaultApiKbDeleteRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        kbDelete(requestParameters: DefaultApiKbDeleteRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid> {
+            return localVarFp.kbDelete(requestParameters.id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 删除文档
+         * @param {DefaultApiKbDeleteDocumentRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        kbDeleteDocument(requestParameters: DefaultApiKbDeleteDocumentRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid> {
+            return localVarFp.kbDeleteDocument(requestParameters.id, requestParameters.docId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 获取知识库详情
+         * @param {DefaultApiKbGetByIdRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        kbGetById(requestParameters: DefaultApiKbGetByIdRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseKnowledgeBaseVO> {
+            return localVarFp.kbGetById(requestParameters.id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 获取用户的知识库列表
+         * @param {DefaultApiKbListByCreatorRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        kbListByCreator(requestParameters: DefaultApiKbListByCreatorRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListKnowledgeBaseVO> {
+            return localVarFp.kbListByCreator(requestParameters.userId, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 获取文档分块列表
+         * @param {DefaultApiKbListChunksRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        kbListChunks(requestParameters: DefaultApiKbListChunksRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringObject> {
+            return localVarFp.kbListChunks(requestParameters.id, requestParameters.docId, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 获取文档列表
+         * @param {DefaultApiKbListDocumentsRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        kbListDocuments(requestParameters: DefaultApiKbListDocumentsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListKnowledgeDocumentVO> {
+            return localVarFp.kbListDocuments(requestParameters.id, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 触发文档向量化
+         * @param {DefaultApiKbProcessDocumentRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        kbProcessDocument(requestParameters: DefaultApiKbProcessDocumentRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid> {
+            return localVarFp.kbProcessDocument(requestParameters.id, requestParameters.docId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 输入查询文本，返回向量检索+Rerank后的召回结果，用于调试知识库检索效果
+         * @summary 知识库召回测试
+         * @param {DefaultApiKbRecallTestRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        kbRecallTest(requestParameters: DefaultApiKbRecallTestRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringObject> {
+            return localVarFp.kbRecallTest(requestParameters.id, requestParameters.requestBody, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 搜索知识库
+         * @param {DefaultApiKbSearchRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        kbSearch(requestParameters: DefaultApiKbSearchRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListKnowledgeBaseVO> {
+            return localVarFp.kbSearch(requestParameters.keyword, requestParameters.userId, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 更新知识库
+         * @param {DefaultApiKbUpdateRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        kbUpdate(requestParameters: DefaultApiKbUpdateRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseKnowledgeBaseVO> {
+            return localVarFp.kbUpdate(requestParameters.id, requestParameters.updateKnowledgeBaseCommand, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 更新文档元信息
+         * @param {DefaultApiKbUpdateDocumentRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        kbUpdateDocument(requestParameters: DefaultApiKbUpdateDocumentRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseKnowledgeDocumentVO> {
+            return localVarFp.kbUpdateDocument(requestParameters.id, requestParameters.docId, requestParameters.requestBody, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary 退出群
          * @param {DefaultApiLeaveGroupRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
@@ -22084,16 +22282,6 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
-         * @summary 获取用户的知识库列表
-         * @param {DefaultApiListByCreatorRequest} requestParameters Request parameters.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        listByCreator(requestParameters: DefaultApiListByCreatorRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListKnowledgeBaseVO> {
-            return localVarFp.listByCreator(requestParameters.userId, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
          * @summary 获取用户的工作流列表
          * @param {DefaultApiListByUserRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
@@ -22114,16 +22302,6 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
-         * @summary 获取文档分块列表
-         * @param {DefaultApiListChunksRequest} requestParameters Request parameters.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        listChunks(requestParameters: DefaultApiListChunksRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringObject> {
-            return localVarFp.listChunks(requestParameters.id, requestParameters.docId, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
          * @summary 获取课程列表
          * @param {DefaultApiListCoursesRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
@@ -22141,16 +22319,6 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         listCoursesByTeacher(requestParameters: DefaultApiListCoursesByTeacherRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListCourseResponse> {
             return localVarFp.listCoursesByTeacher(requestParameters.teacherId, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @summary 获取文档列表
-         * @param {DefaultApiListDocumentsRequest} requestParameters Request parameters.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        listDocuments(requestParameters: DefaultApiListDocumentsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListKnowledgeDocumentVO> {
-            return localVarFp.listDocuments(requestParameters.id, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -22333,23 +22501,13 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
-         * @summary 触发文档向量化
-         * @param {DefaultApiProcessDocumentRequest} requestParameters Request parameters.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        processDocument(requestParameters: DefaultApiProcessDocumentRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid> {
-            return localVarFp.processDocument(requestParameters.id, requestParameters.docId, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
          * @summary 发布工作流
-         * @param {DefaultApiPublish1Request} requestParameters Request parameters.
+         * @param {DefaultApiPublishRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        publish1(requestParameters: DefaultApiPublish1Request, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseWorkflowResponse> {
-            return localVarFp.publish1(requestParameters.id, options).then((request) => request(axios, basePath));
+        publish(requestParameters: DefaultApiPublishRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseWorkflowResponse> {
+            return localVarFp.publish(requestParameters.id, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -22693,16 +22851,6 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
-         * @summary 搜索知识库
-         * @param {DefaultApiSearchRequest} requestParameters Request parameters.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        search(requestParameters: DefaultApiSearchRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListKnowledgeBaseVO> {
-            return localVarFp.search(requestParameters.keyword, requestParameters.userId, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
          * @summary 搜索文章
          * @param {DefaultApiSearchArticlesRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
@@ -23012,16 +23160,6 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.update(requestParameters.id, requestParameters.updateWorkflowRequest, options).then((request) => request(axios, basePath));
         },
         /**
-         * 
-         * @summary 更新知识库
-         * @param {DefaultApiUpdate1Request} requestParameters Request parameters.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        update1(requestParameters: DefaultApiUpdate1Request, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseKnowledgeBaseVO> {
-            return localVarFp.update1(requestParameters.id, requestParameters.updateKnowledgeBaseCommand, options).then((request) => request(axios, basePath));
-        },
-        /**
          * 更新公告信息
          * @summary 更新公告
          * @param {DefaultApiUpdateAnnouncementRequest} requestParameters Request parameters.
@@ -23110,16 +23248,6 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         updateDefinition(requestParameters: DefaultApiUpdateDefinitionRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseWorkflowResponse> {
             return localVarFp.updateDefinition(requestParameters.id, requestParameters.updateWorkflowDefinitionRequest, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @summary 更新文档元信息
-         * @param {DefaultApiUpdateDocumentRequest} requestParameters Request parameters.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        updateDocument(requestParameters: DefaultApiUpdateDocumentRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseKnowledgeDocumentVO> {
-            return localVarFp.updateDocument(requestParameters.id, requestParameters.docId, requestParameters.requestBody, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -23396,15 +23524,6 @@ export interface DefaultApiInterface {
 
     /**
      * 
-     * @summary 添加文档
-     * @param {DefaultApiAddDocumentRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    addDocument(requestParameters: DefaultApiAddDocumentRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseKnowledgeDocumentVO>;
-
-    /**
-     * 
      * @summary 添加连接线
      * @param {DefaultApiAddEdgeRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -23468,6 +23587,15 @@ export interface DefaultApiInterface {
 
     /**
      * 
+     * @summary 管理员删除帖子
+     * @param {DefaultApiAdminDeletePostRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    adminDeletePost(requestParameters: DefaultApiAdminDeletePostRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid>;
+
+    /**
+     * 
      * @summary 申请成为讲师
      * @param {DefaultApiApplyTeacherRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -23487,11 +23615,11 @@ export interface DefaultApiInterface {
     /**
      * 
      * @summary 归档工作流
-     * @param {DefaultApiArchive1Request} requestParameters Request parameters.
+     * @param {DefaultApiArchiveRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    archive1(requestParameters: DefaultApiArchive1Request, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseWorkflowResponse>;
+    archive(requestParameters: DefaultApiArchiveRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseWorkflowResponse>;
 
     /**
      * 管理员批量封禁或解封用户
@@ -23510,33 +23638,6 @@ export interface DefaultApiInterface {
      * @throws {RequiredError}
      */
     batchCreateUsers(requestParameters: DefaultApiBatchCreateUsersRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListLong>;
-
-    /**
-     * 
-     * @summary 向量化知识库所有待处理文档
-     * @param {DefaultApiBatchProcessByKnowledgeBaseRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    batchProcessByKnowledgeBase(requestParameters: DefaultApiBatchProcessByKnowledgeBaseRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseBatchProcessResult>;
-
-    /**
-     * 
-     * @summary 批量文档向量化
-     * @param {DefaultApiBatchProcessDocumentsRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    batchProcessDocuments(requestParameters: DefaultApiBatchProcessDocumentsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseBatchProcessResult>;
-
-    /**
-     * 
-     * @summary 异步批量文档向量化
-     * @param {DefaultApiBatchProcessDocumentsAsyncRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    batchProcessDocumentsAsync(requestParameters: DefaultApiBatchProcessDocumentsAsyncRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseString>;
 
     /**
      * 
@@ -23662,15 +23763,6 @@ export interface DefaultApiInterface {
      * @throws {RequiredError}
      */
     create(requestParameters: DefaultApiCreateRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseWorkflowResponse>;
-
-    /**
-     * 
-     * @summary 创建知识库
-     * @param {DefaultApiCreate1Request} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    create1(requestParameters: DefaultApiCreate1Request, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseKnowledgeBaseVO>;
 
     /**
      * 创建新公告，初始状态为草稿
@@ -23880,15 +23972,6 @@ export interface DefaultApiInterface {
     createWebhookTrigger(requestParameters: DefaultApiCreateWebhookTriggerRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseWorkflowTriggerResponse>;
 
     /**
-     * 
-     * @summary 删除知识库
-     * @param {DefaultApiDelete1Request} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    delete1(requestParameters: DefaultApiDelete1Request, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid>;
-
-    /**
      * 逻辑删除公告
      * @summary 删除公告
      * @param {DefaultApiDeleteAnnouncementRequest} requestParameters Request parameters.
@@ -23977,15 +24060,6 @@ export interface DefaultApiInterface {
      * @throws {RequiredError}
      */
     deleteDailyWord(requestParameters: DefaultApiDeleteDailyWordRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid>;
-
-    /**
-     * 
-     * @summary 删除文档
-     * @param {DefaultApiDeleteDocumentRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    deleteDocument(requestParameters: DefaultApiDeleteDocumentRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid>;
 
     /**
      * 
@@ -24333,15 +24407,6 @@ export interface DefaultApiInterface {
      * @throws {RequiredError}
      */
     getById(requestParameters: DefaultApiGetByIdRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseWorkflowResponse>;
-
-    /**
-     * 
-     * @summary 获取知识库详情
-     * @param {DefaultApiGetById1Request} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    getById1(requestParameters: DefaultApiGetById1Request, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseKnowledgeBaseVO>;
 
     /**
      * 
@@ -25332,6 +25397,150 @@ export interface DefaultApiInterface {
 
     /**
      * 
+     * @summary 添加文档
+     * @param {DefaultApiKbAddDocumentRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    kbAddDocument(requestParameters: DefaultApiKbAddDocumentRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseKnowledgeDocumentVO>;
+
+    /**
+     * 
+     * @summary 向量化知识库所有待处理文档
+     * @param {DefaultApiKbBatchProcessByKnowledgeBaseRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    kbBatchProcessByKnowledgeBase(requestParameters: DefaultApiKbBatchProcessByKnowledgeBaseRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseBatchProcessResult>;
+
+    /**
+     * 
+     * @summary 批量文档向量化
+     * @param {DefaultApiKbBatchProcessDocumentsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    kbBatchProcessDocuments(requestParameters: DefaultApiKbBatchProcessDocumentsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseBatchProcessResult>;
+
+    /**
+     * 
+     * @summary 异步批量文档向量化
+     * @param {DefaultApiKbBatchProcessDocumentsAsyncRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    kbBatchProcessDocumentsAsync(requestParameters: DefaultApiKbBatchProcessDocumentsAsyncRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseString>;
+
+    /**
+     * 
+     * @summary 创建知识库
+     * @param {DefaultApiKbCreateRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    kbCreate(requestParameters: DefaultApiKbCreateRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseKnowledgeBaseVO>;
+
+    /**
+     * 
+     * @summary 删除知识库
+     * @param {DefaultApiKbDeleteRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    kbDelete(requestParameters: DefaultApiKbDeleteRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid>;
+
+    /**
+     * 
+     * @summary 删除文档
+     * @param {DefaultApiKbDeleteDocumentRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    kbDeleteDocument(requestParameters: DefaultApiKbDeleteDocumentRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid>;
+
+    /**
+     * 
+     * @summary 获取知识库详情
+     * @param {DefaultApiKbGetByIdRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    kbGetById(requestParameters: DefaultApiKbGetByIdRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseKnowledgeBaseVO>;
+
+    /**
+     * 
+     * @summary 获取用户的知识库列表
+     * @param {DefaultApiKbListByCreatorRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    kbListByCreator(requestParameters: DefaultApiKbListByCreatorRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListKnowledgeBaseVO>;
+
+    /**
+     * 
+     * @summary 获取文档分块列表
+     * @param {DefaultApiKbListChunksRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    kbListChunks(requestParameters: DefaultApiKbListChunksRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringObject>;
+
+    /**
+     * 
+     * @summary 获取文档列表
+     * @param {DefaultApiKbListDocumentsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    kbListDocuments(requestParameters: DefaultApiKbListDocumentsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListKnowledgeDocumentVO>;
+
+    /**
+     * 
+     * @summary 触发文档向量化
+     * @param {DefaultApiKbProcessDocumentRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    kbProcessDocument(requestParameters: DefaultApiKbProcessDocumentRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid>;
+
+    /**
+     * 输入查询文本，返回向量检索+Rerank后的召回结果，用于调试知识库检索效果
+     * @summary 知识库召回测试
+     * @param {DefaultApiKbRecallTestRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    kbRecallTest(requestParameters: DefaultApiKbRecallTestRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringObject>;
+
+    /**
+     * 
+     * @summary 搜索知识库
+     * @param {DefaultApiKbSearchRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    kbSearch(requestParameters: DefaultApiKbSearchRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListKnowledgeBaseVO>;
+
+    /**
+     * 
+     * @summary 更新知识库
+     * @param {DefaultApiKbUpdateRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    kbUpdate(requestParameters: DefaultApiKbUpdateRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseKnowledgeBaseVO>;
+
+    /**
+     * 
+     * @summary 更新文档元信息
+     * @param {DefaultApiKbUpdateDocumentRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    kbUpdateDocument(requestParameters: DefaultApiKbUpdateDocumentRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseKnowledgeDocumentVO>;
+
+    /**
+     * 
      * @summary 退出群
      * @param {DefaultApiLeaveGroupRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -25384,15 +25593,6 @@ export interface DefaultApiInterface {
 
     /**
      * 
-     * @summary 获取用户的知识库列表
-     * @param {DefaultApiListByCreatorRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    listByCreator(requestParameters: DefaultApiListByCreatorRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListKnowledgeBaseVO>;
-
-    /**
-     * 
      * @summary 获取用户的工作流列表
      * @param {DefaultApiListByUserRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -25411,15 +25611,6 @@ export interface DefaultApiInterface {
 
     /**
      * 
-     * @summary 获取文档分块列表
-     * @param {DefaultApiListChunksRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    listChunks(requestParameters: DefaultApiListChunksRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringObject>;
-
-    /**
-     * 
      * @summary 获取课程列表
      * @param {DefaultApiListCoursesRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -25435,15 +25626,6 @@ export interface DefaultApiInterface {
      * @throws {RequiredError}
      */
     listCoursesByTeacher(requestParameters: DefaultApiListCoursesByTeacherRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListCourseResponse>;
-
-    /**
-     * 
-     * @summary 获取文档列表
-     * @param {DefaultApiListDocumentsRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    listDocuments(requestParameters: DefaultApiListDocumentsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListKnowledgeDocumentVO>;
 
     /**
      * 
@@ -25608,21 +25790,12 @@ export interface DefaultApiInterface {
 
     /**
      * 
-     * @summary 触发文档向量化
-     * @param {DefaultApiProcessDocumentRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    processDocument(requestParameters: DefaultApiProcessDocumentRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid>;
-
-    /**
-     * 
      * @summary 发布工作流
-     * @param {DefaultApiPublish1Request} requestParameters Request parameters.
+     * @param {DefaultApiPublishRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    publish1(requestParameters: DefaultApiPublish1Request, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseWorkflowResponse>;
+    publish(requestParameters: DefaultApiPublishRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseWorkflowResponse>;
 
     /**
      * 
@@ -25932,15 +26105,6 @@ export interface DefaultApiInterface {
 
     /**
      * 
-     * @summary 搜索知识库
-     * @param {DefaultApiSearchRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    search(requestParameters: DefaultApiSearchRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListKnowledgeBaseVO>;
-
-    /**
-     * 
      * @summary 搜索文章
      * @param {DefaultApiSearchArticlesRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -26219,15 +26383,6 @@ export interface DefaultApiInterface {
     update(requestParameters: DefaultApiUpdateRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseWorkflowResponse>;
 
     /**
-     * 
-     * @summary 更新知识库
-     * @param {DefaultApiUpdate1Request} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    update1(requestParameters: DefaultApiUpdate1Request, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseKnowledgeBaseVO>;
-
-    /**
      * 更新公告信息
      * @summary 更新公告
      * @param {DefaultApiUpdateAnnouncementRequest} requestParameters Request parameters.
@@ -26307,15 +26462,6 @@ export interface DefaultApiInterface {
      * @throws {RequiredError}
      */
     updateDefinition(requestParameters: DefaultApiUpdateDefinitionRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseWorkflowResponse>;
-
-    /**
-     * 
-     * @summary 更新文档元信息
-     * @param {DefaultApiUpdateDocumentRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    updateDocument(requestParameters: DefaultApiUpdateDocumentRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseKnowledgeDocumentVO>;
 
     /**
      * 
@@ -26565,17 +26711,6 @@ export interface DefaultApiAddCourseRequest {
 }
 
 /**
- * Request parameters for addDocument operation in DefaultApi.
- */
-export interface DefaultApiAddDocumentRequest {
-    readonly id: number
-
-    readonly userId: number
-
-    readonly requestBody: { [key: string]: object; }
-}
-
-/**
  * Request parameters for addEdge operation in DefaultApi.
  */
 export interface DefaultApiAddEdgeRequest {
@@ -26647,6 +26782,13 @@ export interface DefaultApiAddVariableRequest {
 }
 
 /**
+ * Request parameters for adminDeletePost operation in DefaultApi.
+ */
+export interface DefaultApiAdminDeletePostRequest {
+    readonly postId: number
+}
+
+/**
  * Request parameters for applyTeacher operation in DefaultApi.
  */
 export interface DefaultApiApplyTeacherRequest {
@@ -26663,9 +26805,9 @@ export interface DefaultApiApplyToJoinRequest {
 }
 
 /**
- * Request parameters for archive1 operation in DefaultApi.
+ * Request parameters for archive operation in DefaultApi.
  */
-export interface DefaultApiArchive1Request {
+export interface DefaultApiArchiveRequest {
     /**
      * 工作流ID
      */
@@ -26684,31 +26826,6 @@ export interface DefaultApiBatchBanUsersRequest {
  */
 export interface DefaultApiBatchCreateUsersRequest {
     readonly batchCreateUserRequest: BatchCreateUserRequest
-}
-
-/**
- * Request parameters for batchProcessByKnowledgeBase operation in DefaultApi.
- */
-export interface DefaultApiBatchProcessByKnowledgeBaseRequest {
-    readonly id: number
-}
-
-/**
- * Request parameters for batchProcessDocuments operation in DefaultApi.
- */
-export interface DefaultApiBatchProcessDocumentsRequest {
-    readonly id: number
-
-    readonly requestBody: Array<number>
-}
-
-/**
- * Request parameters for batchProcessDocumentsAsync operation in DefaultApi.
- */
-export interface DefaultApiBatchProcessDocumentsAsyncRequest {
-    readonly id: number
-
-    readonly requestBody: Array<number>
 }
 
 /**
@@ -26849,15 +26966,6 @@ export interface DefaultApiCopyRequest {
  */
 export interface DefaultApiCreateRequest {
     readonly createWorkflowRequest: CreateWorkflowRequest
-}
-
-/**
- * Request parameters for create1 operation in DefaultApi.
- */
-export interface DefaultApiCreate1Request {
-    readonly userId: number
-
-    readonly createKnowledgeBaseCommand: CreateKnowledgeBaseCommand
 }
 
 /**
@@ -27081,13 +27189,6 @@ export interface DefaultApiCreateWebhookTriggerRequest {
 }
 
 /**
- * Request parameters for delete1 operation in DefaultApi.
- */
-export interface DefaultApiDelete1Request {
-    readonly id: number
-}
-
-/**
  * Request parameters for deleteAnnouncement operation in DefaultApi.
  */
 export interface DefaultApiDeleteAnnouncementRequest {
@@ -27172,15 +27273,6 @@ export interface DefaultApiDeleteDailyWordRequest {
      * 单词ID
      */
     readonly id: number
-}
-
-/**
- * Request parameters for deleteDocument operation in DefaultApi.
- */
-export interface DefaultApiDeleteDocumentRequest {
-    readonly id: number
-
-    readonly docId: number
 }
 
 /**
@@ -27502,13 +27594,6 @@ export interface DefaultApiGetByIdRequest {
     /**
      * 工作流ID
      */
-    readonly id: number
-}
-
-/**
- * Request parameters for getById1 operation in DefaultApi.
- */
-export interface DefaultApiGetById1Request {
     readonly id: number
 }
 
@@ -28432,6 +28517,160 @@ export interface DefaultApiIsFollowingRequest {
 }
 
 /**
+ * Request parameters for kbAddDocument operation in DefaultApi.
+ */
+export interface DefaultApiKbAddDocumentRequest {
+    readonly id: number
+
+    readonly userId: number
+
+    readonly requestBody: { [key: string]: object; }
+}
+
+/**
+ * Request parameters for kbBatchProcessByKnowledgeBase operation in DefaultApi.
+ */
+export interface DefaultApiKbBatchProcessByKnowledgeBaseRequest {
+    readonly id: number
+}
+
+/**
+ * Request parameters for kbBatchProcessDocuments operation in DefaultApi.
+ */
+export interface DefaultApiKbBatchProcessDocumentsRequest {
+    readonly id: number
+
+    readonly requestBody: Array<number>
+}
+
+/**
+ * Request parameters for kbBatchProcessDocumentsAsync operation in DefaultApi.
+ */
+export interface DefaultApiKbBatchProcessDocumentsAsyncRequest {
+    readonly id: number
+
+    readonly requestBody: Array<number>
+}
+
+/**
+ * Request parameters for kbCreate operation in DefaultApi.
+ */
+export interface DefaultApiKbCreateRequest {
+    readonly userId: number
+
+    readonly createKnowledgeBaseCommand: CreateKnowledgeBaseCommand
+}
+
+/**
+ * Request parameters for kbDelete operation in DefaultApi.
+ */
+export interface DefaultApiKbDeleteRequest {
+    readonly id: number
+}
+
+/**
+ * Request parameters for kbDeleteDocument operation in DefaultApi.
+ */
+export interface DefaultApiKbDeleteDocumentRequest {
+    readonly id: number
+
+    readonly docId: number
+}
+
+/**
+ * Request parameters for kbGetById operation in DefaultApi.
+ */
+export interface DefaultApiKbGetByIdRequest {
+    readonly id: number
+}
+
+/**
+ * Request parameters for kbListByCreator operation in DefaultApi.
+ */
+export interface DefaultApiKbListByCreatorRequest {
+    readonly userId: number
+
+    readonly page?: number
+
+    readonly size?: number
+}
+
+/**
+ * Request parameters for kbListChunks operation in DefaultApi.
+ */
+export interface DefaultApiKbListChunksRequest {
+    readonly id: number
+
+    readonly docId: number
+
+    readonly page?: number
+
+    readonly size?: number
+}
+
+/**
+ * Request parameters for kbListDocuments operation in DefaultApi.
+ */
+export interface DefaultApiKbListDocumentsRequest {
+    readonly id: number
+
+    readonly page?: number
+
+    readonly size?: number
+}
+
+/**
+ * Request parameters for kbProcessDocument operation in DefaultApi.
+ */
+export interface DefaultApiKbProcessDocumentRequest {
+    readonly id: number
+
+    readonly docId: number
+}
+
+/**
+ * Request parameters for kbRecallTest operation in DefaultApi.
+ */
+export interface DefaultApiKbRecallTestRequest {
+    readonly id: number
+
+    readonly requestBody: { [key: string]: object; }
+}
+
+/**
+ * Request parameters for kbSearch operation in DefaultApi.
+ */
+export interface DefaultApiKbSearchRequest {
+    readonly keyword: string
+
+    readonly userId: number
+
+    readonly page?: number
+
+    readonly size?: number
+}
+
+/**
+ * Request parameters for kbUpdate operation in DefaultApi.
+ */
+export interface DefaultApiKbUpdateRequest {
+    readonly id: number
+
+    readonly updateKnowledgeBaseCommand: UpdateKnowledgeBaseCommand
+}
+
+/**
+ * Request parameters for kbUpdateDocument operation in DefaultApi.
+ */
+export interface DefaultApiKbUpdateDocumentRequest {
+    readonly id: number
+
+    readonly docId: number
+
+    readonly requestBody: { [key: string]: string; }
+}
+
+/**
  * Request parameters for leaveGroup operation in DefaultApi.
  */
 export interface DefaultApiLeaveGroupRequest {
@@ -28493,17 +28732,6 @@ export interface DefaultApiListBooksRequest {
 }
 
 /**
- * Request parameters for listByCreator operation in DefaultApi.
- */
-export interface DefaultApiListByCreatorRequest {
-    readonly userId: number
-
-    readonly page?: number
-
-    readonly size?: number
-}
-
-/**
  * Request parameters for listByUser operation in DefaultApi.
  */
 export interface DefaultApiListByUserRequest {
@@ -28531,19 +28759,6 @@ export interface DefaultApiListChaptersRequest {
      * 课程ID
      */
     readonly courseId: number
-}
-
-/**
- * Request parameters for listChunks operation in DefaultApi.
- */
-export interface DefaultApiListChunksRequest {
-    readonly id: number
-
-    readonly docId: number
-
-    readonly page?: number
-
-    readonly size?: number
 }
 
 /**
@@ -28583,17 +28798,6 @@ export interface DefaultApiListCoursesByTeacherRequest {
     /**
      * 每页数量
      */
-    readonly size?: number
-}
-
-/**
- * Request parameters for listDocuments operation in DefaultApi.
- */
-export interface DefaultApiListDocumentsRequest {
-    readonly id: number
-
-    readonly page?: number
-
     readonly size?: number
 }
 
@@ -28804,18 +29008,9 @@ export interface DefaultApiPhoneLoginRequest {
 }
 
 /**
- * Request parameters for processDocument operation in DefaultApi.
+ * Request parameters for publish operation in DefaultApi.
  */
-export interface DefaultApiProcessDocumentRequest {
-    readonly id: number
-
-    readonly docId: number
-}
-
-/**
- * Request parameters for publish1 operation in DefaultApi.
- */
-export interface DefaultApiPublish1Request {
+export interface DefaultApiPublishRequest {
     /**
      * 工作流ID
      */
@@ -29097,19 +29292,6 @@ export interface DefaultApiScrapeRecursivelyRequest {
  */
 export interface DefaultApiScrapeSinglePageRequest {
     readonly scrapeRequest: ScrapeRequest
-}
-
-/**
- * Request parameters for search operation in DefaultApi.
- */
-export interface DefaultApiSearchRequest {
-    readonly keyword: string
-
-    readonly userId: number
-
-    readonly page?: number
-
-    readonly size?: number
 }
 
 /**
@@ -29448,15 +29630,6 @@ export interface DefaultApiUpdateRequest {
 }
 
 /**
- * Request parameters for update1 operation in DefaultApi.
- */
-export interface DefaultApiUpdate1Request {
-    readonly id: number
-
-    readonly updateKnowledgeBaseCommand: UpdateKnowledgeBaseCommand
-}
-
-/**
  * Request parameters for updateAnnouncement operation in DefaultApi.
  */
 export interface DefaultApiUpdateAnnouncementRequest {
@@ -29551,17 +29724,6 @@ export interface DefaultApiUpdateDefinitionRequest {
     readonly id: number
 
     readonly updateWorkflowDefinitionRequest: UpdateWorkflowDefinitionRequest
-}
-
-/**
- * Request parameters for updateDocument operation in DefaultApi.
- */
-export interface DefaultApiUpdateDocumentRequest {
-    readonly id: number
-
-    readonly docId: number
-
-    readonly requestBody: { [key: string]: string; }
 }
 
 /**
@@ -29867,17 +30029,6 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
 
     /**
      * 
-     * @summary 添加文档
-     * @param {DefaultApiAddDocumentRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    public addDocument(requestParameters: DefaultApiAddDocumentRequest, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).addDocument(requestParameters.id, requestParameters.userId, requestParameters.requestBody, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
      * @summary 添加连接线
      * @param {DefaultApiAddEdgeRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -29955,6 +30106,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
 
     /**
      * 
+     * @summary 管理员删除帖子
+     * @param {DefaultApiAdminDeletePostRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public adminDeletePost(requestParameters: DefaultApiAdminDeletePostRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).adminDeletePost(requestParameters.postId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @summary 申请成为讲师
      * @param {DefaultApiApplyTeacherRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -29978,12 +30140,12 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     /**
      * 
      * @summary 归档工作流
-     * @param {DefaultApiArchive1Request} requestParameters Request parameters.
+     * @param {DefaultApiArchiveRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    public archive1(requestParameters: DefaultApiArchive1Request, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).archive1(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
+    public archive(requestParameters: DefaultApiArchiveRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).archive(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -30006,39 +30168,6 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public batchCreateUsers(requestParameters: DefaultApiBatchCreateUsersRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).batchCreateUsers(requestParameters.batchCreateUserRequest, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @summary 向量化知识库所有待处理文档
-     * @param {DefaultApiBatchProcessByKnowledgeBaseRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    public batchProcessByKnowledgeBase(requestParameters: DefaultApiBatchProcessByKnowledgeBaseRequest, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).batchProcessByKnowledgeBase(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @summary 批量文档向量化
-     * @param {DefaultApiBatchProcessDocumentsRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    public batchProcessDocuments(requestParameters: DefaultApiBatchProcessDocumentsRequest, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).batchProcessDocuments(requestParameters.id, requestParameters.requestBody, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @summary 异步批量文档向量化
-     * @param {DefaultApiBatchProcessDocumentsAsyncRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    public batchProcessDocumentsAsync(requestParameters: DefaultApiBatchProcessDocumentsAsyncRequest, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).batchProcessDocumentsAsync(requestParameters.id, requestParameters.requestBody, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -30192,17 +30321,6 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public create(requestParameters: DefaultApiCreateRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).create(requestParameters.createWorkflowRequest, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @summary 创建知识库
-     * @param {DefaultApiCreate1Request} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    public create1(requestParameters: DefaultApiCreate1Request, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).create1(requestParameters.userId, requestParameters.createKnowledgeBaseCommand, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -30459,17 +30577,6 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
-     * 
-     * @summary 删除知识库
-     * @param {DefaultApiDelete1Request} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    public delete1(requestParameters: DefaultApiDelete1Request, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).delete1(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
      * 逻辑删除公告
      * @summary 删除公告
      * @param {DefaultApiDeleteAnnouncementRequest} requestParameters Request parameters.
@@ -30577,17 +30684,6 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public deleteDailyWord(requestParameters: DefaultApiDeleteDailyWordRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).deleteDailyWord(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @summary 删除文档
-     * @param {DefaultApiDeleteDocumentRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    public deleteDocument(requestParameters: DefaultApiDeleteDocumentRequest, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).deleteDocument(requestParameters.id, requestParameters.docId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -31013,17 +31109,6 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public getById(requestParameters: DefaultApiGetByIdRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).getById(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @summary 获取知识库详情
-     * @param {DefaultApiGetById1Request} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    public getById1(requestParameters: DefaultApiGetById1Request, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).getById1(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -32239,6 +32324,182 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
 
     /**
      * 
+     * @summary 添加文档
+     * @param {DefaultApiKbAddDocumentRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public kbAddDocument(requestParameters: DefaultApiKbAddDocumentRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).kbAddDocument(requestParameters.id, requestParameters.userId, requestParameters.requestBody, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 向量化知识库所有待处理文档
+     * @param {DefaultApiKbBatchProcessByKnowledgeBaseRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public kbBatchProcessByKnowledgeBase(requestParameters: DefaultApiKbBatchProcessByKnowledgeBaseRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).kbBatchProcessByKnowledgeBase(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 批量文档向量化
+     * @param {DefaultApiKbBatchProcessDocumentsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public kbBatchProcessDocuments(requestParameters: DefaultApiKbBatchProcessDocumentsRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).kbBatchProcessDocuments(requestParameters.id, requestParameters.requestBody, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 异步批量文档向量化
+     * @param {DefaultApiKbBatchProcessDocumentsAsyncRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public kbBatchProcessDocumentsAsync(requestParameters: DefaultApiKbBatchProcessDocumentsAsyncRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).kbBatchProcessDocumentsAsync(requestParameters.id, requestParameters.requestBody, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 创建知识库
+     * @param {DefaultApiKbCreateRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public kbCreate(requestParameters: DefaultApiKbCreateRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).kbCreate(requestParameters.userId, requestParameters.createKnowledgeBaseCommand, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 删除知识库
+     * @param {DefaultApiKbDeleteRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public kbDelete(requestParameters: DefaultApiKbDeleteRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).kbDelete(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 删除文档
+     * @param {DefaultApiKbDeleteDocumentRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public kbDeleteDocument(requestParameters: DefaultApiKbDeleteDocumentRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).kbDeleteDocument(requestParameters.id, requestParameters.docId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 获取知识库详情
+     * @param {DefaultApiKbGetByIdRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public kbGetById(requestParameters: DefaultApiKbGetByIdRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).kbGetById(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 获取用户的知识库列表
+     * @param {DefaultApiKbListByCreatorRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public kbListByCreator(requestParameters: DefaultApiKbListByCreatorRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).kbListByCreator(requestParameters.userId, requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 获取文档分块列表
+     * @param {DefaultApiKbListChunksRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public kbListChunks(requestParameters: DefaultApiKbListChunksRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).kbListChunks(requestParameters.id, requestParameters.docId, requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 获取文档列表
+     * @param {DefaultApiKbListDocumentsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public kbListDocuments(requestParameters: DefaultApiKbListDocumentsRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).kbListDocuments(requestParameters.id, requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 触发文档向量化
+     * @param {DefaultApiKbProcessDocumentRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public kbProcessDocument(requestParameters: DefaultApiKbProcessDocumentRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).kbProcessDocument(requestParameters.id, requestParameters.docId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 输入查询文本，返回向量检索+Rerank后的召回结果，用于调试知识库检索效果
+     * @summary 知识库召回测试
+     * @param {DefaultApiKbRecallTestRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public kbRecallTest(requestParameters: DefaultApiKbRecallTestRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).kbRecallTest(requestParameters.id, requestParameters.requestBody, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 搜索知识库
+     * @param {DefaultApiKbSearchRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public kbSearch(requestParameters: DefaultApiKbSearchRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).kbSearch(requestParameters.keyword, requestParameters.userId, requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 更新知识库
+     * @param {DefaultApiKbUpdateRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public kbUpdate(requestParameters: DefaultApiKbUpdateRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).kbUpdate(requestParameters.id, requestParameters.updateKnowledgeBaseCommand, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 更新文档元信息
+     * @param {DefaultApiKbUpdateDocumentRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public kbUpdateDocument(requestParameters: DefaultApiKbUpdateDocumentRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).kbUpdateDocument(requestParameters.id, requestParameters.docId, requestParameters.requestBody, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @summary 退出群
      * @param {DefaultApiLeaveGroupRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -32303,17 +32564,6 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
 
     /**
      * 
-     * @summary 获取用户的知识库列表
-     * @param {DefaultApiListByCreatorRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    public listByCreator(requestParameters: DefaultApiListByCreatorRequest, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).listByCreator(requestParameters.userId, requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
      * @summary 获取用户的工作流列表
      * @param {DefaultApiListByUserRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -32336,17 +32586,6 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
 
     /**
      * 
-     * @summary 获取文档分块列表
-     * @param {DefaultApiListChunksRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    public listChunks(requestParameters: DefaultApiListChunksRequest, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).listChunks(requestParameters.id, requestParameters.docId, requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
      * @summary 获取课程列表
      * @param {DefaultApiListCoursesRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -32365,17 +32604,6 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public listCoursesByTeacher(requestParameters: DefaultApiListCoursesByTeacherRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).listCoursesByTeacher(requestParameters.teacherId, requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @summary 获取文档列表
-     * @param {DefaultApiListDocumentsRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    public listDocuments(requestParameters: DefaultApiListDocumentsRequest, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).listDocuments(requestParameters.id, requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -32577,24 +32805,13 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
 
     /**
      * 
-     * @summary 触发文档向量化
-     * @param {DefaultApiProcessDocumentRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    public processDocument(requestParameters: DefaultApiProcessDocumentRequest, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).processDocument(requestParameters.id, requestParameters.docId, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
      * @summary 发布工作流
-     * @param {DefaultApiPublish1Request} requestParameters Request parameters.
+     * @param {DefaultApiPublishRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    public publish1(requestParameters: DefaultApiPublish1Request, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).publish1(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
+    public publish(requestParameters: DefaultApiPublishRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).publish(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -32973,17 +33190,6 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
 
     /**
      * 
-     * @summary 搜索知识库
-     * @param {DefaultApiSearchRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    public search(requestParameters: DefaultApiSearchRequest, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).search(requestParameters.keyword, requestParameters.userId, requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
      * @summary 搜索文章
      * @param {DefaultApiSearchArticlesRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -33324,17 +33530,6 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
-     * 
-     * @summary 更新知识库
-     * @param {DefaultApiUpdate1Request} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    public update1(requestParameters: DefaultApiUpdate1Request, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).update1(requestParameters.id, requestParameters.updateKnowledgeBaseCommand, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
      * 更新公告信息
      * @summary 更新公告
      * @param {DefaultApiUpdateAnnouncementRequest} requestParameters Request parameters.
@@ -33431,17 +33626,6 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public updateDefinition(requestParameters: DefaultApiUpdateDefinitionRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).updateDefinition(requestParameters.id, requestParameters.updateWorkflowDefinitionRequest, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @summary 更新文档元信息
-     * @param {DefaultApiUpdateDocumentRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    public updateDocument(requestParameters: DefaultApiUpdateDocumentRequest, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).updateDocument(requestParameters.id, requestParameters.docId, requestParameters.requestBody, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

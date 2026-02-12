@@ -31,11 +31,11 @@ export interface ChatGroupMember {
     'muteUntil'?: string;
     'joinTime'?: string;
     'updateTime'?: string;
-    'adminOrOwner'?: boolean;
+    'mute'?: boolean;
     'owner'?: boolean;
     'delete'?: boolean;
     'muted'?: boolean;
-    'mute'?: boolean;
+    'adminOrOwner'?: boolean;
 }
 
 export const ChatGroupMemberMemberTypeEnum = {
