@@ -1,5 +1,11 @@
 # 忽略所有点目录下的内容
-.*/ 
+.*/
 
 # 但保留 .gitignore 自身
 !.gitignore
+
+# 环境变量文件（包含敏感信息）
+.env
+
+# Docker 数据
+docker/data/

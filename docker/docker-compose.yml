@@ -1,0 +1,307 @@
+# NovaCloudEdu 基础设施编排
+# 使用前请先复制 .env.example 为 .env 并修改密码
+
+services:
+  # ========== 基础设施服务 ==========
+
+  # PostgreSQL - 主数据库（含 vector 扩展）
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: nova-postgres
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-novacloudedu}
+      - POSTGRES_USER=${POSTGRES_USER:-nova}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_INITDB_ARGS=--encoding=UTF-8 --locale=C
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ../backend/sql:/docker-entrypoint-initdb.d:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-nova} -d ${POSTGRES_DB:-novacloudedu}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - nova-network
+    command:
+      - postgres
+      - -c
+      - max_connections=200
+      - -c
+      - shared_buffers=256MB
+      - -c
+      - effective_cache_size=1GB
+      - -c
+      - log_statement=all
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 512M
+        reservations:
+          cpus: '1'
+          memory: 256M
+
+  # Redis - 缓存和会话
+  redis:
+    image: redis:7-alpine
+    container_name: nova-redis
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    command: >
+      sh -c 'redis-server
+      --appendonly yes
+      $${REDIS_PASSWORD:+--requirepass $$REDIS_PASSWORD}'
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - nova-network
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-}
+
+  # Elasticsearch - 搜索引擎（含 IK 中文分词器）
+  elasticsearch:
+    build:
+      context: ./elasticsearch
+      dockerfile: Dockerfile
+    container_name: nova-elasticsearch
+    ports:
+      - "${ES_PORT:-9200}:9200"
+      - "${ES_TRANSPORT_PORT:-9300}:9300"
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    networks:
+      - nova-network
+
+  # Neo4j - 图数据库
+  neo4j:
+    image: neo4j:5-community
+    container_name: nova-neo4j
+    ports:
+      - "${NEO4J_HTTP_PORT:-7474}:7474"
+      - "${NEO4J_BOLT_PORT:-7687}:7687"
+    environment:
+      - NEO4J_AUTH=${NEO4J_AUTH:-neo4j/neo4j_password}
+      - NEO4J_dbms_memory_heap_initial__size=512m
+      - NEO4J_dbms_memory_heap_max__size=512m
+    volumes:
+      - neo4j_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:7474 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+    networks:
+      - nova-network
+
+  # ========== 文档处理服务 ==========
+
+  # Gotenberg - PDF 转换服务
+  gotenberg:
+    image: gotenberg/gotenberg:8
+    container_name: nova-gotenberg
+    ports:
+      - "${GOTENBERG_PORT:-3000}:3000"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    networks:
+      - nova-network
+    deploy:
+      resources:
+        limits:
+          cpus: '${GOTENBERG_CPU_LIMIT:-1}'
+          memory: ${GOTENBERG_MEM_LIMIT:-1G}
+        reservations:
+          cpus: '${GOTENBERG_CPU_RESERVE:-0.5}'
+          memory: ${GOTENBERG_MEM_RESERVE:-512M}
+
+  # OnlyOffice - 文档编辑服务
+  onlyoffice:
+    image: onlyoffice/documentserver:8.2
+    container_name: nova-onlyoffice
+    ports:
+      - "${ONLYOFFICE_PORT:-9980}:80"
+    environment:
+      - JWT_ENABLED=${ONLYOFFICE_JWT_ENABLED:-true}
+      - JWT_SECRET=${ONLYOFFICE_JWT_SECRET:-change-me-in-production}
+      - JWT_HEADER=Authorization
+    volumes:
+      - onlyoffice_data:/var/www/onlyoffice/Data
+      - onlyoffice_log:/var/log/onlyoffice
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/healthcheck"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    networks:
+      - nova-network
+    deploy:
+      resources:
+        limits:
+          cpus: '${ONLYOFFICE_CPU_LIMIT:-2}'
+          memory: ${ONLYOFFICE_MEM_LIMIT:-2G}
+        reservations:
+          cpus: '${ONLYOFFICE_CPU_RESERVE:-0.5}'
+          memory: ${ONLYOFFICE_MEM_RESERVE:-1G}
+
+  # ========== 应用服务 ==========
+
+  # Backend - Java 后端服务
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: nova-backend
+    ports:
+      - "${BACKEND_PORT:-8080}:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB:-novacloudedu}
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER:-nova}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+      - SPRING_REDIS_HOST=redis
+      - SPRING_REDIS_PORT=6379
+      - SPRING_REDIS_PASSWORD=${REDIS_PASSWORD:-}
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - NEO4J_URI=bolt://neo4j:7687
+      - NEO4J_USERNAME=neo4j
+      - NEO4J_PASSWORD=${NEO4J_PASSWORD:-neo4j_password}
+      - GOTENBERG_URL=http://gotenberg:3000
+      # AI 服务 API Keys（与 Spring Boot 配置绑定）
+      # Spring Boot 绑定规则: ai.dashscope.api-key -> AI_DASHSCOPE_APIKEY (去掉连字符)
+      - AI_DASHSCOPE_APIKEY=${DASHSCOPE_API_KEY:-}
+      - AI_DASHSCOPE_LLM_MODELNAME=qwen-max
+      - AI_DASHSCOPE_EMBEDDING_MODELNAME=${DASHSCOPE_EMBEDDING_MODEL:-text-embedding-v2}
+      - AI_DASHSCOPE_LLM_VISION_MODELNAME=qwen-vl-max
+      - DASHSCOPE_API_KEY=${DASHSCOPE_API_KEY:-}
+      - DASHSCOPE_EMBEDDING_MODEL=${DASHSCOPE_EMBEDDING_MODEL:-text-embedding-v2}
+      - DASHSCOPE_RERANK_MODEL=${DASHSCOPE_RERANK_MODEL:-gte-rerank}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY:-}
+      - MOONSHOT_API_KEY=${MOONSHOT_API_KEY:-}
+      - ZHIPU_API_KEY=${ZHIPU_API_KEY:-}
+      - SILICONFLOW_API_KEY=${SILICONFLOW_API_KEY:-}
+      # 阿里云 OSS (aliyun.oss.* -> ALIYUN_OSS_*)
+      - ALIYUN_OSS_ENDPOINT=${ALIYUN_OSS_ENDPOINT:-oss-cn-hangzhou.aliyuncs.com}
+      - ALIYUN_OSS_ACCESSKEYID=${ALIYUN_OSS_ACCESS_KEY_ID:-}
+      - ALIYUN_OSS_ACCESSKEYSECRET=${ALIYUN_OSS_ACCESS_KEY_SECRET:-}
+      - ALIYUN_OSS_BUCKETNAME=${ALIYUN_OSS_BUCKET_NAME:-}
+      - ALIYUN_OSS_DOMAIN=${ALIYUN_OSS_DOMAIN:-}
+      # 阿里云 NLS (aliyun.nls.* -> ALIYUN_NLS_*)
+      - ALIYUN_NLS_ACCESSKEYID=${ALIYUN_ACCESS_KEY_ID:-}
+      - ALIYUN_NLS_ACCESSKEYSECRET=${ALIYUN_ACCESS_KEY_SECRET:-}
+      - ALIYUN_NLS_APPKEY=${ALIYUN_NLS_APP_KEY:-}
+      # SMS 配置
+      - SMS_URL=${SMS_URL:-}
+      - SMS_TOKEN=${SMS_TOKEN:-}
+      - SMS_APP_NAME=${SMS_APP_NAME:-智云星课}
+      # 书籍加密 (book.content.encryption.* -> BOOK_CONTENT_ENCRYPTION_*)
+      - BOOK_CONTENT_ENCRYPTION_ENABLED=false
+      - BOOK_CONTENT_ENCRYPTION_SECRETKEY=${BOOK_ENCRYPTION_KEY:-NovaCloudEduBookKey1}
+      # OnlyOffice
+      - ONLYOFFICE_URL=${ONLYOFFICE_URL:-http://localhost:9980}
+      - ONLYOFFICE_CALLBACK_URL=${ONLYOFFICE_CALLBACK_URL:-http://localhost:8080/api/onlyoffice/callback}
+      # PPT 服务
+      - PPT_SERVICE_URL=${PPT_SERVICE_URL:-http://ppt-service:8100}
+      # 工作流代码沙箱配置
+      - CODE_SANDBOX_DOCKER_ENABLED=true
+    volumes:
+      # Docker socket - 允许容器内创建其他容器
+      # macOS Docker Desktop 使用特殊路径，需要读写权限
+      - /Users/longxinliu/.docker/run/docker.sock:/var/run/docker.sock:rw
+      # Python 代码沙箱缓存和临时目录
+      - python-sandbox-venvs:/opt/novacloudedu/venvs
+      - python-sandbox-tmp:/tmp/novacloudedu-sandbox
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      gotenberg:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - nova-network
+    # 使用 root 用户运行以访问 Docker socket
+    user: root
+
+  # PPT Service - Python PPT 生成服务
+  ppt-service:
+    build:
+      context: ../ppt-service
+      dockerfile: Dockerfile
+    container_name: nova-ppt-service
+    ports:
+      - "${PPT_SERVICE_PORT:-8100}:8100"
+    environment:
+      - PORT=8100
+      - GOTENBERG_URL=http://gotenberg:3000
+      # 阿里云 OSS（与 Spring Boot 配置保持一致）
+      - ALIYUN_OSS_ENDPOINT=${ALIYUN_OSS_ENDPOINT:-oss-cn-hangzhou.aliyuncs.com}
+      - ALIYUN_OSS_ACCESS_KEY_ID=${ALIYUN_OSS_ACCESS_KEY_ID:-}
+      - ALIYUN_OSS_ACCESS_KEY_SECRET=${ALIYUN_OSS_ACCESS_KEY_SECRET:-}
+      - ALIYUN_OSS_BUCKET_NAME=${ALIYUN_OSS_BUCKET_NAME:-}
+      - ALIYUN_OSS_DOMAIN=${ALIYUN_OSS_DOMAIN:-}
+    depends_on:
+      gotenberg:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8100/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - nova-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  nova-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
+  es_data:
+  neo4j_data:
+  onlyoffice_data:
+  onlyoffice_log:
+  # Python 代码沙箱缓存和临时目录
+  python-sandbox-venvs:
+  python-sandbox-tmp:
