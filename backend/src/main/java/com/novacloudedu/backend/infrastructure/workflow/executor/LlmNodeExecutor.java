@@ -1,11 +1,24 @@
 package com.novacloudedu.backend.infrastructure.workflow.executor;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.novacloudedu.backend.domain.ai.entity.McpServer;
 import com.novacloudedu.backend.domain.ai.entity.WorkflowExecution;
+import com.novacloudedu.backend.domain.ai.repository.McpServerRepository;
 import com.novacloudedu.backend.domain.ai.service.NodeExecutor;
 import com.novacloudedu.backend.domain.ai.valueobject.NodeType;
 import com.novacloudedu.backend.domain.ai.valueobject.WorkflowNode;
 import com.novacloudedu.backend.domain.knowledge.service.KnowledgeSearchService;
+import com.novacloudedu.backend.infrastructure.ai.ChatModelFactory;
 import com.novacloudedu.backend.infrastructure.ai.LangchainChatService;
+import com.novacloudedu.backend.infrastructure.ai.McpClientService;
+import com.novacloudedu.backend.infrastructure.ai.McpClientService.McpTool;
+import dev.langchain4j.agent.tool.ToolSpecification;
+import dev.langchain4j.data.message.*;
+import dev.langchain4j.model.chat.ChatLanguageModel;
+import dev.langchain4j.model.chat.request.ChatRequest;
+import dev.langchain4j.model.chat.request.json.JsonObjectSchema;
+import dev.langchain4j.model.chat.response.ChatResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -38,6 +51,12 @@ public class LlmNodeExecutor implements NodeExecutor {
 
     private final LangchainChatService langchainChatService;
     private final KnowledgeSearchService knowledgeSearchService;
+    private final McpClientService mcpClientService;
+    private final ChatModelFactory chatModelFactory;
+    private final McpServerRepository mcpServerRepository;
+
+    private static final int MAX_TOOL_CALL_ITERATIONS = 10;
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private static final Pattern VAR_PATTERN = Pattern.compile("\\{\\{([^}]+)}}");
 
@@ -151,9 +170,23 @@ public class LlmNodeExecutor implements NodeExecutor {
         List<String> enabledCapabilities = (List<String>) config.get("enabledCapabilities");
         boolean enableSearch = enabledCapabilities != null && enabledCapabilities.contains("webSearch");
 
+        // ===== 6.5 MCP 工具调用（通过 mcpServerIds 从数据库加载配置） =====
+        List<?> mcpServerIdsRaw = (List<?>) config.get("mcpServerIds");
+        List<Long> mcpServerIds = mcpServerIdsRaw != null
+                ? mcpServerIdsRaw.stream().map(id -> Long.valueOf(String.valueOf(id))).toList()
+                : List.of();
+        boolean hasMcpTools = !mcpServerIds.isEmpty();
+
         // ===== 7. 调用 LLM =====
         String response;
-        if (temperature != null || topP != null || maxTokens != null || enableSearch) {
+        List<Map<String, Object>> toolCallLogs = new ArrayList<>();
+
+        if (hasMcpTools) {
+            // ===== MCP Tool Calling 模式：从DB加载服务器配置 =====
+            List<McpServer> mcpServers = mcpServerRepository.findByIds(mcpServerIds);
+            response = executeWithMcpTools(model, messages, mcpServers,
+                    temperature, topP, maxTokens, toolCallLogs);
+        } else if (temperature != null || topP != null || maxTokens != null || enableSearch) {
             // 使用自定义参数调用（同步收集）
             StringBuilder sb = new StringBuilder();
             langchainChatService.streamChatWithParams(
@@ -199,6 +232,12 @@ public class LlmNodeExecutor implements NodeExecutor {
         // 可选 AI 能力标记（前端可据此做后处理，如文生图触发等）
         if (enabledCapabilities != null && !enabledCapabilities.isEmpty()) {
             result.put("enabledCapabilities", enabledCapabilities);
+        }
+
+        // MCP 工具调用日志
+        if (!toolCallLogs.isEmpty()) {
+            result.put("toolCalls", toolCallLogs);
+            result.put("toolCallCount", toolCallLogs.size());
         }
 
         return result;
@@ -264,6 +303,212 @@ public class LlmNodeExecutor implements NodeExecutor {
             return "";
         }
     }
+
+    // ==================== MCP Tool Calling ====================
+
+    /**
+     * 使用 MCP 工具调用模式执行 LLM 对话
+     * <p>
+     * 流程：
+     * 1. 连接所有配置的 MCP 服务器，发现工具列表
+     * 2. 将 MCP 工具转换为 langchain4j ToolSpecification
+     * 3. 使用非流式 ChatLanguageModel 发送消息 + 工具规格
+     * 4. 如果 LLM 返回工具调用请求，通过 MCP 执行工具
+     * 5. 将工具结果反馈给 LLM，循环直到得到最终文本回复
+     */
+    private String executeWithMcpTools(String modelId, List<Map<String, String>> messages,
+                                        List<McpServer> mcpServers,
+                                        Double temperature, Double topP, Integer maxTokens,
+                                        List<Map<String, Object>> toolCallLogs) {
+
+        // 1. 发现所有 MCP 服务器的工具
+        List<ToolSpecification> allToolSpecs = new ArrayList<>();
+        // 工具名 -> 所属 McpServer（用于后续调用）
+        Map<String, McpServer> toolToServer = new LinkedHashMap<>();
+
+        for (McpServer server : mcpServers) {
+            if (!Boolean.TRUE.equals(server.getEnabled())) {
+                log.info("MCP服务器 [{}] 已禁用，跳过", server.getName());
+                continue;
+            }
+            try {
+                List<McpTool> tools = mcpClientService.listTools(server);
+                for (McpTool tool : tools) {
+                    ToolSpecification spec = convertMcpToolToSpec(tool);
+                    allToolSpecs.add(spec);
+                    toolToServer.put(tool.getName(), server);
+                }
+                log.info("MCP服务器 [{}] 发现 {} 个工具", server.getName(), tools.size());
+            } catch (Exception e) {
+                log.error("MCP服务器 [{}] 工具发现失败: {}", server.getName(), e.getMessage());
+            }
+        }
+
+        if (allToolSpecs.isEmpty()) {
+            log.warn("所有MCP服务器均未返回工具，回退到普通LLM调用");
+            StringBuilder sb = new StringBuilder();
+            langchainChatService.streamChatWithParams(modelId, messages, temperature, topP, maxTokens, false, sb::append);
+            return sb.toString();
+        }
+
+        log.info("MCP工具发现完成: 共{}个工具, 工具名={}", allToolSpecs.size(),
+                allToolSpecs.stream().map(ToolSpecification::name).toList());
+
+        // 2. 创建非流式模型（tool calling 需要同步响应）
+        ChatLanguageModel chatModel;
+        if (temperature != null || topP != null || maxTokens != null) {
+            chatModel = chatModelFactory.createChatModelWithParams(modelId, temperature, topP, maxTokens);
+        } else {
+            chatModel = chatModelFactory.getChatModel(modelId);
+        }
+
+        // 3. 构建初始消息列表
+        List<ChatMessage> chatMessages = new ArrayList<>();
+        for (Map<String, String> msg : messages) {
+            String role = msg.get("role");
+            String content = msg.get("content");
+            if (role == null || content == null) continue;
+            switch (role.toLowerCase()) {
+                case "system" -> chatMessages.add(SystemMessage.from(content));
+                case "assistant" -> chatMessages.add(AiMessage.from(content));
+                default -> chatMessages.add(UserMessage.from(content));
+            }
+        }
+
+        // 4. Tool calling 循环
+        for (int iteration = 0; iteration < MAX_TOOL_CALL_ITERATIONS; iteration++) {
+            ChatRequest request = ChatRequest.builder()
+                    .messages(chatMessages)
+                    .toolSpecifications(allToolSpecs)
+                    .build();
+
+            ChatResponse chatResponse = chatModel.chat(request);
+            AiMessage aiMessage = chatResponse.aiMessage();
+            chatMessages.add(aiMessage);
+
+            // 如果 LLM 没有请求工具调用，返回最终文本
+            if (!aiMessage.hasToolExecutionRequests()) {
+                log.info("MCP tool calling 完成: 迭代{}次, 工具调用{}次",
+                        iteration + 1, toolCallLogs.size());
+                return aiMessage.text() != null ? aiMessage.text() : "";
+            }
+
+            // 执行工具调用
+            for (var toolRequest : aiMessage.toolExecutionRequests()) {
+                String toolName = toolRequest.name();
+                String toolArgs = toolRequest.arguments();
+                String toolId = toolRequest.id();
+
+                log.info("MCP tool call [{}]: name={}, args={}", iteration + 1, toolName, toolArgs);
+
+                // 查找工具所属的 MCP 服务器
+                McpServer server = toolToServer.get(toolName);
+                String toolResult;
+                if (server == null) {
+                    toolResult = "[错误: 未找到工具 " + toolName + " 所属的MCP服务器]";
+                    log.warn("MCP工具未找到对应服务器: {}", toolName);
+                } else {
+                    Map<String, Object> argsMap = parseToolArguments(toolArgs);
+                    toolResult = mcpClientService.callTool(server, toolName, argsMap);
+                }
+
+                // 记录工具调用日志
+                Map<String, Object> logEntry = new LinkedHashMap<>();
+                logEntry.put("iteration", iteration + 1);
+                logEntry.put("toolName", toolName);
+                logEntry.put("arguments", toolArgs);
+                logEntry.put("result", toolResult.length() > 500
+                        ? toolResult.substring(0, 500) + "...(截断)" : toolResult);
+                toolCallLogs.add(logEntry);
+
+                // 将工具结果添加到消息历史
+                chatMessages.add(ToolExecutionResultMessage.from(
+                        toolId != null ? toolId : toolName,
+                        toolName,
+                        toolResult
+                ));
+            }
+        }
+
+        // 超过最大迭代次数，收集最后的消息
+        log.warn("MCP tool calling 达到最大迭代次数 {}", MAX_TOOL_CALL_ITERATIONS);
+        ChatMessage lastMsg = chatMessages.get(chatMessages.size() - 1);
+        if (lastMsg instanceof AiMessage ai && ai.text() != null) {
+            return ai.text();
+        }
+        return "[MCP工具调用达到最大迭代次数，未获得最终回复]";
+    }
+
+    /**
+     * 将 MCP 工具定义转换为 langchain4j ToolSpecification
+     */
+    private ToolSpecification convertMcpToolToSpec(McpTool mcpTool) {
+        ToolSpecification.Builder builder = ToolSpecification.builder()
+                .name(mcpTool.getName())
+                .description(mcpTool.getDescription() != null ? mcpTool.getDescription() : "");
+
+        // 解析 inputSchema 为 JsonObjectSchema
+        JsonNode schema = mcpTool.getInputSchema();
+        if (schema != null && schema.has("properties")) {
+            try {
+                JsonObjectSchema.Builder schemaBuilder = JsonObjectSchema.builder();
+                JsonNode properties = schema.get("properties");
+                Iterator<Map.Entry<String, JsonNode>> fields = properties.fields();
+                while (fields.hasNext()) {
+                    Map.Entry<String, JsonNode> field = fields.next();
+                    String propName = field.getKey();
+                    JsonNode propDef = field.getValue();
+                    String description = propDef.has("description") ? propDef.get("description").asText() : "";
+                    String type = propDef.has("type") ? propDef.get("type").asText() : "string";
+
+                    switch (type) {
+                        case "integer", "number" -> schemaBuilder.addNumberProperty(propName, description);
+                        case "boolean" -> schemaBuilder.addBooleanProperty(propName, description);
+                        case "array" -> schemaBuilder.addProperty(propName,
+                                dev.langchain4j.model.chat.request.json.JsonArraySchema.builder()
+                                        .description(description).build());
+                        default -> schemaBuilder.addStringProperty(propName, description);
+                    }
+                }
+
+                // 处理 required 字段
+                if (schema.has("required") && schema.get("required").isArray()) {
+                    List<String> required = new ArrayList<>();
+                    for (JsonNode r : schema.get("required")) {
+                        required.add(r.asText());
+                    }
+                    schemaBuilder.required(required);
+                }
+
+                builder.parameters(schemaBuilder.build());
+            } catch (Exception e) {
+                log.warn("MCP工具 [{}] inputSchema 解析失败，将不传递参数定义: {}",
+                        mcpTool.getName(), e.getMessage());
+            }
+        }
+
+        return builder.build();
+    }
+
+    /**
+     * 解析工具调用的参数 JSON 字符串为 Map
+     */
+    private Map<String, Object> parseToolArguments(String argsJson) {
+        if (argsJson == null || argsJson.isBlank()) {
+            return Map.of();
+        }
+        try {
+            @SuppressWarnings("unchecked")
+            Map<String, Object> result = OBJECT_MAPPER.readValue(argsJson, Map.class);
+            return result;
+        } catch (Exception e) {
+            log.warn("工具参数JSON解析失败: {}", e.getMessage());
+            return Map.of();
+        }
+    }
+
+
+    // ==================== 模板与工具方法 ====================
 
     /**
      * 替换模板中的 {{变量}} 占位符
