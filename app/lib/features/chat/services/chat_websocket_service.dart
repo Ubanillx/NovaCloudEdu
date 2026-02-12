@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:stomp_dart_client/stomp_dart_client.dart';
 import '../../../config/env_config.dart';
 
@@ -174,6 +176,12 @@ class ChatWebSocketService {
   StompClient? _stompClient;
   bool _isConnected = false;
   String? _token;
+  bool _isRefreshingToken = false;
+  int _reconnectAttempts = 0;
+  static const int _maxReconnectAttempts = 3;
+  static const String _tokenKey = 'auth_token';
+  static const String _refreshTokenKey = 'refresh_token';
+  final FlutterSecureStorage _storage = const FlutterSecureStorage();
 
   // 消息回调
   final _chatMessageController = StreamController<WsChatMessage>.broadcast();
@@ -234,6 +242,8 @@ class ChatWebSocketService {
 
     debugPrint('正在连接 WebSocket: $_wsUrl');
 
+    _reconnectAttempts = 0;
+
     _stompClient = StompClient(
       config: StompConfig(
         url: _wsUrl,
@@ -249,7 +259,8 @@ class ChatWebSocketService {
         },
         heartbeatIncoming: const Duration(seconds: 10),
         heartbeatOutgoing: const Duration(seconds: 10),
-        reconnectDelay: const Duration(seconds: 5),
+        // 禁用自动重连，由 _onWebSocketError 手动处理（先刷新token再重连）
+        reconnectDelay: const Duration(seconds: 0),
       ),
     );
 
@@ -259,6 +270,7 @@ class ChatWebSocketService {
   void _onConnect(StompFrame frame) {
     debugPrint('WebSocket 已连接: ${frame.command}');
     _isConnected = true;
+    _reconnectAttempts = 0;
     _connectionStateController.add(true);
 
     // 订阅私聊消息
@@ -357,6 +369,87 @@ class ChatWebSocketService {
     debugPrint('WebSocket 错误: $error');
     _isConnected = false;
     _connectionStateController.add(false);
+
+    // 检测 401 错误（token 过期）
+    final errorStr = error.toString();
+    if (errorStr.contains('401') || errorStr.contains('not upgraded')) {
+      debugPrint('WebSocket 401 错误，尝试刷新 token 后重连...');
+      _refreshTokenAndReconnect();
+    } else {
+      // 非 401 错误，延迟后尝试用当前 token 重连
+      _scheduleReconnect();
+    }
+  }
+
+  /// 延迟重连（非 token 过期的情况）
+  void _scheduleReconnect() {
+    if (_reconnectAttempts >= _maxReconnectAttempts) {
+      debugPrint('WebSocket 重连次数已达上限 ($_maxReconnectAttempts)，停止重连');
+      return;
+    }
+    _reconnectAttempts++;
+    final delay = Duration(seconds: 5 * _reconnectAttempts);
+    debugPrint('WebSocket 将在 ${delay.inSeconds}s 后重连 (第 $_reconnectAttempts 次)');
+    Future.delayed(delay, () {
+      if (!_isConnected && _token != null) {
+        connect(_token!);
+      }
+    });
+  }
+
+  /// 刷新 token 并重连 WebSocket
+  Future<void> _refreshTokenAndReconnect() async {
+    if (_isRefreshingToken) return;
+    _isRefreshingToken = true;
+
+    try {
+      final refreshToken = await _storage.read(key: _refreshTokenKey);
+      if (refreshToken == null || refreshToken.isEmpty) {
+        debugPrint('WebSocket: 无 refresh token，无法刷新');
+        _isRefreshingToken = false;
+        return;
+      }
+
+      debugPrint('WebSocket: 正在刷新 token...');
+      final refreshDio = Dio(BaseOptions(
+        baseUrl: EnvConfig.apiBaseUrl,
+        connectTimeout: const Duration(seconds: 10),
+        receiveTimeout: const Duration(seconds: 10),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      ));
+
+      final response = await refreshDio.post(
+        '/api/auth/refresh',
+        data: {'refreshToken': refreshToken},
+      );
+
+      if (response.statusCode == 200 && response.data['code'] == 0) {
+        final data = response.data['data'];
+        final newToken = data['token'] as String?;
+        final newRefreshToken = data['refreshToken'] as String?;
+
+        if (newToken != null && newRefreshToken != null) {
+          // 保存新 token
+          await _storage.write(key: _tokenKey, value: newToken);
+          await _storage.write(key: _refreshTokenKey, value: newRefreshToken);
+
+          debugPrint('WebSocket: token 刷新成功，使用新 token 重连');
+          _isRefreshingToken = false;
+          // 用新 token 重连
+          connect(newToken);
+          return;
+        }
+      }
+
+      debugPrint('WebSocket: token 刷新失败');
+    } catch (e) {
+      debugPrint('WebSocket: token 刷新异常: $e');
+    }
+
+    _isRefreshingToken = false;
   }
 
   void _onStompError(StompFrame frame) {
