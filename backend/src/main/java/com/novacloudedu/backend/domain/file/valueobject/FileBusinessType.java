@@ -20,7 +20,11 @@ public enum FileBusinessType {
     BOOK_FILE("book/file", "书籍文件", 200 * 1024 * 1024),
     BOOK_COVER("book/cover", "书籍封面", 5 * 1024 * 1024),
     AI_GENERATED_IMAGE("ai/generated", "AI生成图片", 20 * 1024 * 1024),
-    AI_GENERATED_VIDEO("ai/video", "AI生成视频", 200 * 1024 * 1024);
+    AI_GENERATED_VIDEO("ai/video", "AI生成视频", 200 * 1024 * 1024),
+    WORKFLOW_FILE("workflow/file", "工作流文件", 50 * 1024 * 1024),
+    PPT_TEMPLATE("ppt/template", "PPT模板", 100 * 1024 * 1024),
+    PPT_GENERATED("ppt/generated", "生成的PPT", 100 * 1024 * 1024),
+    PPT_COVER("ppt/cover", "PPT封面", 5 * 1024 * 1024);
 
     private final String folder;
     private final String description;
