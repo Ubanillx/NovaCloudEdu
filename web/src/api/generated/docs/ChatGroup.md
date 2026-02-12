@@ -21,8 +21,8 @@ Name | Type | Description | Notes
 **createTime** | **string** |  | [optional] [default to undefined]
 **updateTime** | **string** |  | [optional] [default to undefined]
 **mute** | **boolean** |  | [optional] [default to undefined]
-**_delete** | **boolean** |  | [optional] [default to undefined]
 **full** | **boolean** |  | [optional] [default to undefined]
+**_delete** | **boolean** |  | [optional] [default to undefined]
 
 ## Example
 
@@ -46,8 +46,8 @@ const instance: ChatGroup = {
     createTime,
     updateTime,
     mute,
-    _delete,
     full,
+    _delete,
 };
 ```
 

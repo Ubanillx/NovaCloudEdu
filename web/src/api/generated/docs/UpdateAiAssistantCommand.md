@@ -19,6 +19,7 @@ Name | Type | Description | Notes
 **maxTokens** | **number** |  | [optional] [default to undefined]
 **isPublic** | **boolean** |  | [optional] [default to undefined]
 **sort** | **number** |  | [optional] [default to undefined]
+**mcpServerIds** | **Array&lt;number&gt;** |  | [optional] [default to undefined]
 
 ## Example
 
@@ -40,6 +41,7 @@ const instance: UpdateAiAssistantCommand = {
     maxTokens,
     isPublic,
     sort,
+    mcpServerIds,
 };
 ```
 

@@ -18,6 +18,7 @@ Name | Type | Description | Notes
 **topP** | **number** |  | [optional] [default to undefined]
 **maxTokens** | **number** |  | [optional] [default to undefined]
 **knowledgeBaseIds** | **Array&lt;number&gt;** |  | [optional] [default to undefined]
+**mcpServerIds** | **Array&lt;number&gt;** |  | [optional] [default to undefined]
 
 ## Example
 
@@ -38,6 +39,7 @@ const instance: CreateAiAssistantCommand = {
     topP,
     maxTokens,
     knowledgeBaseIds,
+    mcpServerIds,
 };
 ```
 

@@ -82,44 +82,6 @@ export const AIApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
          * 
-         * @summary 归档AI助手
-         * @param {number} id 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        archive: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'id' is not null or undefined
-            assertParamExists('archive', 'id', id)
-            const localVarPath = `/api/ai/assistants/{id}/archive`
-                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication Bearer Token required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            localVarHeaderParameter['Accept'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
          * @summary 提问（新对话）
          * @param {number} bookId 
          * @param {{ [key: string]: object; }} requestBody 
@@ -155,6 +117,128 @@ export const AIApiAxiosParamCreator = function (configuration?: Configuration) {
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(requestBody, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 归档AI助手
+         * @param {number} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assistantArchive: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('assistantArchive', 'id', id)
+            const localVarPath = `/api/ai/assistants/{id}/archive`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 绑定知识库
+         * @param {number} id 
+         * @param {number} kbId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assistantBindKnowledgeBase: async (id: number, kbId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('assistantBindKnowledgeBase', 'id', id)
+            // verify required parameter 'kbId' is not null or undefined
+            assertParamExists('assistantBindKnowledgeBase', 'kbId', kbId)
+            const localVarPath = `/api/ai/assistants/{id}/knowledge-bases/{kbId}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)))
+                .replace(`{${"kbId"}}`, encodeURIComponent(String(kbId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 绑定工作流到AI助手
+         * @param {number} id 
+         * @param {number} workflowId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assistantBindWorkflow: async (id: number, workflowId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('assistantBindWorkflow', 'id', id)
+            // verify required parameter 'workflowId' is not null or undefined
+            assertParamExists('assistantBindWorkflow', 'workflowId', workflowId)
+            const localVarPath = `/api/ai/assistants/{id}/workflows/{workflowId}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)))
+                .replace(`{${"workflowId"}}`, encodeURIComponent(String(workflowId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -205,6 +289,567 @@ export const AIApiAxiosParamCreator = function (configuration?: Configuration) {
             };
         },
         /**
+         * 
+         * @summary 创建AI助手
+         * @param {number} userId 
+         * @param {CreateAiAssistantCommand} createAiAssistantCommand 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assistantCreate: async (userId: number, createAiAssistantCommand: CreateAiAssistantCommand, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'userId' is not null or undefined
+            assertParamExists('assistantCreate', 'userId', userId)
+            // verify required parameter 'createAiAssistantCommand' is not null or undefined
+            assertParamExists('assistantCreate', 'createAiAssistantCommand', createAiAssistantCommand)
+            const localVarPath = `/api/ai/assistants`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (userId !== undefined) {
+                localVarQueryParameter['userId'] = userId;
+            }
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(createAiAssistantCommand, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 删除AI助手
+         * @param {number} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assistantDelete: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('assistantDelete', 'id', id)
+            const localVarPath = `/api/ai/assistants/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 执行AI助手绑定的工作流
+         * @param {number} id 
+         * @param {number} workflowId 
+         * @param {number} userId 
+         * @param {{ [key: string]: object; }} [requestBody] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assistantExecuteWorkflow: async (id: number, workflowId: number, userId: number, requestBody?: { [key: string]: object; }, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('assistantExecuteWorkflow', 'id', id)
+            // verify required parameter 'workflowId' is not null or undefined
+            assertParamExists('assistantExecuteWorkflow', 'workflowId', workflowId)
+            // verify required parameter 'userId' is not null or undefined
+            assertParamExists('assistantExecuteWorkflow', 'userId', userId)
+            const localVarPath = `/api/ai/assistants/{id}/workflows/{workflowId}/execute`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)))
+                .replace(`{${"workflowId"}}`, encodeURIComponent(String(workflowId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (userId !== undefined) {
+                localVarQueryParameter['userId'] = userId;
+            }
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(requestBody, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 获取AI助手详情
+         * @param {number} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assistantGetById: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('assistantGetById', 'id', id)
+            const localVarPath = `/api/ai/assistants/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 返回绑定的工作流详情，包含描述、输入参数、输出参数，供前端展示或 AI 助手对话时使用
+         * @summary 获取AI助手的工作流技能列表
+         * @param {number} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assistantGetWorkflowSkills: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('assistantGetWorkflowSkills', 'id', id)
+            const localVarPath = `/api/ai/assistants/{id}/workflow-skills`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 获取AI助手绑定的工作流列表
+         * @param {number} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assistantGetWorkflows: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('assistantGetWorkflows', 'id', id)
+            const localVarPath = `/api/ai/assistants/{id}/workflows`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 获取用户的AI助手列表
+         * @param {number} userId 
+         * @param {number} [page] 
+         * @param {number} [size] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assistantListByCreator: async (userId: number, page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'userId' is not null or undefined
+            assertParamExists('assistantListByCreator', 'userId', userId)
+            const localVarPath = `/api/ai/assistants`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (userId !== undefined) {
+                localVarQueryParameter['userId'] = userId;
+            }
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (size !== undefined) {
+                localVarQueryParameter['size'] = size;
+            }
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 获取公开的AI助手列表
+         * @param {number} [page] 
+         * @param {number} [size] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assistantListPublic: async (page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/ai/assistants/public`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (size !== undefined) {
+                localVarQueryParameter['size'] = size;
+            }
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 发布AI助手
+         * @param {number} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assistantPublish: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('assistantPublish', 'id', id)
+            const localVarPath = `/api/ai/assistants/{id}/publish`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 搜索AI助手
+         * @param {string} keyword 
+         * @param {number} [page] 
+         * @param {number} [size] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assistantSearch: async (keyword: string, page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'keyword' is not null or undefined
+            assertParamExists('assistantSearch', 'keyword', keyword)
+            const localVarPath = `/api/ai/assistants/search`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (keyword !== undefined) {
+                localVarQueryParameter['keyword'] = keyword;
+            }
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (size !== undefined) {
+                localVarQueryParameter['size'] = size;
+            }
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 解绑知识库
+         * @param {number} id 
+         * @param {number} kbId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assistantUnbindKnowledgeBase: async (id: number, kbId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('assistantUnbindKnowledgeBase', 'id', id)
+            // verify required parameter 'kbId' is not null or undefined
+            assertParamExists('assistantUnbindKnowledgeBase', 'kbId', kbId)
+            const localVarPath = `/api/ai/assistants/{id}/knowledge-bases/{kbId}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)))
+                .replace(`{${"kbId"}}`, encodeURIComponent(String(kbId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 解绑工作流
+         * @param {number} id 
+         * @param {number} workflowId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assistantUnbindWorkflow: async (id: number, workflowId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('assistantUnbindWorkflow', 'id', id)
+            // verify required parameter 'workflowId' is not null or undefined
+            assertParamExists('assistantUnbindWorkflow', 'workflowId', workflowId)
+            const localVarPath = `/api/ai/assistants/{id}/workflows/{workflowId}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)))
+                .replace(`{${"workflowId"}}`, encodeURIComponent(String(workflowId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 更新AI助手
+         * @param {number} id 
+         * @param {UpdateAiAssistantCommand} updateAiAssistantCommand 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assistantUpdate: async (id: number, updateAiAssistantCommand: UpdateAiAssistantCommand, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('assistantUpdate', 'id', id)
+            // verify required parameter 'updateAiAssistantCommand' is not null or undefined
+            assertParamExists('assistantUpdate', 'updateAiAssistantCommand', updateAiAssistantCommand)
+            const localVarPath = `/api/ai/assistants/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(updateAiAssistantCommand, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 批量对多篇文章进行AI处理
          * @summary 批量AI处理文章
          * @param {BatchAiProcessRequest} batchAiProcessRequest 
@@ -237,90 +882,6 @@ export const AIApiAxiosParamCreator = function (configuration?: Configuration) {
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(batchAiProcessRequest, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @summary 绑定知识库
-         * @param {number} id 
-         * @param {number} kbId 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        bindKnowledgeBase: async (id: number, kbId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'id' is not null or undefined
-            assertParamExists('bindKnowledgeBase', 'id', id)
-            // verify required parameter 'kbId' is not null or undefined
-            assertParamExists('bindKnowledgeBase', 'kbId', kbId)
-            const localVarPath = `/api/ai/assistants/{id}/knowledge-bases/{kbId}`
-                .replace(`{${"id"}}`, encodeURIComponent(String(id)))
-                .replace(`{${"kbId"}}`, encodeURIComponent(String(kbId)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication Bearer Token required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            localVarHeaderParameter['Accept'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @summary 绑定工作流到AI助手
-         * @param {number} id 
-         * @param {number} workflowId 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        bindWorkflow: async (id: number, workflowId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'id' is not null or undefined
-            assertParamExists('bindWorkflow', 'id', id)
-            // verify required parameter 'workflowId' is not null or undefined
-            assertParamExists('bindWorkflow', 'workflowId', workflowId)
-            const localVarPath = `/api/ai/assistants/{id}/workflows/{workflowId}`
-                .replace(`{${"id"}}`, encodeURIComponent(String(id)))
-                .replace(`{${"workflowId"}}`, encodeURIComponent(String(workflowId)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication Bearer Token required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            localVarHeaderParameter['Accept'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -415,52 +976,6 @@ export const AIApiAxiosParamCreator = function (configuration?: Configuration) {
         },
         /**
          * 
-         * @summary 创建AI助手
-         * @param {number} userId 
-         * @param {CreateAiAssistantCommand} createAiAssistantCommand 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        create2: async (userId: number, createAiAssistantCommand: CreateAiAssistantCommand, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'userId' is not null or undefined
-            assertParamExists('create2', 'userId', userId)
-            // verify required parameter 'createAiAssistantCommand' is not null or undefined
-            assertParamExists('create2', 'createAiAssistantCommand', createAiAssistantCommand)
-            const localVarPath = `/api/ai/assistants`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication Bearer Token required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            if (userId !== undefined) {
-                localVarQueryParameter['userId'] = userId;
-            }
-
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-            localVarHeaderParameter['Accept'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(createAiAssistantCommand, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
          * @summary 创建新会话
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -495,52 +1010,14 @@ export const AIApiAxiosParamCreator = function (configuration?: Configuration) {
         },
         /**
          * 
-         * @summary 删除AI助手
-         * @param {number} id 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        delete2: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'id' is not null or undefined
-            assertParamExists('delete2', 'id', id)
-            const localVarPath = `/api/ai/assistants/{id}`
-                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication Bearer Token required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            localVarHeaderParameter['Accept'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
          * @summary 删除会话
          * @param {number} sessionId 会话ID
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deleteSession: async (sessionId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        deleteSession1: async (sessionId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'sessionId' is not null or undefined
-            assertParamExists('deleteSession', 'sessionId', sessionId)
+            assertParamExists('deleteSession1', 'sessionId', sessionId)
             const localVarPath = `/api/ai/chat/sessions/{sessionId}`
                 .replace(`{${"sessionId"}}`, encodeURIComponent(String(sessionId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -563,58 +1040,6 @@ export const AIApiAxiosParamCreator = function (configuration?: Configuration) {
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @summary 执行AI助手绑定的工作流
-         * @param {number} id 
-         * @param {number} workflowId 
-         * @param {number} userId 
-         * @param {{ [key: string]: object; }} [requestBody] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        executeWorkflow: async (id: number, workflowId: number, userId: number, requestBody?: { [key: string]: object; }, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'id' is not null or undefined
-            assertParamExists('executeWorkflow', 'id', id)
-            // verify required parameter 'workflowId' is not null or undefined
-            assertParamExists('executeWorkflow', 'workflowId', workflowId)
-            // verify required parameter 'userId' is not null or undefined
-            assertParamExists('executeWorkflow', 'userId', userId)
-            const localVarPath = `/api/ai/assistants/{id}/workflows/{workflowId}/execute`
-                .replace(`{${"id"}}`, encodeURIComponent(String(id)))
-                .replace(`{${"workflowId"}}`, encodeURIComponent(String(workflowId)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication Bearer Token required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            if (userId !== undefined) {
-                localVarQueryParameter['userId'] = userId;
-            }
-
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-            localVarHeaderParameter['Accept'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(requestBody, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -778,44 +1203,6 @@ export const AIApiAxiosParamCreator = function (configuration?: Configuration) {
             const localVarPath = `/api/books/{bookId}/ai/chapters/{chapterId}/summaries`
                 .replace(`{${"bookId"}}`, encodeURIComponent(String(bookId)))
                 .replace(`{${"chapterId"}}`, encodeURIComponent(String(chapterId)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication Bearer Token required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            localVarHeaderParameter['Accept'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @summary 获取AI助手详情
-         * @param {number} id 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getById2: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'id' is not null or undefined
-            assertParamExists('getById2', 'id', id)
-            const localVarPath = `/api/ai/assistants/{id}`
-                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -1022,9 +1409,9 @@ export const AIApiAxiosParamCreator = function (configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getSessionDetail: async (sessionId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getSessionDetail1: async (sessionId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'sessionId' is not null or undefined
-            assertParamExists('getSessionDetail', 'sessionId', sessionId)
+            assertParamExists('getSessionDetail1', 'sessionId', sessionId)
             const localVarPath = `/api/ai/chat/sessions/{sessionId}`
                 .replace(`{${"sessionId"}}`, encodeURIComponent(String(sessionId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -1156,82 +1543,6 @@ export const AIApiAxiosParamCreator = function (configuration?: Configuration) {
             };
         },
         /**
-         * 返回绑定的工作流详情，包含描述、输入参数、输出参数，供前端展示或 AI 助手对话时使用
-         * @summary 获取AI助手的工作流技能列表
-         * @param {number} id 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getWorkflowSkills: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'id' is not null or undefined
-            assertParamExists('getWorkflowSkills', 'id', id)
-            const localVarPath = `/api/ai/assistants/{id}/workflow-skills`
-                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication Bearer Token required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            localVarHeaderParameter['Accept'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @summary 获取AI助手绑定的工作流列表
-         * @param {number} id 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getWorkflows: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'id' is not null or undefined
-            assertParamExists('getWorkflows', 'id', id)
-            const localVarPath = `/api/ai/assistants/{id}/workflows`
-                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication Bearer Token required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            localVarHeaderParameter['Accept'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
          * 返回所有供应商的所有模型（含未启用的），标注 enabled/isDefault 状态
          * @summary 获取全量模型配置
          * @param {*} [options] Override http request option.
@@ -1266,57 +1577,6 @@ export const AIApiAxiosParamCreator = function (configuration?: Configuration) {
             };
         },
         /**
-         * 
-         * @summary 获取用户的AI助手列表
-         * @param {number} userId 
-         * @param {number} [page] 
-         * @param {number} [size] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        listByCreator1: async (userId: number, page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'userId' is not null or undefined
-            assertParamExists('listByCreator1', 'userId', userId)
-            const localVarPath = `/api/ai/assistants`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication Bearer Token required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            if (userId !== undefined) {
-                localVarQueryParameter['userId'] = userId;
-            }
-
-            if (page !== undefined) {
-                localVarQueryParameter['page'] = page;
-            }
-
-            if (size !== undefined) {
-                localVarQueryParameter['size'] = size;
-            }
-
-            localVarHeaderParameter['Accept'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
          * 仅返回已启用的模型，前端用于模型选择下拉框
          * @summary 获取可用模型列表
          * @param {*} [options] Override http request option.
@@ -1338,50 +1598,6 @@ export const AIApiAxiosParamCreator = function (configuration?: Configuration) {
             // authentication Bearer Token required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            localVarHeaderParameter['Accept'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @summary 获取公开的AI助手列表
-         * @param {number} [page] 
-         * @param {number} [size] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        listPublic1: async (page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/ai/assistants/public`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication Bearer Token required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            if (page !== undefined) {
-                localVarQueryParameter['page'] = page;
-            }
-
-            if (size !== undefined) {
-                localVarQueryParameter['size'] = size;
-            }
 
             localVarHeaderParameter['Accept'] = 'application/json';
 
@@ -1518,44 +1734,6 @@ export const AIApiAxiosParamCreator = function (configuration?: Configuration) {
         },
         /**
          * 
-         * @summary 发布AI助手
-         * @param {number} id 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        publish: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'id' is not null or undefined
-            assertParamExists('publish', 'id', id)
-            const localVarPath = `/api/ai/assistants/{id}/publish`
-                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication Bearer Token required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            localVarHeaderParameter['Accept'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
          * @summary 重新提取知识点
          * @param {number} bookId 
          * @param {number} chapterId 
@@ -1630,57 +1808,6 @@ export const AIApiAxiosParamCreator = function (configuration?: Configuration) {
 
             if (summaryType !== undefined) {
                 localVarQueryParameter['summaryType'] = summaryType;
-            }
-
-            localVarHeaderParameter['Accept'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @summary 搜索AI助手
-         * @param {string} keyword 
-         * @param {number} [page] 
-         * @param {number} [size] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        search1: async (keyword: string, page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'keyword' is not null or undefined
-            assertParamExists('search1', 'keyword', keyword)
-            const localVarPath = `/api/ai/assistants/search`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication Bearer Token required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            if (keyword !== undefined) {
-                localVarQueryParameter['keyword'] = keyword;
-            }
-
-            if (page !== undefined) {
-                localVarQueryParameter['page'] = page;
-            }
-
-            if (size !== undefined) {
-                localVarQueryParameter['size'] = size;
             }
 
             localVarHeaderParameter['Accept'] = 'application/json';
@@ -1967,133 +2094,6 @@ export const AIApiAxiosParamCreator = function (configuration?: Configuration) {
                 options: localVarRequestOptions,
             };
         },
-        /**
-         * 
-         * @summary 解绑知识库
-         * @param {number} id 
-         * @param {number} kbId 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        unbindKnowledgeBase: async (id: number, kbId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'id' is not null or undefined
-            assertParamExists('unbindKnowledgeBase', 'id', id)
-            // verify required parameter 'kbId' is not null or undefined
-            assertParamExists('unbindKnowledgeBase', 'kbId', kbId)
-            const localVarPath = `/api/ai/assistants/{id}/knowledge-bases/{kbId}`
-                .replace(`{${"id"}}`, encodeURIComponent(String(id)))
-                .replace(`{${"kbId"}}`, encodeURIComponent(String(kbId)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication Bearer Token required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            localVarHeaderParameter['Accept'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @summary 解绑工作流
-         * @param {number} id 
-         * @param {number} workflowId 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        unbindWorkflow: async (id: number, workflowId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'id' is not null or undefined
-            assertParamExists('unbindWorkflow', 'id', id)
-            // verify required parameter 'workflowId' is not null or undefined
-            assertParamExists('unbindWorkflow', 'workflowId', workflowId)
-            const localVarPath = `/api/ai/assistants/{id}/workflows/{workflowId}`
-                .replace(`{${"id"}}`, encodeURIComponent(String(id)))
-                .replace(`{${"workflowId"}}`, encodeURIComponent(String(workflowId)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication Bearer Token required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            localVarHeaderParameter['Accept'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @summary 更新AI助手
-         * @param {number} id 
-         * @param {UpdateAiAssistantCommand} updateAiAssistantCommand 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        update2: async (id: number, updateAiAssistantCommand: UpdateAiAssistantCommand, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'id' is not null or undefined
-            assertParamExists('update2', 'id', id)
-            // verify required parameter 'updateAiAssistantCommand' is not null or undefined
-            assertParamExists('update2', 'updateAiAssistantCommand', updateAiAssistantCommand)
-            const localVarPath = `/api/ai/assistants/{id}`
-                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication Bearer Token required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-            localVarHeaderParameter['Accept'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(updateAiAssistantCommand, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
     }
 };
 
@@ -2103,19 +2103,6 @@ export const AIApiAxiosParamCreator = function (configuration?: Configuration) {
 export const AIApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = AIApiAxiosParamCreator(configuration)
     return {
-        /**
-         * 
-         * @summary 归档AI助手
-         * @param {number} id 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async archive(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseAiAssistantVO>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.archive(id, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['AIApi.archive']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
         /**
          * 
          * @summary 提问（新对话）
@@ -2128,6 +2115,47 @@ export const AIApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.askQuestion(bookId, requestBody, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['AIApi.askQuestion']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 归档AI助手
+         * @param {number} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async assistantArchive(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseAiAssistantVO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.assistantArchive(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AIApi.assistantArchive']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 绑定知识库
+         * @param {number} id 
+         * @param {number} kbId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async assistantBindKnowledgeBase(id: number, kbId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.assistantBindKnowledgeBase(id, kbId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AIApi.assistantBindKnowledgeBase']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 绑定工作流到AI助手
+         * @param {number} id 
+         * @param {number} workflowId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async assistantBindWorkflow(id: number, workflowId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.assistantBindWorkflow(id, workflowId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AIApi.assistantBindWorkflow']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -2145,6 +2173,187 @@ export const AIApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 
+         * @summary 创建AI助手
+         * @param {number} userId 
+         * @param {CreateAiAssistantCommand} createAiAssistantCommand 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async assistantCreate(userId: number, createAiAssistantCommand: CreateAiAssistantCommand, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseAiAssistantVO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.assistantCreate(userId, createAiAssistantCommand, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AIApi.assistantCreate']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 删除AI助手
+         * @param {number} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async assistantDelete(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.assistantDelete(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AIApi.assistantDelete']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 执行AI助手绑定的工作流
+         * @param {number} id 
+         * @param {number} workflowId 
+         * @param {number} userId 
+         * @param {{ [key: string]: object; }} [requestBody] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async assistantExecuteWorkflow(id: number, workflowId: number, userId: number, requestBody?: { [key: string]: object; }, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseMapStringObject>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.assistantExecuteWorkflow(id, workflowId, userId, requestBody, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AIApi.assistantExecuteWorkflow']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 获取AI助手详情
+         * @param {number} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async assistantGetById(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseAiAssistantVO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.assistantGetById(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AIApi.assistantGetById']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 返回绑定的工作流详情，包含描述、输入参数、输出参数，供前端展示或 AI 助手对话时使用
+         * @summary 获取AI助手的工作流技能列表
+         * @param {number} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async assistantGetWorkflowSkills(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseListWorkflowSkillVO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.assistantGetWorkflowSkills(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AIApi.assistantGetWorkflowSkills']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 获取AI助手绑定的工作流列表
+         * @param {number} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async assistantGetWorkflows(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseListLong>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.assistantGetWorkflows(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AIApi.assistantGetWorkflows']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 获取用户的AI助手列表
+         * @param {number} userId 
+         * @param {number} [page] 
+         * @param {number} [size] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async assistantListByCreator(userId: number, page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseListAiAssistantVO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.assistantListByCreator(userId, page, size, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AIApi.assistantListByCreator']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 获取公开的AI助手列表
+         * @param {number} [page] 
+         * @param {number} [size] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async assistantListPublic(page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseListAiAssistantVO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.assistantListPublic(page, size, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AIApi.assistantListPublic']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 发布AI助手
+         * @param {number} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async assistantPublish(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseAiAssistantVO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.assistantPublish(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AIApi.assistantPublish']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 搜索AI助手
+         * @param {string} keyword 
+         * @param {number} [page] 
+         * @param {number} [size] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async assistantSearch(keyword: string, page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseListAiAssistantVO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.assistantSearch(keyword, page, size, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AIApi.assistantSearch']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 解绑知识库
+         * @param {number} id 
+         * @param {number} kbId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async assistantUnbindKnowledgeBase(id: number, kbId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.assistantUnbindKnowledgeBase(id, kbId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AIApi.assistantUnbindKnowledgeBase']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 解绑工作流
+         * @param {number} id 
+         * @param {number} workflowId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async assistantUnbindWorkflow(id: number, workflowId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.assistantUnbindWorkflow(id, workflowId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AIApi.assistantUnbindWorkflow']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 更新AI助手
+         * @param {number} id 
+         * @param {UpdateAiAssistantCommand} updateAiAssistantCommand 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async assistantUpdate(id: number, updateAiAssistantCommand: UpdateAiAssistantCommand, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseAiAssistantVO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.assistantUpdate(id, updateAiAssistantCommand, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AIApi.assistantUpdate']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 批量对多篇文章进行AI处理
          * @summary 批量AI处理文章
          * @param {BatchAiProcessRequest} batchAiProcessRequest 
@@ -2155,34 +2364,6 @@ export const AIApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.batchProcessArticles(batchAiProcessRequest, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['AIApi.batchProcessArticles']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * 
-         * @summary 绑定知识库
-         * @param {number} id 
-         * @param {number} kbId 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async bindKnowledgeBase(id: number, kbId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseVoid>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.bindKnowledgeBase(id, kbId, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['AIApi.bindKnowledgeBase']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * 
-         * @summary 绑定工作流到AI助手
-         * @param {number} id 
-         * @param {number} workflowId 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async bindWorkflow(id: number, workflowId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseVoid>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.bindWorkflow(id, workflowId, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['AIApi.bindWorkflow']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -2215,20 +2396,6 @@ export const AIApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
-         * @summary 创建AI助手
-         * @param {number} userId 
-         * @param {CreateAiAssistantCommand} createAiAssistantCommand 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async create2(userId: number, createAiAssistantCommand: CreateAiAssistantCommand, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseAiAssistantVO>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.create2(userId, createAiAssistantCommand, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['AIApi.create2']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * 
          * @summary 创建新会话
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -2241,44 +2408,15 @@ export const AIApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
-         * @summary 删除AI助手
-         * @param {number} id 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async delete2(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseVoid>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.delete2(id, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['AIApi.delete2']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * 
          * @summary 删除会话
          * @param {number} sessionId 会话ID
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async deleteSession(sessionId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseVoid>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteSession(sessionId, options);
+        async deleteSession1(sessionId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteSession1(sessionId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['AIApi.deleteSession']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * 
-         * @summary 执行AI助手绑定的工作流
-         * @param {number} id 
-         * @param {number} workflowId 
-         * @param {number} userId 
-         * @param {{ [key: string]: object; }} [requestBody] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async executeWorkflow(id: number, workflowId: number, userId: number, requestBody?: { [key: string]: object; }, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseMapStringObject>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.executeWorkflow(id, workflowId, userId, requestBody, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['AIApi.executeWorkflow']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['AIApi.deleteSession1']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -2338,19 +2476,6 @@ export const AIApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getAllSummaries(bookId, chapterId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['AIApi.getAllSummaries']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * 
-         * @summary 获取AI助手详情
-         * @param {number} id 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async getById2(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseAiAssistantVO>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getById2(id, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['AIApi.getById2']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -2417,10 +2542,10 @@ export const AIApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getSessionDetail(sessionId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseMapStringObject>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getSessionDetail(sessionId, options);
+        async getSessionDetail1(sessionId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseMapStringObject>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getSessionDetail1(sessionId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['AIApi.getSessionDetail']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['AIApi.getSessionDetail1']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -2455,32 +2580,6 @@ export const AIApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * 返回绑定的工作流详情，包含描述、输入参数、输出参数，供前端展示或 AI 助手对话时使用
-         * @summary 获取AI助手的工作流技能列表
-         * @param {number} id 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async getWorkflowSkills(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseListWorkflowSkillVO>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getWorkflowSkills(id, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['AIApi.getWorkflowSkills']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * 
-         * @summary 获取AI助手绑定的工作流列表
-         * @param {number} id 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async getWorkflows(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseListLong>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getWorkflows(id, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['AIApi.getWorkflows']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
          * 返回所有供应商的所有模型（含未启用的），标注 enabled/isDefault 状态
          * @summary 获取全量模型配置
          * @param {*} [options] Override http request option.
@@ -2493,21 +2592,6 @@ export const AIApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * 
-         * @summary 获取用户的AI助手列表
-         * @param {number} userId 
-         * @param {number} [page] 
-         * @param {number} [size] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async listByCreator1(userId: number, page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseListAiAssistantVO>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listByCreator1(userId, page, size, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['AIApi.listByCreator1']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
          * 仅返回已启用的模型，前端用于模型选择下拉框
          * @summary 获取可用模型列表
          * @param {*} [options] Override http request option.
@@ -2517,20 +2601,6 @@ export const AIApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.listModels(options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['AIApi.listModels']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * 
-         * @summary 获取公开的AI助手列表
-         * @param {number} [page] 
-         * @param {number} [size] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async listPublic1(page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseListAiAssistantVO>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listPublic1(page, size, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['AIApi.listPublic1']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -2575,19 +2645,6 @@ export const AIApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
-         * @summary 发布AI助手
-         * @param {number} id 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async publish(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseAiAssistantVO>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.publish(id, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['AIApi.publish']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * 
          * @summary 重新提取知识点
          * @param {number} bookId 
          * @param {number} chapterId 
@@ -2613,21 +2670,6 @@ export const AIApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.regenerateSummary(bookId, chapterId, summaryType, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['AIApi.regenerateSummary']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * 
-         * @summary 搜索AI助手
-         * @param {string} keyword 
-         * @param {number} [page] 
-         * @param {number} [size] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async search1(keyword: string, page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseListAiAssistantVO>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.search1(keyword, page, size, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['AIApi.search1']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -2716,48 +2758,6 @@ export const AIApiFp = function(configuration?: Configuration) {
             const localVarOperationServerBasePath = operationServerMap['AIApi.submitAnswers']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
-        /**
-         * 
-         * @summary 解绑知识库
-         * @param {number} id 
-         * @param {number} kbId 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async unbindKnowledgeBase(id: number, kbId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseVoid>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.unbindKnowledgeBase(id, kbId, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['AIApi.unbindKnowledgeBase']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * 
-         * @summary 解绑工作流
-         * @param {number} id 
-         * @param {number} workflowId 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async unbindWorkflow(id: number, workflowId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseVoid>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.unbindWorkflow(id, workflowId, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['AIApi.unbindWorkflow']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * 
-         * @summary 更新AI助手
-         * @param {number} id 
-         * @param {UpdateAiAssistantCommand} updateAiAssistantCommand 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async update2(id: number, updateAiAssistantCommand: UpdateAiAssistantCommand, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseAiAssistantVO>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.update2(id, updateAiAssistantCommand, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['AIApi.update2']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
     }
 };
 
@@ -2769,16 +2769,6 @@ export const AIApiFactory = function (configuration?: Configuration, basePath?: 
     return {
         /**
          * 
-         * @summary 归档AI助手
-         * @param {AIApiArchiveRequest} requestParameters Request parameters.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        archive(requestParameters: AIApiArchiveRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseAiAssistantVO> {
-            return localVarFp.archive(requestParameters.id, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
          * @summary 提问（新对话）
          * @param {AIApiAskQuestionRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
@@ -2786,6 +2776,36 @@ export const AIApiFactory = function (configuration?: Configuration, basePath?: 
          */
         askQuestion(requestParameters: AIApiAskQuestionRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringObject> {
             return localVarFp.askQuestion(requestParameters.bookId, requestParameters.requestBody, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 归档AI助手
+         * @param {AIApiAssistantArchiveRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assistantArchive(requestParameters: AIApiAssistantArchiveRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseAiAssistantVO> {
+            return localVarFp.assistantArchive(requestParameters.id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 绑定知识库
+         * @param {AIApiAssistantBindKnowledgeBaseRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assistantBindKnowledgeBase(requestParameters: AIApiAssistantBindKnowledgeBaseRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid> {
+            return localVarFp.assistantBindKnowledgeBase(requestParameters.id, requestParameters.kbId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 绑定工作流到AI助手
+         * @param {AIApiAssistantBindWorkflowRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assistantBindWorkflow(requestParameters: AIApiAssistantBindWorkflowRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid> {
+            return localVarFp.assistantBindWorkflow(requestParameters.id, requestParameters.workflowId, options).then((request) => request(axios, basePath));
         },
         /**
          * 通过助手ID与配置好的AI助手进行SSE流式对话。自动使用助手的systemPrompt和modelConfig，自动从绑定的知识库进行RAG检索，支持文档解析、多模态图片理解、文生图、图参生图、文生视频等全部外部技能。如不传sessionId则自动创建新会话，支持会话级记忆管理。
@@ -2798,6 +2818,136 @@ export const AIApiFactory = function (configuration?: Configuration, basePath?: 
             return localVarFp.assistantChat(requestParameters.id, requestParameters.assistantChatRequest, options).then((request) => request(axios, basePath));
         },
         /**
+         * 
+         * @summary 创建AI助手
+         * @param {AIApiAssistantCreateRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assistantCreate(requestParameters: AIApiAssistantCreateRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseAiAssistantVO> {
+            return localVarFp.assistantCreate(requestParameters.userId, requestParameters.createAiAssistantCommand, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 删除AI助手
+         * @param {AIApiAssistantDeleteRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assistantDelete(requestParameters: AIApiAssistantDeleteRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid> {
+            return localVarFp.assistantDelete(requestParameters.id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 执行AI助手绑定的工作流
+         * @param {AIApiAssistantExecuteWorkflowRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assistantExecuteWorkflow(requestParameters: AIApiAssistantExecuteWorkflowRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringObject> {
+            return localVarFp.assistantExecuteWorkflow(requestParameters.id, requestParameters.workflowId, requestParameters.userId, requestParameters.requestBody, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 获取AI助手详情
+         * @param {AIApiAssistantGetByIdRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assistantGetById(requestParameters: AIApiAssistantGetByIdRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseAiAssistantVO> {
+            return localVarFp.assistantGetById(requestParameters.id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 返回绑定的工作流详情，包含描述、输入参数、输出参数，供前端展示或 AI 助手对话时使用
+         * @summary 获取AI助手的工作流技能列表
+         * @param {AIApiAssistantGetWorkflowSkillsRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assistantGetWorkflowSkills(requestParameters: AIApiAssistantGetWorkflowSkillsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListWorkflowSkillVO> {
+            return localVarFp.assistantGetWorkflowSkills(requestParameters.id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 获取AI助手绑定的工作流列表
+         * @param {AIApiAssistantGetWorkflowsRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assistantGetWorkflows(requestParameters: AIApiAssistantGetWorkflowsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListLong> {
+            return localVarFp.assistantGetWorkflows(requestParameters.id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 获取用户的AI助手列表
+         * @param {AIApiAssistantListByCreatorRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assistantListByCreator(requestParameters: AIApiAssistantListByCreatorRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListAiAssistantVO> {
+            return localVarFp.assistantListByCreator(requestParameters.userId, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 获取公开的AI助手列表
+         * @param {AIApiAssistantListPublicRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assistantListPublic(requestParameters: AIApiAssistantListPublicRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListAiAssistantVO> {
+            return localVarFp.assistantListPublic(requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 发布AI助手
+         * @param {AIApiAssistantPublishRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assistantPublish(requestParameters: AIApiAssistantPublishRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseAiAssistantVO> {
+            return localVarFp.assistantPublish(requestParameters.id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 搜索AI助手
+         * @param {AIApiAssistantSearchRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assistantSearch(requestParameters: AIApiAssistantSearchRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListAiAssistantVO> {
+            return localVarFp.assistantSearch(requestParameters.keyword, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 解绑知识库
+         * @param {AIApiAssistantUnbindKnowledgeBaseRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assistantUnbindKnowledgeBase(requestParameters: AIApiAssistantUnbindKnowledgeBaseRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid> {
+            return localVarFp.assistantUnbindKnowledgeBase(requestParameters.id, requestParameters.kbId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 解绑工作流
+         * @param {AIApiAssistantUnbindWorkflowRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assistantUnbindWorkflow(requestParameters: AIApiAssistantUnbindWorkflowRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid> {
+            return localVarFp.assistantUnbindWorkflow(requestParameters.id, requestParameters.workflowId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 更新AI助手
+         * @param {AIApiAssistantUpdateRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assistantUpdate(requestParameters: AIApiAssistantUpdateRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseAiAssistantVO> {
+            return localVarFp.assistantUpdate(requestParameters.id, requestParameters.updateAiAssistantCommand, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 批量对多篇文章进行AI处理
          * @summary 批量AI处理文章
          * @param {AIApiBatchProcessArticlesRequest} requestParameters Request parameters.
@@ -2806,26 +2956,6 @@ export const AIApiFactory = function (configuration?: Configuration, basePath?: 
          */
         batchProcessArticles(requestParameters: AIApiBatchProcessArticlesRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringObject> {
             return localVarFp.batchProcessArticles(requestParameters.batchAiProcessRequest, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @summary 绑定知识库
-         * @param {AIApiBindKnowledgeBaseRequest} requestParameters Request parameters.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        bindKnowledgeBase(requestParameters: AIApiBindKnowledgeBaseRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid> {
-            return localVarFp.bindKnowledgeBase(requestParameters.id, requestParameters.kbId, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @summary 绑定工作流到AI助手
-         * @param {AIApiBindWorkflowRequest} requestParameters Request parameters.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        bindWorkflow(requestParameters: AIApiBindWorkflowRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid> {
-            return localVarFp.bindWorkflow(requestParameters.id, requestParameters.workflowId, options).then((request) => request(axios, basePath));
         },
         /**
          * 与文章内容进行AI对话，返回完整回复
@@ -2849,16 +2979,6 @@ export const AIApiFactory = function (configuration?: Configuration, basePath?: 
         },
         /**
          * 
-         * @summary 创建AI助手
-         * @param {AIApiCreate2Request} requestParameters Request parameters.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        create2(requestParameters: AIApiCreate2Request, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseAiAssistantVO> {
-            return localVarFp.create2(requestParameters.userId, requestParameters.createAiAssistantCommand, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
          * @summary 创建新会话
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -2868,33 +2988,13 @@ export const AIApiFactory = function (configuration?: Configuration, basePath?: 
         },
         /**
          * 
-         * @summary 删除AI助手
-         * @param {AIApiDelete2Request} requestParameters Request parameters.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        delete2(requestParameters: AIApiDelete2Request, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid> {
-            return localVarFp.delete2(requestParameters.id, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
          * @summary 删除会话
-         * @param {AIApiDeleteSessionRequest} requestParameters Request parameters.
+         * @param {AIApiDeleteSession1Request} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deleteSession(requestParameters: AIApiDeleteSessionRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid> {
-            return localVarFp.deleteSession(requestParameters.sessionId, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @summary 执行AI助手绑定的工作流
-         * @param {AIApiExecuteWorkflowRequest} requestParameters Request parameters.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        executeWorkflow(requestParameters: AIApiExecuteWorkflowRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringObject> {
-            return localVarFp.executeWorkflow(requestParameters.id, requestParameters.workflowId, requestParameters.userId, requestParameters.requestBody, options).then((request) => request(axios, basePath));
+        deleteSession1(requestParameters: AIApiDeleteSession1Request, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid> {
+            return localVarFp.deleteSession1(requestParameters.sessionId, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -2935,16 +3035,6 @@ export const AIApiFactory = function (configuration?: Configuration, basePath?: 
          */
         getAllSummaries(requestParameters: AIApiGetAllSummariesRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListChapterSummary> {
             return localVarFp.getAllSummaries(requestParameters.bookId, requestParameters.chapterId, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @summary 获取AI助手详情
-         * @param {AIApiGetById2Request} requestParameters Request parameters.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getById2(requestParameters: AIApiGetById2Request, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseAiAssistantVO> {
-            return localVarFp.getById2(requestParameters.id, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -2989,12 +3079,12 @@ export const AIApiFactory = function (configuration?: Configuration, basePath?: 
         /**
          * 
          * @summary 获取会话详情（含消息列表）
-         * @param {AIApiGetSessionDetailRequest} requestParameters Request parameters.
+         * @param {AIApiGetSessionDetail1Request} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getSessionDetail(requestParameters: AIApiGetSessionDetailRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringObject> {
-            return localVarFp.getSessionDetail(requestParameters.sessionId, options).then((request) => request(axios, basePath));
+        getSessionDetail1(requestParameters: AIApiGetSessionDetail1Request, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringObject> {
+            return localVarFp.getSessionDetail1(requestParameters.sessionId, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -3017,26 +3107,6 @@ export const AIApiFactory = function (configuration?: Configuration, basePath?: 
             return localVarFp.getUserConversations(requestParameters.bookId, requestParameters.userId, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
         },
         /**
-         * 返回绑定的工作流详情，包含描述、输入参数、输出参数，供前端展示或 AI 助手对话时使用
-         * @summary 获取AI助手的工作流技能列表
-         * @param {AIApiGetWorkflowSkillsRequest} requestParameters Request parameters.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getWorkflowSkills(requestParameters: AIApiGetWorkflowSkillsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListWorkflowSkillVO> {
-            return localVarFp.getWorkflowSkills(requestParameters.id, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @summary 获取AI助手绑定的工作流列表
-         * @param {AIApiGetWorkflowsRequest} requestParameters Request parameters.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getWorkflows(requestParameters: AIApiGetWorkflowsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListLong> {
-            return localVarFp.getWorkflows(requestParameters.id, options).then((request) => request(axios, basePath));
-        },
-        /**
          * 返回所有供应商的所有模型（含未启用的），标注 enabled/isDefault 状态
          * @summary 获取全量模型配置
          * @param {*} [options] Override http request option.
@@ -3046,16 +3116,6 @@ export const AIApiFactory = function (configuration?: Configuration, basePath?: 
             return localVarFp.listAllModels(options).then((request) => request(axios, basePath));
         },
         /**
-         * 
-         * @summary 获取用户的AI助手列表
-         * @param {AIApiListByCreator1Request} requestParameters Request parameters.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        listByCreator1(requestParameters: AIApiListByCreator1Request, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListAiAssistantVO> {
-            return localVarFp.listByCreator1(requestParameters.userId, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
-        },
-        /**
          * 仅返回已启用的模型，前端用于模型选择下拉框
          * @summary 获取可用模型列表
          * @param {*} [options] Override http request option.
@@ -3063,16 +3123,6 @@ export const AIApiFactory = function (configuration?: Configuration, basePath?: 
          */
         listModels(options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListMapStringObject> {
             return localVarFp.listModels(options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @summary 获取公开的AI助手列表
-         * @param {AIApiListPublic1Request} requestParameters Request parameters.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        listPublic1(requestParameters: AIApiListPublic1Request = {}, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListAiAssistantVO> {
-            return localVarFp.listPublic1(requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -3106,16 +3156,6 @@ export const AIApiFactory = function (configuration?: Configuration, basePath?: 
         },
         /**
          * 
-         * @summary 发布AI助手
-         * @param {AIApiPublishRequest} requestParameters Request parameters.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        publish(requestParameters: AIApiPublishRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseAiAssistantVO> {
-            return localVarFp.publish(requestParameters.id, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
          * @summary 重新提取知识点
          * @param {AIApiRegenerateKnowledgePointsRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
@@ -3133,16 +3173,6 @@ export const AIApiFactory = function (configuration?: Configuration, basePath?: 
          */
         regenerateSummary(requestParameters: AIApiRegenerateSummaryRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseChapterSummary> {
             return localVarFp.regenerateSummary(requestParameters.bookId, requestParameters.chapterId, requestParameters.summaryType, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @summary 搜索AI助手
-         * @param {AIApiSearch1Request} requestParameters Request parameters.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        search1(requestParameters: AIApiSearch1Request, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListAiAssistantVO> {
-            return localVarFp.search1(requestParameters.keyword, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -3204,36 +3234,6 @@ export const AIApiFactory = function (configuration?: Configuration, basePath?: 
         submitAnswers(requestParameters: AIApiSubmitAnswersRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringObject> {
             return localVarFp.submitAnswers(requestParameters.bookId, requestParameters.quizId, requestParameters.requestBody, options).then((request) => request(axios, basePath));
         },
-        /**
-         * 
-         * @summary 解绑知识库
-         * @param {AIApiUnbindKnowledgeBaseRequest} requestParameters Request parameters.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        unbindKnowledgeBase(requestParameters: AIApiUnbindKnowledgeBaseRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid> {
-            return localVarFp.unbindKnowledgeBase(requestParameters.id, requestParameters.kbId, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @summary 解绑工作流
-         * @param {AIApiUnbindWorkflowRequest} requestParameters Request parameters.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        unbindWorkflow(requestParameters: AIApiUnbindWorkflowRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid> {
-            return localVarFp.unbindWorkflow(requestParameters.id, requestParameters.workflowId, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @summary 更新AI助手
-         * @param {AIApiUpdate2Request} requestParameters Request parameters.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        update2(requestParameters: AIApiUpdate2Request, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseAiAssistantVO> {
-            return localVarFp.update2(requestParameters.id, requestParameters.updateAiAssistantCommand, options).then((request) => request(axios, basePath));
-        },
     };
 };
 
@@ -3243,21 +3243,39 @@ export const AIApiFactory = function (configuration?: Configuration, basePath?: 
 export interface AIApiInterface {
     /**
      * 
-     * @summary 归档AI助手
-     * @param {AIApiArchiveRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    archive(requestParameters: AIApiArchiveRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseAiAssistantVO>;
-
-    /**
-     * 
      * @summary 提问（新对话）
      * @param {AIApiAskQuestionRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     askQuestion(requestParameters: AIApiAskQuestionRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringObject>;
+
+    /**
+     * 
+     * @summary 归档AI助手
+     * @param {AIApiAssistantArchiveRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    assistantArchive(requestParameters: AIApiAssistantArchiveRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseAiAssistantVO>;
+
+    /**
+     * 
+     * @summary 绑定知识库
+     * @param {AIApiAssistantBindKnowledgeBaseRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    assistantBindKnowledgeBase(requestParameters: AIApiAssistantBindKnowledgeBaseRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid>;
+
+    /**
+     * 
+     * @summary 绑定工作流到AI助手
+     * @param {AIApiAssistantBindWorkflowRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    assistantBindWorkflow(requestParameters: AIApiAssistantBindWorkflowRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid>;
 
     /**
      * 通过助手ID与配置好的AI助手进行SSE流式对话。自动使用助手的systemPrompt和modelConfig，自动从绑定的知识库进行RAG检索，支持文档解析、多模态图片理解、文生图、图参生图、文生视频等全部外部技能。如不传sessionId则自动创建新会话，支持会话级记忆管理。
@@ -3269,6 +3287,123 @@ export interface AIApiInterface {
     assistantChat(requestParameters: AIApiAssistantChatRequest, options?: RawAxiosRequestConfig): AxiosPromise<SseEmitter>;
 
     /**
+     * 
+     * @summary 创建AI助手
+     * @param {AIApiAssistantCreateRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    assistantCreate(requestParameters: AIApiAssistantCreateRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseAiAssistantVO>;
+
+    /**
+     * 
+     * @summary 删除AI助手
+     * @param {AIApiAssistantDeleteRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    assistantDelete(requestParameters: AIApiAssistantDeleteRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid>;
+
+    /**
+     * 
+     * @summary 执行AI助手绑定的工作流
+     * @param {AIApiAssistantExecuteWorkflowRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    assistantExecuteWorkflow(requestParameters: AIApiAssistantExecuteWorkflowRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringObject>;
+
+    /**
+     * 
+     * @summary 获取AI助手详情
+     * @param {AIApiAssistantGetByIdRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    assistantGetById(requestParameters: AIApiAssistantGetByIdRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseAiAssistantVO>;
+
+    /**
+     * 返回绑定的工作流详情，包含描述、输入参数、输出参数，供前端展示或 AI 助手对话时使用
+     * @summary 获取AI助手的工作流技能列表
+     * @param {AIApiAssistantGetWorkflowSkillsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    assistantGetWorkflowSkills(requestParameters: AIApiAssistantGetWorkflowSkillsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListWorkflowSkillVO>;
+
+    /**
+     * 
+     * @summary 获取AI助手绑定的工作流列表
+     * @param {AIApiAssistantGetWorkflowsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    assistantGetWorkflows(requestParameters: AIApiAssistantGetWorkflowsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListLong>;
+
+    /**
+     * 
+     * @summary 获取用户的AI助手列表
+     * @param {AIApiAssistantListByCreatorRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    assistantListByCreator(requestParameters: AIApiAssistantListByCreatorRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListAiAssistantVO>;
+
+    /**
+     * 
+     * @summary 获取公开的AI助手列表
+     * @param {AIApiAssistantListPublicRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    assistantListPublic(requestParameters?: AIApiAssistantListPublicRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListAiAssistantVO>;
+
+    /**
+     * 
+     * @summary 发布AI助手
+     * @param {AIApiAssistantPublishRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    assistantPublish(requestParameters: AIApiAssistantPublishRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseAiAssistantVO>;
+
+    /**
+     * 
+     * @summary 搜索AI助手
+     * @param {AIApiAssistantSearchRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    assistantSearch(requestParameters: AIApiAssistantSearchRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListAiAssistantVO>;
+
+    /**
+     * 
+     * @summary 解绑知识库
+     * @param {AIApiAssistantUnbindKnowledgeBaseRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    assistantUnbindKnowledgeBase(requestParameters: AIApiAssistantUnbindKnowledgeBaseRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid>;
+
+    /**
+     * 
+     * @summary 解绑工作流
+     * @param {AIApiAssistantUnbindWorkflowRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    assistantUnbindWorkflow(requestParameters: AIApiAssistantUnbindWorkflowRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid>;
+
+    /**
+     * 
+     * @summary 更新AI助手
+     * @param {AIApiAssistantUpdateRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    assistantUpdate(requestParameters: AIApiAssistantUpdateRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseAiAssistantVO>;
+
+    /**
      * 批量对多篇文章进行AI处理
      * @summary 批量AI处理文章
      * @param {AIApiBatchProcessArticlesRequest} requestParameters Request parameters.
@@ -3276,24 +3411,6 @@ export interface AIApiInterface {
      * @throws {RequiredError}
      */
     batchProcessArticles(requestParameters: AIApiBatchProcessArticlesRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringObject>;
-
-    /**
-     * 
-     * @summary 绑定知识库
-     * @param {AIApiBindKnowledgeBaseRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    bindKnowledgeBase(requestParameters: AIApiBindKnowledgeBaseRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid>;
-
-    /**
-     * 
-     * @summary 绑定工作流到AI助手
-     * @param {AIApiBindWorkflowRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    bindWorkflow(requestParameters: AIApiBindWorkflowRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid>;
 
     /**
      * 与文章内容进行AI对话，返回完整回复
@@ -3315,15 +3432,6 @@ export interface AIApiInterface {
 
     /**
      * 
-     * @summary 创建AI助手
-     * @param {AIApiCreate2Request} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    create2(requestParameters: AIApiCreate2Request, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseAiAssistantVO>;
-
-    /**
-     * 
      * @summary 创建新会话
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -3332,30 +3440,12 @@ export interface AIApiInterface {
 
     /**
      * 
-     * @summary 删除AI助手
-     * @param {AIApiDelete2Request} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    delete2(requestParameters: AIApiDelete2Request, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid>;
-
-    /**
-     * 
      * @summary 删除会话
-     * @param {AIApiDeleteSessionRequest} requestParameters Request parameters.
+     * @param {AIApiDeleteSession1Request} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    deleteSession(requestParameters: AIApiDeleteSessionRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid>;
-
-    /**
-     * 
-     * @summary 执行AI助手绑定的工作流
-     * @param {AIApiExecuteWorkflowRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    executeWorkflow(requestParameters: AIApiExecuteWorkflowRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringObject>;
+    deleteSession1(requestParameters: AIApiDeleteSession1Request, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid>;
 
     /**
      * 
@@ -3392,15 +3482,6 @@ export interface AIApiInterface {
      * @throws {RequiredError}
      */
     getAllSummaries(requestParameters: AIApiGetAllSummariesRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListChapterSummary>;
-
-    /**
-     * 
-     * @summary 获取AI助手详情
-     * @param {AIApiGetById2Request} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    getById2(requestParameters: AIApiGetById2Request, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseAiAssistantVO>;
 
     /**
      * 
@@ -3441,11 +3522,11 @@ export interface AIApiInterface {
     /**
      * 
      * @summary 获取会话详情（含消息列表）
-     * @param {AIApiGetSessionDetailRequest} requestParameters Request parameters.
+     * @param {AIApiGetSessionDetail1Request} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    getSessionDetail(requestParameters: AIApiGetSessionDetailRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringObject>;
+    getSessionDetail1(requestParameters: AIApiGetSessionDetail1Request, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringObject>;
 
     /**
      * 
@@ -3466,24 +3547,6 @@ export interface AIApiInterface {
     getUserConversations(requestParameters: AIApiGetUserConversationsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListAiConversation>;
 
     /**
-     * 返回绑定的工作流详情，包含描述、输入参数、输出参数，供前端展示或 AI 助手对话时使用
-     * @summary 获取AI助手的工作流技能列表
-     * @param {AIApiGetWorkflowSkillsRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    getWorkflowSkills(requestParameters: AIApiGetWorkflowSkillsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListWorkflowSkillVO>;
-
-    /**
-     * 
-     * @summary 获取AI助手绑定的工作流列表
-     * @param {AIApiGetWorkflowsRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    getWorkflows(requestParameters: AIApiGetWorkflowsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListLong>;
-
-    /**
      * 返回所有供应商的所有模型（含未启用的），标注 enabled/isDefault 状态
      * @summary 获取全量模型配置
      * @param {*} [options] Override http request option.
@@ -3492,30 +3555,12 @@ export interface AIApiInterface {
     listAllModels(options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListMapStringObject>;
 
     /**
-     * 
-     * @summary 获取用户的AI助手列表
-     * @param {AIApiListByCreator1Request} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    listByCreator1(requestParameters: AIApiListByCreator1Request, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListAiAssistantVO>;
-
-    /**
      * 仅返回已启用的模型，前端用于模型选择下拉框
      * @summary 获取可用模型列表
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     listModels(options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListMapStringObject>;
-
-    /**
-     * 
-     * @summary 获取公开的AI助手列表
-     * @param {AIApiListPublic1Request} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    listPublic1(requestParameters?: AIApiListPublic1Request, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListAiAssistantVO>;
 
     /**
      * 
@@ -3546,15 +3591,6 @@ export interface AIApiInterface {
 
     /**
      * 
-     * @summary 发布AI助手
-     * @param {AIApiPublishRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    publish(requestParameters: AIApiPublishRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseAiAssistantVO>;
-
-    /**
-     * 
      * @summary 重新提取知识点
      * @param {AIApiRegenerateKnowledgePointsRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -3570,15 +3606,6 @@ export interface AIApiInterface {
      * @throws {RequiredError}
      */
     regenerateSummary(requestParameters: AIApiRegenerateSummaryRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseChapterSummary>;
-
-    /**
-     * 
-     * @summary 搜索AI助手
-     * @param {AIApiSearch1Request} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    search1(requestParameters: AIApiSearch1Request, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListAiAssistantVO>;
 
     /**
      * 
@@ -3634,40 +3661,6 @@ export interface AIApiInterface {
      */
     submitAnswers(requestParameters: AIApiSubmitAnswersRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringObject>;
 
-    /**
-     * 
-     * @summary 解绑知识库
-     * @param {AIApiUnbindKnowledgeBaseRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    unbindKnowledgeBase(requestParameters: AIApiUnbindKnowledgeBaseRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid>;
-
-    /**
-     * 
-     * @summary 解绑工作流
-     * @param {AIApiUnbindWorkflowRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    unbindWorkflow(requestParameters: AIApiUnbindWorkflowRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid>;
-
-    /**
-     * 
-     * @summary 更新AI助手
-     * @param {AIApiUpdate2Request} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    update2(requestParameters: AIApiUpdate2Request, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseAiAssistantVO>;
-
-}
-
-/**
- * Request parameters for archive operation in AIApi.
- */
-export interface AIApiArchiveRequest {
-    readonly id: number
 }
 
 /**
@@ -3677,6 +3670,31 @@ export interface AIApiAskQuestionRequest {
     readonly bookId: number
 
     readonly requestBody: { [key: string]: object; }
+}
+
+/**
+ * Request parameters for assistantArchive operation in AIApi.
+ */
+export interface AIApiAssistantArchiveRequest {
+    readonly id: number
+}
+
+/**
+ * Request parameters for assistantBindKnowledgeBase operation in AIApi.
+ */
+export interface AIApiAssistantBindKnowledgeBaseRequest {
+    readonly id: number
+
+    readonly kbId: number
+}
+
+/**
+ * Request parameters for assistantBindWorkflow operation in AIApi.
+ */
+export interface AIApiAssistantBindWorkflowRequest {
+    readonly id: number
+
+    readonly workflowId: number
 }
 
 /**
@@ -3692,28 +3710,125 @@ export interface AIApiAssistantChatRequest {
 }
 
 /**
- * Request parameters for batchProcessArticles operation in AIApi.
+ * Request parameters for assistantCreate operation in AIApi.
  */
-export interface AIApiBatchProcessArticlesRequest {
-    readonly batchAiProcessRequest: BatchAiProcessRequest
+export interface AIApiAssistantCreateRequest {
+    readonly userId: number
+
+    readonly createAiAssistantCommand: CreateAiAssistantCommand
 }
 
 /**
- * Request parameters for bindKnowledgeBase operation in AIApi.
+ * Request parameters for assistantDelete operation in AIApi.
  */
-export interface AIApiBindKnowledgeBaseRequest {
+export interface AIApiAssistantDeleteRequest {
+    readonly id: number
+}
+
+/**
+ * Request parameters for assistantExecuteWorkflow operation in AIApi.
+ */
+export interface AIApiAssistantExecuteWorkflowRequest {
+    readonly id: number
+
+    readonly workflowId: number
+
+    readonly userId: number
+
+    readonly requestBody?: { [key: string]: object; }
+}
+
+/**
+ * Request parameters for assistantGetById operation in AIApi.
+ */
+export interface AIApiAssistantGetByIdRequest {
+    readonly id: number
+}
+
+/**
+ * Request parameters for assistantGetWorkflowSkills operation in AIApi.
+ */
+export interface AIApiAssistantGetWorkflowSkillsRequest {
+    readonly id: number
+}
+
+/**
+ * Request parameters for assistantGetWorkflows operation in AIApi.
+ */
+export interface AIApiAssistantGetWorkflowsRequest {
+    readonly id: number
+}
+
+/**
+ * Request parameters for assistantListByCreator operation in AIApi.
+ */
+export interface AIApiAssistantListByCreatorRequest {
+    readonly userId: number
+
+    readonly page?: number
+
+    readonly size?: number
+}
+
+/**
+ * Request parameters for assistantListPublic operation in AIApi.
+ */
+export interface AIApiAssistantListPublicRequest {
+    readonly page?: number
+
+    readonly size?: number
+}
+
+/**
+ * Request parameters for assistantPublish operation in AIApi.
+ */
+export interface AIApiAssistantPublishRequest {
+    readonly id: number
+}
+
+/**
+ * Request parameters for assistantSearch operation in AIApi.
+ */
+export interface AIApiAssistantSearchRequest {
+    readonly keyword: string
+
+    readonly page?: number
+
+    readonly size?: number
+}
+
+/**
+ * Request parameters for assistantUnbindKnowledgeBase operation in AIApi.
+ */
+export interface AIApiAssistantUnbindKnowledgeBaseRequest {
     readonly id: number
 
     readonly kbId: number
 }
 
 /**
- * Request parameters for bindWorkflow operation in AIApi.
+ * Request parameters for assistantUnbindWorkflow operation in AIApi.
  */
-export interface AIApiBindWorkflowRequest {
+export interface AIApiAssistantUnbindWorkflowRequest {
     readonly id: number
 
     readonly workflowId: number
+}
+
+/**
+ * Request parameters for assistantUpdate operation in AIApi.
+ */
+export interface AIApiAssistantUpdateRequest {
+    readonly id: number
+
+    readonly updateAiAssistantCommand: UpdateAiAssistantCommand
+}
+
+/**
+ * Request parameters for batchProcessArticles operation in AIApi.
+ */
+export interface AIApiBatchProcessArticlesRequest {
+    readonly batchAiProcessRequest: BatchAiProcessRequest
 }
 
 /**
@@ -3735,42 +3850,13 @@ export interface AIApiContinueConversationRequest {
 }
 
 /**
- * Request parameters for create2 operation in AIApi.
+ * Request parameters for deleteSession1 operation in AIApi.
  */
-export interface AIApiCreate2Request {
-    readonly userId: number
-
-    readonly createAiAssistantCommand: CreateAiAssistantCommand
-}
-
-/**
- * Request parameters for delete2 operation in AIApi.
- */
-export interface AIApiDelete2Request {
-    readonly id: number
-}
-
-/**
- * Request parameters for deleteSession operation in AIApi.
- */
-export interface AIApiDeleteSessionRequest {
+export interface AIApiDeleteSession1Request {
     /**
      * 会话ID
      */
     readonly sessionId: number
-}
-
-/**
- * Request parameters for executeWorkflow operation in AIApi.
- */
-export interface AIApiExecuteWorkflowRequest {
-    readonly id: number
-
-    readonly workflowId: number
-
-    readonly userId: number
-
-    readonly requestBody?: { [key: string]: object; }
 }
 
 /**
@@ -3816,13 +3902,6 @@ export interface AIApiGetAllSummariesRequest {
 }
 
 /**
- * Request parameters for getById2 operation in AIApi.
- */
-export interface AIApiGetById2Request {
-    readonly id: number
-}
-
-/**
  * Request parameters for getConversation operation in AIApi.
  */
 export interface AIApiGetConversationRequest {
@@ -3861,9 +3940,9 @@ export interface AIApiGetQuizRequest {
 }
 
 /**
- * Request parameters for getSessionDetail operation in AIApi.
+ * Request parameters for getSessionDetail1 operation in AIApi.
  */
-export interface AIApiGetSessionDetailRequest {
+export interface AIApiGetSessionDetail1Request {
     /**
      * 会话ID
      */
@@ -3889,40 +3968,6 @@ export interface AIApiGetUserConversationsRequest {
 
     readonly userId: number
 
-    readonly page?: number
-
-    readonly size?: number
-}
-
-/**
- * Request parameters for getWorkflowSkills operation in AIApi.
- */
-export interface AIApiGetWorkflowSkillsRequest {
-    readonly id: number
-}
-
-/**
- * Request parameters for getWorkflows operation in AIApi.
- */
-export interface AIApiGetWorkflowsRequest {
-    readonly id: number
-}
-
-/**
- * Request parameters for listByCreator1 operation in AIApi.
- */
-export interface AIApiListByCreator1Request {
-    readonly userId: number
-
-    readonly page?: number
-
-    readonly size?: number
-}
-
-/**
- * Request parameters for listPublic1 operation in AIApi.
- */
-export interface AIApiListPublic1Request {
     readonly page?: number
 
     readonly size?: number
@@ -3958,13 +4003,6 @@ export interface AIApiProcessArticleRequest {
 }
 
 /**
- * Request parameters for publish operation in AIApi.
- */
-export interface AIApiPublishRequest {
-    readonly id: number
-}
-
-/**
  * Request parameters for regenerateKnowledgePoints operation in AIApi.
  */
 export interface AIApiRegenerateKnowledgePointsRequest {
@@ -3982,17 +4020,6 @@ export interface AIApiRegenerateSummaryRequest {
     readonly chapterId: number
 
     readonly summaryType?: string
-}
-
-/**
- * Request parameters for search1 operation in AIApi.
- */
-export interface AIApiSearch1Request {
-    readonly keyword: string
-
-    readonly page?: number
-
-    readonly size?: number
 }
 
 /**
@@ -4057,47 +4084,9 @@ export interface AIApiSubmitAnswersRequest {
 }
 
 /**
- * Request parameters for unbindKnowledgeBase operation in AIApi.
- */
-export interface AIApiUnbindKnowledgeBaseRequest {
-    readonly id: number
-
-    readonly kbId: number
-}
-
-/**
- * Request parameters for unbindWorkflow operation in AIApi.
- */
-export interface AIApiUnbindWorkflowRequest {
-    readonly id: number
-
-    readonly workflowId: number
-}
-
-/**
- * Request parameters for update2 operation in AIApi.
- */
-export interface AIApiUpdate2Request {
-    readonly id: number
-
-    readonly updateAiAssistantCommand: UpdateAiAssistantCommand
-}
-
-/**
  * AIApi - object-oriented interface
  */
 export class AIApi extends BaseAPI implements AIApiInterface {
-    /**
-     * 
-     * @summary 归档AI助手
-     * @param {AIApiArchiveRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    public archive(requestParameters: AIApiArchiveRequest, options?: RawAxiosRequestConfig) {
-        return AIApiFp(this.configuration).archive(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
-    }
-
     /**
      * 
      * @summary 提问（新对话）
@@ -4107,6 +4096,39 @@ export class AIApi extends BaseAPI implements AIApiInterface {
      */
     public askQuestion(requestParameters: AIApiAskQuestionRequest, options?: RawAxiosRequestConfig) {
         return AIApiFp(this.configuration).askQuestion(requestParameters.bookId, requestParameters.requestBody, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 归档AI助手
+     * @param {AIApiAssistantArchiveRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public assistantArchive(requestParameters: AIApiAssistantArchiveRequest, options?: RawAxiosRequestConfig) {
+        return AIApiFp(this.configuration).assistantArchive(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 绑定知识库
+     * @param {AIApiAssistantBindKnowledgeBaseRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public assistantBindKnowledgeBase(requestParameters: AIApiAssistantBindKnowledgeBaseRequest, options?: RawAxiosRequestConfig) {
+        return AIApiFp(this.configuration).assistantBindKnowledgeBase(requestParameters.id, requestParameters.kbId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 绑定工作流到AI助手
+     * @param {AIApiAssistantBindWorkflowRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public assistantBindWorkflow(requestParameters: AIApiAssistantBindWorkflowRequest, options?: RawAxiosRequestConfig) {
+        return AIApiFp(this.configuration).assistantBindWorkflow(requestParameters.id, requestParameters.workflowId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -4121,6 +4143,149 @@ export class AIApi extends BaseAPI implements AIApiInterface {
     }
 
     /**
+     * 
+     * @summary 创建AI助手
+     * @param {AIApiAssistantCreateRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public assistantCreate(requestParameters: AIApiAssistantCreateRequest, options?: RawAxiosRequestConfig) {
+        return AIApiFp(this.configuration).assistantCreate(requestParameters.userId, requestParameters.createAiAssistantCommand, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 删除AI助手
+     * @param {AIApiAssistantDeleteRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public assistantDelete(requestParameters: AIApiAssistantDeleteRequest, options?: RawAxiosRequestConfig) {
+        return AIApiFp(this.configuration).assistantDelete(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 执行AI助手绑定的工作流
+     * @param {AIApiAssistantExecuteWorkflowRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public assistantExecuteWorkflow(requestParameters: AIApiAssistantExecuteWorkflowRequest, options?: RawAxiosRequestConfig) {
+        return AIApiFp(this.configuration).assistantExecuteWorkflow(requestParameters.id, requestParameters.workflowId, requestParameters.userId, requestParameters.requestBody, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 获取AI助手详情
+     * @param {AIApiAssistantGetByIdRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public assistantGetById(requestParameters: AIApiAssistantGetByIdRequest, options?: RawAxiosRequestConfig) {
+        return AIApiFp(this.configuration).assistantGetById(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 返回绑定的工作流详情，包含描述、输入参数、输出参数，供前端展示或 AI 助手对话时使用
+     * @summary 获取AI助手的工作流技能列表
+     * @param {AIApiAssistantGetWorkflowSkillsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public assistantGetWorkflowSkills(requestParameters: AIApiAssistantGetWorkflowSkillsRequest, options?: RawAxiosRequestConfig) {
+        return AIApiFp(this.configuration).assistantGetWorkflowSkills(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 获取AI助手绑定的工作流列表
+     * @param {AIApiAssistantGetWorkflowsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public assistantGetWorkflows(requestParameters: AIApiAssistantGetWorkflowsRequest, options?: RawAxiosRequestConfig) {
+        return AIApiFp(this.configuration).assistantGetWorkflows(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 获取用户的AI助手列表
+     * @param {AIApiAssistantListByCreatorRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public assistantListByCreator(requestParameters: AIApiAssistantListByCreatorRequest, options?: RawAxiosRequestConfig) {
+        return AIApiFp(this.configuration).assistantListByCreator(requestParameters.userId, requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 获取公开的AI助手列表
+     * @param {AIApiAssistantListPublicRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public assistantListPublic(requestParameters: AIApiAssistantListPublicRequest = {}, options?: RawAxiosRequestConfig) {
+        return AIApiFp(this.configuration).assistantListPublic(requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 发布AI助手
+     * @param {AIApiAssistantPublishRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public assistantPublish(requestParameters: AIApiAssistantPublishRequest, options?: RawAxiosRequestConfig) {
+        return AIApiFp(this.configuration).assistantPublish(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 搜索AI助手
+     * @param {AIApiAssistantSearchRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public assistantSearch(requestParameters: AIApiAssistantSearchRequest, options?: RawAxiosRequestConfig) {
+        return AIApiFp(this.configuration).assistantSearch(requestParameters.keyword, requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 解绑知识库
+     * @param {AIApiAssistantUnbindKnowledgeBaseRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public assistantUnbindKnowledgeBase(requestParameters: AIApiAssistantUnbindKnowledgeBaseRequest, options?: RawAxiosRequestConfig) {
+        return AIApiFp(this.configuration).assistantUnbindKnowledgeBase(requestParameters.id, requestParameters.kbId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 解绑工作流
+     * @param {AIApiAssistantUnbindWorkflowRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public assistantUnbindWorkflow(requestParameters: AIApiAssistantUnbindWorkflowRequest, options?: RawAxiosRequestConfig) {
+        return AIApiFp(this.configuration).assistantUnbindWorkflow(requestParameters.id, requestParameters.workflowId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 更新AI助手
+     * @param {AIApiAssistantUpdateRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public assistantUpdate(requestParameters: AIApiAssistantUpdateRequest, options?: RawAxiosRequestConfig) {
+        return AIApiFp(this.configuration).assistantUpdate(requestParameters.id, requestParameters.updateAiAssistantCommand, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 批量对多篇文章进行AI处理
      * @summary 批量AI处理文章
      * @param {AIApiBatchProcessArticlesRequest} requestParameters Request parameters.
@@ -4129,28 +4294,6 @@ export class AIApi extends BaseAPI implements AIApiInterface {
      */
     public batchProcessArticles(requestParameters: AIApiBatchProcessArticlesRequest, options?: RawAxiosRequestConfig) {
         return AIApiFp(this.configuration).batchProcessArticles(requestParameters.batchAiProcessRequest, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @summary 绑定知识库
-     * @param {AIApiBindKnowledgeBaseRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    public bindKnowledgeBase(requestParameters: AIApiBindKnowledgeBaseRequest, options?: RawAxiosRequestConfig) {
-        return AIApiFp(this.configuration).bindKnowledgeBase(requestParameters.id, requestParameters.kbId, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @summary 绑定工作流到AI助手
-     * @param {AIApiBindWorkflowRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    public bindWorkflow(requestParameters: AIApiBindWorkflowRequest, options?: RawAxiosRequestConfig) {
-        return AIApiFp(this.configuration).bindWorkflow(requestParameters.id, requestParameters.workflowId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -4177,17 +4320,6 @@ export class AIApi extends BaseAPI implements AIApiInterface {
 
     /**
      * 
-     * @summary 创建AI助手
-     * @param {AIApiCreate2Request} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    public create2(requestParameters: AIApiCreate2Request, options?: RawAxiosRequestConfig) {
-        return AIApiFp(this.configuration).create2(requestParameters.userId, requestParameters.createAiAssistantCommand, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
      * @summary 创建新会话
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -4198,35 +4330,13 @@ export class AIApi extends BaseAPI implements AIApiInterface {
 
     /**
      * 
-     * @summary 删除AI助手
-     * @param {AIApiDelete2Request} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    public delete2(requestParameters: AIApiDelete2Request, options?: RawAxiosRequestConfig) {
-        return AIApiFp(this.configuration).delete2(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
      * @summary 删除会话
-     * @param {AIApiDeleteSessionRequest} requestParameters Request parameters.
+     * @param {AIApiDeleteSession1Request} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    public deleteSession(requestParameters: AIApiDeleteSessionRequest, options?: RawAxiosRequestConfig) {
-        return AIApiFp(this.configuration).deleteSession(requestParameters.sessionId, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @summary 执行AI助手绑定的工作流
-     * @param {AIApiExecuteWorkflowRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    public executeWorkflow(requestParameters: AIApiExecuteWorkflowRequest, options?: RawAxiosRequestConfig) {
-        return AIApiFp(this.configuration).executeWorkflow(requestParameters.id, requestParameters.workflowId, requestParameters.userId, requestParameters.requestBody, options).then((request) => request(this.axios, this.basePath));
+    public deleteSession1(requestParameters: AIApiDeleteSession1Request, options?: RawAxiosRequestConfig) {
+        return AIApiFp(this.configuration).deleteSession1(requestParameters.sessionId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -4271,17 +4381,6 @@ export class AIApi extends BaseAPI implements AIApiInterface {
      */
     public getAllSummaries(requestParameters: AIApiGetAllSummariesRequest, options?: RawAxiosRequestConfig) {
         return AIApiFp(this.configuration).getAllSummaries(requestParameters.bookId, requestParameters.chapterId, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @summary 获取AI助手详情
-     * @param {AIApiGetById2Request} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    public getById2(requestParameters: AIApiGetById2Request, options?: RawAxiosRequestConfig) {
-        return AIApiFp(this.configuration).getById2(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -4331,12 +4430,12 @@ export class AIApi extends BaseAPI implements AIApiInterface {
     /**
      * 
      * @summary 获取会话详情（含消息列表）
-     * @param {AIApiGetSessionDetailRequest} requestParameters Request parameters.
+     * @param {AIApiGetSessionDetail1Request} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    public getSessionDetail(requestParameters: AIApiGetSessionDetailRequest, options?: RawAxiosRequestConfig) {
-        return AIApiFp(this.configuration).getSessionDetail(requestParameters.sessionId, options).then((request) => request(this.axios, this.basePath));
+    public getSessionDetail1(requestParameters: AIApiGetSessionDetail1Request, options?: RawAxiosRequestConfig) {
+        return AIApiFp(this.configuration).getSessionDetail1(requestParameters.sessionId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -4362,28 +4461,6 @@ export class AIApi extends BaseAPI implements AIApiInterface {
     }
 
     /**
-     * 返回绑定的工作流详情，包含描述、输入参数、输出参数，供前端展示或 AI 助手对话时使用
-     * @summary 获取AI助手的工作流技能列表
-     * @param {AIApiGetWorkflowSkillsRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    public getWorkflowSkills(requestParameters: AIApiGetWorkflowSkillsRequest, options?: RawAxiosRequestConfig) {
-        return AIApiFp(this.configuration).getWorkflowSkills(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @summary 获取AI助手绑定的工作流列表
-     * @param {AIApiGetWorkflowsRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    public getWorkflows(requestParameters: AIApiGetWorkflowsRequest, options?: RawAxiosRequestConfig) {
-        return AIApiFp(this.configuration).getWorkflows(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
      * 返回所有供应商的所有模型（含未启用的），标注 enabled/isDefault 状态
      * @summary 获取全量模型配置
      * @param {*} [options] Override http request option.
@@ -4394,17 +4471,6 @@ export class AIApi extends BaseAPI implements AIApiInterface {
     }
 
     /**
-     * 
-     * @summary 获取用户的AI助手列表
-     * @param {AIApiListByCreator1Request} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    public listByCreator1(requestParameters: AIApiListByCreator1Request, options?: RawAxiosRequestConfig) {
-        return AIApiFp(this.configuration).listByCreator1(requestParameters.userId, requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
      * 仅返回已启用的模型，前端用于模型选择下拉框
      * @summary 获取可用模型列表
      * @param {*} [options] Override http request option.
@@ -4412,17 +4478,6 @@ export class AIApi extends BaseAPI implements AIApiInterface {
      */
     public listModels(options?: RawAxiosRequestConfig) {
         return AIApiFp(this.configuration).listModels(options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @summary 获取公开的AI助手列表
-     * @param {AIApiListPublic1Request} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    public listPublic1(requestParameters: AIApiListPublic1Request = {}, options?: RawAxiosRequestConfig) {
-        return AIApiFp(this.configuration).listPublic1(requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -4460,17 +4515,6 @@ export class AIApi extends BaseAPI implements AIApiInterface {
 
     /**
      * 
-     * @summary 发布AI助手
-     * @param {AIApiPublishRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    public publish(requestParameters: AIApiPublishRequest, options?: RawAxiosRequestConfig) {
-        return AIApiFp(this.configuration).publish(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
      * @summary 重新提取知识点
      * @param {AIApiRegenerateKnowledgePointsRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -4489,17 +4533,6 @@ export class AIApi extends BaseAPI implements AIApiInterface {
      */
     public regenerateSummary(requestParameters: AIApiRegenerateSummaryRequest, options?: RawAxiosRequestConfig) {
         return AIApiFp(this.configuration).regenerateSummary(requestParameters.bookId, requestParameters.chapterId, requestParameters.summaryType, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @summary 搜索AI助手
-     * @param {AIApiSearch1Request} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    public search1(requestParameters: AIApiSearch1Request, options?: RawAxiosRequestConfig) {
-        return AIApiFp(this.configuration).search1(requestParameters.keyword, requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -4566,39 +4599,6 @@ export class AIApi extends BaseAPI implements AIApiInterface {
      */
     public submitAnswers(requestParameters: AIApiSubmitAnswersRequest, options?: RawAxiosRequestConfig) {
         return AIApiFp(this.configuration).submitAnswers(requestParameters.bookId, requestParameters.quizId, requestParameters.requestBody, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @summary 解绑知识库
-     * @param {AIApiUnbindKnowledgeBaseRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    public unbindKnowledgeBase(requestParameters: AIApiUnbindKnowledgeBaseRequest, options?: RawAxiosRequestConfig) {
-        return AIApiFp(this.configuration).unbindKnowledgeBase(requestParameters.id, requestParameters.kbId, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @summary 解绑工作流
-     * @param {AIApiUnbindWorkflowRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    public unbindWorkflow(requestParameters: AIApiUnbindWorkflowRequest, options?: RawAxiosRequestConfig) {
-        return AIApiFp(this.configuration).unbindWorkflow(requestParameters.id, requestParameters.workflowId, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @summary 更新AI助手
-     * @param {AIApiUpdate2Request} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    public update2(requestParameters: AIApiUpdate2Request, options?: RawAxiosRequestConfig) {
-        return AIApiFp(this.configuration).update2(requestParameters.id, requestParameters.updateAiAssistantCommand, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

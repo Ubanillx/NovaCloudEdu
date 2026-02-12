@@ -37,8 +37,8 @@ export interface ChatGroup {
     'createTime'?: string;
     'updateTime'?: string;
     'mute'?: boolean;
-    'delete'?: boolean;
     'full'?: boolean;
+    'delete'?: boolean;
 }
 
 export const ChatGroupInviteModeEnum = {

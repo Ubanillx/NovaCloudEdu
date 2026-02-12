@@ -8,7 +8,6 @@ All URIs are relative to *http://localhost:8080*
 |[**activateSetting**](#activatesetting) | **POST** /api/schedule/setting/{id}/activate | 激活课表配置|
 |[**addComment**](#addcomment) | **POST** /api/user/daily-article/{articleId}/comment | 添加评论|
 |[**addCourse**](#addcourse) | **POST** /api/classes/{classId}/courses | 添加课程|
-|[**addDocument**](#adddocument) | **POST** /api/ai/knowledge-bases/{id}/documents | 添加文档|
 |[**addEdge**](#addedge) | **POST** /api/workflows/{id}/edges | 添加连接线|
 |[**addItem**](#additem) | **POST** /api/schedule/item | 添加课程项|
 |[**addMember**](#addmember) | **POST** /api/classes/{classId}/members | 添加成员|
@@ -16,14 +15,12 @@ All URIs are relative to *http://localhost:8080*
 |[**addToShelf**](#addtoshelf) | **POST** /api/reading/shelf | 添加书籍到书架|
 |[**addToWordBook**](#addtowordbook) | **POST** /api/user/word-book/add/{wordId} | 添加单词到生词本|
 |[**addVariable**](#addvariable) | **POST** /api/workflows/{id}/variables | 添加变量|
+|[**adminDeletePost**](#admindeletepost) | **DELETE** /api/posts/admin/{postId} | 管理员删除帖子|
 |[**applyTeacher**](#applyteacher) | **POST** /api/teacher/apply | 申请成为讲师|
 |[**applyToJoin**](#applytojoin) | **POST** /api/groups/{groupId}/join | 申请加入群|
-|[**archive1**](#archive1) | **POST** /api/workflows/{id}/archive | 归档工作流|
+|[**archive**](#archive) | **POST** /api/workflows/{id}/archive | 归档工作流|
 |[**batchBanUsers**](#batchbanusers) | **POST** /api/user/admin/ban | 批量封禁/解封用户|
 |[**batchCreateUsers**](#batchcreateusers) | **POST** /api/user/admin/batch-create | 批量创建用户|
-|[**batchProcessByKnowledgeBase**](#batchprocessbyknowledgebase) | **POST** /api/ai/knowledge-bases/{id}/embed-all | 向量化知识库所有待处理文档|
-|[**batchProcessDocuments**](#batchprocessdocuments) | **POST** /api/ai/knowledge-bases/{id}/documents/batch-embed | 批量文档向量化|
-|[**batchProcessDocumentsAsync**](#batchprocessdocumentsasync) | **POST** /api/ai/knowledge-bases/{id}/documents/batch-embed-async | 异步批量文档向量化|
 |[**batchSyncAll**](#batchsyncall) | **POST** /api/dailylearning/graph-sync/all/batch | 批量同步所有数据到知识图谱（高效批量导入）|
 |[**batchSyncArticles**](#batchsyncarticles) | **POST** /api/dailylearning/graph-sync/articles/batch | 批量同步每日文章到知识图谱（高效批量导入）|
 |[**batchSyncWords**](#batchsyncwords) | **POST** /api/dailylearning/graph-sync/words/batch | 批量同步每日单词到知识图谱（高效批量导入）|
@@ -38,7 +35,6 @@ All URIs are relative to *http://localhost:8080*
 |[**confirmPayment**](#confirmpayment) | **POST** /api/admin/order/confirm | 确认收款（管理员手动确认）|
 |[**copy**](#copy) | **POST** /api/workflows/{id}/copy | 复制工作流|
 |[**create**](#create) | **POST** /api/workflows | 创建工作流|
-|[**create1**](#create1) | **POST** /api/ai/knowledge-bases | 创建知识库|
 |[**createAnnouncement**](#createannouncement) | **POST** /api/announcement/admin/create | 创建公告|
 |[**createBanner**](#createbanner) | **POST** /api/admin/banner | 创建轮播图|
 |[**createChapter**](#createchapter) | **POST** /api/course/{courseId}/chapter | 创建章节（管理员）|
@@ -62,7 +58,6 @@ All URIs are relative to *http://localhost:8080*
 |[**createUser**](#createuser) | **POST** /api/user/admin/create | 创建用户|
 |[**createVersionSnapshot**](#createversionsnapshot) | **POST** /api/workflows/{id}/versions | 创建版本快照（发布时）|
 |[**createWebhookTrigger**](#createwebhooktrigger) | **POST** /api/workflows/{id}/triggers/webhook | 创建Webhook触发器|
-|[**delete1**](#delete1) | **DELETE** /api/ai/knowledge-bases/{id} | 删除知识库|
 |[**deleteAnnouncement**](#deleteannouncement) | **DELETE** /api/announcement/admin/delete/{id} | 删除公告|
 |[**deleteBanner**](#deletebanner) | **DELETE** /api/admin/banner/{id} | 删除轮播图|
 |[**deleteBook**](#deletebook) | **DELETE** /api/books/{bookId} | 删除书籍|
@@ -73,7 +68,6 @@ All URIs are relative to *http://localhost:8080*
 |[**deleteCourse**](#deletecourse) | **DELETE** /api/course/{id} | 删除课程（管理员）|
 |[**deleteDailyArticle**](#deletedailyarticle) | **DELETE** /api/daily-article/{id} | 删除每日文章（管理员）|
 |[**deleteDailyWord**](#deletedailyword) | **DELETE** /api/daily-word/{id} | 删除每日单词（管理员）|
-|[**deleteDocument**](#deletedocument) | **DELETE** /api/ai/knowledge-bases/{id}/documents/{docId} | 删除文档|
 |[**deleteEdge**](#deleteedge) | **DELETE** /api/workflows/{id}/edges/{edgeId} | 删除连接线|
 |[**deleteFeedback**](#deletefeedback) | **DELETE** /api/feedback/{id} | 删除反馈|
 |[**deleteFeedback1**](#deletefeedback1) | **DELETE** /api/feedback/admin/{id} | 删除反馈|
@@ -113,7 +107,6 @@ All URIs are relative to *http://localhost:8080*
 |[**getBook**](#getbook) | **GET** /api/books/{bookId} | 获取书籍详情|
 |[**getBookChapters**](#getbookchapters) | **GET** /api/books/{bookId}/chapters | 获取书籍章节列表|
 |[**getById**](#getbyid) | **GET** /api/workflows/{id} | 获取工作流详情|
-|[**getById1**](#getbyid1) | **GET** /api/ai/knowledge-bases/{id} | 获取知识库详情|
 |[**getChapter**](#getchapter) | **GET** /api/course/{courseId}/chapter/{chapterId} | 获取章节详情|
 |[**getChapterContent**](#getchaptercontent) | **GET** /api/books/{bookId}/chapters/{chapterIndex} | 获取章节内容|
 |[**getChatHistory**](#getchathistory) | **POST** /api/chat/history | 获取聊天历史|
@@ -226,19 +219,32 @@ All URIs are relative to *http://localhost:8080*
 |[**health**](#health) | **GET** /api/health | 健康检查|
 |[**inviteMember**](#invitemember) | **POST** /api/groups/{groupId}/invite | 邀请用户加入群|
 |[**isFollowing**](#isfollowing) | **GET** /api/follow/check/{targetUserId} | 检查是否已关注|
+|[**kbAddDocument**](#kbadddocument) | **POST** /api/ai/knowledge-bases/{id}/documents | 添加文档|
+|[**kbBatchProcessByKnowledgeBase**](#kbbatchprocessbyknowledgebase) | **POST** /api/ai/knowledge-bases/{id}/embed-all | 向量化知识库所有待处理文档|
+|[**kbBatchProcessDocuments**](#kbbatchprocessdocuments) | **POST** /api/ai/knowledge-bases/{id}/documents/batch-embed | 批量文档向量化|
+|[**kbBatchProcessDocumentsAsync**](#kbbatchprocessdocumentsasync) | **POST** /api/ai/knowledge-bases/{id}/documents/batch-embed-async | 异步批量文档向量化|
+|[**kbCreate**](#kbcreate) | **POST** /api/ai/knowledge-bases | 创建知识库|
+|[**kbDelete**](#kbdelete) | **DELETE** /api/ai/knowledge-bases/{id} | 删除知识库|
+|[**kbDeleteDocument**](#kbdeletedocument) | **DELETE** /api/ai/knowledge-bases/{id}/documents/{docId} | 删除文档|
+|[**kbGetById**](#kbgetbyid) | **GET** /api/ai/knowledge-bases/{id} | 获取知识库详情|
+|[**kbListByCreator**](#kblistbycreator) | **GET** /api/ai/knowledge-bases | 获取用户的知识库列表|
+|[**kbListChunks**](#kblistchunks) | **GET** /api/ai/knowledge-bases/{id}/documents/{docId}/chunks | 获取文档分块列表|
+|[**kbListDocuments**](#kblistdocuments) | **GET** /api/ai/knowledge-bases/{id}/documents | 获取文档列表|
+|[**kbProcessDocument**](#kbprocessdocument) | **POST** /api/ai/knowledge-bases/{id}/documents/{docId}/embed | 触发文档向量化|
+|[**kbRecallTest**](#kbrecalltest) | **POST** /api/ai/knowledge-bases/{id}/recall-test | 知识库召回测试|
+|[**kbSearch**](#kbsearch) | **GET** /api/ai/knowledge-bases/search | 搜索知识库|
+|[**kbUpdate**](#kbupdate) | **PUT** /api/ai/knowledge-bases/{id} | 更新知识库|
+|[**kbUpdateDocument**](#kbupdatedocument) | **PUT** /api/ai/knowledge-bases/{id}/documents/{docId} | 更新文档元信息|
 |[**leaveGroup**](#leavegroup) | **POST** /api/groups/{groupId}/leave | 退出群|
 |[**listAllowedTables**](#listallowedtables) | **GET** /api/workflows/database/tables | 获取可查询的数据库表列表|
 |[**listApplications**](#listapplications) | **GET** /api/teacher/application/list | 获取申请列表（管理员）|
 |[**listArticles**](#listarticles) | **GET** /api/daily-article/list | 获取文章列表|
 |[**listAvailableModels**](#listavailablemodels) | **GET** /api/workflows/models | 获取可用模型列表|
 |[**listBooks**](#listbooks) | **GET** /api/books | 获取书籍列表|
-|[**listByCreator**](#listbycreator) | **GET** /api/ai/knowledge-bases | 获取用户的知识库列表|
 |[**listByUser**](#listbyuser) | **GET** /api/workflows | 获取用户的工作流列表|
 |[**listChapters**](#listchapters) | **GET** /api/course/{courseId}/chapter | 获取课程的章节列表|
-|[**listChunks**](#listchunks) | **GET** /api/ai/knowledge-bases/{id}/documents/{docId}/chunks | 获取文档分块列表|
 |[**listCourses**](#listcourses) | **GET** /api/course/list | 获取课程列表|
 |[**listCoursesByTeacher**](#listcoursesbyteacher) | **GET** /api/course/teacher/{teacherId} | 获取讲师的课程列表|
-|[**listDocuments**](#listdocuments) | **GET** /api/ai/knowledge-bases/{id}/documents | 获取文档列表|
 |[**listExecutions**](#listexecutions) | **GET** /api/workflows/{id}/executions | 获取工作流执行历史列表|
 |[**listOrders**](#listorders) | **GET** /api/admin/order/list | 获取订单列表（管理员）|
 |[**listPublic**](#listpublic) | **GET** /api/workflows/public | 获取公开的工作流列表|
@@ -257,8 +263,7 @@ All URIs are relative to *http://localhost:8080*
 |[**offlineAnnouncement**](#offlineannouncement) | **POST** /api/announcement/admin/offline/{id} | 下线公告|
 |[**offlineBanner**](#offlinebanner) | **POST** /api/admin/banner/{id}/offline | 下线轮播图|
 |[**phoneLogin**](#phonelogin) | **POST** /api/auth/login/phone | 手机验证码登录|
-|[**processDocument**](#processdocument) | **POST** /api/ai/knowledge-bases/{id}/documents/{docId}/embed | 触发文档向量化|
-|[**publish1**](#publish1) | **POST** /api/workflows/{id}/publish | 发布工作流|
+|[**publish**](#publish) | **POST** /api/workflows/{id}/publish | 发布工作流|
 |[**publishAnnouncement**](#publishannouncement) | **PUT** /api/groups/{groupId}/announcement | 发布群公告|
 |[**publishAnnouncement1**](#publishannouncement1) | **POST** /api/announcement/admin/publish/{id} | 发布公告|
 |[**publishBanner**](#publishbanner) | **POST** /api/admin/banner/{id}/publish | 发布轮播图|
@@ -293,7 +298,6 @@ All URIs are relative to *http://localhost:8080*
 |[**scrapeMultiplePages**](#scrapemultiplepages) | **POST** /api/scraper/batch | 批量抓取|
 |[**scrapeRecursively**](#scraperecursively) | **POST** /api/scraper/recursive | 递归抓取|
 |[**scrapeSinglePage**](#scrapesinglepage) | **POST** /api/scraper/single | 抓取单个页面|
-|[**search**](#search) | **GET** /api/ai/knowledge-bases/search | 搜索知识库|
 |[**searchArticles**](#searcharticles) | **GET** /api/daily-article/search | 搜索文章|
 |[**searchBooks**](#searchbooks) | **GET** /api/books/search | 搜索书籍|
 |[**searchCourses**](#searchcourses) | **GET** /api/course/search | 搜索课程|
@@ -325,7 +329,6 @@ All URIs are relative to *http://localhost:8080*
 |[**unfavouriteCourse**](#unfavouritecourse) | **DELETE** /api/course/favourite/{courseId} | 取消收藏|
 |[**unfollow**](#unfollow) | **DELETE** /api/follow/{targetUserId} | 取消关注|
 |[**update**](#update) | **PUT** /api/workflows/{id} | 更新工作流基本信息|
-|[**update1**](#update1) | **PUT** /api/ai/knowledge-bases/{id} | 更新知识库|
 |[**updateAnnouncement**](#updateannouncement) | **PUT** /api/announcement/admin/update | 更新公告|
 |[**updateBanner**](#updatebanner) | **PUT** /api/admin/banner | 更新轮播图|
 |[**updateChapter**](#updatechapter) | **PUT** /api/course/{courseId}/chapter/{chapterId} | 更新章节（管理员）|
@@ -335,7 +338,6 @@ All URIs are relative to *http://localhost:8080*
 |[**updateDailyArticle**](#updatedailyarticle) | **PUT** /api/daily-article/{id} | 更新每日文章（管理员）|
 |[**updateDailyWord**](#updatedailyword) | **PUT** /api/daily-word/{id} | 更新每日单词（管理员）|
 |[**updateDefinition**](#updatedefinition) | **PUT** /api/workflows/{id}/definition | 更新工作流定义|
-|[**updateDocument**](#updatedocument) | **PUT** /api/ai/knowledge-bases/{id}/documents/{docId} | 更新文档元信息|
 |[**updateEdge**](#updateedge) | **PUT** /api/workflows/{id}/edges/{edgeId} | 更新连接线|
 |[**updateFeedbackStatus**](#updatefeedbackstatus) | **PUT** /api/feedback/admin/status | 更新反馈状态|
 |[**updateGroupInfo**](#updategroupinfo) | **PUT** /api/groups/{groupId} | 更新群信息|
@@ -554,63 +556,6 @@ const { status, data } = await apiInstance.addCourse(
 ### Return type
 
 **BaseResponseVoid**
-
-### Authorization
-
-[Bearer Token](../README.md#Bearer Token)
-
-### HTTP request headers
-
- - **Content-Type**: application/json
- - **Accept**: application/json
-
-
-### HTTP response details
-| Status code | Description | Response headers |
-|-------------|-------------|------------------|
-|**400** | Bad Request |  -  |
-|**200** | OK |  -  |
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
-
-# **addDocument**
-> BaseResponseKnowledgeDocumentVO addDocument(requestBody)
-
-
-### Example
-
-```typescript
-import {
-    DefaultApi,
-    Configuration
-} from './api';
-
-const configuration = new Configuration();
-const apiInstance = new DefaultApi(configuration);
-
-let id: number; // (default to undefined)
-let userId: number; // (default to undefined)
-let requestBody: { [key: string]: object; }; //
-
-const { status, data } = await apiInstance.addDocument(
-    id,
-    userId,
-    requestBody
-);
-```
-
-### Parameters
-
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **requestBody** | **{ [key: string]: object; }**|  | |
-| **id** | [**number**] |  | defaults to undefined|
-| **userId** | [**number**] |  | defaults to undefined|
-
-
-### Return type
-
-**BaseResponseKnowledgeDocumentVO**
 
 ### Authorization
 
@@ -1008,6 +953,57 @@ const { status, data } = await apiInstance.addVariable(
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **adminDeletePost**
+> BaseResponseVoid adminDeletePost()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let postId: number; // (default to undefined)
+
+const { status, data } = await apiInstance.adminDeletePost(
+    postId
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **postId** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseVoid**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **applyTeacher**
 > BaseResponseLong applyTeacher(applyTeacherRequest)
 
@@ -1115,8 +1111,8 @@ const { status, data } = await apiInstance.applyToJoin(
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **archive1**
-> BaseResponseWorkflowResponse archive1()
+# **archive**
+> BaseResponseWorkflowResponse archive()
 
 
 ### Example
@@ -1132,7 +1128,7 @@ const apiInstance = new DefaultApi(configuration);
 
 let id: number; //工作流ID (default to undefined)
 
-const { status, data } = await apiInstance.archive1(
+const { status, data } = await apiInstance.archive(
     id
 );
 ```
@@ -1253,165 +1249,6 @@ const { status, data } = await apiInstance.batchCreateUsers(
 ### Return type
 
 **BaseResponseListLong**
-
-### Authorization
-
-[Bearer Token](../README.md#Bearer Token)
-
-### HTTP request headers
-
- - **Content-Type**: application/json
- - **Accept**: application/json
-
-
-### HTTP response details
-| Status code | Description | Response headers |
-|-------------|-------------|------------------|
-|**400** | Bad Request |  -  |
-|**200** | OK |  -  |
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
-
-# **batchProcessByKnowledgeBase**
-> BaseResponseBatchProcessResult batchProcessByKnowledgeBase()
-
-
-### Example
-
-```typescript
-import {
-    DefaultApi,
-    Configuration
-} from './api';
-
-const configuration = new Configuration();
-const apiInstance = new DefaultApi(configuration);
-
-let id: number; // (default to undefined)
-
-const { status, data } = await apiInstance.batchProcessByKnowledgeBase(
-    id
-);
-```
-
-### Parameters
-
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **id** | [**number**] |  | defaults to undefined|
-
-
-### Return type
-
-**BaseResponseBatchProcessResult**
-
-### Authorization
-
-[Bearer Token](../README.md#Bearer Token)
-
-### HTTP request headers
-
- - **Content-Type**: Not defined
- - **Accept**: application/json
-
-
-### HTTP response details
-| Status code | Description | Response headers |
-|-------------|-------------|------------------|
-|**400** | Bad Request |  -  |
-|**200** | OK |  -  |
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
-
-# **batchProcessDocuments**
-> BaseResponseBatchProcessResult batchProcessDocuments(requestBody)
-
-
-### Example
-
-```typescript
-import {
-    DefaultApi,
-    Configuration
-} from './api';
-
-const configuration = new Configuration();
-const apiInstance = new DefaultApi(configuration);
-
-let id: number; // (default to undefined)
-let requestBody: Array<number>; //
-
-const { status, data } = await apiInstance.batchProcessDocuments(
-    id,
-    requestBody
-);
-```
-
-### Parameters
-
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **requestBody** | **Array<number>**|  | |
-| **id** | [**number**] |  | defaults to undefined|
-
-
-### Return type
-
-**BaseResponseBatchProcessResult**
-
-### Authorization
-
-[Bearer Token](../README.md#Bearer Token)
-
-### HTTP request headers
-
- - **Content-Type**: application/json
- - **Accept**: application/json
-
-
-### HTTP response details
-| Status code | Description | Response headers |
-|-------------|-------------|------------------|
-|**400** | Bad Request |  -  |
-|**200** | OK |  -  |
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
-
-# **batchProcessDocumentsAsync**
-> BaseResponseString batchProcessDocumentsAsync(requestBody)
-
-
-### Example
-
-```typescript
-import {
-    DefaultApi,
-    Configuration
-} from './api';
-
-const configuration = new Configuration();
-const apiInstance = new DefaultApi(configuration);
-
-let id: number; // (default to undefined)
-let requestBody: Array<number>; //
-
-const { status, data } = await apiInstance.batchProcessDocumentsAsync(
-    id,
-    requestBody
-);
-```
-
-### Parameters
-
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **requestBody** | **Array<number>**|  | |
-| **id** | [**number**] |  | defaults to undefined|
-
-
-### Return type
-
-**BaseResponseString**
 
 ### Authorization
 
@@ -2141,61 +1978,6 @@ const { status, data } = await apiInstance.create(
 ### Return type
 
 **BaseResponseWorkflowResponse**
-
-### Authorization
-
-[Bearer Token](../README.md#Bearer Token)
-
-### HTTP request headers
-
- - **Content-Type**: application/json
- - **Accept**: application/json
-
-
-### HTTP response details
-| Status code | Description | Response headers |
-|-------------|-------------|------------------|
-|**400** | Bad Request |  -  |
-|**200** | OK |  -  |
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
-
-# **create1**
-> BaseResponseKnowledgeBaseVO create1(createKnowledgeBaseCommand)
-
-
-### Example
-
-```typescript
-import {
-    DefaultApi,
-    Configuration,
-    CreateKnowledgeBaseCommand
-} from './api';
-
-const configuration = new Configuration();
-const apiInstance = new DefaultApi(configuration);
-
-let userId: number; // (default to undefined)
-let createKnowledgeBaseCommand: CreateKnowledgeBaseCommand; //
-
-const { status, data } = await apiInstance.create1(
-    userId,
-    createKnowledgeBaseCommand
-);
-```
-
-### Parameters
-
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **createKnowledgeBaseCommand** | **CreateKnowledgeBaseCommand**|  | |
-| **userId** | [**number**] |  | defaults to undefined|
-
-
-### Return type
-
-**BaseResponseKnowledgeBaseVO**
 
 ### Authorization
 
@@ -3468,57 +3250,6 @@ const { status, data } = await apiInstance.createWebhookTrigger(
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **delete1**
-> BaseResponseVoid delete1()
-
-
-### Example
-
-```typescript
-import {
-    DefaultApi,
-    Configuration
-} from './api';
-
-const configuration = new Configuration();
-const apiInstance = new DefaultApi(configuration);
-
-let id: number; // (default to undefined)
-
-const { status, data } = await apiInstance.delete1(
-    id
-);
-```
-
-### Parameters
-
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **id** | [**number**] |  | defaults to undefined|
-
-
-### Return type
-
-**BaseResponseVoid**
-
-### Authorization
-
-[Bearer Token](../README.md#Bearer Token)
-
-### HTTP request headers
-
- - **Content-Type**: Not defined
- - **Accept**: application/json
-
-
-### HTTP response details
-| Status code | Description | Response headers |
-|-------------|-------------|------------------|
-|**400** | Bad Request |  -  |
-|**200** | OK |  -  |
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
-
 # **deleteAnnouncement**
 > BaseResponseBoolean deleteAnnouncement()
 
@@ -4011,60 +3742,6 @@ const { status, data } = await apiInstance.deleteDailyWord(
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
 | **id** | [**number**] | 单词ID | defaults to undefined|
-
-
-### Return type
-
-**BaseResponseVoid**
-
-### Authorization
-
-[Bearer Token](../README.md#Bearer Token)
-
-### HTTP request headers
-
- - **Content-Type**: Not defined
- - **Accept**: application/json
-
-
-### HTTP response details
-| Status code | Description | Response headers |
-|-------------|-------------|------------------|
-|**400** | Bad Request |  -  |
-|**200** | OK |  -  |
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
-
-# **deleteDocument**
-> BaseResponseVoid deleteDocument()
-
-
-### Example
-
-```typescript
-import {
-    DefaultApi,
-    Configuration
-} from './api';
-
-const configuration = new Configuration();
-const apiInstance = new DefaultApi(configuration);
-
-let id: number; // (default to undefined)
-let docId: number; // (default to undefined)
-
-const { status, data } = await apiInstance.deleteDocument(
-    id,
-    docId
-);
-```
-
-### Parameters
-
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **id** | [**number**] |  | defaults to undefined|
-| **docId** | [**number**] |  | defaults to undefined|
 
 
 ### Return type
@@ -6081,57 +5758,6 @@ const { status, data } = await apiInstance.getById(
 ### Return type
 
 **BaseResponseWorkflowResponse**
-
-### Authorization
-
-[Bearer Token](../README.md#Bearer Token)
-
-### HTTP request headers
-
- - **Content-Type**: Not defined
- - **Accept**: application/json
-
-
-### HTTP response details
-| Status code | Description | Response headers |
-|-------------|-------------|------------------|
-|**400** | Bad Request |  -  |
-|**200** | OK |  -  |
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
-
-# **getById1**
-> BaseResponseKnowledgeBaseVO getById1()
-
-
-### Example
-
-```typescript
-import {
-    DefaultApi,
-    Configuration
-} from './api';
-
-const configuration = new Configuration();
-const apiInstance = new DefaultApi(configuration);
-
-let id: number; // (default to undefined)
-
-const { status, data } = await apiInstance.getById1(
-    id
-);
-```
-
-### Parameters
-
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **id** | [**number**] |  | defaults to undefined|
-
-
-### Return type
-
-**BaseResponseKnowledgeBaseVO**
 
 ### Authorization
 
@@ -11913,6 +11539,888 @@ const { status, data } = await apiInstance.isFollowing(
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **kbAddDocument**
+> BaseResponseKnowledgeDocumentVO kbAddDocument(requestBody)
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let id: number; // (default to undefined)
+let userId: number; // (default to undefined)
+let requestBody: { [key: string]: object; }; //
+
+const { status, data } = await apiInstance.kbAddDocument(
+    id,
+    userId,
+    requestBody
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **requestBody** | **{ [key: string]: object; }**|  | |
+| **id** | [**number**] |  | defaults to undefined|
+| **userId** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseKnowledgeDocumentVO**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **kbBatchProcessByKnowledgeBase**
+> BaseResponseBatchProcessResult kbBatchProcessByKnowledgeBase()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let id: number; // (default to undefined)
+
+const { status, data } = await apiInstance.kbBatchProcessByKnowledgeBase(
+    id
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **id** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseBatchProcessResult**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **kbBatchProcessDocuments**
+> BaseResponseBatchProcessResult kbBatchProcessDocuments(requestBody)
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let id: number; // (default to undefined)
+let requestBody: Array<number>; //
+
+const { status, data } = await apiInstance.kbBatchProcessDocuments(
+    id,
+    requestBody
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **requestBody** | **Array<number>**|  | |
+| **id** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseBatchProcessResult**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **kbBatchProcessDocumentsAsync**
+> BaseResponseString kbBatchProcessDocumentsAsync(requestBody)
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let id: number; // (default to undefined)
+let requestBody: Array<number>; //
+
+const { status, data } = await apiInstance.kbBatchProcessDocumentsAsync(
+    id,
+    requestBody
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **requestBody** | **Array<number>**|  | |
+| **id** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseString**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **kbCreate**
+> BaseResponseKnowledgeBaseVO kbCreate(createKnowledgeBaseCommand)
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration,
+    CreateKnowledgeBaseCommand
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let userId: number; // (default to undefined)
+let createKnowledgeBaseCommand: CreateKnowledgeBaseCommand; //
+
+const { status, data } = await apiInstance.kbCreate(
+    userId,
+    createKnowledgeBaseCommand
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **createKnowledgeBaseCommand** | **CreateKnowledgeBaseCommand**|  | |
+| **userId** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseKnowledgeBaseVO**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **kbDelete**
+> BaseResponseVoid kbDelete()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let id: number; // (default to undefined)
+
+const { status, data } = await apiInstance.kbDelete(
+    id
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **id** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseVoid**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **kbDeleteDocument**
+> BaseResponseVoid kbDeleteDocument()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let id: number; // (default to undefined)
+let docId: number; // (default to undefined)
+
+const { status, data } = await apiInstance.kbDeleteDocument(
+    id,
+    docId
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **id** | [**number**] |  | defaults to undefined|
+| **docId** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseVoid**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **kbGetById**
+> BaseResponseKnowledgeBaseVO kbGetById()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let id: number; // (default to undefined)
+
+const { status, data } = await apiInstance.kbGetById(
+    id
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **id** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseKnowledgeBaseVO**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **kbListByCreator**
+> BaseResponseListKnowledgeBaseVO kbListByCreator()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let userId: number; // (default to undefined)
+let page: number; // (optional) (default to 0)
+let size: number; // (optional) (default to 20)
+
+const { status, data } = await apiInstance.kbListByCreator(
+    userId,
+    page,
+    size
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **userId** | [**number**] |  | defaults to undefined|
+| **page** | [**number**] |  | (optional) defaults to 0|
+| **size** | [**number**] |  | (optional) defaults to 20|
+
+
+### Return type
+
+**BaseResponseListKnowledgeBaseVO**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **kbListChunks**
+> BaseResponseMapStringObject kbListChunks()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let id: number; // (default to undefined)
+let docId: number; // (default to undefined)
+let page: number; // (optional) (default to 0)
+let size: number; // (optional) (default to 20)
+
+const { status, data } = await apiInstance.kbListChunks(
+    id,
+    docId,
+    page,
+    size
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **id** | [**number**] |  | defaults to undefined|
+| **docId** | [**number**] |  | defaults to undefined|
+| **page** | [**number**] |  | (optional) defaults to 0|
+| **size** | [**number**] |  | (optional) defaults to 20|
+
+
+### Return type
+
+**BaseResponseMapStringObject**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **kbListDocuments**
+> BaseResponseListKnowledgeDocumentVO kbListDocuments()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let id: number; // (default to undefined)
+let page: number; // (optional) (default to 0)
+let size: number; // (optional) (default to 20)
+
+const { status, data } = await apiInstance.kbListDocuments(
+    id,
+    page,
+    size
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **id** | [**number**] |  | defaults to undefined|
+| **page** | [**number**] |  | (optional) defaults to 0|
+| **size** | [**number**] |  | (optional) defaults to 20|
+
+
+### Return type
+
+**BaseResponseListKnowledgeDocumentVO**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **kbProcessDocument**
+> BaseResponseVoid kbProcessDocument()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let id: number; // (default to undefined)
+let docId: number; // (default to undefined)
+
+const { status, data } = await apiInstance.kbProcessDocument(
+    id,
+    docId
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **id** | [**number**] |  | defaults to undefined|
+| **docId** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseVoid**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **kbRecallTest**
+> BaseResponseMapStringObject kbRecallTest(requestBody)
+
+输入查询文本，返回向量检索+Rerank后的召回结果，用于调试知识库检索效果
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let id: number; // (default to undefined)
+let requestBody: { [key: string]: object; }; //
+
+const { status, data } = await apiInstance.kbRecallTest(
+    id,
+    requestBody
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **requestBody** | **{ [key: string]: object; }**|  | |
+| **id** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseMapStringObject**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **kbSearch**
+> BaseResponseListKnowledgeBaseVO kbSearch()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let keyword: string; // (default to undefined)
+let userId: number; // (default to undefined)
+let page: number; // (optional) (default to 0)
+let size: number; // (optional) (default to 20)
+
+const { status, data } = await apiInstance.kbSearch(
+    keyword,
+    userId,
+    page,
+    size
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **keyword** | [**string**] |  | defaults to undefined|
+| **userId** | [**number**] |  | defaults to undefined|
+| **page** | [**number**] |  | (optional) defaults to 0|
+| **size** | [**number**] |  | (optional) defaults to 20|
+
+
+### Return type
+
+**BaseResponseListKnowledgeBaseVO**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **kbUpdate**
+> BaseResponseKnowledgeBaseVO kbUpdate(updateKnowledgeBaseCommand)
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration,
+    UpdateKnowledgeBaseCommand
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let id: number; // (default to undefined)
+let updateKnowledgeBaseCommand: UpdateKnowledgeBaseCommand; //
+
+const { status, data } = await apiInstance.kbUpdate(
+    id,
+    updateKnowledgeBaseCommand
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **updateKnowledgeBaseCommand** | **UpdateKnowledgeBaseCommand**|  | |
+| **id** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseKnowledgeBaseVO**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **kbUpdateDocument**
+> BaseResponseKnowledgeDocumentVO kbUpdateDocument(requestBody)
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let id: number; // (default to undefined)
+let docId: number; // (default to undefined)
+let requestBody: { [key: string]: string; }; //
+
+const { status, data } = await apiInstance.kbUpdateDocument(
+    id,
+    docId,
+    requestBody
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **requestBody** | **{ [key: string]: string; }**|  | |
+| **id** | [**number**] |  | defaults to undefined|
+| **docId** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseKnowledgeDocumentVO**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **leaveGroup**
 > BaseResponseVoid leaveGroup()
 
@@ -12225,63 +12733,6 @@ const { status, data } = await apiInstance.listBooks(
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **listByCreator**
-> BaseResponseListKnowledgeBaseVO listByCreator()
-
-
-### Example
-
-```typescript
-import {
-    DefaultApi,
-    Configuration
-} from './api';
-
-const configuration = new Configuration();
-const apiInstance = new DefaultApi(configuration);
-
-let userId: number; // (default to undefined)
-let page: number; // (optional) (default to 0)
-let size: number; // (optional) (default to 20)
-
-const { status, data } = await apiInstance.listByCreator(
-    userId,
-    page,
-    size
-);
-```
-
-### Parameters
-
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **userId** | [**number**] |  | defaults to undefined|
-| **page** | [**number**] |  | (optional) defaults to 0|
-| **size** | [**number**] |  | (optional) defaults to 20|
-
-
-### Return type
-
-**BaseResponseListKnowledgeBaseVO**
-
-### Authorization
-
-[Bearer Token](../README.md#Bearer Token)
-
-### HTTP request headers
-
- - **Content-Type**: Not defined
- - **Accept**: application/json
-
-
-### HTTP response details
-| Status code | Description | Response headers |
-|-------------|-------------|------------------|
-|**400** | Bad Request |  -  |
-|**200** | OK |  -  |
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
-
 # **listByUser**
 > BaseResponseListWorkflowResponse listByUser()
 
@@ -12371,66 +12822,6 @@ const { status, data } = await apiInstance.listChapters(
 ### Return type
 
 **BaseResponseListChapterResponse**
-
-### Authorization
-
-[Bearer Token](../README.md#Bearer Token)
-
-### HTTP request headers
-
- - **Content-Type**: Not defined
- - **Accept**: application/json
-
-
-### HTTP response details
-| Status code | Description | Response headers |
-|-------------|-------------|------------------|
-|**400** | Bad Request |  -  |
-|**200** | OK |  -  |
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
-
-# **listChunks**
-> BaseResponseMapStringObject listChunks()
-
-
-### Example
-
-```typescript
-import {
-    DefaultApi,
-    Configuration
-} from './api';
-
-const configuration = new Configuration();
-const apiInstance = new DefaultApi(configuration);
-
-let id: number; // (default to undefined)
-let docId: number; // (default to undefined)
-let page: number; // (optional) (default to 0)
-let size: number; // (optional) (default to 20)
-
-const { status, data } = await apiInstance.listChunks(
-    id,
-    docId,
-    page,
-    size
-);
-```
-
-### Parameters
-
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **id** | [**number**] |  | defaults to undefined|
-| **docId** | [**number**] |  | defaults to undefined|
-| **page** | [**number**] |  | (optional) defaults to 0|
-| **size** | [**number**] |  | (optional) defaults to 20|
-
-
-### Return type
-
-**BaseResponseMapStringObject**
 
 ### Authorization
 
@@ -12545,63 +12936,6 @@ const { status, data } = await apiInstance.listCoursesByTeacher(
 ### Return type
 
 **BaseResponseListCourseResponse**
-
-### Authorization
-
-[Bearer Token](../README.md#Bearer Token)
-
-### HTTP request headers
-
- - **Content-Type**: Not defined
- - **Accept**: application/json
-
-
-### HTTP response details
-| Status code | Description | Response headers |
-|-------------|-------------|------------------|
-|**400** | Bad Request |  -  |
-|**200** | OK |  -  |
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
-
-# **listDocuments**
-> BaseResponseListKnowledgeDocumentVO listDocuments()
-
-
-### Example
-
-```typescript
-import {
-    DefaultApi,
-    Configuration
-} from './api';
-
-const configuration = new Configuration();
-const apiInstance = new DefaultApi(configuration);
-
-let id: number; // (default to undefined)
-let page: number; // (optional) (default to 0)
-let size: number; // (optional) (default to 20)
-
-const { status, data } = await apiInstance.listDocuments(
-    id,
-    page,
-    size
-);
-```
-
-### Parameters
-
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **id** | [**number**] |  | defaults to undefined|
-| **page** | [**number**] |  | (optional) defaults to 0|
-| **size** | [**number**] |  | (optional) defaults to 20|
-
-
-### Return type
-
-**BaseResponseListKnowledgeDocumentVO**
 
 ### Authorization
 
@@ -13575,62 +13909,8 @@ const { status, data } = await apiInstance.phoneLogin(
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **processDocument**
-> BaseResponseVoid processDocument()
-
-
-### Example
-
-```typescript
-import {
-    DefaultApi,
-    Configuration
-} from './api';
-
-const configuration = new Configuration();
-const apiInstance = new DefaultApi(configuration);
-
-let id: number; // (default to undefined)
-let docId: number; // (default to undefined)
-
-const { status, data } = await apiInstance.processDocument(
-    id,
-    docId
-);
-```
-
-### Parameters
-
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **id** | [**number**] |  | defaults to undefined|
-| **docId** | [**number**] |  | defaults to undefined|
-
-
-### Return type
-
-**BaseResponseVoid**
-
-### Authorization
-
-[Bearer Token](../README.md#Bearer Token)
-
-### HTTP request headers
-
- - **Content-Type**: Not defined
- - **Accept**: application/json
-
-
-### HTTP response details
-| Status code | Description | Response headers |
-|-------------|-------------|------------------|
-|**400** | Bad Request |  -  |
-|**200** | OK |  -  |
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
-
-# **publish1**
-> BaseResponseWorkflowResponse publish1()
+# **publish**
+> BaseResponseWorkflowResponse publish()
 
 
 ### Example
@@ -13646,7 +13926,7 @@ const apiInstance = new DefaultApi(configuration);
 
 let id: number; //工作流ID (default to undefined)
 
-const { status, data } = await apiInstance.publish1(
+const { status, data } = await apiInstance.publish(
     id
 );
 ```
@@ -15483,66 +15763,6 @@ const { status, data } = await apiInstance.scrapeSinglePage(
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **search**
-> BaseResponseListKnowledgeBaseVO search()
-
-
-### Example
-
-```typescript
-import {
-    DefaultApi,
-    Configuration
-} from './api';
-
-const configuration = new Configuration();
-const apiInstance = new DefaultApi(configuration);
-
-let keyword: string; // (default to undefined)
-let userId: number; // (default to undefined)
-let page: number; // (optional) (default to 0)
-let size: number; // (optional) (default to 20)
-
-const { status, data } = await apiInstance.search(
-    keyword,
-    userId,
-    page,
-    size
-);
-```
-
-### Parameters
-
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **keyword** | [**string**] |  | defaults to undefined|
-| **userId** | [**number**] |  | defaults to undefined|
-| **page** | [**number**] |  | (optional) defaults to 0|
-| **size** | [**number**] |  | (optional) defaults to 20|
-
-
-### Return type
-
-**BaseResponseListKnowledgeBaseVO**
-
-### Authorization
-
-[Bearer Token](../README.md#Bearer Token)
-
-### HTTP request headers
-
- - **Content-Type**: Not defined
- - **Accept**: application/json
-
-
-### HTTP response details
-| Status code | Description | Response headers |
-|-------------|-------------|------------------|
-|**400** | Bad Request |  -  |
-|**200** | OK |  -  |
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
-
 # **searchArticles**
 > BaseResponseDailyArticlePageResponse searchArticles()
 
@@ -17219,61 +17439,6 @@ const { status, data } = await apiInstance.update(
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **update1**
-> BaseResponseKnowledgeBaseVO update1(updateKnowledgeBaseCommand)
-
-
-### Example
-
-```typescript
-import {
-    DefaultApi,
-    Configuration,
-    UpdateKnowledgeBaseCommand
-} from './api';
-
-const configuration = new Configuration();
-const apiInstance = new DefaultApi(configuration);
-
-let id: number; // (default to undefined)
-let updateKnowledgeBaseCommand: UpdateKnowledgeBaseCommand; //
-
-const { status, data } = await apiInstance.update1(
-    id,
-    updateKnowledgeBaseCommand
-);
-```
-
-### Parameters
-
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **updateKnowledgeBaseCommand** | **UpdateKnowledgeBaseCommand**|  | |
-| **id** | [**number**] |  | defaults to undefined|
-
-
-### Return type
-
-**BaseResponseKnowledgeBaseVO**
-
-### Authorization
-
-[Bearer Token](../README.md#Bearer Token)
-
-### HTTP request headers
-
- - **Content-Type**: application/json
- - **Accept**: application/json
-
-
-### HTTP response details
-| Status code | Description | Response headers |
-|-------------|-------------|------------------|
-|**400** | Bad Request |  -  |
-|**200** | OK |  -  |
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
-
 # **updateAnnouncement**
 > BaseResponseBoolean updateAnnouncement(updateAnnouncementRequest)
 
@@ -17750,63 +17915,6 @@ const { status, data } = await apiInstance.updateDefinition(
 ### Return type
 
 **BaseResponseWorkflowResponse**
-
-### Authorization
-
-[Bearer Token](../README.md#Bearer Token)
-
-### HTTP request headers
-
- - **Content-Type**: application/json
- - **Accept**: application/json
-
-
-### HTTP response details
-| Status code | Description | Response headers |
-|-------------|-------------|------------------|
-|**400** | Bad Request |  -  |
-|**200** | OK |  -  |
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
-
-# **updateDocument**
-> BaseResponseKnowledgeDocumentVO updateDocument(requestBody)
-
-
-### Example
-
-```typescript
-import {
-    DefaultApi,
-    Configuration
-} from './api';
-
-const configuration = new Configuration();
-const apiInstance = new DefaultApi(configuration);
-
-let id: number; // (default to undefined)
-let docId: number; // (default to undefined)
-let requestBody: { [key: string]: string; }; //
-
-const { status, data } = await apiInstance.updateDocument(
-    id,
-    docId,
-    requestBody
-);
-```
-
-### Parameters
-
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **requestBody** | **{ [key: string]: string; }**|  | |
-| **id** | [**number**] |  | defaults to undefined|
-| **docId** | [**number**] |  | defaults to undefined|
-
-
-### Return type
-
-**BaseResponseKnowledgeDocumentVO**
 
 ### Authorization
 

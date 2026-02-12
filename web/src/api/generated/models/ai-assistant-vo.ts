@@ -38,6 +38,7 @@ export interface AiAssistantVO {
     'usageCount'?: number;
     'rating'?: number;
     'knowledgeBases'?: Array<KnowledgeBaseVO>;
+    'mcpServerIds'?: Array<number>;
     'creatorId'?: number;
     'sort'?: number;
     'createTime'?: string;

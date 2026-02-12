@@ -25,6 +25,7 @@ Name | Type | Description | Notes
 **usageCount** | **number** |  | [optional] [default to undefined]
 **rating** | **number** |  | [optional] [default to undefined]
 **knowledgeBases** | [**Array&lt;KnowledgeBaseVO&gt;**](KnowledgeBaseVO.md) |  | [optional] [default to undefined]
+**mcpServerIds** | **Array&lt;number&gt;** |  | [optional] [default to undefined]
 **creatorId** | **number** |  | [optional] [default to undefined]
 **sort** | **number** |  | [optional] [default to undefined]
 **createTime** | **string** |  | [optional] [default to undefined]
@@ -56,6 +57,7 @@ const instance: AiAssistantVO = {
     usageCount,
     rating,
     knowledgeBases,
+    mcpServerIds,
     creatorId,
     sort,
     createTime,

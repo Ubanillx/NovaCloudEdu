@@ -14,9 +14,10 @@
 
 
 
-export * from './api/default-api';
-export * from './api/aiapi';
-export * from './api/mcpapi';
-export * from './api/pptapi';
-export * from './api/webhook-api';
+export interface UploadTemplateRequest {
+    /**
+     * PPTX模板文件
+     */
+    'file': File;
+}
 

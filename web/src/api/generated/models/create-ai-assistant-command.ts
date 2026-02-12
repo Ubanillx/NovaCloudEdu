@@ -28,5 +28,6 @@ export interface CreateAiAssistantCommand {
     'topP'?: number;
     'maxTokens'?: number;
     'knowledgeBaseIds'?: Array<number>;
+    'mcpServerIds'?: Array<number>;
 }
 
