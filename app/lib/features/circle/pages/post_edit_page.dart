@@ -35,6 +35,14 @@ class _PostEditPageState extends State<PostEditPage> {
   bool _isFullscreen = false;
   bool get _isEdit => widget.postId != null;
 
+  static const Map<String, String> _postTypes = {
+    'discussion': '讨论',
+    'question': '提问',
+    'share': '分享',
+    'announcement': '公告',
+  };
+  String _selectedPostType = 'discussion';
+
   @override
   void initState() {
     super.initState();
@@ -43,6 +51,9 @@ class _PostEditPageState extends State<PostEditPage> {
       _contentController.text = widget.post!.content ?? '';
       if (widget.post!.tags != null) {
         _tags.addAll(widget.post!.tags!.toList());
+      }
+      if (widget.post!.postType != null && _postTypes.containsKey(widget.post!.postType)) {
+        _selectedPostType = widget.post!.postType!;
       }
     }
   }
@@ -184,6 +195,7 @@ class _PostEditPageState extends State<PostEditPage> {
           title: title,
           content: content,
           tags: _tags,
+          postType: _selectedPostType,
         );
         if (success && mounted) {
           NovaMessage.success(context, '更新成功');
@@ -194,6 +206,7 @@ class _PostEditPageState extends State<PostEditPage> {
           title: title,
           content: content,
           tags: _tags,
+          postType: _selectedPostType,
         );
         if (post != null && mounted) {
           NovaMessage.success(context, '发布成功');
@@ -328,6 +341,64 @@ class _PostEditPageState extends State<PostEditPage> {
               counterText: '',
               contentPadding: EdgeInsets.zero,
             ),
+          ),
+          const SizedBox(height: 16),
+
+          // 帖子类型选择
+          Row(
+            children: [
+              Icon(Icons.category, size: 18, color: colors.textTertiary),
+              const SizedBox(width: 6),
+              Text(
+                '类型',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: colors.textSecondary,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: _postTypes.entries.map((entry) {
+                      final isSelected = _selectedPostType == entry.key;
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(16),
+                          onTap: () {
+                            setState(() => _selectedPostType = entry.key);
+                          },
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 180),
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: isSelected
+                                  ? AppTheme.brand.withOpacity(context.isDarkMode ? 0.22 : 0.16)
+                                  : colors.surfaceVariant,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: isSelected ? AppTheme.brand : colors.border,
+                              ),
+                            ),
+                            child: Text(
+                              entry.value,
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: isSelected ? AppTheme.brand : colors.textSecondary,
+                                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 20),
           
