@@ -30,11 +30,28 @@ public class KnowledgeChunkRepositoryImpl implements KnowledgeChunkRepository {
         mapper.insertChunk(knowledgeBaseId.value(), documentId.value(), content, chunkIndex, embeddingStr, metadata);
     }
 
+    private static final int DB_BATCH_SIZE = 1000;
+
     @Override
     public void saveChunks(KnowledgeBaseId knowledgeBaseId, KnowledgeDocumentId documentId,
                            List<String> contents, List<float[]> embeddings, String metadata) {
+        List<Map<String, Object>> allRows = new ArrayList<>();
         for (int i = 0; i < contents.size(); i++) {
-            saveChunk(knowledgeBaseId, documentId, contents.get(i), i, embeddings.get(i), metadata);
+            Map<String, Object> row = new java.util.HashMap<>();
+            row.put("knowledgeBaseId", knowledgeBaseId.value());
+            row.put("documentId", documentId.value());
+            row.put("content", contents.get(i));
+            row.put("chunkIndex", i);
+            row.put("embedding", floatArrayToString(embeddings.get(i)));
+            row.put("metadata", metadata);
+            allRows.add(row);
+        }
+
+        for (int start = 0; start < allRows.size(); start += DB_BATCH_SIZE) {
+            int end = Math.min(start + DB_BATCH_SIZE, allRows.size());
+            List<Map<String, Object>> batch = allRows.subList(start, end);
+            log.info("批量插入分块 {}-{}/{}", start + 1, end, allRows.size());
+            mapper.batchInsertChunks(batch);
         }
     }
 
