@@ -46,4 +46,29 @@ public interface OssService {
      * @return 文件访问URL
      */
     String uploadBytes(byte[] data, String extension, FileBusinessType businessType);
+
+    /**
+     * 读取文件内容为字符串（用于工作流文件读取节点）
+     * @param fileUrl 文件URL
+     * @param encoding 字符编码（如 "UTF-8"）
+     * @return 文件文本内容
+     */
+    String readFileAsString(String fileUrl, String encoding);
+
+    /**
+     * 上传字符串内容为文件（用于工作流文件写入节点）
+     * @param content 文本内容
+     * @param fileName 文件名（如 "output.txt"）
+     * @param encoding 字符编码（如 "UTF-8"）
+     * @param businessType 业务类型
+     * @return 文件访问URL
+     */
+    String uploadString(String content, String fileName, String encoding, FileBusinessType businessType);
+
+    /**
+     * 获取文件大小（字节）
+     * @param fileUrl 文件URL
+     * @return 文件大小，文件不存在返回 -1
+     */
+    long getFileSize(String fileUrl);
 }
