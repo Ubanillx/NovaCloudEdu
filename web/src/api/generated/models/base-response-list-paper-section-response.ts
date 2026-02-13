@@ -13,11 +13,13 @@
  */
 
 
+// May contain unused imports in some cases
+// @ts-ignore
+import type { PaperSectionResponse } from './paper-section-response';
 
-export * from './api/default-api';
-export * from './api/aiapi';
-export * from './api/mcpapi';
-export * from './api/only-office-api';
-export * from './api/pptapi';
-export * from './api/webhook-api';
+export interface BaseResponseListPaperSectionResponse {
+    'code'?: number;
+    'data'?: Array<PaperSectionResponse>;
+    'message'?: string;
+}
 

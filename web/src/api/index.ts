@@ -137,8 +137,10 @@ export const apiClient = axios.create({
     'Content-Type': 'application/json',
   },
   // 自定义响应转换器，使用 json-bigint 解析响应，解决 Long 精度丢失问题
-  transformResponse: [(data) => {
-    if (typeof data === 'string') {
+  // 仅对 JSON 响应做解析，避免 PDF/图片等二进制数据被损坏
+  transformResponse: [(data, headers) => {
+    const ct = headers?.['content-type'] || headers?.['Content-Type'] || '';
+    if (typeof data === 'string' && (ct === '' || ct.includes('json'))) {
       try {
         return JSONBigString.parse(data);
       } catch {

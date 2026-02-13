@@ -11,7 +11,6 @@ All URIs are relative to *http://localhost:8080*
 |[**getTemplateDetail**](#gettemplatedetail) | **GET** /api/ppt/templates/{id} | 查看模板详情|
 |[**listSessions1**](#listsessions1) | **GET** /api/ppt/generation/sessions | 获取PPT会话列表|
 |[**listTemplates**](#listtemplates) | **GET** /api/ppt/templates | 列出所有可用模板|
-|[**proxyFile**](#proxyfile) | **GET** /api/ppt/proxy-file | 代理下载文件|
 |[**stream**](#stream) | **POST** /api/ppt/generation/stream | PPT生成助手（SSE流式）|
 |[**uploadTemplate**](#uploadtemplate) | **POST** /api/ppt/templates | 上传PPT模板|
 
@@ -340,58 +339,6 @@ This endpoint does not have any parameters.
 ### Return type
 
 **BaseResponseListPptTemplateListResponse**
-
-### Authorization
-
-[Bearer Token](../README.md#Bearer Token)
-
-### HTTP request headers
-
- - **Content-Type**: Not defined
- - **Accept**: application/json
-
-
-### HTTP response details
-| Status code | Description | Response headers |
-|-------------|-------------|------------------|
-|**400** | Bad Request |  -  |
-|**200** | OK |  -  |
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
-
-# **proxyFile**
-> string proxyFile()
-
-通过后端代理下载 OSS 上的 PPTX 文件，返回二进制内容
-
-### Example
-
-```typescript
-import {
-    PPTApi,
-    Configuration
-} from './api';
-
-const configuration = new Configuration();
-const apiInstance = new PPTApi(configuration);
-
-let url: string; // (default to undefined)
-
-const { status, data } = await apiInstance.proxyFile(
-    url
-);
-```
-
-### Parameters
-
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **url** | [**string**] |  | defaults to undefined|
-
-
-### Return type
-
-**string**
 
 ### Authorization
 

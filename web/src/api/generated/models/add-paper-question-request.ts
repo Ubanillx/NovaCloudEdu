@@ -14,10 +14,21 @@
 
 
 
-export * from './api/default-api';
-export * from './api/aiapi';
-export * from './api/mcpapi';
-export * from './api/only-office-api';
-export * from './api/pptapi';
-export * from './api/webhook-api';
+/**
+ * 添加试卷题目请求
+ */
+export interface AddPaperQuestionRequest {
+    /**
+     * 题目ID
+     */
+    'questionId': number;
+    /**
+     * 分值
+     */
+    'score': number;
+    /**
+     * 排序
+     */
+    'sortOrder'?: number;
+}
 
