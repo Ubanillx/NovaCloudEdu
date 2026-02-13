@@ -28,6 +28,10 @@ public class GetTeacherQuery {
         return teacherRepository.findAll(page, size);
     }
 
+    public List<Teacher> searchByName(String keyword, int page, int size) {
+        return teacherRepository.searchByName(keyword, page, size);
+    }
+
     public long count() {
         return teacherRepository.count();
     }

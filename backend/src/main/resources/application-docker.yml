@@ -131,6 +131,11 @@ book:
 ppt-service:
   url: ${PPT_SERVICE_URL:http://ppt-service:8100}
 
+# Typst 试卷排版服务配置
+typst:
+  service:
+    url: ${TYPST_SERVICE_URL:http://typst-service:8200}
+
 # OnlyOffice 配置
 onlyoffice:
   document-server-url: ${ONLYOFFICE_URL:http://onlyoffice:80}

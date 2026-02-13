@@ -7,6 +7,7 @@ import com.novacloudedu.backend.common.ErrorCode;
 import com.novacloudedu.backend.common.ResultUtils;
 import com.novacloudedu.backend.exception.BusinessException;
 import com.novacloudedu.backend.domain.clazz.entity.ClassInfo;
+import com.novacloudedu.backend.domain.clazz.repository.ClassInfoRepository;
 import com.novacloudedu.backend.domain.clazz.repository.ClassMemberRepository;
 import com.novacloudedu.backend.domain.clazz.valueobject.ClassRole;
 import com.novacloudedu.backend.interfaces.rest.clazz.assembler.ClassAssembler;
@@ -71,6 +72,21 @@ public class ClassController {
     public BaseResponse<ClassResponse> getClassInfo(@PathVariable Long classId) {
         ClassInfo classInfo = classService.getClassInfo(classId);
         return ResultUtils.success(assembler.toClassResponse(classInfo));
+    }
+
+    @Operation(summary = "获取班级列表")
+    @GetMapping("/list")
+    public BaseResponse<PageResponse<ClassResponse>> listClasses(
+            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(defaultValue = "10") int pageSize,
+            @RequestParam(required = false) String keyword) {
+        ClassInfoRepository.ClassPage page = (keyword != null && !keyword.isBlank())
+                ? classService.searchClasses(keyword.trim(), pageNum, pageSize)
+                : classService.listClasses(pageNum, pageSize);
+        List<ClassResponse> list = page.getList().stream()
+                .map(assembler::toClassResponse)
+                .toList();
+        return ResultUtils.success(PageResponse.of(list, page.getTotal(), pageNum, pageSize));
     }
 
     @Operation(summary = "添加成员")

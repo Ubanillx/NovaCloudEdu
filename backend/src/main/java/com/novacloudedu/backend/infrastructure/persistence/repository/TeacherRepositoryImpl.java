@@ -59,6 +59,18 @@ public class TeacherRepositoryImpl implements TeacherRepository {
     }
 
     @Override
+    public List<Teacher> searchByName(String keyword, int page, int size) {
+        Page<TeacherPO> pageParam = new Page<>(page, size);
+        LambdaQueryWrapper<TeacherPO> wrapper = new LambdaQueryWrapper<>();
+        wrapper.like(TeacherPO::getName, keyword)
+                .orderByDesc(TeacherPO::getCreateTime);
+        Page<TeacherPO> result = teacherMapper.selectPage(pageParam, wrapper);
+        return result.getRecords().stream()
+                .map(teacherConverter::toTeacher)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public long count() {
         return teacherMapper.selectCount(null);
     }

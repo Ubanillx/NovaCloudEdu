@@ -24,7 +24,11 @@ public enum FileBusinessType {
     WORKFLOW_FILE("workflow/file", "工作流文件", 50 * 1024 * 1024),
     PPT_TEMPLATE("ppt/template", "PPT模板", 100 * 1024 * 1024),
     PPT_GENERATED("ppt/generated", "生成的PPT", 100 * 1024 * 1024),
-    PPT_COVER("ppt/cover", "PPT封面", 5 * 1024 * 1024);
+    PPT_COVER("ppt/cover", "PPT封面", 5 * 1024 * 1024),
+    EXAM_QUESTION_IMAGE("exam/question", "试题图片", 10 * 1024 * 1024),
+    EXAM_TEMPLATE("exam/template", "试卷模板", 1 * 1024 * 1024),
+    BANNER("banner", "轮播图", 10 * 1024 * 1024),
+    ANNOUNCEMENT("announcement", "公告图片", 5 * 1024 * 1024);
 
     private final String folder;
     private final String description;
