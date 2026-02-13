@@ -16,10 +16,10 @@ Name | Type | Description | Notes
 **joinTime** | **string** |  | [optional] [default to undefined]
 **updateTime** | **string** |  | [optional] [default to undefined]
 **mute** | **boolean** |  | [optional] [default to undefined]
+**adminOrOwner** | **boolean** |  | [optional] [default to undefined]
 **owner** | **boolean** |  | [optional] [default to undefined]
 **_delete** | **boolean** |  | [optional] [default to undefined]
 **muted** | **boolean** |  | [optional] [default to undefined]
-**adminOrOwner** | **boolean** |  | [optional] [default to undefined]
 
 ## Example
 
@@ -38,10 +38,10 @@ const instance: ChatGroupMember = {
     joinTime,
     updateTime,
     mute,
+    adminOrOwner,
     owner,
     _delete,
     muted,
-    adminOrOwner,
 };
 ```
 

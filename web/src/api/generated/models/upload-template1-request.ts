@@ -14,10 +14,10 @@
 
 
 
-export * from './api/default-api';
-export * from './api/aiapi';
-export * from './api/mcpapi';
-export * from './api/only-office-api';
-export * from './api/pptapi';
-export * from './api/webhook-api';
+export interface UploadTemplate1Request {
+    /**
+     * Typst 模板文件 (.typ)
+     */
+    'file': File;
+}
 

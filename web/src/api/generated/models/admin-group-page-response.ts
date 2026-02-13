@@ -13,11 +13,15 @@
  */
 
 
+// May contain unused imports in some cases
+// @ts-ignore
+import type { GroupResponse } from './group-response';
 
-export * from './api/default-api';
-export * from './api/aiapi';
-export * from './api/mcpapi';
-export * from './api/only-office-api';
-export * from './api/pptapi';
-export * from './api/webhook-api';
+export interface AdminGroupPageResponse {
+    'list'?: Array<GroupResponse>;
+    'total'?: number;
+    'pageNum'?: number;
+    'pageSize'?: number;
+    'totalPages'?: number;
+}
 

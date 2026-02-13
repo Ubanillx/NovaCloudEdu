@@ -310,47 +310,6 @@ export const PPTApiAxiosParamCreator = function (configuration?: Configuration) 
             };
         },
         /**
-         * 通过后端代理下载 OSS 上的 PPTX 文件，返回二进制内容
-         * @summary 代理下载文件
-         * @param {string} url 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        proxyFile: async (url: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'url' is not null or undefined
-            assertParamExists('proxyFile', 'url', url)
-            const localVarPath = `/api/ppt/proxy-file`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication Bearer Token required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            if (url !== undefined) {
-                localVarQueryParameter['url'] = url;
-            }
-
-            localVarHeaderParameter['Accept'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
          * 多步骤PPT生成流程，通过 action 字段控制： 0. detect_intent - AI判断用户是否要生成PPT，提取主题 1. generate_outline - 输入主题，AI生成Markdown大纲 2. revise_outline - 不满意可修改大纲 3. confirm_outline - 确认大纲 4. select_template - 选择模板（系统模板ID 或 自定义URL） 5. generate_ppt - AI逐页生成内容并生成最终PPT文件  SSE事件：status / message / intent / outline / template_parsed / slide_progress / result / error / done 
          * @summary PPT生成助手（SSE流式）
          * @param {PptGenerationRequest} pptGenerationRequest 
@@ -537,19 +496,6 @@ export const PPTApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * 通过后端代理下载 OSS 上的 PPTX 文件，返回二进制内容
-         * @summary 代理下载文件
-         * @param {string} url 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async proxyFile(url: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.proxyFile(url, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['PPTApi.proxyFile']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
          * 多步骤PPT生成流程，通过 action 字段控制： 0. detect_intent - AI判断用户是否要生成PPT，提取主题 1. generate_outline - 输入主题，AI生成Markdown大纲 2. revise_outline - 不满意可修改大纲 3. confirm_outline - 确认大纲 4. select_template - 选择模板（系统模板ID 或 自定义URL） 5. generate_ppt - AI逐页生成内容并生成最终PPT文件  SSE事件：status / message / intent / outline / template_parsed / slide_progress / result / error / done 
          * @summary PPT生成助手（SSE流式）
          * @param {PptGenerationRequest} pptGenerationRequest 
@@ -655,16 +601,6 @@ export const PPTApiFactory = function (configuration?: Configuration, basePath?:
             return localVarFp.listTemplates(options).then((request) => request(axios, basePath));
         },
         /**
-         * 通过后端代理下载 OSS 上的 PPTX 文件，返回二进制内容
-         * @summary 代理下载文件
-         * @param {PPTApiProxyFileRequest} requestParameters Request parameters.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        proxyFile(requestParameters: PPTApiProxyFileRequest, options?: RawAxiosRequestConfig): AxiosPromise<string> {
-            return localVarFp.proxyFile(requestParameters.url, options).then((request) => request(axios, basePath));
-        },
-        /**
          * 多步骤PPT生成流程，通过 action 字段控制： 0. detect_intent - AI判断用户是否要生成PPT，提取主题 1. generate_outline - 输入主题，AI生成Markdown大纲 2. revise_outline - 不满意可修改大纲 3. confirm_outline - 确认大纲 4. select_template - 选择模板（系统模板ID 或 自定义URL） 5. generate_ppt - AI逐页生成内容并生成最终PPT文件  SSE事件：status / message / intent / outline / template_parsed / slide_progress / result / error / done 
          * @summary PPT生成助手（SSE流式）
          * @param {PPTApiStreamRequest} requestParameters Request parameters.
@@ -753,15 +689,6 @@ export interface PPTApiInterface {
     listTemplates(options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListPptTemplateListResponse>;
 
     /**
-     * 通过后端代理下载 OSS 上的 PPTX 文件，返回二进制内容
-     * @summary 代理下载文件
-     * @param {PPTApiProxyFileRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    proxyFile(requestParameters: PPTApiProxyFileRequest, options?: RawAxiosRequestConfig): AxiosPromise<string>;
-
-    /**
      * 多步骤PPT生成流程，通过 action 字段控制： 0. detect_intent - AI判断用户是否要生成PPT，提取主题 1. generate_outline - 输入主题，AI生成Markdown大纲 2. revise_outline - 不满意可修改大纲 3. confirm_outline - 确认大纲 4. select_template - 选择模板（系统模板ID 或 自定义URL） 5. generate_ppt - AI逐页生成内容并生成最终PPT文件  SSE事件：status / message / intent / outline / template_parsed / slide_progress / result / error / done 
      * @summary PPT生成助手（SSE流式）
      * @param {PPTApiStreamRequest} requestParameters Request parameters.
@@ -826,13 +753,6 @@ export interface PPTApiGetTemplateDetailRequest {
      * 模板ID
      */
     readonly id: number
-}
-
-/**
- * Request parameters for proxyFile operation in PPTApi.
- */
-export interface PPTApiProxyFileRequest {
-    readonly url: string
 }
 
 /**
@@ -936,17 +856,6 @@ export class PPTApi extends BaseAPI implements PPTApiInterface {
      */
     public listTemplates(options?: RawAxiosRequestConfig) {
         return PPTApiFp(this.configuration).listTemplates(options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 通过后端代理下载 OSS 上的 PPTX 文件，返回二进制内容
-     * @summary 代理下载文件
-     * @param {PPTApiProxyFileRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    public proxyFile(requestParameters: PPTApiProxyFileRequest, options?: RawAxiosRequestConfig) {
-        return PPTApiFp(this.configuration).proxyFile(requestParameters.url, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

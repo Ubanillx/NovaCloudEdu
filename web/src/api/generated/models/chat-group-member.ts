@@ -32,10 +32,10 @@ export interface ChatGroupMember {
     'joinTime'?: string;
     'updateTime'?: string;
     'mute'?: boolean;
+    'adminOrOwner'?: boolean;
     'owner'?: boolean;
     'delete'?: boolean;
     'muted'?: boolean;
-    'adminOrOwner'?: boolean;
 }
 
 export const ChatGroupMemberMemberTypeEnum = {

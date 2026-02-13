@@ -14,10 +14,25 @@
 
 
 
-export * from './api/default-api';
-export * from './api/aiapi';
-export * from './api/mcpapi';
-export * from './api/only-office-api';
-export * from './api/pptapi';
-export * from './api/webhook-api';
+/**
+ * 添加试卷大题请求
+ */
+export interface AddPaperSectionRequest {
+    /**
+     * 大题标题
+     */
+    'title': string;
+    /**
+     * 大题描述
+     */
+    'description'?: string;
+    /**
+     * 题型
+     */
+    'questionType'?: string;
+    /**
+     * 排序
+     */
+    'sortOrder'?: number;
+}
 
