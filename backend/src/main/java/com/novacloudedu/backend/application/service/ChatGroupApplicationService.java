@@ -478,6 +478,72 @@ public class ChatGroupApplicationService {
         return groupRepository.searchByName(keyword, pageNum, pageSize);
     }
 
+    // ==================== 管理员操作（跳过群成员权限校验） ====================
+
+    /**
+     * 管理员分页获取所有群列表
+     */
+    public ChatGroupRepository.GroupPage adminListGroups(int pageNum, int pageSize) {
+        return groupRepository.findAll(pageNum, pageSize);
+    }
+
+    /**
+     * 管理员搜索群
+     */
+    public ChatGroupRepository.GroupPage adminSearchGroups(String keyword, int pageNum, int pageSize) {
+        return groupRepository.searchByName(keyword, pageNum, pageSize);
+    }
+
+    /**
+     * 管理员解散群（无需群主身份）
+     */
+    @Transactional
+    public void adminDissolveGroup(Long groupId) {
+        ChatGroup group = getGroupOrThrow(groupId);
+        memberRepository.deleteByGroupId(GroupId.of(groupId));
+        group.dissolve();
+        groupRepository.update(group);
+        log.info("管理员解散群: groupId={}", groupId);
+    }
+
+    /**
+     * 管理员更新群信息（无需群成员身份）
+     */
+    @Transactional
+    public void adminUpdateGroupInfo(Long groupId, String groupName, String description, String avatar) {
+        ChatGroup group = getGroupOrThrow(groupId);
+        group.updateInfo(groupName, avatar, description);
+        groupRepository.update(group);
+        log.info("管理员更新群信息: groupId={}", groupId);
+    }
+
+    /**
+     * 管理员移除群成员（无需群成员身份）
+     */
+    @Transactional
+    public void adminRemoveMember(Long groupId, Long targetUserId) {
+        ChatGroup group = getGroupOrThrow(groupId);
+        ChatGroupMember target = getMemberOrThrow(groupId, targetUserId);
+
+        target.leave();
+        memberRepository.update(target);
+
+        group.decrementMemberCount();
+        groupRepository.update(group);
+        log.info("管理员移除群成员: groupId={}, targetUserId={}", groupId, targetUserId);
+    }
+
+    /**
+     * 管理员设置群全员禁言（无需群成员身份）
+     */
+    @Transactional
+    public void adminSetMute(Long groupId, boolean mute) {
+        ChatGroup group = getGroupOrThrow(groupId);
+        group.setMute(mute);
+        groupRepository.update(group);
+        log.info("管理员设置群禁言: groupId={}, mute={}", groupId, mute);
+    }
+
     // ==================== 私有方法 ====================
 
     private ChatGroup getGroupOrThrow(Long groupId) {

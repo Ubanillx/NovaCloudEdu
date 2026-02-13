@@ -1,6 +1,9 @@
 package com.novacloudedu.backend.interfaces.rest.teacher;
 
+import com.novacloudedu.backend.annotation.AuthCheck;
+import com.novacloudedu.backend.application.service.UserApplicationService;
 import com.novacloudedu.backend.application.teacher.command.ApplyTeacherCommand;
+import com.novacloudedu.backend.application.teacher.command.RemoveTeacherCommand;
 import com.novacloudedu.backend.application.teacher.command.UpdateTeacherCommand;
 import com.novacloudedu.backend.application.teacher.query.GetTeacherQuery;
 import com.novacloudedu.backend.common.BaseResponse;
@@ -8,6 +11,7 @@ import com.novacloudedu.backend.common.ErrorCode;
 import com.novacloudedu.backend.common.ResultUtils;
 import com.novacloudedu.backend.domain.teacher.entity.Teacher;
 import com.novacloudedu.backend.domain.teacher.valueobject.TeacherId;
+import com.novacloudedu.backend.domain.user.entity.User;
 import com.novacloudedu.backend.domain.user.valueobject.UserId;
 import com.novacloudedu.backend.exception.BusinessException;
 import com.novacloudedu.backend.interfaces.rest.teacher.assembler.TeacherAssembler;
@@ -33,8 +37,10 @@ public class TeacherController {
 
     private final ApplyTeacherCommand applyTeacherCommand;
     private final UpdateTeacherCommand updateTeacherCommand;
+    private final RemoveTeacherCommand removeTeacherCommand;
     private final GetTeacherQuery getTeacherQuery;
     private final TeacherAssembler teacherAssembler;
+    private final UserApplicationService userApplicationService;
 
     @PostMapping("/apply")
     @Operation(summary = "申请成为讲师")
@@ -71,8 +77,11 @@ public class TeacherController {
     @Operation(summary = "获取讲师列表")
     public BaseResponse<List<TeacherResponse>> listTeachers(
             @RequestParam(defaultValue = "1") @Parameter(description = "页码") int page,
-            @RequestParam(defaultValue = "10") @Parameter(description = "每页数量") int size) {
-        List<Teacher> teachers = getTeacherQuery.executeList(page, size);
+            @RequestParam(defaultValue = "10") @Parameter(description = "每页数量") int size,
+            @RequestParam(required = false) @Parameter(description = "搜索关键词（讲师姓名）") String keyword) {
+        List<Teacher> teachers = (keyword != null && !keyword.isBlank())
+                ? getTeacherQuery.searchByName(keyword.trim(), page, size)
+                : getTeacherQuery.executeList(page, size);
         List<TeacherResponse> responses = teachers.stream()
                 .map(teacherAssembler::toTeacherResponse)
                 .collect(Collectors.toList());
@@ -88,7 +97,8 @@ public class TeacherController {
         Teacher teacher = getTeacherQuery.execute(TeacherId.of(id))
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_ERROR));
         
-        if (!teacher.getUserId().value().equals(userId)) {
+        User currentUser = userApplicationService.getCurrentUser();
+        if (!currentUser.isAdmin() && !teacher.getUserId().value().equals(userId)) {
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
         }
 
@@ -98,6 +108,14 @@ public class TeacherController {
                 request.getIntroduction(),
                 request.getExpertise()
         );
+        return ResultUtils.success(null);
+    }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "移除讲师", description = "管理员移除讲师，用户角色降回学生，需重新申请")
+    @AuthCheck(mustRole = "admin")
+    public BaseResponse<Void> removeTeacher(@PathVariable @Parameter(description = "讲师ID") Long id) {
+        removeTeacherCommand.execute(TeacherId.of(id));
         return ResultUtils.success(null);
     }
 

@@ -236,6 +236,14 @@ public class ClassApplicationService {
 
     // ==================== 查询方法 ====================
 
+    public ClassInfoRepository.ClassPage listClasses(int pageNum, int pageSize) {
+        return classInfoRepository.findAll(pageNum, pageSize);
+    }
+
+    public ClassInfoRepository.ClassPage searchClasses(String keyword, int pageNum, int pageSize) {
+        return classInfoRepository.searchByName(keyword, pageNum, pageSize);
+    }
+
     public ClassInfo getClassInfo(Long classId) {
         return getClassOrThrow(classId);
     }

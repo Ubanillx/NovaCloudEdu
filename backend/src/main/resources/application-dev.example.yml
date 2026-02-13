@@ -30,6 +30,10 @@ spring:
     authentication:
       username: ${NEO4J_USERNAME:neo4j}
       password: ${NEO4J_PASSWORD:your-neo4j-password}
+  # Elasticsearch 搜索引擎配置
+  elasticsearch:
+    uris: http://localhost:${ES_PORT:9200}
+
   # Docker Compose 由 ppt-service/docker-compose.yml 统一管理，禁用 Spring Boot 自动启动
   docker:
     compose:

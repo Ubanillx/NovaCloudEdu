@@ -17,6 +17,8 @@ public interface TeacherRepository {
 
     List<Teacher> findAll(int page, int size);
 
+    List<Teacher> searchByName(String keyword, int page, int size);
+
     long count();
 
     void deleteById(TeacherId id);

@@ -186,6 +186,14 @@ public class User {
     }
 
     /**
+     * 降级为学生（移除讲师身份）
+     */
+    public void demoteToStudent() {
+        this.role = UserRole.STUDENT;
+        this.updateTime = LocalDateTime.now();
+    }
+
+    /**
      * 更新用户资料（用户自己）
      */
     public void updateProfile(String userName, String userAvatar, String userProfile,
