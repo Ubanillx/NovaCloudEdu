@@ -27,7 +27,12 @@ import {
   Presentation,
   Sparkles,
   Maximize,
-  Minimize
+  Minimize,
+  ClipboardList,
+  FileEdit,
+  GraduationCap,
+  School,
+  MessagesSquare
 } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { clearTokens } from '../../api';
@@ -64,6 +69,9 @@ const AdminSider: React.FC<AdminSiderProps> = ({
     { icon: LayoutDashboard, label: '仪表盘', path: '/admin' },
     { icon: Users, label: '用户管理', path: '/admin/users' },
     { icon: BookOpen, label: '课程管理', path: '/admin/courses' },
+    { icon: GraduationCap, label: '教师管理', path: '/admin/teachers' },
+    { icon: School, label: '班级管理', path: '/admin/classes' },
+    { icon: MessagesSquare, label: '群聊管理', path: '/admin/groups' },
     { icon: BookA, label: '每日单词', path: '/admin/daily-words' },
     { icon: FileText, label: '每日美文', path: '/admin/daily-articles' },
     { icon: Megaphone, label: '公告管理', path: '/admin/announcements' },
@@ -76,6 +84,9 @@ const AdminSider: React.FC<AdminSiderProps> = ({
     { icon: Plug2, label: 'MCP 服务器', path: '/admin/mcp-servers' },
     { icon: Presentation, label: 'PPT 模板', path: '/admin/ppt-templates' },
     { icon: Sparkles, label: 'PPT 生成助手', path: '/admin/ppt-generator' },
+    { icon: ClipboardList, label: '题库管理', path: '/admin/questions' },
+    { icon: FileEdit, label: '试卷管理', path: '/admin/exam-papers' },
+    { icon: FileText, label: '试卷模板', path: '/admin/exam-templates' },
     { icon: Globe, label: '抓取配置', path: '/admin/scraper/config' },
     { icon: ListTodo, label: '抓取任务', path: '/admin/scraper/tasks' },
     { icon: Settings, label: '系统设置', path: '/admin/settings' },

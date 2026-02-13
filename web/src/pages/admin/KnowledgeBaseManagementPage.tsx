@@ -740,12 +740,15 @@ const ChunkViewerModal: React.FC<ChunkViewerModalProps> = ({ isOpen, onClose, kn
     if (!doc.id) return;
     setLoading(true);
     try {
-      const response = await apiClient.get(`/api/ai/knowledge-bases/${knowledgeBaseId}/documents/${doc.id}/chunks`, {
-        params: { page, size: pageSize }
+      const response = await api.kbListChunks({
+        id: knowledgeBaseId as unknown as number,
+        docId: doc.id as unknown as number,
+        page,
+        size: pageSize,
       });
       if (response.data.code === 0) {
-        setChunks(response.data.data?.chunks || []);
-        setTotal(response.data.data?.total || 0);
+        setChunks((response.data as any).data?.chunks || []);
+        setTotal((response.data as any).data?.total || 0);
       }
     } catch {
       toast.error('获取分块列表失败');
@@ -881,9 +884,10 @@ const EditDocumentModal: React.FC<EditDocumentModalProps> = ({ isOpen, onClose, 
     }
     setSaving(true);
     try {
-      const response = await apiClient.put(`/api/ai/knowledge-bases/${knowledgeBaseId}/documents/${doc.id}`, {
-        name: name.trim(),
-        fileType
+      const response = await api.kbUpdateDocument({
+        id: knowledgeBaseId as unknown as number,
+        docId: doc.id as unknown as number,
+        requestBody: { name: name.trim(), fileType },
       });
       if (response.data.code === 0) {
         toast.success('更新成功');
@@ -1390,13 +1394,12 @@ const RecallTestModal: React.FC<RecallTestModalProps> = ({ isOpen, onClose, know
     setLoading(true);
     setResult(null);
     try {
-      const response = await apiClient.post(`/api/ai/knowledge-bases/${knowledgeBase.id}/recall-test`, {
-        query: query.trim(),
-        topK,
-        similarityThreshold: threshold,
+      const response = await api.kbRecallTest({
+        id: knowledgeBase.id as unknown as number,
+        requestBody: { query: query.trim(), topK, similarityThreshold: threshold } as any,
       });
       if (response.data.code === 0) {
-        setResult(response.data.data);
+        setResult((response.data as any).data);
       } else {
         toast.error(response.data.message || '召回测试失败');
       }
