@@ -234,6 +234,8 @@ services:
       - ONLYOFFICE_CALLBACK_URL=${ONLYOFFICE_CALLBACK_URL:-http://localhost:8080/api/onlyoffice/callback}
       # PPT 服务
       - PPT_SERVICE_URL=${PPT_SERVICE_URL:-http://ppt-service:8100}
+      # Typst 试卷排版服务
+      - TYPST_SERVICE_URL=${TYPST_SERVICE_URL:-http://typst-service:8200}
       # 工作流代码沙箱配置
       - CODE_SANDBOX_DOCKER_ENABLED=true
     volumes:
@@ -283,6 +285,31 @@ services:
       timeout: 10s
       retries: 3
       start_period: 10s
+    networks:
+      - nova-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Typst Service - 试卷排版编译服务
+  typst-service:
+    build:
+      context: ../typst-service
+      dockerfile: Dockerfile
+    container_name: nova-typst-service
+    ports:
+      - "${TYPST_SERVICE_PORT:-8200}:8200"
+    environment:
+      - PORT=8200
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8200/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
     networks:
       - nova-network
     logging:
