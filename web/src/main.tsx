@@ -24,6 +24,13 @@ import { McpServerManagementPage } from './pages/admin/McpServerManagementPage'
 import PptTemplateManagementPage from './pages/admin/PptTemplateManagementPage'
 import PptGeneratorPage from './pages/admin/PptGeneratorPage'
 import PptEditorPage from './pages/admin/PptEditorPage'
+import { QuestionManagementPage } from './pages/admin/QuestionManagementPage'
+import { ExamPaperManagementPage } from './pages/admin/ExamPaperManagementPage'
+import { ExamTemplateManagementPage } from './pages/admin/ExamTemplateManagementPage'
+import { CourseManagementPage } from './pages/admin/CourseManagementPage'
+import { TeacherManagementPage } from './pages/admin/TeacherManagementPage'
+import { ClassManagementPage } from './pages/admin/ClassManagementPage'
+import { GroupManagementPage } from './pages/admin/GroupManagementPage'
 import { getToken } from './api'
 import { useEffect } from 'react'
 
@@ -93,7 +100,10 @@ createRoot(document.getElementById('root')!).render(
                   <Routes>
                     <Route index element={<div className="text-2xl font-bold">欢迎进入管理后台</div>} />
                     <Route path="users" element={<UserManagementPage />} />
-                    <Route path="courses" element={<div className="p-8 bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm"><h2 className="text-2xl font-bold">课程管理 (开发中...)</h2></div>} />
+                    <Route path="courses" element={<CourseManagementPage />} />
+                    <Route path="teachers" element={<TeacherManagementPage />} />
+                    <Route path="classes" element={<ClassManagementPage />} />
+                    <Route path="groups" element={<GroupManagementPage />} />
                     <Route path="scraper/config" element={<ScraperConfigPage />} />
                     <Route path="scraper/tasks" element={<ScraperTaskPage />} />
                     <Route path="daily-words" element={<DailyWordManagementPage />} />
@@ -108,6 +118,9 @@ createRoot(document.getElementById('root')!).render(
                     <Route path="mcp-servers" element={<McpServerManagementPage />} />
                     <Route path="ppt-templates" element={<PptTemplateManagementPage />} />
                     <Route path="ppt-generator" element={<PptGeneratorPage />} />
+                    <Route path="questions" element={<QuestionManagementPage />} />
+                    <Route path="exam-papers" element={<ExamPaperManagementPage />} />
+                    <Route path="exam-templates" element={<ExamTemplateManagementPage />} />
                     <Route path="settings" element={<div className="p-8 bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm"><h2 className="text-2xl font-bold">系统设置 (开发中...)</h2></div>} />
                   </Routes>
                 </AdminLayout>

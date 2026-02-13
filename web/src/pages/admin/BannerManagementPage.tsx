@@ -79,14 +79,13 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ value, onChange, label = '轮
     try {
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('businessType', 'banner');
 
-      const response = await apiClient.post('/api/file/upload', formData, {
+      const response = await apiClient.post('/api/file/upload/banner', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 
-      if (response.data?.code === 0 && response.data?.data?.url) {
-        const url = response.data.data.url;
+      if (response.data?.code === 0 && response.data?.data?.fileUrl) {
+        const url = response.data.data.fileUrl;
         setPreviewUrl(url);
         onChange(url);
         toast.success('上传成功');
