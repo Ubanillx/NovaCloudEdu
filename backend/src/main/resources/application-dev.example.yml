@@ -64,6 +64,12 @@ sms:
   app-name: 智云星课
   expire-minutes: 5 
 
+# 管理员邮件通知配置
+admin-email:
+  enabled: ${ADMIN_EMAIL_ENABLED:true}
+  recipients: ${ADMIN_EMAIL_RECIPIENTS:your-admin-email@example.com}
+  platform-name: 智云星课
+
 # 阿里云配置
 aliyun:
   oss:

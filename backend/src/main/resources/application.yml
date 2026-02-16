@@ -8,6 +8,28 @@ spring:
       max-file-size: 500MB
       max-request-size: 500MB
       enabled: true
+  # 邮件 SMTP 配置
+  mail:
+    host: ${MAIL_HOST:smtp.exmail.qq.com}
+    port: ${MAIL_PORT:465}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    default-encoding: UTF-8
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.ssl.enable: true
+      mail.smtp.ssl.required: true
+      mail.smtp.socketFactory.class: javax.net.ssl.SSLSocketFactory
+      mail.smtp.socketFactory.port: 465
+      mail.smtp.socketFactory.fallback: false
+      mail.smtp.timeout: 5000
+      mail.smtp.connectiontimeout: 5000
+
+# 管理员邮件通知配置
+admin-email:
+  enabled: ${ADMIN_EMAIL_ENABLED:true}
+  recipients: ${ADMIN_EMAIL_RECIPIENTS:email@ubanillx.cn}
+  platform-name: 智云星课
 # JWT 配置
 jwt:
   secret: ${JWT_SECRET:NovaCloudEduSecretKey123456789012345678901234567890}
