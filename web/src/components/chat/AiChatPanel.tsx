@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import {
   Bot, Plus, History, Trash2, Send, Square, Loader2,
   Sparkles, MessageSquarePlus, ChevronRight, Copy, Check,
@@ -44,11 +44,23 @@ const QUICK_PROMPTS = [
 // ============ 智慧体卡片数据 ============
 
 const AI_ASSISTANTS = [
-  { id: '1', name: '英语教师 Emma', desc: '专业英语教学，语法讲解', emoji: '👩‍🏫' },
-  { id: '2', name: '口语伙伴 Mike', desc: '日常对话，地道表达', emoji: '🗣️' },
-  { id: '3', name: '写作助手 Sarah', desc: '作文指导，文章润色', emoji: '✍️' },
-  { id: '4', name: '数学导师 Tom', desc: '数学辅导，解题思路', emoji: '📐' },
+  { id: 'math', name: '数学解题助手', desc: '条理清晰，适合解方程与几何题', emoji: '�' },
+  { id: 'english', name: '英语口语教练', desc: '纠正语音语法，提供地道表达', emoji: '🗣️' },
+  { id: 'programming', name: '代码助手', desc: '编程辅导，代码讲解与优化', emoji: '💻' },
+  { id: 'writing', name: '作文润色', desc: '提升文章结构与语言表达', emoji: '✍️' },
 ];
+
+// 当前用户信息（头像、昵称）
+const getCurrentUserInfo = () => {
+  try {
+    const stored = localStorage.getItem('user_info');
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      return { avatar: parsed?.userAvatar || '', name: parsed?.userName || '' };
+    }
+  } catch { /* ignore */ }
+  return { avatar: '', name: '' };
+};
 
 // ============ 复制按钮 ============
 
@@ -586,6 +598,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
   messages, streamingContent, isLoading, isInitializing,
   sessionTitle, imageGenerations, videoGenerations, onSend, onCancel, onNewSession,
 }) => {
+  const currentUser = useMemo(() => getCurrentUserInfo(), []);
   const [input, setInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -858,9 +871,17 @@ const ChatArea: React.FC<ChatAreaProps> = ({
                       )}
                     </div>
                     {msg.role === 'user' && (
-                      <div className="w-8 h-8 rounded-lg bg-gray-200 dark:bg-gray-700 flex items-center justify-center flex-shrink-0 shadow-sm mt-0.5">
-                        <span className="text-xs font-bold text-gray-600 dark:text-gray-300">我</span>
-                      </div>
+                      currentUser.avatar ? (
+                        <img
+                          src={currentUser.avatar}
+                          alt={currentUser.name || '我'}
+                          className="w-8 h-8 rounded-lg object-cover flex-shrink-0 shadow-sm mt-0.5"
+                        />
+                      ) : (
+                        <div className="w-8 h-8 rounded-lg bg-gray-200 dark:bg-gray-700 flex items-center justify-center flex-shrink-0 shadow-sm mt-0.5">
+                          <span className="text-xs font-bold text-gray-600 dark:text-gray-300">{currentUser.name?.[0] || '我'}</span>
+                        </div>
+                      )
                     )}
                   </div>
                   {/* 文生图 / 文生视频状态卡片：显示在流式消息下方 */}

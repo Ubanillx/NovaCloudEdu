@@ -205,6 +205,23 @@ export function useAiChat() {
     abortControllerRef.current = controller;
 
     let accumulated = '';
+    // RAF 节流：避免每个 token 都触发 React 重渲染 + ReactMarkdown 全量解析
+    let rafId: number | null = null;
+    const flushStreaming = () => {
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
+      setStreamingContent(accumulated);
+    };
+    const scheduleStreamingUpdate = () => {
+      if (rafId === null) {
+        rafId = requestAnimationFrame(() => {
+          setStreamingContent(accumulated);
+          rafId = null;
+        });
+      }
+    };
     // 本地追踪生成结果（避免闭包读不到最新 React state）
     const imageResultsMap = new Map<number, { url?: string; error?: string }>();
     const videoResultsMap = new Map<number, { url?: string; error?: string }>();
@@ -363,11 +380,14 @@ export function useAiChat() {
               accumulated += data;
             }
 
-            setStreamingContent(accumulated);
+            scheduleStreamingUpdate();
             currentEventType = 'message';
           }
         }
       }
+
+      // 流结束前 flush 最后的 streaming 内容
+      flushStreaming();
 
       // 流结束，替换标记并保存为 assistant 消息
       if (accumulated) {
@@ -411,6 +431,7 @@ export function useAiChat() {
       setVideoGenerations([]);
 
     } catch (e) {
+      flushStreaming();
       if ((e as Error).name !== 'AbortError') {
         console.error('SSE 请求失败:', e);
         // 如果有部分内容，仍然保存
