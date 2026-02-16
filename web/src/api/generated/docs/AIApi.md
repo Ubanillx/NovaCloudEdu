@@ -12,6 +12,7 @@ All URIs are relative to *http://localhost:8080*
 |[**assistantCreate**](#assistantcreate) | **POST** /api/ai/assistants | 创建AI助手|
 |[**assistantDelete**](#assistantdelete) | **DELETE** /api/ai/assistants/{id} | 删除AI助手|
 |[**assistantExecuteWorkflow**](#assistantexecuteworkflow) | **POST** /api/ai/assistants/{id}/workflows/{workflowId}/execute | 执行AI助手绑定的工作流|
+|[**assistantGenerateAvatar**](#assistantgenerateavatar) | **POST** /api/ai/assistants/generate-avatar | AI生成助手头像|
 |[**assistantGetById**](#assistantgetbyid) | **GET** /api/ai/assistants/{id} | 获取AI助手详情|
 |[**assistantGetWorkflowSkills**](#assistantgetworkflowskills) | **GET** /api/ai/assistants/{id}/workflow-skills | 获取AI助手的工作流技能列表|
 |[**assistantGetWorkflows**](#assistantgetworkflows) | **GET** /api/ai/assistants/{id}/workflows | 获取AI助手绑定的工作流列表|
@@ -468,6 +469,59 @@ const { status, data } = await apiInstance.assistantExecuteWorkflow(
 ### Return type
 
 **BaseResponseMapStringObject**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **assistantGenerateAvatar**
+> BaseResponseGenerateAvatarResponse assistantGenerateAvatar(generateAvatarRequest)
+
+根据提示词使用AI生成助手头像图片，返回图片URL
+
+### Example
+
+```typescript
+import {
+    AIApi,
+    Configuration,
+    GenerateAvatarRequest
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new AIApi(configuration);
+
+let generateAvatarRequest: GenerateAvatarRequest; //
+
+const { status, data } = await apiInstance.assistantGenerateAvatar(
+    generateAvatarRequest
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **generateAvatarRequest** | **GenerateAvatarRequest**|  | |
+
+
+### Return type
+
+**BaseResponseGenerateAvatarResponse**
 
 ### Authorization
 

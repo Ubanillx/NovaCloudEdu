@@ -38,6 +38,8 @@ import type { BaseResponseChapterSummary } from '../models';
 // @ts-ignore
 import type { BaseResponseDailyArticleResponse } from '../models';
 // @ts-ignore
+import type { BaseResponseGenerateAvatarResponse } from '../models';
+// @ts-ignore
 import type { BaseResponseListAiAssistantVO } from '../models';
 // @ts-ignore
 import type { BaseResponseListAiConversation } from '../models';
@@ -67,6 +69,8 @@ import type { BatchAiProcessRequest } from '../models';
 import type { ChatRequest } from '../models';
 // @ts-ignore
 import type { CreateAiAssistantCommand } from '../models';
+// @ts-ignore
+import type { GenerateAvatarRequest } from '../models';
 // @ts-ignore
 import type { PreviewAiProcessRequest } from '../models';
 // @ts-ignore
@@ -418,6 +422,45 @@ export const AIApiAxiosParamCreator = function (configuration?: Configuration) {
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(requestBody, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 根据提示词使用AI生成助手头像图片，返回图片URL
+         * @summary AI生成助手头像
+         * @param {GenerateAvatarRequest} generateAvatarRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assistantGenerateAvatar: async (generateAvatarRequest: GenerateAvatarRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'generateAvatarRequest' is not null or undefined
+            assertParamExists('assistantGenerateAvatar', 'generateAvatarRequest', generateAvatarRequest)
+            const localVarPath = `/api/ai/assistants/generate-avatar`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(generateAvatarRequest, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -2216,6 +2259,19 @@ export const AIApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 根据提示词使用AI生成助手头像图片，返回图片URL
+         * @summary AI生成助手头像
+         * @param {GenerateAvatarRequest} generateAvatarRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async assistantGenerateAvatar(generateAvatarRequest: GenerateAvatarRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseGenerateAvatarResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.assistantGenerateAvatar(generateAvatarRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AIApi.assistantGenerateAvatar']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 
          * @summary 获取AI助手详情
          * @param {number} id 
@@ -2848,6 +2904,16 @@ export const AIApiFactory = function (configuration?: Configuration, basePath?: 
             return localVarFp.assistantExecuteWorkflow(requestParameters.id, requestParameters.workflowId, requestParameters.userId, requestParameters.requestBody, options).then((request) => request(axios, basePath));
         },
         /**
+         * 根据提示词使用AI生成助手头像图片，返回图片URL
+         * @summary AI生成助手头像
+         * @param {AIApiAssistantGenerateAvatarRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        assistantGenerateAvatar(requestParameters: AIApiAssistantGenerateAvatarRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseGenerateAvatarResponse> {
+            return localVarFp.assistantGenerateAvatar(requestParameters.generateAvatarRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 
          * @summary 获取AI助手详情
          * @param {AIApiAssistantGetByIdRequest} requestParameters Request parameters.
@@ -3314,6 +3380,15 @@ export interface AIApiInterface {
     assistantExecuteWorkflow(requestParameters: AIApiAssistantExecuteWorkflowRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringObject>;
 
     /**
+     * 根据提示词使用AI生成助手头像图片，返回图片URL
+     * @summary AI生成助手头像
+     * @param {AIApiAssistantGenerateAvatarRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    assistantGenerateAvatar(requestParameters: AIApiAssistantGenerateAvatarRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseGenerateAvatarResponse>;
+
+    /**
      * 
      * @summary 获取AI助手详情
      * @param {AIApiAssistantGetByIdRequest} requestParameters Request parameters.
@@ -3736,6 +3811,13 @@ export interface AIApiAssistantExecuteWorkflowRequest {
     readonly userId: number
 
     readonly requestBody?: { [key: string]: object; }
+}
+
+/**
+ * Request parameters for assistantGenerateAvatar operation in AIApi.
+ */
+export interface AIApiAssistantGenerateAvatarRequest {
+    readonly generateAvatarRequest: GenerateAvatarRequest
 }
 
 /**
@@ -4173,6 +4255,17 @@ export class AIApi extends BaseAPI implements AIApiInterface {
      */
     public assistantExecuteWorkflow(requestParameters: AIApiAssistantExecuteWorkflowRequest, options?: RawAxiosRequestConfig) {
         return AIApiFp(this.configuration).assistantExecuteWorkflow(requestParameters.id, requestParameters.workflowId, requestParameters.userId, requestParameters.requestBody, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 根据提示词使用AI生成助手头像图片，返回图片URL
+     * @summary AI生成助手头像
+     * @param {AIApiAssistantGenerateAvatarRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public assistantGenerateAvatar(requestParameters: AIApiAssistantGenerateAvatarRequest, options?: RawAxiosRequestConfig) {
+        return AIApiFp(this.configuration).assistantGenerateAvatar(requestParameters.generateAvatarRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
