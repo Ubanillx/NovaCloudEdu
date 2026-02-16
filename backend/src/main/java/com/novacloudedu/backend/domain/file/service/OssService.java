@@ -71,4 +71,14 @@ public interface OssService {
      * @return 文件大小，文件不存在返回 -1
      */
     long getFileSize(String fileUrl);
+
+    /**
+     * 上传字节数组到指定的 OSS 路径（保留原始文件名）
+     * @param data 文件字节数据
+     * @param objectName OSS 对象名（如 "course/hls/123/seg_000.ts"）
+     * @param contentType MIME 类型
+     * @param publicRead 是否设置公开读权限
+     * @return 文件访问URL
+     */
+    String uploadToPath(byte[] data, String objectName, String contentType, boolean publicRead);
 }
