@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Sun, Moon, LogOut, ShieldCheck, User, Bell } from 'lucide-react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTheme } from '../../context/ThemeContext';
 import { getToken, clearTokens } from '../../api';
 import { useChat } from '../../context/ChatContext';
-import toast from '../ui/Toast';
 import logo from '../../assets/logo.svg';
 
 // 用户信息类型
@@ -55,7 +54,6 @@ const NotificationBell: React.FC = () => {
 export const Header: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
-  const location = useLocation();
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -103,36 +101,8 @@ export const Header: React.FC = () => {
         </Link>
       </div>
 
-      {/* Navigation */}
-      <nav className="hidden md:flex flex-1 items-center gap-6">
-        {[
-          { name: '首页', path: '/' },
-          { name: '课程', path: null },
-          { name: '学习圈', path: '/circle' },
-          { name: 'AI 助手', path: null },
-        ].map((item) => {
-          const isActive = item.path === '/' ? location.pathname === '/' : item.path ? location.pathname.startsWith(item.path) : false;
-          return (
-            <button
-              key={item.name}
-              onClick={() => {
-                if (item.path) {
-                  navigate(item.path);
-                } else {
-                  toast.info(`「${item.name}」功能正在开发中，敬请期待`);
-                }
-              }}
-              className={`text-sm font-medium transition-colors ${
-                isActive
-                  ? 'text-brand-600 dark:text-brand-400'
-                  : 'text-gray-600 dark:text-gray-300 hover:text-brand-600 dark:hover:text-brand-400'
-              }`}
-            >
-              {item.name}
-            </button>
-          );
-        })}
-      </nav>
+      {/* Navigation 已迁移至侧边栏，预留空间对齐右侧操作区 */}
+      <div className="flex-1" />
 
       {/* Right Actions */}
       <div className="flex items-center gap-4 ml-auto">
@@ -198,7 +168,7 @@ export const Header: React.FC = () => {
                   </p>
                 </div>
 
-                {userRole?.toLowerCase() === 'admin' && (
+                {(userRole?.toLowerCase() === 'admin' || userRole?.toLowerCase() === 'teacher') && (
                   <button
                     onClick={() => {
                       setShowDropdown(false);
