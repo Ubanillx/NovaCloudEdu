@@ -8,6 +8,7 @@ import com.novacloudedu.backend.domain.user.entity.User;
 import com.novacloudedu.backend.domain.user.repository.UserRepository;
 import com.novacloudedu.backend.domain.user.valueobject.UserId;
 import com.novacloudedu.backend.exception.BusinessException;
+import com.novacloudedu.backend.infrastructure.email.AdminEmailNotifier;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +20,7 @@ public class ApproveTeacherApplicationCommand {
     private final TeacherApplicationRepository applicationRepository;
     private final TeacherRepository teacherRepository;
     private final UserRepository userRepository;
+    private final AdminEmailNotifier adminEmailNotifier;
 
     @Transactional
     public void execute(Long applicationId, UserId reviewerId) {
@@ -46,5 +48,8 @@ public class ApproveTeacherApplicationCommand {
                 .orElseThrow(() -> new BusinessException(40400, "用户不存在"));
         user.promoteToTeacher();
         userRepository.save(user);
+
+        // 异步通知管理员审核结果
+        adminEmailNotifier.notifyTeacherReviewResult(application);
     }
 }
