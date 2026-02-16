@@ -8,7 +8,10 @@ import com.novacloudedu.backend.application.ai.command.UpdateAiAssistantCommand;
 import com.novacloudedu.backend.application.ai.dto.AiAssistantVO;
 import com.novacloudedu.backend.common.BaseResponse;
 import com.novacloudedu.backend.common.ResultUtils;
+import com.novacloudedu.backend.infrastructure.ai.ImageGenerationService;
 import com.novacloudedu.backend.interfaces.rest.ai.dto.AssistantChatRequest;
+import com.novacloudedu.backend.interfaces.rest.ai.dto.GenerateAvatarRequest;
+import com.novacloudedu.backend.interfaces.rest.ai.dto.GenerateAvatarResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -35,6 +38,7 @@ public class AiAssistantController {
     private final AiAssistantApplicationService assistantService;
     private final AiAssistantWorkflowService workflowService;
     private final AiChatApplicationService aiChatApplicationService;
+    private final ImageGenerationService imageGenerationService;
 
     @PostMapping
     @Operation(summary = "创建AI助手", operationId = "assistantCreate")
@@ -250,6 +254,26 @@ public class AiAssistantController {
         } catch (Exception e) {
             log.error("执行工作流失败", e);
             return (BaseResponse<java.util.Map<String, Object>>) (BaseResponse<?>) ResultUtils.error(50000, e.getMessage());
+        }
+    }
+
+    // ==================== AI生成头像 ====================
+
+    @PostMapping("/generate-avatar")
+    @Operation(summary = "AI生成助手头像", operationId = "assistantGenerateAvatar",
+            description = "根据提示词使用AI生成助手头像图片，返回图片URL")
+    public BaseResponse<GenerateAvatarResponse> generateAvatar(
+            @Valid @RequestBody GenerateAvatarRequest request) {
+        try {
+            ImageGenerationService.ImageResult result = imageGenerationService.generateImage(request.getPrompt());
+            if (result.success()) {
+                return ResultUtils.success(GenerateAvatarResponse.success(result.imageUrl()));
+            } else {
+                return ResultUtils.success(GenerateAvatarResponse.failure(result.errorMessage()));
+            }
+        } catch (Exception e) {
+            log.error("AI生成头像失败", e);
+            return ResultUtils.success(GenerateAvatarResponse.failure(e.getMessage()));
         }
     }
 
