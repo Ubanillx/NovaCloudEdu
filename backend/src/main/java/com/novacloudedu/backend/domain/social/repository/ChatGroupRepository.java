@@ -48,6 +48,16 @@ public interface ChatGroupRepository {
     GroupPage searchByName(String keyword, int pageNum, int pageSize);
 
     /**
+     * 根据群主ID分页获取群列表
+     */
+    GroupPage findByOwnerId(UserId ownerId, int pageNum, int pageSize);
+
+    /**
+     * 根据群主ID和名称模糊搜索群
+     */
+    GroupPage searchByNameAndOwnerId(String keyword, UserId ownerId, int pageNum, int pageSize);
+
+    /**
      * 删除群聊（逻辑删除）
      */
     void delete(GroupId id);
