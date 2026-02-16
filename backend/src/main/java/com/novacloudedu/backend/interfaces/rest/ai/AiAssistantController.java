@@ -261,11 +261,11 @@ public class AiAssistantController {
 
     @PostMapping("/generate-avatar")
     @Operation(summary = "AI生成助手头像", operationId = "assistantGenerateAvatar",
-            description = "根据提示词使用AI生成助手头像图片，返回图片URL")
+            description = "根据提示词使用AI生成助手头像图片，图片会自动上传到OSS持久化存储，返回OSS图片URL")
     public BaseResponse<GenerateAvatarResponse> generateAvatar(
             @Valid @RequestBody GenerateAvatarRequest request) {
         try {
-            ImageGenerationService.ImageResult result = imageGenerationService.generateImage(request.getPrompt());
+            ImageGenerationService.ImageResult result = imageGenerationService.generateImageForAvatar(request.getPrompt());
             if (result.success()) {
                 return ResultUtils.success(GenerateAvatarResponse.success(result.imageUrl()));
             } else {

@@ -386,6 +386,64 @@ public class ImageGenerationService {
         throw new RuntimeException("OpenAI 文生图未返回图片数据");
     }
 
+    /**
+     * 生成头像图片（始终上传到OSS，不依赖 uploadToOss 配置）
+     * 
+     * @param prompt 图片描述
+     * @return 上传到OSS后的图片URL
+     */
+    public ImageResult generateImageForAvatar(String prompt) {
+        if (!properties.isEnabled()) {
+            return ImageResult.failure(prompt, "文生图功能未启用");
+        }
+
+        String modelId = properties.getDefaultModel();
+        try {
+            ImageModelProperties.ProviderAndModel pm = properties.parseModelId(modelId);
+            ImageProviderConfig providerConfig = properties.getProviderConfig(pm.provider());
+            ImageModelConfig modelConfig = properties.getModelConfig(pm.provider(), pm.model());
+
+            log.info("生成AI助手头像: provider={}, model={}, prompt={}", pm.provider(), pm.model(), prompt);
+
+            String imageUrl = switch (providerConfig.getType()) {
+                case "dashscope" -> generateWithDashScope(providerConfig, modelConfig, pm.model(), prompt, null);
+                case "openai" -> generateWithOpenAi(providerConfig, modelConfig, pm.model(), prompt, null);
+                default -> throw new IllegalArgumentException("不支持的文生图供应商类型: " + providerConfig.getType());
+            };
+
+            // 强制上传到OSS
+            String ossUrl = forceUploadImageToOss(imageUrl);
+            log.info("AI助手头像生成并上传OSS成功: ossUrl={}", ossUrl);
+            return ImageResult.success(ossUrl, prompt);
+
+        } catch (Exception e) {
+            log.error("生成AI助手头像失败: prompt={}", prompt, e);
+            return ImageResult.failure(prompt, e.getMessage());
+        }
+    }
+
+    /**
+     * 强制下载图片并上传到OSS（失败时抛出异常，不回退到原始URL）
+     */
+    private String forceUploadImageToOss(String imageUrl) {
+        if (imageUrl == null || imageUrl.isBlank()) {
+            throw new RuntimeException("图片URL为空，无法上传到OSS");
+        }
+        // 使用 java.net.URI 下载，避免 RestTemplate 添加额外 HTTP 头导致预签名 URL 签名校验失败
+        try {
+            byte[] imageBytes = new java.net.URI(imageUrl).toURL().openStream().readAllBytes();
+            String extension = ".png";
+            if (imageUrl.contains(".jpg") || imageUrl.contains(".jpeg")) {
+                extension = ".jpg";
+            } else if (imageUrl.contains(".webp")) {
+                extension = ".webp";
+            }
+            return ossService.uploadBytes(imageBytes, extension, FileBusinessType.AI_GENERATED_IMAGE);
+        } catch (Exception e) {
+            throw new RuntimeException("下载图片并上传OSS失败: " + e.getMessage(), e);
+        }
+    }
+
     // ==================== 工具方法 ====================
 
     /**
