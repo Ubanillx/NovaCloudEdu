@@ -32,6 +32,16 @@ public class CourseSectionPO implements Serializable {
 
     private String resourceUrl;
 
+    private String hlsUrl;
+
+    private String encryptionKeyId;
+
+    private Integer transcodeStatus;
+
+    private String thumbnailUrl;
+
+    private Integer thumbnailCount;
+
     private Long adminId;
 
     private LocalDateTime createTime;

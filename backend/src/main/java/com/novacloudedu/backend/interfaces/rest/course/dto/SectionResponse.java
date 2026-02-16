@@ -45,6 +45,18 @@ public class SectionResponse {
     @Schema(description = "资源URL")
     private String resourceUrl;
 
+    @Schema(description = "HLS播放地址(m3u8)")
+    private String hlsUrl;
+
+    @Schema(description = "转码状态: 0-未转码, 1-转码中, 2-已完成, 3-失败")
+    private Integer transcodeStatus;
+
+    @Schema(description = "缩略图雪碧图URL")
+    private String thumbnailUrl;
+
+    @Schema(description = "缩略图数量")
+    private Integer thumbnailCount;
+
     @Schema(description = "创建时间")
     private LocalDateTime createTime;
 

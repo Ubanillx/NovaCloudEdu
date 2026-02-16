@@ -21,13 +21,21 @@ public class CourseSection {
     private Integer sort;
     private Boolean isFree;
     private String resourceUrl;
+    private String hlsUrl;
+    private String encryptionKeyId;
+    private Integer transcodeStatus; // 0-未转码, 1-转码中, 2-已完成, 3-失败
+    private String thumbnailUrl;
+    private Integer thumbnailCount;
     private final UserId adminId;
     private final LocalDateTime createTime;
     private LocalDateTime updateTime;
 
     private CourseSection(SectionId id, CourseId courseId, ChapterId chapterId, String title,
                          String description, String videoUrl, Integer duration, Integer sort,
-                         Boolean isFree, String resourceUrl, UserId adminId,
+                         Boolean isFree, String resourceUrl, String hlsUrl,
+                         String encryptionKeyId, Integer transcodeStatus,
+                         String thumbnailUrl, Integer thumbnailCount,
+                         UserId adminId,
                          LocalDateTime createTime, LocalDateTime updateTime) {
         this.id = id;
         this.courseId = courseId;
@@ -39,6 +47,11 @@ public class CourseSection {
         this.sort = sort;
         this.isFree = isFree;
         this.resourceUrl = resourceUrl;
+        this.hlsUrl = hlsUrl;
+        this.encryptionKeyId = encryptionKeyId;
+        this.transcodeStatus = transcodeStatus;
+        this.thumbnailUrl = thumbnailUrl;
+        this.thumbnailCount = thumbnailCount;
         this.adminId = adminId;
         this.createTime = createTime;
         this.updateTime = updateTime;
@@ -49,16 +62,21 @@ public class CourseSection {
                                       Integer sort, Boolean isFree, String resourceUrl, UserId adminId) {
         LocalDateTime now = LocalDateTime.now();
         return new CourseSection(null, courseId, chapterId, title, description, videoUrl,
-                duration, sort, isFree, resourceUrl, adminId, now, now);
+                duration, sort, isFree, resourceUrl, null, null, 0,
+                null, 0, adminId, now, now);
     }
 
     public static CourseSection reconstruct(SectionId id, CourseId courseId, ChapterId chapterId,
                                            String title, String description, String videoUrl,
                                            Integer duration, Integer sort, Boolean isFree,
-                                           String resourceUrl, UserId adminId,
+                                           String resourceUrl, String hlsUrl,
+                                           String encryptionKeyId, Integer transcodeStatus,
+                                           String thumbnailUrl, Integer thumbnailCount,
+                                           UserId adminId,
                                            LocalDateTime createTime, LocalDateTime updateTime) {
         return new CourseSection(id, courseId, chapterId, title, description, videoUrl,
-                duration, sort, isFree, resourceUrl, adminId, createTime, updateTime);
+                duration, sort, isFree, resourceUrl, hlsUrl, encryptionKeyId, transcodeStatus,
+                thumbnailUrl, thumbnailCount, adminId, createTime, updateTime);
     }
 
     public void assignId(SectionId id) {
@@ -82,6 +100,24 @@ public class CourseSection {
 
     public void updateSort(Integer sort) {
         this.sort = sort;
+        this.updateTime = LocalDateTime.now();
+    }
+
+    public void updateTranscodeStatus(Integer transcodeStatus) {
+        this.transcodeStatus = transcodeStatus;
+        this.updateTime = LocalDateTime.now();
+    }
+
+    public void updateHlsInfo(String hlsUrl, String encryptionKeyId) {
+        this.hlsUrl = hlsUrl;
+        this.encryptionKeyId = encryptionKeyId;
+        this.transcodeStatus = 2; // 已完成
+        this.updateTime = LocalDateTime.now();
+    }
+
+    public void updateThumbnailInfo(String thumbnailUrl, Integer thumbnailCount) {
+        this.thumbnailUrl = thumbnailUrl;
+        this.thumbnailCount = thumbnailCount;
         this.updateTime = LocalDateTime.now();
     }
 }
