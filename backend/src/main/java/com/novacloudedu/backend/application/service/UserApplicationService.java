@@ -13,6 +13,7 @@ import com.novacloudedu.backend.domain.user.valueobject.UserAccount;
 import com.novacloudedu.backend.domain.user.valueobject.UserId;
 import com.novacloudedu.backend.domain.user.valueobject.UserRole;
 import com.novacloudedu.backend.exception.BusinessException;
+import com.novacloudedu.backend.infrastructure.email.AdminEmailNotifier;
 import com.novacloudedu.backend.infrastructure.security.PasswordEncoderAdapter;
 import com.novacloudedu.backend.infrastructure.security.JwtTokenProvider;
 import com.novacloudedu.backend.infrastructure.sms.SmsCodeService;
@@ -39,6 +40,7 @@ public class UserApplicationService {
     private final PasswordEncoderAdapter passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final SmsCodeService smsCodeService;
+    private final AdminEmailNotifier adminEmailNotifier;
 
     /**
      * 用户注册
@@ -73,6 +75,10 @@ public class UserApplicationService {
             userRepository.save(user);
 
             log.info("用户注册成功: {}", account);
+
+            // 异步通知管理员
+            adminEmailNotifier.notifyNewUserRegistered(user.getUserName(), command.phone());
+
             return user.getId().value();
         }
     }

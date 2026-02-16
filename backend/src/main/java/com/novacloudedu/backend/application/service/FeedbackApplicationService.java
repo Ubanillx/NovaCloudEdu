@@ -18,6 +18,7 @@ import com.novacloudedu.backend.domain.feedback.valueobject.SenderRole;
 import com.novacloudedu.backend.domain.user.entity.User;
 import com.novacloudedu.backend.domain.user.valueobject.UserId;
 import com.novacloudedu.backend.exception.BusinessException;
+import com.novacloudedu.backend.infrastructure.email.AdminEmailNotifier;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -36,6 +37,7 @@ public class FeedbackApplicationService {
     private final UserFeedbackRepository feedbackRepository;
     private final FeedbackReplyRepository replyRepository;
     private final UserApplicationService userApplicationService;
+    private final AdminEmailNotifier adminEmailNotifier;
 
     // ==================== 用户反馈操作 ====================
 
@@ -57,6 +59,10 @@ public class FeedbackApplicationService {
 
         feedbackRepository.save(feedback);
         log.info("用户创建反馈成功: userId={}, feedbackId={}", userId.value(), feedback.getId().value());
+
+        // 异步通知管理员
+        adminEmailNotifier.notifyNewFeedback(feedback);
+
         return feedback.getId().value();
     }
 
