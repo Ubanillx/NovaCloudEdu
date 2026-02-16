@@ -1,16 +1,21 @@
 package com.novacloudedu.backend.interfaces.rest.course.assembler;
 
+import com.novacloudedu.backend.application.course.service.VideoUrlService;
 import com.novacloudedu.backend.domain.course.entity.CourseChapter;
 import com.novacloudedu.backend.domain.course.entity.CourseSection;
 import com.novacloudedu.backend.interfaces.rest.course.dto.ChapterResponse;
 import com.novacloudedu.backend.interfaces.rest.course.dto.SectionResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
+@RequiredArgsConstructor
 public class ChapterAssembler {
+
+    private final VideoUrlService videoUrlService;
 
     public ChapterResponse toChapterResponse(CourseChapter chapter, List<CourseSection> sections) {
         List<SectionResponse> sectionResponses = sections.stream()
@@ -36,11 +41,15 @@ public class ChapterAssembler {
                 .chapterId(section.getChapterId().value())
                 .title(section.getTitle())
                 .description(section.getDescription())
-                .videoUrl(section.getVideoUrl())
+                .videoUrl(videoUrlService.toPresignedUrl(section.getVideoUrl()))
                 .duration(section.getDuration())
                 .sort(section.getSort())
                 .isFree(section.getIsFree())
-                .resourceUrl(section.getResourceUrl())
+                .resourceUrl(videoUrlService.toPresignedUrl(section.getResourceUrl()))
+                .hlsUrl(videoUrlService.toPresignedUrl(section.getHlsUrl()))
+                .transcodeStatus(section.getTranscodeStatus())
+                .thumbnailUrl(videoUrlService.toPresignedUrl(section.getThumbnailUrl()))
+                .thumbnailCount(section.getThumbnailCount())
                 .createTime(section.getCreateTime())
                 .updateTime(section.getUpdateTime())
                 .build();

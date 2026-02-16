@@ -2,9 +2,12 @@ package com.novacloudedu.backend.interfaces.rest.clazz;
 
 import com.novacloudedu.backend.annotation.AuthCheck;
 import com.novacloudedu.backend.application.service.ClassApplicationService;
+import com.novacloudedu.backend.application.service.UserApplicationService;
 import com.novacloudedu.backend.common.BaseResponse;
 import com.novacloudedu.backend.common.ErrorCode;
 import com.novacloudedu.backend.common.ResultUtils;
+import com.novacloudedu.backend.domain.user.entity.User;
+import com.novacloudedu.backend.domain.user.valueobject.UserRole;
 import com.novacloudedu.backend.exception.BusinessException;
 import com.novacloudedu.backend.domain.clazz.entity.ClassInfo;
 import com.novacloudedu.backend.domain.clazz.repository.ClassInfoRepository;
@@ -30,6 +33,7 @@ import java.util.List;
 public class ClassController {
 
     private final ClassApplicationService classService;
+    private final UserApplicationService userApplicationService;
     private final ClassAssembler assembler;
 
     @Operation(summary = "创建班级")
@@ -70,7 +74,14 @@ public class ClassController {
     @Operation(summary = "获取班级详情")
     @GetMapping("/{classId}")
     public BaseResponse<ClassResponse> getClassInfo(@PathVariable Long classId) {
-        ClassInfo classInfo = classService.getClassInfo(classId);
+        Long operatorId = getLoginUserId();
+        User currentUser = userApplicationService.getCurrentUser();
+        ClassInfo classInfo;
+        if (currentUser.getRole() == UserRole.ADMIN) {
+            classInfo = classService.getClassInfo(classId);
+        } else {
+            classInfo = classService.getClassInfoWithPermission(classId, operatorId);
+        }
         return ResultUtils.success(assembler.toClassResponse(classInfo));
     }
 
@@ -80,9 +91,20 @@ public class ClassController {
             @RequestParam(defaultValue = "1") int pageNum,
             @RequestParam(defaultValue = "10") int pageSize,
             @RequestParam(required = false) String keyword) {
-        ClassInfoRepository.ClassPage page = (keyword != null && !keyword.isBlank())
-                ? classService.searchClasses(keyword.trim(), pageNum, pageSize)
-                : classService.listClasses(pageNum, pageSize);
+        Long operatorId = getLoginUserId();
+        User currentUser = userApplicationService.getCurrentUser();
+        boolean isAdmin = currentUser.getRole() == UserRole.ADMIN;
+
+        ClassInfoRepository.ClassPage page;
+        if (keyword != null && !keyword.isBlank()) {
+            page = isAdmin
+                    ? classService.searchClasses(keyword.trim(), pageNum, pageSize)
+                    : classService.searchClassesByCreator(keyword.trim(), operatorId, pageNum, pageSize);
+        } else {
+            page = isAdmin
+                    ? classService.listClasses(pageNum, pageSize)
+                    : classService.listClassesByCreator(operatorId, pageNum, pageSize);
+        }
         List<ClassResponse> list = page.getList().stream()
                 .map(assembler::toClassResponse)
                 .toList();
@@ -118,7 +140,14 @@ public class ClassController {
             @PathVariable Long classId,
             @RequestParam(defaultValue = "1") int pageNum,
             @RequestParam(defaultValue = "20") int pageSize) {
-        ClassMemberRepository.MemberPage page = classService.getClassMembers(classId, pageNum, pageSize);
+        Long operatorId = getLoginUserId();
+        User currentUser = userApplicationService.getCurrentUser();
+        ClassMemberRepository.MemberPage page;
+        if (currentUser.getRole() == UserRole.ADMIN) {
+            page = classService.getClassMembers(classId, pageNum, pageSize);
+        } else {
+            page = classService.getClassMembersWithPermission(classId, operatorId, pageNum, pageSize);
+        }
         List<ClassMemberResponse> list = page.getList().stream()
                 .map(assembler::toClassMemberResponse)
                 .toList();

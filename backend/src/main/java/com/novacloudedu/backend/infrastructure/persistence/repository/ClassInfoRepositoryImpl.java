@@ -70,10 +70,39 @@ public class ClassInfoRepositoryImpl implements ClassInfoRepository {
     }
 
     @Override
+    public ClassPage findByCreatorId(UserId creatorId, int pageNum, int pageSize) {
+        Page<ClassInfoPO> page = new Page<>(pageNum, pageSize);
+        LambdaQueryWrapper<ClassInfoPO> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(ClassInfoPO::getCreatorId, creatorId.value())
+               .orderByDesc(ClassInfoPO::getCreateTime);
+        Page<ClassInfoPO> result = classInfoMapper.selectPage(page, wrapper);
+        
+        List<ClassInfo> list = result.getRecords().stream()
+                .map(converter::toDomain)
+                .toList();
+        return new ClassPage(list, result.getTotal(), pageNum, pageSize);
+    }
+
+    @Override
     public ClassPage searchByName(String keyword, int pageNum, int pageSize) {
         Page<ClassInfoPO> page = new Page<>(pageNum, pageSize);
         LambdaQueryWrapper<ClassInfoPO> wrapper = new LambdaQueryWrapper<>();
         wrapper.like(ClassInfoPO::getClassName, keyword)
+               .orderByDesc(ClassInfoPO::getCreateTime);
+        Page<ClassInfoPO> result = classInfoMapper.selectPage(page, wrapper);
+        
+        List<ClassInfo> list = result.getRecords().stream()
+                .map(converter::toDomain)
+                .toList();
+        return new ClassPage(list, result.getTotal(), pageNum, pageSize);
+    }
+
+    @Override
+    public ClassPage searchByNameAndCreatorId(String keyword, UserId creatorId, int pageNum, int pageSize) {
+        Page<ClassInfoPO> page = new Page<>(pageNum, pageSize);
+        LambdaQueryWrapper<ClassInfoPO> wrapper = new LambdaQueryWrapper<>();
+        wrapper.like(ClassInfoPO::getClassName, keyword)
+               .eq(ClassInfoPO::getCreatorId, creatorId.value())
                .orderByDesc(ClassInfoPO::getCreateTime);
         Page<ClassInfoPO> result = classInfoMapper.selectPage(page, wrapper);
         
