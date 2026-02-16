@@ -1,8 +1,10 @@
 package com.novacloudedu.backend.interfaces.rest.banner;
 
 import com.novacloudedu.backend.application.banner.command.CreateBannerCommand;
+import com.novacloudedu.backend.application.banner.command.GenerateBannerImageCommand;
 import com.novacloudedu.backend.application.banner.command.UpdateBannerCommand;
 import com.novacloudedu.backend.application.banner.query.BannerQuery;
+import com.novacloudedu.backend.infrastructure.ai.ImageGenerationService;
 import com.novacloudedu.backend.application.service.BannerApplicationService;
 import com.novacloudedu.backend.common.BaseResponse;
 import com.novacloudedu.backend.common.ResultUtils;
@@ -11,9 +13,11 @@ import com.novacloudedu.backend.domain.banner.repository.BannerRepository.Banner
 import com.novacloudedu.backend.interfaces.rest.banner.assembler.BannerAssembler;
 import com.novacloudedu.backend.interfaces.rest.banner.dto.request.CreateBannerRequest;
 import com.novacloudedu.backend.interfaces.rest.banner.dto.request.QueryBannerRequest;
+import com.novacloudedu.backend.interfaces.rest.banner.dto.request.GenerateBannerImageRequest;
 import com.novacloudedu.backend.interfaces.rest.banner.dto.request.UpdateBannerRequest;
 import com.novacloudedu.backend.interfaces.rest.banner.dto.response.BannerPageResponse;
 import com.novacloudedu.backend.interfaces.rest.banner.dto.response.BannerResponse;
+import com.novacloudedu.backend.interfaces.rest.banner.dto.response.GenerateBannerImageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -107,5 +111,21 @@ public class AdminBannerController {
     public BaseResponse<Boolean> offlineBanner(@PathVariable Long id) {
         bannerApplicationService.offlineBanner(id);
         return ResultUtils.success(true);
+    }
+
+    /**
+     * AI生成轮播图图片
+     */
+    @Operation(summary = "AI生成轮播图图片", description = "根据标题和图片描述，使用AI生成轮播图图片")
+    @PostMapping("/generate-image")
+    public BaseResponse<GenerateBannerImageResponse> generateBannerImage(
+            @Valid @RequestBody GenerateBannerImageRequest request) {
+        GenerateBannerImageCommand command = bannerAssembler.toGenerateImageCommand(request);
+        ImageGenerationService.ImageResult result = bannerApplicationService.generateBannerImage(command);
+        if (result.success()) {
+            return ResultUtils.success(GenerateBannerImageResponse.success(result.imageUrl()));
+        } else {
+            return ResultUtils.success(GenerateBannerImageResponse.failure(result.errorMessage()));
+        }
     }
 }

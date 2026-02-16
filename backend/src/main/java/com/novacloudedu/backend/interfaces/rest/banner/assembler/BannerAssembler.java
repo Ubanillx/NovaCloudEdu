@@ -1,11 +1,13 @@
 package com.novacloudedu.backend.interfaces.rest.banner.assembler;
 
 import com.novacloudedu.backend.application.banner.command.CreateBannerCommand;
+import com.novacloudedu.backend.application.banner.command.GenerateBannerImageCommand;
 import com.novacloudedu.backend.application.banner.command.UpdateBannerCommand;
 import com.novacloudedu.backend.application.banner.query.BannerQuery;
 import com.novacloudedu.backend.domain.banner.entity.Banner;
 import com.novacloudedu.backend.domain.banner.repository.BannerRepository.BannerPage;
 import com.novacloudedu.backend.interfaces.rest.banner.dto.request.CreateBannerRequest;
+import com.novacloudedu.backend.interfaces.rest.banner.dto.request.GenerateBannerImageRequest;
 import com.novacloudedu.backend.interfaces.rest.banner.dto.request.QueryBannerRequest;
 import com.novacloudedu.backend.interfaces.rest.banner.dto.request.UpdateBannerRequest;
 import com.novacloudedu.backend.interfaces.rest.banner.dto.response.BannerListResponse;
@@ -125,5 +127,15 @@ public class BannerAssembler {
         return banners.stream()
                 .map(this::toListResponse)
                 .toList();
+    }
+
+    /**
+     * 转换为AI生成图片命令
+     */
+    public GenerateBannerImageCommand toGenerateImageCommand(GenerateBannerImageRequest request) {
+        return new GenerateBannerImageCommand(
+                request.title(),
+                request.imageDescription()
+        );
     }
 }
