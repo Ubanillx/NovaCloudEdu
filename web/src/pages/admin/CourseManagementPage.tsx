@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Search,
   Plus,
@@ -15,6 +16,7 @@ import {
   Star,
   Users,
   Upload,
+  List,
 } from 'lucide-react';
 import { apiClient, DefaultApi, Configuration } from '../../api';
 import type {
@@ -339,6 +341,7 @@ const CourseFormModal: React.FC<CourseFormModalProps> = ({ isOpen, onClose, onSu
 // ============ 课程管理主页面 ============
 
 export const CourseManagementPage: React.FC = () => {
+  const navigate = useNavigate();
   const [courses, setCourses] = useState<CourseResponse[]>([]);
   const [teachers, setTeachers] = useState<TeacherResponse[]>([]);
   const [loading, setLoading] = useState(false);
@@ -553,6 +556,10 @@ export const CourseManagementPage: React.FC = () => {
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button onClick={() => navigate(`/admin/courses/${String(course.id)}`)}
+                          className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-all" title="章节管理">
+                          <List size={18} />
+                        </button>
                         <button onClick={() => { setEditingCourse(course); setModalOpen(true); }}
                           className="p-2 text-gray-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded-lg transition-all" title="编辑">
                           <Edit2 size={18} />
