@@ -95,6 +95,38 @@ public class ChatGroupRepositoryImpl implements ChatGroupRepository {
     }
 
     @Override
+    public GroupPage findByOwnerId(UserId ownerId, int pageNum, int pageSize) {
+        Page<ChatGroupPO> page = new Page<>(pageNum, pageSize);
+        LambdaQueryWrapper<ChatGroupPO> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(ChatGroupPO::getOwnerId, ownerId.value())
+               .orderByDesc(ChatGroupPO::getCreateTime);
+        Page<ChatGroupPO> result = chatGroupMapper.selectPage(page, wrapper);
+        
+        List<ChatGroup> groups = result.getRecords().stream()
+                .map(converter::toDomain)
+                .toList();
+        return new GroupPage(groups, result.getTotal(), pageNum, pageSize);
+    }
+
+    @Override
+    public GroupPage searchByNameAndOwnerId(String keyword, UserId ownerId, int pageNum, int pageSize) {
+        Page<ChatGroupPO> page = new Page<>(pageNum, pageSize);
+        LambdaQueryWrapper<ChatGroupPO> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(ChatGroupPO::getOwnerId, ownerId.value())
+               .and(w -> w
+                       .like(ChatGroupPO::getGroupName, keyword)
+                       .or()
+                       .eq(ChatGroupPO::getGroupNumber, keyword)
+               ).orderByDesc(ChatGroupPO::getCreateTime);
+        Page<ChatGroupPO> result = chatGroupMapper.selectPage(page, wrapper);
+        
+        List<ChatGroup> groups = result.getRecords().stream()
+                .map(converter::toDomain)
+                .toList();
+        return new GroupPage(groups, result.getTotal(), pageNum, pageSize);
+    }
+
+    @Override
     public void delete(GroupId id) {
         chatGroupMapper.deleteById(id.value());
     }

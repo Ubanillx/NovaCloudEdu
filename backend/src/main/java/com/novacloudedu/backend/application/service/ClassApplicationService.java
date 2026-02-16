@@ -240,15 +240,41 @@ public class ClassApplicationService {
         return classInfoRepository.findAll(pageNum, pageSize);
     }
 
+    public ClassInfoRepository.ClassPage listClassesByCreator(Long creatorId, int pageNum, int pageSize) {
+        return classInfoRepository.findByCreatorId(UserId.of(creatorId), pageNum, pageSize);
+    }
+
     public ClassInfoRepository.ClassPage searchClasses(String keyword, int pageNum, int pageSize) {
         return classInfoRepository.searchByName(keyword, pageNum, pageSize);
+    }
+
+    public ClassInfoRepository.ClassPage searchClassesByCreator(String keyword, Long creatorId, int pageNum, int pageSize) {
+        return classInfoRepository.searchByNameAndCreatorId(keyword, UserId.of(creatorId), pageNum, pageSize);
     }
 
     public ClassInfo getClassInfo(Long classId) {
         return getClassOrThrow(classId);
     }
 
+    /**
+     * 获取班级详情（带权限检查：教师只能查看自己创建的班级）
+     */
+    public ClassInfo getClassInfoWithPermission(Long classId, Long operatorId) {
+        ClassInfo classInfo = getClassOrThrow(classId);
+        checkPermission(classInfo, operatorId);
+        return classInfo;
+    }
+
     public ClassMemberRepository.MemberPage getClassMembers(Long classId, int pageNum, int pageSize) {
+        return classMemberRepository.findByClassId(ClassId.of(classId), pageNum, pageSize);
+    }
+
+    /**
+     * 获取班级成员列表（带权限检查）
+     */
+    public ClassMemberRepository.MemberPage getClassMembersWithPermission(Long classId, Long operatorId, int pageNum, int pageSize) {
+        ClassInfo classInfo = getClassOrThrow(classId);
+        checkPermission(classInfo, operatorId);
         return classMemberRepository.findByClassId(ClassId.of(classId), pageNum, pageSize);
     }
     
