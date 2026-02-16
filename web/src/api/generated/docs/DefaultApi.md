@@ -105,6 +105,7 @@ All URIs are relative to *http://localhost:8080*
 |[**exportAnswerKey**](#exportanswerkey) | **POST** /api/exam-papers/{id}/export-answer-key | 导出参考答案PDF|
 |[**favouriteCourse**](#favouritecourse) | **POST** /api/course/favourite/{courseId} | 收藏课程|
 |[**follow**](#follow) | **POST** /api/follow/{targetUserId} | 关注用户|
+|[**generateBannerImage**](#generatebannerimage) | **POST** /api/admin/banner/generate-image | AI生成轮播图图片|
 |[**getAllConfigs**](#getallconfigs) | **GET** /api/admin/scraper/config | 获取所有配置|
 |[**getAllFriends**](#getallfriends) | **GET** /api/friend/all | 获取全部好友|
 |[**getAllTasks**](#getalltasks) | **GET** /api/admin/scraper/config/tasks | 获取所有任务|
@@ -155,6 +156,7 @@ All URIs are relative to *http://localhost:8080*
 |[**getGroupMembers**](#getgroupmembers) | **GET** /api/groups/{groupId}/members | 获取群成员列表|
 |[**getGroupMembers1**](#getgroupmembers1) | **GET** /api/admin/groups/{groupId}/members | 分页获取群成员|
 |[**getGroupMembersPage**](#getgroupmemberspage) | **GET** /api/groups/{groupId}/members/page | 分页获取群成员|
+|[**getKey**](#getkey) | **GET** /api/video/key | 获取视频解密密钥（HLS播放器自动调用）|
 |[**getLatestMessages**](#getlatestmessages) | **GET** /api/group-chat/{groupId}/messages/latest | 获取群最新消息|
 |[**getLikedArticles**](#getlikedarticles) | **GET** /api/user/daily-article/liked | 获取点赞文章列表|
 |[**getLoginUser**](#getloginuser) | **GET** /api/auth/current | 获取当前用户|
@@ -266,7 +268,7 @@ All URIs are relative to *http://localhost:8080*
 |[**listCourses**](#listcourses) | **GET** /api/course/list | 获取课程列表|
 |[**listCoursesByTeacher**](#listcoursesbyteacher) | **GET** /api/course/teacher/{teacherId} | 获取讲师的课程列表|
 |[**listExecutions**](#listexecutions) | **GET** /api/workflows/{id}/executions | 获取工作流执行历史列表|
-|[**listGroups**](#listgroups) | **GET** /api/admin/groups/list | 分页获取所有群列表|
+|[**listGroups**](#listgroups) | **GET** /api/admin/groups/list | 分页获取群列表|
 |[**listOrders**](#listorders) | **GET** /api/admin/order/list | 获取订单列表（管理员）|
 |[**listPublic**](#listpublic) | **GET** /api/workflows/public | 获取公开的工作流列表|
 |[**listReviews**](#listreviews) | **GET** /api/course/review/{courseId}/list | 获取课程评价列表|
@@ -5740,6 +5742,59 @@ const { status, data } = await apiInstance.follow(
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **generateBannerImage**
+> BaseResponseGenerateBannerImageResponse generateBannerImage(generateBannerImageRequest)
+
+根据标题和图片描述，使用AI生成轮播图图片
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration,
+    GenerateBannerImageRequest
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let generateBannerImageRequest: GenerateBannerImageRequest; //
+
+const { status, data } = await apiInstance.generateBannerImage(
+    generateBannerImageRequest
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **generateBannerImageRequest** | **GenerateBannerImageRequest**|  | |
+
+
+### Return type
+
+**BaseResponseGenerateBannerImageResponse**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **getAllConfigs**
 > BaseResponseListScraperConfigResponse getAllConfigs()
 
@@ -8320,6 +8375,60 @@ const { status, data } = await apiInstance.getGroupMembersPage(
 ### Return type
 
 **BaseResponseMemberPage**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getKey**
+> getKey()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let keyId: string; //密钥ID (default to undefined)
+let token: string; //一次性播放令牌（可选） (optional) (default to undefined)
+
+const { status, data } = await apiInstance.getKey(
+    keyId,
+    token
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **keyId** | [**string**] | 密钥ID | defaults to undefined|
+| **token** | [**string**] | 一次性播放令牌（可选） | (optional) defaults to undefined|
+
+
+### Return type
+
+void (empty response body)
 
 ### Authorization
 

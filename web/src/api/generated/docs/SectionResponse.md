@@ -16,6 +16,10 @@ Name | Type | Description | Notes
 **sort** | **number** | 排序 | [optional] [default to undefined]
 **isFree** | **boolean** | 是否免费 | [optional] [default to undefined]
 **resourceUrl** | **string** | 资源URL | [optional] [default to undefined]
+**hlsUrl** | **string** | HLS播放地址(m3u8) | [optional] [default to undefined]
+**transcodeStatus** | **number** | 转码状态: 0-未转码, 1-转码中, 2-已完成, 3-失败 | [optional] [default to undefined]
+**thumbnailUrl** | **string** | 缩略图雪碧图URL | [optional] [default to undefined]
+**thumbnailCount** | **number** | 缩略图数量 | [optional] [default to undefined]
 **createTime** | **string** | 创建时间 | [optional] [default to undefined]
 **updateTime** | **string** | 更新时间 | [optional] [default to undefined]
 
@@ -35,6 +39,10 @@ const instance: SectionResponse = {
     sort,
     isFree,
     resourceUrl,
+    hlsUrl,
+    transcodeStatus,
+    thumbnailUrl,
+    thumbnailCount,
     createTime,
     updateTime,
 };

@@ -136,6 +136,8 @@ export const apiClient = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  // 使用 XHR 以支持 onUploadProgress（fetch 适配器不支持上传进度）
+  adapter: ['xhr', 'fetch'],
   // 自定义响应转换器，使用 json-bigint 解析响应，解决 Long 精度丢失问题
   // 仅对 JSON 响应做解析，避免 PDF/图片等二进制数据被损坏
   transformResponse: [(data, headers) => {

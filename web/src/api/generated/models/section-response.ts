@@ -59,6 +59,22 @@ export interface SectionResponse {
      */
     'resourceUrl'?: string;
     /**
+     * HLS播放地址(m3u8)
+     */
+    'hlsUrl'?: string;
+    /**
+     * 转码状态: 0-未转码, 1-转码中, 2-已完成, 3-失败
+     */
+    'transcodeStatus'?: number;
+    /**
+     * 缩略图雪碧图URL
+     */
+    'thumbnailUrl'?: string;
+    /**
+     * 缩略图数量
+     */
+    'thumbnailCount'?: number;
+    /**
      * 创建时间
      */
     'createTime'?: string;

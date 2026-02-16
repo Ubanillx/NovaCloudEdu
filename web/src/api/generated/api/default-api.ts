@@ -120,6 +120,8 @@ import type { BaseResponseFriendPageResponse } from '../models';
 // @ts-ignore
 import type { BaseResponseFriendRequestPageResponse } from '../models';
 // @ts-ignore
+import type { BaseResponseGenerateBannerImageResponse } from '../models';
+// @ts-ignore
 import type { BaseResponseGroupMessagePageResponse } from '../models';
 // @ts-ignore
 import type { BaseResponseGroupPage } from '../models';
@@ -395,6 +397,8 @@ import type { ExecuteWorkflowRequest } from '../models';
 import type { FriendListRequestDTO } from '../models';
 // @ts-ignore
 import type { FriendRequestListDTO } from '../models';
+// @ts-ignore
+import type { GenerateBannerImageRequest } from '../models';
 // @ts-ignore
 import type { HandleFriendRequestDTO } from '../models';
 // @ts-ignore
@@ -4608,6 +4612,45 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 根据标题和图片描述，使用AI生成轮播图图片
+         * @summary AI生成轮播图图片
+         * @param {GenerateBannerImageRequest} generateBannerImageRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        generateBannerImage: async (generateBannerImageRequest: GenerateBannerImageRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'generateBannerImageRequest' is not null or undefined
+            assertParamExists('generateBannerImage', 'generateBannerImageRequest', generateBannerImageRequest)
+            const localVarPath = `/api/admin/banner/generate-image`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(generateBannerImageRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 获取所有抓取源配置列表
          * @summary 获取所有配置
          * @param {*} [options] Override http request option.
@@ -6580,6 +6623,52 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
 
             if (pageSize !== undefined) {
                 localVarQueryParameter['pageSize'] = pageSize;
+            }
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 获取视频解密密钥（HLS播放器自动调用）
+         * @param {string} keyId 密钥ID
+         * @param {string} [token] 一次性播放令牌（可选）
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getKey: async (keyId: string, token?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'keyId' is not null or undefined
+            assertParamExists('getKey', 'keyId', keyId)
+            const localVarPath = `/api/video/key`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (keyId !== undefined) {
+                localVarQueryParameter['keyId'] = keyId;
+            }
+
+            if (token !== undefined) {
+                localVarQueryParameter['token'] = token;
             }
 
             localVarHeaderParameter['Accept'] = 'application/json';
@@ -11142,7 +11231,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
-         * @summary 分页获取所有群列表
+         * @summary 分页获取群列表
          * @param {number} [pageNum] 页码
          * @param {number} [pageSize] 每页数量
          * @param {*} [options] Override http request option.
@@ -18170,6 +18259,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 根据标题和图片描述，使用AI生成轮播图图片
+         * @summary AI生成轮播图图片
+         * @param {GenerateBannerImageRequest} generateBannerImageRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async generateBannerImage(generateBannerImageRequest: GenerateBannerImageRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseGenerateBannerImageResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.generateBannerImage(generateBannerImageRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.generateBannerImage']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 获取所有抓取源配置列表
          * @summary 获取所有配置
          * @param {*} [options] Override http request option.
@@ -18832,6 +18934,20 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getGroupMembersPage(groupId, pageNum, pageSize, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.getGroupMembersPage']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 获取视频解密密钥（HLS播放器自动调用）
+         * @param {string} keyId 密钥ID
+         * @param {string} [token] 一次性播放令牌（可选）
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getKey(keyId: string, token?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getKey(keyId, token, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getKey']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -20333,7 +20449,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
-         * @summary 分页获取所有群列表
+         * @summary 分页获取群列表
          * @param {number} [pageNum] 页码
          * @param {number} [pageSize] 每页数量
          * @param {*} [options] Override http request option.
@@ -23190,6 +23306,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.follow(requestParameters.targetUserId, options).then((request) => request(axios, basePath));
         },
         /**
+         * 根据标题和图片描述，使用AI生成轮播图图片
+         * @summary AI生成轮播图图片
+         * @param {DefaultApiGenerateBannerImageRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        generateBannerImage(requestParameters: DefaultApiGenerateBannerImageRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseGenerateBannerImageResponse> {
+            return localVarFp.generateBannerImage(requestParameters.generateBannerImageRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 获取所有抓取源配置列表
          * @summary 获取所有配置
          * @param {*} [options] Override http request option.
@@ -23684,6 +23810,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         getGroupMembersPage(requestParameters: DefaultApiGetGroupMembersPageRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMemberPage> {
             return localVarFp.getGroupMembersPage(requestParameters.groupId, requestParameters.pageNum, requestParameters.pageSize, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 获取视频解密密钥（HLS播放器自动调用）
+         * @param {DefaultApiGetKeyRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getKey(requestParameters: DefaultApiGetKeyRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.getKey(requestParameters.keyId, requestParameters.token, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -24774,7 +24910,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
-         * @summary 分页获取所有群列表
+         * @summary 分页获取群列表
          * @param {DefaultApiListGroupsRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -27035,6 +27171,15 @@ export interface DefaultApiInterface {
     follow(requestParameters: DefaultApiFollowRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid>;
 
     /**
+     * 根据标题和图片描述，使用AI生成轮播图图片
+     * @summary AI生成轮播图图片
+     * @param {DefaultApiGenerateBannerImageRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    generateBannerImage(requestParameters: DefaultApiGenerateBannerImageRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseGenerateBannerImageResponse>;
+
+    /**
      * 获取所有抓取源配置列表
      * @summary 获取所有配置
      * @param {*} [options] Override http request option.
@@ -27479,6 +27624,15 @@ export interface DefaultApiInterface {
      * @throws {RequiredError}
      */
     getGroupMembersPage(requestParameters: DefaultApiGetGroupMembersPageRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMemberPage>;
+
+    /**
+     * 
+     * @summary 获取视频解密密钥（HLS播放器自动调用）
+     * @param {DefaultApiGetKeyRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getKey(requestParameters: DefaultApiGetKeyRequest, options?: RawAxiosRequestConfig): AxiosPromise<void>;
 
     /**
      * 
@@ -28458,7 +28612,7 @@ export interface DefaultApiInterface {
 
     /**
      * 
-     * @summary 分页获取所有群列表
+     * @summary 分页获取群列表
      * @param {DefaultApiListGroupsRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -30605,6 +30759,13 @@ export interface DefaultApiFollowRequest {
 }
 
 /**
+ * Request parameters for generateBannerImage operation in DefaultApi.
+ */
+export interface DefaultApiGenerateBannerImageRequest {
+    readonly generateBannerImageRequest: GenerateBannerImageRequest
+}
+
+/**
  * Request parameters for getAllTasks operation in DefaultApi.
  */
 export interface DefaultApiGetAllTasksRequest {
@@ -31049,6 +31210,21 @@ export interface DefaultApiGetGroupMembersPageRequest {
     readonly pageNum?: number
 
     readonly pageSize?: number
+}
+
+/**
+ * Request parameters for getKey operation in DefaultApi.
+ */
+export interface DefaultApiGetKeyRequest {
+    /**
+     * 密钥ID
+     */
+    readonly keyId: string
+
+    /**
+     * 一次性播放令牌（可选）
+     */
+    readonly token?: string
 }
 
 /**
@@ -34474,6 +34650,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * 根据标题和图片描述，使用AI生成轮播图图片
+     * @summary AI生成轮播图图片
+     * @param {DefaultApiGenerateBannerImageRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public generateBannerImage(requestParameters: DefaultApiGenerateBannerImageRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).generateBannerImage(requestParameters.generateBannerImageRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 获取所有抓取源配置列表
      * @summary 获取所有配置
      * @param {*} [options] Override http request option.
@@ -35017,6 +35204,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public getGroupMembersPage(requestParameters: DefaultApiGetGroupMembersPageRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).getGroupMembersPage(requestParameters.groupId, requestParameters.pageNum, requestParameters.pageSize, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 获取视频解密密钥（HLS播放器自动调用）
+     * @param {DefaultApiGetKeyRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getKey(requestParameters: DefaultApiGetKeyRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getKey(requestParameters.keyId, requestParameters.token, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -36219,7 +36417,7 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
 
     /**
      * 
-     * @summary 分页获取所有群列表
+     * @summary 分页获取群列表
      * @param {DefaultApiListGroupsRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}

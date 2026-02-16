@@ -82,6 +82,8 @@ docs/BaseResponseFollowPageResponse.md
 docs/BaseResponseFollowStatsResponse.md
 docs/BaseResponseFriendPageResponse.md
 docs/BaseResponseFriendRequestPageResponse.md
+docs/BaseResponseGenerateAvatarResponse.md
+docs/BaseResponseGenerateBannerImageResponse.md
 docs/BaseResponseGroupMessagePageResponse.md
 docs/BaseResponseGroupPage.md
 docs/BaseResponseGroupResponse.md
@@ -291,6 +293,10 @@ docs/FriendRequestListDTO.md
 docs/FriendRequestPageResponse.md
 docs/FriendRequestResponse.md
 docs/FriendResponse.md
+docs/GenerateAvatarRequest.md
+docs/GenerateAvatarResponse.md
+docs/GenerateBannerImageRequest.md
+docs/GenerateBannerImageResponse.md
 docs/GeneratePptRequest.md
 docs/GroupId.md
 docs/GroupMemberResponse.md
@@ -520,6 +526,8 @@ models/base-response-follow-page-response.ts
 models/base-response-follow-stats-response.ts
 models/base-response-friend-page-response.ts
 models/base-response-friend-request-page-response.ts
+models/base-response-generate-avatar-response.ts
+models/base-response-generate-banner-image-response.ts
 models/base-response-group-message-page-response.ts
 models/base-response-group-page.ts
 models/base-response-group-response.ts
@@ -728,6 +736,10 @@ models/friend-request-list-dto.ts
 models/friend-request-page-response.ts
 models/friend-request-response.ts
 models/friend-response.ts
+models/generate-avatar-request.ts
+models/generate-avatar-response.ts
+models/generate-banner-image-request.ts
+models/generate-banner-image-response.ts
 models/generate-ppt-request.ts
 models/group-id.ts
 models/group-member-response.ts
