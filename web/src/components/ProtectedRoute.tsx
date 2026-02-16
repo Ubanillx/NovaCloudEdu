@@ -24,9 +24,12 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  if (requireAdmin && userRole?.toLowerCase() !== 'admin') {
-    // 需要管理员权限但用户不是管理员，重定向到首页
-    return <Navigate to="/" replace />;
+  if (requireAdmin) {
+    const role = userRole?.toLowerCase();
+    if (role !== 'admin' && role !== 'teacher') {
+      // 需要管理权限但用户既不是管理员也不是教师，重定向到首页
+      return <Navigate to="/" replace />;
+    }
   }
 
   return <>{children}</>;

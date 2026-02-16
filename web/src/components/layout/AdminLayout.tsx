@@ -65,7 +65,24 @@ const AdminSider: React.FC<AdminSiderProps> = ({
     return () => clearTimeout(timer);
   }, [isCollapsed]);
 
-  const menuItems = [
+  // 从 localStorage 获取角色
+  const userInfoStr = localStorage.getItem('user_info');
+  const userInfo = userInfoStr ? JSON.parse(userInfoStr) : null;
+  const userRole = (userInfo?.userRole || userInfo?.role || '').toLowerCase();
+
+  // 教师可见的菜单路径
+  const teacherAllowedPaths = new Set([
+    '/admin/courses',
+    '/admin/classes',
+    '/admin/groups',
+    '/admin/ppt-templates',
+    '/admin/ppt-generator',
+    '/admin/questions',
+    '/admin/exam-papers',
+    '/admin/exam-templates',
+  ]);
+
+  const allMenuItems = [
     { icon: LayoutDashboard, label: '仪表盘', path: '/admin' },
     { icon: Users, label: '用户管理', path: '/admin/users' },
     { icon: BookOpen, label: '课程管理', path: '/admin/courses' },
@@ -91,6 +108,18 @@ const AdminSider: React.FC<AdminSiderProps> = ({
     { icon: ListTodo, label: '抓取任务', path: '/admin/scraper/tasks' },
     { icon: Settings, label: '系统设置', path: '/admin/settings' },
   ];
+
+  // 教师只显示指定菜单，管理员显示全部
+  const menuItems = userRole === 'teacher'
+    ? allMenuItems.filter(item => teacherAllowedPaths.has(item.path))
+    : allMenuItems;
+
+  // 教师访问仪表盘时重定向到课程管理
+  React.useEffect(() => {
+    if (userRole === 'teacher' && location.pathname === '/admin') {
+      navigate('/admin/courses', { replace: true });
+    }
+  }, [userRole, location.pathname, navigate]);
 
   const handleLogout = () => {
     clearTokens();
@@ -297,10 +326,19 @@ export const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children 
               
               {/* User Profile */}
               <div className="flex items-center gap-3 pl-2 group cursor-pointer">
-                <div className="text-right hidden sm:block">
-                  <div className="text-sm font-bold text-gray-900 dark:text-white group-hover:text-brand-600 transition-colors duration-300">管理员</div>
-                  <div className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">系统管理员</div>
-                </div>
+                {(() => {
+                  const infoStr = localStorage.getItem('user_info');
+                  const info = infoStr ? JSON.parse(infoStr) : null;
+                  const role = (info?.userRole || info?.role || '').toLowerCase();
+                  const name = info?.userName || info?.userAccount || '用户';
+                  const roleLabel = role === 'admin' ? '系统管理员' : role === 'teacher' ? '教师' : '用户';
+                  return (
+                    <div className="text-right hidden sm:block">
+                      <div className="text-sm font-bold text-gray-900 dark:text-white group-hover:text-brand-600 transition-colors duration-300">{name}</div>
+                      <div className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">{roleLabel}</div>
+                    </div>
+                  );
+                })()}
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-indigo-600 p-0.5 shadow-lg shadow-brand-500/20 transition-all duration-300">
                   <div className="w-full h-full rounded-[10px] bg-white dark:bg-gray-800 flex items-center justify-center overflow-hidden transition-colors duration-300">
                     <Users size={20} className="text-brand-600" />

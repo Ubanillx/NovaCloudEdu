@@ -1,8 +1,11 @@
 import React from 'react';
 import { Twitter, Github, Linkedin, MessageCircle } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import logo from '../../assets/logo.svg';
 
 export const Footer: React.FC = () => {
+  const currentYear = new Date().getFullYear();
+  const yearText = currentYear === 2026 ? '2026' : `2026-${currentYear}`;
   return (
     <footer className="bg-white dark:bg-[#111827] border-t border-gray-200 dark:border-gray-800 pt-16 pb-8 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 md:px-6">
@@ -40,10 +43,10 @@ export const Footer: React.FC = () => {
           <div>
             <h3 className="font-semibold text-gray-900 dark:text-white mb-4">平台</h3>
             <ul className="space-y-3 text-sm text-gray-500 dark:text-gray-400">
-              <li><a href="#" className="hover:text-brand-600 dark:hover:text-brand-400 transition-colors">浏览课程</a></li>
-              <li><a href="#" className="hover:text-brand-600 dark:hover:text-brand-400 transition-colors">学习计划</a></li>
-              <li><a href="#" className="hover:text-brand-600 dark:hover:text-brand-400 transition-colors">AI 助手</a></li>
-              <li><a href="#" className="hover:text-brand-600 dark:hover:text-brand-400 transition-colors">模拟面试</a></li>
+              <li><a href="/" className="hover:text-brand-600 dark:hover:text-brand-400 transition-colors">首页</a></li>
+              <li><a href="/schedule" className="hover:text-brand-600 dark:hover:text-brand-400 transition-colors">课程表</a></li>
+              <li><a href="/circle" className="hover:text-brand-600 dark:hover:text-brand-400 transition-colors">学习圈</a></li>
+              <li><a href="/chat" className="hover:text-brand-600 dark:hover:text-brand-400 transition-colors">AI 助手</a></li>
             </ul>
           </div>
 
@@ -53,8 +56,8 @@ export const Footer: React.FC = () => {
             <ul className="space-y-3 text-sm text-gray-500 dark:text-gray-400">
               <li><a href="#" className="hover:text-brand-600 dark:hover:text-brand-400 transition-colors">关于我们</a></li>
               <li><a href="#" className="hover:text-brand-600 dark:hover:text-brand-400 transition-colors">加入我们</a></li>
-              <li><a href="#" className="hover:text-brand-600 dark:hover:text-brand-400 transition-colors">博客</a></li>
-              <li><a href="#" className="hover:text-brand-600 dark:hover:text-brand-400 transition-colors">联系我们</a></li>
+              <li><a href="https://blog.ubanillx.com" target="_blank" rel="noopener noreferrer" className="hover:text-brand-600 dark:hover:text-brand-400 transition-colors">博客</a></li>
+              <li><Link to="/feedback" className="hover:text-brand-600 dark:hover:text-brand-400 transition-colors">联系我们</Link></li>
             </ul>
           </div>
 
@@ -78,11 +81,10 @@ export const Footer: React.FC = () => {
         </div>
 
         <div className="border-t border-gray-200 dark:border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
-          <p>&copy; 2024 智云星课. 保留所有权利。</p>
+          <p>&copy; {yearText} 智云星课. 保留所有权利。</p>
           <div className="flex gap-6">
             <a href="#" className="hover:text-gray-900 dark:hover:text-white transition-colors">隐私政策</a>
             <a href="#" className="hover:text-gray-900 dark:hover:text-white transition-colors">服务条款</a>
-            <a href="#" className="hover:text-gray-900 dark:hover:text-white transition-colors">Cookie 政策</a>
           </div>
         </div>
       </div>

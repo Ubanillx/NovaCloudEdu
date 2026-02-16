@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { MockData } from '../../data/mock';
 import { useSider } from '../../context/SiderContext';
-import { LayoutGrid, MessageCircle, Bot, Code, Calculator, Palette, FlaskConical, Languages, ChevronsLeft, ChevronsRight } from 'lucide-react';
+import { AIApi, Configuration, apiClient } from '../../api';
+import type { AiAssistantVO } from '../../api/generated/models';
+import { LayoutGrid, MessageCircle, Bot, ChevronsLeft, ChevronsRight, Home } from 'lucide-react';
 
 interface SiderProps {
   collapsed?: boolean;
@@ -13,22 +14,39 @@ const SiderTooltip: React.FC<{ label: string; show: boolean; children: React.Rea
   <>{children}</>
 );
 
-const categoryIcons: Record<string, React.ElementType> = {
-  Coding: Code,
-  Math: Calculator,
-  Arts: Palette,
-  Science: FlaskConical,
-  English: Languages,
-};
-
 export const Sider: React.FC<SiderProps> = ({ collapsed: propCollapsed = false }) => {
   const { siderHidden, siderCollapsed, setSiderCollapsed } = useSider();
   const navigate = useNavigate();
   const location = useLocation();
+  const isHomeActive = location.pathname === '/';
   const isCircleActive = location.pathname.startsWith('/circle');
   const isChatActive = location.pathname.startsWith('/chat');
+  const isAiChatActive = location.pathname.startsWith('/ai-chat');
+  const activeAssistantId = isAiChatActive ? location.pathname.split('/ai-chat/')[1]?.split('/')[0] : undefined;
   // 文字渐隐/渐显样式：折叠时同步渐隐，展开时延迟渐显
   const textFadeClass = `whitespace-nowrap overflow-hidden transition-opacity ${siderCollapsed ? 'opacity-0 w-0 duration-200' : 'opacity-100 duration-200 delay-200'}`;
+
+  const [aiList, setAiList] = useState<AiAssistantVO[]>([]);
+  const [aiLoading, setAiLoading] = useState(false);
+
+  // 拉取公开智慧体列表（取前6个）
+  useEffect(() => {
+    let mounted = true;
+    const api = new AIApi(new Configuration(), '', apiClient);
+    setAiLoading(true);
+    api.assistantListPublic({ page: 0, size: 6 })
+      .then(res => {
+        if (!mounted) return;
+        if (res.data?.code === 0 && Array.isArray(res.data.data)) {
+          setAiList(res.data.data);
+        }
+      })
+      .catch(err => {
+        console.error('获取智慧体失败', err);
+      })
+      .finally(() => { if (mounted) setAiLoading(false); });
+    return () => { mounted = false; };
+  }, []);
 
   if (propCollapsed) return null;
 
@@ -42,6 +60,27 @@ export const Sider: React.FC<SiderProps> = ({ collapsed: propCollapsed = false }
         <div>
           <div className="h-px bg-gray-100 dark:bg-gray-800 mb-2" />
           <ul className="space-y-1">
+            <li>
+              <SiderTooltip label="首页" show={isCollapsed}>
+                <button
+                  onClick={() => navigate('/')}
+                  className={`w-full flex items-center ${isCollapsed ? 'justify-center px-0 gap-0' : 'gap-3 px-3'} py-2 text-sm rounded-lg transition-all duration-200 ${
+                    isHomeActive
+                      ? 'bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 font-medium'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-brand-50 dark:hover:bg-brand-900/30 hover:text-brand-600 dark:hover:text-brand-400'
+                  }`}
+                >
+                  <div className={`w-7 h-7 rounded-lg flex-shrink-0 flex items-center justify-center transition-colors ${
+                    isHomeActive
+                      ? 'bg-brand-500 text-white shadow-sm'
+                      : 'bg-brand-100 dark:bg-brand-900/50 text-brand-600 dark:text-brand-400'
+                  }`}>
+                    <Home size={15} />
+                  </div>
+                  <span className={textFadeClass}>首页</span>
+                </button>
+              </SiderTooltip>
+            </li>
             <li>
               <SiderTooltip label="圈子" show={isCollapsed}>
                 <button
@@ -87,34 +126,6 @@ export const Sider: React.FC<SiderProps> = ({ collapsed: propCollapsed = false }
           </ul>
         </div>
 
-        {/* Section 1: Categories */}
-        <div>
-          <div className="h-px bg-gray-100 dark:bg-gray-800 mb-2" />
-          <ul className="space-y-1">
-            {[
-              { name: '少儿编程', item: 'Coding' },
-              { name: '趣味数学', item: 'Math' },
-              { name: '人文艺术', item: 'Arts' },
-              { name: '科学探索', item: 'Science' },
-              { name: '英语口语', item: 'English' }
-            ].map((cat) => {
-              const Icon = categoryIcons[cat.item];
-              return (
-                <li key={cat.item}>
-                  <SiderTooltip label={cat.name} show={isCollapsed}>
-                    <a href="#" className={`flex items-center ${isCollapsed ? 'justify-center px-0 gap-0' : 'gap-3 px-3'} py-2 text-sm text-gray-700 dark:text-gray-300 rounded-lg hover:bg-brand-50 dark:hover:bg-brand-900/30 hover:text-brand-600 dark:hover:text-brand-400 transition-all duration-200`}>
-                      <div className="w-7 h-7 rounded-lg flex-shrink-0 flex items-center justify-center bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400">
-                        <Icon size={15} />
-                      </div>
-                      <span className={textFadeClass}>{cat.name}</span>
-                    </a>
-                  </SiderTooltip>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-
         {/* Section 2: 智慧体中心 */}
         <div>
           <div className="h-px bg-gray-100 dark:bg-gray-800 mb-2" />
@@ -132,19 +143,53 @@ export const Sider: React.FC<SiderProps> = ({ collapsed: propCollapsed = false }
                 </button>
               </SiderTooltip>
             </li>
-            {MockData.aiAssistants.slice(0, 3).map((assistant) => (
-              <li key={assistant.id}>
-                <SiderTooltip label={`${assistant.name}（即将上线）`} show={isCollapsed}>
-                  <span className={`flex items-center ${isCollapsed ? 'justify-center px-0 gap-0' : 'gap-3 px-3'} py-2 text-sm text-gray-500 dark:text-gray-500 rounded-lg cursor-default`}>
-                    <div className="w-7 h-7 rounded-full flex-shrink-0 bg-brand-100 dark:bg-brand-900/50 text-brand-600 dark:text-brand-400 flex items-center justify-center text-xs">
-                      {assistant.name[0]}
-                    </div>
-                    <span className={textFadeClass}>{assistant.name}</span>
-                    <span className={`text-[10px] text-gray-400 ${isCollapsed ? '' : 'ml-auto flex-shrink-0'} ${textFadeClass}`}>即将上线</span>
-                  </span>
-                </SiderTooltip>
-              </li>
-            ))}
+            {aiLoading
+              ? Array.from({ length: 3 }).map((_, idx) => (
+                  <li key={idx}>
+                    <span className={`flex items-center ${isCollapsed ? 'justify-center px-0 gap-0' : 'gap-3 px-3'} py-2 text-sm rounded-lg`}>
+                      <div className="w-7 h-7 rounded-full flex-shrink-0 bg-gray-100 dark:bg-gray-800 animate-pulse" />
+                      {!isCollapsed && (
+                        <div className="flex-1 space-y-2">
+                          <div className="h-3 w-20 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
+                          <div className="h-2 w-14 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
+                        </div>
+                      )}
+                    </span>
+                  </li>
+                ))
+              : aiList.map((assistant) => {
+                  const isOnline = assistant?.status === 'ONLINE' || assistant?.status === 'PUBLISHED';
+                  const isThisActive = String(assistant?.id) === activeAssistantId;
+                  return (
+                    <li key={assistant?.id}>
+                      <SiderTooltip label={assistant?.name || '加载中...'} show={isCollapsed}>
+                        <button
+                          onClick={() => navigate(`/ai-chat/${String(assistant?.id)}`)}
+                          className={`w-full flex items-center ${isCollapsed ? 'justify-center px-0 gap-0' : 'gap-3 px-3'} py-2 text-sm rounded-lg transition-all duration-200 ${
+                            isThisActive
+                              ? 'bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 font-medium'
+                              : 'text-gray-600 dark:text-gray-400 hover:bg-brand-50 dark:hover:bg-brand-900/30 hover:text-brand-600 dark:hover:text-brand-400'
+                          }`}
+                        >
+                          <div className={`w-7 h-7 rounded-full flex-shrink-0 flex items-center justify-center text-xs transition-colors ${
+                            isThisActive
+                              ? 'bg-brand-500 text-white shadow-sm'
+                              : 'bg-brand-100 dark:bg-brand-900/50 text-brand-600 dark:text-brand-400'
+                          }`}>
+                            {assistant?.name ? assistant.name[0] : '…'}
+                          </div>
+                          <span className={textFadeClass}>{assistant?.name || '加载中...'}</span>
+                          {isOnline && (
+                            <span className={`flex items-center gap-1 text-[10px] ${isCollapsed ? '' : 'ml-auto flex-shrink-0'} ${textFadeClass} text-emerald-500`}>
+                              <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                              在线
+                            </span>
+                          )}
+                        </button>
+                      </SiderTooltip>
+                    </li>
+                  );
+                })}
           </ul>
         </div>
       </div>
