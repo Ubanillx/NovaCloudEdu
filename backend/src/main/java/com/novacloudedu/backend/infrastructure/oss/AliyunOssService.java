@@ -273,12 +273,60 @@ public class AliyunOssService implements OssService {
         }
     }
 
-    private String extractObjectName(String fileUrl) {
-        if (fileUrl.contains(bucketName + "." + endpoint)) {
-            return fileUrl.substring(fileUrl.indexOf(bucketName + "." + endpoint) + bucketName.length() + endpoint.length() + 2);
-        } else if (!customDomain.isEmpty() && fileUrl.contains(customDomain)) {
-            return fileUrl.substring(fileUrl.indexOf(customDomain) + customDomain.length() + 1);
+    @Override
+    public String uploadToPath(byte[] data, String objectName, String contentType, boolean publicRead) {
+        if (data == null || data.length == 0) {
+            throw new BusinessException(40000, "文件数据不能为空");
         }
-        throw new IllegalArgumentException("无法解析文件URL: " + fileUrl);
+
+        OSS ossClient = null;
+        try {
+            ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
+
+            InputStream inputStream = new ByteArrayInputStream(data);
+            ObjectMetadata metadata = new ObjectMetadata();
+            metadata.setContentLength(data.length);
+            if (contentType != null && !contentType.isBlank()) {
+                metadata.setContentType(contentType);
+            }
+            if (publicRead) {
+                metadata.setObjectAcl(com.aliyun.oss.model.CannedAccessControlList.PublicRead);
+            }
+
+            PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, objectName, inputStream, metadata);
+            ossClient.putObject(putObjectRequest);
+
+            String fileUrl = customDomain.isEmpty()
+                    ? "https://" + bucketName + "." + endpoint + "/" + objectName
+                    : customDomain + "/" + objectName;
+
+            log.info("文件上传到指定路径成功: {}, publicRead={}", fileUrl, publicRead);
+            return fileUrl;
+
+        } catch (Exception e) {
+            log.error("文件上传到指定路径失败: {}", objectName, e);
+            throw new BusinessException(50000, "文件上传失败: " + e.getMessage());
+        } finally {
+            if (ossClient != null) {
+                ossClient.shutdown();
+            }
+        }
+    }
+
+    private String extractObjectName(String fileUrl) {
+        String objectName;
+        if (fileUrl.contains(bucketName + "." + endpoint)) {
+            objectName = fileUrl.substring(fileUrl.indexOf(bucketName + "." + endpoint) + bucketName.length() + endpoint.length() + 2);
+        } else if (!customDomain.isEmpty() && fileUrl.contains(customDomain)) {
+            objectName = fileUrl.substring(fileUrl.indexOf(customDomain) + customDomain.length() + 1);
+        } else {
+            throw new IllegalArgumentException("无法解析文件URL: " + fileUrl);
+        }
+        // 去掉查询参数（如预签名URL中的 ?Expires=...&Signature=...）
+        int queryIndex = objectName.indexOf('?');
+        if (queryIndex > 0) {
+            objectName = objectName.substring(0, queryIndex);
+        }
+        return objectName;
     }
 }
