@@ -4,6 +4,8 @@ import com.novacloudedu.backend.common.BaseResponse;
 import com.novacloudedu.backend.common.ErrorCode;
 import com.novacloudedu.backend.common.ResultUtils;
 import com.novacloudedu.backend.domain.user.entity.User;
+import com.novacloudedu.backend.infrastructure.email.AdminEmailNotifier;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindException;
@@ -20,7 +22,10 @@ import java.util.stream.Collectors;
  */
 @RestControllerAdvice
 @Slf4j
+@RequiredArgsConstructor
 public class GlobalExceptionHandler {
+
+    private final AdminEmailNotifier adminEmailNotifier;
 
     @ExceptionHandler(BusinessException.class)
     public BaseResponse<?> businessExceptionHandler(BusinessException e) {
@@ -70,6 +75,21 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RuntimeException.class)
     public BaseResponse<?> runtimeExceptionHandler(RuntimeException e) {
         log.error("RuntimeException: ", e);
+
+        // 异步发送系统异常报警邮件
+        try {
+            String stackTrace = getStackTraceString(e);
+            adminEmailNotifier.notifySystemError(e.getMessage(), stackTrace);
+        } catch (Exception ignored) {
+            // 邮件发送失败不影响异常响应
+        }
+
         return ResultUtils.error(ErrorCode.SYSTEM_ERROR, "系统错误");
+    }
+
+    private String getStackTraceString(Throwable e) {
+        java.io.StringWriter sw = new java.io.StringWriter();
+        e.printStackTrace(new java.io.PrintWriter(sw));
+        return sw.toString();
     }
 }
