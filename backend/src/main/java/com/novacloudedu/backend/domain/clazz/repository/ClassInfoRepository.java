@@ -19,7 +19,11 @@ public interface ClassInfoRepository {
     
     ClassPage findAll(int pageNum, int pageSize);
     
+    ClassPage findByCreatorId(UserId creatorId, int pageNum, int pageSize);
+    
     ClassPage searchByName(String keyword, int pageNum, int pageSize);
+    
+    ClassPage searchByNameAndCreatorId(String keyword, UserId creatorId, int pageNum, int pageSize);
     
     void delete(ClassId id);
 
