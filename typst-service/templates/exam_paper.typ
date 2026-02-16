@@ -82,9 +82,11 @@
 #let paper-size = if "paper_size" in data { data.paper_size } else { "a4" }
 #let col-count = if "columns" in data { data.columns } else { 1 }
 #let font-size = if "font_size" in data { eval(data.font_size) } else { 10.5pt }
+#let is-landscape = paper-size == "a3"
 
 #set page(
   paper: paper-size,
+  flipped: is-landscape,
   margin: (top: 2.5cm, bottom: 2cm, left: 2cm, right: 2cm),
   header: align(center, text(size: 9pt, fill: rgb("#999999"))[
     #if "title" in data { data.title }
