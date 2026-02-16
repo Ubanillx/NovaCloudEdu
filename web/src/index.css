@@ -245,6 +245,338 @@ table.admin-table td {
 }
 
 /* ========================================
+   Artplayer.js 自定义主题样式
+   ======================================== */
+
+/* --- 播放器容器 --- */
+.art-video-player {
+  --art-theme: #3b82f6;
+  --art-font-color: #ffffff;
+  --art-background-color: rgba(0, 0, 0, 0.85);
+  --art-text-shadow-color: rgba(0, 0, 0, 0.5);
+  --art-padding: 12px;
+  --art-border-radius: 0px;
+  --art-progress-height: 4px;
+  --art-progress-color: rgba(255, 255, 255, 0.3);
+  --art-hover-color: rgba(59, 130, 246, 0.6);
+  --art-loaded-color: rgba(255, 255, 255, 0.5);
+  --art-bottom-height: 50px;
+  --art-bottom-gap: 14px;
+  --art-control-height: 38px;
+  --art-control-opacity: 0.85;
+  --art-control-icon-size: 24px;
+  --art-control-icon-scale: 1;
+  --art-indicator-size: 14px;
+  --art-indicator-scale: 1;
+  --art-volume-height: 120px;
+  --art-volume-handle-size: 14px;
+  --art-lock-size: 30px;
+  --art-settings-icon-size: 22px;
+  --art-settings-max-height: 320px;
+  --art-widget-background: rgba(15, 23, 42, 0.92);
+  --art-tip-background: rgba(15, 23, 42, 0.88);
+  --art-scrollbar-size: 5px;
+  --art-scrollbar-background: rgba(255, 255, 255, 0.15);
+  --art-scrollbar-background-hover: rgba(255, 255, 255, 0.3);
+  --art-mini-progress-height: 3px;
+  --art-transition-duration: 0.2s;
+  font-family: Inter, system-ui, -apple-system, sans-serif !important;
+}
+
+/* --- 进度条区域 --- */
+.art-video-player .art-progress-bar {
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.art-video-player .art-progress-played {
+  background: linear-gradient(90deg, #2563eb, #3b82f6, #60a5fa) !important;
+  border-radius: 6px;
+  box-shadow: 0 0 6px rgba(59, 130, 246, 0.6);
+}
+
+.art-video-player .art-progress-loaded {
+  background: rgba(255, 255, 255, 0.35) !important;
+  border-radius: 6px;
+}
+
+/* 进度条指示器 */
+.art-video-player .art-progress-indicator {
+  border: 2px solid #ffffff;
+  background: #3b82f6 !important;
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.art-video-player .art-progress:hover .art-progress-indicator {
+  transform: scale(1.3);
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.7);
+}
+
+/* 进度条预览时间提示 */
+.art-video-player .art-progress-tip {
+  background: var(--art-tip-background) !important;
+  border-radius: 8px !important;
+  padding: 4px 10px !important;
+  font-size: 12px !important;
+  font-weight: 500;
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+/* --- 底部控制栏 --- */
+.art-video-player .art-bottom {
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0.4) 60%, transparent 100%) !important;
+  padding-bottom: 6px !important;
+}
+
+.art-video-player .art-controls {
+  gap: 2px;
+}
+
+/* 控制按钮通用 */
+.art-video-player .art-control {
+  opacity: 0.9;
+  transition: opacity 0.2s ease, transform 0.15s ease;
+}
+
+.art-video-player .art-control:hover {
+  opacity: 1;
+  transform: scale(1.08);
+}
+
+/* 进度条不应用缩放，避免点击位置与视觉位置不一致 */
+.art-video-player .art-control.art-control-progress:hover {
+  transform: none;
+}
+
+/* 播放按钮特殊强调 */
+.art-video-player .art-control-playAndPause:hover svg,
+.art-video-player .art-control[data-index="playAndPause"]:hover svg {
+  filter: drop-shadow(0 0 4px rgba(59, 130, 246, 0.5));
+}
+
+/* 音量滑块 */
+.art-video-player .art-volume-panel {
+  background: var(--art-widget-background) !important;
+  border-radius: 10px !important;
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.art-video-player .art-volume-slider .art-volume-inner {
+  background: linear-gradient(to top, #3b82f6, #60a5fa) !important;
+  border-radius: 4px;
+}
+
+.art-video-player .art-volume-slider .art-volume-handle {
+  background: #ffffff !important;
+  border: 2px solid #3b82f6 !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+}
+
+/* --- 时间显示 --- */
+.art-video-player .art-control-time {
+  font-size: 12px !important;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  opacity: 0.85;
+}
+
+/* --- 中央播放状态图标 --- */
+.art-video-player .art-state {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.art-video-player .art-state svg {
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.4));
+}
+
+/* --- 设置面板 --- */
+.art-video-player .art-settings {
+  background: var(--art-widget-background) !important;
+  border-radius: 12px !important;
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4) !important;
+  overflow: hidden;
+}
+
+.art-video-player .art-setting-item {
+  padding: 10px 16px !important;
+  transition: background 0.15s ease;
+}
+
+.art-video-player .art-setting-item:hover {
+  background: rgba(59, 130, 246, 0.12) !important;
+}
+
+.art-video-player .art-setting-item-left-icon svg {
+  width: 18px;
+  height: 18px;
+  opacity: 0.7;
+}
+
+.art-video-player .art-setting-item-right-tooltip {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 12px;
+}
+
+/* 选择器面板 */
+.art-video-player .art-selector-list {
+  background: var(--art-widget-background) !important;
+  border-radius: 10px !important;
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35) !important;
+}
+
+.art-video-player .art-selector-item {
+  padding: 8px 16px !important;
+  transition: background 0.15s ease;
+  font-size: 13px;
+}
+
+.art-video-player .art-selector-item:hover {
+  background: rgba(59, 130, 246, 0.12) !important;
+}
+
+.art-video-player .art-selector-item.art-current {
+  color: #60a5fa !important;
+}
+
+/* --- 右键菜单 --- */
+.art-video-player .art-contextmenus {
+  background: var(--art-widget-background) !important;
+  border-radius: 12px !important;
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45) !important;
+  padding: 6px 0 !important;
+  overflow: hidden;
+}
+
+.art-video-player .art-contextmenu {
+  padding: 8px 18px !important;
+  font-size: 13px;
+  transition: background 0.15s ease;
+}
+
+.art-video-player .art-contextmenu:hover {
+  background: rgba(59, 130, 246, 0.12) !important;
+}
+
+.art-video-player .art-contextmenu a {
+  color: rgba(255, 255, 255, 0.8) !important;
+  text-decoration: none;
+}
+
+.art-video-player .art-contextmenu a:hover {
+  color: #60a5fa !important;
+}
+
+/* --- 提示文字 --- */
+.art-video-player .art-tip {
+  background: var(--art-tip-background) !important;
+  border-radius: 10px !important;
+  padding: 8px 16px !important;
+  font-size: 13px !important;
+  font-weight: 500;
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* --- 遮罩和 loading --- */
+.art-video-player .art-loading {
+  filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.3));
+}
+
+.art-video-player .art-mask .art-state {
+  background: rgba(59, 130, 246, 0.15);
+  border-radius: 50%;
+  padding: 16px;
+  backdrop-filter: blur(4px);
+}
+
+/* --- 迷你进度条 --- */
+.art-video-player .art-mini-progress {
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+.art-video-player .art-mini-progress .art-mini-progress-played {
+  background: linear-gradient(90deg, #3b82f6, #60a5fa) !important;
+}
+
+/* --- 锁定按钮 --- */
+.art-video-player .art-lock {
+  background: var(--art-widget-background) !important;
+  border-radius: 50% !important;
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.art-video-player .art-lock:hover {
+  background: rgba(59, 130, 246, 0.2) !important;
+  transform: scale(1.1);
+}
+
+/* --- PIP 画中画 --- */
+.art-video-player .art-pip-header {
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.6), transparent) !important;
+}
+
+/* --- Tooltip --- */
+.art-video-player .art-control .art-control-tooltip {
+  background: var(--art-tip-background) !important;
+  border-radius: 8px !important;
+  padding: 4px 10px !important;
+  font-size: 12px !important;
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  white-space: nowrap;
+}
+
+/* --- 全屏 Web 模式 --- */
+.art-video-player.art-fullscreen-web {
+  border-radius: 0 !important;
+}
+
+/* --- 高亮章节标记 --- */
+.art-video-player .art-progress-highlight {
+  background: rgba(96, 165, 250, 0.6) !important;
+  border-radius: 2px;
+}
+
+/* --- 播放器容器圆角（非全屏时） --- */
+.art-video-player:not(.art-fullscreen):not(.art-fullscreen-web) {
+  border-radius: var(--art-border-radius);
+  overflow: hidden;
+}
+
+/* --- 自定义滚动条（设置/选择器面板内） --- */
+.art-video-player .art-settings::-webkit-scrollbar,
+.art-video-player .art-selector-list::-webkit-scrollbar {
+  width: var(--art-scrollbar-size);
+}
+
+.art-video-player .art-settings::-webkit-scrollbar-thumb,
+.art-video-player .art-selector-list::-webkit-scrollbar-thumb {
+  background: var(--art-scrollbar-background);
+  border-radius: 3px;
+}
+
+.art-video-player .art-settings::-webkit-scrollbar-thumb:hover,
+.art-video-player .art-selector-list::-webkit-scrollbar-thumb:hover {
+  background: var(--art-scrollbar-background-hover);
+}
+
+/* ========================================
    ReactFlow: 循环容器内边线可见性修复
    ======================================== */
 .react-flow__node-loopContainer {

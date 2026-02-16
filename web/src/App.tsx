@@ -1,11 +1,14 @@
-import { Routes, Route } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import { Header, Footer, Sider, Content } from './components/layout';
 import { SiderProvider } from './context/SiderContext';
 import { ChatProvider } from './context/ChatContext';
 import { BannerCarousel, AnnouncementSection, DailyWordSection, DailyArticleSection, CourseScheduleCard } from './components/home';
 import { StudyStatsCard } from './components/home/StudyStatsCard';
 import { StudyPlanCard } from './components/home/StudyPlanCard';
-import { MockData } from './data/mock';
+import { apiClient, DefaultApi, Configuration } from './api';
+import type { CourseResponse } from './api/generated/models';
+import CourseDetailUserPage from './pages/CourseDetailUserPage';
 import AnnouncementDetailPage from './pages/AnnouncementDetailPage';
 import AnnouncementListPage from './pages/AnnouncementListPage';
 import DailyWordDetailPage from './pages/DailyWordDetailPage';
@@ -19,9 +22,29 @@ import ProfilePage from './pages/ProfilePage';
 import ChatPage from './pages/ChatPage';
 import SchedulePage from './pages/SchedulePage';
 import WordBookPage from './pages/WordBookPage';
+import AiAssistantChatPage from './pages/AiAssistantChatPage';
+import FeedbackPage from './pages/FeedbackPage';
+
+const homeApi = new DefaultApi(new Configuration(), '', apiClient);
 
 /** 主页内容 */
-const HomePage: React.FC = () => (
+const HomePage: React.FC = () => {
+  const navigate = useNavigate();
+  const [courses, setCourses] = useState<CourseResponse[]>([]);
+  const [coursesLoading, setCoursesLoading] = useState(true);
+
+  useEffect(() => {
+    homeApi.listCourses({ status: 1, page: 0, size: 6 })
+      .then(res => {
+        if (res.data.code === 0 && res.data.data) {
+          setCourses(res.data.data);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setCoursesLoading(false));
+  }, []);
+
+  return (
   <div className="space-y-8">
     {/* 全宽区域：Banner + Hero */}
     <BannerCarousel />
@@ -82,27 +105,61 @@ const HomePage: React.FC = () => (
               查看全部 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path></svg>
             </a>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
-            {MockData.courses.map((course) => (
-              <div key={course.id} className="group bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer">
-                <div className="relative aspect-video overflow-hidden">
-                  <img src={course.cover} alt={course.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                  <div className="absolute top-2 right-2 bg-white/90 dark:bg-gray-900/90 dark:text-white px-2 py-1 rounded text-xs font-semibold backdrop-blur-sm">{course.tag}</div>
-                </div>
-                <div className="p-4">
-                  <h3 className="font-semibold text-base mb-1.5 line-clamp-1 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors text-gray-900 dark:text-white">{course.title}</h3>
-                  <p className="text-gray-500 dark:text-gray-400 text-sm mb-3 line-clamp-2">{course.brief}</p>
-                  <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500">
-                    <div className="flex items-center gap-1">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                      {course.studentsCount} 位学员
-                    </div>
-                    <span className="text-brand-600 bg-brand-50 dark:bg-brand-900/30 dark:text-brand-400 px-2 py-1 rounded">开始学习</span>
+          {coursesLoading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden animate-pulse">
+                  <div className="aspect-video bg-gray-100 dark:bg-gray-800" />
+                  <div className="p-4 space-y-3">
+                    <div className="h-4 bg-gray-100 dark:bg-gray-800 rounded w-3/4" />
+                    <div className="h-3 bg-gray-100 dark:bg-gray-800 rounded w-full" />
+                    <div className="h-3 bg-gray-100 dark:bg-gray-800 rounded w-1/2" />
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : courses.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+              {courses.map((course) => (
+                <div key={String(course.id)} onClick={() => navigate(`/course/${course.id}`)} className="group bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer">
+                  <div className="relative aspect-video overflow-hidden bg-gray-100 dark:bg-gray-800">
+                    {course.coverImage ? (
+                      <img src={course.coverImage} alt={course.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <svg className="w-12 h-12 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                      </div>
+                    )}
+                    {course.courseTypeDesc && (
+                      <div className="absolute top-2 right-2 bg-white/90 dark:bg-gray-900/90 dark:text-white px-2 py-1 rounded text-xs font-semibold backdrop-blur-sm">{course.courseTypeDesc}</div>
+                    )}
+                    {course.tags && course.tags.length > 0 && (
+                      <div className="absolute top-2 left-2 flex gap-1">
+                        {course.tags.slice(0, 2).map(tag => (
+                          <span key={tag} className="bg-brand-500/80 text-white px-1.5 py-0.5 rounded text-[10px] font-medium backdrop-blur-sm">{tag}</span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-4">
+                    <h3 className="font-semibold text-base mb-1.5 line-clamp-1 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors text-gray-900 dark:text-white">{course.title}</h3>
+                    <p className="text-gray-500 dark:text-gray-400 text-sm mb-3 line-clamp-2">{course.description || course.subtitle || '暂无简介'}</p>
+                    <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500">
+                      <div className="flex items-center gap-1">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                        {course.studentCount || 0} 位学员
+                      </div>
+                      <span className="text-brand-600 bg-brand-50 dark:bg-brand-900/30 dark:text-brand-400 px-2 py-1 rounded">开始学习</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 text-gray-400 dark:text-gray-500">
+              <p>暂无已发布的课程</p>
+            </div>
+          )}
         </div>
 
         {/* 每日美文 */}
@@ -118,7 +175,8 @@ const HomePage: React.FC = () => (
       </div>
     </div>
   </div>
-);
+  );
+};
 
 function App() {
   return (
@@ -147,6 +205,10 @@ function App() {
               <Route path="chat" element={<ChatPage />} />
               <Route path="schedule" element={<SchedulePage />} />
               <Route path="word-book" element={<WordBookPage />} />
+              <Route path="feedback" element={<FeedbackPage />} />
+              <Route path="ai-chat" element={<AiAssistantChatPage />} />
+              <Route path="ai-chat/:assistantId" element={<AiAssistantChatPage />} />
+              <Route path="course/:courseId" element={<CourseDetailUserPage />} />
             </Routes>
           </Content>
         </div>

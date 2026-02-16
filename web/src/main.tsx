@@ -28,9 +28,11 @@ import { QuestionManagementPage } from './pages/admin/QuestionManagementPage'
 import { ExamPaperManagementPage } from './pages/admin/ExamPaperManagementPage'
 import { ExamTemplateManagementPage } from './pages/admin/ExamTemplateManagementPage'
 import { CourseManagementPage } from './pages/admin/CourseManagementPage'
+import { CourseDetailPage } from './pages/admin/CourseDetailPage'
 import { TeacherManagementPage } from './pages/admin/TeacherManagementPage'
 import { ClassManagementPage } from './pages/admin/ClassManagementPage'
 import { GroupManagementPage } from './pages/admin/GroupManagementPage'
+import CourseLessonPage from './pages/CourseLessonPage'
 import { getToken } from './api'
 import { useEffect } from 'react'
 
@@ -52,7 +54,8 @@ const InitialRedirect = () => {
   const userInfo = userInfoStr ? JSON.parse(userInfoStr) : null;
   const userRole = userInfo?.userRole || userInfo?.role;
   
-  if (userRole?.toLowerCase() === 'admin') {
+  const role = userRole?.toLowerCase();
+  if (role === 'admin' || role === 'teacher') {
     return <Navigate to="/admin" replace />;
   }
   return <Navigate to="/" replace />;
@@ -91,6 +94,16 @@ createRoot(document.getElementById('root')!).render(
             }
           />
           
+          {/* 上课页面 - 全屏沉浸式，不套用户 App 壳 */}
+          <Route
+            path="/course/:courseId/learn"
+            element={
+              <ProtectedRoute>
+                <CourseLessonPage />
+              </ProtectedRoute>
+            }
+          />
+          
           {/* 管理员路由 */}
           <Route 
             path="/admin/*" 
@@ -101,6 +114,7 @@ createRoot(document.getElementById('root')!).render(
                     <Route index element={<div className="text-2xl font-bold">欢迎进入管理后台</div>} />
                     <Route path="users" element={<UserManagementPage />} />
                     <Route path="courses" element={<CourseManagementPage />} />
+                    <Route path="courses/:courseId" element={<CourseDetailPage />} />
                     <Route path="teachers" element={<TeacherManagementPage />} />
                     <Route path="classes" element={<ClassManagementPage />} />
                     <Route path="groups" element={<GroupManagementPage />} />
