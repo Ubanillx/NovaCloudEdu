@@ -544,6 +544,103 @@ public class ChatGroupApplicationService {
         log.info("管理员设置群禁言: groupId={}, mute={}", groupId, mute);
     }
 
+    // ==================== 教师操作（需要群主身份校验） ====================
+
+    /**
+     * 教师分页获取自己拥有的群列表
+     */
+    public ChatGroupRepository.GroupPage teacherListGroups(Long ownerId, int pageNum, int pageSize) {
+        return groupRepository.findByOwnerId(UserId.of(ownerId), pageNum, pageSize);
+    }
+
+    /**
+     * 教师搜索自己拥有的群
+     */
+    public ChatGroupRepository.GroupPage teacherSearchGroups(String keyword, Long ownerId, int pageNum, int pageSize) {
+        return groupRepository.searchByNameAndOwnerId(keyword, UserId.of(ownerId), pageNum, pageSize);
+    }
+
+    /**
+     * 检查群主权限（教师操作时使用）
+     */
+    private void checkOwnership(ChatGroup group, Long operatorId) {
+        if (!group.isOwner(UserId.of(operatorId))) {
+            throw new BusinessException(ErrorCode.FORBIDDEN_ERROR, "没有权限操作该群聊");
+        }
+    }
+
+    /**
+     * 教师更新群信息（需要群主身份）
+     */
+    @Transactional
+    public void teacherUpdateGroupInfo(Long groupId, Long operatorId, String groupName, String description, String avatar) {
+        ChatGroup group = getGroupOrThrow(groupId);
+        checkOwnership(group, operatorId);
+        group.updateInfo(groupName, avatar, description);
+        groupRepository.update(group);
+        log.info("教师更新群信息: groupId={}, operatorId={}", groupId, operatorId);
+    }
+
+    /**
+     * 教师移除群成员（需要群主身份）
+     */
+    @Transactional
+    public void teacherRemoveMember(Long groupId, Long operatorId, Long targetUserId) {
+        ChatGroup group = getGroupOrThrow(groupId);
+        checkOwnership(group, operatorId);
+        ChatGroupMember target = getMemberOrThrow(groupId, targetUserId);
+
+        target.leave();
+        memberRepository.update(target);
+
+        group.decrementMemberCount();
+        groupRepository.update(group);
+        log.info("教师移除群成员: groupId={}, operatorId={}, targetUserId={}", groupId, operatorId, targetUserId);
+    }
+
+    /**
+     * 教师设置群全员禁言（需要群主身份）
+     */
+    @Transactional
+    public void teacherSetMute(Long groupId, Long operatorId, boolean mute) {
+        ChatGroup group = getGroupOrThrow(groupId);
+        checkOwnership(group, operatorId);
+        group.setMute(mute);
+        groupRepository.update(group);
+        log.info("教师设置群禁言: groupId={}, operatorId={}, mute={}", groupId, operatorId, mute);
+    }
+
+    /**
+     * 教师解散群（需要群主身份）
+     */
+    @Transactional
+    public void teacherDissolveGroup(Long groupId, Long operatorId) {
+        ChatGroup group = getGroupOrThrow(groupId);
+        checkOwnership(group, operatorId);
+        memberRepository.deleteByGroupId(GroupId.of(groupId));
+        group.dissolve();
+        groupRepository.update(group);
+        log.info("教师解散群: groupId={}, operatorId={}", groupId, operatorId);
+    }
+
+    /**
+     * 教师获取群详情（需要群主身份）
+     */
+    public ChatGroup teacherGetGroupInfo(Long groupId, Long operatorId) {
+        ChatGroup group = getGroupOrThrow(groupId);
+        checkOwnership(group, operatorId);
+        return group;
+    }
+
+    /**
+     * 教师获取群成员列表（需要群主身份）
+     */
+    public ChatGroupMemberRepository.MemberPage teacherGetGroupMembersPage(Long groupId, Long operatorId, int pageNum, int pageSize) {
+        ChatGroup group = getGroupOrThrow(groupId);
+        checkOwnership(group, operatorId);
+        return memberRepository.findByGroupId(GroupId.of(groupId), pageNum, pageSize);
+    }
+
     // ==================== 私有方法 ====================
 
     private ChatGroup getGroupOrThrow(Long groupId) {
