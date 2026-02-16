@@ -16,14 +16,16 @@ import {
   Send,
   XCircle,
   Upload,
-  ArrowUpDown
+  ArrowUpDown,
+  Sparkles,
+  Wand2
 } from 'lucide-react';
 import { apiClient, DefaultApi, Configuration } from '../../api';
 import type { 
   BannerResponse, 
   CreateBannerRequest, 
   UpdateBannerRequest,
-  QueryBannerRequest 
+  QueryBannerRequest
 } from '../../api/generated/models';
 import { toast, TruncateWithTooltip } from '../../components/ui';
 
@@ -174,6 +176,9 @@ interface BannerFormModalProps {
 const BannerFormModal: React.FC<BannerFormModalProps> = ({ isOpen, onClose, onSuccess, banner }) => {
   const isEdit = !!banner;
   const [loading, setLoading] = useState(false);
+  const [aiGenerating, setAiGenerating] = useState(false);
+  const [aiDescription, setAiDescription] = useState('');
+  const [showAiPanel, setShowAiPanel] = useState(false);
   const [formData, setFormData] = useState<CreateBannerRequest>({
     title: '',
     imageUrl: '',
@@ -207,6 +212,40 @@ const BannerFormModal: React.FC<BannerFormModalProps> = ({ isOpen, onClose, onSu
       });
     }
   }, [banner, isOpen]);
+
+  const handleAiGenerate = async () => {
+    if (!formData.title.trim()) {
+      toast.warning('请先输入轮播图标题');
+      return;
+    }
+    if (!aiDescription.trim()) {
+      toast.warning('请输入图片描述');
+      return;
+    }
+
+    setAiGenerating(true);
+    try {
+      const response = await api.generateBannerImage({
+        generateBannerImageRequest: {
+          title: formData.title,
+          imageDescription: aiDescription,
+        }
+      });
+      if (response.data.code === 0 && response.data.data?.success) {
+        const imageUrl = response.data.data.imageUrl || '';
+        setFormData(prev => ({ ...prev, imageUrl }));
+        toast.success('AI 图片生成成功');
+        setShowAiPanel(false);
+        setAiDescription('');
+      } else {
+        toast.error(response.data.data?.errorMessage || response.data.message || 'AI 生成失败');
+      }
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || 'AI 生成失败，请稍后重试');
+    } finally {
+      setAiGenerating(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -289,11 +328,73 @@ const BannerFormModal: React.FC<BannerFormModalProps> = ({ isOpen, onClose, onSu
             />
           </div>
 
-          {/* 图片上传 */}
-          <ImageUpload
-            value={formData.imageUrl}
-            onChange={(url) => setFormData(prev => ({ ...prev, imageUrl: url }))}
-          />
+          {/* 图片上传 + AI 生成 */}
+          <div>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">轮播图片 *</label>
+              <button
+                type="button"
+                onClick={() => setShowAiPanel(!showAiPanel)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                  showAiPanel 
+                    ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400' 
+                    : 'bg-gray-100 text-gray-600 hover:bg-purple-50 hover:text-purple-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-purple-900/20 dark:hover:text-purple-400'
+                }`}
+              >
+                <Wand2 size={14} />
+                AI 生成
+              </button>
+            </div>
+
+            {/* AI 生成面板 */}
+            {showAiPanel && (
+              <div className="mb-3 p-4 bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 border border-purple-200 dark:border-purple-800 rounded-xl space-y-3 animate-in slide-in-from-top-2 duration-200">
+                <div className="flex items-center gap-2 text-sm font-bold text-purple-700 dark:text-purple-400">
+                  <Sparkles size={16} />
+                  AI 智能生成轮播图
+                </div>
+                <p className="text-xs text-purple-600/70 dark:text-purple-400/60">
+                  输入图片描述，AI 将根据标题和描述自动生成轮播图（英文描述效果更佳）
+                </p>
+                <textarea
+                  value={aiDescription}
+                  onChange={(e) => setAiDescription(e.target.value)}
+                  placeholder="例如：A vibrant summer education promotion banner with books, graduation caps and warm sunshine"
+                  className="w-full px-4 py-2.5 bg-white dark:bg-gray-800/80 border border-purple-200 dark:border-purple-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all text-sm resize-none"
+                  rows={3}
+                />
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-purple-500/60 dark:text-purple-400/50">
+                    {aiDescription.length}/500
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleAiGenerate}
+                    disabled={aiGenerating || !formData.title.trim() || !aiDescription.trim()}
+                    className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-xl text-sm font-bold hover:bg-purple-700 shadow-lg shadow-purple-600/20 disabled:opacity-50 transition-all active:scale-95"
+                  >
+                    {aiGenerating ? (
+                      <>
+                        <RefreshCw size={14} className="animate-spin" />
+                        生成中...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles size={14} />
+                        生成图片
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            <ImageUpload
+              value={formData.imageUrl}
+              onChange={(url) => setFormData(prev => ({ ...prev, imageUrl: url }))}
+              label=""
+            />
+          </div>
 
           {/* 跳转设置 */}
           <div className="grid grid-cols-2 gap-4">
@@ -602,7 +703,7 @@ export const BannerManagementPage: React.FC = () => {
                     >
                       <Edit2 size={18} />
                     </button>
-                    {item.status === 0 && (
+                    {(item.status === 0 || item.status === 2) && (
                       <button 
                         onClick={() => handlePublish(item)}
                         className="p-2.5 bg-white text-gray-700 rounded-lg hover:bg-green-600 hover:text-white transition-colors" 

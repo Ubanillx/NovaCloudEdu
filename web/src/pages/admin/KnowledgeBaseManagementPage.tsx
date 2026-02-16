@@ -1683,7 +1683,7 @@ export const KnowledgeBaseManagementPage: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-500">
+    <div className="space-y-6">
       {/* Page Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
@@ -1748,18 +1748,18 @@ export const KnowledgeBaseManagementPage: React.FC = () => {
           {knowledgeBases.map((kb) => (
             <div
               key={String(kb.id)}
-              className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-lg transition-all duration-300 group cursor-pointer overflow-hidden"
+              className="group bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm cursor-pointer overflow-hidden"
               onClick={() => setSelectedKB(kb)}
             >
               {/* Card Header */}
               <div className="p-6 pb-4">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-brand-50 to-accent-50 dark:from-brand-900/20 dark:to-accent-900/20 flex items-center justify-center border border-brand-100 dark:border-brand-800 group-hover:scale-105 transition-transform">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-brand-50 to-accent-50 dark:from-brand-900/20 dark:to-accent-900/20 flex items-center justify-center border border-brand-100 dark:border-brand-800">
                       <Database size={22} className="text-brand-600 dark:text-brand-400" />
                     </div>
                     <div>
-                      <h3 className="font-bold text-gray-900 dark:text-white group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors line-clamp-1">
+                      <h3 className="font-bold text-gray-900 dark:text-white line-clamp-1">
                         {kb.name}
                       </h3>
                       {getStatusBadge(kb.status)}

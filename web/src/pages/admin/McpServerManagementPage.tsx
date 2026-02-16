@@ -402,7 +402,7 @@ export const McpServerManagementPage: React.FC = () => {
           <table className="w-full text-left border-collapse admin-table">
             <thead>
               <tr className="bg-gray-50/50 dark:bg-gray-800/50 border-b border-gray-100 dark:border-gray-800 transition-colors duration-300">
-                <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">服务器信息</th>
+                <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider min-w-[320px]">服务器信息</th>
                 <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">传输方式</th>
                 <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">状态</th>
                 <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">连接测试</th>
@@ -428,13 +428,13 @@ export const McpServerManagementPage: React.FC = () => {
                 filteredServers.map((server) => (
                   <tr key={server.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors group">
                     {/* 服务器信息 */}
-                    <td className="px-6 py-4">
+                    <td className="px-8 py-4 min-w-[320px]">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-50 to-indigo-50 dark:from-gray-800 dark:to-gray-800 flex items-center justify-center border border-gray-100 dark:border-gray-700">
                           <Plug2 size={18} className={server.enabled ? 'text-brand-500' : 'text-gray-400'} />
                         </div>
-                        <div>
-                          <p className="font-bold text-gray-900 dark:text-white group-hover:text-brand-600 transition-colors">
+                        <div className="min-w-0 flex-1">
+                          <p className="font-bold text-gray-900 dark:text-white group-hover:text-brand-600 transition-colors truncate">
                             {server.name || '未命名'}
                           </p>
                           <p className="text-xs text-gray-500 dark:text-gray-400 font-medium line-clamp-1">
