@@ -25,6 +25,11 @@ public class CourseSectionConverter {
         po.setSort(section.getSort());
         po.setIsFree(section.getIsFree() ? 1 : 0);
         po.setResourceUrl(section.getResourceUrl());
+        po.setHlsUrl(section.getHlsUrl());
+        po.setEncryptionKeyId(section.getEncryptionKeyId());
+        po.setTranscodeStatus(section.getTranscodeStatus());
+        po.setThumbnailUrl(section.getThumbnailUrl());
+        po.setThumbnailCount(section.getThumbnailCount());
         po.setAdminId(section.getAdminId().value());
         po.setCreateTime(section.getCreateTime());
         po.setUpdateTime(section.getUpdateTime());
@@ -43,6 +48,11 @@ public class CourseSectionConverter {
                 po.getSort(),
                 po.getIsFree() == 1,
                 po.getResourceUrl(),
+                po.getHlsUrl(),
+                po.getEncryptionKeyId(),
+                po.getTranscodeStatus(),
+                po.getThumbnailUrl(),
+                po.getThumbnailCount(),
                 UserId.of(po.getAdminId()),
                 po.getCreateTime(),
                 po.getUpdateTime()
