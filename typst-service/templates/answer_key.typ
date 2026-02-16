@@ -65,8 +65,12 @@
   }
 }
 
+#let paper-size = if "paper_size" in data { data.paper_size } else { "a4" }
+#let is-landscape = paper-size == "a3"
+
 #set page(
-  paper: "a4",
+  paper: paper-size,
+  flipped: is-landscape,
   margin: (top: 2cm, bottom: 2cm, left: 2cm, right: 2cm),
 )
 
