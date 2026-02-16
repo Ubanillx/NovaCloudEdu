@@ -1,7 +1,9 @@
 package com.novacloudedu.backend.application.service;
 
 import com.novacloudedu.backend.application.banner.command.CreateBannerCommand;
+import com.novacloudedu.backend.application.banner.command.GenerateBannerImageCommand;
 import com.novacloudedu.backend.application.banner.command.UpdateBannerCommand;
+import com.novacloudedu.backend.infrastructure.ai.ImageGenerationService;
 import com.novacloudedu.backend.application.banner.query.BannerQuery;
 import com.novacloudedu.backend.common.ErrorCode;
 import com.novacloudedu.backend.domain.banner.entity.Banner;
@@ -30,6 +32,7 @@ public class BannerApplicationService {
 
     private final BannerRepository bannerRepository;
     private final UserApplicationService userApplicationService;
+    private final ImageGenerationService imageGenerationService;
 
     // ==================== 管理员功能 ====================
 
@@ -156,6 +159,41 @@ public class BannerApplicationService {
                 query.pageSize()
         );
         return bannerRepository.findByCondition(condition);
+    }
+
+    // ==================== AI 功能 ====================
+
+    /**
+     * AI生成轮播图图片
+     */
+    public ImageGenerationService.ImageResult generateBannerImage(GenerateBannerImageCommand command) {
+        if (!imageGenerationService.isEnabled()) {
+            return ImageGenerationService.ImageResult.failure(command.imageDescription(), "文生图功能未启用");
+        }
+
+        // 将标题和图片描述组合成更完善的 prompt
+        String prompt = buildImagePrompt(command.title(), command.imageDescription());
+        log.info("AI生成轮播图图片: title={}, prompt={}", command.title(), prompt);
+
+        ImageGenerationService.ImageResult result = imageGenerationService.generateImage(prompt);
+        if (result.success()) {
+            log.info("AI生成轮播图图片成功: url={}", result.imageUrl());
+        } else {
+            log.warn("AI生成轮播图图片失败: error={}", result.errorMessage());
+        }
+        return result;
+    }
+
+    /**
+     * 构建图片生成 prompt
+     */
+    private String buildImagePrompt(String title, String imageDescription) {
+        return String.format(
+                "Design a professional website banner image. Title: \"%s\". Description: %s. " +
+                "Style: modern, clean, vibrant colors, suitable for an educational platform banner. " +
+                "Aspect ratio: wide banner (16:9). No text in the image.",
+                title, imageDescription
+        );
     }
 
     // ==================== 用户功能 ====================
