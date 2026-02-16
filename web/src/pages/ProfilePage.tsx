@@ -4,9 +4,10 @@ import {
   ArrowLeft, User, Mail, Phone, Calendar, Edit3, Save,
   Shield, Clock, Flame, Heart, Camera, Loader2, MapPin, Cake,
   X, Hash, UserCheck, Ban, RefreshCw, BookMarked, ChevronRight,
+  GraduationCap, Send, CheckCircle2, XCircle, Clock3, Plus, Trash2,
 } from 'lucide-react';
 import { apiClient, DefaultApi, Configuration } from '../api';
-import type { UserDetailResponse, UpdateProfileRequest, UserStatsResult } from '../api/generated/models';
+import type { UserDetailResponse, UpdateProfileRequest, UserStatsResult, TeacherApplicationResponse } from '../api/generated/models';
 import toast from '../components/ui/Toast';
 import PhoneEditModal from '../components/ui/PhoneEditModal';
 import RegionPicker from '../components/ui/RegionPicker';
@@ -29,7 +30,8 @@ const getGenderLabel = (gender?: number) => {
 
 const getRoleLabel = (role?: string) => {
   if (role === 'admin') return '管理员';
-  if (role === 'user') return '普通用户';
+  if (role === 'teacher') return '教师';
+  if (role === 'user' || role === 'student') return '普通用户';
   return role ?? '未知';
 };
 
@@ -68,6 +70,13 @@ const ProfilePage: React.FC = () => {
   const [uploading, setUploading] = useState(false);
   const [phoneModalOpen, setPhoneModalOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // ====== 申请成为老师 ======
+  const [teacherApp, setTeacherApp] = useState<TeacherApplicationResponse | null>(null);
+  const [teacherAppLoading, setTeacherAppLoading] = useState(false);
+  const [showApplyForm, setShowApplyForm] = useState(false);
+  const [applySubmitting, setApplySubmitting] = useState(false);
+  const [applyForm, setApplyForm] = useState({ name: '', introduction: '', expertise: [''], certificateUrl: '' });
 
   const [form, setForm] = useState<ProfileFormData>({
     userName: '', userAvatar: '', userProfile: '',
@@ -141,6 +150,63 @@ const ProfilePage: React.FC = () => {
   }, []);
 
   useEffect(() => { fetchData(); }, [fetchData]);
+
+  // 获取教师申请状态
+  const fetchTeacherApplication = useCallback(async () => {
+    setTeacherAppLoading(true);
+    try {
+      const res = await api.getMyApplication();
+      if (res.data?.code === 0 && res.data.data) {
+        setTeacherApp(res.data.data);
+      }
+    } catch {
+      // 404 表示没有申请记录，忽略
+      setTeacherApp(null);
+    } finally {
+      setTeacherAppLoading(false);
+    }
+  }, []);
+
+  // 当用户角色为普通用户时，获取教师申请状态
+  useEffect(() => {
+    if (user) {
+      const role = (user.role || '').toLowerCase();
+      if (role === 'user' || role === 'student' || role === '') {
+        fetchTeacherApplication();
+      }
+    }
+  }, [user, fetchTeacherApplication]);
+
+  // 提交教师申请
+  const handleApplyTeacher = async () => {
+    if (applySubmitting) return;
+    if (!applyForm.name.trim()) { toast.warning('请输入您的姓名'); return; }
+    const validExpertise = applyForm.expertise.filter(e => e.trim());
+    if (validExpertise.length === 0) { toast.warning('请至少填写一个专业领域'); return; }
+    setApplySubmitting(true);
+    try {
+      const res = await api.applyTeacher({
+        applyTeacherRequest: {
+          name: applyForm.name.trim(),
+          introduction: applyForm.introduction.trim() || undefined,
+          expertise: validExpertise,
+          certificateUrl: applyForm.certificateUrl.trim() || undefined,
+        },
+      });
+      if (res.data?.code === 0) {
+        toast.success('申请已提交，请等待管理员审核');
+        setShowApplyForm(false);
+        fetchTeacherApplication();
+      } else {
+        toast.error(res.data?.message || '提交失败');
+      }
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || '提交失败，请稍后重试';
+      toast.error(msg);
+    } finally {
+      setApplySubmitting(false);
+    }
+  };
 
   // 进入编辑模式 - 不包含 phone（需要验证码单独修改）
   const startEditing = () => {
@@ -474,6 +540,210 @@ const ProfilePage: React.FC = () => {
           </button>
         </div>
       </div>
+
+      {/* ==================== 申请成为老师 ==================== */}
+      {(() => {
+        const role = (user.role || '').toLowerCase();
+        if (role === 'admin' || role === 'teacher') return null;
+        return (
+          <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm p-5">
+            <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+              <span className="w-1 h-4 bg-brand-600 rounded-full" />
+              申请成为老师
+            </h3>
+
+            {teacherAppLoading ? (
+              <div className="flex items-center justify-center py-6">
+                <Loader2 size={20} className="animate-spin text-brand-500" />
+              </div>
+            ) : teacherApp ? (
+              /* ---------- 已有申请记录 ---------- */
+              <div className="space-y-3">
+                <div className={`flex items-center gap-3 p-4 rounded-xl border ${
+                  teacherApp.status === 0
+                    ? 'bg-amber-50 dark:bg-amber-900/10 border-amber-200 dark:border-amber-800'
+                    : teacherApp.status === 1
+                      ? 'bg-green-50 dark:bg-green-900/10 border-green-200 dark:border-green-800'
+                      : 'bg-red-50 dark:bg-red-900/10 border-red-200 dark:border-red-800'
+                }`}>
+                  <div className="flex-shrink-0">
+                    {teacherApp.status === 0 && <Clock3 size={22} className="text-amber-500" />}
+                    {teacherApp.status === 1 && <CheckCircle2 size={22} className="text-green-500" />}
+                    {teacherApp.status === 2 && <XCircle size={22} className="text-red-500" />}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-bold text-gray-900 dark:text-white">
+                      {teacherApp.status === 0 && '审核中'}
+                      {teacherApp.status === 1 && '已通过'}
+                      {teacherApp.status === 2 && '已被拒绝'}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                      {teacherApp.status === 0 && '您的申请正在审核中，请耐心等待管理员处理'}
+                      {teacherApp.status === 1 && '恭喜！您的教师申请已通过，请重新登录以激活教师权限'}
+                      {teacherApp.status === 2 && (teacherApp.rejectReason || '很遗憾，您的申请未通过')}
+                    </p>
+                  </div>
+                </div>
+
+                {/* 申请详情 */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-sm">
+                  <InfoRow icon={<User size={14} />} label="姓名" value={teacherApp.name || '—'} />
+                  <InfoRow icon={<Calendar size={14} />} label="申请时间" value={formatDateTime(teacherApp.createTime)} />
+                  {teacherApp.expertise && teacherApp.expertise.length > 0 && (
+                    <div className="sm:col-span-2 flex items-center gap-2.5 p-2.5 rounded-lg bg-gray-50 dark:bg-gray-800/50">
+                      <div className="w-7 h-7 rounded-md bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex items-center justify-center text-gray-400 dark:text-gray-500 flex-shrink-0">
+                        <GraduationCap size={14} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[10px] font-medium text-gray-400 dark:text-gray-500 leading-none mb-1">专业领域</p>
+                        <div className="flex flex-wrap gap-1">
+                          {teacherApp.expertise.map((e, i) => (
+                            <span key={i} className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400">
+                              {e}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* 被拒绝后可重新申请 */}
+                {teacherApp.status === 2 && (
+                  <button
+                    onClick={() => {
+                      setTeacherApp(null);
+                      setShowApplyForm(true);
+                      setApplyForm({ name: '', introduction: '', expertise: [''], certificateUrl: '' });
+                    }}
+                    className="w-full mt-2 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-brand-600 bg-brand-50 dark:bg-brand-900/20 dark:text-brand-400 hover:bg-brand-100 dark:hover:bg-brand-900/30 transition-colors"
+                  >
+                    <RefreshCw size={14} />
+                    重新申请
+                  </button>
+                )}
+              </div>
+            ) : showApplyForm ? (
+              /* ---------- 申请表单 ---------- */
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5">
+                    姓名 <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={applyForm.name}
+                    onChange={e => setApplyForm(p => ({ ...p, name: e.target.value }))}
+                    className={inputCls}
+                    placeholder="请输入您的真实姓名"
+                    maxLength={20}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5">个人简介</label>
+                  <textarea
+                    value={applyForm.introduction}
+                    onChange={e => setApplyForm(p => ({ ...p, introduction: e.target.value }))}
+                    className={`${inputCls} resize-none`}
+                    rows={3}
+                    placeholder="请简要介绍您的教学经验和背景"
+                    maxLength={500}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5">
+                    专业领域 <span className="text-red-500">*</span>
+                  </label>
+                  <div className="space-y-2">
+                    {applyForm.expertise.map((exp, idx) => (
+                      <div key={idx} className="flex items-center gap-2">
+                        <input
+                          type="text"
+                          value={exp}
+                          onChange={e => {
+                            const newArr = [...applyForm.expertise];
+                            newArr[idx] = e.target.value;
+                            setApplyForm(p => ({ ...p, expertise: newArr }));
+                          }}
+                          className={inputCls}
+                          placeholder={`专业领域 ${idx + 1}`}
+                          maxLength={30}
+                        />
+                        {applyForm.expertise.length > 1 && (
+                          <button
+                            onClick={() => setApplyForm(p => ({
+                              ...p,
+                              expertise: p.expertise.filter((_, i) => i !== idx),
+                            }))}
+                            className="flex-shrink-0 p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                    {applyForm.expertise.length < 5 && (
+                      <button
+                        onClick={() => setApplyForm(p => ({ ...p, expertise: [...p.expertise, ''] }))}
+                        className="flex items-center gap-1 text-xs text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 font-medium"
+                      >
+                        <Plus size={12} />
+                        添加领域
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5">资质证书链接（选填）</label>
+                  <input
+                    type="url"
+                    value={applyForm.certificateUrl}
+                    onChange={e => setApplyForm(p => ({ ...p, certificateUrl: e.target.value }))}
+                    className={inputCls}
+                    placeholder="https://..."
+                  />
+                </div>
+
+                <div className="flex items-center gap-2 pt-1">
+                  <button
+                    onClick={() => setShowApplyForm(false)}
+                    className="flex-1 px-4 py-2.5 rounded-xl text-sm font-bold text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                  >
+                    取消
+                  </button>
+                  <button
+                    onClick={handleApplyTeacher}
+                    disabled={applySubmitting}
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-white bg-brand-600 hover:bg-brand-700 transition-colors disabled:opacity-50"
+                  >
+                    {applySubmitting ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
+                    提交申请
+                  </button>
+                </div>
+              </div>
+            ) : (
+              /* ---------- 未申请 ---------- */
+              <div className="text-center py-4">
+                <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-brand-50 dark:bg-brand-900/20 flex items-center justify-center">
+                  <GraduationCap size={28} className="text-brand-500" />
+                </div>
+                <p className="text-sm text-gray-600 dark:text-gray-300 mb-1 font-medium">成为平台教师</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500 mb-4">创建课程、管理班级、出题组卷，发挥您的教学才能</p>
+                <button
+                  onClick={() => setShowApplyForm(true)}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-brand-600 hover:bg-brand-700 transition-colors shadow-sm shadow-brand-600/20"
+                >
+                  <GraduationCap size={16} />
+                  申请成为老师
+                </button>
+              </div>
+            )}
+          </div>
+        );
+      })()}
 
       {/* 手机号修改弹窗 */}
       <PhoneEditModal
