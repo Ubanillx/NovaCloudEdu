@@ -29,6 +29,9 @@ import {
   ChevronDown,
   ChevronUp,
   Terminal,
+  Upload,
+  Sparkles,
+  Image as ImageIcon,
 } from 'lucide-react';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -82,6 +85,11 @@ const AssistantFormModal: React.FC<AssistantFormModalProps> = ({ isOpen, onClose
   const isEdit = !!assistant;
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'basic' | 'prompt' | 'model'>('basic');
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const [aiAvatarGenerating, setAiAvatarGenerating] = useState(false);
+  const [showAiAvatarPanel, setShowAiAvatarPanel] = useState(false);
+  const [aiAvatarPrompt, setAiAvatarPrompt] = useState('');
+  const avatarInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -273,16 +281,101 @@ const AssistantFormModal: React.FC<AssistantFormModalProps> = ({ isOpen, onClose
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">头像 URL</label>
-                  <input
-                    type="text"
-                    value={formData.avatarUrl}
-                    onChange={(e) => setFormData(prev => ({ ...prev, avatarUrl: e.target.value }))}
-                    className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all"
-                    placeholder="https://..."
-                  />
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">头像</label>
+                  <div className="flex items-center gap-3">
+                    {/* 头像预览 */}
+                    <div className="w-16 h-16 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center overflow-hidden flex-shrink-0 bg-gray-50 dark:bg-gray-800/50">
+                      {formData.avatarUrl ? (
+                        <img src={formData.avatarUrl} alt="头像" className="w-full h-full object-cover rounded-xl" />
+                      ) : (
+                        <Bot size={24} className="text-gray-400" />
+                      )}
+                    </div>
+                    <div className="flex flex-col gap-1.5 flex-1 min-w-0">
+                      {/* 上传按钮 */}
+                      <input ref={avatarInputRef} type="file" accept="image/*" className="hidden" onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        if (!file.type.startsWith('image/')) { toast.warning('请选择图片文件'); return; }
+                        if (file.size > 5 * 1024 * 1024) { toast.warning('图片不能超过 5MB'); return; }
+                        setAvatarUploading(true);
+                        try {
+                          const fd = new FormData();
+                          fd.append('file', file);
+                          const res = await apiClient.post('/api/file/upload/assistant/avatar', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+                          if (res.data?.code === 0 && res.data.data?.fileUrl) {
+                            setFormData(prev => ({ ...prev, avatarUrl: res.data.data.fileUrl }));
+                            toast.success('头像上传成功');
+                          } else { toast.error(res.data?.message || '上传失败'); }
+                        } catch { toast.error('上传失败'); }
+                        finally { setAvatarUploading(false); if (avatarInputRef.current) avatarInputRef.current.value = ''; }
+                      }} />
+                      <button type="button" disabled={avatarUploading} onClick={() => avatarInputRef.current?.click()}
+                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors disabled:opacity-50">
+                        {avatarUploading ? <Loader2 size={12} className="animate-spin" /> : <Upload size={12} />}
+                        {avatarUploading ? '上传中...' : '上传图片'}
+                      </button>
+                      {/* AI 生成按钮 */}
+                      <button type="button" onClick={() => setShowAiAvatarPanel(v => !v)}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors ${
+                          showAiAvatarPanel
+                            ? 'border-brand-500 bg-brand-50 dark:bg-brand-900/20 text-brand-600 dark:text-brand-400'
+                            : 'border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                        }`}>
+                        <Sparkles size={12} />
+                        AI 生成头像
+                      </button>
+                      {/* 清除 */}
+                      {formData.avatarUrl && (
+                        <button type="button" onClick={() => setFormData(prev => ({ ...prev, avatarUrl: '' }))}
+                          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
+                          <X size={12} />
+                          清除头像
+                        </button>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
+              {/* AI 生成头像面板 */}
+              {showAiAvatarPanel && (
+                <div className="p-4 bg-gradient-to-br from-brand-50 to-indigo-50 dark:from-brand-900/10 dark:to-indigo-900/10 rounded-xl border border-brand-100 dark:border-brand-800/30 space-y-3">
+                  <div className="flex items-center gap-2 text-sm font-medium text-brand-700 dark:text-brand-300">
+                    <Sparkles size={14} />
+                    AI 生成头像
+                  </div>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={aiAvatarPrompt}
+                      onChange={(e) => setAiAvatarPrompt(e.target.value)}
+                      className="flex-1 px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all"
+                      placeholder="描述头像风格，如：可爱的卡通数学老师，蓝色主题"
+                    />
+                    <button type="button" disabled={aiAvatarGenerating || !aiAvatarPrompt.trim()}
+                      onClick={async () => {
+                        setAiAvatarGenerating(true);
+                        try {
+                          const res = await aiApi.assistantGenerateAvatar({ generateAvatarRequest: { prompt: aiAvatarPrompt.trim() } });
+                          if (res.data.code === 0 && res.data.data?.success) {
+                            setFormData(prev => ({ ...prev, avatarUrl: res.data.data!.imageUrl || '' }));
+                            toast.success('AI 头像生成成功');
+                            setShowAiAvatarPanel(false);
+                            setAiAvatarPrompt('');
+                          } else {
+                            toast.error(res.data.data?.errorMessage || res.data.message || 'AI 生成失败');
+                          }
+                        } catch (err: any) { toast.error(err?.response?.data?.message || 'AI 生成失败'); }
+                        finally { setAiAvatarGenerating(false); }
+                      }}
+                      className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg bg-brand-600 hover:bg-brand-700 text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap">
+                      {aiAvatarGenerating ? <Loader2 size={14} className="animate-spin" /> : <ImageIcon size={14} />}
+                      {aiAvatarGenerating ? '生成中...' : '生成'}
+                    </button>
+                  </div>
+                  <p className="text-[11px] text-gray-500 dark:text-gray-400">提示：使用英文描述效果更好，AI 生成需要 10-30 秒</p>
+                </div>
+              )}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">标签</label>
                 <input
