@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Search,
@@ -15,8 +15,8 @@ import {
   DollarSign,
   Star,
   Users,
-  Upload,
   List,
+  Loader2,
 } from 'lucide-react';
 import { apiClient, DefaultApi, Configuration } from '../../api';
 import type {
@@ -25,7 +25,7 @@ import type {
   UpdateCourseRequest,
   TeacherResponse,
 } from '../../api/generated/models';
-import { toast } from '../../components/ui';
+import { toast, ImageUploadArea } from '../../components/ui';
 
 const api = new DefaultApi(new Configuration(), '', apiClient);
 
@@ -66,7 +66,6 @@ const CourseFormModal: React.FC<CourseFormModalProps> = ({ isOpen, onClose, onSu
   const isEdit = !!course;
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState({
     title: '',
     subtitle: '',
@@ -100,9 +99,7 @@ const CourseFormModal: React.FC<CourseFormModalProps> = ({ isOpen, onClose, onSu
     }
   }, [course, isOpen]);
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const handleImageUpload = async (file: File) => {
     if (!file.type.startsWith('image/')) { toast.error('请选择图片文件'); return; }
     if (file.size > 10 * 1024 * 1024) { toast.error('图片大小不能超过 10MB'); return; }
     setUploading(true);
@@ -122,7 +119,6 @@ const CourseFormModal: React.FC<CourseFormModalProps> = ({ isOpen, onClose, onSu
       toast.error(error?.response?.data?.message || '上传失败');
     } finally {
       setUploading(false);
-      if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
 
@@ -210,62 +206,17 @@ const CourseFormModal: React.FC<CourseFormModalProps> = ({ isOpen, onClose, onSu
               className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all resize-none"
               placeholder="课程描述信息" />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">封面图片</label>
-            <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
-            <div
-              onClick={() => { if (!uploading && !formData.coverImage) fileInputRef.current?.click(); }}
-              onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
-              onDragEnter={(e) => { e.preventDefault(); e.stopPropagation(); }}
-              onDrop={(e) => {
-                e.preventDefault(); e.stopPropagation();
-                if (uploading) return;
-                const file = e.dataTransfer.files?.[0];
-                if (file) {
-                  const dt = new DataTransfer(); dt.items.add(file);
-                  if (fileInputRef.current) { fileInputRef.current.files = dt.files; fileInputRef.current.dispatchEvent(new Event('change', { bubbles: true })); }
-                }
-              }}
-              className={`relative w-full aspect-video rounded-xl overflow-hidden border-2 border-dashed transition-all ${
-                formData.coverImage
-                  ? 'border-gray-200 dark:border-gray-700'
-                  : 'border-gray-300 dark:border-gray-600 hover:border-brand-400 dark:hover:border-brand-500 cursor-pointer'
-              } bg-gray-50 dark:bg-gray-800/50`}
-            >
-              {formData.coverImage ? (
-                <>
-                  <img src={formData.coverImage} alt="封面预览" className="w-full h-full object-cover" />
-                  <div className="absolute inset-0 bg-black/0 hover:bg-black/40 transition-all group flex items-center justify-center">
-                    <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2">
-                      <button type="button" onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
-                        className="p-2 bg-white/90 text-gray-700 rounded-lg hover:bg-white transition-colors" title="更换图片">
-                        <Upload size={18} />
-                      </button>
-                      <button type="button" onClick={(e) => { e.stopPropagation(); setFormData(prev => ({ ...prev, coverImage: '' })); }}
-                        className="p-2 bg-red-500/90 text-white rounded-lg hover:bg-red-600 transition-colors" title="删除图片">
-                        <X size={18} />
-                      </button>
-                    </div>
-                  </div>
-                </>
-              ) : (
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
-                  {uploading ? (
-                    <>
-                      <RefreshCw size={32} className="text-brand-500 animate-spin" />
-                      <p className="text-sm font-medium text-brand-500">上传中...</p>
-                    </>
-                  ) : (
-                    <>
-                      <Upload size={32} className="text-gray-300 dark:text-gray-600" />
-                      <p className="text-sm text-gray-400 dark:text-gray-500">点击或拖拽图片到此处上传</p>
-                      <p className="text-xs text-gray-300 dark:text-gray-600">推荐 16:9 比例，不超过 10MB</p>
-                    </>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
+          <ImageUploadArea
+            label="封面图片"
+            value={formData.coverImage}
+            onFileSelect={handleImageUpload}
+            onChange={(url) => setFormData(prev => ({ ...prev, coverImage: url }))}
+            uploading={uploading}
+            enableDrop
+            accept="image/*"
+            placeholder="点击或拖拽图片到此处上传"
+            hint="推荐 16:9 比例，不超过 10MB"
+          />
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">课程类型 *</label>
@@ -329,7 +280,7 @@ const CourseFormModal: React.FC<CourseFormModalProps> = ({ isOpen, onClose, onSu
           </button>
           <button onClick={handleSubmit} disabled={loading}
             className="px-6 py-2 bg-brand-600 text-white text-sm font-bold rounded-xl hover:bg-brand-700 shadow-lg shadow-brand-600/20 disabled:opacity-50 transition-all active:scale-95 flex items-center gap-2">
-            {loading && <RefreshCw size={16} className="animate-spin" />}
+            {loading && <Loader2 size={16} className="animate-spin" />}
             {isEdit ? '保存修改' : '创建课程'}
           </button>
         </div>
