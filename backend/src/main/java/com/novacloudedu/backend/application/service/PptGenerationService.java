@@ -9,6 +9,8 @@ import com.novacloudedu.backend.domain.ppt.entity.PptTemplate;
 import com.novacloudedu.backend.domain.ppt.repository.PptGenerationSessionRepository;
 import com.novacloudedu.backend.domain.ppt.repository.PptTemplateRepository;
 import com.novacloudedu.backend.domain.ppt.valueobject.PptTemplateId;
+import com.novacloudedu.backend.domain.membership.service.AiUsageLimitService;
+import com.novacloudedu.backend.domain.membership.valueobject.AiFeatureType;
 import com.novacloudedu.backend.exception.BusinessException;
 import com.novacloudedu.backend.infrastructure.ai.LangchainChatService;
 import com.novacloudedu.backend.infrastructure.ppt.PptServiceClient;
@@ -44,6 +46,7 @@ public class PptGenerationService {
     private final PptTemplateRepository templateRepository;
     private final LangchainChatService langchainChatService;
     private final PptServiceClient pptServiceClient;
+    private final AiUsageLimitService aiUsageLimitService;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final ExecutorService executor = Executors.newCachedThreadPool();
 
@@ -230,6 +233,7 @@ public class PptGenerationService {
     // ==================== 步骤 1：生成大纲 ====================
 
     private SseEmitter doGenerateOutline(Map<String, Object> params, Long userId) {
+        aiUsageLimitService.checkAndConsume(userId, AiFeatureType.AI_PPT);
         Long sessionId = toLong(params.get("sessionId"));
         String requirements = (String) params.getOrDefault("requirements", "");
 
