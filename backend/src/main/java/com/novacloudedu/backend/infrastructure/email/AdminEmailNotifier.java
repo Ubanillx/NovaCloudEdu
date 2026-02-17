@@ -124,6 +124,90 @@ public class AdminEmailNotifier {
         log.info("已发送讲师审核结果通知邮件, applicantName={}, status={}", application.getName(), statusDesc);
     }
 
+    // ==================== 课程订单通知 ====================
+
+    /**
+     * 通知管理员：新课程订单（待支付）
+     */
+    public void notifyNewCourseOrder(String orderNo, String courseName, String amount, String userName) {
+        if (!canSend()) return;
+
+        String subject = buildSubject("新课程订单待确认");
+        String htmlContent = buildHtmlTemplate(
+            "新课程订单",
+            "ORDER",
+            "#3b82f6",
+            "有新的课程订单创建，如为付费课程请等待用户支付后确认收款。",
+            List.of(
+                new InfoItem("订单号", orderNo),
+                new InfoItem("课程名称", courseName),
+                new InfoItem("订单金额", "¥" + amount),
+                new InfoItem("购买用户", userName),
+                new InfoItem("创建时间", LocalDateTime.now().format(FORMATTER))
+            ),
+            "查看订单",
+            "https://ubanillx.cn/admin/orders"
+        );
+
+        sendHtmlToAllAdmins(subject, htmlContent);
+        log.info("已发送新课程订单通知邮件, orderNo={}", orderNo);
+    }
+
+    // ==================== 会员通知 ====================
+
+    /**
+     * 通知管理员：新会员购买订单
+     */
+    public void notifyMembershipPurchased(String orderNo, String planName, String amount, String userName) {
+        if (!canSend()) return;
+
+        String subject = buildSubject("新会员订单待确认");
+        String htmlContent = buildHtmlTemplate(
+            "新会员订单",
+            "MEMBERSHIP",
+            "#8b5cf6",
+            "有新的会员购买订单，请及时确认收款。",
+            List.of(
+                new InfoItem("订单号", orderNo),
+                new InfoItem("会员计划", planName),
+                new InfoItem("金额", "¥" + amount),
+                new InfoItem("购买用户", userName),
+                new InfoItem("创建时间", LocalDateTime.now().format(FORMATTER))
+            ),
+            "确认收款",
+            "https://ubanillx.cn/admin/membership"
+        );
+
+        sendHtmlToAllAdmins(subject, htmlContent);
+        log.info("已发送会员购买通知邮件, orderNo={}", orderNo);
+    }
+
+    /**
+     * 通知管理员：会员已激活
+     */
+    public void notifyMembershipActivated(String orderNo, String planName, String userName) {
+        if (!canSend()) return;
+
+        String subject = buildSubject("会员开通成功");
+        String htmlContent = buildHtmlTemplate(
+            "会员开通成功",
+            "MEMBERSHIP",
+            "#10b981",
+            "用户会员已成功开通。",
+            List.of(
+                new InfoItem("订单号", orderNo),
+                new InfoItem("会员计划", planName),
+                new InfoItem("用户", userName),
+                new InfoItem("开通时间", LocalDateTime.now().format(FORMATTER))
+            ),
+            "查看会员列表",
+            "https://ubanillx.cn/admin/membership"
+        );
+
+        sendHtmlToAllAdmins(subject, htmlContent);
+        log.info("已发送会员激活通知邮件, orderNo={}", orderNo);
+    }
+
     // ==================== 订单支付通知 ====================
 
     /**
