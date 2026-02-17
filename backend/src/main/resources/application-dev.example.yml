@@ -33,6 +33,8 @@ spring:
   # Elasticsearch 搜索引擎配置
   elasticsearch:
     uris: http://localhost:${ES_PORT:9200}
+    connection-timeout: 5s
+    socket-timeout: 30s
 
   # Docker Compose 由 ppt-service/docker-compose.yml 统一管理，禁用 Spring Boot 自动启动
   docker:
@@ -365,3 +367,19 @@ ppt-service:
 onlyoffice:
   document-server-url: ${ONLYOFFICE_URL:http://localhost:9980}
   callback-url: ${ONLYOFFICE_CALLBACK_URL:http://host.docker.internal:8080/api/onlyoffice/callback}
+
+# =================================================================
+# ES 全文搜索配置
+# =================================================================
+search:
+  elasticsearch:
+    enabled: true                                          # false 则降级到 PostgreSQL LIKE
+    book-index: nova_books
+    chapter-index: nova_chapters
+    post-index: nova_posts
+    highlight-pre-tag: "<em class=\"search-highlight\">"
+    highlight-post-tag: "</em>"
+    max-result-window: 10000
+    suggest-size: 10
+    fragment-size: 150
+    number-of-fragments: 3

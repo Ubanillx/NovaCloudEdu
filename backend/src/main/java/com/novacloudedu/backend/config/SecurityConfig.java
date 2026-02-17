@@ -57,7 +57,9 @@ public class SecurityConfig {
             "/api/user/checkin/ranking", // 打卡排行榜（公开）
             "/api/v1/webhook/**",       // Webhook 触发端点（外部调用，无需认证）
             "/api/onlyoffice/callback",  // OnlyOffice 文档保存回调（外部调用，无需认证）
-            "/api/video/key"             // HLS 视频密钥分发（播放器无法附加JWT，通过一次性Token验证）
+            "/api/video/key",            // HLS 视频密钥分发（播放器无法附加JWT，通过一次性Token验证）
+            "/api/payment/callback/**",  // 支付回调（外部调用，无需认证）
+            "/api/membership/plans"      // 会员计划列表（公开查询）
     };
 
     /**
