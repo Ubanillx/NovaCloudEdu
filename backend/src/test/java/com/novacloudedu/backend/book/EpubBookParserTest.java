@@ -19,7 +19,7 @@ class EpubBookParserTest {
 
     @BeforeEach
     void setUp() {
-        parser = new EpubBookParser();
+        parser = new EpubBookParser(null);
         String projectRoot = System.getProperty("user.dir");
         testFilePath = Paths.get(projectRoot, "test-flie", "机器学习公式详解 .epub").toString();
     }

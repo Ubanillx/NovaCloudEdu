@@ -123,7 +123,7 @@ class BookParserPerformanceTest {
             return;
         }
 
-        EpubBookParser parser = new EpubBookParser();
+        EpubBookParser parser = new EpubBookParser(null);
         String fileUrl = "file://" + testFilePath;
         
         long startTime = System.currentTimeMillis();
