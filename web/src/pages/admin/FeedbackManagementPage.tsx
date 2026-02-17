@@ -14,7 +14,8 @@ import {
   HelpCircle,
   XCircle,
   Eye,
-  MessageCircle
+  MessageCircle,
+  Loader2
 } from 'lucide-react';
 import { apiClient, DefaultApi, Configuration } from '../../api';
 import type { 
@@ -279,7 +280,7 @@ const FeedbackDetailModal: React.FC<FeedbackDetailModalProps> = ({ isOpen, onClo
               disabled={submitting || !replyContent.trim()}
               className="px-6 py-2 bg-brand-600 text-white text-sm font-bold rounded-xl hover:bg-brand-700 shadow-lg shadow-brand-600/20 disabled:opacity-50 transition-all active:scale-95 flex items-center gap-2 self-end"
             >
-              {submitting ? <RefreshCw size={16} className="animate-spin" /> : <Send size={16} />}
+              {submitting ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
               回复
             </button>
           </div>

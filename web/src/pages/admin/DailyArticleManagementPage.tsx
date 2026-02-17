@@ -23,7 +23,8 @@ import {
   Sparkles,
   CheckSquare,
   Square,
-  Loader
+  Loader,
+  Loader2
 } from 'lucide-react';
 import { apiClient, DefaultApi, AIApi, Configuration } from '../../api';
 import type { DailyArticleResponse, DailyArticlePageResponse, CreateDailyArticleRequest, UpdateDailyArticleRequest } from '../../api/generated/models';
@@ -367,7 +368,7 @@ const ArticleFormModal: React.FC<ArticleFormModalProps> = ({ isOpen, onClose, on
             disabled={loading}
             className="px-6 py-2 bg-brand-600 text-white text-sm font-bold rounded-xl hover:bg-brand-700 shadow-lg shadow-brand-600/20 disabled:opacity-50 transition-all active:scale-95 flex items-center gap-2"
           >
-            {loading && <RefreshCw size={16} className="animate-spin" />}
+            {loading && <Loader2 size={16} className="animate-spin" />}
             {isEdit ? '保存修改' : '创建文章'}
           </button>
         </div>

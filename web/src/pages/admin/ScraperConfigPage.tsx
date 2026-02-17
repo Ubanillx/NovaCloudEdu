@@ -13,7 +13,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Code,
-  Zap
+  Zap,
+  Loader2
 } from 'lucide-react';
 import { apiClient, DefaultApi, Configuration } from '../../api';
 import type { ScraperConfigResponse, ScraperConfigPageResponse, ScraperConfigRequest } from '../../api/generated/models';
@@ -200,69 +201,69 @@ const ConfigFormModal: React.FC<ConfigFormModalProps> = ({ isOpen, onClose, onSu
               <>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                       配置名称 <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
+                      className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all"
                       placeholder="如：科技新闻抓取"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                       来源代码 <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
                       value={formData.sourceCode}
                       onChange={(e) => setFormData({ ...formData, sourceCode: e.target.value })}
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
+                      className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all"
                       placeholder="如：tech_news"
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                     基础URL <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="url"
                     value={formData.baseUrl}
                     onChange={(e) => setFormData({ ...formData, baseUrl: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
+                    className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all"
                     placeholder="https://example.com/news"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">描述</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">描述</label>
                   <textarea
                     value={formData.description || ''}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     rows={3}
-                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all resize-none"
+                    className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all resize-none"
                     placeholder="配置描述..."
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">默认分类</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">默认分类</label>
                     <input
                       type="text"
                       value={formData.defaultCategory || ''}
                       onChange={(e) => setFormData({ ...formData, defaultCategory: e.target.value })}
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
+                      className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all"
                       placeholder="科技"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">默认难度</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">默认难度</label>
                     <select
                       value={formData.defaultDifficulty}
                       onChange={(e) => setFormData({ ...formData, defaultDifficulty: Number(e.target.value) })}
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
+                      className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all"
                     >
                       <option value={1}>简单</option>
                       <option value={2}>中等</option>
@@ -282,76 +283,76 @@ const ConfigFormModal: React.FC<ConfigFormModalProps> = ({ isOpen, onClose, onSu
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">标题选择器</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">标题选择器</label>
                     <input
                       type="text"
                       value={formData.titleSelector || ''}
                       onChange={(e) => setFormData({ ...formData, titleSelector: e.target.value })}
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-mono text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
+                      className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white font-mono text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all"
                       placeholder="h1, .title"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">作者选择器</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">作者选择器</label>
                     <input
                       type="text"
                       value={formData.authorSelector || ''}
                       onChange={(e) => setFormData({ ...formData, authorSelector: e.target.value })}
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-mono text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
+                      className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white font-mono text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all"
                       placeholder=".author, .byline"
                     />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">来源选择器</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">来源选择器</label>
                     <input
                       type="text"
                       value={formData.sourceSelector || ''}
                       onChange={(e) => setFormData({ ...formData, sourceSelector: e.target.value })}
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-mono text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
+                      className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white font-mono text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all"
                       placeholder=".source, .category"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">日期选择器</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">日期选择器</label>
                     <input
                       type="text"
                       value={formData.dateSelector || ''}
                       onChange={(e) => setFormData({ ...formData, dateSelector: e.target.value })}
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-mono text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
+                      className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white font-mono text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all"
                       placeholder=".date, time"
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">内容选择器</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">内容选择器</label>
                   <input
                     type="text"
                     value={formData.contentSelector || ''}
                     onChange={(e) => setFormData({ ...formData, contentSelector: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-mono text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
+                    className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white font-mono text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all"
                     placeholder="article, .content, .article-content"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">图片选择器</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">图片选择器</label>
                     <input
                       type="text"
                       value={formData.imageSelector || ''}
                       onChange={(e) => setFormData({ ...formData, imageSelector: e.target.value })}
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-mono text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
+                      className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white font-mono text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all"
                       placeholder="article img"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">链接选择器</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">链接选择器</label>
                     <input
                       type="text"
                       value={formData.linkSelector || ''}
                       onChange={(e) => setFormData({ ...formData, linkSelector: e.target.value })}
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-mono text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
+                      className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white font-mono text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all"
                       placeholder="a[href]"
                     />
                   </div>
@@ -363,42 +364,42 @@ const ConfigFormModal: React.FC<ConfigFormModalProps> = ({ isOpen, onClose, onSu
               <>
                 <div className="grid grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">最大深度</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">最大深度</label>
                     <input
                       type="number"
                       min={1}
                       max={10}
                       value={formData.maxDepth}
                       onChange={(e) => setFormData({ ...formData, maxDepth: Number(e.target.value) })}
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
+                      className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">最大页面数</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">最大页面数</label>
                     <input
                       type="number"
                       min={1}
                       max={100}
                       value={formData.maxPages}
                       onChange={(e) => setFormData({ ...formData, maxPages: Number(e.target.value) })}
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
+                      className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">默认文章数</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">默认文章数</label>
                     <input
                       type="number"
                       min={1}
                       max={50}
                       value={formData.defaultMaxArticles}
                       onChange={(e) => setFormData({ ...formData, defaultMaxArticles: Number(e.target.value) })}
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
+                      className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all"
                     />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">请求延迟 (毫秒)</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">请求延迟 (毫秒)</label>
                     <input
                       type="number"
                       min={500}
@@ -406,16 +407,16 @@ const ConfigFormModal: React.FC<ConfigFormModalProps> = ({ isOpen, onClose, onSu
                       step={100}
                       value={formData.delayMs}
                       onChange={(e) => setFormData({ ...formData, delayMs: Number(e.target.value) })}
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
+                      className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Cron 表达式</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Cron 表达式</label>
                     <input
                       type="text"
                       value={formData.cronExpression || ''}
                       onChange={(e) => setFormData({ ...formData, cronExpression: e.target.value })}
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-mono text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
+                      className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white font-mono text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all"
                       placeholder="0 0 8 * * ? (每天8点)"
                     />
                   </div>
@@ -445,7 +446,7 @@ const ConfigFormModal: React.FC<ConfigFormModalProps> = ({ isOpen, onClose, onSu
                   </div>
                   {formData.useDynamic && (
                     <div className="mt-4">
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">JS等待时间 (毫秒)</label>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">JS等待时间 (毫秒)</label>
                       <input
                         type="number"
                         min={1000}
@@ -453,7 +454,7 @@ const ConfigFormModal: React.FC<ConfigFormModalProps> = ({ isOpen, onClose, onSu
                         step={500}
                         value={formData.waitForJsMs}
                         onChange={(e) => setFormData({ ...formData, waitForJsMs: Number(e.target.value) })}
-                        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
+                        className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all"
                       />
                     </div>
                   )}
@@ -485,11 +486,11 @@ const ConfigFormModal: React.FC<ConfigFormModalProps> = ({ isOpen, onClose, onSu
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 flex-shrink-0">
+        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/50 flex-shrink-0">
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2.5 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+            className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
           >
             取消
           </button>
@@ -497,9 +498,9 @@ const ConfigFormModal: React.FC<ConfigFormModalProps> = ({ isOpen, onClose, onSu
             type="submit"
             onClick={handleSubmit}
             disabled={loading}
-            className="px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white text-sm font-medium rounded-xl shadow-lg shadow-brand-600/20 hover:shadow-brand-600/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2"
+            className="px-6 py-2 bg-brand-600 text-white text-sm font-bold rounded-xl hover:bg-brand-700 shadow-lg shadow-brand-600/20 disabled:opacity-50 transition-all active:scale-95 flex items-center gap-2"
           >
-            {loading && <RefreshCw size={16} className="animate-spin" />}
+            {loading && <Loader2 size={16} className="animate-spin" />}
             {isEdit ? '保存修改' : '创建配置'}
           </button>
         </div>
@@ -563,7 +564,7 @@ const ExecuteModal: React.FC<ExecuteModalProps> = ({ isOpen, onClose, config, on
             <p className="text-lg font-semibold text-gray-900 dark:text-white">{config.name}</p>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
               最大抓取文章数
             </label>
             <input
@@ -572,23 +573,23 @@ const ExecuteModal: React.FC<ExecuteModalProps> = ({ isOpen, onClose, config, on
               max={50}
               value={maxArticles}
               onChange={(e) => setMaxArticles(Number(e.target.value))}
-              className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
+              className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all"
             />
           </div>
         </div>
-        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50">
+        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/50">
           <button
             onClick={onClose}
-            className="px-5 py-2.5 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+            className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
           >
             取消
           </button>
           <button
             onClick={handleExecute}
             disabled={loading}
-            className="px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-xl shadow-lg shadow-green-600/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2"
+            className="px-6 py-2 bg-green-600 text-white text-sm font-bold rounded-xl hover:bg-green-700 shadow-lg shadow-green-600/20 disabled:opacity-50 transition-all active:scale-95 flex items-center gap-2"
           >
-            {loading ? <RefreshCw size={16} className="animate-spin" /> : <Play size={16} />}
+            {loading ? <Loader2 size={16} className="animate-spin" /> : <Play size={16} />}
             开始抓取
           </button>
         </div>
