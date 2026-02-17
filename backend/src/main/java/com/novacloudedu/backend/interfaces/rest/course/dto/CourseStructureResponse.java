@@ -20,4 +20,10 @@ public class CourseStructureResponse {
 
     @Schema(description = "章节列表（包含小节）")
     private List<ChapterResponse> chapters;
+
+    @Schema(description = "当前用户是否有权访问付费内容")
+    private Boolean hasAccess;
+
+    @Schema(description = "当前用户是否已购买此课程（有有效订单）")
+    private Boolean purchased;
 }

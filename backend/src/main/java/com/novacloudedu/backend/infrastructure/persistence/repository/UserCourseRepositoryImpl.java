@@ -63,6 +63,17 @@ public class UserCourseRepositoryImpl implements UserCourseRepository {
     }
 
     @Override
+    public Optional<UserCourse> findLatestByUserIdAndCourseId(UserId userId, CourseId courseId) {
+        LambdaQueryWrapper<UserCoursePO> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(UserCoursePO::getUserId, userId.value())
+                .eq(UserCoursePO::getCourseId, courseId.value())
+                .orderByDesc(UserCoursePO::getCreateTime)
+                .last("LIMIT 1");
+        UserCoursePO po = userCourseMapper.selectOne(wrapper);
+        return Optional.ofNullable(po).map(userCourseConverter::toUserCourse);
+    }
+
+    @Override
     public List<UserCourse> findByUserId(UserId userId, int page, int size) {
         Page<UserCoursePO> pageParam = new Page<>(page, size);
         LambdaQueryWrapper<UserCoursePO> wrapper = new LambdaQueryWrapper<>();
