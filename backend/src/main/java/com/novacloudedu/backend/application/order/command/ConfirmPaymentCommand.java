@@ -6,6 +6,8 @@ import com.novacloudedu.backend.domain.order.entity.UserCourse;
 import com.novacloudedu.backend.domain.order.repository.UserCourseRepository;
 import com.novacloudedu.backend.domain.order.valueobject.PaymentMethod;
 import com.novacloudedu.backend.exception.BusinessException;
+import com.novacloudedu.backend.infrastructure.email.AdminEmailNotifier;
+import com.novacloudedu.backend.infrastructure.email.UserEmailNotifier;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +20,8 @@ public class ConfirmPaymentCommand {
 
     private final UserCourseRepository userCourseRepository;
     private final CourseRepository courseRepository;
+    private final AdminEmailNotifier adminEmailNotifier;
+    private final UserEmailNotifier userEmailNotifier;
 
     @Transactional
     public void execute(String orderNo, PaymentMethod paymentMethod, Integer validityDays) {
@@ -35,5 +39,10 @@ public class ConfirmPaymentCommand {
                 .orElseThrow(() -> new BusinessException(40400, "课程不存在"));
         course.incrementStudentCount();
         courseRepository.save(course);
+
+        // 邮件通知
+        adminEmailNotifier.notifyPaymentSuccess(orderNo, course.getTitle(), userCourse.getPrice().toPlainString());
+        userEmailNotifier.notifyPaymentConfirmed(userCourse.getUserId().value(), orderNo,
+                course.getTitle(), userCourse.getPrice().toPlainString());
     }
 }
