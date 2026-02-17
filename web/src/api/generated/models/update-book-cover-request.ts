@@ -14,11 +14,7 @@
 
 
 
-export interface UploadBookCommand {
-    'file': File;
-    'title': string;
-    'author'?: string;
-    'cover'?: File;
-    'adminId': number;
+export interface UpdateBookCoverRequest {
+    'cover': File;
 }
 

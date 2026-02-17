@@ -122,6 +122,7 @@ docs/BaseResponseListKnowledgeDocumentVO.md
 docs/BaseResponseListKnowledgePoint.md
 docs/BaseResponseListLong.md
 docs/BaseResponseListMapStringObject.md
+docs/BaseResponseListMembershipPlan.md
 docs/BaseResponseListMessageReadUserResponse.md
 docs/BaseResponseListNodeTypeResponse.md
 docs/BaseResponseListOrderResponse.md
@@ -130,13 +131,17 @@ docs/BaseResponseListPaperSectionResponse.md
 docs/BaseResponseListPostResponse.md
 docs/BaseResponseListPptTemplateListResponse.md
 docs/BaseResponseListProgressResponse.md
+docs/BaseResponseListReadingBookmarkDTO.md
+docs/BaseResponseListReadingNoteDTO.md
 docs/BaseResponseListScraperConfigResponse.md
+docs/BaseResponseListSearchSuggestionDTO.md
 docs/BaseResponseListSectionResponse.md
 docs/BaseResponseListString.md
 docs/BaseResponseListTeacherApplicationResponse.md
 docs/BaseResponseListTeacherResponse.md
 docs/BaseResponseListUserDailyArticleResponse.md
 docs/BaseResponseListUserDailyWordResponse.md
+docs/BaseResponseListUserMembership.md
 docs/BaseResponseListUserShelfDTO.md
 docs/BaseResponseListUserWordBookResponse.md
 docs/BaseResponseListWorkflowEdgeResponse.md
@@ -149,14 +154,19 @@ docs/BaseResponseListWorkflowVariableResponse.md
 docs/BaseResponseListWorkflowVersionResponse.md
 docs/BaseResponseLoginUserResponse.md
 docs/BaseResponseLong.md
+docs/BaseResponseMapStringInteger.md
+docs/BaseResponseMapStringLong.md
+docs/BaseResponseMapStringMapStringInteger.md
 docs/BaseResponseMapStringObject.md
 docs/BaseResponseMapStringString.md
 docs/BaseResponseMemberPage.md
+docs/BaseResponseMembershipPlan.md
 docs/BaseResponseObject.md
 docs/BaseResponseOrderResponse.md
 docs/BaseResponseOrderStatistics.md
 docs/BaseResponsePageResponseClassMemberResponse.md
 docs/BaseResponsePageResponseClassResponse.md
+docs/BaseResponsePageResult.md
 docs/BaseResponsePostDetailResponse.md
 docs/BaseResponsePostPageResponse.md
 docs/BaseResponsePostResponse.md
@@ -165,6 +175,8 @@ docs/BaseResponsePptTemplateDetailResponse.md
 docs/BaseResponseProgressResponse.md
 docs/BaseResponseQuestionPageResponse.md
 docs/BaseResponseQuestionResponse.md
+docs/BaseResponseReadingBookmarkDTO.md
+docs/BaseResponseReadingNoteDTO.md
 docs/BaseResponseReadingQuiz.md
 docs/BaseResponseReadingStats.md
 docs/BaseResponseRefreshTokenResponse.md
@@ -185,6 +197,7 @@ docs/BaseResponseTeacherResponse.md
 docs/BaseResponseTtsResponse.md
 docs/BaseResponseUserAnnouncementPageResponse.md
 docs/BaseResponseUserDetailResponse.md
+docs/BaseResponseUserMembership.md
 docs/BaseResponseUserPageResponse.md
 docs/BaseResponseUserPublicResponse.md
 docs/BaseResponseUserStatsResult.md
@@ -255,8 +268,10 @@ docs/CreateFeedbackRequest.md
 docs/CreateGroupRequest.md
 docs/CreateKnowledgeBaseCommand.md
 docs/CreateOrderRequest.md
+docs/CreatePlanRequest.md
 docs/CreatePostRequest.md
 docs/CreateQuestionRequest.md
+docs/CreateReadingNoteCommand.md
 docs/CreateReplyRequest.md
 docs/CreateScheduleSettingRequest.md
 docs/CreateSectionRequest.md
@@ -298,6 +313,7 @@ docs/GenerateAvatarResponse.md
 docs/GenerateBannerImageRequest.md
 docs/GenerateBannerImageResponse.md
 docs/GeneratePptRequest.md
+docs/GrantMembershipRequest.md
 docs/GroupId.md
 docs/GroupMemberResponse.md
 docs/GroupMessageItem.md
@@ -316,6 +332,7 @@ docs/LearningStats.md
 docs/LoginUserResponse.md
 docs/MCPApi.md
 docs/MemberPage.md
+docs/MembershipPlan.md
 docs/MessageReadUserResponse.md
 docs/NodeExecutionDTO.md
 docs/NodeTypeResponse.md
@@ -326,6 +343,7 @@ docs/OrderStatistics.md
 docs/PPTApi.md
 docs/PageResponseClassMemberResponse.md
 docs/PageResponseClassResponse.md
+docs/PageResult.md
 docs/PaperQuestionResponse.md
 docs/PaperSectionResponse.md
 docs/PhoneLoginRequest.md
@@ -340,6 +358,7 @@ docs/PptTemplateDetailResponse.md
 docs/PptTemplateListResponse.md
 docs/PreviewAiProcessRequest.md
 docs/ProgressResponse.md
+docs/PurchaseMembershipRequest.md
 docs/QueryAnnouncementRequest.md
 docs/QueryBannerRequest.md
 docs/QueryExamPaperRequest.md
@@ -349,6 +368,8 @@ docs/QueryUserRequest.md
 docs/QuestionPageResponse.md
 docs/QuestionResponse.md
 docs/QuizQuestion.md
+docs/ReadingBookmarkDTO.md
+docs/ReadingNoteDTO.md
 docs/ReadingQuiz.md
 docs/ReadingQuizId.md
 docs/ReadingStats.md
@@ -368,6 +389,8 @@ docs/ScraperConfigRequest.md
 docs/ScraperConfigResponse.md
 docs/ScraperTaskPageResponse.md
 docs/ScraperTaskResponse.md
+docs/SearchResultDTO.md
+docs/SearchSuggestionDTO.md
 docs/SearchUserPageResponse.md
 docs/SearchUserRequestDTO.md
 docs/SearchUserResponse.md
@@ -389,6 +412,7 @@ docs/TtsResponse.md
 docs/UpdateAiAssistantCommand.md
 docs/UpdateAnnouncementRequest.md
 docs/UpdateBannerRequest.md
+docs/UpdateBookCoverRequest.md
 docs/UpdateChapterRequest.md
 docs/UpdateClassRequest.md
 docs/UpdateCourseRequest.md
@@ -402,6 +426,8 @@ docs/UpdateKnowledgeBaseCommand.md
 docs/UpdateNodeConfigRequest.md
 docs/UpdateNodeRequest.md
 docs/UpdatePaperQuestionRequest.md
+docs/UpdatePlanQuotaRequest.md
+docs/UpdatePlanRequest.md
 docs/UpdatePostRequest.md
 docs/UpdateProfileRequest.md
 docs/UpdateProgressRequest.md
@@ -425,6 +451,7 @@ docs/UserDailyWordResponse.md
 docs/UserDetailResponse.md
 docs/UserId.md
 docs/UserLoginRequest.md
+docs/UserMembership.md
 docs/UserPageResponse.md
 docs/UserPublicResponse.md
 docs/UserRegisterRequest.md
@@ -566,6 +593,7 @@ models/base-response-list-knowledge-document-vo.ts
 models/base-response-list-knowledge-point.ts
 models/base-response-list-long.ts
 models/base-response-list-map-string-object.ts
+models/base-response-list-membership-plan.ts
 models/base-response-list-message-read-user-response.ts
 models/base-response-list-node-type-response.ts
 models/base-response-list-order-response.ts
@@ -574,13 +602,17 @@ models/base-response-list-paper-section-response.ts
 models/base-response-list-post-response.ts
 models/base-response-list-ppt-template-list-response.ts
 models/base-response-list-progress-response.ts
+models/base-response-list-reading-bookmark-dto.ts
+models/base-response-list-reading-note-dto.ts
 models/base-response-list-scraper-config-response.ts
+models/base-response-list-search-suggestion-dto.ts
 models/base-response-list-section-response.ts
 models/base-response-list-string.ts
 models/base-response-list-teacher-application-response.ts
 models/base-response-list-teacher-response.ts
 models/base-response-list-user-daily-article-response.ts
 models/base-response-list-user-daily-word-response.ts
+models/base-response-list-user-membership.ts
 models/base-response-list-user-shelf-dto.ts
 models/base-response-list-user-word-book-response.ts
 models/base-response-list-workflow-edge-response.ts
@@ -593,14 +625,19 @@ models/base-response-list-workflow-variable-response.ts
 models/base-response-list-workflow-version-response.ts
 models/base-response-login-user-response.ts
 models/base-response-long.ts
+models/base-response-map-string-integer.ts
+models/base-response-map-string-long.ts
+models/base-response-map-string-map-string-integer.ts
 models/base-response-map-string-object.ts
 models/base-response-map-string-string.ts
 models/base-response-member-page.ts
+models/base-response-membership-plan.ts
 models/base-response-object.ts
 models/base-response-order-response.ts
 models/base-response-order-statistics.ts
 models/base-response-page-response-class-member-response.ts
 models/base-response-page-response-class-response.ts
+models/base-response-page-result.ts
 models/base-response-post-detail-response.ts
 models/base-response-post-page-response.ts
 models/base-response-post-response.ts
@@ -609,6 +646,8 @@ models/base-response-ppt-template-detail-response.ts
 models/base-response-progress-response.ts
 models/base-response-question-page-response.ts
 models/base-response-question-response.ts
+models/base-response-reading-bookmark-dto.ts
+models/base-response-reading-note-dto.ts
 models/base-response-reading-quiz.ts
 models/base-response-reading-stats.ts
 models/base-response-refresh-token-response.ts
@@ -629,6 +668,7 @@ models/base-response-teacher-response.ts
 models/base-response-tts-response.ts
 models/base-response-user-announcement-page-response.ts
 models/base-response-user-detail-response.ts
+models/base-response-user-membership.ts
 models/base-response-user-page-response.ts
 models/base-response-user-public-response.ts
 models/base-response-user-stats-result.ts
@@ -699,8 +739,10 @@ models/create-feedback-request.ts
 models/create-group-request.ts
 models/create-knowledge-base-command.ts
 models/create-order-request.ts
+models/create-plan-request.ts
 models/create-post-request.ts
 models/create-question-request.ts
+models/create-reading-note-command.ts
 models/create-reply-request.ts
 models/create-schedule-setting-request.ts
 models/create-section-request.ts
@@ -741,6 +783,7 @@ models/generate-avatar-response.ts
 models/generate-banner-image-request.ts
 models/generate-banner-image-response.ts
 models/generate-ppt-request.ts
+models/grant-membership-request.ts
 models/group-id.ts
 models/group-member-response.ts
 models/group-message-item.ts
@@ -759,6 +802,7 @@ models/knowledge-point.ts
 models/learning-stats.ts
 models/login-user-response.ts
 models/member-page.ts
+models/membership-plan.ts
 models/message-read-user-response.ts
 models/node-execution-dto.ts
 models/node-type-response.ts
@@ -767,6 +811,7 @@ models/order-response.ts
 models/order-statistics.ts
 models/page-response-class-member-response.ts
 models/page-response-class-response.ts
+models/page-result.ts
 models/paper-question-response.ts
 models/paper-section-response.ts
 models/phone-login-request.ts
@@ -781,6 +826,7 @@ models/ppt-template-detail-response.ts
 models/ppt-template-list-response.ts
 models/preview-ai-process-request.ts
 models/progress-response.ts
+models/purchase-membership-request.ts
 models/query-announcement-request.ts
 models/query-banner-request.ts
 models/query-exam-paper-request.ts
@@ -790,6 +836,8 @@ models/query-user-request.ts
 models/question-page-response.ts
 models/question-response.ts
 models/quiz-question.ts
+models/reading-bookmark-dto.ts
+models/reading-note-dto.ts
 models/reading-quiz-id.ts
 models/reading-quiz.ts
 models/reading-stats.ts
@@ -809,6 +857,8 @@ models/scraper-config-request.ts
 models/scraper-config-response.ts
 models/scraper-task-page-response.ts
 models/scraper-task-response.ts
+models/search-result-dto.ts
+models/search-suggestion-dto.ts
 models/search-user-page-response.ts
 models/search-user-request-dto.ts
 models/search-user-response.ts
@@ -830,6 +880,7 @@ models/tts-response.ts
 models/update-ai-assistant-command.ts
 models/update-announcement-request.ts
 models/update-banner-request.ts
+models/update-book-cover-request.ts
 models/update-chapter-request.ts
 models/update-class-request.ts
 models/update-course-request.ts
@@ -843,6 +894,8 @@ models/update-knowledge-base-command.ts
 models/update-node-config-request.ts
 models/update-node-request.ts
 models/update-paper-question-request.ts
+models/update-plan-quota-request.ts
+models/update-plan-request.ts
 models/update-post-request.ts
 models/update-profile-request.ts
 models/update-progress-request.ts
@@ -866,6 +919,7 @@ models/user-daily-word-response.ts
 models/user-detail-response.ts
 models/user-id.ts
 models/user-login-request.ts
+models/user-membership.ts
 models/user-page-response.ts
 models/user-public-response.ts
 models/user-register-request.ts

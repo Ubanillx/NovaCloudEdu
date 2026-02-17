@@ -14,11 +14,9 @@
 
 
 
-export interface UploadBookCommand {
-    'file': File;
-    'title': string;
-    'author'?: string;
-    'cover'?: File;
-    'adminId': number;
+export interface BaseResponseMapStringMapStringInteger {
+    'code'?: number;
+    'data'?: { [key: string]: { [key: string]: number; }; };
+    'message'?: string;
 }
 

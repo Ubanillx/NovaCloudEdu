@@ -14,11 +14,14 @@
 
 
 
-export interface UploadBookCommand {
-    'file': File;
-    'title': string;
-    'author'?: string;
-    'cover'?: File;
-    'adminId': number;
+export interface CreateReadingNoteCommand {
+    'userId': number;
+    'chapterId': number;
+    'chapterIndex'?: number;
+    'noteContent': string;
+    'selectedText'?: string;
+    'startPosition'?: number;
+    'endPosition'?: number;
+    'noteColor'?: string;
 }
 

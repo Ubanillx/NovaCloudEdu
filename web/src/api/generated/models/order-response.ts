@@ -19,6 +19,14 @@
  */
 export interface OrderResponse {
     /**
+     * 订单类型：COURSE-课程订单，MEMBERSHIP-会员订单
+     */
+    'orderType'?: string;
+    /**
+     * 商品名称（课程名/会员计划名）
+     */
+    'productName'?: string;
+    /**
      * 订单ID
      */
     'id'?: number;

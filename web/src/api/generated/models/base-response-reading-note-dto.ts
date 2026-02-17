@@ -13,12 +13,13 @@
  */
 
 
+// May contain unused imports in some cases
+// @ts-ignore
+import type { ReadingNoteDTO } from './reading-note-dto';
 
-export interface UploadBookCommand {
-    'file': File;
-    'title': string;
-    'author'?: string;
-    'cover'?: File;
-    'adminId': number;
+export interface BaseResponseReadingNoteDTO {
+    'code'?: number;
+    'data'?: ReadingNoteDTO;
+    'message'?: string;
 }
 

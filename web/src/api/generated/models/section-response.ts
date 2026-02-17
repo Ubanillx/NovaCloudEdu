@@ -63,6 +63,10 @@ export interface SectionResponse {
      */
     'hlsUrl'?: string;
     /**
+     * 当前用户是否可访问此小节
+     */
+    'accessible'?: boolean;
+    /**
      * 转码状态: 0-未转码, 1-转码中, 2-已完成, 3-失败
      */
     'transcodeStatus'?: number;

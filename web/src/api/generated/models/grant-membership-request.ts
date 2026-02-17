@@ -14,11 +14,17 @@
 
 
 
-export interface UploadBookCommand {
-    'file': File;
-    'title': string;
-    'author'?: string;
-    'cover'?: File;
-    'adminId': number;
+/**
+ * 管理员为用户开通会员请求
+ */
+export interface GrantMembershipRequest {
+    /**
+     * 用户ID
+     */
+    'userId': number;
+    /**
+     * 会员计划ID
+     */
+    'planId': number;
 }
 

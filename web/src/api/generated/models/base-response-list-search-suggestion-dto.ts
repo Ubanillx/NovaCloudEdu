@@ -13,12 +13,13 @@
  */
 
 
+// May contain unused imports in some cases
+// @ts-ignore
+import type { SearchSuggestionDTO } from './search-suggestion-dto';
 
-export interface UploadBookCommand {
-    'file': File;
-    'title': string;
-    'author'?: string;
-    'cover'?: File;
-    'adminId': number;
+export interface BaseResponseListSearchSuggestionDTO {
+    'code'?: number;
+    'data'?: Array<SearchSuggestionDTO>;
+    'message'?: string;
 }
 

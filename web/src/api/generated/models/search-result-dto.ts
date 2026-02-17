@@ -14,18 +14,25 @@
 
 
 
-export interface BookDTO {
+export interface SearchResultDTO {
+    'type'?: string;
     'id'?: number;
     'title'?: string;
+    'content'?: string;
+    'score'?: number;
+    'highlights'?: { [key: string]: Array<string>; };
     'author'?: string;
-    'coverUrl'?: string;
-    'originFileUrl'?: string;
     'fileType'?: string;
-    'status'?: string;
+    'coverUrl'?: string;
     'totalChapters'?: number;
-    'wordCount'?: number;
-    'fileSize'?: number;
+    'bookId'?: number;
+    'bookTitle'?: string;
+    'chapterIndex'?: number;
+    'tags'?: Array<string>;
+    'postType'?: string;
+    'thumbNum'?: number;
+    'favourNum'?: number;
+    'commentNum'?: number;
     'createTime'?: string;
-    'updateTime'?: string;
 }
 

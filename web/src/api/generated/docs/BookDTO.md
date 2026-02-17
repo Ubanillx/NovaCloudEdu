@@ -9,6 +9,7 @@ Name | Type | Description | Notes
 **title** | **string** |  | [optional] [default to undefined]
 **author** | **string** |  | [optional] [default to undefined]
 **coverUrl** | **string** |  | [optional] [default to undefined]
+**originFileUrl** | **string** |  | [optional] [default to undefined]
 **fileType** | **string** |  | [optional] [default to undefined]
 **status** | **string** |  | [optional] [default to undefined]
 **totalChapters** | **number** |  | [optional] [default to undefined]
@@ -27,6 +28,7 @@ const instance: BookDTO = {
     title,
     author,
     coverUrl,
+    originFileUrl,
     fileType,
     status,
     totalChapters,

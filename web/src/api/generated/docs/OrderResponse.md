@@ -6,6 +6,8 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
+**orderType** | **string** | 订单类型：COURSE-课程订单，MEMBERSHIP-会员订单 | [optional] [default to undefined]
+**productName** | **string** | 商品名称（课程名/会员计划名） | [optional] [default to undefined]
 **id** | **number** | 订单ID | [optional] [default to undefined]
 **userId** | **number** | 用户ID | [optional] [default to undefined]
 **courseId** | **number** | 课程ID | [optional] [default to undefined]
@@ -27,6 +29,8 @@ Name | Type | Description | Notes
 import { OrderResponse } from './api';
 
 const instance: OrderResponse = {
+    orderType,
+    productName,
     id,
     userId,
     courseId,

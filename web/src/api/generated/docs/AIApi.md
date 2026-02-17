@@ -491,7 +491,7 @@ const { status, data } = await apiInstance.assistantExecuteWorkflow(
 # **assistantGenerateAvatar**
 > BaseResponseGenerateAvatarResponse assistantGenerateAvatar(generateAvatarRequest)
 
-根据提示词使用AI生成助手头像图片，返回图片URL
+根据提示词使用AI生成助手头像图片，图片会自动上传到OSS持久化存储，返回OSS图片URL
 
 ### Example
 

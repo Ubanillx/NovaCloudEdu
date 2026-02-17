@@ -14,11 +14,15 @@
 
 
 
-export interface UploadBookCommand {
-    'file': File;
-    'title': string;
-    'author'?: string;
-    'cover'?: File;
-    'adminId': number;
+export interface ReadingBookmarkDTO {
+    'id'?: number;
+    'userId'?: number;
+    'bookId'?: number;
+    'chapterId'?: number;
+    'chapterIndex'?: number;
+    'position'?: number;
+    'bookmarkTitle'?: string;
+    'note'?: string;
+    'createTime'?: string;
 }
 

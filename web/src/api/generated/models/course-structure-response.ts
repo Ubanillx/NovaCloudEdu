@@ -29,5 +29,13 @@ export interface CourseStructureResponse {
      * 章节列表（包含小节）
      */
     'chapters'?: Array<ChapterResponse>;
+    /**
+     * 当前用户是否有权访问付费内容
+     */
+    'hasAccess'?: boolean;
+    /**
+     * 当前用户是否已购买此课程（有有效订单）
+     */
+    'purchased'?: boolean;
 }
 

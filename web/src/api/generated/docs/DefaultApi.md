@@ -19,6 +19,7 @@ All URIs are relative to *http://localhost:8080*
 |[**addVariable**](#addvariable) | **POST** /api/workflows/{id}/variables | 添加变量|
 |[**adminDeletePost**](#admindeletepost) | **DELETE** /api/posts/admin/{postId} | 管理员删除帖子|
 |[**aiGenerateQuestions**](#aigeneratequestions) | **POST** /api/questions/ai-generate | AI 智能出题|
+|[**alipayCallback**](#alipaycallback) | **POST** /api/payment/callback/alipay | 支付宝异步回调（预留）|
 |[**applyTeacher**](#applyteacher) | **POST** /api/teacher/apply | 申请成为讲师|
 |[**applyToJoin**](#applytojoin) | **POST** /api/groups/{groupId}/join | 申请加入群|
 |[**archive**](#archive) | **POST** /api/workflows/{id}/archive | 归档工作流|
@@ -30,16 +31,20 @@ All URIs are relative to *http://localhost:8080*
 |[**batchUpdate**](#batchupdate) | **POST** /api/workflows/{id}/batch-update | 批量更新节点和连接线|
 |[**bindToAssistant**](#bindtoassistant) | **POST** /api/workflows/{id}/assistants/{assistantId} | 绑定工作流到AI助手|
 |[**cancelExecution**](#cancelexecution) | **POST** /api/workflows/executions/{executionId}/cancel | 取消执行|
+|[**cancelMembership**](#cancelmembership) | **POST** /api/membership/cancel | 取消会员|
+|[**cancelMembership1**](#cancelmembership1) | **POST** /api/admin/membership/cancel/{userId} | 取消用户会员|
 |[**changePassword**](#changepassword) | **POST** /api/user/password | 修改密码|
 |[**checkFavourite**](#checkfavourite) | **GET** /api/course/favourite/{courseId}/check | 检查是否已收藏|
 |[**checkFriendship**](#checkfriendship) | **GET** /api/friend/check/{userId} | 检查好友关系|
 |[**checkin**](#checkin) | **POST** /api/user/checkin | 用户打卡|
 |[**completeSection**](#completesection) | **POST** /api/progress/section/{sectionId}/complete | 标记小节为已完成|
 |[**confirmPayment**](#confirmpayment) | **POST** /api/admin/order/confirm | 确认收款（管理员手动确认）|
+|[**confirmPayment1**](#confirmpayment1) | **POST** /api/admin/membership/confirm | 确认会员支付（管理员手动确认）|
 |[**copy**](#copy) | **POST** /api/workflows/{id}/copy | 复制工作流|
 |[**create**](#create) | **POST** /api/workflows | 创建工作流|
 |[**createAnnouncement**](#createannouncement) | **POST** /api/announcement/admin/create | 创建公告|
 |[**createBanner**](#createbanner) | **POST** /api/admin/banner | 创建轮播图|
+|[**createBookmark**](#createbookmark) | **POST** /api/books/{bookId}/bookmarks | 创建书签|
 |[**createChapter**](#createchapter) | **POST** /api/course/{courseId}/chapter | 创建章节（管理员）|
 |[**createClass**](#createclass) | **POST** /api/classes | 创建班级|
 |[**createComment**](#createcomment) | **POST** /api/posts/{postId}/comments | 发表评论|
@@ -52,7 +57,9 @@ All URIs are relative to *http://localhost:8080*
 |[**createFromTemplate**](#createfromtemplate) | **POST** /api/workflows/templates/{templateId}/create-workflow | 从模板创建工作流|
 |[**createGroup**](#creategroup) | **POST** /api/groups | 创建群聊|
 |[**createGroupFromClass**](#creategroupfromclass) | **POST** /api/classes/{classId}/chat-group | 基于班级创建群聊|
+|[**createNote**](#createnote) | **POST** /api/books/{bookId}/notes | 创建阅读笔记|
 |[**createOrder**](#createorder) | **POST** /api/order | 创建订单（用户下单）|
+|[**createPlan**](#createplan) | **POST** /api/admin/membership/plans | 创建会员计划|
 |[**createPost**](#createpost) | **POST** /api/posts | 发布帖子|
 |[**createQuestion**](#createquestion) | **POST** /api/questions | 创建题目|
 |[**createReply**](#createreply) | **POST** /api/posts/comments/{commentId}/replies | 发表回复|
@@ -66,6 +73,7 @@ All URIs are relative to *http://localhost:8080*
 |[**deleteAnnouncement**](#deleteannouncement) | **DELETE** /api/announcement/admin/delete/{id} | 删除公告|
 |[**deleteBanner**](#deletebanner) | **DELETE** /api/admin/banner/{id} | 删除轮播图|
 |[**deleteBook**](#deletebook) | **DELETE** /api/books/{bookId} | 删除书籍|
+|[**deleteBookmark**](#deletebookmark) | **DELETE** /api/books/{bookId}/bookmarks/{bookmarkId} | 删除书签|
 |[**deleteChapter**](#deletechapter) | **DELETE** /api/course/{courseId}/chapter/{chapterId} | 删除章节（管理员）|
 |[**deleteClass**](#deleteclass) | **DELETE** /api/classes/{classId} | 删除班级|
 |[**deleteComment**](#deletecomment) | **DELETE** /api/posts/comments/{commentId} | 删除评论|
@@ -82,6 +90,8 @@ All URIs are relative to *http://localhost:8080*
 |[**deleteItem**](#deleteitem) | **DELETE** /api/schedule/item/{id} | 删除课程项|
 |[**deleteMessage**](#deletemessage) | **DELETE** /api/group-chat/{groupId}/messages/{messageId} | 删除消息|
 |[**deleteNode**](#deletenode) | **DELETE** /api/workflows/{id}/nodes/{nodeId} | 删除节点|
+|[**deleteNote**](#deletenote) | **DELETE** /api/books/{bookId}/notes/{noteId} | 删除笔记|
+|[**deletePlan**](#deleteplan) | **DELETE** /api/admin/membership/plans/{planId} | 删除会员计划|
 |[**deletePost**](#deletepost) | **DELETE** /api/posts/{postId} | 删除帖子|
 |[**deleteQuestion**](#deletequestion) | **DELETE** /api/questions/{id} | 删除题目|
 |[**deleteReply**](#deletereply) | **DELETE** /api/posts/replies/{replyId} | 删除回复|
@@ -97,6 +107,7 @@ All URIs are relative to *http://localhost:8080*
 |[**dissolveGroup1**](#dissolvegroup1) | **DELETE** /api/admin/groups/{groupId} | 解散群|
 |[**enableConfig**](#enableconfig) | **POST** /api/admin/scraper/config/{id}/enable | 启用配置|
 |[**enableTrigger**](#enabletrigger) | **POST** /api/workflows/triggers/{triggerId}/enable | 启用触发器|
+|[**encryptAllChapters**](#encryptallchapters) | **POST** /api/books/{bookId}/chapters/encrypt-all | 批量加密所有章节|
 |[**encryptChapterContent**](#encryptchaptercontent) | **POST** /api/books/{bookId}/chapters/{chapterIndex}/encrypt | 加密章节内容|
 |[**execute**](#execute) | **POST** /api/workflows/{id}/execute | 执行工作流|
 |[**executeAllTasks**](#executealltasks) | **POST** /api/admin/scraper/config/execute-all | 触发所有抓取|
@@ -106,6 +117,7 @@ All URIs are relative to *http://localhost:8080*
 |[**favouriteCourse**](#favouritecourse) | **POST** /api/course/favourite/{courseId} | 收藏课程|
 |[**follow**](#follow) | **POST** /api/follow/{targetUserId} | 关注用户|
 |[**generateBannerImage**](#generatebannerimage) | **POST** /api/admin/banner/generate-image | AI生成轮播图图片|
+|[**getAiQuota**](#getaiquota) | **GET** /api/membership/ai-quota | 查询我的AI功能剩余额度|
 |[**getAllConfigs**](#getallconfigs) | **GET** /api/admin/scraper/config | 获取所有配置|
 |[**getAllFriends**](#getallfriends) | **GET** /api/friend/all | 获取全部好友|
 |[**getAllTasks**](#getalltasks) | **GET** /api/admin/scraper/config/tasks | 获取所有任务|
@@ -118,6 +130,7 @@ All URIs are relative to *http://localhost:8080*
 |[**getBannerList**](#getbannerlist) | **GET** /api/banner/list | 获取轮播图列表|
 |[**getBook**](#getbook) | **GET** /api/books/{bookId} | 获取书籍详情|
 |[**getBookChapters**](#getbookchapters) | **GET** /api/books/{bookId}/chapters | 获取书籍章节列表|
+|[**getBookmarksByBook**](#getbookmarksbybook) | **GET** /api/books/{bookId}/bookmarks | 获取用户在该书的书签列表|
 |[**getById**](#getbyid) | **GET** /api/workflows/{id} | 获取工作流详情|
 |[**getChapter**](#getchapter) | **GET** /api/course/{courseId}/chapter/{chapterId} | 获取章节详情|
 |[**getChapterContent**](#getchaptercontent) | **GET** /api/books/{bookId}/chapters/{chapterIndex} | 获取章节内容|
@@ -135,6 +148,7 @@ All URIs are relative to *http://localhost:8080*
 |[**getCourseProgress**](#getcourseprogress) | **GET** /api/progress/course/{courseId} | 获取课程所有小节的学习进度|
 |[**getCourseProgressSummary**](#getcourseprogresssummary) | **GET** /api/progress/course/{courseId}/summary | 获取课程进度汇总|
 |[**getCourseStructure**](#getcoursestructure) | **GET** /api/course/{courseId}/structure | 获取课程完整结构（课程+章节+小节）|
+|[**getCurrentMembership**](#getcurrentmembership) | **GET** /api/membership/current | 查询我的当前会员状态|
 |[**getDailyArticle**](#getdailyarticle) | **GET** /api/daily-article/{id} | 获取文章详情|
 |[**getDailyWord**](#getdailyword) | **GET** /api/daily-word/{id} | 获取单词详情|
 |[**getDefinition**](#getdefinition) | **GET** /api/workflows/{id}/definition | 获取工作流定义详情|
@@ -160,6 +174,7 @@ All URIs are relative to *http://localhost:8080*
 |[**getLatestMessages**](#getlatestmessages) | **GET** /api/group-chat/{groupId}/messages/latest | 获取群最新消息|
 |[**getLikedArticles**](#getlikedarticles) | **GET** /api/user/daily-article/liked | 获取点赞文章列表|
 |[**getLoginUser**](#getloginuser) | **GET** /api/auth/current | 获取当前用户|
+|[**getMembershipHistory**](#getmembershiphistory) | **GET** /api/membership/history | 查询我的会员历史|
 |[**getMessages**](#getmessages) | **GET** /api/group-chat/{groupId}/messages | 获取群聊历史消息（分页）|
 |[**getMessagesBefore**](#getmessagesbefore) | **GET** /api/group-chat/{groupId}/messages/before | 获取群聊历史消息（游标分页，获取某消息之前的消息）|
 |[**getMyApplication**](#getmyapplication) | **GET** /api/teacher/application/my | 获取当前用户的申请|
@@ -179,10 +194,14 @@ All URIs are relative to *http://localhost:8080*
 |[**getNode**](#getnode) | **GET** /api/workflows/{id}/nodes/{nodeId} | 获取单个节点详情|
 |[**getNodeTypes**](#getnodetypes) | **GET** /api/workflows/node-types | 获取所有可用的节点类型|
 |[**getNodes**](#getnodes) | **GET** /api/workflows/{id}/nodes | 获取工作流所有节点|
+|[**getNotesByBook**](#getnotesbybook) | **GET** /api/books/{bookId}/notes | 获取用户在该书的笔记列表|
+|[**getNotesByChapter**](#getnotesbychapter) | **GET** /api/books/{bookId}/notes/chapters/{chapterId} | 获取用户在该章节的笔记|
 |[**getOrder**](#getorder) | **GET** /api/order/{orderNo} | 查询订单详情|
 |[**getPaperQuestions**](#getpaperquestions) | **GET** /api/exam-papers/{paperId}/sections/{sectionId}/questions | 获取大题下的所有题目关联|
+|[**getPdfUrl**](#getpdfurl) | **GET** /api/books/{bookId}/pdf-url | 获取PDF预签名URL|
 |[**getPendingCount**](#getpendingcount) | **GET** /api/teacher/application/pending/count | 获取待审核申请数量（管理员）|
 |[**getPendingRequests**](#getpendingrequests) | **GET** /api/groups/{groupId}/requests | 获取群待审批申请列表|
+|[**getPlan**](#getplan) | **GET** /api/membership/plans/{planId} | 获取计划详情|
 |[**getPostComments**](#getpostcomments) | **GET** /api/posts/{postId}/comments | 获取帖子评论列表|
 |[**getPostDetail**](#getpostdetail) | **GET** /api/posts/{postId} | 获取帖子详情|
 |[**getPostList**](#getpostlist) | **GET** /api/posts | 分页获取帖子列表|
@@ -199,7 +218,8 @@ All URIs are relative to *http://localhost:8080*
 |[**getSections**](#getsections) | **GET** /api/exam-papers/{paperId}/sections | 获取试卷的所有大题|
 |[**getSentRequests**](#getsentrequests) | **POST** /api/friend/request/sent | 获取发送的好友申请|
 |[**getSessionList**](#getsessionlist) | **GET** /api/chat/sessions | 获取会话列表|
-|[**getStatistics**](#getstatistics) | **GET** /api/admin/order/statistics | 订单统计（管理员）|
+|[**getStatistics**](#getstatistics) | **GET** /api/admin/order/statistics | 订单统计（管理员，包含课程+会员）|
+|[**getStatistics1**](#getstatistics1) | **GET** /api/admin/membership/statistics | 会员统计|
 |[**getStats**](#getstats) | **GET** /api/user/word-book/stats | 获取生词本统计|
 |[**getStats1**](#getstats1) | **GET** /api/user/daily-word/stats | 获取学习统计|
 |[**getStats2**](#getstats2) | **GET** /api/user/daily-article/stats | 获取阅读统计|
@@ -220,6 +240,7 @@ All URIs are relative to *http://localhost:8080*
 |[**getUnreadCount**](#getunreadcount) | **GET** /api/group-chat/{groupId}/unread/count | 获取群未读消息数|
 |[**getUnreadCount1**](#getunreadcount1) | **GET** /api/chat/unread/count | 获取未读消息数|
 |[**getUnreadCount2**](#getunreadcount2) | **GET** /api/announcement/unread-count | 获取未读公告数量|
+|[**getUserAiQuota**](#getuseraiquota) | **GET** /api/admin/membership/users/{userId}/ai-quota | 查询指定用户的AI额度|
 |[**getUserDetail**](#getuserdetail) | **GET** /api/user/admin/{id} | 获取用户详情|
 |[**getUserDetailInfo**](#getuserdetailinfo) | **GET** /api/user/detail/{id} | 获取用户详细信息|
 |[**getUserFollowStats**](#getuserfollowstats) | **GET** /api/follow/user/{targetUserId}/stats | 获取指定用户的关注统计|
@@ -234,6 +255,7 @@ All URIs are relative to *http://localhost:8080*
 |[**getWordBookList**](#getwordbooklist) | **GET** /api/user/word-book/list | 获取生词本列表|
 |[**getWordsByDate**](#getwordsbydate) | **GET** /api/daily-word/date/{date} | 获取指定日期单词|
 |[**getWorkflowAssistants**](#getworkflowassistants) | **GET** /api/workflows/{id}/assistants | 获取使用该工作流的AI助手ID列表|
+|[**grantMembership**](#grantmembership) | **POST** /api/admin/membership/grant | 为用户直接开通会员|
 |[**handleFriendRequest**](#handlefriendrequest) | **POST** /api/friend/request/handle | 处理好友申请|
 |[**handleJoinRequest**](#handlejoinrequest) | **POST** /api/groups/requests/{requestId}/handle | 处理加入申请|
 |[**health**](#health) | **GET** /api/health | 健康检查|
@@ -269,7 +291,10 @@ All URIs are relative to *http://localhost:8080*
 |[**listCoursesByTeacher**](#listcoursesbyteacher) | **GET** /api/course/teacher/{teacherId} | 获取讲师的课程列表|
 |[**listExecutions**](#listexecutions) | **GET** /api/workflows/{id}/executions | 获取工作流执行历史列表|
 |[**listGroups**](#listgroups) | **GET** /api/admin/groups/list | 分页获取群列表|
-|[**listOrders**](#listorders) | **GET** /api/admin/order/list | 获取订单列表（管理员）|
+|[**listMemberships**](#listmemberships) | **GET** /api/admin/membership/list | 按状态查询会员列表|
+|[**listOrders**](#listorders) | **GET** /api/admin/order/list | 获取订单列表（管理员，包含课程订单和会员订单）|
+|[**listPlans**](#listplans) | **GET** /api/admin/membership/plans | 获取所有会员计划|
+|[**listPlans1**](#listplans1) | **GET** /api/membership/plans | 获取所有会员计划|
 |[**listPublic**](#listpublic) | **GET** /api/workflows/public | 获取公开的工作流列表|
 |[**listReviews**](#listreviews) | **GET** /api/course/review/{courseId}/list | 获取课程评价列表|
 |[**listSections**](#listsections) | **GET** /api/course/{courseId}/section | 获取课程的所有小节|
@@ -295,6 +320,7 @@ All URIs are relative to *http://localhost:8080*
 |[**publishBanner**](#publishbanner) | **POST** /api/admin/banner/{id}/publish | 发布轮播图|
 |[**publishCourse**](#publishcourse) | **POST** /api/course/{id}/publish | 发布课程（管理员）|
 |[**publishExamPaper**](#publishexampaper) | **POST** /api/exam-papers/{id}/publish | 发布试卷|
+|[**purchaseMembership**](#purchasemembership) | **POST** /api/membership/purchase | 购买会员（创建待支付订单）|
 |[**queryAnnouncements**](#queryannouncements) | **POST** /api/announcement/admin/list | 分页查询公告|
 |[**queryBanners**](#querybanners) | **GET** /api/admin/banner/list | 分页查询轮播图|
 |[**queryExamPapers**](#queryexampapers) | **GET** /api/exam-papers | 分页查询我的试卷|
@@ -306,6 +332,7 @@ All URIs are relative to *http://localhost:8080*
 |[**quickScrape**](#quickscrape) | **GET** /api/scraper/quick | 快速抓取|
 |[**refreshToken**](#refreshtoken) | **POST** /api/auth/refresh | 刷新Token|
 |[**refund**](#refund) | **POST** /api/admin/order/{orderNo}/refund | 退款（管理员）|
+|[**reindex**](#reindex) | **POST** /api/search/admin/reindex | 全量重建索引（管理员）|
 |[**removeCourse**](#removecourse) | **DELETE** /api/classes/{classId}/courses/{courseId} | 移除课程|
 |[**removeFromShelf**](#removefromshelf) | **DELETE** /api/reading/shelf | 从书架移除书籍|
 |[**removeFromWordBook**](#removefromwordbook) | **DELETE** /api/user/word-book/{wordBookId} | 从生词本移除单词|
@@ -331,12 +358,17 @@ All URIs are relative to *http://localhost:8080*
 |[**scrapeMultiplePages**](#scrapemultiplepages) | **POST** /api/scraper/batch | 批量抓取|
 |[**scrapeRecursively**](#scraperecursively) | **POST** /api/scraper/recursive | 递归抓取|
 |[**scrapeSinglePage**](#scrapesinglepage) | **POST** /api/scraper/single | 抓取单个页面|
+|[**searchAll**](#searchall) | **GET** /api/search | 聚合搜索（书籍+章节+帖子）|
 |[**searchArticles**](#searcharticles) | **GET** /api/daily-article/search | 搜索文章|
-|[**searchBooks**](#searchbooks) | **GET** /api/books/search | 搜索书籍|
+|[**searchBookChapters**](#searchbookchapters) | **GET** /api/search/books/{bookId}/chapters | 书内搜索|
+|[**searchBooks**](#searchbooks) | **GET** /api/search/books | 搜索书籍|
+|[**searchBooks1**](#searchbooks1) | **GET** /api/books/search | 搜索书籍|
+|[**searchChapters**](#searchchapters) | **GET** /api/search/chapters | 搜索章节内容|
 |[**searchCourses**](#searchcourses) | **GET** /api/course/search | 搜索课程|
 |[**searchGroups**](#searchgroups) | **GET** /api/groups/search | 搜索群|
 |[**searchGroups1**](#searchgroups1) | **GET** /api/admin/groups/search | 搜索群|
-|[**searchPosts**](#searchposts) | **GET** /api/posts/search | 搜索帖子|
+|[**searchPosts**](#searchposts) | **GET** /api/search/posts | 搜索帖子|
+|[**searchPosts1**](#searchposts1) | **GET** /api/posts/search | 搜索帖子|
 |[**searchPostsByTag**](#searchpostsbytag) | **GET** /api/posts/tag | 根据标签搜索帖子|
 |[**searchTemplates**](#searchtemplates) | **GET** /api/workflows/templates | 搜索工作流模板|
 |[**searchUsers**](#searchusers) | **POST** /api/friend/search | 搜索用户|
@@ -350,6 +382,7 @@ All URIs are relative to *http://localhost:8080*
 |[**smartDynamicScrape**](#smartdynamicscrape) | **POST** /api/scraper/dynamic/smart | 智能动态抓取|
 |[**smartScrape**](#smartscrape) | **POST** /api/scraper/smart | 智能抓取|
 |[**studyWord**](#studyword) | **POST** /api/user/daily-word/{wordId}/study | 标记单词为已学习|
+|[**suggest**](#suggest) | **GET** /api/search/suggest | 搜索建议（即时联想）|
 |[**takeOffline**](#takeoffline) | **POST** /api/course/{id}/offline | 下架课程（管理员）|
 |[**textToSpeech**](#texttospeech) | **POST** /api/speech/tts | 文本转语音|
 |[**textToSpeechBase64**](#texttospeechbase64) | **POST** /api/speech/tts/base64 | 文本转语音 (Base64)|
@@ -367,6 +400,9 @@ All URIs are relative to *http://localhost:8080*
 |[**update**](#update) | **PUT** /api/workflows/{id} | 更新工作流基本信息|
 |[**updateAnnouncement**](#updateannouncement) | **PUT** /api/announcement/admin/update | 更新公告|
 |[**updateBanner**](#updatebanner) | **PUT** /api/admin/banner | 更新轮播图|
+|[**updateBook**](#updatebook) | **PUT** /api/books/{bookId} | 编辑书籍信息|
+|[**updateBookCover**](#updatebookcover) | **PUT** /api/books/{bookId}/cover | 更新书籍封面|
+|[**updateBookmark**](#updatebookmark) | **PUT** /api/books/{bookId}/bookmarks/{bookmarkId} | 更新书签备注/标题|
 |[**updateChapter**](#updatechapter) | **PUT** /api/course/{courseId}/chapter/{chapterId} | 更新章节（管理员）|
 |[**updateClass**](#updateclass) | **PUT** /api/classes/{classId} | 更新班级信息|
 |[**updateConfig**](#updateconfig) | **PUT** /api/admin/scraper/config/{id} | 更新抓取配置|
@@ -384,7 +420,10 @@ All URIs are relative to *http://localhost:8080*
 |[**updateMastery**](#updatemastery) | **POST** /api/user/daily-word/{wordId}/mastery | 更新单词掌握程度|
 |[**updateNode**](#updatenode) | **PUT** /api/workflows/{id}/nodes/{nodeId} | 更新节点|
 |[**updateNodeConfig**](#updatenodeconfig) | **PUT** /api/workflows/{id}/nodes/{nodeId}/config | 更新节点配置|
+|[**updateNote**](#updatenote) | **PUT** /api/books/{bookId}/notes/{noteId} | 更新笔记内容/颜色|
 |[**updatePaperQuestion**](#updatepaperquestion) | **PUT** /api/exam-papers/{paperId}/sections/{sectionId}/questions/{pqId} | 更新试卷题目分值/排序|
+|[**updatePlan**](#updateplan) | **PUT** /api/admin/membership/plans | 更新会员计划基本信息|
+|[**updatePlanQuota**](#updateplanquota) | **PUT** /api/admin/membership/plans/{planId}/quota | 修改计划AI配额|
 |[**updatePost**](#updatepost) | **PUT** /api/posts/{postId} | 更新帖子|
 |[**updateProfile**](#updateprofile) | **PUT** /api/user/profile | 更新个人资料|
 |[**updateProgress**](#updateprogress) | **PUT** /api/reading/progress | 更新阅读进度|
@@ -403,6 +442,7 @@ All URIs are relative to *http://localhost:8080*
 |[**userLogin**](#userlogin) | **POST** /api/auth/login | 用户登录|
 |[**userRegister**](#userregister) | **POST** /api/auth/register | 用户注册|
 |[**validate**](#validate) | **POST** /api/workflows/{id}/validate | 验证工作流定义|
+|[**wechatCallback**](#wechatcallback) | **POST** /api/payment/callback/wechat | 微信支付异步回调（预留）|
 
 # **_delete**
 > BaseResponseVoid _delete()
@@ -1212,6 +1252,57 @@ const { status, data } = await apiInstance.aiGenerateQuestions(
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **alipayCallback**
+> string alipayCallback(body)
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let body: string; //
+
+const { status, data } = await apiInstance.alipayCallback(
+    body
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **body** | **string**|  | |
+
+
+### Return type
+
+**string**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **applyTeacher**
 > BaseResponseLong applyTeacher(applyTeacherRequest)
 
@@ -1789,6 +1880,101 @@ const { status, data } = await apiInstance.cancelExecution(
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **cancelMembership**
+> BaseResponseVoid cancelMembership()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+const { status, data } = await apiInstance.cancelMembership();
+```
+
+### Parameters
+This endpoint does not have any parameters.
+
+
+### Return type
+
+**BaseResponseVoid**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **cancelMembership1**
+> BaseResponseVoid cancelMembership1()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let userId: number; // (default to undefined)
+
+const { status, data } = await apiInstance.cancelMembership1(
+    userId
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **userId** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseVoid**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **changePassword**
 > BaseResponseBoolean changePassword(changePasswordRequest)
 
@@ -2096,6 +2282,57 @@ const { status, data } = await apiInstance.confirmPayment(
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **confirmPayment1**
+> BaseResponseVoid confirmPayment1()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let orderNo: string; //会员订单号 (default to undefined)
+
+const { status, data } = await apiInstance.confirmPayment1(
+    orderNo
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **orderNo** | [**string**] | 会员订单号 | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseVoid**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **copy**
 > BaseResponseWorkflowResponse copy()
 
@@ -2292,6 +2529,60 @@ const { status, data } = await apiInstance.createBanner(
 ### Return type
 
 **BaseResponseLong**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **createBookmark**
+> BaseResponseReadingBookmarkDTO createBookmark(requestBody)
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let bookId: number; // (default to undefined)
+let requestBody: { [key: string]: object; }; //
+
+const { status, data } = await apiInstance.createBookmark(
+    bookId,
+    requestBody
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **requestBody** | **{ [key: string]: object; }**|  | |
+| **bookId** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseReadingBookmarkDTO**
 
 ### Authorization
 
@@ -2950,6 +3241,61 @@ const { status, data } = await apiInstance.createGroupFromClass(
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **createNote**
+> BaseResponseReadingNoteDTO createNote(createReadingNoteCommand)
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration,
+    CreateReadingNoteCommand
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let bookId: number; // (default to undefined)
+let createReadingNoteCommand: CreateReadingNoteCommand; //
+
+const { status, data } = await apiInstance.createNote(
+    bookId,
+    createReadingNoteCommand
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **createReadingNoteCommand** | **CreateReadingNoteCommand**|  | |
+| **bookId** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseReadingNoteDTO**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **createOrder**
 > BaseResponseString createOrder(createOrderRequest)
 
@@ -2983,6 +3329,58 @@ const { status, data } = await apiInstance.createOrder(
 ### Return type
 
 **BaseResponseString**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **createPlan**
+> BaseResponseMembershipPlan createPlan(createPlanRequest)
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration,
+    CreatePlanRequest
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let createPlanRequest: CreatePlanRequest; //
+
+const { status, data } = await apiInstance.createPlan(
+    createPlanRequest
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **createPlanRequest** | **CreatePlanRequest**|  | |
+
+
+### Return type
+
+**BaseResponseMembershipPlan**
 
 ### Authorization
 
@@ -3693,6 +4091,60 @@ const { status, data } = await apiInstance.deleteBook(
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
 | **bookId** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseVoid**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **deleteBookmark**
+> BaseResponseVoid deleteBookmark()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let bookId: number; // (default to undefined)
+let bookmarkId: number; // (default to undefined)
+
+const { status, data } = await apiInstance.deleteBookmark(
+    bookId,
+    bookmarkId
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **bookId** | [**number**] |  | defaults to undefined|
+| **bookmarkId** | [**number**] |  | defaults to undefined|
 
 
 ### Return type
@@ -4550,6 +5002,111 @@ const { status, data } = await apiInstance.deleteNode(
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **deleteNote**
+> BaseResponseVoid deleteNote()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let bookId: number; // (default to undefined)
+let noteId: number; // (default to undefined)
+
+const { status, data } = await apiInstance.deleteNote(
+    bookId,
+    noteId
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **bookId** | [**number**] |  | defaults to undefined|
+| **noteId** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseVoid**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **deletePlan**
+> BaseResponseVoid deletePlan()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let planId: number; // (default to undefined)
+
+const { status, data } = await apiInstance.deletePlan(
+    planId
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **planId** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseVoid**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **deletePost**
 > BaseResponseVoid deletePost()
 
@@ -5326,6 +5883,58 @@ const { status, data } = await apiInstance.enableTrigger(
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **encryptAllChapters**
+> BaseResponseInteger encryptAllChapters()
+
+对整本书所有未加密章节进行AES加密存储
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let bookId: number; // (default to undefined)
+
+const { status, data } = await apiInstance.encryptAllChapters(
+    bookId
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **bookId** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseInteger**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **encryptChapterContent**
 > BaseResponseVoid encryptChapterContent()
 
@@ -5784,6 +6393,50 @@ const { status, data } = await apiInstance.generateBannerImage(
 ### HTTP request headers
 
  - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getAiQuota**
+> BaseResponseMapStringMapStringInteger getAiQuota()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+const { status, data } = await apiInstance.getAiQuota();
+```
+
+### Parameters
+This endpoint does not have any parameters.
+
+
+### Return type
+
+**BaseResponseMapStringMapStringInteger**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
  - **Accept**: application/json
 
 
@@ -6381,6 +7034,60 @@ const { status, data } = await apiInstance.getBookChapters(
 ### Return type
 
 **BaseResponseListChapterDTO**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getBookmarksByBook**
+> BaseResponseListReadingBookmarkDTO getBookmarksByBook()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let bookId: number; // (default to undefined)
+let userId: number; // (default to undefined)
+
+const { status, data } = await apiInstance.getBookmarksByBook(
+    bookId,
+    userId
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **bookId** | [**number**] |  | defaults to undefined|
+| **userId** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseListReadingBookmarkDTO**
 
 ### Authorization
 
@@ -7274,6 +7981,50 @@ const { status, data } = await apiInstance.getCourseStructure(
 ### Return type
 
 **BaseResponseCourseStructureResponse**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getCurrentMembership**
+> BaseResponseUserMembership getCurrentMembership()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+const { status, data } = await apiInstance.getCurrentMembership();
+```
+
+### Parameters
+This endpoint does not have any parameters.
+
+
+### Return type
+
+**BaseResponseUserMembership**
 
 ### Authorization
 
@@ -8601,6 +9352,50 @@ This endpoint does not have any parameters.
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **getMembershipHistory**
+> BaseResponseListUserMembership getMembershipHistory()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+const { status, data } = await apiInstance.getMembershipHistory();
+```
+
+### Parameters
+This endpoint does not have any parameters.
+
+
+### Return type
+
+**BaseResponseListUserMembership**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **getMessages**
 > BaseResponseGroupMessagePageResponse getMessages()
 
@@ -9559,6 +10354,117 @@ const { status, data } = await apiInstance.getNodes(
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **getNotesByBook**
+> BaseResponseListReadingNoteDTO getNotesByBook()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let bookId: number; // (default to undefined)
+let userId: number; // (default to undefined)
+
+const { status, data } = await apiInstance.getNotesByBook(
+    bookId,
+    userId
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **bookId** | [**number**] |  | defaults to undefined|
+| **userId** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseListReadingNoteDTO**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getNotesByChapter**
+> BaseResponseListReadingNoteDTO getNotesByChapter()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let bookId: number; // (default to undefined)
+let chapterId: number; // (default to undefined)
+let userId: number; // (default to undefined)
+
+const { status, data } = await apiInstance.getNotesByChapter(
+    bookId,
+    chapterId,
+    userId
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **bookId** | [**number**] |  | defaults to undefined|
+| **chapterId** | [**number**] |  | defaults to undefined|
+| **userId** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseListReadingNoteDTO**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **getOrder**
 > BaseResponseOrderResponse getOrder()
 
@@ -9664,6 +10570,57 @@ const { status, data } = await apiInstance.getPaperQuestions(
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **getPdfUrl**
+> BaseResponseString getPdfUrl()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let bookId: number; // (default to undefined)
+
+const { status, data } = await apiInstance.getPdfUrl(
+    bookId
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **bookId** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseString**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **getPendingCount**
 > BaseResponseLong getPendingCount()
 
@@ -9740,6 +10697,57 @@ const { status, data } = await apiInstance.getPendingRequests(
 ### Return type
 
 **BaseResponseListJoinRequestResponse**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getPlan**
+> BaseResponseMembershipPlan getPlan()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let planId: number; // (default to undefined)
+
+const { status, data } = await apiInstance.getPlan(
+    planId
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **planId** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseMembershipPlan**
 
 ### Authorization
 
@@ -10620,6 +11628,50 @@ This endpoint does not have any parameters.
 ### Return type
 
 **BaseResponseOrderStatistics**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getStatistics1**
+> BaseResponseMapStringLong getStatistics1()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+const { status, data } = await apiInstance.getStatistics1();
+```
+
+### Parameters
+This endpoint does not have any parameters.
+
+
+### Return type
+
+**BaseResponseMapStringLong**
 
 ### Authorization
 
@@ -11637,6 +12689,57 @@ This endpoint does not have any parameters.
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **getUserAiQuota**
+> BaseResponseMapStringMapStringInteger getUserAiQuota()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let userId: number; // (default to undefined)
+
+const { status, data } = await apiInstance.getUserAiQuota(
+    userId
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **userId** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseMapStringMapStringInteger**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **getUserDetail**
 > BaseResponseUserDetailResponse getUserDetail()
 
@@ -12364,6 +13467,58 @@ const { status, data } = await apiInstance.getWorkflowAssistants(
 ### HTTP request headers
 
  - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **grantMembership**
+> BaseResponseVoid grantMembership(grantMembershipRequest)
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration,
+    GrantMembershipRequest
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let grantMembershipRequest: GrantMembershipRequest; //
+
+const { status, data } = await apiInstance.grantMembership(
+    grantMembershipRequest
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **grantMembershipRequest** | **GrantMembershipRequest**|  | |
+
+
+### Return type
+
+**BaseResponseVoid**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
  - **Accept**: application/json
 
 
@@ -14261,6 +15416,63 @@ const { status, data } = await apiInstance.listGroups(
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **listMemberships**
+> BaseResponseListUserMembership listMemberships()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let status: number; //状态：0-待支付，1-生效中，2-已过期，3-已取消 (optional) (default to undefined)
+let page: number; // (optional) (default to 1)
+let size: number; // (optional) (default to 10)
+
+const { status, data } = await apiInstance.listMemberships(
+    status,
+    page,
+    size
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **status** | [**number**] | 状态：0-待支付，1-生效中，2-已过期，3-已取消 | (optional) defaults to undefined|
+| **page** | [**number**] |  | (optional) defaults to 1|
+| **size** | [**number**] |  | (optional) defaults to 10|
+
+
+### Return type
+
+**BaseResponseListUserMembership**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **listOrders**
 > BaseResponseListOrderResponse listOrders()
 
@@ -14276,7 +15488,7 @@ import {
 const configuration = new Configuration();
 const apiInstance = new DefaultApi(configuration);
 
-let status: number; //订单状态：0-未支付，1-已支付，2-已过期，3-已退款 (optional) (default to undefined)
+let status: number; //订单状态：0-未支付，1-已支付，2-已过期，3-已退款/已取消 (optional) (default to undefined)
 let page: number; //页码 (optional) (default to 1)
 let size: number; //每页数量 (optional) (default to 10)
 
@@ -14291,7 +15503,7 @@ const { status, data } = await apiInstance.listOrders(
 
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
-| **status** | [**number**] | 订单状态：0-未支付，1-已支付，2-已过期，3-已退款 | (optional) defaults to undefined|
+| **status** | [**number**] | 订单状态：0-未支付，1-已支付，2-已过期，3-已退款/已取消 | (optional) defaults to undefined|
 | **page** | [**number**] | 页码 | (optional) defaults to 1|
 | **size** | [**number**] | 每页数量 | (optional) defaults to 10|
 
@@ -14299,6 +15511,94 @@ const { status, data } = await apiInstance.listOrders(
 ### Return type
 
 **BaseResponseListOrderResponse**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **listPlans**
+> BaseResponseListMembershipPlan listPlans()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+const { status, data } = await apiInstance.listPlans();
+```
+
+### Parameters
+This endpoint does not have any parameters.
+
+
+### Return type
+
+**BaseResponseListMembershipPlan**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **listPlans1**
+> BaseResponseListMembershipPlan listPlans1()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+const { status, data } = await apiInstance.listPlans1();
+```
+
+### Parameters
+This endpoint does not have any parameters.
+
+
+### Return type
+
+**BaseResponseListMembershipPlan**
 
 ### Authorization
 
@@ -15618,6 +16918,58 @@ const { status, data } = await apiInstance.publishExamPaper(
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **purchaseMembership**
+> BaseResponseString purchaseMembership(purchaseMembershipRequest)
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration,
+    PurchaseMembershipRequest
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let purchaseMembershipRequest: PurchaseMembershipRequest; //
+
+const { status, data } = await apiInstance.purchaseMembership(
+    purchaseMembershipRequest
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **purchaseMembershipRequest** | **PurchaseMembershipRequest**|  | |
+
+
+### Return type
+
+**BaseResponseString**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **queryAnnouncements**
 > BaseResponseAnnouncementPageResponse queryAnnouncements(queryAnnouncementRequest)
 
@@ -16178,6 +17530,57 @@ const { status, data } = await apiInstance.refund(
 ### Return type
 
 **BaseResponseVoid**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **reindex**
+> BaseResponseMapStringInteger reindex()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let type: string; // (optional) (default to 'all')
+
+const { status, data } = await apiInstance.reindex(
+    type
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **type** | [**string**] |  | (optional) defaults to 'all'|
+
+
+### Return type
+
+**BaseResponseMapStringInteger**
 
 ### Authorization
 
@@ -17531,6 +18934,66 @@ const { status, data } = await apiInstance.scrapeSinglePage(
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **searchAll**
+> BaseResponsePageResult searchAll()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let q: string; // (default to undefined)
+let type: string; // (optional) (default to 'all')
+let page: number; // (optional) (default to 1)
+let size: number; // (optional) (default to 20)
+
+const { status, data } = await apiInstance.searchAll(
+    q,
+    type,
+    page,
+    size
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **q** | [**string**] |  | defaults to undefined|
+| **type** | [**string**] |  | (optional) defaults to 'all'|
+| **page** | [**number**] |  | (optional) defaults to 1|
+| **size** | [**number**] |  | (optional) defaults to 20|
+
+
+### Return type
+
+**BaseResponsePageResult**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **searchArticles**
 > BaseResponseDailyArticlePageResponse searchArticles()
 
@@ -17588,8 +19051,125 @@ const { status, data } = await apiInstance.searchArticles(
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **searchBookChapters**
+> BaseResponsePageResult searchBookChapters()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let bookId: number; // (default to undefined)
+let q: string; // (default to undefined)
+let page: number; // (optional) (default to 1)
+let size: number; // (optional) (default to 20)
+
+const { status, data } = await apiInstance.searchBookChapters(
+    bookId,
+    q,
+    page,
+    size
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **bookId** | [**number**] |  | defaults to undefined|
+| **q** | [**string**] |  | defaults to undefined|
+| **page** | [**number**] |  | (optional) defaults to 1|
+| **size** | [**number**] |  | (optional) defaults to 20|
+
+
+### Return type
+
+**BaseResponsePageResult**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **searchBooks**
-> BaseResponseListBookDTO searchBooks()
+> BaseResponsePageResult searchBooks()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let q: string; // (default to undefined)
+let page: number; // (optional) (default to 1)
+let size: number; // (optional) (default to 20)
+
+const { status, data } = await apiInstance.searchBooks(
+    q,
+    page,
+    size
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **q** | [**string**] |  | defaults to undefined|
+| **page** | [**number**] |  | (optional) defaults to 1|
+| **size** | [**number**] |  | (optional) defaults to 20|
+
+
+### Return type
+
+**BaseResponsePageResult**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **searchBooks1**
+> BaseResponseListBookDTO searchBooks1()
 
 
 ### Example
@@ -17607,7 +19187,7 @@ let keyword: string; // (default to undefined)
 let page: number; // (optional) (default to 1)
 let size: number; // (optional) (default to 20)
 
-const { status, data } = await apiInstance.searchBooks(
+const { status, data } = await apiInstance.searchBooks1(
     keyword,
     page,
     size
@@ -17626,6 +19206,66 @@ const { status, data } = await apiInstance.searchBooks(
 ### Return type
 
 **BaseResponseListBookDTO**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **searchChapters**
+> BaseResponsePageResult searchChapters()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let q: string; // (default to undefined)
+let bookId: number; // (optional) (default to undefined)
+let page: number; // (optional) (default to 1)
+let size: number; // (optional) (default to 20)
+
+const { status, data } = await apiInstance.searchChapters(
+    q,
+    bookId,
+    page,
+    size
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **q** | [**string**] |  | defaults to undefined|
+| **bookId** | [**number**] |  | (optional) defaults to undefined|
+| **page** | [**number**] |  | (optional) defaults to 1|
+| **size** | [**number**] |  | (optional) defaults to 20|
+
+
+### Return type
+
+**BaseResponsePageResult**
 
 ### Authorization
 
@@ -17817,7 +19457,67 @@ const { status, data } = await apiInstance.searchGroups1(
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **searchPosts**
-> BaseResponsePostPageResponse searchPosts()
+> BaseResponsePageResult searchPosts()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let q: string; // (default to undefined)
+let postType: string; // (optional) (default to undefined)
+let page: number; // (optional) (default to 1)
+let size: number; // (optional) (default to 20)
+
+const { status, data } = await apiInstance.searchPosts(
+    q,
+    postType,
+    page,
+    size
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **q** | [**string**] |  | defaults to undefined|
+| **postType** | [**string**] |  | (optional) defaults to undefined|
+| **page** | [**number**] |  | (optional) defaults to 1|
+| **size** | [**number**] |  | (optional) defaults to 20|
+
+
+### Return type
+
+**BaseResponsePageResult**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **searchPosts1**
+> BaseResponsePostPageResponse searchPosts1()
 
 
 ### Example
@@ -17835,7 +19535,7 @@ let keyword: string; // (default to undefined)
 let pageNum: number; // (optional) (default to 1)
 let pageSize: number; // (optional) (default to 10)
 
-const { status, data } = await apiInstance.searchPosts(
+const { status, data } = await apiInstance.searchPosts1(
     keyword,
     pageNum,
     pageSize
@@ -18571,6 +20271,60 @@ const { status, data } = await apiInstance.studyWord(
 ### Return type
 
 **BaseResponseVoid**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **suggest**
+> BaseResponseListSearchSuggestionDTO suggest()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let q: string; // (default to undefined)
+let type: string; // (optional) (default to 'all')
+
+const { status, data } = await apiInstance.suggest(
+    q,
+    type
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **q** | [**string**] |  | defaults to undefined|
+| **type** | [**string**] |  | (optional) defaults to 'all'|
+
+
+### Return type
+
+**BaseResponseListSearchSuggestionDTO**
 
 ### Authorization
 
@@ -19456,6 +21210,172 @@ const { status, data } = await apiInstance.updateBanner(
 ### Return type
 
 **BaseResponseBoolean**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **updateBook**
+> BaseResponseBookDTO updateBook(requestBody)
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let bookId: number; // (default to undefined)
+let requestBody: { [key: string]: string; }; //
+
+const { status, data } = await apiInstance.updateBook(
+    bookId,
+    requestBody
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **requestBody** | **{ [key: string]: string; }**|  | |
+| **bookId** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseBookDTO**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **updateBookCover**
+> BaseResponseBookDTO updateBookCover()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration,
+    UpdateBookCoverRequest
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let bookId: number; // (default to undefined)
+let updateBookCoverRequest: UpdateBookCoverRequest; // (optional)
+
+const { status, data } = await apiInstance.updateBookCover(
+    bookId,
+    updateBookCoverRequest
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **updateBookCoverRequest** | **UpdateBookCoverRequest**|  | |
+| **bookId** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseBookDTO**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **updateBookmark**
+> BaseResponseReadingBookmarkDTO updateBookmark(requestBody)
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let bookId: number; // (default to undefined)
+let bookmarkId: number; // (default to undefined)
+let requestBody: { [key: string]: string; }; //
+
+const { status, data } = await apiInstance.updateBookmark(
+    bookId,
+    bookmarkId,
+    requestBody
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **requestBody** | **{ [key: string]: string; }**|  | |
+| **bookId** | [**number**] |  | defaults to undefined|
+| **bookmarkId** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseReadingBookmarkDTO**
 
 ### Authorization
 
@@ -20417,6 +22337,63 @@ const { status, data } = await apiInstance.updateNodeConfig(
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **updateNote**
+> BaseResponseReadingNoteDTO updateNote(requestBody)
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let bookId: number; // (default to undefined)
+let noteId: number; // (default to undefined)
+let requestBody: { [key: string]: string; }; //
+
+const { status, data } = await apiInstance.updateNote(
+    bookId,
+    noteId,
+    requestBody
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **requestBody** | **{ [key: string]: string; }**|  | |
+| **bookId** | [**number**] |  | defaults to undefined|
+| **noteId** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseReadingNoteDTO**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **updatePaperQuestion**
 > BaseResponseBoolean updatePaperQuestion(updatePaperQuestionRequest)
 
@@ -20459,6 +22436,113 @@ const { status, data } = await apiInstance.updatePaperQuestion(
 ### Return type
 
 **BaseResponseBoolean**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **updatePlan**
+> BaseResponseVoid updatePlan(updatePlanRequest)
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration,
+    UpdatePlanRequest
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let updatePlanRequest: UpdatePlanRequest; //
+
+const { status, data } = await apiInstance.updatePlan(
+    updatePlanRequest
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **updatePlanRequest** | **UpdatePlanRequest**|  | |
+
+
+### Return type
+
+**BaseResponseVoid**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **updatePlanQuota**
+> BaseResponseVoid updatePlanQuota(updatePlanQuotaRequest)
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration,
+    UpdatePlanQuotaRequest
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let planId: number; // (default to undefined)
+let updatePlanQuotaRequest: UpdatePlanQuotaRequest; //
+
+const { status, data } = await apiInstance.updatePlanQuota(
+    planId,
+    updatePlanQuotaRequest
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **updatePlanQuotaRequest** | **UpdatePlanQuotaRequest**|  | |
+| **planId** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseVoid**
 
 ### Authorization
 
@@ -21446,6 +23530,57 @@ const { status, data } = await apiInstance.validate(
 ### HTTP request headers
 
  - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **wechatCallback**
+> string wechatCallback(body)
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let body: string; //
+
+const { status, data } = await apiInstance.wechatCallback(
+    body
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **body** | **string**|  | |
+
+
+### Return type
+
+**string**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
  - **Accept**: application/json
 
 

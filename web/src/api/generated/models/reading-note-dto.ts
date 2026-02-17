@@ -14,17 +14,17 @@
 
 
 
-export interface BookDTO {
+export interface ReadingNoteDTO {
     'id'?: number;
-    'title'?: string;
-    'author'?: string;
-    'coverUrl'?: string;
-    'originFileUrl'?: string;
-    'fileType'?: string;
-    'status'?: string;
-    'totalChapters'?: number;
-    'wordCount'?: number;
-    'fileSize'?: number;
+    'userId'?: number;
+    'bookId'?: number;
+    'chapterId'?: number;
+    'chapterIndex'?: number;
+    'noteContent'?: string;
+    'selectedText'?: string;
+    'startPosition'?: number;
+    'endPosition'?: number;
+    'noteColor'?: string;
     'createTime'?: string;
     'updateTime'?: string;
 }

@@ -13,12 +13,13 @@
  */
 
 
+// May contain unused imports in some cases
+// @ts-ignore
+import type { PageResult } from './page-result';
 
-export interface UploadBookCommand {
-    'file': File;
-    'title': string;
-    'author'?: string;
-    'cover'?: File;
-    'adminId': number;
+export interface BaseResponsePageResult {
+    'code'?: number;
+    'data'?: PageResult;
+    'message'?: string;
 }
 

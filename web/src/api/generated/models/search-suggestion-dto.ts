@@ -14,11 +14,9 @@
 
 
 
-export interface UploadBookCommand {
-    'file': File;
-    'title': string;
-    'author'?: string;
-    'cover'?: File;
-    'adminId': number;
+export interface SearchSuggestionDTO {
+    'text'?: string;
+    'type'?: string;
+    'id'?: number;
 }
 
