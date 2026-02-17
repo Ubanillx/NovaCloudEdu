@@ -29,7 +29,8 @@ public enum FileBusinessType {
     EXAM_TEMPLATE("exam/template", "试卷模板", 1 * 1024 * 1024),
     BANNER("banner", "轮播图", 10 * 1024 * 1024),
     ANNOUNCEMENT("announcement", "公告图片", 5 * 1024 * 1024),
-    ASSISTANT_AVATAR("assistant/avatar", "助手头像", 5 * 1024 * 1024);
+    ASSISTANT_AVATAR("assistant/avatar", "助手头像", 5 * 1024 * 1024),
+    BOOK_IMAGE("book/image", "书籍内嵌图片", 10 * 1024 * 1024);
 
     private final String folder;
     private final String description;
