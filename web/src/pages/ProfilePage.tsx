@@ -5,9 +5,13 @@ import {
   Shield, Clock, Flame, Heart, Camera, Loader2, MapPin, Cake,
   X, Hash, UserCheck, Ban, RefreshCw, BookMarked, ChevronRight,
   GraduationCap, Send, CheckCircle2, XCircle, Clock3, Plus, Trash2,
+  BookOpen, Star, Users, FileText, Languages, HeartOff,
 } from 'lucide-react';
 import { apiClient, DefaultApi, Configuration } from '../api';
-import type { UserDetailResponse, UpdateProfileRequest, UserStatsResult, TeacherApplicationResponse } from '../api/generated/models';
+import type {
+  UserDetailResponse, UpdateProfileRequest, UserStatsResult, TeacherApplicationResponse,
+  CourseResponse, PostResponse, UserDailyArticleResponse, UserDailyWordResponse,
+} from '../api/generated/models';
 import toast from '../components/ui/Toast';
 import PhoneEditModal from '../components/ui/PhoneEditModal';
 import RegionPicker from '../components/ui/RegionPicker';
@@ -70,6 +74,99 @@ const ProfilePage: React.FC = () => {
   const [uploading, setUploading] = useState(false);
   const [phoneModalOpen, setPhoneModalOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // ====== 我的收藏 ======
+  type FavTab = 'courses' | 'posts' | 'articles' | 'words';
+  const [favTab, setFavTab] = useState<FavTab>('courses');
+  const [favCourses, setFavCourses] = useState<CourseResponse[]>([]);
+  const [favPosts, setFavPosts] = useState<PostResponse[]>([]);
+  const [favArticles, setFavArticles] = useState<UserDailyArticleResponse[]>([]);
+  const [favWords, setFavWords] = useState<UserDailyWordResponse[]>([]);
+  const [favLoading, setFavLoading] = useState(false);
+  const [favLoaded, setFavLoaded] = useState<Record<FavTab, boolean>>({ courses: false, posts: false, articles: false, words: false });
+  const [favPage, setFavPage] = useState<Record<FavTab, number>>({ courses: 1, posts: 1, articles: 1, words: 1 });
+  const [favHasMore, setFavHasMore] = useState<Record<FavTab, boolean>>({ courses: false, posts: false, articles: false, words: false });
+  const FAV_PAGE_SIZE = 6;
+
+  const fetchFavData = useCallback(async (tab: FavTab, page: number, append = false) => {
+    setFavLoading(true);
+    try {
+      if (tab === 'courses') {
+        const res = await api.getMyFavourites1({ page, size: FAV_PAGE_SIZE });
+        if (res.data?.code === 0) {
+          const list = (res.data.data || []) as CourseResponse[];
+          setFavCourses(prev => append ? [...prev, ...list] : list);
+          setFavHasMore(prev => ({ ...prev, courses: list.length >= FAV_PAGE_SIZE }));
+        }
+      } else if (tab === 'posts') {
+        const res = await api.getMyFavourites({ pageNum: page, pageSize: FAV_PAGE_SIZE });
+        if (res.data?.code === 0 && res.data.data) {
+          const list = (res.data.data.posts || []) as PostResponse[];
+          setFavPosts(prev => append ? [...prev, ...list] : list);
+          setFavHasMore(prev => ({ ...prev, posts: list.length >= FAV_PAGE_SIZE }));
+        }
+      } else if (tab === 'articles') {
+        const res = await api.getCollectedArticles({ page, size: FAV_PAGE_SIZE });
+        if (res.data?.code === 0) {
+          const list = (res.data.data || []) as UserDailyArticleResponse[];
+          setFavArticles(prev => append ? [...prev, ...list] : list);
+          setFavHasMore(prev => ({ ...prev, articles: list.length >= FAV_PAGE_SIZE }));
+        }
+      } else if (tab === 'words') {
+        const res = await api.getCollectedWords({ page, size: FAV_PAGE_SIZE });
+        if (res.data?.code === 0) {
+          const list = (res.data.data || []) as UserDailyWordResponse[];
+          setFavWords(prev => append ? [...prev, ...list] : list);
+          setFavHasMore(prev => ({ ...prev, words: list.length >= FAV_PAGE_SIZE }));
+        }
+      }
+      setFavLoaded(prev => ({ ...prev, [tab]: true }));
+    } catch {
+      toast.error('加载收藏数据失败');
+    } finally {
+      setFavLoading(false);
+    }
+  }, []);
+
+  // 切换 tab 时懒加载
+  useEffect(() => {
+    if (user && !favLoaded[favTab]) {
+      fetchFavData(favTab, 1);
+    }
+  }, [favTab, user, favLoaded, fetchFavData]);
+
+  const handleFavLoadMore = () => {
+    const nextPage = favPage[favTab] + 1;
+    setFavPage(prev => ({ ...prev, [favTab]: nextPage }));
+    fetchFavData(favTab, nextPage, true);
+  };
+
+  const handleUnfavCourse = async (courseId: number | undefined) => {
+    if (!courseId) return;
+    try {
+      await api.unfavouriteCourse({ courseId: courseId as unknown as number });
+      setFavCourses(prev => prev.filter(c => String(c.id) !== String(courseId)));
+      toast.success('已取消收藏');
+    } catch { toast.error('操作失败'); }
+  };
+
+  const handleUnfavArticle = async (articleId: number | undefined) => {
+    if (!articleId) return;
+    try {
+      await api.toggleCollect1({ articleId: articleId as unknown as number });
+      setFavArticles(prev => prev.filter(a => String(a.articleId) !== String(articleId)));
+      toast.success('已取消收藏');
+    } catch { toast.error('操作失败'); }
+  };
+
+  const handleUnfavWord = async (wordId: number | undefined) => {
+    if (!wordId) return;
+    try {
+      await api.toggleCollect({ wordId: wordId as unknown as number });
+      setFavWords(prev => prev.filter(w => String(w.wordId) !== String(wordId)));
+      toast.success('已取消收藏');
+    } catch { toast.error('操作失败'); }
+  };
 
   // ====== 申请成为老师 ======
   const [teacherApp, setTeacherApp] = useState<TeacherApplicationResponse | null>(null);
@@ -505,6 +602,277 @@ const ProfilePage: React.FC = () => {
         </div>
       </div>
 
+      {/* ==================== 我的收藏 ==================== */}
+      <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm p-5">
+        <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+          <span className="w-1 h-4 bg-brand-600 rounded-full" />
+          我的收藏
+        </h3>
+
+        {/* Tab 栏 */}
+        <div className="flex items-center gap-1.5 p-1 bg-gray-50 dark:bg-gray-800/50 rounded-xl mb-4">
+          {([
+            { key: 'courses' as FavTab, label: '课程', icon: <GraduationCap size={13} /> },
+            { key: 'posts' as FavTab, label: '帖子', icon: <FileText size={13} /> },
+            { key: 'articles' as FavTab, label: '美文', icon: <BookOpen size={13} /> },
+            { key: 'words' as FavTab, label: '单词', icon: <Languages size={13} /> },
+          ]).map(t => (
+            <button
+              key={t.key}
+              onClick={() => setFavTab(t.key)}
+              className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all ${
+                favTab === t.key
+                  ? 'bg-brand-600 text-white shadow-sm'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-white dark:hover:bg-gray-800'
+              }`}
+            >
+              {t.icon}
+              {t.label}
+            </button>
+          ))}
+        </div>
+
+        {/* 内容区 */}
+        {favLoading && !favLoaded[favTab] ? (
+          // 骨架屏
+          <div className="space-y-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 dark:bg-gray-800/30 animate-pulse">
+                <div className="w-16 h-16 rounded-lg bg-gray-200 dark:bg-gray-700 flex-shrink-0" />
+                <div className="flex-1 space-y-2">
+                  <div className="h-3.5 bg-gray-200 dark:bg-gray-700 rounded w-2/3" />
+                  <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-full" />
+                  <div className="h-2.5 bg-gray-200 dark:bg-gray-700 rounded w-1/3" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <>
+            {/* ---- 课程收藏 ---- */}
+            {favTab === 'courses' && (
+              favCourses.length === 0 ? (
+                <FavEmptyState icon={<GraduationCap size={28} />} text="还没有收藏的课程" />
+              ) : (
+                <div className="space-y-2.5">
+                  {favCourses.map(course => (
+                    <div
+                      key={String(course.id)}
+                      className="group flex items-center gap-3 p-3 rounded-xl bg-gray-50 dark:bg-gray-800/30 hover:bg-brand-50/50 dark:hover:bg-brand-900/10 transition-colors cursor-pointer"
+                      onClick={() => navigate(`/course/${String(course.id)}`)}
+                    >
+                      <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 dark:bg-gray-800">
+                        {course.coverImage ? (
+                          <img src={course.coverImage} alt={course.title} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <BookOpen size={20} className="text-gray-300 dark:text-gray-600" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-bold text-gray-900 dark:text-white line-clamp-1 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">
+                          {course.title}
+                        </p>
+                        <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-1">
+                          {course.description || course.subtitle || '暂无简介'}
+                        </p>
+                        <div className="flex items-center gap-3 mt-1.5 text-[10px] text-gray-400 dark:text-gray-500">
+                          {course.totalChapters != null && course.totalChapters > 0 && (
+                            <span className="flex items-center gap-0.5"><BookOpen size={10} />{course.totalChapters}章</span>
+                          )}
+                          <span className="flex items-center gap-0.5"><Users size={10} />{course.studentCount || 0}人</span>
+                          {course.ratingScore != null && course.ratingScore > 0 && (
+                            <span className="flex items-center gap-0.5 text-amber-500"><Star size={10} fill="currentColor" />{course.ratingScore.toFixed(1)}</span>
+                          )}
+                          {course.courseType === 0 && <span className="text-green-600 dark:text-green-400 font-bold">免费</span>}
+                          {course.courseType === 2 && <span className="text-amber-600 dark:text-amber-400 font-bold">会员</span>}
+                        </div>
+                      </div>
+                      <button
+                        onClick={e => { e.stopPropagation(); handleUnfavCourse(course.id); }}
+                        className="flex-shrink-0 p-1.5 rounded-lg text-gray-300 dark:text-gray-600 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 opacity-0 group-hover:opacity-100 transition-all"
+                        title="取消收藏"
+                      >
+                        <HeartOff size={14} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )
+            )}
+
+            {/* ---- 帖子收藏 ---- */}
+            {favTab === 'posts' && (
+              favPosts.length === 0 ? (
+                <FavEmptyState icon={<FileText size={28} />} text="还没有收藏的帖子" />
+              ) : (
+                <div className="space-y-2.5">
+                  {favPosts.map(post => (
+                    <div
+                      key={String(post.id)}
+                      className="group flex items-start gap-3 p-3 rounded-xl bg-gray-50 dark:bg-gray-800/30 hover:bg-brand-50/50 dark:hover:bg-brand-900/10 transition-colors cursor-pointer"
+                      onClick={() => navigate(`/circle/post/${String(post.id)}`)}
+                    >
+                      <div className="w-8 h-8 rounded-lg bg-brand-50 dark:bg-brand-900/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <FileText size={14} className="text-brand-500" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-bold text-gray-900 dark:text-white line-clamp-1 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">
+                          {post.title || '无标题帖子'}
+                        </p>
+                        <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-2">
+                          {post.content?.replace(/<[^>]+>/g, '').slice(0, 100) || '暂无内容'}
+                        </p>
+                        <div className="flex items-center gap-3 mt-1.5 text-[10px] text-gray-400 dark:text-gray-500">
+                          {post.tags && post.tags.length > 0 && (
+                            <div className="flex items-center gap-1">
+                              {post.tags.slice(0, 2).map(tag => (
+                                <span key={tag} className="px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400">{tag}</span>
+                              ))}
+                            </div>
+                          )}
+                          <span className="flex items-center gap-0.5"><Heart size={10} />{post.thumbNum || 0}</span>
+                          <span className="flex items-center gap-0.5"><BookMarked size={10} />{post.favourNum || 0}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )
+            )}
+
+            {/* ---- 美文收藏 ---- */}
+            {favTab === 'articles' && (
+              favArticles.length === 0 ? (
+                <FavEmptyState icon={<BookOpen size={28} />} text="还没有收藏的美文" />
+              ) : (
+                <div className="space-y-2.5">
+                  {favArticles.map(item => {
+                    const article = item.article;
+                    return (
+                      <div
+                        key={String(item.id)}
+                        className="group flex items-center gap-3 p-3 rounded-xl bg-gray-50 dark:bg-gray-800/30 hover:bg-brand-50/50 dark:hover:bg-brand-900/10 transition-colors cursor-pointer"
+                        onClick={() => navigate(`/daily-article/${String(item.articleId)}`)}
+                      >
+                        <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 dark:bg-gray-800">
+                          {article?.coverImage ? (
+                            <img src={article.coverImage} alt={article.title} className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-brand-50 to-accent-50 dark:from-brand-900/20 dark:to-accent-900/20">
+                              <BookOpen size={20} className="text-brand-300 dark:text-brand-600" />
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-bold text-gray-900 dark:text-white line-clamp-1 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">
+                            {article?.title || '未知文章'}
+                          </p>
+                          <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-1">
+                            {article?.summary || article?.content?.slice(0, 60) || '暂无摘要'}
+                          </p>
+                          <div className="flex items-center gap-3 mt-1.5 text-[10px] text-gray-400 dark:text-gray-500">
+                            {article?.author && <span>{article.author}</span>}
+                            {article?.readTime != null && article.readTime > 0 && (
+                              <span className="flex items-center gap-0.5"><Clock size={10} />{article.readTime}分钟</span>
+                            )}
+                            {article?.category && (
+                              <span className="px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-700">{article.category}</span>
+                            )}
+                          </div>
+                        </div>
+                        <button
+                          onClick={e => { e.stopPropagation(); handleUnfavArticle(item.articleId); }}
+                          className="flex-shrink-0 p-1.5 rounded-lg text-gray-300 dark:text-gray-600 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 opacity-0 group-hover:opacity-100 transition-all"
+                          title="取消收藏"
+                        >
+                          <HeartOff size={14} />
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              )
+            )}
+
+            {/* ---- 单词收藏 ---- */}
+            {favTab === 'words' && (
+              favWords.length === 0 ? (
+                <FavEmptyState icon={<Languages size={28} />} text="还没有收藏的单词" />
+              ) : (
+                <div className="space-y-2.5">
+                  {favWords.map(item => {
+                    const word = item.word;
+                    return (
+                      <div
+                        key={String(item.id)}
+                        className="group flex items-center gap-3 p-3 rounded-xl bg-gray-50 dark:bg-gray-800/30 hover:bg-brand-50/50 dark:hover:bg-brand-900/10 transition-colors cursor-pointer"
+                        onClick={() => navigate(`/daily-word/${String(item.wordId)}`)}
+                      >
+                        <div className="w-10 h-10 rounded-lg bg-violet-50 dark:bg-violet-900/20 flex items-center justify-center flex-shrink-0">
+                          <span className="text-sm font-black text-violet-600 dark:text-violet-400">
+                            {word?.word?.[0]?.toUpperCase() || 'A'}
+                          </span>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <p className="text-sm font-bold text-gray-900 dark:text-white group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">
+                              {word?.word || '—'}
+                            </p>
+                            {word?.pronunciationUs && (
+                              <span className="text-[10px] text-gray-400 dark:text-gray-500">/{word.pronunciationUs}/</span>
+                            )}
+                          </div>
+                          <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-1">
+                            {word?.translation || '暂无翻译'}
+                          </p>
+                          <div className="flex items-center gap-2 mt-1">
+                            {item.masteryLevelDesc && (
+                              <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
+                                (item.masteryLevel || 0) >= 3
+                                  ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                                  : (item.masteryLevel || 0) >= 2
+                                    ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
+                                    : 'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400'
+                              }`}>
+                                {item.masteryLevelDesc}
+                              </span>
+                            )}
+                            {word?.category && (
+                              <span className="text-[10px] text-gray-400 dark:text-gray-500">{word.category}</span>
+                            )}
+                          </div>
+                        </div>
+                        <button
+                          onClick={e => { e.stopPropagation(); handleUnfavWord(item.wordId); }}
+                          className="flex-shrink-0 p-1.5 rounded-lg text-gray-300 dark:text-gray-600 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 opacity-0 group-hover:opacity-100 transition-all"
+                          title="取消收藏"
+                        >
+                          <HeartOff size={14} />
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              )
+            )}
+
+            {/* 加载更多 */}
+            {favHasMore[favTab] && (
+              <button
+                onClick={handleFavLoadMore}
+                disabled={favLoading}
+                className="w-full mt-4 py-2.5 rounded-xl text-xs font-bold text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-900/20 hover:bg-brand-100 dark:hover:bg-brand-900/30 transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5"
+              >
+                {favLoading ? <Loader2 size={13} className="animate-spin" /> : <ChevronRight size={13} />}
+                加载更多
+              </button>
+            )}
+          </>
+        )}
+      </div>
+
       {/* ==================== 快捷入口 ==================== */}
       <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm p-5">
         <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
@@ -757,6 +1125,15 @@ const ProfilePage: React.FC = () => {
 };
 
 // ==================== 子组件 ====================
+
+const FavEmptyState: React.FC<{ icon: React.ReactNode; text: string }> = ({ icon, text }) => (
+  <div className="py-10 text-center">
+    <div className="w-14 h-14 rounded-2xl bg-gray-50 dark:bg-gray-800 flex items-center justify-center mx-auto mb-3 text-gray-300 dark:text-gray-600">
+      {icon}
+    </div>
+    <p className="text-xs text-gray-400 dark:text-gray-500">{text}</p>
+  </div>
+);
 
 const SectionTitle: React.FC<{ title: string }> = ({ title }) => (
   <div className="flex items-center gap-2 mb-3">
