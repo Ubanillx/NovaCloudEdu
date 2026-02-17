@@ -251,7 +251,7 @@ const PptTemplateManagementPage: React.FC = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">PPTX 文件 *</label>
-                <label className="flex items-center justify-center gap-2 px-4 py-6 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 cursor-pointer hover:border-brand-400 hover:bg-brand-50/30 dark:hover:bg-brand-900/10 transition-all">
+                <label className="flex items-center justify-center gap-2 px-4 py-6 rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-700 cursor-pointer hover:border-brand-400 hover:bg-brand-50/30 dark:hover:bg-brand-900/10 transition-all">
                   <Upload className="w-5 h-5 text-gray-400" />
                   <span className="text-sm text-gray-500">
                     {uploadFile ? uploadFile.name : '点击选择 .pptx 文件'}
