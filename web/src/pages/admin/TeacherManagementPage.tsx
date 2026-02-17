@@ -14,6 +14,7 @@ import {
   UserCheck,
   FileText,
   User,
+  Loader2,
 } from 'lucide-react';
 import { apiClient, DefaultApi, Configuration } from '../../api';
 import type {
@@ -122,7 +123,7 @@ const TeacherEditModal: React.FC<TeacherEditModalProps> = ({ isOpen, onClose, on
             className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">取消</button>
           <button onClick={handleSubmit} disabled={loading}
             className="px-6 py-2 bg-brand-600 text-white text-sm font-bold rounded-xl hover:bg-brand-700 shadow-lg shadow-brand-600/20 disabled:opacity-50 transition-all active:scale-95 flex items-center gap-2">
-            {loading && <RefreshCw size={16} className="animate-spin" />}
+            {loading && <Loader2 size={16} className="animate-spin" />}
             保存修改
           </button>
         </div>
@@ -174,7 +175,7 @@ const RemoveConfirmModal: React.FC<RemoveConfirmModalProps> = ({ isOpen, onClose
             className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">取消</button>
           <button onClick={onConfirm} disabled={loading}
             className="px-6 py-2 bg-red-600 text-white text-sm font-bold rounded-xl hover:bg-red-700 shadow-lg shadow-red-600/20 disabled:opacity-50 transition-all active:scale-95 flex items-center gap-2">
-            {loading && <RefreshCw size={16} className="animate-spin" />}
+            {loading && <Loader2 size={16} className="animate-spin" />}
             <Trash2 size={16} /> 确认移除
           </button>
         </div>
@@ -278,12 +279,12 @@ const ReviewModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSuccess, a
             <>
               <button onClick={() => handleReview(false)} disabled={loading}
                 className="px-5 py-2 bg-red-600 text-white text-sm font-bold rounded-xl hover:bg-red-700 disabled:opacity-50 transition-all active:scale-95 flex items-center gap-2">
-                {loading && <RefreshCw size={16} className="animate-spin" />}
+                {loading && <Loader2 size={16} className="animate-spin" />}
                 <XCircle size={16} /> 拒绝
               </button>
               <button onClick={() => handleReview(true)} disabled={loading}
                 className="px-5 py-2 bg-green-600 text-white text-sm font-bold rounded-xl hover:bg-green-700 shadow-lg shadow-green-600/20 disabled:opacity-50 transition-all active:scale-95 flex items-center gap-2">
-                {loading && <RefreshCw size={16} className="animate-spin" />}
+                {loading && <Loader2 size={16} className="animate-spin" />}
                 <CheckCircle2 size={16} /> 通过
               </button>
             </>

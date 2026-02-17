@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Search, 
   Plus, 
@@ -11,11 +11,11 @@ import {
   Megaphone,
   Calendar,
   Eye,
-  Upload,
   Clock,
   CheckCircle,
   XCircle,
-  Send
+  Send,
+  Loader2
 } from 'lucide-react';
 import { apiClient, DefaultApi, Configuration } from '../../api';
 import type { 
@@ -24,7 +24,7 @@ import type {
   UpdateAnnouncementRequest,
   QueryAnnouncementRequest 
 } from '../../api/generated/models';
-import { toast, TruncateWithTooltip } from '../../components/ui';
+import { toast, TruncateWithTooltip, ImageUploadArea } from '../../components/ui';
 
 const api = new DefaultApi(new Configuration(), '', apiClient);
 
@@ -35,117 +35,6 @@ const STATUS_OPTIONS = [
   { value: 1, label: '已发布', color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border-green-200 dark:border-green-800' },
   { value: 2, label: '已下线', color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 border-red-200 dark:border-red-800' },
 ];
-
-// 图片上传组件
-interface ImageUploadProps {
-  value?: string;
-  onChange: (url: string) => void;
-  label?: string;
-}
-
-const ImageUpload: React.FC<ImageUploadProps> = ({ value, onChange, label = '封面图片' }) => {
-  const [uploading, setUploading] = useState(false);
-  const [previewUrl, setPreviewUrl] = useState(value || '');
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    setPreviewUrl(value || '');
-  }, [value]);
-
-  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (!file.type.startsWith('image/')) {
-      toast.error('请选择图片文件');
-      return;
-    }
-
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error('图片大小不能超过 5MB');
-      return;
-    }
-
-    setUploading(true);
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-
-      const response = await apiClient.post('/api/file/upload/announcement', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
-
-      if (response.data?.code === 0 && response.data?.data?.fileUrl) {
-        const url = response.data.data.fileUrl;
-        setPreviewUrl(url);
-        onChange(url);
-        toast.success('上传成功');
-      } else {
-        toast.error(response.data?.message || '上传失败');
-      }
-    } catch (error: any) {
-      toast.error(error?.response?.data?.message || '上传失败');
-    } finally {
-      setUploading(false);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
-    }
-  };
-
-  const handleUrlInput = (url: string) => {
-    setPreviewUrl(url);
-    onChange(url);
-  };
-
-  return (
-    <div>
-      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">{label}</label>
-      <div className="space-y-3">
-        {/* 预览区域 */}
-        {previewUrl && (
-          <div className="relative w-full h-40 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
-            <img src={previewUrl} alt="预览" className="w-full h-full object-cover" />
-            <button
-              type="button"
-              onClick={() => { setPreviewUrl(''); onChange(''); }}
-              className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
-            >
-              <X size={14} />
-            </button>
-          </div>
-        )}
-        
-        {/* 上传按钮和URL输入 */}
-        <div className="flex gap-3">
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            onChange={handleFileSelect}
-            className="hidden"
-          />
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={uploading}
-            className="flex items-center gap-2 px-4 py-2.5 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors disabled:opacity-50"
-          >
-            {uploading ? <RefreshCw size={16} className="animate-spin" /> : <Upload size={16} />}
-            <span>{uploading ? '上传中...' : '上传图片'}</span>
-          </button>
-          <input
-            type="text"
-            value={previewUrl}
-            onChange={(e) => handleUrlInput(e.target.value)}
-            placeholder="或输入图片URL"
-            className="flex-1 px-4 py-2.5 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all text-sm"
-          />
-        </div>
-      </div>
-    </div>
-  );
-};
 
 // 公告表单弹窗组件
 interface AnnouncementFormModalProps {
@@ -158,6 +47,7 @@ interface AnnouncementFormModalProps {
 const AnnouncementFormModal: React.FC<AnnouncementFormModalProps> = ({ isOpen, onClose, onSuccess, announcement }) => {
   const isEdit = !!announcement;
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [formData, setFormData] = useState<CreateAnnouncementRequest>({
     title: '',
     content: '',
@@ -282,9 +172,30 @@ const AnnouncementFormModal: React.FC<AnnouncementFormModalProps> = ({ isOpen, o
           </div>
 
           {/* 封面图片 */}
-          <ImageUpload
-            value={formData.coverImage}
+          <ImageUploadArea
+            label="封面图片"
+            value={formData.coverImage || ''}
+            onFileSelect={async (file) => {
+              if (!file.type.startsWith('image/')) { toast.error('请选择图片文件'); return; }
+              if (file.size > 5 * 1024 * 1024) { toast.error('图片大小不能超过 5MB'); return; }
+              setUploading(true);
+              try {
+                const fd = new FormData();
+                fd.append('file', file);
+                const response = await apiClient.post('/api/file/upload/announcement', fd, {
+                  headers: { 'Content-Type': 'multipart/form-data' }
+                });
+                if (response.data?.code === 0 && response.data?.data?.fileUrl) {
+                  setFormData(prev => ({ ...prev, coverImage: response.data.data.fileUrl }));
+                  toast.success('上传成功');
+                } else { toast.error(response.data?.message || '上传失败'); }
+              } catch (error: any) { toast.error(error?.response?.data?.message || '上传失败'); }
+              finally { setUploading(false); }
+            }}
             onChange={(url) => setFormData(prev => ({ ...prev, coverImage: url }))}
+            uploading={uploading}
+            showUrlInput
+            placeholder="上传或输入图片 URL"
           />
 
           {/* 排序和时间 */}
@@ -334,7 +245,7 @@ const AnnouncementFormModal: React.FC<AnnouncementFormModalProps> = ({ isOpen, o
             disabled={loading}
             className="px-6 py-2 bg-brand-600 text-white text-sm font-bold rounded-xl hover:bg-brand-700 shadow-lg shadow-brand-600/20 disabled:opacity-50 transition-all active:scale-95 flex items-center gap-2"
           >
-            {loading && <RefreshCw size={16} className="animate-spin" />}
+            {loading && <Loader2 size={16} className="animate-spin" />}
             {isEdit ? '保存修改' : '创建公告'}
           </button>
         </div>
