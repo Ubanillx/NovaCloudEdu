@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, BookOpen, Clock, Users, Star, Heart, Play, Lock,
-  ChevronDown, ChevronRight, Download, Shield,
+  ChevronDown, ChevronRight, Download, Shield, ShoppingCart, Crown, Unlock, Loader2,
 } from 'lucide-react';
 import { apiClient, DefaultApi, Configuration } from '../api';
 import type {
@@ -48,7 +48,12 @@ const CourseDetailUserPage: React.FC = () => {
   const [isFavourited, setIsFavourited] = useState(false);
   const [favouriteCount, setFavouriteCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [purchasing, setPurchasing] = useState(false);
   const [expandedChapters, setExpandedChapters] = useState<Set<string>>(new Set());
+
+  // 从 structure 中获取访问状态
+  const hasAccess = structure?.hasAccess ?? false;
+  const purchased = structure?.purchased ?? false;
 
   const fetchData = useCallback(async () => {
     if (!courseId) return;
@@ -133,7 +138,43 @@ const CourseDetailUserPage: React.FC = () => {
 
   const handleSectionClick = (section: SectionExt) => {
     if (!courseId) return;
+    // 无权限且非可访问小节 → 拦截
+    if (!section.accessible) {
+      if (course?.courseType === 2) {
+        toast.warning('此小节需要开通会员或购买课程后观看');
+      } else {
+        toast.warning('此小节需要购买课程后观看');
+      }
+      return;
+    }
     navigate(`/course/${courseId}/learn?section=${section.id}`);
+  };
+
+  const handlePurchase = async () => {
+    if (!courseId) return;
+    setPurchasing(true);
+    try {
+      const res = await api.createOrder({
+        createOrderRequest: { courseId: courseId as unknown as number },
+      });
+      if (res.data.code === 0 && res.data.data) {
+        const orderNo = res.data.data;
+        // 免费课/会员课自动完成支付 → 刷新页面
+        if (course?.courseType === 0 || course?.courseType === 2) {
+          toast.success('课程开通成功');
+          fetchData();
+        } else {
+          toast.success(`订单创建成功，订单号：${orderNo}`);
+          // 付费课后续需要支付，暂时提示
+          toast.info('请联系管理员确认支付');
+        }
+      }
+    } catch (err: unknown) {
+      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || '操作失败';
+      toast.error(msg);
+    } finally {
+      setPurchasing(false);
+    }
   };
 
   if (loading) {
@@ -209,6 +250,15 @@ const CourseDetailUserPage: React.FC = () => {
                 )}
                 {course.courseType === 0 && (
                   <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-green-500/20 text-green-300 backdrop-blur-sm">免费</span>
+                )}
+                {course.courseType === 1 && (
+                  <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-500/20 text-amber-300 backdrop-blur-sm">付费</span>
+                )}
+                {course.courseType === 2 && (
+                  <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-violet-500/20 text-violet-300 backdrop-blur-sm flex items-center gap-0.5"><Crown size={10} />会员</span>
+                )}
+                {hasAccess && course.courseType !== 0 && (
+                  <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-500/20 text-emerald-300 backdrop-blur-sm flex items-center gap-0.5"><Unlock size={10} />已解锁</span>
                 )}
               </div>
               <h1 className="text-2xl md:text-3xl font-bold text-white drop-shadow-lg leading-tight">{course.title}</h1>
@@ -295,8 +345,12 @@ const CourseDetailUserPage: React.FC = () => {
                           {sections.map((section, si) => (
                             <button key={String(section.id)} onClick={() => handleSectionClick(section)}
                               className="w-full flex items-center gap-3 px-6 pl-16 py-3 hover:bg-brand-50/50 dark:hover:bg-brand-900/10 transition-colors text-left group/sec">
-                              <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 bg-gray-100 dark:bg-gray-800 group-hover/sec:bg-brand-100 dark:group-hover/sec:bg-brand-900/30 transition-colors">
-                                {section.isFree ? (
+                              <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 transition-colors ${
+                                section.accessible
+                                  ? 'bg-brand-50 dark:bg-brand-900/20 group-hover/sec:bg-brand-100 dark:group-hover/sec:bg-brand-900/30'
+                                  : 'bg-gray-100 dark:bg-gray-800'
+                              }`}>
+                                {section.accessible ? (
                                   <Play size={11} className="text-brand-600 dark:text-brand-400 ml-0.5" fill="currentColor" />
                                 ) : (
                                   <Lock size={11} className="text-gray-400" />
@@ -310,6 +364,9 @@ const CourseDetailUserPage: React.FC = () => {
                               <div className="flex items-center gap-2 flex-shrink-0">
                                 {section.isFree && (
                                   <span className="px-1.5 py-0.5 text-[10px] font-bold bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 rounded">免费</span>
+                                )}
+                                {!section.accessible && (
+                                  <span className="px-1.5 py-0.5 text-[10px] font-bold bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400 rounded">需购买</span>
                                 )}
                                 {section.transcodeStatus === 2 && (
                                   <Shield size={12} className="text-emerald-500" />
@@ -344,26 +401,65 @@ const CourseDetailUserPage: React.FC = () => {
         <div className="space-y-4 xl:sticky xl:top-20">
           {/* 操作卡片 */}
           <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-6 shadow-sm sticky top-20 space-y-4">
-            {/* 价格 */}
+            {/* 价格 & 购买状态 */}
             <div className="text-center pb-3 border-b border-gray-50 dark:border-gray-800">
               {course.courseType === 0 ? (
                 <div className="flex items-center justify-center gap-2">
                   <span className="text-2xl font-bold text-green-600 dark:text-green-400">免费课程</span>
                 </div>
+              ) : purchased ? (
+                <div className="flex items-center justify-center gap-2">
+                  <Unlock size={18} className="text-emerald-500" />
+                  <span className="text-lg font-bold text-emerald-600 dark:text-emerald-400">已购买</span>
+                </div>
+              ) : hasAccess && course.courseType === 2 ? (
+                <div className="flex items-center justify-center gap-2">
+                  <Crown size={18} className="text-violet-500" />
+                  <span className="text-lg font-bold text-violet-600 dark:text-violet-400">会员免费观看</span>
+                </div>
               ) : (
-                <div className="flex items-baseline justify-center gap-0.5">
-                  <span className="text-sm text-gray-400">¥</span>
-                  <span className="text-3xl font-black text-brand-600 dark:text-brand-400 tabular-nums">{course.price || 0}</span>
+                <div>
+                  <div className="flex items-baseline justify-center gap-0.5">
+                    <span className="text-sm text-gray-400">¥</span>
+                    <span className="text-3xl font-black text-brand-600 dark:text-brand-400 tabular-nums">{course.price || 0}</span>
+                  </div>
+                  {course.courseType === 2 && (
+                    <p className="text-xs text-violet-500 dark:text-violet-400 mt-1 flex items-center justify-center gap-1">
+                      <Crown size={12} />
+                      开通会员可免费观看
+                    </p>
+                  )}
                 </div>
               )}
             </div>
 
-            {/* 开始学习 */}
-            <button onClick={handleStartLearn}
-              className="w-full py-3 bg-gradient-to-r from-brand-600 to-brand-500 text-white rounded-xl text-sm font-bold hover:from-brand-700 hover:to-brand-600 shadow-lg shadow-brand-600/25 transition-all active:scale-[0.97] flex items-center justify-center gap-2 group">
-              <Play size={18} fill="currentColor" className="group-hover:scale-110 transition-transform" />
-              {progress && (progress.completionRate || 0) > 0 ? '继续学习' : '开始学习'}
-            </button>
+            {/* 操作按钮区域 */}
+            {hasAccess ? (
+              <button onClick={handleStartLearn}
+                className="w-full py-3 bg-gradient-to-r from-brand-600 to-brand-500 text-white rounded-xl text-sm font-bold hover:from-brand-700 hover:to-brand-600 shadow-lg shadow-brand-600/25 transition-all active:scale-[0.97] flex items-center justify-center gap-2 group">
+                <Play size={18} fill="currentColor" className="group-hover:scale-110 transition-transform" />
+                {progress && (progress.completionRate || 0) > 0 ? '继续学习' : '开始学习'}
+              </button>
+            ) : (
+              <>
+                <button onClick={handlePurchase} disabled={purchasing}
+                  className="w-full py-3 bg-gradient-to-r from-brand-600 to-brand-500 text-white rounded-xl text-sm font-bold hover:from-brand-700 hover:to-brand-600 shadow-lg shadow-brand-600/25 transition-all active:scale-[0.97] disabled:opacity-50 flex items-center justify-center gap-2 group">
+                  {purchasing ? (
+                    <Loader2 size={18} className="animate-spin" />
+                  ) : (
+                    <ShoppingCart size={18} className="group-hover:scale-110 transition-transform" />
+                  )}
+                  {course.courseType === 2 ? '立即开通' : '立即购买'}
+                </button>
+                {course.courseType === 2 && (
+                  <button onClick={() => navigate('/membership')}
+                    className="w-full py-2.5 rounded-xl text-sm font-medium border border-violet-200 dark:border-violet-800 text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-900/10 hover:bg-violet-100 dark:hover:bg-violet-900/20 transition-all active:scale-[0.97] flex items-center justify-center gap-2">
+                    <Crown size={16} />
+                    开通会员免费看
+                  </button>
+                )}
+              </>
+            )}
 
             {/* 收藏 */}
             <button onClick={handleFavourite}
