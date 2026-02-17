@@ -56,6 +56,7 @@ export const Header: React.FC = () => {
   const navigate = useNavigate();
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [headerSearch, setHeaderSearch] = useState('');
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -111,6 +112,15 @@ export const Header: React.FC = () => {
           <input
             type="text"
             placeholder="搜索..."
+            value={headerSearch}
+            onChange={e => setHeaderSearch(e.target.value)}
+            onKeyDown={e => {
+              if (e.key === 'Enter' && headerSearch.trim()) {
+                navigate(`/search?q=${encodeURIComponent(headerSearch.trim())}`);
+                setHeaderSearch('');
+                (e.target as HTMLInputElement).blur();
+              }
+            }}
             className="peer w-9 hover:w-48 focus:w-64 h-9 bg-transparent hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 pl-9 pr-4 rounded-full border border-transparent focus:border-gray-200 dark:focus:border-gray-600 outline-none text-sm transition-all duration-300 ease-in-out cursor-pointer focus:cursor-text placeholder-transparent focus:placeholder-gray-400 dark:text-gray-200"
           />
           <div className="absolute left-0 top-1/2 -translate-y-1/2 p-2 pointer-events-none text-gray-600 dark:text-gray-300">

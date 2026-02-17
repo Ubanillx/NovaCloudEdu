@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useSider } from '../../context/SiderContext';
 import { AIApi, Configuration, apiClient } from '../../api';
 import type { AiAssistantVO } from '../../api/generated/models';
-import { LayoutGrid, MessageCircle, Bot, ChevronsLeft, ChevronsRight, Home } from 'lucide-react';
+import { LayoutGrid, MessageCircle, Bot, ChevronsLeft, ChevronsRight, Home, BookOpen, GraduationCap } from 'lucide-react';
 
 interface SiderProps {
   collapsed?: boolean;
@@ -22,6 +22,8 @@ export const Sider: React.FC<SiderProps> = ({ collapsed: propCollapsed = false }
   const isCircleActive = location.pathname.startsWith('/circle');
   const isChatActive = location.pathname.startsWith('/chat');
   const isAiChatActive = location.pathname.startsWith('/ai-chat');
+  const isEbookActive = location.pathname.startsWith('/ebooks');
+  const isCoursesActive = location.pathname === '/courses';
   const activeAssistantId = isAiChatActive ? location.pathname.split('/ai-chat/')[1]?.split('/')[0] : undefined;
   // 文字渐隐/渐显样式：折叠时同步渐隐，展开时延迟渐显
   const textFadeClass = `whitespace-nowrap overflow-hidden transition-opacity ${siderCollapsed ? 'opacity-0 w-0 duration-200' : 'opacity-100 duration-200 delay-200'}`;
@@ -120,6 +122,48 @@ export const Sider: React.FC<SiderProps> = ({ collapsed: propCollapsed = false }
                     <MessageCircle size={15} />
                   </div>
                   <span className={textFadeClass}>聊天</span>
+                </button>
+              </SiderTooltip>
+            </li>
+            <li>
+              <SiderTooltip label="电子书" show={isCollapsed}>
+                <button
+                  onClick={() => navigate('/ebooks')}
+                  className={`w-full flex items-center ${isCollapsed ? 'justify-center px-0 gap-0' : 'gap-3 px-3'} py-2 text-sm rounded-lg transition-all duration-200 ${
+                    isEbookActive
+                      ? 'bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 font-medium'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-brand-50 dark:hover:bg-brand-900/30 hover:text-brand-600 dark:hover:text-brand-400'
+                  }`}
+                >
+                  <div className={`w-7 h-7 rounded-lg flex-shrink-0 flex items-center justify-center transition-colors ${
+                    isEbookActive
+                      ? 'bg-brand-500 text-white shadow-sm'
+                      : 'bg-brand-100 dark:bg-brand-900/50 text-brand-600 dark:text-brand-400'
+                  }`}>
+                    <BookOpen size={15} />
+                  </div>
+                  <span className={textFadeClass}>电子书</span>
+                </button>
+              </SiderTooltip>
+            </li>
+            <li>
+              <SiderTooltip label="课程" show={isCollapsed}>
+                <button
+                  onClick={() => navigate('/courses')}
+                  className={`w-full flex items-center ${isCollapsed ? 'justify-center px-0 gap-0' : 'gap-3 px-3'} py-2 text-sm rounded-lg transition-all duration-200 ${
+                    isCoursesActive
+                      ? 'bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 font-medium'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-brand-50 dark:hover:bg-brand-900/30 hover:text-brand-600 dark:hover:text-brand-400'
+                  }`}
+                >
+                  <div className={`w-7 h-7 rounded-lg flex-shrink-0 flex items-center justify-center transition-colors ${
+                    isCoursesActive
+                      ? 'bg-brand-500 text-white shadow-sm'
+                      : 'bg-brand-100 dark:bg-brand-900/50 text-brand-600 dark:text-brand-400'
+                  }`}>
+                    <GraduationCap size={15} />
+                  </div>
+                  <span className={textFadeClass}>课程</span>
                 </button>
               </SiderTooltip>
             </li>
