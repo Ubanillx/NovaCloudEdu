@@ -4,6 +4,7 @@ import { Header, Footer, Sider, Content } from './components/layout';
 import { SiderProvider } from './context/SiderContext';
 import { ChatProvider } from './context/ChatContext';
 import { BannerCarousel, AnnouncementSection, DailyWordSection, DailyArticleSection, CourseScheduleCard } from './components/home';
+import { MembershipCard } from './components/home/MembershipCard';
 import { StudyStatsCard } from './components/home/StudyStatsCard';
 import { StudyPlanCard } from './components/home/StudyPlanCard';
 import { apiClient, DefaultApi, Configuration } from './api';
@@ -24,6 +25,10 @@ import SchedulePage from './pages/SchedulePage';
 import WordBookPage from './pages/WordBookPage';
 import AiAssistantChatPage from './pages/AiAssistantChatPage';
 import FeedbackPage from './pages/FeedbackPage';
+import EbookListPage from './pages/EbookListPage';
+import SearchResultsPage from './pages/SearchResultsPage';
+import MembershipPage from './pages/MembershipPage';
+import CourseListPage from './pages/CourseListPage';
 
 const homeApi = new DefaultApi(new Configuration(), '', apiClient);
 
@@ -32,6 +37,7 @@ const HomePage: React.FC = () => {
   const navigate = useNavigate();
   const [courses, setCourses] = useState<CourseResponse[]>([]);
   const [coursesLoading, setCoursesLoading] = useState(true);
+  const [heroSearch, setHeroSearch] = useState('');
 
   useEffect(() => {
     homeApi.listCourses({ status: 1, page: 0, size: 6 })
@@ -74,8 +80,8 @@ const HomePage: React.FC = () => {
             <div className="pl-4 pr-3 text-gray-400 group-focus-within/search:text-brand-500 dark:group-focus-within/search:text-brand-400 transition-colors">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
             </div>
-            <input type="text" placeholder="想探索什么新知识？" className="flex-1 bg-transparent border-none outline-none text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 h-12 text-lg" />
-            <button className="bg-gray-900 dark:bg-brand-600 hover:bg-brand-600 dark:hover:bg-brand-500 text-white px-6 py-3 rounded-xl font-semibold transition-all shadow-lg shadow-gray-900/10 dark:shadow-brand-600/20 hover:shadow-brand-600/30 active:scale-95 flex items-center gap-2">
+            <input type="text" value={heroSearch} onChange={e => setHeroSearch(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && heroSearch.trim()) navigate(`/search?q=${encodeURIComponent(heroSearch.trim())}`); }} placeholder="想探索什么新知识？" className="flex-1 bg-transparent border-none outline-none text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 h-12 text-lg" />
+            <button onClick={() => { if (heroSearch.trim()) navigate(`/search?q=${encodeURIComponent(heroSearch.trim())}`); }} className="bg-gray-900 dark:bg-brand-600 hover:bg-brand-600 dark:hover:bg-brand-500 text-white px-6 py-3 rounded-xl font-semibold transition-all shadow-lg shadow-gray-900/10 dark:shadow-brand-600/20 hover:shadow-brand-600/30 active:scale-95 flex items-center gap-2">
               <span>探索</span>
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
             </button>
@@ -84,7 +90,7 @@ const HomePage: React.FC = () => {
         <div className="mt-6 flex flex-wrap justify-center gap-3 text-sm text-gray-500 dark:text-gray-400">
           <span className="text-gray-400 dark:text-gray-500">大家都在找:</span>
           {['少儿编程', '趣味数学', '英语口语', '科学小实验'].map(tag => (
-            <a key={tag} href="#" className="hover:text-brand-600 dark:hover:text-white hover:bg-brand-50 dark:hover:bg-brand-900/20 px-2 py-1 rounded transition-colors">{tag}</a>
+            <a key={tag} onClick={() => navigate(`/search?q=${encodeURIComponent(tag)}`)} className="cursor-pointer hover:text-brand-600 dark:hover:text-white hover:bg-brand-50 dark:hover:bg-brand-900/20 px-2 py-1 rounded transition-colors">{tag}</a>
           ))}
         </div>
       </div>
@@ -101,7 +107,7 @@ const HomePage: React.FC = () => {
         <div>
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white">热门课程</h2>
-            <a href="#courses" className="text-brand-600 hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300 text-sm font-medium flex items-center gap-1">
+            <a onClick={() => navigate('/courses')} className="cursor-pointer text-brand-600 hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300 text-sm font-medium flex items-center gap-1">
               查看全部 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path></svg>
             </a>
           </div>
@@ -168,6 +174,7 @@ const HomePage: React.FC = () => {
 
       {/* 右栏 - 学习状态 / 公告 / 每日单词 */}
       <div className="lg:col-span-4 xl:col-span-3 space-y-6">
+        <MembershipCard />
         <StudyStatsCard />
         <StudyPlanCard />
         <AnnouncementSection />
@@ -209,6 +216,10 @@ function App() {
               <Route path="ai-chat" element={<AiAssistantChatPage />} />
               <Route path="ai-chat/:assistantId" element={<AiAssistantChatPage />} />
               <Route path="course/:courseId" element={<CourseDetailUserPage />} />
+              <Route path="ebooks" element={<EbookListPage />} />
+              <Route path="courses" element={<CourseListPage />} />
+              <Route path="membership" element={<MembershipPage />} />
+              <Route path="search" element={<SearchResultsPage />} />
             </Routes>
           </Content>
         </div>

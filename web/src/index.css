@@ -582,3 +582,81 @@ table.admin-table td {
 .react-flow__node-loopContainer {
   z-index: -1 !important;
 }
+
+/* ========================================
+   电子书阅读器：图片行内/块级自适应
+   ======================================== */
+
+/* 覆盖 prose 的 display:block，让公式图片行内显示 */
+.reader-content img {
+  display: inline;
+  vertical-align: middle;
+  margin: 0 0.15em;
+  max-height: 1.8em;
+}
+
+/* 独立段落中的大图保持块级居中 */
+.reader-content p > img:only-child,
+.reader-content .block-img,
+.reader-content figure img {
+  display: block;
+  margin: 1em auto;
+  max-height: none;
+  max-width: 100%;
+}
+
+/* ========================================
+   电子书阅读器：数学公式样式
+   ======================================== */
+
+/* KaTeX 行内公式 */
+.reader-content .katex {
+  font-size: 1.05em;
+}
+
+/* KaTeX 块级公式 */
+.reader-content .katex-display {
+  margin: 1.5em 0;
+  text-align: center;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.5em 0;
+}
+
+/* MathML 原生渲染样式 */
+.reader-content math {
+  font-size: 1.05em;
+}
+
+.reader-content math[display="block"] {
+  display: block;
+  text-align: center;
+  margin: 1.5em 0;
+  overflow-x: auto;
+}
+
+/* 公式溢出时可横向滚动 */
+.reader-content .katex-display > .katex {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+/* ========================================
+   PDF 阅读器：页面样式
+   ======================================== */
+
+.pdf-page-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.pdf-page-wrapper .react-pdf__Page {
+  box-shadow: 0 4px 24px -4px rgba(0, 0, 0, 0.12), 0 0 8px -2px rgba(0, 0, 0, 0.06);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.pdf-page-wrapper .react-pdf__Page canvas {
+  display: block;
+}
