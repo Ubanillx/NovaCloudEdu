@@ -6,6 +6,8 @@ import com.novacloudedu.backend.application.book.service.KnowledgePointApplicati
 import com.novacloudedu.backend.application.book.service.ReadingQuizApplicationService;
 import com.novacloudedu.backend.common.BaseResponse;
 import com.novacloudedu.backend.common.ResultUtils;
+import com.novacloudedu.backend.domain.membership.service.AiUsageLimitService;
+import com.novacloudedu.backend.domain.membership.valueobject.AiFeatureType;
 import com.novacloudedu.backend.domain.book.entity.AiConversation;
 import com.novacloudedu.backend.domain.book.entity.ChapterSummary;
 import com.novacloudedu.backend.domain.book.entity.KnowledgePoint;
@@ -14,6 +16,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,6 +38,7 @@ public class AiBookController {
     private final AiQuestionApplicationService questionService;
     private final KnowledgePointApplicationService knowledgeService;
     private final ReadingQuizApplicationService quizService;
+    private final AiUsageLimitService aiUsageLimitService;
 
     // ==================== 章节总结 ====================
 
@@ -44,6 +49,7 @@ public class AiBookController {
             @PathVariable Long chapterId,
             @RequestParam(defaultValue = "DETAILED") String summaryType) {
         try {
+            aiUsageLimitService.checkAndConsume(getCurrentUserId(), AiFeatureType.AI_BOOK);
             ChapterSummary summary = summaryService.generateSummary(chapterId, summaryType);
             return ResultUtils.success(summary);
         } catch (Exception e) {
@@ -98,10 +104,11 @@ public class AiBookController {
             @PathVariable Long bookId,
             @RequestBody Map<String, Object> request) {
         try {
-            Long userId = ((Number) request.get("userId")).longValue();
+            Long userId = parseLong(request.get("userId"));
+            aiUsageLimitService.checkAndConsume(userId, AiFeatureType.AI_BOOK);
             String question = (String) request.get("question");
             Long chapterId = request.containsKey("chapterId") ? 
-                    ((Number) request.get("chapterId")).longValue() : null;
+                    parseLong(request.get("chapterId")) : null;
             
             Map<String, Object> result = questionService.askQuestion(userId, bookId, question, chapterId);
             return ResultUtils.success(result);
@@ -160,6 +167,7 @@ public class AiBookController {
             @PathVariable Long bookId,
             @PathVariable Long chapterId) {
         try {
+            aiUsageLimitService.checkAndConsume(getCurrentUserId(), AiFeatureType.AI_BOOK);
             List<KnowledgePoint> points = knowledgeService.extractKnowledgePoints(chapterId);
             return ResultUtils.success(points);
         } catch (Exception e) {
@@ -218,6 +226,7 @@ public class AiBookController {
             @RequestParam(required = false) Integer questionCount,
             @RequestParam(required = false) String difficulty) {
         try {
+            aiUsageLimitService.checkAndConsume(getCurrentUserId(), AiFeatureType.AI_BOOK);
             ReadingQuiz quiz = quizService.generateQuiz(chapterId, questionCount, difficulty);
             return ResultUtils.success(quiz);
         } catch (Exception e) {
@@ -266,5 +275,19 @@ public class AiBookController {
             log.error("提交答案失败", e);
             return (BaseResponse<Map<String, Object>>) (BaseResponse<?>) ResultUtils.error(50000, e.getMessage());
         }
+    }
+
+    private Long parseLong(Object value) {
+        if (value == null) return null;
+        if (value instanceof Number) return ((Number) value).longValue();
+        return Long.parseLong(value.toString().trim());
+    }
+
+    private Long getCurrentUserId() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.getName() != null) {
+            return Long.parseLong(auth.getName());
+        }
+        throw new IllegalStateException("无法获取当前用户ID");
     }
 }

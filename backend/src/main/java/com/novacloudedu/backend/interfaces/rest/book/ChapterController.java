@@ -44,4 +44,11 @@ public class ChapterController {
         chapterApplicationService.encryptChapterContent(bookId, chapterIndex);
         return ResultUtils.success(null);
     }
+
+    @Operation(summary = "批量加密所有章节", description = "对整本书所有未加密章节进行AES加密存储")
+    @PostMapping("/encrypt-all")
+    public BaseResponse<Integer> encryptAllChapters(@PathVariable Long bookId) {
+        int count = chapterApplicationService.encryptAllChapters(bookId);
+        return ResultUtils.success(count);
+    }
 }
