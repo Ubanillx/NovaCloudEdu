@@ -48,6 +48,9 @@ public class SectionResponse {
     @Schema(description = "HLS播放地址(m3u8)")
     private String hlsUrl;
 
+    @Schema(description = "当前用户是否可访问此小节")
+    private Boolean accessible;
+
     @Schema(description = "转码状态: 0-未转码, 1-转码中, 2-已完成, 3-失败")
     private Integer transcodeStatus;
 

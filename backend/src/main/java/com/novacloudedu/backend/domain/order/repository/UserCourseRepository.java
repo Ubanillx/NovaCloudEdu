@@ -18,6 +18,8 @@ public interface UserCourseRepository {
 
     Optional<UserCourse> findByUserIdAndCourseId(UserId userId, CourseId courseId);
 
+    Optional<UserCourse> findLatestByUserIdAndCourseId(UserId userId, CourseId courseId);
+
     List<UserCourse> findByUserId(UserId userId, int page, int size);
 
     List<UserCourse> findByStatus(OrderStatus status, int page, int size);

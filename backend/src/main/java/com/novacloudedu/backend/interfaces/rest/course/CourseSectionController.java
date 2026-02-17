@@ -7,6 +7,7 @@ import com.novacloudedu.backend.application.course.command.UpdateSectionCommand;
 import com.novacloudedu.backend.application.course.query.GetCourseQuery;
 import com.novacloudedu.backend.application.course.query.GetSectionQuery;
 import com.novacloudedu.backend.application.course.service.VideoUrlService;
+import com.novacloudedu.backend.application.membership.service.MembershipApplicationService;
 import com.novacloudedu.backend.infrastructure.video.VideoTranscodeService;
 import com.novacloudedu.backend.common.BaseResponse;
 import com.novacloudedu.backend.common.ErrorCode;
@@ -49,6 +50,7 @@ public class CourseSectionController {
     private final UserCourseRepository userCourseRepository;
     private final VideoUrlService videoUrlService;
     private final VideoTranscodeService videoTranscodeService;
+    private final MembershipApplicationService membershipApplicationService;
 
     @PostMapping
     @Operation(summary = "创建小节（管理员）")
@@ -161,7 +163,15 @@ public class CourseSectionController {
             return false;
         }
         Long userId = Long.parseLong(authentication.getName());
-        return userCourseRepository.existsByUserIdAndCourseId(
+        boolean hasPaidOrder = userCourseRepository.existsByUserIdAndCourseId(
                 UserId.of(userId), CourseId.of(courseId));
+        if (hasPaidOrder) {
+            return true;
+        }
+        // 会员课额外检查会员权限
+        if (course.getCourseType() == CourseType.MEMBER) {
+            return membershipApplicationService.hasCourseMemberAccess(userId);
+        }
+        return false;
     }
 }

@@ -4,6 +4,7 @@ import com.novacloudedu.backend.application.course.query.GetChapterQuery;
 import com.novacloudedu.backend.application.course.query.GetCourseQuery;
 import com.novacloudedu.backend.application.course.query.GetSectionQuery;
 import com.novacloudedu.backend.application.course.service.VideoUrlService;
+import com.novacloudedu.backend.application.membership.service.MembershipApplicationService;
 import com.novacloudedu.backend.common.BaseResponse;
 import com.novacloudedu.backend.common.ErrorCode;
 import com.novacloudedu.backend.common.ResultUtils;
@@ -45,6 +46,7 @@ public class CourseStructureController {
     private final ChapterAssembler chapterAssembler;
     private final UserCourseRepository userCourseRepository;
     private final VideoUrlService videoUrlService;
+    private final MembershipApplicationService membershipApplicationService;
 
     @GetMapping("/{courseId}/structure")
     @Operation(summary = "获取课程完整结构（课程+章节+小节）")
@@ -72,9 +74,14 @@ public class CourseStructureController {
                 })
                 .collect(Collectors.toList());
         
+        // 判断用户是否已购买（有有效的已支付订单）
+        boolean purchased = determinePurchased(course, authentication);
+
         CourseStructureResponse response = CourseStructureResponse.builder()
                 .course(courseAssembler.toCourseResponse(course))
                 .chapters(chapterResponses)
+                .hasAccess(hasAccess)
+                .purchased(purchased)
                 .build();
         
         return ResultUtils.success(response);
@@ -83,12 +90,33 @@ public class CourseStructureController {
     /**
      * 判断当前用户是否有权访问课程的付费内容
      * 公开课(FREE) → 所有人可访问
-     * 付费课(PAID)/会员课(MEMBER) → 需已购买
+     * 付费课(PAID) → 需已购买（有效订单）
+     * 会员课(MEMBER) → 已购买 或 持有有效会员
      */
     private boolean determineAccess(Course course, Authentication authentication) {
         if (course.getCourseType() == CourseType.FREE) {
             return true;
         }
+        if (authentication == null || authentication.getName() == null) {
+            return false;
+        }
+        Long userId = Long.parseLong(authentication.getName());
+        boolean hasPaidOrder = userCourseRepository.existsByUserIdAndCourseId(
+                UserId.of(userId), CourseId.of(course.getId().value()));
+        if (hasPaidOrder) {
+            return true;
+        }
+        // 会员课额外检查会员权限
+        if (course.getCourseType() == CourseType.MEMBER) {
+            return membershipApplicationService.hasCourseMemberAccess(userId);
+        }
+        return false;
+    }
+
+    /**
+     * 判断当前用户是否已购买此课程（有有效的已支付订单）
+     */
+    private boolean determinePurchased(Course course, Authentication authentication) {
         if (authentication == null || authentication.getName() == null) {
             return false;
         }
