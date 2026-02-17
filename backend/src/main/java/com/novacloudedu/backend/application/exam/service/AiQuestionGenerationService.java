@@ -7,6 +7,8 @@ import com.novacloudedu.backend.domain.exam.valueobject.DifficultyLevel;
 import com.novacloudedu.backend.domain.exam.valueobject.QuestionType;
 import com.novacloudedu.backend.domain.exam.valueobject.Subject;
 import com.novacloudedu.backend.domain.file.service.OssService;
+import com.novacloudedu.backend.domain.membership.service.AiUsageLimitService;
+import com.novacloudedu.backend.domain.membership.valueobject.AiFeatureType;
 import com.novacloudedu.backend.domain.file.valueobject.FileBusinessType;
 import com.novacloudedu.backend.config.ChatModelProperties;
 import com.novacloudedu.backend.infrastructure.ai.ImageGenerationService;
@@ -42,6 +44,7 @@ public class AiQuestionGenerationService {
     private final OssService ossService;
     private final ObjectMapper objectMapper;
     private final ChatModelProperties chatModelProperties;
+    private final AiUsageLimitService aiUsageLimitService;
 
     private final ExecutorService executor = Executors.newCachedThreadPool();
 
@@ -66,6 +69,7 @@ public class AiQuestionGenerationService {
      * SSE 流式生成题目
      */
     public SseEmitter generateQuestions(GenerateParams params, Long userId) {
+        aiUsageLimitService.checkAndConsume(userId, AiFeatureType.AI_EXAM);
         SseEmitter emitter = new SseEmitter(600_000L); // 10分钟超时（逐题调用 LLM，20题约需6-8分钟）
 
         executor.submit(() -> {

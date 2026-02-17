@@ -8,7 +8,9 @@ import com.novacloudedu.backend.domain.social.repository.UserFollowRepository;
 import com.novacloudedu.backend.domain.user.repository.UserRepository;
 import com.novacloudedu.backend.domain.user.valueobject.UserId;
 import com.novacloudedu.backend.exception.BusinessException;
+import com.novacloudedu.backend.infrastructure.elasticsearch.service.IndexSyncService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +34,9 @@ public class PostApplicationService {
     private final UserRepository userRepository;
     private final UserFollowRepository userFollowRepository;
 
+    @Autowired(required = false)
+    private IndexSyncService indexSyncService;
+
     // ==================== 帖子管理 ====================
 
     /**
@@ -47,6 +52,11 @@ public class PostApplicationService {
         Post post = Post.create(title, content, tags, UserId.of(userId), PostType.fromCode(postType));
         post.setIpAddress(ipAddress);
         Post savedPost = postRepository.save(post);
+
+        // 同步 ES 索引
+        if (indexSyncService != null) {
+            indexSyncService.indexPost(savedPost);
+        }
 
         log.info("帖子创建成功: postId={}, userId={}", savedPost.getId().value(), userId);
         return savedPost;
@@ -67,6 +77,11 @@ public class PostApplicationService {
 
         post.update(title, content, tags, postType != null ? PostType.fromCode(postType) : null);
         postRepository.update(post);
+
+        // 同步 ES 索引
+        if (indexSyncService != null) {
+            indexSyncService.indexPost(post);
+        }
 
         log.info("帖子更新成功: postId={}, userId={}", postId, userId);
     }
@@ -90,6 +105,11 @@ public class PostApplicationService {
         // 删除帖子（逻辑删除，通过 @TableLogic 将 is_delete 置为 1）
         postRepository.delete(PostId.of(postId));
 
+        // 同步删除 ES 索引
+        if (indexSyncService != null) {
+            indexSyncService.deletePostIndex(postId);
+        }
+
         log.info("帖子删除成功: postId={}, userId={}", postId, userId);
     }
 
@@ -106,6 +126,11 @@ public class PostApplicationService {
         commentRepository.deleteByPostId(PostId.of(postId));
         // 删除帖子（逻辑删除，通过 @TableLogic 将 is_delete 置为 1）
         postRepository.delete(PostId.of(postId));
+
+        // 同步删除 ES 索引
+        if (indexSyncService != null) {
+            indexSyncService.deletePostIndex(postId);
+        }
 
         log.info("管理员删除帖子成功: postId={}", postId);
     }

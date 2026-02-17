@@ -11,6 +11,8 @@ import com.novacloudedu.backend.domain.ai.valueobject.AiChatMessageId;
 import com.novacloudedu.backend.domain.ai.valueobject.AiChatSessionId;
 import com.novacloudedu.backend.domain.ai.valueobject.ModelConfig;
 import com.novacloudedu.backend.domain.knowledge.service.KnowledgeSearchService;
+import com.novacloudedu.backend.domain.membership.service.AiUsageLimitService;
+import com.novacloudedu.backend.domain.membership.valueobject.AiFeatureType;
 import com.novacloudedu.backend.domain.user.valueobject.UserId;
 import com.novacloudedu.backend.exception.BusinessException;
 import com.novacloudedu.backend.infrastructure.ai.DocumentParseService;
@@ -52,6 +54,7 @@ public class AiChatApplicationService {
     private final AiAssistantRepository assistantRepository;
     private final KnowledgeSearchService knowledgeSearchService;
     private final AiAssistantWorkflowService workflowSkillService;
+    private final AiUsageLimitService aiUsageLimitService;
     private final ExecutorService executor = Executors.newCachedThreadPool();
 
     /** 多模态生成能力的系统提示词（根据启用状态动态拼装） */
@@ -152,6 +155,7 @@ public class AiChatApplicationService {
     public SseEmitter sessionStreamChat(Long sessionId, Long userId, String message,
                                          String systemPrompt, List<String> imageUrls,
                                          List<String> documentUrls, String modelId) {
+        aiUsageLimitService.checkAndConsume(userId, AiFeatureType.AI_CHAT);
         AiChatSession session = getSessionAndVerifyOwner(sessionId, userId);
         boolean hasImages = imageUrls != null && !imageUrls.isEmpty();
         // hasDocuments 在 lambda 内通过 safeDocUrls 判断
@@ -722,6 +726,7 @@ public class AiChatApplicationService {
     public Map<String, Object> assistantStreamChat(Long assistantId, Long userId, Long sessionId,
                                                     String message, List<String> imageUrls,
                                                     List<String> documentUrls) {
+        aiUsageLimitService.checkAndConsume(userId, AiFeatureType.AI_CHAT);
         // 1. 加载助手配置
         AiAssistant assistant = assistantRepository.findById(AiAssistantId.of(assistantId))
                 .orElseThrow(() -> new BusinessException(40400, "AI助手不存在"));
