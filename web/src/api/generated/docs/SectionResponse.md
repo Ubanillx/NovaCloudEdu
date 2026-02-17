@@ -17,6 +17,7 @@ Name | Type | Description | Notes
 **isFree** | **boolean** | 是否免费 | [optional] [default to undefined]
 **resourceUrl** | **string** | 资源URL | [optional] [default to undefined]
 **hlsUrl** | **string** | HLS播放地址(m3u8) | [optional] [default to undefined]
+**accessible** | **boolean** | 当前用户是否可访问此小节 | [optional] [default to undefined]
 **transcodeStatus** | **number** | 转码状态: 0-未转码, 1-转码中, 2-已完成, 3-失败 | [optional] [default to undefined]
 **thumbnailUrl** | **string** | 缩略图雪碧图URL | [optional] [default to undefined]
 **thumbnailCount** | **number** | 缩略图数量 | [optional] [default to undefined]
@@ -40,6 +41,7 @@ const instance: SectionResponse = {
     isFree,
     resourceUrl,
     hlsUrl,
+    accessible,
     transcodeStatus,
     thumbnailUrl,
     thumbnailCount,

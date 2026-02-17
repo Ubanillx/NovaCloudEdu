@@ -13,12 +13,13 @@
  */
 
 
+// May contain unused imports in some cases
+// @ts-ignore
+import type { UserMembership } from './user-membership';
 
-export interface UploadBookCommand {
-    'file': File;
-    'title': string;
-    'author'?: string;
-    'cover'?: File;
-    'adminId': number;
+export interface BaseResponseUserMembership {
+    'code'?: number;
+    'data'?: UserMembership;
+    'message'?: string;
 }
 

@@ -190,6 +190,8 @@ import type { BaseResponseListLong } from '../models';
 // @ts-ignore
 import type { BaseResponseListMapStringObject } from '../models';
 // @ts-ignore
+import type { BaseResponseListMembershipPlan } from '../models';
+// @ts-ignore
 import type { BaseResponseListMessageReadUserResponse } from '../models';
 // @ts-ignore
 import type { BaseResponseListNodeTypeResponse } from '../models';
@@ -204,7 +206,13 @@ import type { BaseResponseListPostResponse } from '../models';
 // @ts-ignore
 import type { BaseResponseListProgressResponse } from '../models';
 // @ts-ignore
+import type { BaseResponseListReadingBookmarkDTO } from '../models';
+// @ts-ignore
+import type { BaseResponseListReadingNoteDTO } from '../models';
+// @ts-ignore
 import type { BaseResponseListScraperConfigResponse } from '../models';
+// @ts-ignore
+import type { BaseResponseListSearchSuggestionDTO } from '../models';
 // @ts-ignore
 import type { BaseResponseListSectionResponse } from '../models';
 // @ts-ignore
@@ -217,6 +225,8 @@ import type { BaseResponseListTeacherResponse } from '../models';
 import type { BaseResponseListUserDailyArticleResponse } from '../models';
 // @ts-ignore
 import type { BaseResponseListUserDailyWordResponse } from '../models';
+// @ts-ignore
+import type { BaseResponseListUserMembership } from '../models';
 // @ts-ignore
 import type { BaseResponseListUserShelfDTO } from '../models';
 // @ts-ignore
@@ -240,9 +250,17 @@ import type { BaseResponseLoginUserResponse } from '../models';
 // @ts-ignore
 import type { BaseResponseLong } from '../models';
 // @ts-ignore
+import type { BaseResponseMapStringInteger } from '../models';
+// @ts-ignore
+import type { BaseResponseMapStringLong } from '../models';
+// @ts-ignore
+import type { BaseResponseMapStringMapStringInteger } from '../models';
+// @ts-ignore
 import type { BaseResponseMapStringObject } from '../models';
 // @ts-ignore
 import type { BaseResponseMemberPage } from '../models';
+// @ts-ignore
+import type { BaseResponseMembershipPlan } from '../models';
 // @ts-ignore
 import type { BaseResponseObject } from '../models';
 // @ts-ignore
@@ -253,6 +271,8 @@ import type { BaseResponseOrderStatistics } from '../models';
 import type { BaseResponsePageResponseClassMemberResponse } from '../models';
 // @ts-ignore
 import type { BaseResponsePageResponseClassResponse } from '../models';
+// @ts-ignore
+import type { BaseResponsePageResult } from '../models';
 // @ts-ignore
 import type { BaseResponsePostDetailResponse } from '../models';
 // @ts-ignore
@@ -265,6 +285,10 @@ import type { BaseResponseProgressResponse } from '../models';
 import type { BaseResponseQuestionPageResponse } from '../models';
 // @ts-ignore
 import type { BaseResponseQuestionResponse } from '../models';
+// @ts-ignore
+import type { BaseResponseReadingBookmarkDTO } from '../models';
+// @ts-ignore
+import type { BaseResponseReadingNoteDTO } from '../models';
 // @ts-ignore
 import type { BaseResponseReadingStats } from '../models';
 // @ts-ignore
@@ -303,6 +327,8 @@ import type { BaseResponseTtsResponse } from '../models';
 import type { BaseResponseUserAnnouncementPageResponse } from '../models';
 // @ts-ignore
 import type { BaseResponseUserDetailResponse } from '../models';
+// @ts-ignore
+import type { BaseResponseUserMembership } from '../models';
 // @ts-ignore
 import type { BaseResponseUserPageResponse } from '../models';
 // @ts-ignore
@@ -374,9 +400,13 @@ import type { CreateKnowledgeBaseCommand } from '../models';
 // @ts-ignore
 import type { CreateOrderRequest } from '../models';
 // @ts-ignore
+import type { CreatePlanRequest } from '../models';
+// @ts-ignore
 import type { CreatePostRequest } from '../models';
 // @ts-ignore
 import type { CreateQuestionRequest } from '../models';
+// @ts-ignore
+import type { CreateReadingNoteCommand } from '../models';
 // @ts-ignore
 import type { CreateReplyRequest } from '../models';
 // @ts-ignore
@@ -400,6 +430,8 @@ import type { FriendRequestListDTO } from '../models';
 // @ts-ignore
 import type { GenerateBannerImageRequest } from '../models';
 // @ts-ignore
+import type { GrantMembershipRequest } from '../models';
+// @ts-ignore
 import type { HandleFriendRequestDTO } from '../models';
 // @ts-ignore
 import type { HandleJoinRequestDTO } from '../models';
@@ -407,6 +439,8 @@ import type { HandleJoinRequestDTO } from '../models';
 import type { JoinGroupRequest } from '../models';
 // @ts-ignore
 import type { PhoneLoginRequest } from '../models';
+// @ts-ignore
+import type { PurchaseMembershipRequest } from '../models';
 // @ts-ignore
 import type { QueryAnnouncementRequest } from '../models';
 // @ts-ignore
@@ -450,6 +484,8 @@ import type { UpdateAnnouncementRequest } from '../models';
 // @ts-ignore
 import type { UpdateBannerRequest } from '../models';
 // @ts-ignore
+import type { UpdateBookCoverRequest } from '../models';
+// @ts-ignore
 import type { UpdateChapterRequest } from '../models';
 // @ts-ignore
 import type { UpdateClassRequest } from '../models';
@@ -475,6 +511,10 @@ import type { UpdateNodeConfigRequest } from '../models';
 import type { UpdateNodeRequest } from '../models';
 // @ts-ignore
 import type { UpdatePaperQuestionRequest } from '../models';
+// @ts-ignore
+import type { UpdatePlanQuotaRequest } from '../models';
+// @ts-ignore
+import type { UpdatePlanRequest } from '../models';
 // @ts-ignore
 import type { UpdatePostRequest } from '../models';
 // @ts-ignore
@@ -1144,6 +1184,45 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
+         * @summary 支付宝异步回调（预留）
+         * @param {string} body 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        alipayCallback: async (body: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'body' is not null or undefined
+            assertParamExists('alipayCallback', 'body', body)
+            const localVarPath = `/api/payment/callback/alipay`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(body, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary 申请成为讲师
          * @param {ApplyTeacherRequest} applyTeacherRequest 
          * @param {*} [options] Override http request option.
@@ -1579,6 +1658,78 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 
+         * @summary 取消会员
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        cancelMembership: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/membership/cancel`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 取消用户会员
+         * @param {number} userId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        cancelMembership1: async (userId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'userId' is not null or undefined
+            assertParamExists('cancelMembership1', 'userId', userId)
+            const localVarPath = `/api/admin/membership/cancel/{userId}`
+                .replace(`{${"userId"}}`, encodeURIComponent(String(userId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 用户修改自己的密码，需要验证旧密码
          * @summary 修改密码
          * @param {ChangePasswordRequest} changePasswordRequest 
@@ -1813,6 +1964,47 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
+         * @summary 确认会员支付（管理员手动确认）
+         * @param {string} orderNo 会员订单号
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        confirmPayment1: async (orderNo: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'orderNo' is not null or undefined
+            assertParamExists('confirmPayment1', 'orderNo', orderNo)
+            const localVarPath = `/api/admin/membership/confirm`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (orderNo !== undefined) {
+                localVarQueryParameter['orderNo'] = orderNo;
+            }
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary 复制工作流
          * @param {number} id 工作流ID
          * @param {string} newName 新工作流名称
@@ -1974,6 +2166,49 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(createBannerRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 创建书签
+         * @param {number} bookId 
+         * @param {{ [key: string]: object; }} requestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createBookmark: async (bookId: number, requestBody: { [key: string]: object; }, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'bookId' is not null or undefined
+            assertParamExists('createBookmark', 'bookId', bookId)
+            // verify required parameter 'requestBody' is not null or undefined
+            assertParamExists('createBookmark', 'requestBody', requestBody)
+            const localVarPath = `/api/books/{bookId}/bookmarks`
+                .replace(`{${"bookId"}}`, encodeURIComponent(String(bookId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(requestBody, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -2473,6 +2708,49 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
+         * @summary 创建阅读笔记
+         * @param {number} bookId 
+         * @param {CreateReadingNoteCommand} createReadingNoteCommand 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createNote: async (bookId: number, createReadingNoteCommand: CreateReadingNoteCommand, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'bookId' is not null or undefined
+            assertParamExists('createNote', 'bookId', bookId)
+            // verify required parameter 'createReadingNoteCommand' is not null or undefined
+            assertParamExists('createNote', 'createReadingNoteCommand', createReadingNoteCommand)
+            const localVarPath = `/api/books/{bookId}/notes`
+                .replace(`{${"bookId"}}`, encodeURIComponent(String(bookId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(createReadingNoteCommand, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary 创建订单（用户下单）
          * @param {CreateOrderRequest} createOrderRequest 
          * @param {*} [options] Override http request option.
@@ -2504,6 +2782,45 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(createOrderRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 创建会员计划
+         * @param {CreatePlanRequest} createPlanRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createPlan: async (createPlanRequest: CreatePlanRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'createPlanRequest' is not null or undefined
+            assertParamExists('createPlan', 'createPlanRequest', createPlanRequest)
+            const localVarPath = `/api/admin/membership/plans`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(createPlanRequest, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -3064,6 +3381,48 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('deleteBook', 'bookId', bookId)
             const localVarPath = `/api/books/{bookId}`
                 .replace(`{${"bookId"}}`, encodeURIComponent(String(bookId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 删除书签
+         * @param {number} bookId 
+         * @param {number} bookmarkId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteBookmark: async (bookId: number, bookmarkId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'bookId' is not null or undefined
+            assertParamExists('deleteBookmark', 'bookId', bookId)
+            // verify required parameter 'bookmarkId' is not null or undefined
+            assertParamExists('deleteBookmark', 'bookmarkId', bookmarkId)
+            const localVarPath = `/api/books/{bookId}/bookmarks/{bookmarkId}`
+                .replace(`{${"bookId"}}`, encodeURIComponent(String(bookId)))
+                .replace(`{${"bookmarkId"}}`, encodeURIComponent(String(bookmarkId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -3716,6 +4075,86 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
+         * @summary 删除笔记
+         * @param {number} bookId 
+         * @param {number} noteId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteNote: async (bookId: number, noteId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'bookId' is not null or undefined
+            assertParamExists('deleteNote', 'bookId', bookId)
+            // verify required parameter 'noteId' is not null or undefined
+            assertParamExists('deleteNote', 'noteId', noteId)
+            const localVarPath = `/api/books/{bookId}/notes/{noteId}`
+                .replace(`{${"bookId"}}`, encodeURIComponent(String(bookId)))
+                .replace(`{${"noteId"}}`, encodeURIComponent(String(noteId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 删除会员计划
+         * @param {number} planId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deletePlan: async (planId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'planId' is not null or undefined
+            assertParamExists('deletePlan', 'planId', planId)
+            const localVarPath = `/api/admin/membership/plans/{planId}`
+                .replace(`{${"planId"}}`, encodeURIComponent(String(planId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary 删除帖子
          * @param {number} postId 
          * @param {*} [options] Override http request option.
@@ -4297,6 +4736,44 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 对整本书所有未加密章节进行AES加密存储
+         * @summary 批量加密所有章节
+         * @param {number} bookId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        encryptAllChapters: async (bookId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'bookId' is not null or undefined
+            assertParamExists('encryptAllChapters', 'bookId', bookId)
+            const localVarPath = `/api/books/{bookId}/chapters/encrypt-all`
+                .replace(`{${"bookId"}}`, encodeURIComponent(String(bookId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 对指定章节的内容进行AES加密存储
          * @summary 加密章节内容
          * @param {number} bookId 
@@ -4644,6 +5121,40 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(generateBannerImageRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 查询我的AI功能剩余额度
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getAiQuota: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/membership/ai-quota`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -5094,6 +5605,51 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             // authentication Bearer Token required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 获取用户在该书的书签列表
+         * @param {number} bookId 
+         * @param {number} userId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getBookmarksByBook: async (bookId: number, userId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'bookId' is not null or undefined
+            assertParamExists('getBookmarksByBook', 'bookId', bookId)
+            // verify required parameter 'userId' is not null or undefined
+            assertParamExists('getBookmarksByBook', 'userId', userId)
+            const localVarPath = `/api/books/{bookId}/bookmarks`
+                .replace(`{${"bookId"}}`, encodeURIComponent(String(bookId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (userId !== undefined) {
+                localVarQueryParameter['userId'] = userId;
+            }
 
             localVarHeaderParameter['Accept'] = 'application/json';
 
@@ -5770,6 +6326,40 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('getCourseStructure', 'courseId', courseId)
             const localVarPath = `/api/course/{courseId}/structure`
                 .replace(`{${"courseId"}}`, encodeURIComponent(String(courseId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 查询我的当前会员状态
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getCurrentMembership: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/membership/current`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -6805,6 +7395,40 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
+         * @summary 查询我的会员历史
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getMembershipHistory: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/membership/history`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary 获取群聊历史消息（分页）
          * @param {number} groupId 
          * @param {number} [pageNum] 
@@ -7567,6 +8191,100 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
+         * @summary 获取用户在该书的笔记列表
+         * @param {number} bookId 
+         * @param {number} userId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getNotesByBook: async (bookId: number, userId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'bookId' is not null or undefined
+            assertParamExists('getNotesByBook', 'bookId', bookId)
+            // verify required parameter 'userId' is not null or undefined
+            assertParamExists('getNotesByBook', 'userId', userId)
+            const localVarPath = `/api/books/{bookId}/notes`
+                .replace(`{${"bookId"}}`, encodeURIComponent(String(bookId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (userId !== undefined) {
+                localVarQueryParameter['userId'] = userId;
+            }
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 获取用户在该章节的笔记
+         * @param {number} bookId 
+         * @param {number} chapterId 
+         * @param {number} userId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getNotesByChapter: async (bookId: number, chapterId: number, userId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'bookId' is not null or undefined
+            assertParamExists('getNotesByChapter', 'bookId', bookId)
+            // verify required parameter 'chapterId' is not null or undefined
+            assertParamExists('getNotesByChapter', 'chapterId', chapterId)
+            // verify required parameter 'userId' is not null or undefined
+            assertParamExists('getNotesByChapter', 'userId', userId)
+            const localVarPath = `/api/books/{bookId}/notes/chapters/{chapterId}`
+                .replace(`{${"bookId"}}`, encodeURIComponent(String(bookId)))
+                .replace(`{${"chapterId"}}`, encodeURIComponent(String(chapterId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (userId !== undefined) {
+                localVarQueryParameter['userId'] = userId;
+            }
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary 查询订单详情
          * @param {string} orderNo 订单号
          * @param {*} [options] Override http request option.
@@ -7647,6 +8365,44 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
+         * @summary 获取PDF预签名URL
+         * @param {number} bookId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getPdfUrl: async (bookId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'bookId' is not null or undefined
+            assertParamExists('getPdfUrl', 'bookId', bookId)
+            const localVarPath = `/api/books/{bookId}/pdf-url`
+                .replace(`{${"bookId"}}`, encodeURIComponent(String(bookId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary 获取待审核申请数量（管理员）
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -7691,6 +8447,44 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('getPendingRequests', 'groupId', groupId)
             const localVarPath = `/api/groups/{groupId}/requests`
                 .replace(`{${"groupId"}}`, encodeURIComponent(String(groupId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 获取计划详情
+         * @param {number} planId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getPlan: async (planId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'planId' is not null or undefined
+            assertParamExists('getPlan', 'planId', planId)
+            const localVarPath = `/api/membership/plans/{planId}`
+                .replace(`{${"planId"}}`, encodeURIComponent(String(planId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -8361,12 +9155,46 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
-         * @summary 订单统计（管理员）
+         * @summary 订单统计（管理员，包含课程+会员）
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
         getStatistics: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/admin/order/statistics`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 会员统计
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getStatistics1: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/admin/membership/statistics`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -9166,6 +9994,44 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 
+         * @summary 查询指定用户的AI额度
+         * @param {number} userId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getUserAiQuota: async (userId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'userId' is not null or undefined
+            assertParamExists('getUserAiQuota', 'userId', userId)
+            const localVarPath = `/api/admin/membership/users/{userId}/ai-quota`
+                .replace(`{${"userId"}}`, encodeURIComponent(String(userId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 管理员获取用户详细信息
          * @summary 获取用户详情
          * @param {number} id 
@@ -9732,6 +10598,45 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 为用户直接开通会员
+         * @param {GrantMembershipRequest} grantMembershipRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        grantMembership: async (grantMembershipRequest: GrantMembershipRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'grantMembershipRequest' is not null or undefined
+            assertParamExists('grantMembership', 'grantMembershipRequest', grantMembershipRequest)
+            const localVarPath = `/api/admin/membership/grant`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(grantMembershipRequest, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -11275,8 +12180,57 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
-         * @summary 获取订单列表（管理员）
-         * @param {number} [status] 订单状态：0-未支付，1-已支付，2-已过期，3-已退款
+         * @summary 按状态查询会员列表
+         * @param {number} [status] 状态：0-待支付，1-生效中，2-已过期，3-已取消
+         * @param {number} [page] 
+         * @param {number} [size] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listMemberships: async (status?: number, page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/admin/membership/list`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (status !== undefined) {
+                localVarQueryParameter['status'] = status;
+            }
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (size !== undefined) {
+                localVarQueryParameter['size'] = size;
+            }
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 获取订单列表（管理员，包含课程订单和会员订单）
+         * @param {number} [status] 订单状态：0-未支付，1-已支付，2-已过期，3-已退款/已取消
          * @param {number} [page] 页码
          * @param {number} [size] 每页数量
          * @param {*} [options] Override http request option.
@@ -11310,6 +12264,74 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             if (size !== undefined) {
                 localVarQueryParameter['size'] = size;
             }
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 获取所有会员计划
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listPlans: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/admin/membership/plans`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 获取所有会员计划
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listPlans1: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/membership/plans`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
             localVarHeaderParameter['Accept'] = 'application/json';
 
@@ -12318,6 +13340,45 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 
+         * @summary 购买会员（创建待支付订单）
+         * @param {PurchaseMembershipRequest} purchaseMembershipRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        purchaseMembership: async (purchaseMembershipRequest: PurchaseMembershipRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'purchaseMembershipRequest' is not null or undefined
+            assertParamExists('purchaseMembership', 'purchaseMembershipRequest', purchaseMembershipRequest)
+            const localVarPath = `/api/membership/purchase`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(purchaseMembershipRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 管理员分页查询公告列表
          * @summary 分页查询公告
          * @param {QueryAnnouncementRequest} queryAnnouncementRequest 
@@ -12758,6 +13819,45 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             // authentication Bearer Token required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 全量重建索引（管理员）
+         * @param {string} [type] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        reindex: async (type?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/search/admin/reindex`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (type !== undefined) {
+                localVarQueryParameter['type'] = type;
+            }
 
             localVarHeaderParameter['Accept'] = 'application/json';
 
@@ -13784,6 +14884,62 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
+         * @summary 聚合搜索（书籍+章节+帖子）
+         * @param {string} q 
+         * @param {string} [type] 
+         * @param {number} [page] 
+         * @param {number} [size] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        searchAll: async (q: string, type?: string, page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'q' is not null or undefined
+            assertParamExists('searchAll', 'q', q)
+            const localVarPath = `/api/search`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (q !== undefined) {
+                localVarQueryParameter['q'] = q;
+            }
+
+            if (type !== undefined) {
+                localVarQueryParameter['type'] = type;
+            }
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (size !== undefined) {
+                localVarQueryParameter['size'] = size;
+            }
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary 搜索文章
          * @param {string} keyword 关键词
          * @param {number} [page] 页码
@@ -13835,6 +14991,112 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
+         * @summary 书内搜索
+         * @param {number} bookId 
+         * @param {string} q 
+         * @param {number} [page] 
+         * @param {number} [size] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        searchBookChapters: async (bookId: number, q: string, page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'bookId' is not null or undefined
+            assertParamExists('searchBookChapters', 'bookId', bookId)
+            // verify required parameter 'q' is not null or undefined
+            assertParamExists('searchBookChapters', 'q', q)
+            const localVarPath = `/api/search/books/{bookId}/chapters`
+                .replace(`{${"bookId"}}`, encodeURIComponent(String(bookId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (q !== undefined) {
+                localVarQueryParameter['q'] = q;
+            }
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (size !== undefined) {
+                localVarQueryParameter['size'] = size;
+            }
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 搜索书籍
+         * @param {string} q 
+         * @param {number} [page] 
+         * @param {number} [size] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        searchBooks: async (q: string, page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'q' is not null or undefined
+            assertParamExists('searchBooks', 'q', q)
+            const localVarPath = `/api/search/books`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (q !== undefined) {
+                localVarQueryParameter['q'] = q;
+            }
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (size !== undefined) {
+                localVarQueryParameter['size'] = size;
+            }
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary 搜索书籍
          * @param {string} keyword 
          * @param {number} [page] 
@@ -13842,9 +15104,9 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        searchBooks: async (keyword: string, page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        searchBooks1: async (keyword: string, page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'keyword' is not null or undefined
-            assertParamExists('searchBooks', 'keyword', keyword)
+            assertParamExists('searchBooks1', 'keyword', keyword)
             const localVarPath = `/api/books/search`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -13863,6 +15125,62 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
 
             if (keyword !== undefined) {
                 localVarQueryParameter['keyword'] = keyword;
+            }
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (size !== undefined) {
+                localVarQueryParameter['size'] = size;
+            }
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 搜索章节内容
+         * @param {string} q 
+         * @param {number} [bookId] 
+         * @param {number} [page] 
+         * @param {number} [size] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        searchChapters: async (q: string, bookId?: number, page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'q' is not null or undefined
+            assertParamExists('searchChapters', 'q', q)
+            const localVarPath = `/api/search/chapters`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (q !== undefined) {
+                localVarQueryParameter['q'] = q;
+            }
+
+            if (bookId !== undefined) {
+                localVarQueryParameter['bookId'] = bookId;
             }
 
             if (page !== undefined) {
@@ -14040,15 +15358,71 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         /**
          * 
          * @summary 搜索帖子
+         * @param {string} q 
+         * @param {string} [postType] 
+         * @param {number} [page] 
+         * @param {number} [size] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        searchPosts: async (q: string, postType?: string, page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'q' is not null or undefined
+            assertParamExists('searchPosts', 'q', q)
+            const localVarPath = `/api/search/posts`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (q !== undefined) {
+                localVarQueryParameter['q'] = q;
+            }
+
+            if (postType !== undefined) {
+                localVarQueryParameter['postType'] = postType;
+            }
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (size !== undefined) {
+                localVarQueryParameter['size'] = size;
+            }
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 搜索帖子
          * @param {string} keyword 
          * @param {number} [pageNum] 
          * @param {number} [pageSize] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        searchPosts: async (keyword: string, pageNum?: number, pageSize?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        searchPosts1: async (keyword: string, pageNum?: number, pageSize?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'keyword' is not null or undefined
-            assertParamExists('searchPosts', 'keyword', keyword)
+            assertParamExists('searchPosts1', 'keyword', keyword)
             const localVarPath = `/api/posts/search`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -14662,6 +16036,52 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             // authentication Bearer Token required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 搜索建议（即时联想）
+         * @param {string} q 
+         * @param {string} [type] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        suggest: async (q: string, type?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'q' is not null or undefined
+            assertParamExists('suggest', 'q', q)
+            const localVarPath = `/api/search/suggest`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (q !== undefined) {
+                localVarQueryParameter['q'] = q;
+            }
+
+            if (type !== undefined) {
+                localVarQueryParameter['type'] = type;
+            }
 
             localVarHeaderParameter['Accept'] = 'application/json';
 
@@ -15334,6 +16754,137 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(updateBannerRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 编辑书籍信息
+         * @param {number} bookId 
+         * @param {{ [key: string]: string; }} requestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateBook: async (bookId: number, requestBody: { [key: string]: string; }, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'bookId' is not null or undefined
+            assertParamExists('updateBook', 'bookId', bookId)
+            // verify required parameter 'requestBody' is not null or undefined
+            assertParamExists('updateBook', 'requestBody', requestBody)
+            const localVarPath = `/api/books/{bookId}`
+                .replace(`{${"bookId"}}`, encodeURIComponent(String(bookId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(requestBody, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 更新书籍封面
+         * @param {number} bookId 
+         * @param {UpdateBookCoverRequest} [updateBookCoverRequest] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateBookCover: async (bookId: number, updateBookCoverRequest?: UpdateBookCoverRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'bookId' is not null or undefined
+            assertParamExists('updateBookCover', 'bookId', bookId)
+            const localVarPath = `/api/books/{bookId}/cover`
+                .replace(`{${"bookId"}}`, encodeURIComponent(String(bookId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(updateBookCoverRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 更新书签备注/标题
+         * @param {number} bookId 
+         * @param {number} bookmarkId 
+         * @param {{ [key: string]: string; }} requestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateBookmark: async (bookId: number, bookmarkId: number, requestBody: { [key: string]: string; }, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'bookId' is not null or undefined
+            assertParamExists('updateBookmark', 'bookId', bookId)
+            // verify required parameter 'bookmarkId' is not null or undefined
+            assertParamExists('updateBookmark', 'bookmarkId', bookmarkId)
+            // verify required parameter 'requestBody' is not null or undefined
+            assertParamExists('updateBookmark', 'requestBody', requestBody)
+            const localVarPath = `/api/books/{bookId}/bookmarks/{bookmarkId}`
+                .replace(`{${"bookId"}}`, encodeURIComponent(String(bookId)))
+                .replace(`{${"bookmarkId"}}`, encodeURIComponent(String(bookmarkId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(requestBody, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -16085,6 +17636,53 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
+         * @summary 更新笔记内容/颜色
+         * @param {number} bookId 
+         * @param {number} noteId 
+         * @param {{ [key: string]: string; }} requestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateNote: async (bookId: number, noteId: number, requestBody: { [key: string]: string; }, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'bookId' is not null or undefined
+            assertParamExists('updateNote', 'bookId', bookId)
+            // verify required parameter 'noteId' is not null or undefined
+            assertParamExists('updateNote', 'noteId', noteId)
+            // verify required parameter 'requestBody' is not null or undefined
+            assertParamExists('updateNote', 'requestBody', requestBody)
+            const localVarPath = `/api/books/{bookId}/notes/{noteId}`
+                .replace(`{${"bookId"}}`, encodeURIComponent(String(bookId)))
+                .replace(`{${"noteId"}}`, encodeURIComponent(String(noteId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(requestBody, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary 更新试卷题目分值/排序
          * @param {number} paperId 
          * @param {number} sectionId 
@@ -16128,6 +17726,88 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(updatePaperQuestionRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 更新会员计划基本信息
+         * @param {UpdatePlanRequest} updatePlanRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updatePlan: async (updatePlanRequest: UpdatePlanRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'updatePlanRequest' is not null or undefined
+            assertParamExists('updatePlan', 'updatePlanRequest', updatePlanRequest)
+            const localVarPath = `/api/admin/membership/plans`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(updatePlanRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 修改计划AI配额
+         * @param {number} planId 
+         * @param {UpdatePlanQuotaRequest} updatePlanQuotaRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updatePlanQuota: async (planId: number, updatePlanQuotaRequest: UpdatePlanQuotaRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'planId' is not null or undefined
+            assertParamExists('updatePlanQuota', 'planId', planId)
+            // verify required parameter 'updatePlanQuotaRequest' is not null or undefined
+            assertParamExists('updatePlanQuota', 'updatePlanQuotaRequest', updatePlanQuotaRequest)
+            const localVarPath = `/api/admin/membership/plans/{planId}/quota`
+                .replace(`{${"planId"}}`, encodeURIComponent(String(planId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(updatePlanQuotaRequest, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -16893,6 +18573,45 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * 
+         * @summary 微信支付异步回调（预留）
+         * @param {string} body 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        wechatCallback: async (body: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'body' is not null or undefined
+            assertParamExists('wechatCallback', 'body', body)
+            const localVarPath = `/api/payment/callback/wechat`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(body, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -17109,6 +18828,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary 支付宝异步回调（预留）
+         * @param {string} body 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async alipayCallback(body: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.alipayCallback(body, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.alipayCallback']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @summary 申请成为讲师
          * @param {ApplyTeacherRequest} applyTeacherRequest 
          * @param {*} [options] Override http request option.
@@ -17254,6 +18986,31 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 
+         * @summary 取消会员
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async cancelMembership(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.cancelMembership(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.cancelMembership']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 取消用户会员
+         * @param {number} userId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async cancelMembership1(userId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.cancelMembership1(userId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.cancelMembership1']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 用户修改自己的密码，需要验证旧密码
          * @summary 修改密码
          * @param {ChangePasswordRequest} changePasswordRequest 
@@ -17333,6 +19090,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary 确认会员支付（管理员手动确认）
+         * @param {string} orderNo 会员订单号
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async confirmPayment1(orderNo: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.confirmPayment1(orderNo, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.confirmPayment1']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @summary 复制工作流
          * @param {number} id 工作流ID
          * @param {string} newName 新工作流名称
@@ -17383,6 +19153,20 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.createBanner(createBannerRequest, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.createBanner']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 创建书签
+         * @param {number} bookId 
+         * @param {{ [key: string]: object; }} requestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async createBookmark(bookId: number, requestBody: { [key: string]: object; }, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseReadingBookmarkDTO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createBookmark(bookId, requestBody, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.createBookmark']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -17548,6 +19332,20 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary 创建阅读笔记
+         * @param {number} bookId 
+         * @param {CreateReadingNoteCommand} createReadingNoteCommand 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async createNote(bookId: number, createReadingNoteCommand: CreateReadingNoteCommand, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseReadingNoteDTO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createNote(bookId, createReadingNoteCommand, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.createNote']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @summary 创建订单（用户下单）
          * @param {CreateOrderRequest} createOrderRequest 
          * @param {*} [options] Override http request option.
@@ -17557,6 +19355,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.createOrder(createOrderRequest, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.createOrder']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 创建会员计划
+         * @param {CreatePlanRequest} createPlanRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async createPlan(createPlanRequest: CreatePlanRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseMembershipPlan>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createPlan(createPlanRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.createPlan']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -17740,6 +19551,20 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.deleteBook(bookId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.deleteBook']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 删除书签
+         * @param {number} bookId 
+         * @param {number} bookmarkId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deleteBookmark(bookId: number, bookmarkId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteBookmark(bookId, bookmarkId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.deleteBookmark']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -17956,6 +19781,33 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary 删除笔记
+         * @param {number} bookId 
+         * @param {number} noteId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deleteNote(bookId: number, noteId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteNote(bookId, noteId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.deleteNote']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 删除会员计划
+         * @param {number} planId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deletePlan(planId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deletePlan(planId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.deletePlan']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @summary 删除帖子
          * @param {number} postId 
          * @param {*} [options] Override http request option.
@@ -18153,6 +20005,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 对整本书所有未加密章节进行AES加密存储
+         * @summary 批量加密所有章节
+         * @param {number} bookId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async encryptAllChapters(bookId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseInteger>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.encryptAllChapters(bookId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.encryptAllChapters']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 对指定章节的内容进行AES加密存储
          * @summary 加密章节内容
          * @param {number} bookId 
@@ -18269,6 +20134,18 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.generateBannerImage(generateBannerImageRequest, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.generateBannerImage']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 查询我的AI功能剩余额度
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getAiQuota(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseMapStringMapStringInteger>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getAiQuota(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getAiQuota']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -18424,6 +20301,20 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getBookChapters(bookId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.getBookChapters']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 获取用户在该书的书签列表
+         * @param {number} bookId 
+         * @param {number} userId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getBookmarksByBook(bookId: number, userId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseListReadingBookmarkDTO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getBookmarksByBook(bookId, userId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getBookmarksByBook']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -18653,6 +20544,18 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getCourseStructure(courseId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.getCourseStructure']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 查询我的当前会员状态
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getCurrentMembership(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseUserMembership>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getCurrentMembership(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getCurrentMembership']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -18992,6 +20895,18 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary 查询我的会员历史
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getMembershipHistory(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseListUserMembership>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getMembershipHistory(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getMembershipHistory']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @summary 获取群聊历史消息（分页）
          * @param {number} groupId 
          * @param {number} [pageNum] 
@@ -19244,6 +21159,35 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary 获取用户在该书的笔记列表
+         * @param {number} bookId 
+         * @param {number} userId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getNotesByBook(bookId: number, userId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseListReadingNoteDTO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getNotesByBook(bookId, userId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getNotesByBook']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 获取用户在该章节的笔记
+         * @param {number} bookId 
+         * @param {number} chapterId 
+         * @param {number} userId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getNotesByChapter(bookId: number, chapterId: number, userId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseListReadingNoteDTO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getNotesByChapter(bookId, chapterId, userId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getNotesByChapter']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @summary 查询订单详情
          * @param {string} orderNo 订单号
          * @param {*} [options] Override http request option.
@@ -19271,6 +21215,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary 获取PDF预签名URL
+         * @param {number} bookId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getPdfUrl(bookId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseString>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getPdfUrl(bookId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getPdfUrl']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @summary 获取待审核申请数量（管理员）
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -19292,6 +21249,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getPendingRequests(groupId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.getPendingRequests']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 获取计划详情
+         * @param {number} planId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getPlan(planId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseMembershipPlan>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getPlan(planId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getPlan']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -19510,7 +21480,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
-         * @summary 订单统计（管理员）
+         * @summary 订单统计（管理员，包含课程+会员）
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -19518,6 +21488,18 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getStatistics(options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.getStatistics']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 会员统计
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getStatistics1(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseMapStringLong>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getStatistics1(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getStatistics1']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -19781,6 +21763,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 
+         * @summary 查询指定用户的AI额度
+         * @param {number} userId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getUserAiQuota(userId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseMapStringMapStringInteger>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getUserAiQuota(userId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getUserAiQuota']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 管理员获取用户详细信息
          * @summary 获取用户详情
          * @param {number} id 
@@ -19968,6 +21963,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getWorkflowAssistants(id, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.getWorkflowAssistants']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 为用户直接开通会员
+         * @param {GrantMembershipRequest} grantMembershipRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async grantMembership(grantMembershipRequest: GrantMembershipRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.grantMembership(grantMembershipRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.grantMembership']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -20463,8 +22471,23 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
-         * @summary 获取订单列表（管理员）
-         * @param {number} [status] 订单状态：0-未支付，1-已支付，2-已过期，3-已退款
+         * @summary 按状态查询会员列表
+         * @param {number} [status] 状态：0-待支付，1-生效中，2-已过期，3-已取消
+         * @param {number} [page] 
+         * @param {number} [size] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async listMemberships(status?: number, page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseListUserMembership>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listMemberships(status, page, size, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.listMemberships']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 获取订单列表（管理员，包含课程订单和会员订单）
+         * @param {number} [status] 订单状态：0-未支付，1-已支付，2-已过期，3-已退款/已取消
          * @param {number} [page] 页码
          * @param {number} [size] 每页数量
          * @param {*} [options] Override http request option.
@@ -20474,6 +22497,30 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.listOrders(status, page, size, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.listOrders']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 获取所有会员计划
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async listPlans(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseListMembershipPlan>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listPlans(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.listPlans']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 获取所有会员计划
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async listPlans1(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseListMembershipPlan>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listPlans1(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.listPlans1']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -20810,6 +22857,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 
+         * @summary 购买会员（创建待支付订单）
+         * @param {PurchaseMembershipRequest} purchaseMembershipRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async purchaseMembership(purchaseMembershipRequest: PurchaseMembershipRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseString>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.purchaseMembership(purchaseMembershipRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.purchaseMembership']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 管理员分页查询公告列表
          * @summary 分页查询公告
          * @param {QueryAnnouncementRequest} queryAnnouncementRequest 
@@ -20951,6 +23011,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.refund(orderNo, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.refund']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 全量重建索引（管理员）
+         * @param {string} [type] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async reindex(type?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseMapStringInteger>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.reindex(type, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.reindex']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -21290,6 +23363,22 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary 聚合搜索（书籍+章节+帖子）
+         * @param {string} q 
+         * @param {string} [type] 
+         * @param {number} [page] 
+         * @param {number} [size] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async searchAll(q: string, type?: string, page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponsePageResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.searchAll(q, type, page, size, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.searchAll']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @summary 搜索文章
          * @param {string} keyword 关键词
          * @param {number} [page] 页码
@@ -21305,6 +23394,37 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary 书内搜索
+         * @param {number} bookId 
+         * @param {string} q 
+         * @param {number} [page] 
+         * @param {number} [size] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async searchBookChapters(bookId: number, q: string, page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponsePageResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.searchBookChapters(bookId, q, page, size, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.searchBookChapters']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 搜索书籍
+         * @param {string} q 
+         * @param {number} [page] 
+         * @param {number} [size] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async searchBooks(q: string, page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponsePageResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.searchBooks(q, page, size, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.searchBooks']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @summary 搜索书籍
          * @param {string} keyword 
          * @param {number} [page] 
@@ -21312,10 +23432,26 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async searchBooks(keyword: string, page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseListBookDTO>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.searchBooks(keyword, page, size, options);
+        async searchBooks1(keyword: string, page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseListBookDTO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.searchBooks1(keyword, page, size, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.searchBooks']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.searchBooks1']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 搜索章节内容
+         * @param {string} q 
+         * @param {number} [bookId] 
+         * @param {number} [page] 
+         * @param {number} [size] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async searchChapters(q: string, bookId?: number, page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponsePageResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.searchChapters(q, bookId, page, size, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.searchChapters']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -21366,16 +23502,32 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @summary 搜索帖子
+         * @param {string} q 
+         * @param {string} [postType] 
+         * @param {number} [page] 
+         * @param {number} [size] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async searchPosts(q: string, postType?: string, page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponsePageResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.searchPosts(q, postType, page, size, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.searchPosts']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 搜索帖子
          * @param {string} keyword 
          * @param {number} [pageNum] 
          * @param {number} [pageSize] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async searchPosts(keyword: string, pageNum?: number, pageSize?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponsePostPageResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.searchPosts(keyword, pageNum, pageSize, options);
+        async searchPosts1(keyword: string, pageNum?: number, pageSize?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponsePostPageResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.searchPosts1(keyword, pageNum, pageSize, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.searchPosts']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.searchPosts1']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -21559,6 +23711,20 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.studyWord(wordId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.studyWord']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 搜索建议（即时联想）
+         * @param {string} q 
+         * @param {string} [type] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async suggest(q: string, type?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseListSearchSuggestionDTO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.suggest(q, type, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.suggest']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -21783,6 +23949,49 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.updateBanner(updateBannerRequest, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.updateBanner']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 编辑书籍信息
+         * @param {number} bookId 
+         * @param {{ [key: string]: string; }} requestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async updateBook(bookId: number, requestBody: { [key: string]: string; }, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseBookDTO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateBook(bookId, requestBody, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.updateBook']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 更新书籍封面
+         * @param {number} bookId 
+         * @param {UpdateBookCoverRequest} [updateBookCoverRequest] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async updateBookCover(bookId: number, updateBookCoverRequest?: UpdateBookCoverRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseBookDTO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateBookCover(bookId, updateBookCoverRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.updateBookCover']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 更新书签备注/标题
+         * @param {number} bookId 
+         * @param {number} bookmarkId 
+         * @param {{ [key: string]: string; }} requestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async updateBookmark(bookId: number, bookmarkId: number, requestBody: { [key: string]: string; }, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseReadingBookmarkDTO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateBookmark(bookId, bookmarkId, requestBody, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.updateBookmark']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -22027,6 +24236,21 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary 更新笔记内容/颜色
+         * @param {number} bookId 
+         * @param {number} noteId 
+         * @param {{ [key: string]: string; }} requestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async updateNote(bookId: number, noteId: number, requestBody: { [key: string]: string; }, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseReadingNoteDTO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateNote(bookId, noteId, requestBody, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.updateNote']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @summary 更新试卷题目分值/排序
          * @param {number} paperId 
          * @param {number} sectionId 
@@ -22039,6 +24263,33 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.updatePaperQuestion(paperId, sectionId, pqId, updatePaperQuestionRequest, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.updatePaperQuestion']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 更新会员计划基本信息
+         * @param {UpdatePlanRequest} updatePlanRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async updatePlan(updatePlanRequest: UpdatePlanRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updatePlan(updatePlanRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.updatePlan']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 修改计划AI配额
+         * @param {number} planId 
+         * @param {UpdatePlanQuotaRequest} updatePlanQuotaRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async updatePlanQuota(planId: number, updatePlanQuotaRequest: UpdatePlanQuotaRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updatePlanQuota(planId, updatePlanQuotaRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.updatePlanQuota']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -22288,6 +24539,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.validate']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
+        /**
+         * 
+         * @summary 微信支付异步回调（预留）
+         * @param {string} body 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async wechatCallback(body: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.wechatCallback(body, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.wechatCallback']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
     }
 };
 
@@ -22449,6 +24713,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
+         * @summary 支付宝异步回调（预留）
+         * @param {DefaultApiAlipayCallbackRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        alipayCallback(requestParameters: DefaultApiAlipayCallbackRequest, options?: RawAxiosRequestConfig): AxiosPromise<string> {
+            return localVarFp.alipayCallback(requestParameters.body, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary 申请成为讲师
          * @param {DefaultApiApplyTeacherRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
@@ -22558,6 +24832,25 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.cancelExecution(requestParameters.executionId, options).then((request) => request(axios, basePath));
         },
         /**
+         * 
+         * @summary 取消会员
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        cancelMembership(options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid> {
+            return localVarFp.cancelMembership(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 取消用户会员
+         * @param {DefaultApiCancelMembership1Request} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        cancelMembership1(requestParameters: DefaultApiCancelMembership1Request, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid> {
+            return localVarFp.cancelMembership1(requestParameters.userId, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 用户修改自己的密码，需要验证旧密码
          * @summary 修改密码
          * @param {DefaultApiChangePasswordRequest} requestParameters Request parameters.
@@ -22618,6 +24911,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
+         * @summary 确认会员支付（管理员手动确认）
+         * @param {DefaultApiConfirmPayment1Request} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        confirmPayment1(requestParameters: DefaultApiConfirmPayment1Request, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid> {
+            return localVarFp.confirmPayment1(requestParameters.orderNo, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary 复制工作流
          * @param {DefaultApiCopyRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
@@ -22655,6 +24958,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         createBanner(requestParameters: DefaultApiCreateBannerRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseLong> {
             return localVarFp.createBanner(requestParameters.createBannerRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 创建书签
+         * @param {DefaultApiCreateBookmarkRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createBookmark(requestParameters: DefaultApiCreateBookmarkRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseReadingBookmarkDTO> {
+            return localVarFp.createBookmark(requestParameters.bookId, requestParameters.requestBody, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -22778,6 +25091,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
+         * @summary 创建阅读笔记
+         * @param {DefaultApiCreateNoteRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createNote(requestParameters: DefaultApiCreateNoteRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseReadingNoteDTO> {
+            return localVarFp.createNote(requestParameters.bookId, requestParameters.createReadingNoteCommand, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary 创建订单（用户下单）
          * @param {DefaultApiCreateOrderRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
@@ -22785,6 +25108,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         createOrder(requestParameters: DefaultApiCreateOrderRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseString> {
             return localVarFp.createOrder(requestParameters.createOrderRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 创建会员计划
+         * @param {DefaultApiCreatePlanRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createPlan(requestParameters: DefaultApiCreatePlanRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMembershipPlan> {
+            return localVarFp.createPlan(requestParameters.createPlanRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -22915,6 +25248,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         deleteBook(requestParameters: DefaultApiDeleteBookRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid> {
             return localVarFp.deleteBook(requestParameters.bookId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 删除书签
+         * @param {DefaultApiDeleteBookmarkRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteBookmark(requestParameters: DefaultApiDeleteBookmarkRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid> {
+            return localVarFp.deleteBookmark(requestParameters.bookId, requestParameters.bookmarkId, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -23078,6 +25421,26 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
+         * @summary 删除笔记
+         * @param {DefaultApiDeleteNoteRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteNote(requestParameters: DefaultApiDeleteNoteRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid> {
+            return localVarFp.deleteNote(requestParameters.bookId, requestParameters.noteId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 删除会员计划
+         * @param {DefaultApiDeletePlanRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deletePlan(requestParameters: DefaultApiDeletePlanRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid> {
+            return localVarFp.deletePlan(requestParameters.planId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary 删除帖子
          * @param {DefaultApiDeletePostRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
@@ -23227,6 +25590,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.enableTrigger(requestParameters.triggerId, options).then((request) => request(axios, basePath));
         },
         /**
+         * 对整本书所有未加密章节进行AES加密存储
+         * @summary 批量加密所有章节
+         * @param {DefaultApiEncryptAllChaptersRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        encryptAllChapters(requestParameters: DefaultApiEncryptAllChaptersRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseInteger> {
+            return localVarFp.encryptAllChapters(requestParameters.bookId, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 对指定章节的内容进行AES加密存储
          * @summary 加密章节内容
          * @param {DefaultApiEncryptChapterContentRequest} requestParameters Request parameters.
@@ -23314,6 +25687,15 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         generateBannerImage(requestParameters: DefaultApiGenerateBannerImageRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseGenerateBannerImageResponse> {
             return localVarFp.generateBannerImage(requestParameters.generateBannerImageRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 查询我的AI功能剩余额度
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getAiQuota(options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringMapStringInteger> {
+            return localVarFp.getAiQuota(options).then((request) => request(axios, basePath));
         },
         /**
          * 获取所有抓取源配置列表
@@ -23431,6 +25813,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         getBookChapters(requestParameters: DefaultApiGetBookChaptersRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListChapterDTO> {
             return localVarFp.getBookChapters(requestParameters.bookId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 获取用户在该书的书签列表
+         * @param {DefaultApiGetBookmarksByBookRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getBookmarksByBook(requestParameters: DefaultApiGetBookmarksByBookRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListReadingBookmarkDTO> {
+            return localVarFp.getBookmarksByBook(requestParameters.bookId, requestParameters.userId, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -23600,6 +25992,15 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         getCourseStructure(requestParameters: DefaultApiGetCourseStructureRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseCourseStructureResponse> {
             return localVarFp.getCourseStructure(requestParameters.courseId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 查询我的当前会员状态
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getCurrentMembership(options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseUserMembership> {
+            return localVarFp.getCurrentMembership(options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -23852,6 +26253,15 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
+         * @summary 查询我的会员历史
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getMembershipHistory(options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListUserMembership> {
+            return localVarFp.getMembershipHistory(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary 获取群聊历史消息（分页）
          * @param {DefaultApiGetMessagesRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
@@ -24035,6 +26445,26 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
+         * @summary 获取用户在该书的笔记列表
+         * @param {DefaultApiGetNotesByBookRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getNotesByBook(requestParameters: DefaultApiGetNotesByBookRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListReadingNoteDTO> {
+            return localVarFp.getNotesByBook(requestParameters.bookId, requestParameters.userId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 获取用户在该章节的笔记
+         * @param {DefaultApiGetNotesByChapterRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getNotesByChapter(requestParameters: DefaultApiGetNotesByChapterRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListReadingNoteDTO> {
+            return localVarFp.getNotesByChapter(requestParameters.bookId, requestParameters.chapterId, requestParameters.userId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary 查询订单详情
          * @param {DefaultApiGetOrderRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
@@ -24055,6 +26485,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
+         * @summary 获取PDF预签名URL
+         * @param {DefaultApiGetPdfUrlRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getPdfUrl(requestParameters: DefaultApiGetPdfUrlRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseString> {
+            return localVarFp.getPdfUrl(requestParameters.bookId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary 获取待审核申请数量（管理员）
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -24071,6 +26511,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         getPendingRequests(requestParameters: DefaultApiGetPendingRequestsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListJoinRequestResponse> {
             return localVarFp.getPendingRequests(requestParameters.groupId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 获取计划详情
+         * @param {DefaultApiGetPlanRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getPlan(requestParameters: DefaultApiGetPlanRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMembershipPlan> {
+            return localVarFp.getPlan(requestParameters.planId, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -24233,12 +26683,21 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
-         * @summary 订单统计（管理员）
+         * @summary 订单统计（管理员，包含课程+会员）
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
         getStatistics(options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseOrderStatistics> {
             return localVarFp.getStatistics(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 会员统计
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getStatistics1(options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringLong> {
+            return localVarFp.getStatistics1(options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -24434,6 +26893,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.getUnreadCount2(options).then((request) => request(axios, basePath));
         },
         /**
+         * 
+         * @summary 查询指定用户的AI额度
+         * @param {DefaultApiGetUserAiQuotaRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getUserAiQuota(requestParameters: DefaultApiGetUserAiQuotaRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringMapStringInteger> {
+            return localVarFp.getUserAiQuota(requestParameters.userId, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 管理员获取用户详细信息
          * @summary 获取用户详情
          * @param {DefaultApiGetUserDetailRequest} requestParameters Request parameters.
@@ -24571,6 +27040,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         getWorkflowAssistants(requestParameters: DefaultApiGetWorkflowAssistantsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListLong> {
             return localVarFp.getWorkflowAssistants(requestParameters.id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 为用户直接开通会员
+         * @param {DefaultApiGrantMembershipRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        grantMembership(requestParameters: DefaultApiGrantMembershipRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid> {
+            return localVarFp.grantMembership(requestParameters.grantMembershipRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * 接受或拒绝好友申请
@@ -24920,13 +27399,41 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
-         * @summary 获取订单列表（管理员）
+         * @summary 按状态查询会员列表
+         * @param {DefaultApiListMembershipsRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listMemberships(requestParameters: DefaultApiListMembershipsRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListUserMembership> {
+            return localVarFp.listMemberships(requestParameters.status, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 获取订单列表（管理员，包含课程订单和会员订单）
          * @param {DefaultApiListOrdersRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
         listOrders(requestParameters: DefaultApiListOrdersRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListOrderResponse> {
             return localVarFp.listOrders(requestParameters.status, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 获取所有会员计划
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listPlans(options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListMembershipPlan> {
+            return localVarFp.listPlans(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 获取所有会员计划
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listPlans1(options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListMembershipPlan> {
+            return localVarFp.listPlans1(options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -25177,6 +27684,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.publishExamPaper(requestParameters.id, options).then((request) => request(axios, basePath));
         },
         /**
+         * 
+         * @summary 购买会员（创建待支付订单）
+         * @param {DefaultApiPurchaseMembershipRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        purchaseMembership(requestParameters: DefaultApiPurchaseMembershipRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseString> {
+            return localVarFp.purchaseMembership(requestParameters.purchaseMembershipRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 管理员分页查询公告列表
          * @summary 分页查询公告
          * @param {DefaultApiQueryAnnouncementsRequest} requestParameters Request parameters.
@@ -25285,6 +27802,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         refund(requestParameters: DefaultApiRefundRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid> {
             return localVarFp.refund(requestParameters.orderNo, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 全量重建索引（管理员）
+         * @param {DefaultApiReindexRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        reindex(requestParameters: DefaultApiReindexRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringInteger> {
+            return localVarFp.reindex(requestParameters.type, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -25538,6 +28065,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
+         * @summary 聚合搜索（书籍+章节+帖子）
+         * @param {DefaultApiSearchAllRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        searchAll(requestParameters: DefaultApiSearchAllRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponsePageResult> {
+            return localVarFp.searchAll(requestParameters.q, requestParameters.type, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary 搜索文章
          * @param {DefaultApiSearchArticlesRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
@@ -25548,13 +28085,43 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
+         * @summary 书内搜索
+         * @param {DefaultApiSearchBookChaptersRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        searchBookChapters(requestParameters: DefaultApiSearchBookChaptersRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponsePageResult> {
+            return localVarFp.searchBookChapters(requestParameters.bookId, requestParameters.q, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary 搜索书籍
          * @param {DefaultApiSearchBooksRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        searchBooks(requestParameters: DefaultApiSearchBooksRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListBookDTO> {
-            return localVarFp.searchBooks(requestParameters.keyword, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
+        searchBooks(requestParameters: DefaultApiSearchBooksRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponsePageResult> {
+            return localVarFp.searchBooks(requestParameters.q, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 搜索书籍
+         * @param {DefaultApiSearchBooks1Request} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        searchBooks1(requestParameters: DefaultApiSearchBooks1Request, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListBookDTO> {
+            return localVarFp.searchBooks1(requestParameters.keyword, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 搜索章节内容
+         * @param {DefaultApiSearchChaptersRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        searchChapters(requestParameters: DefaultApiSearchChaptersRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponsePageResult> {
+            return localVarFp.searchChapters(requestParameters.q, requestParameters.bookId, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -25593,8 +28160,18 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        searchPosts(requestParameters: DefaultApiSearchPostsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponsePostPageResponse> {
-            return localVarFp.searchPosts(requestParameters.keyword, requestParameters.pageNum, requestParameters.pageSize, options).then((request) => request(axios, basePath));
+        searchPosts(requestParameters: DefaultApiSearchPostsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponsePageResult> {
+            return localVarFp.searchPosts(requestParameters.q, requestParameters.postType, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 搜索帖子
+         * @param {DefaultApiSearchPosts1Request} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        searchPosts1(requestParameters: DefaultApiSearchPosts1Request, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponsePostPageResponse> {
+            return localVarFp.searchPosts1(requestParameters.keyword, requestParameters.pageNum, requestParameters.pageSize, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -25725,6 +28302,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         studyWord(requestParameters: DefaultApiStudyWordRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid> {
             return localVarFp.studyWord(requestParameters.wordId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 搜索建议（即时联想）
+         * @param {DefaultApiSuggestRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        suggest(requestParameters: DefaultApiSuggestRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListSearchSuggestionDTO> {
+            return localVarFp.suggest(requestParameters.q, requestParameters.type, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -25898,6 +28485,36 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
+         * @summary 编辑书籍信息
+         * @param {DefaultApiUpdateBookRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateBook(requestParameters: DefaultApiUpdateBookRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseBookDTO> {
+            return localVarFp.updateBook(requestParameters.bookId, requestParameters.requestBody, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 更新书籍封面
+         * @param {DefaultApiUpdateBookCoverRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateBookCover(requestParameters: DefaultApiUpdateBookCoverRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseBookDTO> {
+            return localVarFp.updateBookCover(requestParameters.bookId, requestParameters.updateBookCoverRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 更新书签备注/标题
+         * @param {DefaultApiUpdateBookmarkRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateBookmark(requestParameters: DefaultApiUpdateBookmarkRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseReadingBookmarkDTO> {
+            return localVarFp.updateBookmark(requestParameters.bookId, requestParameters.bookmarkId, requestParameters.requestBody, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary 更新章节（管理员）
          * @param {DefaultApiUpdateChapterRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
@@ -26068,6 +28685,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
+         * @summary 更新笔记内容/颜色
+         * @param {DefaultApiUpdateNoteRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateNote(requestParameters: DefaultApiUpdateNoteRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseReadingNoteDTO> {
+            return localVarFp.updateNote(requestParameters.bookId, requestParameters.noteId, requestParameters.requestBody, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary 更新试卷题目分值/排序
          * @param {DefaultApiUpdatePaperQuestionRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
@@ -26075,6 +28702,26 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         updatePaperQuestion(requestParameters: DefaultApiUpdatePaperQuestionRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseBoolean> {
             return localVarFp.updatePaperQuestion(requestParameters.paperId, requestParameters.sectionId, requestParameters.pqId, requestParameters.updatePaperQuestionRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 更新会员计划基本信息
+         * @param {DefaultApiUpdatePlanRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updatePlan(requestParameters: DefaultApiUpdatePlanRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid> {
+            return localVarFp.updatePlan(requestParameters.updatePlanRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 修改计划AI配额
+         * @param {DefaultApiUpdatePlanQuotaRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updatePlanQuota(requestParameters: DefaultApiUpdatePlanQuotaRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid> {
+            return localVarFp.updatePlanQuota(requestParameters.planId, requestParameters.updatePlanQuotaRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -26256,6 +28903,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         validate(requestParameters: DefaultApiValidateRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseWorkflowValidationResponse> {
             return localVarFp.validate(requestParameters.id, options).then((request) => request(axios, basePath));
         },
+        /**
+         * 
+         * @summary 微信支付异步回调（预留）
+         * @param {DefaultApiWechatCallbackRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        wechatCallback(requestParameters: DefaultApiWechatCallbackRequest, options?: RawAxiosRequestConfig): AxiosPromise<string> {
+            return localVarFp.wechatCallback(requestParameters.body, options).then((request) => request(axios, basePath));
+        },
     };
 };
 
@@ -26400,6 +29057,15 @@ export interface DefaultApiInterface {
 
     /**
      * 
+     * @summary 支付宝异步回调（预留）
+     * @param {DefaultApiAlipayCallbackRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    alipayCallback(requestParameters: DefaultApiAlipayCallbackRequest, options?: RawAxiosRequestConfig): AxiosPromise<string>;
+
+    /**
+     * 
      * @summary 申请成为讲师
      * @param {DefaultApiApplyTeacherRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -26498,6 +29164,23 @@ export interface DefaultApiInterface {
     cancelExecution(requestParameters: DefaultApiCancelExecutionRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid>;
 
     /**
+     * 
+     * @summary 取消会员
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    cancelMembership(options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid>;
+
+    /**
+     * 
+     * @summary 取消用户会员
+     * @param {DefaultApiCancelMembership1Request} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    cancelMembership1(requestParameters: DefaultApiCancelMembership1Request, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid>;
+
+    /**
      * 用户修改自己的密码，需要验证旧密码
      * @summary 修改密码
      * @param {DefaultApiChangePasswordRequest} requestParameters Request parameters.
@@ -26552,6 +29235,15 @@ export interface DefaultApiInterface {
 
     /**
      * 
+     * @summary 确认会员支付（管理员手动确认）
+     * @param {DefaultApiConfirmPayment1Request} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    confirmPayment1(requestParameters: DefaultApiConfirmPayment1Request, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid>;
+
+    /**
+     * 
      * @summary 复制工作流
      * @param {DefaultApiCopyRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -26585,6 +29277,15 @@ export interface DefaultApiInterface {
      * @throws {RequiredError}
      */
     createBanner(requestParameters: DefaultApiCreateBannerRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseLong>;
+
+    /**
+     * 
+     * @summary 创建书签
+     * @param {DefaultApiCreateBookmarkRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    createBookmark(requestParameters: DefaultApiCreateBookmarkRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseReadingBookmarkDTO>;
 
     /**
      * 
@@ -26696,12 +29397,30 @@ export interface DefaultApiInterface {
 
     /**
      * 
+     * @summary 创建阅读笔记
+     * @param {DefaultApiCreateNoteRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    createNote(requestParameters: DefaultApiCreateNoteRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseReadingNoteDTO>;
+
+    /**
+     * 
      * @summary 创建订单（用户下单）
      * @param {DefaultApiCreateOrderRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     createOrder(requestParameters: DefaultApiCreateOrderRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseString>;
+
+    /**
+     * 
+     * @summary 创建会员计划
+     * @param {DefaultApiCreatePlanRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    createPlan(requestParameters: DefaultApiCreatePlanRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMembershipPlan>;
 
     /**
      * 
@@ -26819,6 +29538,15 @@ export interface DefaultApiInterface {
      * @throws {RequiredError}
      */
     deleteBook(requestParameters: DefaultApiDeleteBookRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid>;
+
+    /**
+     * 
+     * @summary 删除书签
+     * @param {DefaultApiDeleteBookmarkRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    deleteBookmark(requestParameters: DefaultApiDeleteBookmarkRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid>;
 
     /**
      * 
@@ -26966,6 +29694,24 @@ export interface DefaultApiInterface {
 
     /**
      * 
+     * @summary 删除笔记
+     * @param {DefaultApiDeleteNoteRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    deleteNote(requestParameters: DefaultApiDeleteNoteRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid>;
+
+    /**
+     * 
+     * @summary 删除会员计划
+     * @param {DefaultApiDeletePlanRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    deletePlan(requestParameters: DefaultApiDeletePlanRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid>;
+
+    /**
+     * 
      * @summary 删除帖子
      * @param {DefaultApiDeletePostRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -27100,6 +29846,15 @@ export interface DefaultApiInterface {
     enableTrigger(requestParameters: DefaultApiEnableTriggerRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseWorkflowTriggerResponse>;
 
     /**
+     * 对整本书所有未加密章节进行AES加密存储
+     * @summary 批量加密所有章节
+     * @param {DefaultApiEncryptAllChaptersRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    encryptAllChapters(requestParameters: DefaultApiEncryptAllChaptersRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseInteger>;
+
+    /**
      * 对指定章节的内容进行AES加密存储
      * @summary 加密章节内容
      * @param {DefaultApiEncryptChapterContentRequest} requestParameters Request parameters.
@@ -27178,6 +29933,14 @@ export interface DefaultApiInterface {
      * @throws {RequiredError}
      */
     generateBannerImage(requestParameters: DefaultApiGenerateBannerImageRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseGenerateBannerImageResponse>;
+
+    /**
+     * 
+     * @summary 查询我的AI功能剩余额度
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getAiQuota(options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringMapStringInteger>;
 
     /**
      * 获取所有抓取源配置列表
@@ -27283,6 +30046,15 @@ export interface DefaultApiInterface {
      * @throws {RequiredError}
      */
     getBookChapters(requestParameters: DefaultApiGetBookChaptersRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListChapterDTO>;
+
+    /**
+     * 
+     * @summary 获取用户在该书的书签列表
+     * @param {DefaultApiGetBookmarksByBookRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getBookmarksByBook(requestParameters: DefaultApiGetBookmarksByBookRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListReadingBookmarkDTO>;
 
     /**
      * 
@@ -27435,6 +30207,14 @@ export interface DefaultApiInterface {
      * @throws {RequiredError}
      */
     getCourseStructure(requestParameters: DefaultApiGetCourseStructureRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseCourseStructureResponse>;
+
+    /**
+     * 
+     * @summary 查询我的当前会员状态
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getCurrentMembership(options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseUserMembership>;
 
     /**
      * 
@@ -27662,6 +30442,14 @@ export interface DefaultApiInterface {
 
     /**
      * 
+     * @summary 查询我的会员历史
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getMembershipHistory(options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListUserMembership>;
+
+    /**
+     * 
      * @summary 获取群聊历史消息（分页）
      * @param {DefaultApiGetMessagesRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -27826,6 +30614,24 @@ export interface DefaultApiInterface {
 
     /**
      * 
+     * @summary 获取用户在该书的笔记列表
+     * @param {DefaultApiGetNotesByBookRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getNotesByBook(requestParameters: DefaultApiGetNotesByBookRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListReadingNoteDTO>;
+
+    /**
+     * 
+     * @summary 获取用户在该章节的笔记
+     * @param {DefaultApiGetNotesByChapterRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getNotesByChapter(requestParameters: DefaultApiGetNotesByChapterRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListReadingNoteDTO>;
+
+    /**
+     * 
      * @summary 查询订单详情
      * @param {DefaultApiGetOrderRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -27844,6 +30650,15 @@ export interface DefaultApiInterface {
 
     /**
      * 
+     * @summary 获取PDF预签名URL
+     * @param {DefaultApiGetPdfUrlRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getPdfUrl(requestParameters: DefaultApiGetPdfUrlRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseString>;
+
+    /**
+     * 
      * @summary 获取待审核申请数量（管理员）
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -27858,6 +30673,15 @@ export interface DefaultApiInterface {
      * @throws {RequiredError}
      */
     getPendingRequests(requestParameters: DefaultApiGetPendingRequestsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListJoinRequestResponse>;
+
+    /**
+     * 
+     * @summary 获取计划详情
+     * @param {DefaultApiGetPlanRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getPlan(requestParameters: DefaultApiGetPlanRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMembershipPlan>;
 
     /**
      * 
@@ -28004,11 +30828,19 @@ export interface DefaultApiInterface {
 
     /**
      * 
-     * @summary 订单统计（管理员）
+     * @summary 订单统计（管理员，包含课程+会员）
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     getStatistics(options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseOrderStatistics>;
+
+    /**
+     * 
+     * @summary 会员统计
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getStatistics1(options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringLong>;
 
     /**
      * 
@@ -28184,6 +31016,15 @@ export interface DefaultApiInterface {
     getUnreadCount2(options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseLong>;
 
     /**
+     * 
+     * @summary 查询指定用户的AI额度
+     * @param {DefaultApiGetUserAiQuotaRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getUserAiQuota(requestParameters: DefaultApiGetUserAiQuotaRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringMapStringInteger>;
+
+    /**
      * 管理员获取用户详细信息
      * @summary 获取用户详情
      * @param {DefaultApiGetUserDetailRequest} requestParameters Request parameters.
@@ -28307,6 +31148,15 @@ export interface DefaultApiInterface {
      * @throws {RequiredError}
      */
     getWorkflowAssistants(requestParameters: DefaultApiGetWorkflowAssistantsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListLong>;
+
+    /**
+     * 
+     * @summary 为用户直接开通会员
+     * @param {DefaultApiGrantMembershipRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    grantMembership(requestParameters: DefaultApiGrantMembershipRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid>;
 
     /**
      * 接受或拒绝好友申请
@@ -28621,12 +31471,37 @@ export interface DefaultApiInterface {
 
     /**
      * 
-     * @summary 获取订单列表（管理员）
+     * @summary 按状态查询会员列表
+     * @param {DefaultApiListMembershipsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    listMemberships(requestParameters?: DefaultApiListMembershipsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListUserMembership>;
+
+    /**
+     * 
+     * @summary 获取订单列表（管理员，包含课程订单和会员订单）
      * @param {DefaultApiListOrdersRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     listOrders(requestParameters?: DefaultApiListOrdersRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListOrderResponse>;
+
+    /**
+     * 
+     * @summary 获取所有会员计划
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    listPlans(options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListMembershipPlan>;
+
+    /**
+     * 
+     * @summary 获取所有会员计划
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    listPlans1(options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListMembershipPlan>;
 
     /**
      * 
@@ -28852,6 +31727,15 @@ export interface DefaultApiInterface {
     publishExamPaper(requestParameters: DefaultApiPublishExamPaperRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseBoolean>;
 
     /**
+     * 
+     * @summary 购买会员（创建待支付订单）
+     * @param {DefaultApiPurchaseMembershipRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    purchaseMembership(requestParameters: DefaultApiPurchaseMembershipRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseString>;
+
+    /**
      * 管理员分页查询公告列表
      * @summary 分页查询公告
      * @param {DefaultApiQueryAnnouncementsRequest} requestParameters Request parameters.
@@ -28949,6 +31833,15 @@ export interface DefaultApiInterface {
      * @throws {RequiredError}
      */
     refund(requestParameters: DefaultApiRefundRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid>;
+
+    /**
+     * 
+     * @summary 全量重建索引（管理员）
+     * @param {DefaultApiReindexRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    reindex(requestParameters?: DefaultApiReindexRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringInteger>;
 
     /**
      * 
@@ -29177,6 +32070,15 @@ export interface DefaultApiInterface {
 
     /**
      * 
+     * @summary 聚合搜索（书籍+章节+帖子）
+     * @param {DefaultApiSearchAllRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    searchAll(requestParameters: DefaultApiSearchAllRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponsePageResult>;
+
+    /**
+     * 
      * @summary 搜索文章
      * @param {DefaultApiSearchArticlesRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -29186,12 +32088,39 @@ export interface DefaultApiInterface {
 
     /**
      * 
+     * @summary 书内搜索
+     * @param {DefaultApiSearchBookChaptersRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    searchBookChapters(requestParameters: DefaultApiSearchBookChaptersRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponsePageResult>;
+
+    /**
+     * 
      * @summary 搜索书籍
      * @param {DefaultApiSearchBooksRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    searchBooks(requestParameters: DefaultApiSearchBooksRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListBookDTO>;
+    searchBooks(requestParameters: DefaultApiSearchBooksRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponsePageResult>;
+
+    /**
+     * 
+     * @summary 搜索书籍
+     * @param {DefaultApiSearchBooks1Request} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    searchBooks1(requestParameters: DefaultApiSearchBooks1Request, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListBookDTO>;
+
+    /**
+     * 
+     * @summary 搜索章节内容
+     * @param {DefaultApiSearchChaptersRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    searchChapters(requestParameters: DefaultApiSearchChaptersRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponsePageResult>;
 
     /**
      * 
@@ -29227,7 +32156,16 @@ export interface DefaultApiInterface {
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    searchPosts(requestParameters: DefaultApiSearchPostsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponsePostPageResponse>;
+    searchPosts(requestParameters: DefaultApiSearchPostsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponsePageResult>;
+
+    /**
+     * 
+     * @summary 搜索帖子
+     * @param {DefaultApiSearchPosts1Request} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    searchPosts1(requestParameters: DefaultApiSearchPosts1Request, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponsePostPageResponse>;
 
     /**
      * 
@@ -29345,6 +32283,15 @@ export interface DefaultApiInterface {
      * @throws {RequiredError}
      */
     studyWord(requestParameters: DefaultApiStudyWordRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid>;
+
+    /**
+     * 
+     * @summary 搜索建议（即时联想）
+     * @param {DefaultApiSuggestRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    suggest(requestParameters: DefaultApiSuggestRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListSearchSuggestionDTO>;
 
     /**
      * 
@@ -29501,6 +32448,33 @@ export interface DefaultApiInterface {
 
     /**
      * 
+     * @summary 编辑书籍信息
+     * @param {DefaultApiUpdateBookRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    updateBook(requestParameters: DefaultApiUpdateBookRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseBookDTO>;
+
+    /**
+     * 
+     * @summary 更新书籍封面
+     * @param {DefaultApiUpdateBookCoverRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    updateBookCover(requestParameters: DefaultApiUpdateBookCoverRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseBookDTO>;
+
+    /**
+     * 
+     * @summary 更新书签备注/标题
+     * @param {DefaultApiUpdateBookmarkRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    updateBookmark(requestParameters: DefaultApiUpdateBookmarkRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseReadingBookmarkDTO>;
+
+    /**
+     * 
      * @summary 更新章节（管理员）
      * @param {DefaultApiUpdateChapterRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -29654,12 +32628,39 @@ export interface DefaultApiInterface {
 
     /**
      * 
+     * @summary 更新笔记内容/颜色
+     * @param {DefaultApiUpdateNoteRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    updateNote(requestParameters: DefaultApiUpdateNoteRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseReadingNoteDTO>;
+
+    /**
+     * 
      * @summary 更新试卷题目分值/排序
      * @param {DefaultApiUpdatePaperQuestionRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     updatePaperQuestion(requestParameters: DefaultApiUpdatePaperQuestionRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseBoolean>;
+
+    /**
+     * 
+     * @summary 更新会员计划基本信息
+     * @param {DefaultApiUpdatePlanRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    updatePlan(requestParameters: DefaultApiUpdatePlanRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid>;
+
+    /**
+     * 
+     * @summary 修改计划AI配额
+     * @param {DefaultApiUpdatePlanQuotaRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    updatePlanQuota(requestParameters: DefaultApiUpdatePlanQuotaRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid>;
 
     /**
      * 
@@ -29823,6 +32824,15 @@ export interface DefaultApiInterface {
      */
     validate(requestParameters: DefaultApiValidateRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseWorkflowValidationResponse>;
 
+    /**
+     * 
+     * @summary 微信支付异步回调（预留）
+     * @param {DefaultApiWechatCallbackRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    wechatCallback(requestParameters: DefaultApiWechatCallbackRequest, options?: RawAxiosRequestConfig): AxiosPromise<string>;
+
 }
 
 /**
@@ -29969,6 +32979,13 @@ export interface DefaultApiAiGenerateQuestionsRequest {
 }
 
 /**
+ * Request parameters for alipayCallback operation in DefaultApi.
+ */
+export interface DefaultApiAlipayCallbackRequest {
+    readonly body: string
+}
+
+/**
  * Request parameters for applyTeacher operation in DefaultApi.
  */
 export interface DefaultApiApplyTeacherRequest {
@@ -30076,6 +33093,13 @@ export interface DefaultApiCancelExecutionRequest {
 }
 
 /**
+ * Request parameters for cancelMembership1 operation in DefaultApi.
+ */
+export interface DefaultApiCancelMembership1Request {
+    readonly userId: number
+}
+
+/**
  * Request parameters for changePassword operation in DefaultApi.
  */
 export interface DefaultApiChangePasswordRequest {
@@ -30122,6 +33146,16 @@ export interface DefaultApiConfirmPaymentRequest {
 }
 
 /**
+ * Request parameters for confirmPayment1 operation in DefaultApi.
+ */
+export interface DefaultApiConfirmPayment1Request {
+    /**
+     * 会员订单号
+     */
+    readonly orderNo: string
+}
+
+/**
  * Request parameters for copy operation in DefaultApi.
  */
 export interface DefaultApiCopyRequest {
@@ -30160,6 +33194,15 @@ export interface DefaultApiCreateAnnouncementRequest {
  */
 export interface DefaultApiCreateBannerRequest {
     readonly createBannerRequest: CreateBannerRequest
+}
+
+/**
+ * Request parameters for createBookmark operation in DefaultApi.
+ */
+export interface DefaultApiCreateBookmarkRequest {
+    readonly bookId: number
+
+    readonly requestBody: { [key: string]: object; }
 }
 
 /**
@@ -30263,10 +33306,26 @@ export interface DefaultApiCreateGroupFromClassRequest {
 }
 
 /**
+ * Request parameters for createNote operation in DefaultApi.
+ */
+export interface DefaultApiCreateNoteRequest {
+    readonly bookId: number
+
+    readonly createReadingNoteCommand: CreateReadingNoteCommand
+}
+
+/**
  * Request parameters for createOrder operation in DefaultApi.
  */
 export interface DefaultApiCreateOrderRequest {
     readonly createOrderRequest: CreateOrderRequest
+}
+
+/**
+ * Request parameters for createPlan operation in DefaultApi.
+ */
+export interface DefaultApiCreatePlanRequest {
+    readonly createPlanRequest: CreatePlanRequest
 }
 
 /**
@@ -30401,6 +33460,15 @@ export interface DefaultApiDeleteBannerRequest {
  */
 export interface DefaultApiDeleteBookRequest {
     readonly bookId: number
+}
+
+/**
+ * Request parameters for deleteBookmark operation in DefaultApi.
+ */
+export interface DefaultApiDeleteBookmarkRequest {
+    readonly bookId: number
+
+    readonly bookmarkId: number
 }
 
 /**
@@ -30554,6 +33622,22 @@ export interface DefaultApiDeleteNodeRequest {
 }
 
 /**
+ * Request parameters for deleteNote operation in DefaultApi.
+ */
+export interface DefaultApiDeleteNoteRequest {
+    readonly bookId: number
+
+    readonly noteId: number
+}
+
+/**
+ * Request parameters for deletePlan operation in DefaultApi.
+ */
+export interface DefaultApiDeletePlanRequest {
+    readonly planId: number
+}
+
+/**
  * Request parameters for deletePost operation in DefaultApi.
  */
 export interface DefaultApiDeletePostRequest {
@@ -30692,6 +33776,13 @@ export interface DefaultApiEnableTriggerRequest {
      * 触发器ID
      */
     readonly triggerId: number
+}
+
+/**
+ * Request parameters for encryptAllChapters operation in DefaultApi.
+ */
+export interface DefaultApiEncryptAllChaptersRequest {
+    readonly bookId: number
 }
 
 /**
@@ -30836,6 +33927,15 @@ export interface DefaultApiGetBookRequest {
  */
 export interface DefaultApiGetBookChaptersRequest {
     readonly bookId: number
+}
+
+/**
+ * Request parameters for getBookmarksByBook operation in DefaultApi.
+ */
+export interface DefaultApiGetBookmarksByBookRequest {
+    readonly bookId: number
+
+    readonly userId: number
 }
 
 /**
@@ -31390,6 +34490,26 @@ export interface DefaultApiGetNodesRequest {
 }
 
 /**
+ * Request parameters for getNotesByBook operation in DefaultApi.
+ */
+export interface DefaultApiGetNotesByBookRequest {
+    readonly bookId: number
+
+    readonly userId: number
+}
+
+/**
+ * Request parameters for getNotesByChapter operation in DefaultApi.
+ */
+export interface DefaultApiGetNotesByChapterRequest {
+    readonly bookId: number
+
+    readonly chapterId: number
+
+    readonly userId: number
+}
+
+/**
  * Request parameters for getOrder operation in DefaultApi.
  */
 export interface DefaultApiGetOrderRequest {
@@ -31409,10 +34529,24 @@ export interface DefaultApiGetPaperQuestionsRequest {
 }
 
 /**
+ * Request parameters for getPdfUrl operation in DefaultApi.
+ */
+export interface DefaultApiGetPdfUrlRequest {
+    readonly bookId: number
+}
+
+/**
  * Request parameters for getPendingRequests operation in DefaultApi.
  */
 export interface DefaultApiGetPendingRequestsRequest {
     readonly groupId: number
+}
+
+/**
+ * Request parameters for getPlan operation in DefaultApi.
+ */
+export interface DefaultApiGetPlanRequest {
+    readonly planId: number
 }
 
 /**
@@ -31688,6 +34822,13 @@ export interface DefaultApiGetUnreadCountRequest {
 }
 
 /**
+ * Request parameters for getUserAiQuota operation in DefaultApi.
+ */
+export interface DefaultApiGetUserAiQuotaRequest {
+    readonly userId: number
+}
+
+/**
  * Request parameters for getUserDetail operation in DefaultApi.
  */
 export interface DefaultApiGetUserDetailRequest {
@@ -31818,6 +34959,13 @@ export interface DefaultApiGetWorkflowAssistantsRequest {
      * 工作流ID
      */
     readonly id: number
+}
+
+/**
+ * Request parameters for grantMembership operation in DefaultApi.
+ */
+export interface DefaultApiGrantMembershipRequest {
+    readonly grantMembershipRequest: GrantMembershipRequest
 }
 
 /**
@@ -32184,11 +35332,25 @@ export interface DefaultApiListGroupsRequest {
 }
 
 /**
+ * Request parameters for listMemberships operation in DefaultApi.
+ */
+export interface DefaultApiListMembershipsRequest {
+    /**
+     * 状态：0-待支付，1-生效中，2-已过期，3-已取消
+     */
+    readonly status?: number
+
+    readonly page?: number
+
+    readonly size?: number
+}
+
+/**
  * Request parameters for listOrders operation in DefaultApi.
  */
 export interface DefaultApiListOrdersRequest {
     /**
-     * 订单状态：0-未支付，1-已支付，2-已过期，3-已退款
+     * 订单状态：0-未支付，1-已支付，2-已过期，3-已退款/已取消
      */
     readonly status?: number
 
@@ -32442,6 +35604,13 @@ export interface DefaultApiPublishExamPaperRequest {
 }
 
 /**
+ * Request parameters for purchaseMembership operation in DefaultApi.
+ */
+export interface DefaultApiPurchaseMembershipRequest {
+    readonly purchaseMembershipRequest: PurchaseMembershipRequest
+}
+
+/**
  * Request parameters for queryAnnouncements operation in DefaultApi.
  */
 export interface DefaultApiQueryAnnouncementsRequest {
@@ -32521,6 +35690,13 @@ export interface DefaultApiRefundRequest {
      * 订单号
      */
     readonly orderNo: string
+}
+
+/**
+ * Request parameters for reindex operation in DefaultApi.
+ */
+export interface DefaultApiReindexRequest {
+    readonly type?: string
 }
 
 /**
@@ -32743,6 +35919,19 @@ export interface DefaultApiScrapeSinglePageRequest {
 }
 
 /**
+ * Request parameters for searchAll operation in DefaultApi.
+ */
+export interface DefaultApiSearchAllRequest {
+    readonly q: string
+
+    readonly type?: string
+
+    readonly page?: number
+
+    readonly size?: number
+}
+
+/**
  * Request parameters for searchArticles operation in DefaultApi.
  */
 export interface DefaultApiSearchArticlesRequest {
@@ -32763,10 +35952,47 @@ export interface DefaultApiSearchArticlesRequest {
 }
 
 /**
+ * Request parameters for searchBookChapters operation in DefaultApi.
+ */
+export interface DefaultApiSearchBookChaptersRequest {
+    readonly bookId: number
+
+    readonly q: string
+
+    readonly page?: number
+
+    readonly size?: number
+}
+
+/**
  * Request parameters for searchBooks operation in DefaultApi.
  */
 export interface DefaultApiSearchBooksRequest {
+    readonly q: string
+
+    readonly page?: number
+
+    readonly size?: number
+}
+
+/**
+ * Request parameters for searchBooks1 operation in DefaultApi.
+ */
+export interface DefaultApiSearchBooks1Request {
     readonly keyword: string
+
+    readonly page?: number
+
+    readonly size?: number
+}
+
+/**
+ * Request parameters for searchChapters operation in DefaultApi.
+ */
+export interface DefaultApiSearchChaptersRequest {
+    readonly q: string
+
+    readonly bookId?: number
 
     readonly page?: number
 
@@ -32828,6 +36054,19 @@ export interface DefaultApiSearchGroups1Request {
  * Request parameters for searchPosts operation in DefaultApi.
  */
 export interface DefaultApiSearchPostsRequest {
+    readonly q: string
+
+    readonly postType?: string
+
+    readonly page?: number
+
+    readonly size?: number
+}
+
+/**
+ * Request parameters for searchPosts1 operation in DefaultApi.
+ */
+export interface DefaultApiSearchPosts1Request {
     readonly keyword: string
 
     readonly pageNum?: number
@@ -32985,6 +36224,15 @@ export interface DefaultApiStudyWordRequest {
 }
 
 /**
+ * Request parameters for suggest operation in DefaultApi.
+ */
+export interface DefaultApiSuggestRequest {
+    readonly q: string
+
+    readonly type?: string
+}
+
+/**
  * Request parameters for takeOffline operation in DefaultApi.
  */
 export interface DefaultApiTakeOfflineRequest {
@@ -33131,6 +36379,35 @@ export interface DefaultApiUpdateAnnouncementRequest {
  */
 export interface DefaultApiUpdateBannerRequest {
     readonly updateBannerRequest: UpdateBannerRequest
+}
+
+/**
+ * Request parameters for updateBook operation in DefaultApi.
+ */
+export interface DefaultApiUpdateBookRequest {
+    readonly bookId: number
+
+    readonly requestBody: { [key: string]: string; }
+}
+
+/**
+ * Request parameters for updateBookCover operation in DefaultApi.
+ */
+export interface DefaultApiUpdateBookCoverRequest {
+    readonly bookId: number
+
+    readonly updateBookCoverRequest?: UpdateBookCoverRequest
+}
+
+/**
+ * Request parameters for updateBookmark operation in DefaultApi.
+ */
+export interface DefaultApiUpdateBookmarkRequest {
+    readonly bookId: number
+
+    readonly bookmarkId: number
+
+    readonly requestBody: { [key: string]: string; }
 }
 
 /**
@@ -33342,6 +36619,17 @@ export interface DefaultApiUpdateNodeConfigRequest {
 }
 
 /**
+ * Request parameters for updateNote operation in DefaultApi.
+ */
+export interface DefaultApiUpdateNoteRequest {
+    readonly bookId: number
+
+    readonly noteId: number
+
+    readonly requestBody: { [key: string]: string; }
+}
+
+/**
  * Request parameters for updatePaperQuestion operation in DefaultApi.
  */
 export interface DefaultApiUpdatePaperQuestionRequest {
@@ -33352,6 +36640,22 @@ export interface DefaultApiUpdatePaperQuestionRequest {
     readonly pqId: number
 
     readonly updatePaperQuestionRequest: UpdatePaperQuestionRequest
+}
+
+/**
+ * Request parameters for updatePlan operation in DefaultApi.
+ */
+export interface DefaultApiUpdatePlanRequest {
+    readonly updatePlanRequest: UpdatePlanRequest
+}
+
+/**
+ * Request parameters for updatePlanQuota operation in DefaultApi.
+ */
+export interface DefaultApiUpdatePlanQuotaRequest {
+    readonly planId: number
+
+    readonly updatePlanQuotaRequest: UpdatePlanQuotaRequest
 }
 
 /**
@@ -33537,6 +36841,13 @@ export interface DefaultApiValidateRequest {
 }
 
 /**
+ * Request parameters for wechatCallback operation in DefaultApi.
+ */
+export interface DefaultApiWechatCallbackRequest {
+    readonly body: string
+}
+
+/**
  * DefaultApi - object-oriented interface
  */
 export class DefaultApi extends BaseAPI implements DefaultApiInterface {
@@ -33707,6 +37018,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
 
     /**
      * 
+     * @summary 支付宝异步回调（预留）
+     * @param {DefaultApiAlipayCallbackRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public alipayCallback(requestParameters: DefaultApiAlipayCallbackRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).alipayCallback(requestParameters.body, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @summary 申请成为讲师
      * @param {DefaultApiApplyTeacherRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -33827,6 +37149,27 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * 
+     * @summary 取消会员
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public cancelMembership(options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).cancelMembership(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 取消用户会员
+     * @param {DefaultApiCancelMembership1Request} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public cancelMembership1(requestParameters: DefaultApiCancelMembership1Request, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).cancelMembership1(requestParameters.userId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 用户修改自己的密码，需要验证旧密码
      * @summary 修改密码
      * @param {DefaultApiChangePasswordRequest} requestParameters Request parameters.
@@ -33893,6 +37236,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
 
     /**
      * 
+     * @summary 确认会员支付（管理员手动确认）
+     * @param {DefaultApiConfirmPayment1Request} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public confirmPayment1(requestParameters: DefaultApiConfirmPayment1Request, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).confirmPayment1(requestParameters.orderNo, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @summary 复制工作流
      * @param {DefaultApiCopyRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -33933,6 +37287,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public createBanner(requestParameters: DefaultApiCreateBannerRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).createBanner(requestParameters.createBannerRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 创建书签
+     * @param {DefaultApiCreateBookmarkRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public createBookmark(requestParameters: DefaultApiCreateBookmarkRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).createBookmark(requestParameters.bookId, requestParameters.requestBody, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -34069,6 +37434,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
 
     /**
      * 
+     * @summary 创建阅读笔记
+     * @param {DefaultApiCreateNoteRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public createNote(requestParameters: DefaultApiCreateNoteRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).createNote(requestParameters.bookId, requestParameters.createReadingNoteCommand, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @summary 创建订单（用户下单）
      * @param {DefaultApiCreateOrderRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -34076,6 +37452,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public createOrder(requestParameters: DefaultApiCreateOrderRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).createOrder(requestParameters.createOrderRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 创建会员计划
+     * @param {DefaultApiCreatePlanRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public createPlan(requestParameters: DefaultApiCreatePlanRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).createPlan(requestParameters.createPlanRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -34219,6 +37606,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public deleteBook(requestParameters: DefaultApiDeleteBookRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).deleteBook(requestParameters.bookId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 删除书签
+     * @param {DefaultApiDeleteBookmarkRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public deleteBookmark(requestParameters: DefaultApiDeleteBookmarkRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).deleteBookmark(requestParameters.bookId, requestParameters.bookmarkId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -34399,6 +37797,28 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
 
     /**
      * 
+     * @summary 删除笔记
+     * @param {DefaultApiDeleteNoteRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public deleteNote(requestParameters: DefaultApiDeleteNoteRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).deleteNote(requestParameters.bookId, requestParameters.noteId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 删除会员计划
+     * @param {DefaultApiDeletePlanRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public deletePlan(requestParameters: DefaultApiDeletePlanRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).deletePlan(requestParameters.planId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @summary 删除帖子
      * @param {DefaultApiDeletePostRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -34563,6 +37983,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * 对整本书所有未加密章节进行AES加密存储
+     * @summary 批量加密所有章节
+     * @param {DefaultApiEncryptAllChaptersRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public encryptAllChapters(requestParameters: DefaultApiEncryptAllChaptersRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).encryptAllChapters(requestParameters.bookId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 对指定章节的内容进行AES加密存储
      * @summary 加密章节内容
      * @param {DefaultApiEncryptChapterContentRequest} requestParameters Request parameters.
@@ -34658,6 +38089,16 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public generateBannerImage(requestParameters: DefaultApiGenerateBannerImageRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).generateBannerImage(requestParameters.generateBannerImageRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 查询我的AI功能剩余额度
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getAiQuota(options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getAiQuota(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -34787,6 +38228,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public getBookChapters(requestParameters: DefaultApiGetBookChaptersRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).getBookChapters(requestParameters.bookId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 获取用户在该书的书签列表
+     * @param {DefaultApiGetBookmarksByBookRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getBookmarksByBook(requestParameters: DefaultApiGetBookmarksByBookRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getBookmarksByBook(requestParameters.bookId, requestParameters.userId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -34973,6 +38425,16 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public getCourseStructure(requestParameters: DefaultApiGetCourseStructureRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).getCourseStructure(requestParameters.courseId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 查询我的当前会员状态
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getCurrentMembership(options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getCurrentMembership(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -35251,6 +38713,16 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
 
     /**
      * 
+     * @summary 查询我的会员历史
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getMembershipHistory(options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getMembershipHistory(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @summary 获取群聊历史消息（分页）
      * @param {DefaultApiGetMessagesRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -35453,6 +38925,28 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
 
     /**
      * 
+     * @summary 获取用户在该书的笔记列表
+     * @param {DefaultApiGetNotesByBookRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getNotesByBook(requestParameters: DefaultApiGetNotesByBookRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getNotesByBook(requestParameters.bookId, requestParameters.userId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 获取用户在该章节的笔记
+     * @param {DefaultApiGetNotesByChapterRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getNotesByChapter(requestParameters: DefaultApiGetNotesByChapterRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getNotesByChapter(requestParameters.bookId, requestParameters.chapterId, requestParameters.userId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @summary 查询订单详情
      * @param {DefaultApiGetOrderRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -35475,6 +38969,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
 
     /**
      * 
+     * @summary 获取PDF预签名URL
+     * @param {DefaultApiGetPdfUrlRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getPdfUrl(requestParameters: DefaultApiGetPdfUrlRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getPdfUrl(requestParameters.bookId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @summary 获取待审核申请数量（管理员）
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -35492,6 +38997,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public getPendingRequests(requestParameters: DefaultApiGetPendingRequestsRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).getPendingRequests(requestParameters.groupId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 获取计划详情
+     * @param {DefaultApiGetPlanRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getPlan(requestParameters: DefaultApiGetPlanRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getPlan(requestParameters.planId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -35671,12 +39187,22 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
 
     /**
      * 
-     * @summary 订单统计（管理员）
+     * @summary 订单统计（管理员，包含课程+会员）
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     public getStatistics(options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).getStatistics(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 会员统计
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getStatistics1(options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getStatistics1(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -35893,6 +39419,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * 
+     * @summary 查询指定用户的AI额度
+     * @param {DefaultApiGetUserAiQuotaRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getUserAiQuota(requestParameters: DefaultApiGetUserAiQuotaRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getUserAiQuota(requestParameters.userId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 管理员获取用户详细信息
      * @summary 获取用户详情
      * @param {DefaultApiGetUserDetailRequest} requestParameters Request parameters.
@@ -36043,6 +39580,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public getWorkflowAssistants(requestParameters: DefaultApiGetWorkflowAssistantsRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).getWorkflowAssistants(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 为用户直接开通会员
+     * @param {DefaultApiGrantMembershipRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public grantMembership(requestParameters: DefaultApiGrantMembershipRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).grantMembership(requestParameters.grantMembershipRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -36428,13 +39976,44 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
 
     /**
      * 
-     * @summary 获取订单列表（管理员）
+     * @summary 按状态查询会员列表
+     * @param {DefaultApiListMembershipsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public listMemberships(requestParameters: DefaultApiListMembershipsRequest = {}, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).listMemberships(requestParameters.status, requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 获取订单列表（管理员，包含课程订单和会员订单）
      * @param {DefaultApiListOrdersRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     public listOrders(requestParameters: DefaultApiListOrdersRequest = {}, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).listOrders(requestParameters.status, requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 获取所有会员计划
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public listPlans(options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).listPlans(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 获取所有会员计划
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public listPlans1(options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).listPlans1(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -36711,6 +40290,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * 
+     * @summary 购买会员（创建待支付订单）
+     * @param {DefaultApiPurchaseMembershipRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public purchaseMembership(requestParameters: DefaultApiPurchaseMembershipRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).purchaseMembership(requestParameters.purchaseMembershipRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 管理员分页查询公告列表
      * @summary 分页查询公告
      * @param {DefaultApiQueryAnnouncementsRequest} requestParameters Request parameters.
@@ -36829,6 +40419,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public refund(requestParameters: DefaultApiRefundRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).refund(requestParameters.orderNo, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 全量重建索引（管理员）
+     * @param {DefaultApiReindexRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public reindex(requestParameters: DefaultApiReindexRequest = {}, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).reindex(requestParameters.type, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -37108,6 +40709,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
 
     /**
      * 
+     * @summary 聚合搜索（书籍+章节+帖子）
+     * @param {DefaultApiSearchAllRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public searchAll(requestParameters: DefaultApiSearchAllRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).searchAll(requestParameters.q, requestParameters.type, requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @summary 搜索文章
      * @param {DefaultApiSearchArticlesRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -37119,13 +40731,46 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
 
     /**
      * 
+     * @summary 书内搜索
+     * @param {DefaultApiSearchBookChaptersRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public searchBookChapters(requestParameters: DefaultApiSearchBookChaptersRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).searchBookChapters(requestParameters.bookId, requestParameters.q, requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @summary 搜索书籍
      * @param {DefaultApiSearchBooksRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     public searchBooks(requestParameters: DefaultApiSearchBooksRequest, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).searchBooks(requestParameters.keyword, requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
+        return DefaultApiFp(this.configuration).searchBooks(requestParameters.q, requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 搜索书籍
+     * @param {DefaultApiSearchBooks1Request} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public searchBooks1(requestParameters: DefaultApiSearchBooks1Request, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).searchBooks1(requestParameters.keyword, requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 搜索章节内容
+     * @param {DefaultApiSearchChaptersRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public searchChapters(requestParameters: DefaultApiSearchChaptersRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).searchChapters(requestParameters.q, requestParameters.bookId, requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -37169,7 +40814,18 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      * @throws {RequiredError}
      */
     public searchPosts(requestParameters: DefaultApiSearchPostsRequest, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).searchPosts(requestParameters.keyword, requestParameters.pageNum, requestParameters.pageSize, options).then((request) => request(this.axios, this.basePath));
+        return DefaultApiFp(this.configuration).searchPosts(requestParameters.q, requestParameters.postType, requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 搜索帖子
+     * @param {DefaultApiSearchPosts1Request} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public searchPosts1(requestParameters: DefaultApiSearchPosts1Request, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).searchPosts1(requestParameters.keyword, requestParameters.pageNum, requestParameters.pageSize, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -37313,6 +40969,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public studyWord(requestParameters: DefaultApiStudyWordRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).studyWord(requestParameters.wordId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 搜索建议（即时联想）
+     * @param {DefaultApiSuggestRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public suggest(requestParameters: DefaultApiSuggestRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).suggest(requestParameters.q, requestParameters.type, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -37504,6 +41171,39 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
 
     /**
      * 
+     * @summary 编辑书籍信息
+     * @param {DefaultApiUpdateBookRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public updateBook(requestParameters: DefaultApiUpdateBookRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).updateBook(requestParameters.bookId, requestParameters.requestBody, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 更新书籍封面
+     * @param {DefaultApiUpdateBookCoverRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public updateBookCover(requestParameters: DefaultApiUpdateBookCoverRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).updateBookCover(requestParameters.bookId, requestParameters.updateBookCoverRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 更新书签备注/标题
+     * @param {DefaultApiUpdateBookmarkRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public updateBookmark(requestParameters: DefaultApiUpdateBookmarkRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).updateBookmark(requestParameters.bookId, requestParameters.bookmarkId, requestParameters.requestBody, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @summary 更新章节（管理员）
      * @param {DefaultApiUpdateChapterRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -37691,6 +41391,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
 
     /**
      * 
+     * @summary 更新笔记内容/颜色
+     * @param {DefaultApiUpdateNoteRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public updateNote(requestParameters: DefaultApiUpdateNoteRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).updateNote(requestParameters.bookId, requestParameters.noteId, requestParameters.requestBody, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @summary 更新试卷题目分值/排序
      * @param {DefaultApiUpdatePaperQuestionRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -37698,6 +41409,28 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public updatePaperQuestion(requestParameters: DefaultApiUpdatePaperQuestionRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).updatePaperQuestion(requestParameters.paperId, requestParameters.sectionId, requestParameters.pqId, requestParameters.updatePaperQuestionRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 更新会员计划基本信息
+     * @param {DefaultApiUpdatePlanRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public updatePlan(requestParameters: DefaultApiUpdatePlanRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).updatePlan(requestParameters.updatePlanRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 修改计划AI配额
+     * @param {DefaultApiUpdatePlanQuotaRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public updatePlanQuota(requestParameters: DefaultApiUpdatePlanQuotaRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).updatePlanQuota(requestParameters.planId, requestParameters.updatePlanQuotaRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -37896,6 +41629,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public validate(requestParameters: DefaultApiValidateRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).validate(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 微信支付异步回调（预留）
+     * @param {DefaultApiWechatCallbackRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public wechatCallback(requestParameters: DefaultApiWechatCallbackRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).wechatCallback(requestParameters.body, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

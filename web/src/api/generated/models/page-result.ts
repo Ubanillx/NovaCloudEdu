@@ -13,12 +13,15 @@
  */
 
 
+// May contain unused imports in some cases
+// @ts-ignore
+import type { SearchResultDTO } from './search-result-dto';
 
-export interface UploadBookCommand {
-    'file': File;
-    'title': string;
-    'author'?: string;
-    'cover'?: File;
-    'adminId': number;
+export interface PageResult {
+    'items'?: Array<SearchResultDTO>;
+    'total'?: number;
+    'page'?: number;
+    'size'?: number;
+    'totalPages'?: number;
 }
 

@@ -8,6 +8,7 @@ Name | Type | Description | Notes
 **file** | **File** |  | [default to undefined]
 **title** | **string** |  | [default to undefined]
 **author** | **string** |  | [optional] [default to undefined]
+**cover** | **File** |  | [optional] [default to undefined]
 **adminId** | **number** |  | [default to undefined]
 
 ## Example
@@ -19,6 +20,7 @@ const instance: UploadBookCommand = {
     file,
     title,
     author,
+    cover,
     adminId,
 };
 ```

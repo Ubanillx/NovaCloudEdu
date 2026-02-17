@@ -429,7 +429,7 @@ export const AIApiAxiosParamCreator = function (configuration?: Configuration) {
             };
         },
         /**
-         * 根据提示词使用AI生成助手头像图片，返回图片URL
+         * 根据提示词使用AI生成助手头像图片，图片会自动上传到OSS持久化存储，返回OSS图片URL
          * @summary AI生成助手头像
          * @param {GenerateAvatarRequest} generateAvatarRequest 
          * @param {*} [options] Override http request option.
@@ -2259,7 +2259,7 @@ export const AIApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * 根据提示词使用AI生成助手头像图片，返回图片URL
+         * 根据提示词使用AI生成助手头像图片，图片会自动上传到OSS持久化存储，返回OSS图片URL
          * @summary AI生成助手头像
          * @param {GenerateAvatarRequest} generateAvatarRequest 
          * @param {*} [options] Override http request option.
@@ -2904,7 +2904,7 @@ export const AIApiFactory = function (configuration?: Configuration, basePath?: 
             return localVarFp.assistantExecuteWorkflow(requestParameters.id, requestParameters.workflowId, requestParameters.userId, requestParameters.requestBody, options).then((request) => request(axios, basePath));
         },
         /**
-         * 根据提示词使用AI生成助手头像图片，返回图片URL
+         * 根据提示词使用AI生成助手头像图片，图片会自动上传到OSS持久化存储，返回OSS图片URL
          * @summary AI生成助手头像
          * @param {AIApiAssistantGenerateAvatarRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
@@ -3380,7 +3380,7 @@ export interface AIApiInterface {
     assistantExecuteWorkflow(requestParameters: AIApiAssistantExecuteWorkflowRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringObject>;
 
     /**
-     * 根据提示词使用AI生成助手头像图片，返回图片URL
+     * 根据提示词使用AI生成助手头像图片，图片会自动上传到OSS持久化存储，返回OSS图片URL
      * @summary AI生成助手头像
      * @param {AIApiAssistantGenerateAvatarRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -4258,7 +4258,7 @@ export class AIApi extends BaseAPI implements AIApiInterface {
     }
 
     /**
-     * 根据提示词使用AI生成助手头像图片，返回图片URL
+     * 根据提示词使用AI生成助手头像图片，图片会自动上传到OSS持久化存储，返回OSS图片URL
      * @summary AI生成助手头像
      * @param {AIApiAssistantGenerateAvatarRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
