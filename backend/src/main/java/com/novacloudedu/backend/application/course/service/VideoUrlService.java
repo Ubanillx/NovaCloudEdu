@@ -55,7 +55,9 @@ public class VideoUrlService {
         if (response == null) {
             return null;
         }
-        if (!hasAccess && !Boolean.TRUE.equals(response.getIsFree())) {
+        boolean sectionAccessible = hasAccess || Boolean.TRUE.equals(response.getIsFree());
+        response.setAccessible(sectionAccessible);
+        if (!sectionAccessible) {
             response.setVideoUrl(null);
             response.setResourceUrl(null);
             response.setHlsUrl(null);
