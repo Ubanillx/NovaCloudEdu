@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.List;
 
 @Tag(name = "书籍管理", description = "书籍上传、查询、删除等管理接口")
@@ -54,6 +56,33 @@ public class BookController {
             @RequestParam(defaultValue = "20") int size) {
         List<BookDTO> books = bookApplicationService.searchBooks(keyword, page, size);
         return ResultUtils.success(books);
+    }
+
+    @Operation(summary = "编辑书籍信息")
+    @PutMapping("/{bookId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public BaseResponse<BookDTO> updateBook(
+            @PathVariable Long bookId,
+            @RequestBody java.util.Map<String, String> body) {
+        BookDTO book = bookApplicationService.updateBook(bookId, body.get("title"), body.get("author"));
+        return ResultUtils.success(book);
+    }
+
+    @Operation(summary = "更新书籍封面")
+    @PutMapping("/{bookId}/cover")
+    @PreAuthorize("hasRole('ADMIN')")
+    public BaseResponse<BookDTO> updateBookCover(
+            @PathVariable Long bookId,
+            @RequestParam("cover") MultipartFile cover) {
+        BookDTO book = bookApplicationService.updateBookCover(bookId, cover);
+        return ResultUtils.success(book);
+    }
+
+    @Operation(summary = "获取PDF预签名URL")
+    @GetMapping("/{bookId}/pdf-url")
+    public BaseResponse<String> getPdfUrl(@PathVariable Long bookId) {
+        String url = bookApplicationService.getPdfPresignedUrl(bookId);
+        return ResultUtils.success(url);
     }
 
     @Operation(summary = "删除书籍")
