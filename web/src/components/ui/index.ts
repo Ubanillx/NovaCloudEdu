@@ -5,3 +5,4 @@ export { default as PhoneEditModal } from './PhoneEditModal';
 export { Avatar } from './Avatar';
 export { default as FileUploadField } from './FileUploadField';
 export { default as ArtPlayerWrapper } from './ArtPlayerWrapper';
+export { default as ImageUploadArea } from './ImageUploadArea';
