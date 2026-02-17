@@ -5,6 +5,7 @@ import com.novacloudedu.backend.domain.order.repository.UserCourseRepository;
 import com.novacloudedu.backend.domain.payment.PaymentGateway;
 import com.novacloudedu.backend.domain.payment.RefundResult;
 import com.novacloudedu.backend.exception.BusinessException;
+import com.novacloudedu.backend.infrastructure.email.UserEmailNotifier;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +16,7 @@ public class RefundOrderCommand {
 
     private final UserCourseRepository userCourseRepository;
     private final PaymentGateway paymentGateway;
+    private final UserEmailNotifier userEmailNotifier;
 
     @Transactional
     public void execute(String orderNo) {
@@ -29,5 +31,9 @@ public class RefundOrderCommand {
 
         userCourse.refund();
         userCourseRepository.save(userCourse);
+
+        // 邮件通知用户
+        userEmailNotifier.notifyRefundCompleted(userCourse.getUserId().value(),
+                orderNo, userCourse.getPrice().toPlainString());
     }
 }

@@ -16,6 +16,12 @@ import java.time.LocalDateTime;
 @Schema(description = "订单信息响应")
 public class OrderResponse {
 
+    @Schema(description = "订单类型：COURSE-课程订单，MEMBERSHIP-会员订单")
+    private String orderType;
+
+    @Schema(description = "商品名称（课程名/会员计划名）")
+    private String productName;
+
     @Schema(description = "订单ID")
     private Long id;
 
