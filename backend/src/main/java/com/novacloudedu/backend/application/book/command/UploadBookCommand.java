@@ -16,6 +16,8 @@ public class UploadBookCommand {
 
     private String author;
 
+    private MultipartFile cover;
+
     @NotNull(message = "管理员ID不能为空")
     private Long adminId;
 }

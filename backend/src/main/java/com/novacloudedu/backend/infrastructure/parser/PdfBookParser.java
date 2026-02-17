@@ -10,6 +10,9 @@ import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -31,15 +34,29 @@ public class PdfBookParser implements BookParser {
     @Override
     public ParsedBook parse(String fileUrl) {
         try {
-            // 处理 file:// 协议的路径
-            String filePath = fileUrl;
-            if (filePath.startsWith("file://")) {
-                filePath = filePath.substring(7);
+            java.io.File file;
+            Path tempFile = null;
+
+            if (fileUrl.startsWith("http://") || fileUrl.startsWith("https://")) {
+                tempFile = Files.createTempFile("book_pdf_", ".pdf");
+                try (InputStream in = URI.create(fileUrl).toURL().openStream()) {
+                    Files.copy(in, tempFile, StandardCopyOption.REPLACE_EXISTING);
+                }
+                file = tempFile.toFile();
+            } else {
+                String filePath = fileUrl;
+                if (filePath.startsWith("file://")) {
+                    filePath = filePath.substring(7);
+                }
+                file = new java.io.File(filePath);
             }
-            
-            java.io.File file = new java.io.File(filePath);
+
             try (PDDocument document = org.apache.pdfbox.Loader.loadPDF(file)) {
                 return parsePdfDocument(document);
+            } finally {
+                if (tempFile != null) {
+                    Files.deleteIfExists(tempFile);
+                }
             }
         } catch (Exception e) {
             throw new RuntimeException("PDF文件解析失败: " + e.getMessage(), e);

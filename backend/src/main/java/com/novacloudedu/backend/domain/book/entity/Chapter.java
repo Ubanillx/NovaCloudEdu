@@ -30,7 +30,7 @@ public class Chapter {
                                 String content) {
         Chapter chapter = new Chapter();
         chapter.bookId = bookId;
-        chapter.title = title;
+        chapter.title = (title != null && title.length() > 250) ? title.substring(0, 250) + "..." : title;
         chapter.chapterIndex = chapterIndex;
         chapter.content = content;
         chapter.wordCount = calculateWordCount(content);
