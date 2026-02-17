@@ -32,7 +32,11 @@ import { CourseDetailPage } from './pages/admin/CourseDetailPage'
 import { TeacherManagementPage } from './pages/admin/TeacherManagementPage'
 import { ClassManagementPage } from './pages/admin/ClassManagementPage'
 import { GroupManagementPage } from './pages/admin/GroupManagementPage'
+import { BookManagementPage } from './pages/admin/BookManagementPage'
+import { MembershipManagementPage } from './pages/admin/MembershipManagementPage'
+import { OrderManagementPage } from './pages/admin/OrderManagementPage'
 import CourseLessonPage from './pages/CourseLessonPage'
+import EbookReaderPage from './pages/EbookReaderPage'
 import { getToken } from './api'
 import { useEffect } from 'react'
 
@@ -104,6 +108,16 @@ createRoot(document.getElementById('root')!).render(
             }
           />
           
+          {/* 电子书阅读器 - 全屏沉浸式 */}
+          <Route
+            path="/book/:bookId/read"
+            element={
+              <ProtectedRoute>
+                <EbookReaderPage />
+              </ProtectedRoute>
+            }
+          />
+          
           {/* 管理员路由 */}
           <Route 
             path="/admin/*" 
@@ -118,6 +132,7 @@ createRoot(document.getElementById('root')!).render(
                     <Route path="teachers" element={<TeacherManagementPage />} />
                     <Route path="classes" element={<ClassManagementPage />} />
                     <Route path="groups" element={<GroupManagementPage />} />
+                    <Route path="ebooks" element={<BookManagementPage />} />
                     <Route path="scraper/config" element={<ScraperConfigPage />} />
                     <Route path="scraper/tasks" element={<ScraperTaskPage />} />
                     <Route path="daily-words" element={<DailyWordManagementPage />} />
@@ -135,6 +150,8 @@ createRoot(document.getElementById('root')!).render(
                     <Route path="questions" element={<QuestionManagementPage />} />
                     <Route path="exam-papers" element={<ExamPaperManagementPage />} />
                     <Route path="exam-templates" element={<ExamTemplateManagementPage />} />
+                    <Route path="membership" element={<MembershipManagementPage />} />
+                    <Route path="orders" element={<OrderManagementPage />} />
                     <Route path="settings" element={<div className="p-8 bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm"><h2 className="text-2xl font-bold">系统设置 (开发中...)</h2></div>} />
                   </Routes>
                 </AdminLayout>
