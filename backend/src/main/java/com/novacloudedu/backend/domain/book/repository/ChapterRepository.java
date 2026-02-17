@@ -27,6 +27,10 @@ public interface ChapterRepository {
 
     void deleteByBookId(BookId bookId);
 
+    List<Chapter> findUnencryptedByBookId(BookId bookId);
+
+    void batchUpdate(List<Chapter> chapters, int batchSize);
+
     List<Chapter> searchByContentKeyword(String keyword, int page, int size);
 
     List<Chapter> searchByBookIdAndKeyword(Long bookId, String keyword, int page, int size);

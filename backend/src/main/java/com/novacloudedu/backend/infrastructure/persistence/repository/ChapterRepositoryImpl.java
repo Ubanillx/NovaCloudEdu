@@ -9,6 +9,9 @@ import com.novacloudedu.backend.infrastructure.persistence.converter.ChapterConv
 import com.novacloudedu.backend.infrastructure.persistence.mapper.ChapterMapper;
 import com.novacloudedu.backend.infrastructure.persistence.po.ChapterPO;
 import lombok.RequiredArgsConstructor;
+import org.apache.ibatis.session.ExecutorType;
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +25,7 @@ public class ChapterRepositoryImpl implements ChapterRepository {
 
     private final ChapterMapper chapterMapper;
     private final ChapterConverter chapterConverter;
+    private final SqlSessionFactory sqlSessionFactory;
 
     @Override
     public Chapter save(Chapter chapter) {
@@ -59,7 +63,11 @@ public class ChapterRepositoryImpl implements ChapterRepository {
     @Override
     public List<Chapter> findByBookId(BookId bookId) {
         LambdaQueryWrapper<ChapterPO> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(ChapterPO::getBookId, bookId.value());
+        wrapper.select(ChapterPO::getId, ChapterPO::getBookId, ChapterPO::getTitle,
+                        ChapterPO::getChapterIndex, ChapterPO::getWordCount,
+                        ChapterPO::getContentHash, ChapterPO::getEncryptionIv,
+                        ChapterPO::getCreateTime, ChapterPO::getUpdateTime)
+                .eq(ChapterPO::getBookId, bookId.value());
         return chapterMapper.selectList(wrapper).stream()
                 .map(chapterConverter::toChapter)
                 .collect(Collectors.toList());
@@ -68,7 +76,11 @@ public class ChapterRepositoryImpl implements ChapterRepository {
     @Override
     public List<Chapter> findByBookIdOrderByIndex(BookId bookId) {
         LambdaQueryWrapper<ChapterPO> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(ChapterPO::getBookId, bookId.value())
+        wrapper.select(ChapterPO::getId, ChapterPO::getBookId, ChapterPO::getTitle,
+                        ChapterPO::getChapterIndex, ChapterPO::getWordCount,
+                        ChapterPO::getContentHash, ChapterPO::getEncryptionIv,
+                        ChapterPO::getCreateTime, ChapterPO::getUpdateTime)
+                .eq(ChapterPO::getBookId, bookId.value())
                 .orderByAsc(ChapterPO::getChapterIndex);
         return chapterMapper.selectList(wrapper).stream()
                 .map(chapterConverter::toChapter)
@@ -92,6 +104,36 @@ public class ChapterRepositoryImpl implements ChapterRepository {
         LambdaQueryWrapper<ChapterPO> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(ChapterPO::getBookId, bookId.value());
         chapterMapper.delete(wrapper);
+    }
+
+    @Override
+    public List<Chapter> findUnencryptedByBookId(BookId bookId) {
+        LambdaQueryWrapper<ChapterPO> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(ChapterPO::getBookId, bookId.value())
+                .and(w -> w.isNull(ChapterPO::getEncryptionIv)
+                        .or().eq(ChapterPO::getEncryptionIv, ""))
+                .orderByAsc(ChapterPO::getChapterIndex);
+        return chapterMapper.selectList(wrapper).stream()
+                .map(chapterConverter::toChapter)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public void batchUpdate(List<Chapter> chapters, int batchSize) {
+        if (chapters == null || chapters.isEmpty()) return;
+        try (SqlSession sqlSession = sqlSessionFactory.openSession(ExecutorType.BATCH, false)) {
+            ChapterMapper batchMapper = sqlSession.getMapper(ChapterMapper.class);
+            for (int i = 0; i < chapters.size(); i++) {
+                ChapterPO po = chapterConverter.toChapterPO(chapters.get(i));
+                batchMapper.updateById(po);
+                if ((i + 1) % batchSize == 0) {
+                    sqlSession.flushStatements();
+                }
+            }
+            sqlSession.flushStatements();
+            sqlSession.commit();
+        }
     }
 
     @Override

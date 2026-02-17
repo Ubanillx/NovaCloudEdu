@@ -6,14 +6,20 @@ import com.novacloudedu.backend.domain.book.repository.BookRepository;
 import com.novacloudedu.backend.domain.book.repository.ChapterRepository;
 import com.novacloudedu.backend.domain.book.service.BookSearchService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * PostgreSQL LIKE 搜索降级方案
+ * 当 search.elasticsearch.enabled=false（或未配置）时激活
+ */
 @Service
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "search.elasticsearch.enabled", havingValue = "false", matchIfMissing = true)
 public class PostgresBookSearchService implements BookSearchService {
 
     private final BookRepository bookRepository;

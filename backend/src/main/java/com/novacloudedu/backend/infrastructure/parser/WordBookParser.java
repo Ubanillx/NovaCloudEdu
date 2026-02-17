@@ -6,8 +6,12 @@ import com.novacloudedu.backend.domain.book.valueobject.FileType;
 import org.apache.poi.xwpf.usermodel.*;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -28,19 +32,33 @@ public class WordBookParser implements BookParser {
 
     @Override
     public ParsedBook parse(String fileUrl) {
+        Path tempFile = null;
         try {
-            // 处理 file:// 协议的路径
-            String filePath = fileUrl;
-            if (filePath.startsWith("file://")) {
-                filePath = filePath.substring(7);
+            InputStream is;
+
+            if (fileUrl.startsWith("http://") || fileUrl.startsWith("https://")) {
+                tempFile = Files.createTempFile("book_docx_", ".docx");
+                try (InputStream in = URI.create(fileUrl).toURL().openStream()) {
+                    Files.copy(in, tempFile, StandardCopyOption.REPLACE_EXISTING);
+                }
+                is = Files.newInputStream(tempFile);
+            } else {
+                String filePath = fileUrl;
+                if (filePath.startsWith("file://")) {
+                    filePath = filePath.substring(7);
+                }
+                is = new java.io.FileInputStream(filePath);
             }
-            
-            try (InputStream is = new java.io.FileInputStream(filePath)) {
-                XWPFDocument document = new XWPFDocument(is);
+
+            try (is; XWPFDocument document = new XWPFDocument(is)) {
                 return parseWordDocument(document);
             }
         } catch (Exception e) {
             throw new RuntimeException("Word文件解析失败: " + e.getMessage(), e);
+        } finally {
+            if (tempFile != null) {
+                try { Files.deleteIfExists(tempFile); } catch (IOException ignored) {}
+            }
         }
     }
 

@@ -7,7 +7,9 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.security.SecureRandom;
+import java.util.Arrays;
 import java.util.Base64;
 
 @Service
@@ -15,13 +17,14 @@ public class ContentSecurityService {
 
     private static final String ALGORITHM = "AES/CBC/PKCS5Padding";
     private static final int IV_SIZE = 16;
+    private static final int KEY_SIZE = 16;
 
     public EncryptedContent encrypt(String content, String sessionKey) {
         try {
             byte[] iv = generateIV();
             
             SecretKeySpec keySpec = new SecretKeySpec(
-                    sessionKey.getBytes(StandardCharsets.UTF_8), 
+                    normalizeKey(sessionKey), 
                     "AES"
             );
             IvParameterSpec ivSpec = new IvParameterSpec(iv);
@@ -46,7 +49,7 @@ public class ContentSecurityService {
             byte[] encrypted = Base64.getDecoder().decode(encryptedContent);
             
             SecretKeySpec keySpec = new SecretKeySpec(
-                    sessionKey.getBytes(StandardCharsets.UTF_8), 
+                    normalizeKey(sessionKey), 
                     "AES"
             );
             IvParameterSpec ivSpec = new IvParameterSpec(iv);
@@ -65,6 +68,16 @@ public class ContentSecurityService {
         byte[] iv = new byte[IV_SIZE];
         new SecureRandom().nextBytes(iv);
         return iv;
+    }
+
+    private byte[] normalizeKey(String key) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(key.getBytes(StandardCharsets.UTF_8));
+            return Arrays.copyOf(hash, KEY_SIZE);
+        } catch (Exception e) {
+            throw new RuntimeException("密钥标准化失败", e);
+        }
     }
 
     @Getter
