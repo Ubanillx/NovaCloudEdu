@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Search, 
   Plus, 
@@ -15,10 +15,10 @@ import {
   ExternalLink,
   Send,
   XCircle,
-  Upload,
   ArrowUpDown,
   Sparkles,
-  Wand2
+  Wand2,
+  Loader2
 } from 'lucide-react';
 import { apiClient, DefaultApi, Configuration } from '../../api';
 import type { 
@@ -27,7 +27,7 @@ import type {
   UpdateBannerRequest,
   QueryBannerRequest
 } from '../../api/generated/models';
-import { toast, TruncateWithTooltip } from '../../components/ui';
+import { toast, TruncateWithTooltip, ImageUploadArea } from '../../components/ui';
 
 const api = new DefaultApi(new Configuration(), '', apiClient);
 
@@ -46,124 +46,6 @@ const LINK_TYPE_OPTIONS = [
   { value: 2, label: '外部链接', icon: ExternalLink },
 ];
 
-// 图片上传组件
-interface ImageUploadProps {
-  value?: string;
-  onChange: (url: string) => void;
-  label?: string;
-  aspectRatio?: string;
-}
-
-const ImageUpload: React.FC<ImageUploadProps> = ({ value, onChange, label = '轮播图片', aspectRatio = 'aspect-[16/9]' }) => {
-  const [uploading, setUploading] = useState(false);
-  const [previewUrl, setPreviewUrl] = useState(value || '');
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    setPreviewUrl(value || '');
-  }, [value]);
-
-  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (!file.type.startsWith('image/')) {
-      toast.error('请选择图片文件');
-      return;
-    }
-
-    if (file.size > 10 * 1024 * 1024) {
-      toast.error('图片大小不能超过 10MB');
-      return;
-    }
-
-    setUploading(true);
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-
-      const response = await apiClient.post('/api/file/upload/banner', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
-
-      if (response.data?.code === 0 && response.data?.data?.fileUrl) {
-        const url = response.data.data.fileUrl;
-        setPreviewUrl(url);
-        onChange(url);
-        toast.success('上传成功');
-      } else {
-        toast.error(response.data?.message || '上传失败');
-      }
-    } catch (error: any) {
-      toast.error(error?.response?.data?.message || '上传失败');
-    } finally {
-      setUploading(false);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
-    }
-  };
-
-  const handleUrlInput = (url: string) => {
-    setPreviewUrl(url);
-    onChange(url);
-  };
-
-  return (
-    <div>
-      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">{label} *</label>
-      <div className="space-y-3">
-        {/* 预览区域 */}
-        <div className={`relative w-full ${aspectRatio} rounded-xl overflow-hidden border-2 border-dashed border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 ${!previewUrl ? 'flex items-center justify-center' : ''}`}>
-          {previewUrl ? (
-            <>
-              <img src={previewUrl} alt="预览" className="w-full h-full object-cover" />
-              <button
-                type="button"
-                onClick={() => { setPreviewUrl(''); onChange(''); }}
-                className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
-              >
-                <X size={14} />
-              </button>
-            </>
-          ) : (
-            <div className="text-center p-8">
-              <ImageIcon size={48} className="mx-auto text-gray-300 dark:text-gray-600 mb-3" />
-              <p className="text-sm text-gray-400 dark:text-gray-500">推荐尺寸: 1920 x 600 像素</p>
-            </div>
-          )}
-        </div>
-        
-        {/* 上传按钮和URL输入 */}
-        <div className="flex gap-3">
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            onChange={handleFileSelect}
-            className="hidden"
-          />
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={uploading}
-            className="flex items-center gap-2 px-4 py-2.5 bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-brand-700 transition-colors disabled:opacity-50"
-          >
-            {uploading ? <RefreshCw size={16} className="animate-spin" /> : <Upload size={16} />}
-            <span>{uploading ? '上传中...' : '上传图片'}</span>
-          </button>
-          <input
-            type="text"
-            value={previewUrl}
-            onChange={(e) => handleUrlInput(e.target.value)}
-            placeholder="或输入图片URL"
-            className="flex-1 px-4 py-2.5 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all text-sm"
-          />
-        </div>
-      </div>
-    </div>
-  );
-};
 
 // 轮播图表单弹窗组件
 interface BannerFormModalProps {
@@ -176,6 +58,7 @@ interface BannerFormModalProps {
 const BannerFormModal: React.FC<BannerFormModalProps> = ({ isOpen, onClose, onSuccess, banner }) => {
   const isEdit = !!banner;
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [aiGenerating, setAiGenerating] = useState(false);
   const [aiDescription, setAiDescription] = useState('');
   const [showAiPanel, setShowAiPanel] = useState(false);
@@ -375,7 +258,7 @@ const BannerFormModal: React.FC<BannerFormModalProps> = ({ isOpen, onClose, onSu
                   >
                     {aiGenerating ? (
                       <>
-                        <RefreshCw size={14} className="animate-spin" />
+                        <Loader2 size={14} className="animate-spin" />
                         生成中...
                       </>
                     ) : (
@@ -389,10 +272,31 @@ const BannerFormModal: React.FC<BannerFormModalProps> = ({ isOpen, onClose, onSu
               </div>
             )}
 
-            <ImageUpload
+            <ImageUploadArea
               value={formData.imageUrl}
+              onFileSelect={async (file) => {
+                if (!file.type.startsWith('image/')) { toast.error('请选择图片文件'); return; }
+                if (file.size > 10 * 1024 * 1024) { toast.error('图片大小不能超过 10MB'); return; }
+                setUploading(true);
+                try {
+                  const fd = new FormData();
+                  fd.append('file', file);
+                  const response = await apiClient.post('/api/file/upload/banner', fd, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                  });
+                  if (response.data?.code === 0 && response.data?.data?.fileUrl) {
+                    setFormData(prev => ({ ...prev, imageUrl: response.data.data.fileUrl }));
+                    toast.success('上传成功');
+                  } else { toast.error(response.data?.message || '上传失败'); }
+                } catch (error: any) { toast.error(error?.response?.data?.message || '上传失败'); }
+                finally { setUploading(false); }
+              }}
               onChange={(url) => setFormData(prev => ({ ...prev, imageUrl: url }))}
-              label=""
+              uploading={uploading}
+              showUrlInput
+              accept="image/*"
+              placeholder="上传或输入图片 URL"
+              hint="推荐尺寸: 1920 x 600 像素"
             />
           </div>
 
@@ -470,7 +374,7 @@ const BannerFormModal: React.FC<BannerFormModalProps> = ({ isOpen, onClose, onSu
             disabled={loading}
             className="px-6 py-2 bg-brand-600 text-white text-sm font-bold rounded-xl hover:bg-brand-700 shadow-lg shadow-brand-600/20 disabled:opacity-50 transition-all active:scale-95 flex items-center gap-2"
           >
-            {loading && <RefreshCw size={16} className="animate-spin" />}
+            {loading && <Loader2 size={16} className="animate-spin" />}
             {isEdit ? '保存修改' : '创建轮播图'}
           </button>
         </div>
