@@ -342,7 +342,7 @@ import type { BaseResponseUserAnnouncementPageResponse } from '../models';
 // @ts-ignore
 import type { BaseResponseUserDetailResponse } from '../models';
 // @ts-ignore
-import type { BaseResponseUserMembership } from '../models';
+import type { BaseResponseUserMembershipDetailResponse } from '../models';
 // @ts-ignore
 import type { BaseResponseUserPageResponse } from '../models';
 // @ts-ignore
@@ -6404,7 +6404,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
-         * @summary 查询我的当前会员状态
+         * @summary 查询我的当前会员详细信息
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -20976,11 +20976,11 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
-         * @summary 查询我的当前会员状态
+         * @summary 查询我的当前会员详细信息
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getCurrentMembership(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseUserMembership>> {
+        async getCurrentMembership(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseUserMembershipDetailResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getCurrentMembership(options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.getCurrentMembership']?.[localVarOperationServerIndex]?.url;
@@ -26553,11 +26553,11 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
-         * @summary 查询我的当前会员状态
+         * @summary 查询我的当前会员详细信息
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getCurrentMembership(options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseUserMembership> {
+        getCurrentMembership(options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseUserMembershipDetailResponse> {
             return localVarFp.getCurrentMembership(options).then((request) => request(axios, basePath));
         },
         /**
@@ -30865,11 +30865,11 @@ export interface DefaultApiInterface {
 
     /**
      * 
-     * @summary 查询我的当前会员状态
+     * @summary 查询我的当前会员详细信息
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    getCurrentMembership(options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseUserMembership>;
+    getCurrentMembership(options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseUserMembershipDetailResponse>;
 
     /**
      * 
@@ -39240,7 +39240,7 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
 
     /**
      * 
-     * @summary 查询我的当前会员状态
+     * @summary 查询我的当前会员详细信息
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */

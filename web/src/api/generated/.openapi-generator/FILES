@@ -204,7 +204,7 @@ docs/BaseResponseTeacherResponse.md
 docs/BaseResponseTtsResponse.md
 docs/BaseResponseUserAnnouncementPageResponse.md
 docs/BaseResponseUserDetailResponse.md
-docs/BaseResponseUserMembership.md
+docs/BaseResponseUserMembershipDetailResponse.md
 docs/BaseResponseUserPageResponse.md
 docs/BaseResponseUserPublicResponse.md
 docs/BaseResponseUserStatsResult.md
@@ -468,6 +468,7 @@ docs/UserDetailResponse.md
 docs/UserId.md
 docs/UserLoginRequest.md
 docs/UserMembership.md
+docs/UserMembershipDetailResponse.md
 docs/UserPageResponse.md
 docs/UserPublicResponse.md
 docs/UserRegisterRequest.md
@@ -691,7 +692,7 @@ models/base-response-teacher-response.ts
 models/base-response-tts-response.ts
 models/base-response-user-announcement-page-response.ts
 models/base-response-user-detail-response.ts
-models/base-response-user-membership.ts
+models/base-response-user-membership-detail-response.ts
 models/base-response-user-page-response.ts
 models/base-response-user-public-response.ts
 models/base-response-user-stats-result.ts
@@ -951,6 +952,7 @@ models/user-daily-word-response.ts
 models/user-detail-response.ts
 models/user-id.ts
 models/user-login-request.ts
+models/user-membership-detail-response.ts
 models/user-membership.ts
 models/user-page-response.ts
 models/user-public-response.ts

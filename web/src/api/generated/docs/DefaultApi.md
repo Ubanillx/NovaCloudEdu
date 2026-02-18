@@ -149,7 +149,7 @@ All URIs are relative to *http://localhost:8080*
 |[**getCourseProgress**](#getcourseprogress) | **GET** /api/progress/course/{courseId} | 获取课程所有小节的学习进度|
 |[**getCourseProgressSummary**](#getcourseprogresssummary) | **GET** /api/progress/course/{courseId}/summary | 获取课程进度汇总|
 |[**getCourseStructure**](#getcoursestructure) | **GET** /api/course/{courseId}/structure | 获取课程完整结构（课程+章节+小节）|
-|[**getCurrentMembership**](#getcurrentmembership) | **GET** /api/membership/current | 查询我的当前会员状态|
+|[**getCurrentMembership**](#getcurrentmembership) | **GET** /api/membership/current | 查询我的当前会员详细信息|
 |[**getDailyArticle**](#getdailyarticle) | **GET** /api/daily-article/{id} | 获取文章详情|
 |[**getDailyWord**](#getdailyword) | **GET** /api/daily-word/{id} | 获取单词详情|
 |[**getDefinition**](#getdefinition) | **GET** /api/workflows/{id}/definition | 获取工作流定义详情|
@@ -8055,7 +8055,7 @@ const { status, data } = await apiInstance.getCourseStructure(
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **getCurrentMembership**
-> BaseResponseUserMembership getCurrentMembership()
+> BaseResponseUserMembershipDetailResponse getCurrentMembership()
 
 
 ### Example
@@ -8078,7 +8078,7 @@ This endpoint does not have any parameters.
 
 ### Return type
 
-**BaseResponseUserMembership**
+**BaseResponseUserMembershipDetailResponse**
 
 ### Authorization
 
