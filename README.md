@@ -52,10 +52,15 @@
 
 | 特性 | 说明 |
 |:---:|:---|
-| **AI 赋能** | 集成 Langchain4j 多模型路由，支持通义千问/GPT/DeepSeek/Moonshot/智谱/SiliconFlow/Ollama 7 大提供商 |
+| **AI 赋能** | 集成 Langchain4j 多模型路由，支持通义千问/GPT/DeepSeek/Moonshot/智谱/SiliconFlow/Ollama 7 大提供商 + MCP 服务器集成 |
 | **多端同步** | React Web 用户端+管理后台 + Flutter 移动端（Android/iOS），数据实时同步 |
+| **智能批改** | OCR 识别 + AI 逐题批改 + 知识画像 + 错题推荐，支持试卷/通用作业双模式 |
+| **会员系统** | 4 种套餐（FREE/BASIC/PRO/TEACHER），AI 配额控制（按天/按月自动重置） |
+| **课程体系** | 课程/班级/教师管理，HLS 视频播放，学习进度追踪 |
 | **智能推荐** | 基于 Neo4j 知识图谱的个性化学习路径推荐 |
 | **RAG 知识库** | 文档解析（PDF/EPUB/DOCX）→ 向量 Embedding → Rerank 检索增强 |
+| **PPT 生成** | AI 驱动的多步骤 PPT 生成（大纲/内容/模板），OnlyOffice 在线编辑 |
+| **试卷系统** | 试卷/题库管理，AI 生成题目，Typst 排版导出 PDF |
 | **语音交互** | 阿里云 NLS 语音识别 (ASR) + 语音合成 (TTS)，WebSocket 实时转写 |
 | **实时通信** | WebSocket + STOMP 私聊/群聊，已读回执，离线消息缓存 |
 | **工作流引擎** | 可视化 DAG 编排，18 种节点（LLM/代码沙箱/HTTP/数据库等），Cron/Webhook 触发 |
@@ -107,12 +112,13 @@
 │                       后端服务层                             │
 ├─────────────────────────────────────────────────────────────┤
 │  核心:       Java 21 + Spring Boot 3.5.8 (DDD 四层架构)     │
-│  持久化:     MyBatis Plus 3.5.5 (69 PO / 68 Mapper)        │
+│  持久化:     MyBatis Plus 3.5.5 (80+ PO / 80+ Mapper)      │
 │  安全:       Spring Security + JWT (jjwt 0.12.6)           │
 │  AI:         Langchain4j 0.36.2 + DashScope SDK 2.16.7     │
 │  工作流:     自研 DAG 引擎 (18 种节点 + 代码沙箱)           │
+│  微服务:     Python-PPTX (PPT生成) + Typst (试卷排版)      │
 ├─────────────────────────────────────────────────────────────┤
-│  数据存储    │  PostgreSQL 15+ (主数据库, 19 张表)           │
+│  数据存储    │  PostgreSQL 15+ (主数据库, 31 张表)           │
 │              │  Redis 7+ (缓存/会话/离线消息)                │
 │              │  Elasticsearch 8+ (全文检索)                  │
 │              │  Neo4j 5+ (知识图谱/推荐)                     │
@@ -148,8 +154,11 @@
 
 | 模块 | 功能描述 |
 |:---|:---|
-| **AI 智能助手** | Langchain4j 多模型路由（通义千问/GPT/DeepSeek/Moonshot/智谱/SiliconFlow/Ollama），SSE 流式对话，支持文本与视觉理解 |
+| **AI 智能助手** | Langchain4j 多模型路由（通义千问/GPT/DeepSeek/Moonshot/智谱/SiliconFlow/Ollama），SSE 流式对话，支持文本与视觉理解，MCP 服务器集成 |
 | **RAG 知识库** | 文档解析（PDF/EPUB/DOCX）→ 向量 Embedding → Rerank → 相似度检索增强生成 |
+| **智能批改** | OCR 识别 + AI 逐题批改 + 知识点标注 + 错因分析，支持试卷批改/通用作业双模式，知识画像/批改统计/错题推荐 |
+| **PPT 生成** | AI 驱动的多步骤生成（主题→大纲→内容→模板→生成），Python-PPTX 微服务，OnlyOffice 在线编辑 |
+| **试卷生成** | AI 生成题目（基于知识点），Typst 排版引擎导出 PDF，试卷模板快速创建 |
 | **文生图/文生视频** | AI 图片/视频生成，异步任务状态追踪 |
 | **语音交互** | 阿里云 NLS 语音识别 (ASR) + 语音合成 (TTS)，WebSocket 实时转写 |
 | **智能总结** | 文档自动摘要、知识点提取、测试题生成 |
@@ -160,9 +169,13 @@
 | 模块 | 功能描述 |
 |:---|:---|
 | **用户管理** | 学生/教师/管理员角色，手机号+短信验证码注册登录，JWT Token 自动刷新 |
-| **课程管理** | 课程创建/发布，课程表（周视图/编辑/排期），任务列表 |
+| **课程体系** | 课程 CRUD/章节小节管理，HLS 视频播放/转码，学习进度追踪，课程表（周视图/排期） |
+| **班级管理** | 班级 CRUD，成员管理，作业布置 |
+| **教师管理** | 教师资格申请/审核，教师信息管理 |
+| **会员系统** | 4 种套餐（FREE/BASIC/PRO/TEACHER），AI 配额控制（按天/按月），自动重置，订单管理 |
+| **考试系统** | 试卷管理（大题/题目关联），题库管理（分类/标签/AI 生成），试卷模板，Typst 导出 PDF |
 | **每日学习** | 每日单词（7 级别词库/发音/笔记/生词本）、每日文章（分类/收藏/AI 文章对话） |
-| **电子书** | PDF/EPUB/DOCX 解析，AES 内容加密，阅读进度同步 |
+| **电子书** | PDF/EPUB/DOCX 解析，AES 内容加密，阅读进度同步，AI 总结/问答 |
 | **公告系统** | 公告发布/管理、Banner 轮播图管理 |
 
 ### 社交与互动
@@ -179,8 +192,14 @@
 | 模块 | 功能描述 |
 |:---|:---|
 | **工作流引擎** | 可视化 DAG 编排（React Flow），18 种节点执行器（LLM/代码沙箱/HTTP/数据库/条件/循环等），Cron/Webhook/手动触发，版本管理，模板画廊 |
-| **AI 助手管理** | 助手配置/模型选择/系统提示词/知识库关联 |
+| **AI 助手管理** | 助手配置/模型选择/系统提示词/知识库关联/MCP 服务器集成 |
 | **知识库管理** | 文档上传/向量化进度/文档列表/知识库 CRUD |
+| **MCP 服务器** | MCP 服务器配置，工具/资源管理 |
+| **课程管理** | 课程/班级/教师/群组管理，章节小节编辑，视频上传/转码 |
+| **电子书管理** | 电子书上传，章节管理，AES 加密处理 |
+| **考试管理** | 试卷/题库/试卷模板管理，AI 生成题目，Typst 导出 |
+| **PPT 管理** | PPT 生成（AI 大纲/内容），模板管理，OnlyOffice 在线编辑 |
+| **会员管理** | 会员套餐配置，AI 配额调整，订单管理 |
 | **爬虫系统** | 网页爬虫规则配置（CSS 选择器/分页策略/代理），任务调度与监控，Selenium + Jsoup |
 | **内容管理** | 用户/公告/轮播图/帖子/反馈/每日单词/每日文章 管理 |
 
@@ -193,40 +212,60 @@ NovaCloudEdu/
 │
 ├── 📁 backend/                      # Spring Boot 后端服务 (DDD 四层架构)
 │   ├── src/main/java/.../backend/
-│   │   ├── interfaces/rest/         #   接口层 — 22 个 REST 模块
+│   │   ├── interfaces/rest/         #   接口层 — 29 个 REST 模块
 │   │   │   ├── ai/                  #     AI 对话/知识库/助手/语音/爬虫 (7 Controller)
 │   │   │   ├── auth/                #     认证/注册/Token (3 Controller)
-│   │   │   ├── chat/                #     私聊/群聊/好友/群组 (4 Controller)
-│   │   │   ├── daily/               #     每日单词/每日文章 (2 Controller)
-│   │   │   └── ...                  #     课程/电子书/公告/帖子/反馈/签到/课表等
-│   │   ├── application/             #   应用层 — 19 个 ApplicationService
-│   │   │   ├── service/             #     业务编排 + Command/Query 参数
+│   │   │   ├── social/              #     私聊/群聊/好友/群组 (5 Controller)
+│   │   │   ├── dailylearning/       #     每日单词/每日文章 (8 Controller)
+│   │   │   ├── exam/                #     试卷/题库/模板 (3 Controller)
+│   │   │   ├── grading/             #     智能批改 (1 Controller)
+│   │   │   ├── membership/          #     会员/支付 (3 Controller)
+│   │   │   ├── ppt/                 #     PPT 生成/模板/编辑 (3 Controller)
+│   │   │   └── ...                  #     课程/班级/教师/电子书/公告/帖子/反馈等
+│   │   ├── application/             #   应用层 — 22 个应用模块
+│   │   │   ├── service/             #     业务编排 (30+ ApplicationService)
 │   │   │   └── assembler/           #     DTO ↔ Command 转换
-│   │   ├── domain/                  #   领域层 — 22 个领域模块
-│   │   │   ├── ai/ chat/ course/    #     Entity + ValueObject + Repository 接口
-│   │   │   └── workflow/ ebook/ ... #     DomainService
+│   │   ├── domain/                  #   领域层 — 26 个领域模块
+│   │   │   ├── ai/ social/ course/  #     Entity + ValueObject + Repository 接口
+│   │   │   ├── exam/ grading/       #     考试/批改领域
+│   │   │   ├── membership/ ppt/     #     会员/PPT 领域
+│   │   │   └── workflow/ book/ ...  #     DomainService
 │   │   ├── infrastructure/          #   基础设施层
 │   │   │   ├── ai/                  #     AI 多模型路由 (12 个类)
-│   │   │   ├── persistence/         #     数据持久化 (69 PO / 68 Mapper / 55 Repository)
+│   │   │   ├── persistence/         #     数据持久化 (80+ PO / 80+ Mapper / 70+ Repository)
 │   │   │   ├── workflow/            #     工作流引擎 (18 种节点执行器 + 代码沙箱)
 │   │   │   ├── websocket/           #     WebSocket + STOMP (实时通信)
 │   │   │   ├── neo4j/               #     知识图谱
+│   │   │   ├── ppt/                 #     PPT 微服务客户端
+│   │   │   ├── typst/               #     Typst 微服务客户端
 │   │   │   └── security/            #     JWT 认证 (5 个类)
-│   │   └── config/                  #   配置类 (16 个)
-│   ├── sql/                         #   数据库 SQL 脚本 (19 张表)
+│   │   └── config/                  #   配置类 (18 个)
+│   ├── sql/                         #   数据库 SQL 脚本 (31 张表)
 │   └── pom.xml
 │
 ├── 📁 web/                          # React Web 前端 (用户端 + 管理后台)
 │   ├── src/
 │   │   ├── pages/                   #   页面
 │   │   │   ├── LoginPage / RegisterPage    # 登录/注册
-│   │   │   ├── ChatPage / CirclePage / ... # 用户端 (AI 对话/圈子/单词/文章/课表等)
-│   │   │   └── admin/               #     管理后台 (14 个管理页面)
-│   │   │       └── workflow/        #       工作流可视化编辑器 (React Flow)
+│   │   │   ├── ChatPage / CirclePage / ... # 用户端 (20+ 页面)
+│   │   │   │   ├── AiAssistantChatPage     #   AI 助手对话
+│   │   │   │   ├── CourseListPage / ...    #   课程系列 (列表/详情/学习)
+│   │   │   │   ├── EbookListPage / ...     #   电子书系列 (列表/阅读器)
+│   │   │   │   ├── GradingDashboardPage / ...  # 智能批改系列
+│   │   │   │   ├── MembershipPage          #   会员中心
+│   │   │   │   └── SearchResultsPage       #   全局搜索
+│   │   │   └── admin/               #     管理后台 (27 个管理页面)
+│   │   │       ├── workflow/        #       工作流可视化编辑器 (React Flow)
+│   │   │       ├── CourseManagementPage / ...  # 课程/班级/教师管理
+│   │   │       ├── ExamPaperManagementPage / ...  # 试卷/题库/模板管理
+│   │   │       ├── PptGeneratorPage / ...  #   PPT 生成/模板/编辑
+│   │   │       └── MembershipManagementPage / ...  # 会员/订单管理
 │   │   ├── components/              #   组件
 │   │   │   ├── layout/              #     布局 (AdminLayout/Header/Sider/Footer)
 │   │   │   ├── chat/                #     聊天 (AI 面板/私聊/群聊/消息渲染/useAiChat)
 │   │   │   ├── home/                #     首页 (Banner/公告/单词/文章/课表/统计)
+│   │   │   ├── ppt/                 #     PPT 生成 (步骤指示器/大纲编辑器/模板选择器)
+│   │   │   ├── reader/              #     电子书阅读器 (PDF 渲染/AI 问答/设置)
 │   │   │   └── ui/                  #     UI 基础 (Toast/Tooltip/Avatar/RegionPicker)
 │   │   ├── context/                 #   状态管理 (Chat/Sider/Theme Context)
 │   │   ├── api/                     #   API 层
@@ -264,7 +303,23 @@ NovaCloudEdu/
 │   ├── convert_json_to_pgsql.py     #   JSON → SQL 转换工具
 │   └── fetch_audio_urls.py          #   发音 URL 抓取工具
 │
-├── 📄 logo.svg                      # 项目 Logo
+├── � ppt-service/                  # PPT 生成微服务 (Python)
+│   ├── src/                         #   Python-PPTX 生成服务
+│   ├── templates/custom/            #   自定义 PPT 模板
+│   ├── requirements.txt             #   Python 依赖
+│   └── Dockerfile                   #   Docker 容器化
+│
+├── 📁 typst-service/                # Typst 试卷排版微服务 (Python)
+│   ├── templates/                   #   试卷模板 (exam_paper.typ / answer_key.typ)
+│   ├── main.py                      #   FastAPI 服务
+│   ├── requirements.txt             #   Python 依赖
+│   └── Dockerfile                   #   Docker 容器化
+│
+├── 📁 docker/                       # Docker 编排配置
+│   ├── docker-compose.yml           #   一键启动所有服务
+│   └── .env.example                 #   环境变量模板
+│
+├── �📄 logo.svg                      # 项目 Logo
 ├── 📄 README.md                     # 项目文档
 └── 📄 LICENSE                       # CC BY-NC-SA 4.0 许可证
 ```
@@ -317,10 +372,10 @@ NovaCloudEdu/
 
 | 层级 | 职责 | 规模 | 依赖方向 |
 |:---:|:---|:---|:---:|
-| **Interfaces** | HTTP 请求处理、参数校验、DTO 转换 | 22 个 REST 模块 | → Application |
-| **Application** | 业务流程编排、事务管理、权限控制 | 19 个 ApplicationService | → Domain |
-| **Domain** | 核心业务逻辑、领域模型、业务规则 | 22 个领域模块 | 无外部依赖 |
-| **Infrastructure** | 数据持久化、外部服务调用、技术支撑 | 69 PO / 68 Mapper / 55 Repository | → Domain |
+| **Interfaces** | HTTP 请求处理、参数校验、DTO 转换 | 29 个 REST 模块 | → Application |
+| **Application** | 业务流程编排、事务管理、权限控制 | 22 个应用模块 (30+ Service) | → Domain |
+| **Domain** | 核心业务逻辑、领域模型、业务规则 | 26 个领域模块 | 无外部依赖 |
+| **Infrastructure** | 数据持久化、外部服务调用、技术支撑 | 80+ PO / 80+ Mapper / 70+ Repository | → Domain |
 
 ### 系统架构
 
@@ -532,15 +587,19 @@ flutter build ios       # iOS
 
 ### 数据库脚本
 
-所有 SQL 建表脚本位于 `backend/sql/`，包含 19 张表：
+所有 SQL 建表脚本位于 `backend/sql/`，包含 31 张表：
 
 | 分类 | 表 |
 |:---|:---|
-| **用户/认证** | user、user_checkin |
-| **AI** | ai_assistant、ai_chat_session、ai_chat、knowledge_base、knowledge_base_document |
+| **用户/认证** | user、user_follow、user_preference、user_checkin |
+| **AI** | ai_assistant、ai_chat_session、ai_chat、knowledge_base、knowledge_base_document、ppt_generation_session、ppt_template |
 | **社交** | friend、chat_group、chat_group_member、private_message、group_message |
-| **内容** | announcement、banner、post、feedback |
-| **学习** | daily_word、daily_article、course_schedule |
+| **课程** | course、course_chapter、course_section、class、teacher_application、course_schedule |
+| **考试** | exam_paper、exam_paper_section、exam_paper_question、question_bank、exam_template |
+| **批改** | homework_submission、question_grading、student_knowledge_profile |
+| **会员** | membership_plan、user_membership、ai_usage_record、order |
+| **内容** | announcement、banner、post、post_comment、feedback、daily_word、daily_article、book、file_upload |
+| **爬虫** | scraper_config、scraper_task、scraper_result |
 
 ---
 
