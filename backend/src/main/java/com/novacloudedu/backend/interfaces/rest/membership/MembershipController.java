@@ -6,6 +6,7 @@ import com.novacloudedu.backend.common.ResultUtils;
 import com.novacloudedu.backend.domain.membership.entity.MembershipPlan;
 import com.novacloudedu.backend.domain.membership.entity.UserMembership;
 import com.novacloudedu.backend.interfaces.rest.membership.dto.PurchaseMembershipRequest;
+import com.novacloudedu.backend.interfaces.rest.membership.dto.UserMembershipDetailResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -46,10 +47,10 @@ public class MembershipController {
     }
 
     @GetMapping("/current")
-    @Operation(summary = "查询我的当前会员状态")
-    public BaseResponse<UserMembership> getCurrentMembership(Authentication authentication) {
+    @Operation(summary = "查询我的当前会员详细信息")
+    public BaseResponse<UserMembershipDetailResponse> getCurrentMembership(Authentication authentication) {
         Long userId = Long.parseLong(authentication.getName());
-        return ResultUtils.success(membershipApplicationService.getCurrentMembership(userId).orElse(null));
+        return ResultUtils.success(membershipApplicationService.getCurrentMembershipDetail(userId).orElse(null));
     }
 
     @GetMapping("/history")

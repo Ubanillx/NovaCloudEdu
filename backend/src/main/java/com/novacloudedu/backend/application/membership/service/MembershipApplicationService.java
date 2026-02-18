@@ -13,6 +13,7 @@ import com.novacloudedu.backend.domain.user.valueobject.UserId;
 import com.novacloudedu.backend.exception.BusinessException;
 import com.novacloudedu.backend.infrastructure.email.AdminEmailNotifier;
 import com.novacloudedu.backend.infrastructure.email.UserEmailNotifier;
+import com.novacloudedu.backend.interfaces.rest.membership.dto.UserMembershipDetailResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -213,6 +214,71 @@ public class MembershipApplicationService {
             return active;
         }
         return membershipRepository.findLatestByUserId(UserId.of(userId));
+    }
+
+    /**
+     * 查询用户当前会员详细信息（包含计划详情和剩余配额）
+     */
+    public Optional<UserMembershipDetailResponse> getCurrentMembershipDetail(Long userId) {
+        Optional<UserMembership> membershipOpt = getCurrentMembership(userId);
+        
+        MembershipPlan plan;
+        UserMembership membership = null;
+        
+        if (membershipOpt.isEmpty()) {
+            plan = planRepository.findByCode(PlanCode.FREE)
+                    .orElseThrow(() -> new BusinessException(40400, "默认免费计划不存在"));
+        } else {
+            membership = membershipOpt.get();
+            plan = planRepository.findById(membership.getPlanId())
+                    .orElseThrow(() -> new BusinessException(40400, "关联计划不存在"));
+        }
+
+        Map<String, Map<String, Integer>> quotaMap = aiUsageLimitService.getAllRemainingQuota(userId);
+
+        UserMembershipDetailResponse.UserMembershipDetailResponseBuilder builder = UserMembershipDetailResponse.builder()
+                .userId(userId)
+                .planId(plan.getId())
+                .planName(plan.getName())
+                .planCode(plan.getCode().getValue())
+                .planDescription(plan.getDescription())
+                .planPrice(plan.getPrice())
+                .planDurationDays(plan.getDurationDays())
+                .aiChatDailyLimit(plan.getAiChatDailyLimit())
+                .aiChatMonthlyLimit(plan.getAiChatMonthlyLimit())
+                .aiPptDailyLimit(plan.getAiPptDailyLimit())
+                .aiPptMonthlyLimit(plan.getAiPptMonthlyLimit())
+                .aiExamDailyLimit(plan.getAiExamDailyLimit())
+                .aiExamMonthlyLimit(plan.getAiExamMonthlyLimit())
+                .aiBookDailyLimit(plan.getAiBookDailyLimit())
+                .aiBookMonthlyLimit(plan.getAiBookMonthlyLimit())
+                .aiGradingDailyLimit(plan.getAiGradingDailyLimit())
+                .aiGradingMonthlyLimit(plan.getAiGradingMonthlyLimit())
+                .courseMemberAccess(plan.isCourseMemberAccess())
+                .aiChatDailyRemaining(quotaMap.getOrDefault("AI_CHAT", Map.of()).getOrDefault("dailyRemaining", -1))
+                .aiChatMonthlyRemaining(quotaMap.getOrDefault("AI_CHAT", Map.of()).getOrDefault("monthlyRemaining", -1))
+                .aiPptDailyRemaining(quotaMap.getOrDefault("AI_PPT", Map.of()).getOrDefault("dailyRemaining", -1))
+                .aiPptMonthlyRemaining(quotaMap.getOrDefault("AI_PPT", Map.of()).getOrDefault("monthlyRemaining", -1))
+                .aiExamDailyRemaining(quotaMap.getOrDefault("AI_EXAM", Map.of()).getOrDefault("dailyRemaining", -1))
+                .aiExamMonthlyRemaining(quotaMap.getOrDefault("AI_EXAM", Map.of()).getOrDefault("monthlyRemaining", -1))
+                .aiBookDailyRemaining(quotaMap.getOrDefault("AI_BOOK", Map.of()).getOrDefault("dailyRemaining", -1))
+                .aiBookMonthlyRemaining(quotaMap.getOrDefault("AI_BOOK", Map.of()).getOrDefault("monthlyRemaining", -1))
+                .aiGradingDailyRemaining(quotaMap.getOrDefault("AI_GRADING", Map.of()).getOrDefault("dailyRemaining", -1))
+                .aiGradingMonthlyRemaining(quotaMap.getOrDefault("AI_GRADING", Map.of()).getOrDefault("monthlyRemaining", -1));
+
+        if (membership != null) {
+            builder.id(membership.getId())
+                    .orderNo(membership.getOrderNo())
+                    .startTime(membership.getStartTime())
+                    .expireTime(membership.getExpireTime())
+                    .status(membership.getStatus().name())
+                    .createTime(membership.getCreateTime())
+                    .updateTime(membership.getUpdateTime());
+        } else {
+            builder.status("FREE");
+        }
+
+        return Optional.of(builder.build());
     }
 
     /**
