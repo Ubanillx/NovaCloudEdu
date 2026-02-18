@@ -75,6 +75,7 @@ const AdminSider: React.FC<AdminSiderProps> = ({
 
   // 教师可见的菜单路径
   const teacherAllowedPaths = new Set([
+    '/admin',
     '/admin/courses',
     '/admin/classes',
     '/admin/groups',
@@ -120,12 +121,6 @@ const AdminSider: React.FC<AdminSiderProps> = ({
     ? allMenuItems.filter(item => teacherAllowedPaths.has(item.path))
     : allMenuItems;
 
-  // 教师访问仪表盘时重定向到课程管理
-  React.useEffect(() => {
-    if (userRole === 'teacher' && location.pathname === '/admin') {
-      navigate('/admin/courses', { replace: true });
-    }
-  }, [userRole, location.pathname, navigate]);
 
   const handleLogout = () => {
     clearTokens();
