@@ -9,9 +9,12 @@ import com.novacloudedu.backend.domain.post.repository.PostRepository;
 import com.novacloudedu.backend.domain.user.entity.User;
 import com.novacloudedu.backend.domain.user.repository.UserRepository;
 import com.novacloudedu.backend.domain.user.valueobject.UserId;
+import com.novacloudedu.backend.application.analytics.event.LearningActivityEvent;
+import com.novacloudedu.backend.domain.analytics.valueobject.ActivityType;
 import com.novacloudedu.backend.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -32,6 +35,7 @@ public class CheckinApplicationService {
     private final CheckinRepository checkinRepository;
     private final UserRepository userRepository;
     private final PostRepository postRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     /**
      * 用户打卡
@@ -60,6 +64,10 @@ public class CheckinApplicationService {
         checkinRepository.saveCheckin(checkin);
         
         log.info("用户打卡成功: userId={}, streakDays={}", userId.value(), streakDays);
+
+        eventPublisher.publishEvent(LearningActivityEvent.of(
+                this, userId.value(), ActivityType.CHECKIN,
+                null, null, null, 0));
         
         return new CheckinResult(
                 true,
