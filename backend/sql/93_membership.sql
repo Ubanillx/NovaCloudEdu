@@ -17,6 +17,8 @@ CREATE TABLE IF NOT EXISTS membership_plan
     ai_exam_monthly_limit INT            DEFAULT -1              NOT NULL,
     ai_book_daily_limit   INT            DEFAULT -1              NOT NULL,
     ai_book_monthly_limit INT            DEFAULT -1              NOT NULL,
+    ai_grading_daily_limit INT           DEFAULT -1              NOT NULL,
+    ai_grading_monthly_limit INT         DEFAULT -1              NOT NULL,
     course_member_access  SMALLINT       DEFAULT 0               NOT NULL,
     is_default            SMALLINT       DEFAULT 0               NOT NULL,
     sort_order            INT            DEFAULT 0               NOT NULL,
@@ -40,6 +42,8 @@ COMMENT ON COLUMN membership_plan.ai_exam_daily_limit IS 'AI出题每日限额�
 COMMENT ON COLUMN membership_plan.ai_exam_monthly_limit IS 'AI出题每月限额，-1表示无限制';
 COMMENT ON COLUMN membership_plan.ai_book_daily_limit IS '电子书AI每日限额，-1表示无限制';
 COMMENT ON COLUMN membership_plan.ai_book_monthly_limit IS '电子书AI每月限额，-1表示无限制';
+COMMENT ON COLUMN membership_plan.ai_grading_daily_limit IS '智能批改每日限额，-1表示无限制';
+COMMENT ON COLUMN membership_plan.ai_grading_monthly_limit IS '智能批改每月限额，-1表示无限制';
 COMMENT ON COLUMN membership_plan.course_member_access IS '是否可访问会员课：0-否，1-是';
 COMMENT ON COLUMN membership_plan.is_default IS '是否默认计划（未开通会员的用户使用）：0-否，1-是';
 COMMENT ON COLUMN membership_plan.sort_order IS '排序，越小越靠前';
@@ -96,7 +100,7 @@ CREATE INDEX IF NOT EXISTS idx_aur_usage_date ON ai_usage_record(usage_date);
 COMMENT ON TABLE ai_usage_record IS 'AI功能使用记录';
 COMMENT ON COLUMN ai_usage_record.id IS 'id';
 COMMENT ON COLUMN ai_usage_record.user_id IS '用户id';
-COMMENT ON COLUMN ai_usage_record.feature_type IS '功能类型：AI_CHAT/AI_PPT/AI_EXAM/AI_BOOK';
+COMMENT ON COLUMN ai_usage_record.feature_type IS '功能类型：AI_CHAT/AI_PPT/AI_EXAM/AI_BOOK/AI_GRADING';
 COMMENT ON COLUMN ai_usage_record.usage_date IS '使用日期';
 COMMENT ON COLUMN ai_usage_record.usage_count IS '当日使用次数';
 COMMENT ON COLUMN ai_usage_record.create_time IS '创建时间';
@@ -108,18 +112,19 @@ INSERT INTO membership_plan (name, code, description, price, duration_days,
     ai_ppt_daily_limit, ai_ppt_monthly_limit,
     ai_exam_daily_limit, ai_exam_monthly_limit,
     ai_book_daily_limit, ai_book_monthly_limit,
+    ai_grading_daily_limit, ai_grading_monthly_limit,
     course_member_access, is_default, sort_order)
 VALUES
     ('免费版', 'FREE', '注册即享的基础权益', 0.00, 0,
-     10, 200, 1, 20, 3, 60, 5, 100,
+     10, 200, 1, 20, 3, 60, 5, 100, 3, 60,
      0, 1, 0),
     ('基础版', 'BASIC', '适合日常学习的进阶套餐', 29.90, 30,
-     50, 1000, 5, 100, 15, 300, 30, 600,
+     50, 1000, 5, 100, 15, 300, 30, 600, 15, 300,
      1, 0, 1),
     ('专业版', 'PRO', '全功能无限制的专业套餐', 59.90, 30,
-     -1, -1, -1, -1, -1, -1, -1, -1,
+     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
      1, 0, 2),
     ('教师版', 'TEACHER', '教师专属权益计划', 0.00, 0,
-     100, 2000, 20, 400, 50, 1000, 50, 1000,
+     100, 2000, 20, 400, 50, 1000, 50, 1000, 50, 1000,
      1, 0, 3)
 ON CONFLICT (code) DO NOTHING;
