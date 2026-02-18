@@ -3,15 +3,18 @@ import {
   Bot, Plus, History, Trash2, Send, Square, Loader2,
   Sparkles, MessageSquarePlus, ChevronRight, Copy, Check,
   Image as ImageIcon, FileUp, X, ArrowDown, Palette, Video,
-  FileText, FileCode, FileSpreadsheet, Globe, Braces, BookOpen, Paperclip,
+  FileText, FileCode, FileSpreadsheet, Globe, Braces, BookOpen, Paperclip, ChevronLeft,
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import { useAiChat } from './useAiChat';
 import type { AiChatSession, ImageGeneration, VideoGeneration } from './useAiChat';
-import { apiClient } from '../../api';
+import { apiClient, AIApi, Configuration } from '../../api';
+import type { AiAssistantVO } from '../../api/generated/models';
 import toast from '../ui/Toast';
+
+const aiApi = new AIApi(new Configuration(), '', apiClient);
 
 // ============ 工具函数 ============
 
@@ -41,14 +44,7 @@ const QUICK_PROMPTS = [
   '帮我梳理知识点',
 ];
 
-// ============ 智慧体卡片数据 ============
-
-const AI_ASSISTANTS = [
-  { id: 'math', name: '数学解题助手', desc: '条理清晰，适合解方程与几何题', emoji: '�' },
-  { id: 'english', name: '英语口语教练', desc: '纠正语音语法，提供地道表达', emoji: '🗣️' },
-  { id: 'programming', name: '代码助手', desc: '编程辅导，代码讲解与优化', emoji: '💻' },
-  { id: 'writing', name: '作文润色', desc: '提升文章结构与语言表达', emoji: '✍️' },
-];
+// ============ 智慧体卡片数据（已废弃，改用后端真实数据） ============
 
 // 当前用户信息（头像、昵称）
 const getCurrentUserInfo = () => {
@@ -212,9 +208,17 @@ const SessionSidebar: React.FC<SessionSidebarProps> = ({
 interface OverviewProps {
   onStartChat: () => void;
   onViewHistory: () => void;
+  assistants: AiAssistantVO[];
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+  isLoadingMore: boolean;
+  onSelectAssistant: (assistant: AiAssistantVO) => void;
 }
 
-const IntelligenceOverview: React.FC<OverviewProps> = ({ onStartChat, onViewHistory }) => {
+const IntelligenceOverview: React.FC<OverviewProps> = ({ 
+  onStartChat, onViewHistory, assistants, currentPage, totalPages, onPageChange, isLoadingMore, onSelectAssistant 
+}) => {
   return (
     <div className="flex-1 overflow-y-auto custom-scrollbar">
       <div className="max-w-3xl mx-auto p-6 space-y-6">
@@ -257,32 +261,89 @@ const IntelligenceOverview: React.FC<OverviewProps> = ({ onStartChat, onViewHist
           </button>
         </div>
 
-        {/* 更多智慧体 */}
-        <div>
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-base font-bold text-gray-800 dark:text-gray-200">更多智慧体</h3>
-            <span className="text-xs text-gray-400">即将上线</span>
-          </div>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-            {AI_ASSISTANTS.map(a => (
-              <div
-                key={a.id}
-                className="flex flex-col items-center p-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all"
-              >
-                <div className="w-12 h-12 rounded-full bg-brand-50 dark:bg-brand-900/30 flex items-center justify-center text-2xl mb-2.5 ring-2 ring-brand-100 dark:ring-brand-800">
-                  {a.emoji}
-                </div>
-                <p className="text-sm font-semibold text-gray-800 dark:text-gray-200 text-center truncate w-full">
-                  {a.name}
-                </p>
-                <p className="text-xs text-gray-400 text-center mt-1 line-clamp-2">{a.desc}</p>
-                <button className="mt-3 px-4 py-1.5 text-xs font-medium text-brand-500 bg-brand-50 dark:bg-brand-900/20 rounded-full hover:bg-brand-100 dark:hover:bg-brand-900/40 transition-colors">
-                  即将上线
-                </button>
+        {/* 智慧体列表 */}
+        {assistants.length > 0 && (
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-base font-bold text-gray-800 dark:text-gray-200">智慧助手</h3>
+              <div className="text-xs text-gray-400">
+                第 {currentPage + 1} 页 / 共 {totalPages} 页
               </div>
-            ))}
+            </div>
+            
+            {isLoadingMore ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 size={24} className="animate-spin text-brand-500" />
+              </div>
+            ) : (
+              <>
+                <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
+                  {assistants.map(a => (
+                    <div
+                      key={String(a.id)}
+                      onClick={() => onSelectAssistant(a)}
+                      className="flex flex-col items-center p-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all cursor-pointer"
+                    >
+                      {a.avatarUrl ? (
+                        <img src={a.avatarUrl} alt="" className="w-12 h-12 rounded-full object-cover mb-2.5 ring-2 ring-brand-100 dark:ring-brand-800" />
+                      ) : (
+                        <div className="w-12 h-12 rounded-full bg-brand-50 dark:bg-brand-900/30 flex items-center justify-center text-xl font-bold mb-2.5 ring-2 ring-brand-100 dark:ring-brand-800 text-brand-600 dark:text-brand-400">
+                          {a.name?.[0] || '?'}
+                        </div>
+                      )}
+                      <p className="text-sm font-semibold text-gray-800 dark:text-gray-200 text-center truncate w-full">
+                        {a.name}
+                      </p>
+                      <p className="text-xs text-gray-400 text-center mt-1 line-clamp-2">{a.description || '暂无描述'}</p>
+                      <button className="mt-3 px-4 py-1.5 text-xs font-medium text-brand-500 bg-brand-50 dark:bg-brand-900/20 rounded-full hover:bg-brand-100 dark:hover:bg-brand-900/40 transition-colors">
+                        开始对话
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                
+                {/* 分页控件 */}
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-center gap-2 mt-6">
+                    <button
+                      onClick={() => onPageChange(currentPage - 1)}
+                      disabled={currentPage === 0}
+                      className="p-2 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                      title="上一页"
+                    >
+                      <ChevronLeft size={16} className="text-gray-600 dark:text-gray-400" />
+                    </button>
+                    
+                    <div className="flex items-center gap-1">
+                      {Array.from({ length: totalPages }, (_, i) => (
+                        <button
+                          key={i}
+                          onClick={() => onPageChange(i)}
+                          className={`w-8 h-8 rounded-lg text-sm font-medium transition-all ${
+                            i === currentPage
+                              ? 'bg-brand-500 text-white shadow-sm'
+                              : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
+                          }`}
+                        >
+                          {i + 1}
+                        </button>
+                      ))}
+                    </div>
+                    
+                    <button
+                      onClick={() => onPageChange(currentPage + 1)}
+                      disabled={currentPage >= totalPages - 1}
+                      className="p-2 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                      title="下一页"
+                    >
+                      <ChevronRight size={16} className="text-gray-600 dark:text-gray-400" />
+                    </button>
+                  </div>
+                )}
+              </>
+            )}
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
@@ -1035,7 +1096,46 @@ const AiChatPanel: React.FC = () => {
   } = useAiChat();
 
   const [showOverview, setShowOverview] = useState(true);
+  const [assistants, setAssistants] = useState<AiAssistantVO[]>([]);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  
+  const PAGE_SIZE = 6;
+  
   const hasInitRef = useRef(false);
+
+  // 加载公开助手列表（分页）
+  const loadAssistants = useCallback(async (page: number) => {
+    setIsLoadingMore(true);
+    
+    try {
+      const res = await aiApi.assistantListPublic({ page, size: PAGE_SIZE });
+      if (res.data?.code === 0 && Array.isArray(res.data.data)) {
+        setAssistants(res.data.data);
+        setCurrentPage(page);
+        
+        const hasMore = res.data.data.length === PAGE_SIZE;
+        setTotalPages(hasMore ? page + 2 : page + 1);
+      }
+    } catch (err) {
+      console.error('获取助手列表失败:', err);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  }, [PAGE_SIZE]);
+  
+  // 初始加载助手列表
+  useEffect(() => {
+    loadAssistants(0);
+  }, [loadAssistants]);
+  
+  // 页码变化处理
+  const handlePageChange = useCallback((page: number) => {
+    if (page >= 0 && page < totalPages) {
+      loadAssistants(page);
+    }
+  }, [loadAssistants, totalPages]);
 
   // 加载会话列表
   useEffect(() => {
@@ -1092,6 +1192,11 @@ const AiChatPanel: React.FC = () => {
     sendMessage(content, options);
   }, [currentSessionId, startNewSession, sendMessage]);
 
+  const handleSelectAssistant = useCallback((assistant: AiAssistantVO) => {
+    // 跳转到专用的 AI 助手聊天页面
+    window.location.href = `/ai-chat/${String(assistant.id)}`;
+  }, []);
+
   return (
     <div className="flex h-full">
       {/* 左侧会话列表 */}
@@ -1111,6 +1216,12 @@ const AiChatPanel: React.FC = () => {
         <IntelligenceOverview
           onStartChat={handleNewSession}
           onViewHistory={() => setShowOverview(false)}
+          assistants={assistants}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+          isLoadingMore={isLoadingMore}
+          onSelectAssistant={handleSelectAssistant}
         />
       ) : (
         <ChatArea
