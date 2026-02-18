@@ -7,7 +7,8 @@ public enum AiFeatureType {
     AI_CHAT("AI_CHAT", "AI对话"),
     AI_PPT("AI_PPT", "PPT生成"),
     AI_EXAM("AI_EXAM", "AI出题"),
-    AI_BOOK("AI_BOOK", "电子书AI");
+    AI_BOOK("AI_BOOK", "电子书AI"),
+    AI_GRADING("AI_GRADING", "智能批改");
 
     private final String value;
     private final String description;

@@ -41,6 +41,10 @@ public class MembershipPlanPO implements Serializable {
 
     private Integer aiBookMonthlyLimit;
 
+    private Integer aiGradingDailyLimit;
+
+    private Integer aiGradingMonthlyLimit;
+
     private Integer courseMemberAccess;
 
     private Integer isDefault;

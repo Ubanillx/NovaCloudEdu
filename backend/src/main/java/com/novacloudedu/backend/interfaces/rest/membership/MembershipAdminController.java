@@ -69,7 +69,8 @@ public class MembershipAdminController {
                 request.getAiChatDailyLimit(), request.getAiChatMonthlyLimit(),
                 request.getAiPptDailyLimit(), request.getAiPptMonthlyLimit(),
                 request.getAiExamDailyLimit(), request.getAiExamMonthlyLimit(),
-                request.getAiBookDailyLimit(), request.getAiBookMonthlyLimit()
+                request.getAiBookDailyLimit(), request.getAiBookMonthlyLimit(),
+                request.getAiGradingDailyLimit(), request.getAiGradingMonthlyLimit()
         );
         return ResultUtils.success(null);
     }

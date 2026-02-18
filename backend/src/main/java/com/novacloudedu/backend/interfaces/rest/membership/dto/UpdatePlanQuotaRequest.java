@@ -30,4 +30,10 @@ public class UpdatePlanQuotaRequest {
 
     @Schema(description = "电子书AI每月限额，-1表示无限制")
     private Integer aiBookMonthlyLimit;
+
+    @Schema(description = "智能批改每日限额，-1表示无限制")
+    private Integer aiGradingDailyLimit;
+
+    @Schema(description = "智能批改每月限额，-1表示无限制")
+    private Integer aiGradingMonthlyLimit;
 }

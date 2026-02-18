@@ -72,12 +72,14 @@ public class MembershipApplicationService {
                                 Integer aiChatDailyLimit, Integer aiChatMonthlyLimit,
                                 Integer aiPptDailyLimit, Integer aiPptMonthlyLimit,
                                 Integer aiExamDailyLimit, Integer aiExamMonthlyLimit,
-                                Integer aiBookDailyLimit, Integer aiBookMonthlyLimit) {
+                                Integer aiBookDailyLimit, Integer aiBookMonthlyLimit,
+                                Integer aiGradingDailyLimit, Integer aiGradingMonthlyLimit) {
         MembershipPlan plan = getPlan(planId);
         plan.updateQuota(aiChatDailyLimit, aiChatMonthlyLimit,
                 aiPptDailyLimit, aiPptMonthlyLimit,
                 aiExamDailyLimit, aiExamMonthlyLimit,
-                aiBookDailyLimit, aiBookMonthlyLimit);
+                aiBookDailyLimit, aiBookMonthlyLimit,
+                aiGradingDailyLimit, aiGradingMonthlyLimit);
         planRepository.save(plan);
     }
 
