@@ -19,6 +19,8 @@ Name | Type | Description | Notes
 **aiExamMonthlyLimit** | **number** |  | [optional] [default to undefined]
 **aiBookDailyLimit** | **number** |  | [optional] [default to undefined]
 **aiBookMonthlyLimit** | **number** |  | [optional] [default to undefined]
+**aiGradingDailyLimit** | **number** |  | [optional] [default to undefined]
+**aiGradingMonthlyLimit** | **number** |  | [optional] [default to undefined]
 **courseMemberAccess** | **boolean** |  | [optional] [default to undefined]
 **sortOrder** | **number** |  | [optional] [default to undefined]
 **createTime** | **string** |  | [optional] [default to undefined]
@@ -46,6 +48,8 @@ const instance: MembershipPlan = {
     aiExamMonthlyLimit,
     aiBookDailyLimit,
     aiBookMonthlyLimit,
+    aiGradingDailyLimit,
+    aiGradingMonthlyLimit,
     courseMemberAccess,
     sortOrder,
     createTime,
