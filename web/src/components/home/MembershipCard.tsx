@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Crown, Zap, Sparkles, BookOpen, FileText, Brain, ArrowRight, Loader2 } from 'lucide-react';
+import { Crown, Zap, Sparkles, BookOpen, FileText, Brain, ArrowRight, Loader2, FileCheck } from 'lucide-react';
 import { apiClient, DefaultApi, Configuration } from '../../api';
-import type { UserMembership, MembershipPlan } from '../../api/generated/models';
+import type { UserMembershipDetailResponse } from '../../api/generated/models';
 
 const api = new DefaultApi(new Configuration(), '', apiClient);
 
@@ -79,30 +79,14 @@ const QuotaBar: React.FC<{ label: string; icon: React.ElementType; daily: number
 export const MembershipCard: React.FC = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const [membership, setMembership] = useState<UserMembership | null>(null);
-  const [plan, setPlan] = useState<MembershipPlan | null>(null);
-  const [quota, setQuota] = useState<Record<string, { dailyRemaining: number; monthlyRemaining: number }> | null>(null);
+  const [membershipDetail, setMembershipDetail] = useState<UserMembershipDetailResponse | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [memRes, quotaRes] = await Promise.all([
-          api.getCurrentMembership(),
-          api.getAiQuota(),
-        ]);
-
+        const memRes = await api.getCurrentMembership();
         if (memRes.data.code === 0 && memRes.data.data) {
-          setMembership(memRes.data.data);
-          if (memRes.data.data.planId) {
-            const planRes = await api.getPlan({ planId: memRes.data.data.planId as unknown as number });
-            if (planRes.data.code === 0 && planRes.data.data) {
-              setPlan(planRes.data.data);
-            }
-          }
-        }
-
-        if (quotaRes.data.code === 0 && quotaRes.data.data) {
-          setQuota(quotaRes.data.data as any);
+          setMembershipDetail(memRes.data.data);
         }
       } catch {
         // silent
@@ -121,15 +105,16 @@ export const MembershipCard: React.FC = () => {
     );
   }
 
-  const planCode = plan?.code || 'FREE';
+  const planCode = membershipDetail?.planCode || 'FREE';
   const colors = PLAN_COLORS[planCode] || PLAN_COLORS.FREE;
   const planLabel = PLAN_LABELS[planCode] || '免费版';
 
-  const quotaItems: QuotaItem[] = quota ? [
-    { label: 'AI 对话', icon: Brain, dailyRemaining: (quota as any).AI_CHAT?.dailyRemaining ?? -1, monthlyRemaining: (quota as any).AI_CHAT?.monthlyRemaining ?? -1 },
-    { label: 'PPT 生成', icon: FileText, dailyRemaining: (quota as any).AI_PPT?.dailyRemaining ?? -1, monthlyRemaining: (quota as any).AI_PPT?.monthlyRemaining ?? -1 },
-    { label: 'AI 出题', icon: Sparkles, dailyRemaining: (quota as any).AI_EXAM?.dailyRemaining ?? -1, monthlyRemaining: (quota as any).AI_EXAM?.monthlyRemaining ?? -1 },
-    { label: '电子书AI', icon: BookOpen, dailyRemaining: (quota as any).AI_BOOK?.dailyRemaining ?? -1, monthlyRemaining: (quota as any).AI_BOOK?.monthlyRemaining ?? -1 },
+  const quotaItems: QuotaItem[] = membershipDetail ? [
+    { label: 'AI 对话', icon: Brain, dailyRemaining: membershipDetail.aiChatDailyRemaining ?? -1, monthlyRemaining: membershipDetail.aiChatMonthlyRemaining ?? -1 },
+    { label: 'PPT 生成', icon: FileText, dailyRemaining: membershipDetail.aiPptDailyRemaining ?? -1, monthlyRemaining: membershipDetail.aiPptMonthlyRemaining ?? -1 },
+    { label: 'AI 出题', icon: Sparkles, dailyRemaining: membershipDetail.aiExamDailyRemaining ?? -1, monthlyRemaining: membershipDetail.aiExamMonthlyRemaining ?? -1 },
+    { label: '电子书AI', icon: BookOpen, dailyRemaining: membershipDetail.aiBookDailyRemaining ?? -1, monthlyRemaining: membershipDetail.aiBookMonthlyRemaining ?? -1 },
+    { label: '智能批改', icon: FileCheck, dailyRemaining: membershipDetail.aiGradingDailyRemaining ?? -1, monthlyRemaining: membershipDetail.aiGradingMonthlyRemaining ?? -1 },
   ] : [];
 
   return (
@@ -142,11 +127,11 @@ export const MembershipCard: React.FC = () => {
           </div>
           <div>
             <div className={`text-sm font-bold ${colors.text}`}>{planLabel}</div>
-            {membership?.active && membership.expireTime ? (
+            {membershipDetail?.status === 'ACTIVE' && membershipDetail.expireTime ? (
               <div className="text-xs text-gray-500 dark:text-gray-500">
-                到期：{new Date(membership.expireTime).toLocaleDateString('zh-CN')}
+                到期：{new Date(membershipDetail.expireTime).toLocaleDateString('zh-CN')}
               </div>
-            ) : membership?.active ? (
+            ) : membershipDetail?.status === 'ACTIVE' ? (
               <div className="text-xs text-gray-500 dark:text-gray-500">永久有效</div>
             ) : (
               <div className="text-xs text-gray-500 dark:text-gray-500">未开通会员</div>
