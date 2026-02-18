@@ -47,6 +47,14 @@ mybatis-plus:
       logic-delete-value: 1
       logic-not-delete-value: 0
 
+# 百度OCR配置（AIP SDK，替代 PaddleOCR Docker）
+baidu:
+  ocr:
+    app-id: ${BAIDU_OCR_APP_ID:}
+    api-key: ${BAIDU_OCR_API_KEY:}
+    secret-key: ${BAIDU_OCR_SECRET_KEY:}
+    api-type: ${BAIDU_OCR_API_TYPE:accurate}  # accurate / general / handwriting
+
 # 代码执行沙箱配置
 workflow:
   code-sandbox:
