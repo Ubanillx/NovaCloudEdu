@@ -26,6 +26,8 @@ public class MembershipPlanConverter {
         po.setAiExamMonthlyLimit(plan.getAiExamMonthlyLimit());
         po.setAiBookDailyLimit(plan.getAiBookDailyLimit());
         po.setAiBookMonthlyLimit(plan.getAiBookMonthlyLimit());
+        po.setAiGradingDailyLimit(plan.getAiGradingDailyLimit());
+        po.setAiGradingMonthlyLimit(plan.getAiGradingMonthlyLimit());
         po.setCourseMemberAccess(plan.isCourseMemberAccess() ? 1 : 0);
         po.setIsDefault(plan.isDefault() ? 1 : 0);
         po.setSortOrder(plan.getSortOrder());
@@ -50,6 +52,8 @@ public class MembershipPlanConverter {
                 po.getAiExamMonthlyLimit(),
                 po.getAiBookDailyLimit(),
                 po.getAiBookMonthlyLimit(),
+                po.getAiGradingDailyLimit(),
+                po.getAiGradingMonthlyLimit(),
                 po.getCourseMemberAccess() != null && po.getCourseMemberAccess() == 1,
                 po.getIsDefault() != null && po.getIsDefault() == 1,
                 po.getSortOrder(),

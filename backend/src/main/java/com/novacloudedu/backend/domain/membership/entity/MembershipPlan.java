@@ -30,6 +30,8 @@ public class MembershipPlan {
     private Integer aiExamMonthlyLimit;
     private Integer aiBookDailyLimit;
     private Integer aiBookMonthlyLimit;
+    private Integer aiGradingDailyLimit;
+    private Integer aiGradingMonthlyLimit;
     private boolean courseMemberAccess;
     private boolean isDefault;
     private Integer sortOrder;
@@ -53,6 +55,8 @@ public class MembershipPlan {
         plan.aiExamMonthlyLimit = -1;
         plan.aiBookDailyLimit = -1;
         plan.aiBookMonthlyLimit = -1;
+        plan.aiGradingDailyLimit = -1;
+        plan.aiGradingMonthlyLimit = -1;
         plan.courseMemberAccess = false;
         plan.isDefault = false;
         plan.sortOrder = 0;
@@ -68,6 +72,7 @@ public class MembershipPlan {
                                               Integer aiPptDailyLimit, Integer aiPptMonthlyLimit,
                                               Integer aiExamDailyLimit, Integer aiExamMonthlyLimit,
                                               Integer aiBookDailyLimit, Integer aiBookMonthlyLimit,
+                                              Integer aiGradingDailyLimit, Integer aiGradingMonthlyLimit,
                                               boolean courseMemberAccess, boolean isDefault,
                                               Integer sortOrder,
                                               LocalDateTime createTime, LocalDateTime updateTime,
@@ -87,6 +92,8 @@ public class MembershipPlan {
         plan.aiExamMonthlyLimit = aiExamMonthlyLimit;
         plan.aiBookDailyLimit = aiBookDailyLimit;
         plan.aiBookMonthlyLimit = aiBookMonthlyLimit;
+        plan.aiGradingDailyLimit = aiGradingDailyLimit;
+        plan.aiGradingMonthlyLimit = aiGradingMonthlyLimit;
         plan.courseMemberAccess = courseMemberAccess;
         plan.isDefault = isDefault;
         plan.sortOrder = sortOrder;
@@ -114,7 +121,8 @@ public class MembershipPlan {
     public void updateQuota(Integer aiChatDailyLimit, Integer aiChatMonthlyLimit,
                             Integer aiPptDailyLimit, Integer aiPptMonthlyLimit,
                             Integer aiExamDailyLimit, Integer aiExamMonthlyLimit,
-                            Integer aiBookDailyLimit, Integer aiBookMonthlyLimit) {
+                            Integer aiBookDailyLimit, Integer aiBookMonthlyLimit,
+                            Integer aiGradingDailyLimit, Integer aiGradingMonthlyLimit) {
         this.aiChatDailyLimit = aiChatDailyLimit;
         this.aiChatMonthlyLimit = aiChatMonthlyLimit;
         this.aiPptDailyLimit = aiPptDailyLimit;
@@ -123,6 +131,8 @@ public class MembershipPlan {
         this.aiExamMonthlyLimit = aiExamMonthlyLimit;
         this.aiBookDailyLimit = aiBookDailyLimit;
         this.aiBookMonthlyLimit = aiBookMonthlyLimit;
+        this.aiGradingDailyLimit = aiGradingDailyLimit;
+        this.aiGradingMonthlyLimit = aiGradingMonthlyLimit;
         this.updateTime = LocalDateTime.now();
     }
 
@@ -155,6 +165,7 @@ public class MembershipPlan {
             case AI_PPT -> aiPptDailyLimit;
             case AI_EXAM -> aiExamDailyLimit;
             case AI_BOOK -> aiBookDailyLimit;
+            case AI_GRADING -> aiGradingDailyLimit;
         };
     }
 
@@ -167,6 +178,7 @@ public class MembershipPlan {
             case AI_PPT -> aiPptMonthlyLimit;
             case AI_EXAM -> aiExamMonthlyLimit;
             case AI_BOOK -> aiBookMonthlyLimit;
+            case AI_GRADING -> aiGradingMonthlyLimit;
         };
     }
 }
