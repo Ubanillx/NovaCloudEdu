@@ -1,6 +1,6 @@
 package com.novacloudedu.backend.book;
 
-import com.novacloudedu.backend.application.book.service.ChapterSummaryApplicationService;
+import com.novacloudedu.backend.application.service.ChapterSummaryApplicationService;
 import com.novacloudedu.backend.domain.book.entity.Chapter;
 import com.novacloudedu.backend.domain.book.entity.ChapterSummary;
 import com.novacloudedu.backend.domain.book.repository.ChapterRepository;

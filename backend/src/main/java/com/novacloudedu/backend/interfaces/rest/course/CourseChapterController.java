@@ -1,8 +1,10 @@
 package com.novacloudedu.backend.interfaces.rest.course;
 
-import com.novacloudedu.backend.application.course.command.*;
+import com.novacloudedu.backend.application.course.command.CreateChapterCommand;
+import com.novacloudedu.backend.application.course.command.UpdateChapterCommand;
 import com.novacloudedu.backend.application.course.query.GetChapterQuery;
 import com.novacloudedu.backend.application.course.query.GetSectionQuery;
+import com.novacloudedu.backend.application.service.CourseApplicationService;
 import com.novacloudedu.backend.common.BaseResponse;
 import com.novacloudedu.backend.common.ErrorCode;
 import com.novacloudedu.backend.common.ResultUtils;
@@ -31,10 +33,7 @@ import java.util.stream.Collectors;
 @Tag(name = "课程章节", description = "课程章节相关接口")
 public class CourseChapterController {
 
-    private final CreateChapterCommand createChapterCommand;
-    private final UpdateChapterCommand updateChapterCommand;
-    private final DeleteChapterCommand deleteChapterCommand;
-    private final UpdateCourseStatisticsCommand updateStatisticsCommand;
+    private final CourseApplicationService courseApplicationService;
     private final GetChapterQuery getChapterQuery;
     private final GetSectionQuery getSectionQuery;
     private final ChapterAssembler chapterAssembler;
@@ -45,15 +44,11 @@ public class CourseChapterController {
                                            @Valid @RequestBody CreateChapterRequest request,
                                            Authentication authentication) {
         Long adminId = Long.parseLong(authentication.getName());
-        Long chapterId = createChapterCommand.execute(
-                courseId,
-                request.getTitle(),
-                request.getDescription(),
-                request.getSort(),
-                UserId.of(adminId)
+        CreateChapterCommand command = new CreateChapterCommand(
+                courseId, request.getTitle(), request.getDescription(), request.getSort()
         );
-        
-        updateStatisticsCommand.execute(courseId);
+        Long chapterId = courseApplicationService.createChapter(command, UserId.of(adminId));
+        courseApplicationService.refreshCourseStatistics(courseId);
         return ResultUtils.success(chapterId);
     }
 
@@ -62,12 +57,10 @@ public class CourseChapterController {
     public BaseResponse<Void> updateChapter(@PathVariable @Parameter(description = "课程ID") Long courseId,
                                            @PathVariable @Parameter(description = "章节ID") Long chapterId,
                                            @Valid @RequestBody UpdateChapterRequest request) {
-        updateChapterCommand.execute(
-                chapterId,
-                request.getTitle(),
-                request.getDescription(),
-                request.getSort()
+        UpdateChapterCommand command = new UpdateChapterCommand(
+                chapterId, request.getTitle(), request.getDescription(), request.getSort()
         );
+        courseApplicationService.updateChapter(command);
         return ResultUtils.success(null);
     }
 
@@ -75,8 +68,8 @@ public class CourseChapterController {
     @Operation(summary = "删除章节（管理员）")
     public BaseResponse<Void> deleteChapter(@PathVariable @Parameter(description = "课程ID") Long courseId,
                                            @PathVariable @Parameter(description = "章节ID") Long chapterId) {
-        deleteChapterCommand.execute(chapterId);
-        updateStatisticsCommand.execute(courseId);
+        courseApplicationService.deleteChapter(chapterId);
+        courseApplicationService.refreshCourseStatistics(courseId);
         return ResultUtils.success(null);
     }
 

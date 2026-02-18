@@ -1,7 +1,7 @@
 package com.novacloudedu.backend.interfaces.rest.exam;
 
-import com.novacloudedu.backend.application.exam.service.AiQuestionGenerationService;
-import com.novacloudedu.backend.application.exam.service.QuestionBankApplicationService;
+import com.novacloudedu.backend.application.service.AiQuestionGenerationService;
+import com.novacloudedu.backend.application.service.QuestionBankApplicationService;
 import com.novacloudedu.backend.application.service.UserApplicationService;
 import com.novacloudedu.backend.common.BaseResponse;
 import com.novacloudedu.backend.common.ResultUtils;

@@ -1,15 +1,18 @@
 package com.novacloudedu.backend.dailylearning;
 
-import com.novacloudedu.backend.application.dailylearning.command.ArticleInteractionCommand;
 import com.novacloudedu.backend.application.dailylearning.command.CreateDailyArticleCommand;
-import com.novacloudedu.backend.application.dailylearning.command.DeleteDailyArticleCommand;
 import com.novacloudedu.backend.application.dailylearning.command.UpdateDailyArticleCommand;
 import com.novacloudedu.backend.application.dailylearning.query.GetDailyArticleQuery;
 import com.novacloudedu.backend.application.dailylearning.query.GetUserDailyArticleQuery;
+import com.novacloudedu.backend.application.recommendation.service.GraphDataSyncService;
+import com.novacloudedu.backend.application.service.DailyLearningApplicationService;
 import com.novacloudedu.backend.domain.dailylearning.entity.DailyArticle;
 import com.novacloudedu.backend.domain.dailylearning.entity.UserDailyArticle;
 import com.novacloudedu.backend.domain.dailylearning.repository.DailyArticleRepository;
+import com.novacloudedu.backend.domain.dailylearning.repository.DailyWordRepository;
 import com.novacloudedu.backend.domain.dailylearning.repository.UserDailyArticleRepository;
+import com.novacloudedu.backend.domain.dailylearning.repository.UserDailyWordRepository;
+import com.novacloudedu.backend.domain.dailylearning.repository.UserWordBookRepository;
 import com.novacloudedu.backend.domain.dailylearning.valueobject.DailyArticleId;
 import com.novacloudedu.backend.domain.dailylearning.valueobject.Difficulty;
 import com.novacloudedu.backend.domain.user.valueobject.UserId;
@@ -40,22 +43,25 @@ class DailyArticleServiceTest {
     private DailyArticleRepository dailyArticleRepository;
 
     @Mock
+    private DailyWordRepository dailyWordRepository;
+
+    @Mock
     private UserDailyArticleRepository userDailyArticleRepository;
 
-    @InjectMocks
-    private CreateDailyArticleCommand createDailyArticleCommand;
+    @Mock
+    private UserDailyWordRepository userDailyWordRepository;
+
+    @Mock
+    private UserWordBookRepository userWordBookRepository;
+
+    @Mock
+    private GraphDataSyncService graphDataSyncService;
 
     @InjectMocks
-    private UpdateDailyArticleCommand updateDailyArticleCommand;
-
-    @InjectMocks
-    private DeleteDailyArticleCommand deleteDailyArticleCommand;
+    private DailyLearningApplicationService dailyLearningApplicationService;
 
     @InjectMocks
     private GetDailyArticleQuery getDailyArticleQuery;
-
-    @InjectMocks
-    private ArticleInteractionCommand articleInteractionCommand;
 
     @InjectMocks
     private GetUserDailyArticleQuery getUserDailyArticleQuery;
@@ -117,21 +123,12 @@ class DailyArticleServiceTest {
             return article;
         });
 
-        Long id = createDailyArticleCommand.execute(
-                "新文章标题",
-                "新文章内容...",
-                "文章摘要",
-                "http://cover2.jpg",
-                "李老师",
-                "学习报",
-                "http://source2.com",
-                "阅读理解",
-                List.of("阅读", "理解"),
-                3,
-                15,
-                LocalDate.now(),
-                ADMIN_ID
+        CreateDailyArticleCommand command = new CreateDailyArticleCommand(
+                "新文章标题", "新文章内容...", "文章摘要", "http://cover2.jpg",
+                "李老师", "学习报", "http://source2.com", "阅读理解",
+                List.of("阅读", "理解"), 3, 15, LocalDate.now()
         );
+        Long id = dailyLearningApplicationService.createDailyArticle(command, UserId.of(ADMIN_ID));
 
         assertEquals(ARTICLE_ID, id);
         verify(dailyArticleRepository, times(1)).save(any(DailyArticle.class));
@@ -145,21 +142,12 @@ class DailyArticleServiceTest {
                 .thenReturn(Optional.of(mockDailyArticle));
         when(dailyArticleRepository.save(any(DailyArticle.class))).thenReturn(mockDailyArticle);
 
-        assertDoesNotThrow(() -> updateDailyArticleCommand.execute(
-                ARTICLE_ID,
-                "更新后的标题",
-                "更新后的内容...",
-                "更新后的摘要",
-                "http://cover-updated.jpg",
-                "王老师",
-                "新来源",
-                "http://new-source.com",
-                "写作技巧",
-                List.of("写作", "技巧"),
-                2,
-                12,
-                LocalDate.now()
-        ));
+        UpdateDailyArticleCommand cmd = new UpdateDailyArticleCommand(
+                ARTICLE_ID, "更新后的标题", "更新后的内容...", "更新后的摘要",
+                "http://cover-updated.jpg", "王老师", "新来源", "http://new-source.com",
+                "写作技巧", List.of("写作", "技巧"), 2, 12, LocalDate.now()
+        );
+        assertDoesNotThrow(() -> dailyLearningApplicationService.updateDailyArticle(cmd));
 
         verify(dailyArticleRepository, times(1)).save(any(DailyArticle.class));
     }
@@ -171,9 +159,10 @@ class DailyArticleServiceTest {
         when(dailyArticleRepository.findById(any(DailyArticleId.class)))
                 .thenReturn(Optional.empty());
 
-        assertThrows(BusinessException.class, () -> updateDailyArticleCommand.execute(
+        UpdateDailyArticleCommand cmd = new UpdateDailyArticleCommand(
                 999L, "标题", "内容", null, null, null, null, null, null, null, null, null, null
-        ));
+        );
+        assertThrows(BusinessException.class, () -> dailyLearningApplicationService.updateDailyArticle(cmd));
     }
 
     @Test
@@ -184,7 +173,7 @@ class DailyArticleServiceTest {
                 .thenReturn(Optional.of(mockDailyArticle));
         doNothing().when(dailyArticleRepository).deleteById(any(DailyArticleId.class));
 
-        assertDoesNotThrow(() -> deleteDailyArticleCommand.execute(ARTICLE_ID));
+        assertDoesNotThrow(() -> dailyLearningApplicationService.deleteDailyArticle(ARTICLE_ID));
         verify(dailyArticleRepository, times(1)).deleteById(any(DailyArticleId.class));
     }
 
@@ -194,7 +183,7 @@ class DailyArticleServiceTest {
     void deleteDailyArticle_DirectDelete() {
         doNothing().when(dailyArticleRepository).deleteById(any(DailyArticleId.class));
 
-        assertDoesNotThrow(() -> deleteDailyArticleCommand.execute(999L));
+        assertDoesNotThrow(() -> dailyLearningApplicationService.deleteDailyArticle(999L));
         verify(dailyArticleRepository, times(1)).deleteById(any(DailyArticleId.class));
     }
 
@@ -280,7 +269,7 @@ class DailyArticleServiceTest {
         when(userDailyArticleRepository.save(any(UserDailyArticle.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
-        assertDoesNotThrow(() -> articleInteractionCommand.markAsRead(USER_ID, ARTICLE_ID));
+        assertDoesNotThrow(() -> dailyLearningApplicationService.markArticleAsRead(USER_ID, ARTICLE_ID));
         verify(userDailyArticleRepository, times(1)).save(any(UserDailyArticle.class));
     }
 
@@ -301,7 +290,7 @@ class DailyArticleServiceTest {
         when(userDailyArticleRepository.save(any(UserDailyArticle.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
-        assertDoesNotThrow(() -> articleInteractionCommand.markAsRead(USER_ID, ARTICLE_ID));
+        assertDoesNotThrow(() -> dailyLearningApplicationService.markArticleAsRead(USER_ID, ARTICLE_ID));
         verify(userDailyArticleRepository, times(1)).save(any(UserDailyArticle.class));
     }
 
@@ -318,7 +307,7 @@ class DailyArticleServiceTest {
         when(userDailyArticleRepository.save(any(UserDailyArticle.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
-        assertDoesNotThrow(() -> articleInteractionCommand.toggleLike(USER_ID, ARTICLE_ID));
+        assertDoesNotThrow(() -> dailyLearningApplicationService.toggleArticleLike(USER_ID, ARTICLE_ID));
         verify(userDailyArticleRepository, times(1)).save(any(UserDailyArticle.class));
     }
 
@@ -335,7 +324,7 @@ class DailyArticleServiceTest {
         when(userDailyArticleRepository.save(any(UserDailyArticle.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
-        assertDoesNotThrow(() -> articleInteractionCommand.toggleCollect(USER_ID, ARTICLE_ID));
+        assertDoesNotThrow(() -> dailyLearningApplicationService.toggleArticleCollect(USER_ID, ARTICLE_ID));
         verify(userDailyArticleRepository, times(1)).save(any(UserDailyArticle.class));
     }
 
@@ -350,7 +339,7 @@ class DailyArticleServiceTest {
         when(userDailyArticleRepository.save(any(UserDailyArticle.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
-        assertDoesNotThrow(() -> articleInteractionCommand.addComment(USER_ID, ARTICLE_ID, "这篇文章很有帮助！"));
+        assertDoesNotThrow(() -> dailyLearningApplicationService.addArticleComment(USER_ID, ARTICLE_ID, "这篇文章很有帮助！"));
         verify(userDailyArticleRepository, times(1)).save(any(UserDailyArticle.class));
     }
 

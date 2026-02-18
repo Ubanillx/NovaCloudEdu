@@ -1,6 +1,6 @@
 package com.novacloudedu.backend.interfaces.rest.dailylearning;
 
-import com.novacloudedu.backend.application.dailylearning.command.StudyWordCommand;
+import com.novacloudedu.backend.application.service.DailyLearningApplicationService;
 import com.novacloudedu.backend.application.dailylearning.query.GetDailyWordQuery;
 import com.novacloudedu.backend.application.dailylearning.query.GetUserDailyWordQuery;
 import com.novacloudedu.backend.application.recommendation.service.GraphDataSyncService;
@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 @Tag(name = "用户每日单词", description = "用户每日单词学习相关接口")
 public class UserDailyWordController {
 
-    private final StudyWordCommand studyWordCommand;
+    private final DailyLearningApplicationService dailyLearningApplicationService;
     private final GetUserDailyWordQuery getUserDailyWordQuery;
     private final GetDailyWordQuery getDailyWordQuery;
     private final PreferenceAnalysisService preferenceAnalysisService;
@@ -41,7 +41,7 @@ public class UserDailyWordController {
     public BaseResponse<Void> studyWord(@PathVariable @Parameter(description = "单词ID") Long wordId,
                                         Authentication authentication) {
         Long userId = Long.parseLong(authentication.getName());
-        studyWordCommand.execute(userId, wordId);
+        dailyLearningApplicationService.studyWord(userId, wordId);
         preferenceAnalysisService.recordBehavior(userId, BehaviorType.STUDY, TargetType.WORD, wordId, null, null);
         graphDataSyncService.syncUserStudyWord(userId, wordId);
         return ResultUtils.success(null);
@@ -53,7 +53,7 @@ public class UserDailyWordController {
                                             @RequestParam @Parameter(description = "掌握程度：0-未知，1-生词，2-熟悉，3-掌握") Integer level,
                                             Authentication authentication) {
         Long userId = Long.parseLong(authentication.getName());
-        studyWordCommand.updateMastery(userId, wordId, level);
+        dailyLearningApplicationService.updateWordMastery(userId, wordId, level);
         return ResultUtils.success(null);
     }
 
@@ -62,7 +62,7 @@ public class UserDailyWordController {
     public BaseResponse<Void> toggleCollect(@PathVariable @Parameter(description = "单词ID") Long wordId,
                                             Authentication authentication) {
         Long userId = Long.parseLong(authentication.getName());
-        studyWordCommand.toggleCollect(userId, wordId);
+        dailyLearningApplicationService.toggleWordCollect(userId, wordId);
         preferenceAnalysisService.recordBehavior(userId, BehaviorType.COLLECT, TargetType.WORD, wordId, null, null);
         graphDataSyncService.syncUserCollectWord(userId, wordId);
         return ResultUtils.success(null);

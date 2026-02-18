@@ -1,6 +1,6 @@
 package com.novacloudedu.backend.interfaces.rest.order;
 
-import com.novacloudedu.backend.application.order.command.CreateOrderCommand;
+import com.novacloudedu.backend.application.service.OrderApplicationService;
 import com.novacloudedu.backend.application.order.query.GetOrderQuery;
 import com.novacloudedu.backend.common.BaseResponse;
 import com.novacloudedu.backend.common.ErrorCode;
@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 @Tag(name = "订单管理", description = "课程订单相关接口")
 public class OrderController {
 
-    private final CreateOrderCommand createOrderCommand;
+    private final OrderApplicationService orderApplicationService;
     private final GetOrderQuery getOrderQuery;
     private final OrderAssembler orderAssembler;
 
@@ -37,7 +37,7 @@ public class OrderController {
     public BaseResponse<String> createOrder(@Valid @RequestBody CreateOrderRequest request,
                                            Authentication authentication) {
         Long userId = Long.parseLong(authentication.getName());
-        String orderNo = createOrderCommand.execute(UserId.of(userId), request.getCourseId());
+        String orderNo = orderApplicationService.createOrder(UserId.of(userId), request.getCourseId());
         return ResultUtils.success(orderNo);
     }
 

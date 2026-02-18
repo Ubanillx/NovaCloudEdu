@@ -1,9 +1,9 @@
 package com.novacloudedu.backend.interfaces.rest.book;
 
-import com.novacloudedu.backend.application.book.service.AiQuestionApplicationService;
-import com.novacloudedu.backend.application.book.service.ChapterSummaryApplicationService;
-import com.novacloudedu.backend.application.book.service.KnowledgePointApplicationService;
-import com.novacloudedu.backend.application.book.service.ReadingQuizApplicationService;
+import com.novacloudedu.backend.application.service.AiQuestionApplicationService;
+import com.novacloudedu.backend.application.service.ChapterSummaryApplicationService;
+import com.novacloudedu.backend.application.service.KnowledgePointApplicationService;
+import com.novacloudedu.backend.application.service.ReadingQuizApplicationService;
 import com.novacloudedu.backend.common.BaseResponse;
 import com.novacloudedu.backend.common.ResultUtils;
 import com.novacloudedu.backend.domain.membership.service.AiUsageLimitService;

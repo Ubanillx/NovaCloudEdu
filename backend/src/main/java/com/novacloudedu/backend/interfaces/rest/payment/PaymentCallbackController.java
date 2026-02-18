@@ -1,9 +1,9 @@
 package com.novacloudedu.backend.interfaces.rest.payment;
 
 import com.novacloudedu.backend.application.membership.service.MembershipApplicationService;
-import com.novacloudedu.backend.application.order.command.ConfirmPaymentCommand;
+import com.novacloudedu.backend.application.service.OrderApplicationService;
 import com.novacloudedu.backend.domain.order.valueobject.PaymentMethod;
-import com.novacloudedu.backend.domain.payment.PaymentGateway;
+import com.novacloudedu.backend.domain.payment.service.PaymentGateway;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.*;
 public class PaymentCallbackController {
 
     private final PaymentGateway paymentGateway;
-    private final ConfirmPaymentCommand confirmPaymentCommand;
+    private final OrderApplicationService orderApplicationService;
     private final MembershipApplicationService membershipApplicationService;
 
     /**

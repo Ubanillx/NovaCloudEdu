@@ -1,15 +1,18 @@
 package com.novacloudedu.backend.dailylearning;
 
 import com.novacloudedu.backend.application.dailylearning.command.CreateDailyWordCommand;
-import com.novacloudedu.backend.application.dailylearning.command.DeleteDailyWordCommand;
-import com.novacloudedu.backend.application.dailylearning.command.StudyWordCommand;
 import com.novacloudedu.backend.application.dailylearning.command.UpdateDailyWordCommand;
 import com.novacloudedu.backend.application.dailylearning.query.GetDailyWordQuery;
 import com.novacloudedu.backend.application.dailylearning.query.GetUserDailyWordQuery;
+import com.novacloudedu.backend.application.recommendation.service.GraphDataSyncService;
+import com.novacloudedu.backend.application.service.DailyLearningApplicationService;
 import com.novacloudedu.backend.domain.dailylearning.entity.DailyWord;
 import com.novacloudedu.backend.domain.dailylearning.entity.UserDailyWord;
+import com.novacloudedu.backend.domain.dailylearning.repository.DailyArticleRepository;
 import com.novacloudedu.backend.domain.dailylearning.repository.DailyWordRepository;
+import com.novacloudedu.backend.domain.dailylearning.repository.UserDailyArticleRepository;
 import com.novacloudedu.backend.domain.dailylearning.repository.UserDailyWordRepository;
+import com.novacloudedu.backend.domain.dailylearning.repository.UserWordBookRepository;
 import com.novacloudedu.backend.domain.dailylearning.valueobject.DailyWordId;
 import com.novacloudedu.backend.domain.dailylearning.valueobject.Difficulty;
 import com.novacloudedu.backend.domain.dailylearning.valueobject.MasteryLevel;
@@ -38,25 +41,28 @@ import static org.mockito.Mockito.*;
 class DailyWordServiceTest {
 
     @Mock
+    private DailyArticleRepository dailyArticleRepository;
+
+    @Mock
     private DailyWordRepository dailyWordRepository;
+
+    @Mock
+    private UserDailyArticleRepository userDailyArticleRepository;
 
     @Mock
     private UserDailyWordRepository userDailyWordRepository;
 
-    @InjectMocks
-    private CreateDailyWordCommand createDailyWordCommand;
+    @Mock
+    private UserWordBookRepository userWordBookRepository;
+
+    @Mock
+    private GraphDataSyncService graphDataSyncService;
 
     @InjectMocks
-    private UpdateDailyWordCommand updateDailyWordCommand;
-
-    @InjectMocks
-    private DeleteDailyWordCommand deleteDailyWordCommand;
+    private DailyLearningApplicationService dailyLearningApplicationService;
 
     @InjectMocks
     private GetDailyWordQuery getDailyWordQuery;
-
-    @InjectMocks
-    private StudyWordCommand studyWordCommand;
 
     @InjectMocks
     private GetUserDailyWordQuery getUserDailyWordQuery;
@@ -113,21 +119,13 @@ class DailyWordServiceTest {
             return word;
         });
 
-        Long id = createDailyWordCommand.execute(
-                "world",
-                "wɜːrld",
-                "wɜːld",
-                "http://audio2-us.mp3",
-                "http://audio2-uk.mp3",
-                "世界",
-                "The world is beautiful.",
-                "世界是美丽的。",
-                2,
-                "日常用语",
-                "常用名词",
-                LocalDate.now(),
-                ADMIN_ID
+        CreateDailyWordCommand command = new CreateDailyWordCommand(
+                "world", "wɜːrld", "wɜːld",
+                "http://audio2-us.mp3", "http://audio2-uk.mp3",
+                "世界", "The world is beautiful.", "世界是美丽的。",
+                2, "日常用语", "常用名词", LocalDate.now()
         );
+        Long id = dailyLearningApplicationService.createDailyWord(command, UserId.of(ADMIN_ID));
 
         assertEquals(WORD_ID, id);
         verify(dailyWordRepository, times(1)).save(any(DailyWord.class));
@@ -141,21 +139,13 @@ class DailyWordServiceTest {
                 .thenReturn(Optional.of(mockDailyWord));
         when(dailyWordRepository.save(any(DailyWord.class))).thenReturn(mockDailyWord);
 
-        assertDoesNotThrow(() -> updateDailyWordCommand.execute(
-                WORD_ID,
-                "hello updated",
-                "həˈloʊ",
-                "həˈləʊ",
-                "http://audio-us.mp3",
-                "http://audio-uk.mp3",
-                "你好（更新）",
-                "Hello, updated world!",
-                "你好，更新的世界！",
-                2,
-                "日常用语",
-                "更新后的备注",
-                LocalDate.now()
-        ));
+        UpdateDailyWordCommand cmd = new UpdateDailyWordCommand(
+                WORD_ID, "hello updated", "həˈloʊ", "həˈləʊ",
+                "http://audio-us.mp3", "http://audio-uk.mp3",
+                "你好（更新）", "Hello, updated world!", "你好，更新的世界！",
+                2, "日常用语", "更新后的备注", LocalDate.now()
+        );
+        assertDoesNotThrow(() -> dailyLearningApplicationService.updateDailyWord(cmd));
 
         verify(dailyWordRepository, times(1)).save(any(DailyWord.class));
     }
@@ -167,9 +157,10 @@ class DailyWordServiceTest {
         when(dailyWordRepository.findById(any(DailyWordId.class)))
                 .thenReturn(Optional.empty());
 
-        assertThrows(BusinessException.class, () -> updateDailyWordCommand.execute(
+        UpdateDailyWordCommand cmd = new UpdateDailyWordCommand(
                 999L, "test", null, null, null, null, "测试", null, null, null, null, null, null
-        ));
+        );
+        assertThrows(BusinessException.class, () -> dailyLearningApplicationService.updateDailyWord(cmd));
     }
 
     @Test
@@ -180,7 +171,7 @@ class DailyWordServiceTest {
                 .thenReturn(Optional.of(mockDailyWord));
         doNothing().when(dailyWordRepository).deleteById(any(DailyWordId.class));
 
-        assertDoesNotThrow(() -> deleteDailyWordCommand.execute(WORD_ID));
+        assertDoesNotThrow(() -> dailyLearningApplicationService.deleteDailyWord(WORD_ID));
         verify(dailyWordRepository, times(1)).deleteById(any(DailyWordId.class));
     }
 
@@ -190,7 +181,7 @@ class DailyWordServiceTest {
     void deleteDailyWord_DirectDelete() {
         doNothing().when(dailyWordRepository).deleteById(any(DailyWordId.class));
 
-        assertDoesNotThrow(() -> deleteDailyWordCommand.execute(999L));
+        assertDoesNotThrow(() -> dailyLearningApplicationService.deleteDailyWord(999L));
         verify(dailyWordRepository, times(1)).deleteById(any(DailyWordId.class));
     }
 
@@ -275,7 +266,7 @@ class DailyWordServiceTest {
         when(userDailyWordRepository.save(any(UserDailyWord.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
-        assertDoesNotThrow(() -> studyWordCommand.execute(USER_ID, WORD_ID));
+        assertDoesNotThrow(() -> dailyLearningApplicationService.studyWord(USER_ID, WORD_ID));
         verify(userDailyWordRepository, times(1)).save(any(UserDailyWord.class));
     }
 
@@ -294,7 +285,7 @@ class DailyWordServiceTest {
         when(userDailyWordRepository.save(any(UserDailyWord.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
-        assertDoesNotThrow(() -> studyWordCommand.execute(USER_ID, WORD_ID));
+        assertDoesNotThrow(() -> dailyLearningApplicationService.studyWord(USER_ID, WORD_ID));
         verify(userDailyWordRepository, times(1)).save(any(UserDailyWord.class));
     }
 
@@ -307,7 +298,7 @@ class DailyWordServiceTest {
         when(userDailyWordRepository.save(any(UserDailyWord.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
-        assertDoesNotThrow(() -> studyWordCommand.updateMastery(USER_ID, WORD_ID, 3));
+        assertDoesNotThrow(() -> dailyLearningApplicationService.updateWordMastery(USER_ID, WORD_ID, 3));
         verify(userDailyWordRepository, times(1)).save(any(UserDailyWord.class));
     }
 
@@ -322,7 +313,7 @@ class DailyWordServiceTest {
         when(userDailyWordRepository.save(any(UserDailyWord.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
-        assertDoesNotThrow(() -> studyWordCommand.toggleCollect(USER_ID, WORD_ID));
+        assertDoesNotThrow(() -> dailyLearningApplicationService.toggleWordCollect(USER_ID, WORD_ID));
         verify(userDailyWordRepository, times(1)).save(any(UserDailyWord.class));
     }
 

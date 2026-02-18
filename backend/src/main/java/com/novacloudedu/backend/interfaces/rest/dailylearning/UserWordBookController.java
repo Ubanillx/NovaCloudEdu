@@ -1,6 +1,6 @@
 package com.novacloudedu.backend.interfaces.rest.dailylearning;
 
-import com.novacloudedu.backend.application.dailylearning.command.WordBookCommand;
+import com.novacloudedu.backend.application.service.DailyLearningApplicationService;
 import com.novacloudedu.backend.application.dailylearning.query.GetDailyWordQuery;
 import com.novacloudedu.backend.application.dailylearning.query.GetUserWordBookQuery;
 import com.novacloudedu.backend.common.BaseResponse;
@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 @Tag(name = "用户生词本", description = "用户生词本相关接口")
 public class UserWordBookController {
 
-    private final WordBookCommand wordBookCommand;
+    private final DailyLearningApplicationService dailyLearningApplicationService;
     private final GetUserWordBookQuery getUserWordBookQuery;
     private final GetDailyWordQuery getDailyWordQuery;
     private final DailyLearningAssembler assembler;
@@ -35,7 +35,7 @@ public class UserWordBookController {
     public BaseResponse<Long> addToWordBook(@PathVariable @Parameter(description = "单词ID") Long wordId,
                                             Authentication authentication) {
         Long userId = Long.parseLong(authentication.getName());
-        Long wordBookId = wordBookCommand.addToWordBook(userId, wordId);
+        Long wordBookId = dailyLearningApplicationService.addToWordBook(userId, wordId);
         return ResultUtils.success(wordBookId);
     }
 
@@ -46,7 +46,7 @@ public class UserWordBookController {
             @RequestParam @Parameter(description = "学习状态：0-未学习，1-已学习，2-已掌握") Integer status,
             Authentication authentication) {
         Long userId = Long.parseLong(authentication.getName());
-        wordBookCommand.updateLearningStatus(userId, wordBookId, status);
+        dailyLearningApplicationService.updateWordBookLearningStatus(userId, wordBookId, status);
         return ResultUtils.success(null);
     }
 
@@ -56,7 +56,7 @@ public class UserWordBookController {
             @PathVariable @Parameter(description = "生词本记录ID") Long wordBookId,
             Authentication authentication) {
         Long userId = Long.parseLong(authentication.getName());
-        wordBookCommand.removeFromWordBook(userId, wordBookId);
+        dailyLearningApplicationService.removeFromWordBook(userId, wordBookId);
         return ResultUtils.success(null);
     }
 

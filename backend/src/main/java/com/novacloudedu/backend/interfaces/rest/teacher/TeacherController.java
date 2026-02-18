@@ -1,10 +1,8 @@
 package com.novacloudedu.backend.interfaces.rest.teacher;
 
 import com.novacloudedu.backend.annotation.AuthCheck;
+import com.novacloudedu.backend.application.service.TeacherApplicationService;
 import com.novacloudedu.backend.application.service.UserApplicationService;
-import com.novacloudedu.backend.application.teacher.command.ApplyTeacherCommand;
-import com.novacloudedu.backend.application.teacher.command.RemoveTeacherCommand;
-import com.novacloudedu.backend.application.teacher.command.UpdateTeacherCommand;
 import com.novacloudedu.backend.application.teacher.query.GetTeacherQuery;
 import com.novacloudedu.backend.common.BaseResponse;
 import com.novacloudedu.backend.common.ErrorCode;
@@ -35,9 +33,7 @@ import java.util.stream.Collectors;
 @Tag(name = "讲师管理", description = "讲师相关接口")
 public class TeacherController {
 
-    private final ApplyTeacherCommand applyTeacherCommand;
-    private final UpdateTeacherCommand updateTeacherCommand;
-    private final RemoveTeacherCommand removeTeacherCommand;
+    private final TeacherApplicationService teacherApplicationService;
     private final GetTeacherQuery getTeacherQuery;
     private final TeacherAssembler teacherAssembler;
     private final UserApplicationService userApplicationService;
@@ -47,7 +43,7 @@ public class TeacherController {
     public BaseResponse<Long> applyTeacher(@Valid @RequestBody ApplyTeacherRequest request,
                                            Authentication authentication) {
         Long userId = Long.parseLong(authentication.getName());
-        Long applicationId = applyTeacherCommand.execute(
+        Long applicationId = teacherApplicationService.applyTeacher(
                 UserId.of(userId),
                 request.getName(),
                 request.getIntroduction(),
@@ -102,7 +98,7 @@ public class TeacherController {
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
         }
 
-        updateTeacherCommand.execute(
+        teacherApplicationService.updateTeacher(
                 TeacherId.of(id),
                 request.getName(),
                 request.getIntroduction(),
@@ -115,7 +111,7 @@ public class TeacherController {
     @Operation(summary = "移除讲师", description = "管理员移除讲师，用户角色降回学生，需重新申请")
     @AuthCheck(mustRole = "admin")
     public BaseResponse<Void> removeTeacher(@PathVariable @Parameter(description = "讲师ID") Long id) {
-        removeTeacherCommand.execute(TeacherId.of(id));
+        teacherApplicationService.removeTeacher(TeacherId.of(id));
         return ResultUtils.success(null);
     }
 

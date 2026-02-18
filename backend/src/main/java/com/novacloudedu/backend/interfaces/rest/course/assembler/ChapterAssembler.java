@@ -1,6 +1,6 @@
 package com.novacloudedu.backend.interfaces.rest.course.assembler;
 
-import com.novacloudedu.backend.application.course.service.VideoUrlService;
+import com.novacloudedu.backend.application.service.VideoUrlService;
 import com.novacloudedu.backend.domain.course.entity.CourseChapter;
 import com.novacloudedu.backend.domain.course.entity.CourseSection;
 import com.novacloudedu.backend.interfaces.rest.course.dto.ChapterResponse;

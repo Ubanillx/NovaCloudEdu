@@ -48,6 +48,25 @@ public class ClassScheduleItem {
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
 
+    /**
+     * 统一工厂方法：根据课程类型自动选择创建方式
+     */
+    public static ClassScheduleItem create(Long settingId, ClassId classId, UserId userId,
+                                           ScheduleCourseType courseType,
+                                           String courseName, String teacherName, String location,
+                                           CourseId courseId, TeacherId teacherId,
+                                           Integer dayOfWeek, Integer startSection, Integer endSection,
+                                           Integer startWeek, Integer endWeek, ScheduleWeekType weekType,
+                                           String color, String remark) {
+        if (courseType == ScheduleCourseType.CUSTOM) {
+            return createCustom(settingId, classId, userId, courseName, teacherName, location,
+                    dayOfWeek, startSection, endSection, startWeek, endWeek, weekType, color, remark);
+        } else {
+            return createPlatform(settingId, classId, userId, courseId, teacherId, location,
+                    dayOfWeek, startSection, endSection, startWeek, endWeek, weekType, color, remark);
+        }
+    }
+
     public static ClassScheduleItem createCustom(Long settingId, ClassId classId, UserId userId, String courseName, String teacherName, 
                                                  String location, Integer dayOfWeek, Integer startSection, 
                                                  Integer endSection, Integer startWeek, Integer endWeek, 

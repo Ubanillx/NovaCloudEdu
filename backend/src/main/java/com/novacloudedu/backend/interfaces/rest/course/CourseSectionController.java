@@ -1,13 +1,12 @@
 package com.novacloudedu.backend.interfaces.rest.course;
 
 import com.novacloudedu.backend.application.course.command.CreateSectionCommand;
-import com.novacloudedu.backend.application.course.command.DeleteSectionCommand;
-import com.novacloudedu.backend.application.course.command.UpdateCourseStatisticsCommand;
 import com.novacloudedu.backend.application.course.command.UpdateSectionCommand;
 import com.novacloudedu.backend.application.course.query.GetCourseQuery;
 import com.novacloudedu.backend.application.course.query.GetSectionQuery;
-import com.novacloudedu.backend.application.course.service.VideoUrlService;
+import com.novacloudedu.backend.application.service.VideoUrlService;
 import com.novacloudedu.backend.application.membership.service.MembershipApplicationService;
+import com.novacloudedu.backend.application.service.CourseApplicationService;
 import com.novacloudedu.backend.infrastructure.video.VideoTranscodeService;
 import com.novacloudedu.backend.common.BaseResponse;
 import com.novacloudedu.backend.common.ErrorCode;
@@ -40,10 +39,7 @@ import java.util.stream.Collectors;
 @Tag(name = "课程小节", description = "课程小节相关接口")
 public class CourseSectionController {
 
-    private final CreateSectionCommand createSectionCommand;
-    private final UpdateSectionCommand updateSectionCommand;
-    private final DeleteSectionCommand deleteSectionCommand;
-    private final UpdateCourseStatisticsCommand updateStatisticsCommand;
+    private final CourseApplicationService courseApplicationService;
     private final GetSectionQuery getSectionQuery;
     private final GetCourseQuery getCourseQuery;
     private final ChapterAssembler chapterAssembler;
@@ -58,20 +54,15 @@ public class CourseSectionController {
                                            @Valid @RequestBody CreateSectionRequest request,
                                            Authentication authentication) {
         Long adminId = Long.parseLong(authentication.getName());
-        Long sectionId = createSectionCommand.execute(
-                courseId,
-                request.getChapterId(),
-                request.getTitle(),
-                request.getDescription(),
-                request.getVideoUrl(),
-                request.getDuration(),
-                request.getSort(),
-                request.getIsFree(),
-                request.getResourceUrl(),
-                UserId.of(adminId)
+        CreateSectionCommand command = new CreateSectionCommand(
+                courseId, request.getChapterId(),
+                request.getTitle(), request.getDescription(),
+                request.getVideoUrl(), request.getDuration(),
+                request.getSort(), request.getIsFree(),
+                request.getResourceUrl()
         );
-        
-        updateStatisticsCommand.execute(courseId);
+        Long sectionId = courseApplicationService.createSection(command, UserId.of(adminId));
+        courseApplicationService.refreshCourseStatistics(courseId);
 
         // 当 videoUrl 不为空时，异步触发 HLS 转码
         if (request.getVideoUrl() != null && !request.getVideoUrl().isBlank()) {
@@ -91,18 +82,14 @@ public class CourseSectionController {
                 .map(CourseSection::getVideoUrl)
                 .orElse(null);
 
-        updateSectionCommand.execute(
-                sectionId,
-                request.getTitle(),
-                request.getDescription(),
-                request.getVideoUrl(),
-                request.getDuration(),
-                request.getSort(),
-                request.getIsFree(),
+        UpdateSectionCommand command = new UpdateSectionCommand(
+                sectionId, request.getTitle(), request.getDescription(),
+                request.getVideoUrl(), request.getDuration(),
+                request.getSort(), request.getIsFree(),
                 request.getResourceUrl()
         );
-        
-        updateStatisticsCommand.execute(courseId);
+        courseApplicationService.updateSection(command);
+        courseApplicationService.refreshCourseStatistics(courseId);
 
         // 仅当 videoUrl 实际变更时，异步触发 HLS 转码
         String newVideoUrl = request.getVideoUrl();
@@ -119,8 +106,8 @@ public class CourseSectionController {
     @Operation(summary = "删除小节（管理员）")
     public BaseResponse<Void> deleteSection(@PathVariable @Parameter(description = "课程ID") Long courseId,
                                            @PathVariable @Parameter(description = "小节ID") Long sectionId) {
-        deleteSectionCommand.execute(sectionId);
-        updateStatisticsCommand.execute(courseId);
+        courseApplicationService.deleteSection(sectionId);
+        courseApplicationService.refreshCourseStatistics(courseId);
         return ResultUtils.success(null);
     }
 

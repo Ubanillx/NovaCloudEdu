@@ -2,7 +2,7 @@ package com.novacloudedu.backend.interfaces.rest.book;
 
 import com.novacloudedu.backend.application.book.command.UploadBookCommand;
 import com.novacloudedu.backend.application.book.dto.BookDTO;
-import com.novacloudedu.backend.application.book.service.BookApplicationService;
+import com.novacloudedu.backend.application.service.BookApplicationService;
 import com.novacloudedu.backend.common.BaseResponse;
 import com.novacloudedu.backend.common.ResultUtils;
 import io.swagger.v3.oas.annotations.Operation;

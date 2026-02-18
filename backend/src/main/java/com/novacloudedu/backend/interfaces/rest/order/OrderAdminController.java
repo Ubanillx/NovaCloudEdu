@@ -1,7 +1,6 @@
 package com.novacloudedu.backend.interfaces.rest.order;
 
-import com.novacloudedu.backend.application.order.command.ConfirmPaymentCommand;
-import com.novacloudedu.backend.application.order.command.RefundOrderCommand;
+import com.novacloudedu.backend.application.service.OrderApplicationService;
 import com.novacloudedu.backend.application.order.query.GetOrderQuery;
 import com.novacloudedu.backend.common.BaseResponse;
 import com.novacloudedu.backend.common.ResultUtils;
@@ -34,8 +33,7 @@ import java.util.stream.Collectors;
 @Tag(name = "订单管理（管理员）", description = "管理员订单管理接口")
 public class OrderAdminController {
 
-    private final ConfirmPaymentCommand confirmPaymentCommand;
-    private final RefundOrderCommand refundOrderCommand;
+    private final OrderApplicationService orderApplicationService;
     private final GetOrderQuery getOrderQuery;
     private final OrderAssembler orderAssembler;
     private final UserMembershipRepository membershipRepository;
@@ -44,7 +42,7 @@ public class OrderAdminController {
     @PostMapping("/confirm")
     @Operation(summary = "确认收款（管理员手动确认）")
     public BaseResponse<Void> confirmPayment(@Valid @RequestBody ConfirmPaymentRequest request) {
-        confirmPaymentCommand.execute(
+        orderApplicationService.confirmPayment(
                 request.getOrderNo(),
                 PaymentMethod.fromCode(request.getPaymentMethod()),
                 request.getValidityDays()
@@ -55,7 +53,7 @@ public class OrderAdminController {
     @PostMapping("/{orderNo}/refund")
     @Operation(summary = "退款（管理员）")
     public BaseResponse<Void> refund(@PathVariable @Parameter(description = "订单号") String orderNo) {
-        refundOrderCommand.execute(orderNo);
+        orderApplicationService.refundOrder(orderNo);
         return ResultUtils.success(null);
     }
 

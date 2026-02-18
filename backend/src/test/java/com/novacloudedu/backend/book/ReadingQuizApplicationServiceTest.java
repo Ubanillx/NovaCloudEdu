@@ -1,6 +1,6 @@
 package com.novacloudedu.backend.book;
 
-import com.novacloudedu.backend.application.book.service.ReadingQuizApplicationService;
+import com.novacloudedu.backend.application.service.ReadingQuizApplicationService;
 import com.novacloudedu.backend.domain.book.entity.Chapter;
 import com.novacloudedu.backend.domain.book.entity.ReadingQuiz;
 import com.novacloudedu.backend.domain.book.repository.ChapterRepository;

@@ -36,8 +36,19 @@ public class FileUpload {
     public static FileUpload create(String fileName, String originalName, String fileUrl,
                                    Long fileSize, String contentType, FileBusinessType businessType,
                                    UserId uploaderId) {
+        if (originalName == null || originalName.isEmpty()) {
+            throw new IllegalArgumentException("文件名不能为空");
+        }
         return new FileUpload(null, fileName, originalName, fileUrl, fileSize, contentType,
                 businessType, uploaderId, LocalDateTime.now());
+    }
+
+    /**
+     * 创建待上传的文件实体（先验证，再上传后填充URL）
+     */
+    public FileUpload withUrl(String uploadedUrl) {
+        return new FileUpload(null, this.fileName, this.originalName, uploadedUrl,
+                this.fileSize, this.contentType, this.businessType, this.uploaderId, this.createTime);
     }
 
     public static FileUpload reconstruct(Long id, String fileName, String originalName,

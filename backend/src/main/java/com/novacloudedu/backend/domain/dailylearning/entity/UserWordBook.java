@@ -56,6 +56,15 @@ public class UserWordBook {
         this.id = id;
     }
 
+    /**
+     * 确保当前记录归属指定用户，否则抛出异常
+     */
+    public void ensureOwnedBy(UserId ownerId) {
+        if (!this.userId.value().equals(ownerId.value())) {
+            throw new IllegalStateException("无权操作此记录");
+        }
+    }
+
     public void updateLearningStatus(LearningStatus status) {
         this.learningStatus = status;
         this.updateTime = LocalDateTime.now();
