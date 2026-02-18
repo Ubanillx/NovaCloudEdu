@@ -50,5 +50,13 @@ export interface UpdatePlanQuotaRequest {
      * 电子书AI每月限额，-1表示无限制
      */
     'aiBookMonthlyLimit'?: number;
+    /**
+     * 智能批改每日限额，-1表示无限制
+     */
+    'aiGradingDailyLimit'?: number;
+    /**
+     * 智能批改每月限额，-1表示无限制
+     */
+    'aiGradingMonthlyLimit'?: number;
 }
 

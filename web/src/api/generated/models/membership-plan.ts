@@ -29,6 +29,8 @@ export interface MembershipPlan {
     'aiExamMonthlyLimit'?: number;
     'aiBookDailyLimit'?: number;
     'aiBookMonthlyLimit'?: number;
+    'aiGradingDailyLimit'?: number;
+    'aiGradingMonthlyLimit'?: number;
     'courseMemberAccess'?: boolean;
     'sortOrder'?: number;
     'createTime'?: string;

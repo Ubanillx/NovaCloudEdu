@@ -14,6 +14,8 @@ Name | Type | Description | Notes
 **aiExamMonthlyLimit** | **number** | AI出题每月限额，-1表示无限制 | [optional] [default to undefined]
 **aiBookDailyLimit** | **number** | 电子书AI每日限额，-1表示无限制 | [optional] [default to undefined]
 **aiBookMonthlyLimit** | **number** | 电子书AI每月限额，-1表示无限制 | [optional] [default to undefined]
+**aiGradingDailyLimit** | **number** | 智能批改每日限额，-1表示无限制 | [optional] [default to undefined]
+**aiGradingMonthlyLimit** | **number** | 智能批改每月限额，-1表示无限制 | [optional] [default to undefined]
 
 ## Example
 
@@ -29,6 +31,8 @@ const instance: UpdatePlanQuotaRequest = {
     aiExamMonthlyLimit,
     aiBookDailyLimit,
     aiBookMonthlyLimit,
+    aiGradingDailyLimit,
+    aiGradingMonthlyLimit,
 };
 ```
 

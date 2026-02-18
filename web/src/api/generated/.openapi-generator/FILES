@@ -84,6 +84,8 @@ docs/BaseResponseFriendPageResponse.md
 docs/BaseResponseFriendRequestPageResponse.md
 docs/BaseResponseGenerateAvatarResponse.md
 docs/BaseResponseGenerateBannerImageResponse.md
+docs/BaseResponseGradingResultResponse.md
+docs/BaseResponseGradingStatsResponse.md
 docs/BaseResponseGroupMessagePageResponse.md
 docs/BaseResponseGroupPage.md
 docs/BaseResponseGroupResponse.md
@@ -120,6 +122,7 @@ docs/BaseResponseListJoinRequestResponse.md
 docs/BaseResponseListKnowledgeBaseVO.md
 docs/BaseResponseListKnowledgeDocumentVO.md
 docs/BaseResponseListKnowledgePoint.md
+docs/BaseResponseListKnowledgeProfileResponse.md
 docs/BaseResponseListLong.md
 docs/BaseResponseListMapStringObject.md
 docs/BaseResponseListMembershipPlan.md
@@ -137,6 +140,8 @@ docs/BaseResponseListScraperConfigResponse.md
 docs/BaseResponseListSearchSuggestionDTO.md
 docs/BaseResponseListSectionResponse.md
 docs/BaseResponseListString.md
+docs/BaseResponseListSubjectProfileSummary.md
+docs/BaseResponseListSubmissionStatusResponse.md
 docs/BaseResponseListTeacherApplicationResponse.md
 docs/BaseResponseListTeacherResponse.md
 docs/BaseResponseListUserDailyArticleResponse.md
@@ -192,6 +197,8 @@ docs/BaseResponseSearchUserPageResponse.md
 docs/BaseResponseSectionResponse.md
 docs/BaseResponseSendResult.md
 docs/BaseResponseString.md
+docs/BaseResponseSubjectProfileSummary.md
+docs/BaseResponseSubmissionStatusResponse.md
 docs/BaseResponseTeacherApplicationResponse.md
 docs/BaseResponseTeacherResponse.md
 docs/BaseResponseTtsResponse.md
@@ -283,6 +290,7 @@ docs/DailyWordPageResponse.md
 docs/DailyWordResponse.md
 docs/DefaultApi.md
 docs/DynamicScrapeRequest.md
+docs/ErrorCategoryCount.md
 docs/ErrorHandlingConfig.md
 docs/ErrorHandlingConfigDTO.md
 docs/ExamPaperPageResponse.md
@@ -313,6 +321,8 @@ docs/GenerateAvatarResponse.md
 docs/GenerateBannerImageRequest.md
 docs/GenerateBannerImageResponse.md
 docs/GeneratePptRequest.md
+docs/GradingResultResponse.md
+docs/GradingStatsResponse.md
 docs/GrantMembershipRequest.md
 docs/GroupId.md
 docs/GroupMemberResponse.md
@@ -328,6 +338,7 @@ docs/KnowledgeBaseVO.md
 docs/KnowledgeDocumentVO.md
 docs/KnowledgePoint.md
 docs/KnowledgePointId.md
+docs/KnowledgeProfileResponse.md
 docs/LearningStats.md
 docs/LoginUserResponse.md
 docs/MCPApi.md
@@ -365,6 +376,7 @@ docs/QueryExamPaperRequest.md
 docs/QueryFeedbackRequest.md
 docs/QueryQuestionRequest.md
 docs/QueryUserRequest.md
+docs/QuestionGradingItem.md
 docs/QuestionPageResponse.md
 docs/QuestionResponse.md
 docs/QuizQuestion.md
@@ -381,6 +393,7 @@ docs/ResetPasswordRequest.md
 docs/ReviewApplicationRequest.md
 docs/ReviewCourseRequest.md
 docs/ScheduleResponse.md
+docs/ScoreTrendItem.md
 docs/ScrapeConfigRequest.md
 docs/ScrapeRequest.md
 docs/ScrapeResultResponse.md
@@ -404,6 +417,9 @@ docs/SkillOutputVO.md
 docs/SkillParamVO.md
 docs/SourceScrapeRequest.md
 docs/SseEmitter.md
+docs/SubjectProfileSummary.md
+docs/SubmissionStatusResponse.md
+docs/SubmitHomeworkRequest.md
 docs/TeacherApplicationResponse.md
 docs/TeacherResponse.md
 docs/TimeConfigItem.md
@@ -555,6 +571,8 @@ models/base-response-friend-page-response.ts
 models/base-response-friend-request-page-response.ts
 models/base-response-generate-avatar-response.ts
 models/base-response-generate-banner-image-response.ts
+models/base-response-grading-result-response.ts
+models/base-response-grading-stats-response.ts
 models/base-response-group-message-page-response.ts
 models/base-response-group-page.ts
 models/base-response-group-response.ts
@@ -591,6 +609,7 @@ models/base-response-list-join-request-response.ts
 models/base-response-list-knowledge-base-vo.ts
 models/base-response-list-knowledge-document-vo.ts
 models/base-response-list-knowledge-point.ts
+models/base-response-list-knowledge-profile-response.ts
 models/base-response-list-long.ts
 models/base-response-list-map-string-object.ts
 models/base-response-list-membership-plan.ts
@@ -608,6 +627,8 @@ models/base-response-list-scraper-config-response.ts
 models/base-response-list-search-suggestion-dto.ts
 models/base-response-list-section-response.ts
 models/base-response-list-string.ts
+models/base-response-list-subject-profile-summary.ts
+models/base-response-list-submission-status-response.ts
 models/base-response-list-teacher-application-response.ts
 models/base-response-list-teacher-response.ts
 models/base-response-list-user-daily-article-response.ts
@@ -663,6 +684,8 @@ models/base-response-search-user-page-response.ts
 models/base-response-section-response.ts
 models/base-response-send-result.ts
 models/base-response-string.ts
+models/base-response-subject-profile-summary.ts
+models/base-response-submission-status-response.ts
 models/base-response-teacher-application-response.ts
 models/base-response-teacher-response.ts
 models/base-response-tts-response.ts
@@ -753,6 +776,7 @@ models/daily-article-response.ts
 models/daily-word-page-response.ts
 models/daily-word-response.ts
 models/dynamic-scrape-request.ts
+models/error-category-count.ts
 models/error-handling-config-dto.ts
 models/error-handling-config.ts
 models/exam-paper-page-response.ts
@@ -783,6 +807,8 @@ models/generate-avatar-response.ts
 models/generate-banner-image-request.ts
 models/generate-banner-image-response.ts
 models/generate-ppt-request.ts
+models/grading-result-response.ts
+models/grading-stats-response.ts
 models/grant-membership-request.ts
 models/group-id.ts
 models/group-member-response.ts
@@ -799,6 +825,7 @@ models/knowledge-base-vo.ts
 models/knowledge-document-vo.ts
 models/knowledge-point-id.ts
 models/knowledge-point.ts
+models/knowledge-profile-response.ts
 models/learning-stats.ts
 models/login-user-response.ts
 models/member-page.ts
@@ -833,6 +860,7 @@ models/query-exam-paper-request.ts
 models/query-feedback-request.ts
 models/query-question-request.ts
 models/query-user-request.ts
+models/question-grading-item.ts
 models/question-page-response.ts
 models/question-response.ts
 models/quiz-question.ts
@@ -849,6 +877,7 @@ models/reset-password-request.ts
 models/review-application-request.ts
 models/review-course-request.ts
 models/schedule-response.ts
+models/score-trend-item.ts
 models/scrape-config-request.ts
 models/scrape-request.ts
 models/scrape-result-response.ts
@@ -872,6 +901,9 @@ models/skill-output-vo.ts
 models/skill-param-vo.ts
 models/source-scrape-request.ts
 models/sse-emitter.ts
+models/subject-profile-summary.ts
+models/submission-status-response.ts
+models/submit-homework-request.ts
 models/teacher-application-response.ts
 models/teacher-response.ts
 models/time-config-item.ts

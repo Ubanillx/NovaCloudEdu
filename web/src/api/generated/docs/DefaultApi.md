@@ -120,6 +120,7 @@ All URIs are relative to *http://localhost:8080*
 |[**getAiQuota**](#getaiquota) | **GET** /api/membership/ai-quota | 查询我的AI功能剩余额度|
 |[**getAllConfigs**](#getallconfigs) | **GET** /api/admin/scraper/config | 获取所有配置|
 |[**getAllFriends**](#getallfriends) | **GET** /api/friend/all | 获取全部好友|
+|[**getAllProfiles**](#getallprofiles) | **GET** /api/grading/profile | 查询学生全部知识画像|
 |[**getAllTasks**](#getalltasks) | **GET** /api/admin/scraper/config/tasks | 获取所有任务|
 |[**getAnnouncement**](#getannouncement) | **GET** /api/announcement/admin/{id} | 获取公告详情|
 |[**getAnnouncementDetail**](#getannouncementdetail) | **GET** /api/announcement/{id} | 获取公告详情|
@@ -170,6 +171,7 @@ All URIs are relative to *http://localhost:8080*
 |[**getGroupMembers**](#getgroupmembers) | **GET** /api/groups/{groupId}/members | 获取群成员列表|
 |[**getGroupMembers1**](#getgroupmembers1) | **GET** /api/admin/groups/{groupId}/members | 分页获取群成员|
 |[**getGroupMembersPage**](#getgroupmemberspage) | **GET** /api/groups/{groupId}/members/page | 分页获取群成员|
+|[**getHistory**](#gethistory) | **GET** /api/grading/history | 查询批改历史|
 |[**getKey**](#getkey) | **GET** /api/video/key | 获取视频解密密钥（HLS播放器自动调用）|
 |[**getLatestMessages**](#getlatestmessages) | **GET** /api/group-chat/{groupId}/messages/latest | 获取群最新消息|
 |[**getLikedArticles**](#getlikedarticles) | **GET** /api/user/daily-article/liked | 获取点赞文章列表|
@@ -206,11 +208,14 @@ All URIs are relative to *http://localhost:8080*
 |[**getPostDetail**](#getpostdetail) | **GET** /api/posts/{postId} | 获取帖子详情|
 |[**getPostList**](#getpostlist) | **GET** /api/posts | 分页获取帖子列表|
 |[**getPostListByType**](#getpostlistbytype) | **GET** /api/posts/type/{postType} | 根据类型获取帖子列表|
+|[**getPublishedPapers**](#getpublishedpapers) | **GET** /api/grading/papers | 查询已发布试卷列表（供批改选择）|
 |[**getQuestion**](#getquestion) | **GET** /api/questions/{id} | 获取题目详情|
 |[**getReadArticles**](#getreadarticles) | **GET** /api/user/daily-article/read | 获取已阅读文章列表|
 |[**getReadCount**](#getreadcount) | **GET** /api/group-chat/messages/{messageId}/read-count | 获取消息已读人数|
 |[**getReadUsers**](#getreadusers) | **GET** /api/group-chat/messages/{messageId}/read-users | 获取消息已读用户列表（含昵称头像）|
 |[**getReceivedRequests**](#getreceivedrequests) | **POST** /api/friend/request/received | 获取收到的好友申请|
+|[**getRecommendations**](#getrecommendations) | **GET** /api/grading/{submissionId}/recommend | 获取错题的同类题推荐|
+|[**getResult**](#getresult) | **GET** /api/grading/{submissionId}/result | 获取批改结果|
 |[**getReviewCount**](#getreviewcount) | **GET** /api/course/review/{courseId}/count | 获取课程评价数|
 |[**getScheduleBySetting**](#getschedulebysetting) | **GET** /api/schedule/setting/{settingId} | 获取特定配置的课表|
 |[**getSection**](#getsection) | **GET** /api/course/{courseId}/section/{sectionId} | 获取小节详情|
@@ -223,7 +228,10 @@ All URIs are relative to *http://localhost:8080*
 |[**getStats**](#getstats) | **GET** /api/user/word-book/stats | 获取生词本统计|
 |[**getStats1**](#getstats1) | **GET** /api/user/daily-word/stats | 获取学习统计|
 |[**getStats2**](#getstats2) | **GET** /api/user/daily-article/stats | 获取阅读统计|
+|[**getStats3**](#getstats3) | **GET** /api/grading/stats | 查询批改历史统计|
+|[**getStatus**](#getstatus) | **GET** /api/grading/{submissionId}/status | 查询批改状态|
 |[**getStudiedWords**](#getstudiedwords) | **GET** /api/user/daily-word/studied | 获取已学习单词列表|
+|[**getSubjectProfile**](#getsubjectprofile) | **GET** /api/grading/profile/{subjectCode} | 查询某学科知识画像详情|
 |[**getSupportedSources**](#getsupportedsources) | **GET** /api/scraper/sources | 获取预设来源列表|
 |[**getSupportedVoices**](#getsupportedvoices) | **GET** /api/speech/tts/voices | 获取支持的发音人列表|
 |[**getTableColumns**](#gettablecolumns) | **GET** /api/workflows/database/tables/{tableName}/columns | 获取指定表的字段信息|
@@ -252,6 +260,7 @@ All URIs are relative to *http://localhost:8080*
 |[**getUserStats**](#getuserstats) | **GET** /api/user/stats | 获取用户统计数据|
 |[**getVariables**](#getvariables) | **GET** /api/workflows/{id}/variables | 获取工作流所有变量|
 |[**getVersion**](#getversion) | **GET** /api/workflows/{id}/versions/{versionNumber} | 获取指定版本详情|
+|[**getWeakPoints**](#getweakpoints) | **GET** /api/grading/profile/{subjectCode}/weak | 查询某学科薄弱知识点|
 |[**getWordBookList**](#getwordbooklist) | **GET** /api/user/word-book/list | 获取生词本列表|
 |[**getWordsByDate**](#getwordsbydate) | **GET** /api/daily-word/date/{date} | 获取指定日期单词|
 |[**getWorkflowAssistants**](#getworkflowassistants) | **GET** /api/workflows/{id}/assistants | 获取使用该工作流的AI助手ID列表|
@@ -382,6 +391,7 @@ All URIs are relative to *http://localhost:8080*
 |[**smartDynamicScrape**](#smartdynamicscrape) | **POST** /api/scraper/dynamic/smart | 智能动态抓取|
 |[**smartScrape**](#smartscrape) | **POST** /api/scraper/smart | 智能抓取|
 |[**studyWord**](#studyword) | **POST** /api/user/daily-word/{wordId}/study | 标记单词为已学习|
+|[**submitHomework**](#submithomework) | **POST** /api/grading/submit | 提交作业并开始批改（SSE流式返回进度）|
 |[**suggest**](#suggest) | **GET** /api/search/suggest | 搜索建议（即时联想）|
 |[**takeOffline**](#takeoffline) | **POST** /api/course/{id}/offline | 下架课程（管理员）|
 |[**textToSpeech**](#texttospeech) | **POST** /api/speech/tts | 文本转语音|
@@ -6538,6 +6548,50 @@ This endpoint does not have any parameters.
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **getAllProfiles**
+> BaseResponseListSubjectProfileSummary getAllProfiles()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+const { status, data } = await apiInstance.getAllProfiles();
+```
+
+### Parameters
+This endpoint does not have any parameters.
+
+
+### Return type
+
+**BaseResponseListSubjectProfileSummary**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **getAllTasks**
 > BaseResponseScraperTaskPageResponse getAllTasks()
 
@@ -9145,6 +9199,60 @@ const { status, data } = await apiInstance.getGroupMembersPage(
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **getHistory**
+> BaseResponseListSubmissionStatusResponse getHistory()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let page: number; // (optional) (default to 1)
+let size: number; // (optional) (default to 20)
+
+const { status, data } = await apiInstance.getHistory(
+    page,
+    size
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **page** | [**number**] |  | (optional) defaults to 1|
+| **size** | [**number**] |  | (optional) defaults to 20|
+
+
+### Return type
+
+**BaseResponseListSubmissionStatusResponse**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **getKey**
 > getKey()
 
@@ -10986,6 +11094,69 @@ const { status, data } = await apiInstance.getPostListByType(
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **getPublishedPapers**
+> BaseResponseMapStringObject getPublishedPapers()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let keyword: string; // (optional) (default to undefined)
+let subject: string; // (optional) (default to undefined)
+let grade: string; // (optional) (default to undefined)
+let page: number; // (optional) (default to 1)
+let size: number; // (optional) (default to 20)
+
+const { status, data } = await apiInstance.getPublishedPapers(
+    keyword,
+    subject,
+    grade,
+    page,
+    size
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **keyword** | [**string**] |  | (optional) defaults to undefined|
+| **subject** | [**string**] |  | (optional) defaults to undefined|
+| **grade** | [**string**] |  | (optional) defaults to undefined|
+| **page** | [**number**] |  | (optional) defaults to 1|
+| **size** | [**number**] |  | (optional) defaults to 20|
+
+
+### Return type
+
+**BaseResponseMapStringObject**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **getQuestion**
 > BaseResponseQuestionResponse getQuestion()
 
@@ -11235,6 +11406,108 @@ const { status, data } = await apiInstance.getReceivedRequests(
 ### HTTP request headers
 
  - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getRecommendations**
+> BaseResponseListMapStringObject getRecommendations()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let submissionId: number; // (default to undefined)
+
+const { status, data } = await apiInstance.getRecommendations(
+    submissionId
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **submissionId** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseListMapStringObject**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getResult**
+> BaseResponseGradingResultResponse getResult()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let submissionId: number; // (default to undefined)
+
+const { status, data } = await apiInstance.getResult(
+    submissionId
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **submissionId** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseGradingResultResponse**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
  - **Accept**: application/json
 
 
@@ -11823,6 +12096,101 @@ This endpoint does not have any parameters.
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **getStats3**
+> BaseResponseGradingStatsResponse getStats3()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+const { status, data } = await apiInstance.getStats3();
+```
+
+### Parameters
+This endpoint does not have any parameters.
+
+
+### Return type
+
+**BaseResponseGradingStatsResponse**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getStatus**
+> BaseResponseSubmissionStatusResponse getStatus()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let submissionId: number; // (default to undefined)
+
+const { status, data } = await apiInstance.getStatus(
+    submissionId
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **submissionId** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseSubmissionStatusResponse**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **getStudiedWords**
 > BaseResponseListUserDailyWordResponse getStudiedWords()
 
@@ -11858,6 +12226,57 @@ const { status, data } = await apiInstance.getStudiedWords(
 ### Return type
 
 **BaseResponseListUserDailyWordResponse**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getSubjectProfile**
+> BaseResponseSubjectProfileSummary getSubjectProfile()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let subjectCode: string; // (default to undefined)
+
+const { status, data } = await apiInstance.getSubjectProfile(
+    subjectCode
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **subjectCode** | [**string**] |  | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseSubjectProfileSummary**
 
 ### Authorization
 
@@ -13300,6 +13719,57 @@ const { status, data } = await apiInstance.getVersion(
 ### Return type
 
 **BaseResponseWorkflowVersionResponse**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getWeakPoints**
+> BaseResponseListKnowledgeProfileResponse getWeakPoints()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let subjectCode: string; // (default to undefined)
+
+const { status, data } = await apiInstance.getWeakPoints(
+    subjectCode
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **subjectCode** | [**string**] |  | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseListKnowledgeProfileResponse**
 
 ### Authorization
 
@@ -20280,6 +20750,58 @@ const { status, data } = await apiInstance.studyWord(
 
  - **Content-Type**: Not defined
  - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **submitHomework**
+> SseEmitter submitHomework(submitHomeworkRequest)
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration,
+    SubmitHomeworkRequest
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let submitHomeworkRequest: SubmitHomeworkRequest; //
+
+const { status, data } = await apiInstance.submitHomework(
+    submitHomeworkRequest
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **submitHomeworkRequest** | **SubmitHomeworkRequest**|  | |
+
+
+### Return type
+
+**SseEmitter**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json, text/event-stream
 
 
 ### HTTP response details
