@@ -1,7 +1,7 @@
 package com.novacloudedu.backend.interfaces.rest.exam;
 
 import com.novacloudedu.backend.application.exam.command.UpdatePaperSectionCommand;
-import com.novacloudedu.backend.application.exam.service.ExamPaperApplicationService;
+import com.novacloudedu.backend.application.service.ExamPaperApplicationService;
 import com.novacloudedu.backend.common.BaseResponse;
 import com.novacloudedu.backend.common.ResultUtils;
 import com.novacloudedu.backend.domain.exam.entity.ExamPaper;

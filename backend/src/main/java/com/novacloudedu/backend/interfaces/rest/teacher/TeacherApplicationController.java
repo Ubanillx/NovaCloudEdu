@@ -1,7 +1,6 @@
 package com.novacloudedu.backend.interfaces.rest.teacher;
 
-import com.novacloudedu.backend.application.teacher.command.ApproveTeacherApplicationCommand;
-import com.novacloudedu.backend.application.teacher.command.RejectTeacherApplicationCommand;
+import com.novacloudedu.backend.application.service.TeacherApplicationService;
 import com.novacloudedu.backend.application.teacher.query.GetTeacherApplicationQuery;
 import com.novacloudedu.backend.common.BaseResponse;
 import com.novacloudedu.backend.common.ErrorCode;
@@ -30,8 +29,7 @@ import java.util.stream.Collectors;
 @Tag(name = "讲师申请管理", description = "讲师申请审核相关接口")
 public class TeacherApplicationController {
 
-    private final ApproveTeacherApplicationCommand approveCommand;
-    private final RejectTeacherApplicationCommand rejectCommand;
+    private final TeacherApplicationService teacherApplicationService;
     private final GetTeacherApplicationQuery getApplicationQuery;
     private final TeacherAssembler teacherAssembler;
 
@@ -42,12 +40,12 @@ public class TeacherApplicationController {
         Long reviewerId = Long.parseLong(authentication.getName());
 
         if (request.getApproved()) {
-            approveCommand.execute(request.getApplicationId(), UserId.of(reviewerId));
+            teacherApplicationService.approveApplication(request.getApplicationId(), UserId.of(reviewerId));
         } else {
             if (request.getRejectReason() == null || request.getRejectReason().isBlank()) {
                 throw new BusinessException(ErrorCode.PARAMS_ERROR, "拒绝原因不能为空");
             }
-            rejectCommand.execute(request.getApplicationId(), UserId.of(reviewerId), request.getRejectReason());
+            teacherApplicationService.rejectApplication(request.getApplicationId(), UserId.of(reviewerId), request.getRejectReason());
         }
 
         return ResultUtils.success(null);

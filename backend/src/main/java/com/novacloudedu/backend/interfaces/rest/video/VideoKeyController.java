@@ -1,6 +1,6 @@
 package com.novacloudedu.backend.interfaces.rest.video;
 
-import com.novacloudedu.backend.application.course.service.VideoPlayTokenService;
+import com.novacloudedu.backend.application.service.VideoPlayTokenService;
 import com.novacloudedu.backend.domain.course.service.VideoEncryptionKeyService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

@@ -3,7 +3,7 @@ package com.novacloudedu.backend.interfaces.rest.course;
 import com.novacloudedu.backend.application.course.query.GetChapterQuery;
 import com.novacloudedu.backend.application.course.query.GetCourseQuery;
 import com.novacloudedu.backend.application.course.query.GetSectionQuery;
-import com.novacloudedu.backend.application.course.service.VideoUrlService;
+import com.novacloudedu.backend.application.service.VideoUrlService;
 import com.novacloudedu.backend.application.membership.service.MembershipApplicationService;
 import com.novacloudedu.backend.common.BaseResponse;
 import com.novacloudedu.backend.common.ErrorCode;

@@ -1,6 +1,6 @@
 package com.novacloudedu.backend.book;
 
-import com.novacloudedu.backend.application.book.service.AiQuestionApplicationService;
+import com.novacloudedu.backend.application.service.AiQuestionApplicationService;
 import com.novacloudedu.backend.domain.book.entity.AiConversation;
 import com.novacloudedu.backend.domain.book.entity.Chapter;
 import com.novacloudedu.backend.domain.book.repository.AiConversationRepository;

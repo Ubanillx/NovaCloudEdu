@@ -98,4 +98,8 @@ public class UserCourse {
         return this.status == OrderStatus.PAID && 
                (this.expireTime == null || this.expireTime.isAfter(LocalDateTime.now()));
     }
+
+    public boolean isUnpaid() {
+        return this.status == OrderStatus.UNPAID;
+    }
 }

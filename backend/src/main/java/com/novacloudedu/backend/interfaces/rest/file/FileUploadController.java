@@ -1,7 +1,6 @@
 package com.novacloudedu.backend.interfaces.rest.file;
 
-import com.novacloudedu.backend.application.file.command.DeleteFileCommand;
-import com.novacloudedu.backend.application.file.command.UploadFileCommand;
+import com.novacloudedu.backend.application.service.FileApplicationService;
 import com.novacloudedu.backend.application.file.query.GetFileQuery;
 import com.novacloudedu.backend.common.BaseResponse;
 import com.novacloudedu.backend.common.ResultUtils;
@@ -32,8 +31,7 @@ import java.util.stream.Collectors;
 @Tag(name = "文件上传", description = "文件上传管理接口")
 public class FileUploadController {
 
-    private final UploadFileCommand uploadFileCommand;
-    private final DeleteFileCommand deleteFileCommand;
+    private final FileApplicationService fileApplicationService;
     private final GetFileQuery getFileQuery;
     private final UserRepository userRepository;
     private final FileAssembler fileAssembler;
@@ -66,7 +64,7 @@ public class FileUploadController {
             throw new BusinessException(40000, "不支持的业务类型");
         }
 
-        String fileUrl = uploadFileCommand.execute(file, type, UserId.of(userId), isAdmin);
+        String fileUrl = fileApplicationService.uploadFile(file, type, UserId.of(userId), isAdmin);
 
         FileUpload fileUpload = FileUpload.create(
                 file.getName(),
@@ -96,7 +94,7 @@ public class FileUploadController {
             throw new BusinessException(40300, "无权删除此文件");
         }
 
-        deleteFileCommand.execute(fileId);
+        fileApplicationService.deleteFile(fileId);
         return ResultUtils.success(null);
     }
 

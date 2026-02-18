@@ -1,7 +1,10 @@
 package com.novacloudedu.backend.infrastructure.payment;
 
 import com.novacloudedu.backend.domain.order.valueobject.PaymentMethod;
-import com.novacloudedu.backend.domain.payment.*;
+import com.novacloudedu.backend.domain.payment.service.PaymentGateway;
+import com.novacloudedu.backend.domain.payment.valueobject.PaymentQueryResult;
+import com.novacloudedu.backend.domain.payment.valueobject.PaymentResult;
+import com.novacloudedu.backend.domain.payment.valueobject.RefundResult;
 import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;

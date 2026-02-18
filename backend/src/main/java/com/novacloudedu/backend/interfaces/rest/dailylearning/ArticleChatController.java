@@ -1,6 +1,6 @@
 package com.novacloudedu.backend.interfaces.rest.dailylearning;
 
-import com.novacloudedu.backend.application.dailylearning.service.ArticleChatService;
+import com.novacloudedu.backend.application.service.ArticleChatService;
 import com.novacloudedu.backend.common.BaseResponse;
 import com.novacloudedu.backend.common.ResultUtils;
 import com.novacloudedu.backend.interfaces.rest.dailylearning.dto.request.ArticleChatRequest;

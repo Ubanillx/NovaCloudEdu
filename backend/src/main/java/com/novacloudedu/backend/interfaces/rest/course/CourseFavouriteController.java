@@ -1,13 +1,11 @@
 package com.novacloudedu.backend.interfaces.rest.course;
 
-import com.novacloudedu.backend.application.course.command.FavouriteCourseCommand;
-import com.novacloudedu.backend.application.course.command.UnfavouriteCourseCommand;
 import com.novacloudedu.backend.application.course.query.GetCourseFavouriteQuery;
 import com.novacloudedu.backend.application.course.query.GetCourseQuery;
+import com.novacloudedu.backend.application.service.CourseApplicationService;
 import com.novacloudedu.backend.common.BaseResponse;
 import com.novacloudedu.backend.common.ErrorCode;
 import com.novacloudedu.backend.common.ResultUtils;
-import com.novacloudedu.backend.domain.course.entity.Course;
 import com.novacloudedu.backend.domain.course.entity.CourseFavourite;
 import com.novacloudedu.backend.domain.user.valueobject.UserId;
 import com.novacloudedu.backend.exception.BusinessException;
@@ -29,8 +27,7 @@ import java.util.stream.Collectors;
 @Tag(name = "课程收藏", description = "课程收藏相关接口")
 public class CourseFavouriteController {
 
-    private final FavouriteCourseCommand favouriteCommand;
-    private final UnfavouriteCourseCommand unfavouriteCommand;
+    private final CourseApplicationService courseApplicationService;
     private final GetCourseFavouriteQuery getFavouriteQuery;
     private final GetCourseQuery getCourseQuery;
     private final CourseAssembler courseAssembler;
@@ -40,7 +37,7 @@ public class CourseFavouriteController {
     public BaseResponse<Void> favouriteCourse(@PathVariable @Parameter(description = "课程ID") Long courseId,
                                              Authentication authentication) {
         Long userId = Long.parseLong(authentication.getName());
-        favouriteCommand.execute(UserId.of(userId), courseId);
+        courseApplicationService.favouriteCourse(courseId, UserId.of(userId));
         return ResultUtils.success(null);
     }
 
@@ -49,7 +46,7 @@ public class CourseFavouriteController {
     public BaseResponse<Void> unfavouriteCourse(@PathVariable @Parameter(description = "课程ID") Long courseId,
                                                Authentication authentication) {
         Long userId = Long.parseLong(authentication.getName());
-        unfavouriteCommand.execute(UserId.of(userId), courseId);
+        courseApplicationService.unfavouriteCourse(courseId, UserId.of(userId));
         return ResultUtils.success(null);
     }
 

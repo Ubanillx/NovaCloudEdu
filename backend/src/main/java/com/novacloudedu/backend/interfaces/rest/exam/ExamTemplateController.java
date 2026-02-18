@@ -1,6 +1,6 @@
 package com.novacloudedu.backend.interfaces.rest.exam;
 
-import com.novacloudedu.backend.application.exam.service.ExamTemplateApplicationService;
+import com.novacloudedu.backend.application.service.ExamTemplateApplicationService;
 import com.novacloudedu.backend.common.BaseResponse;
 import com.novacloudedu.backend.common.ResultUtils;
 import com.novacloudedu.backend.domain.exam.entity.ExamTemplate;

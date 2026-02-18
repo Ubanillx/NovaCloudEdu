@@ -1,14 +1,15 @@
 package com.novacloudedu.backend.interfaces.rest.dailylearning;
 
 import com.novacloudedu.backend.application.dailylearning.command.CreateDailyWordCommand;
-import com.novacloudedu.backend.application.dailylearning.command.DeleteDailyWordCommand;
 import com.novacloudedu.backend.application.dailylearning.command.UpdateDailyWordCommand;
 import com.novacloudedu.backend.application.dailylearning.query.GetDailyWordQuery;
 import com.novacloudedu.backend.application.recommendation.service.KnowledgeGraphRecommendationService;
+import com.novacloudedu.backend.application.service.DailyLearningApplicationService;
 import com.novacloudedu.backend.common.BaseResponse;
 import com.novacloudedu.backend.common.ErrorCode;
 import com.novacloudedu.backend.common.ResultUtils;
 import com.novacloudedu.backend.domain.dailylearning.entity.DailyWord;
+import com.novacloudedu.backend.domain.user.valueobject.UserId;
 import com.novacloudedu.backend.exception.BusinessException;
 import com.novacloudedu.backend.domain.dailylearning.repository.DailyWordRepository.DailyWordPage;
 import com.novacloudedu.backend.interfaces.rest.dailylearning.assembler.DailyLearningAssembler;
@@ -35,9 +36,7 @@ import java.util.stream.Collectors;
 @Tag(name = "每日单词管理", description = "每日单词相关接口")
 public class DailyWordController {
 
-    private final CreateDailyWordCommand createDailyWordCommand;
-    private final UpdateDailyWordCommand updateDailyWordCommand;
-    private final DeleteDailyWordCommand deleteDailyWordCommand;
+    private final DailyLearningApplicationService dailyLearningApplicationService;
     private final GetDailyWordQuery getDailyWordQuery;
     private final KnowledgeGraphRecommendationService knowledgeGraphRecommendationService;
     private final DailyLearningAssembler assembler;
@@ -47,21 +46,13 @@ public class DailyWordController {
     public BaseResponse<Long> createDailyWord(@Valid @RequestBody CreateDailyWordRequest request,
                                               Authentication authentication) {
         Long adminId = Long.parseLong(authentication.getName());
-        Long wordId = createDailyWordCommand.execute(
-                request.getWord(),
-                request.getPronunciationUs(),
-                request.getPronunciationUk(),
-                request.getAudioUrlUs(),
-                request.getAudioUrlUk(),
-                request.getTranslation(),
-                request.getExample(),
-                request.getExampleTranslation(),
-                request.getDifficulty(),
-                request.getCategory(),
-                request.getNotes(),
-                request.getPublishDate(),
-                adminId
+        CreateDailyWordCommand command = new CreateDailyWordCommand(
+                request.getWord(), request.getPronunciationUs(), request.getPronunciationUk(),
+                request.getAudioUrlUs(), request.getAudioUrlUk(), request.getTranslation(),
+                request.getExample(), request.getExampleTranslation(), request.getDifficulty(),
+                request.getCategory(), request.getNotes(), request.getPublishDate()
         );
+        Long wordId = dailyLearningApplicationService.createDailyWord(command, UserId.of(adminId));
         return ResultUtils.success(wordId);
     }
 
@@ -69,28 +60,20 @@ public class DailyWordController {
     @Operation(summary = "更新每日单词（管理员）")
     public BaseResponse<Void> updateDailyWord(@PathVariable @Parameter(description = "单词ID") Long id,
                                               @Valid @RequestBody UpdateDailyWordRequest request) {
-        updateDailyWordCommand.execute(
-                id,
-                request.getWord(),
-                request.getPronunciationUs(),
-                request.getPronunciationUk(),
-                request.getAudioUrlUs(),
-                request.getAudioUrlUk(),
-                request.getTranslation(),
-                request.getExample(),
-                request.getExampleTranslation(),
-                request.getDifficulty(),
-                request.getCategory(),
-                request.getNotes(),
-                request.getPublishDate()
+        UpdateDailyWordCommand command = new UpdateDailyWordCommand(
+                id, request.getWord(), request.getPronunciationUs(), request.getPronunciationUk(),
+                request.getAudioUrlUs(), request.getAudioUrlUk(), request.getTranslation(),
+                request.getExample(), request.getExampleTranslation(), request.getDifficulty(),
+                request.getCategory(), request.getNotes(), request.getPublishDate()
         );
+        dailyLearningApplicationService.updateDailyWord(command);
         return ResultUtils.success(null);
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "删除每日单词（管理员）")
     public BaseResponse<Void> deleteDailyWord(@PathVariable @Parameter(description = "单词ID") Long id) {
-        deleteDailyWordCommand.execute(id);
+        dailyLearningApplicationService.deleteDailyWord(id);
         return ResultUtils.success(null);
     }
 

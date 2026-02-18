@@ -3,6 +3,7 @@ package com.novacloudedu.backend.interfaces.rest.course;
 import com.novacloudedu.backend.application.course.command.ReviewCourseCommand;
 import com.novacloudedu.backend.application.course.command.UpdateReviewCommand;
 import com.novacloudedu.backend.application.course.query.GetCourseReviewQuery;
+import com.novacloudedu.backend.application.service.CourseApplicationService;
 import com.novacloudedu.backend.common.BaseResponse;
 import com.novacloudedu.backend.common.ErrorCode;
 import com.novacloudedu.backend.common.ResultUtils;
@@ -29,8 +30,7 @@ import java.util.stream.Collectors;
 @Tag(name = "课程评价", description = "课程评价相关接口")
 public class CourseReviewController {
 
-    private final ReviewCourseCommand reviewCommand;
-    private final UpdateReviewCommand updateReviewCommand;
+    private final CourseApplicationService courseApplicationService;
     private final GetCourseReviewQuery getReviewQuery;
     private final CourseAssembler courseAssembler;
 
@@ -40,7 +40,8 @@ public class CourseReviewController {
                                           @Valid @RequestBody ReviewCourseRequest request,
                                           Authentication authentication) {
         Long userId = Long.parseLong(authentication.getName());
-        Long reviewId = reviewCommand.execute(UserId.of(userId), courseId, request.getRating());
+        ReviewCourseCommand command = new ReviewCourseCommand(courseId, request.getRating());
+        Long reviewId = courseApplicationService.reviewCourse(command, UserId.of(userId));
         return ResultUtils.success(reviewId);
     }
 
@@ -48,7 +49,8 @@ public class CourseReviewController {
     @Operation(summary = "更新评价")
     public BaseResponse<Void> updateReview(@PathVariable @Parameter(description = "评价ID") Long reviewId,
                                           @Valid @RequestBody ReviewCourseRequest request) {
-        updateReviewCommand.execute(reviewId, request.getRating());
+        UpdateReviewCommand command = new UpdateReviewCommand(reviewId, request.getRating());
+        courseApplicationService.updateReview(command);
         return ResultUtils.success(null);
     }
 

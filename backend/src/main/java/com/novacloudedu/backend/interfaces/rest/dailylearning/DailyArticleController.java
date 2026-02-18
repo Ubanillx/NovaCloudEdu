@@ -1,14 +1,15 @@
 package com.novacloudedu.backend.interfaces.rest.dailylearning;
 
 import com.novacloudedu.backend.application.dailylearning.command.CreateDailyArticleCommand;
-import com.novacloudedu.backend.application.dailylearning.command.DeleteDailyArticleCommand;
 import com.novacloudedu.backend.application.dailylearning.command.UpdateDailyArticleCommand;
 import com.novacloudedu.backend.application.dailylearning.query.GetDailyArticleQuery;
 import com.novacloudedu.backend.application.recommendation.service.KnowledgeGraphRecommendationService;
+import com.novacloudedu.backend.application.service.DailyLearningApplicationService;
 import com.novacloudedu.backend.common.BaseResponse;
 import com.novacloudedu.backend.common.ErrorCode;
 import com.novacloudedu.backend.common.ResultUtils;
 import com.novacloudedu.backend.domain.dailylearning.entity.DailyArticle;
+import com.novacloudedu.backend.domain.user.valueobject.UserId;
 import com.novacloudedu.backend.exception.BusinessException;
 import com.novacloudedu.backend.domain.dailylearning.repository.DailyArticleRepository.DailyArticlePage;
 import com.novacloudedu.backend.interfaces.rest.dailylearning.assembler.DailyLearningAssembler;
@@ -35,9 +36,7 @@ import java.util.stream.Collectors;
 @Tag(name = "每日文章管理", description = "每日文章相关接口")
 public class DailyArticleController {
 
-    private final CreateDailyArticleCommand createDailyArticleCommand;
-    private final UpdateDailyArticleCommand updateDailyArticleCommand;
-    private final DeleteDailyArticleCommand deleteDailyArticleCommand;
+    private final DailyLearningApplicationService dailyLearningApplicationService;
     private final GetDailyArticleQuery getDailyArticleQuery;
     private final KnowledgeGraphRecommendationService knowledgeGraphRecommendationService;
     private final DailyLearningAssembler assembler;
@@ -47,21 +46,12 @@ public class DailyArticleController {
     public BaseResponse<Long> createDailyArticle(@Valid @RequestBody CreateDailyArticleRequest request,
                                                  Authentication authentication) {
         Long adminId = Long.parseLong(authentication.getName());
-        Long articleId = createDailyArticleCommand.execute(
-                request.getTitle(),
-                request.getContent(),
-                request.getSummary(),
-                request.getCoverImage(),
-                request.getAuthor(),
-                request.getSource(),
-                request.getSourceUrl(),
-                request.getCategory(),
-                request.getTags(),
-                request.getDifficulty(),
-                request.getReadTime(),
-                request.getPublishDate(),
-                adminId
+        CreateDailyArticleCommand command = new CreateDailyArticleCommand(
+                request.getTitle(), request.getContent(), request.getSummary(), request.getCoverImage(),
+                request.getAuthor(), request.getSource(), request.getSourceUrl(), request.getCategory(),
+                request.getTags(), request.getDifficulty(), request.getReadTime(), request.getPublishDate()
         );
+        Long articleId = dailyLearningApplicationService.createDailyArticle(command, UserId.of(adminId));
         return ResultUtils.success(articleId);
     }
 
@@ -69,28 +59,19 @@ public class DailyArticleController {
     @Operation(summary = "更新每日文章（管理员）")
     public BaseResponse<Void> updateDailyArticle(@PathVariable @Parameter(description = "文章ID") Long id,
                                                  @Valid @RequestBody UpdateDailyArticleRequest request) {
-        updateDailyArticleCommand.execute(
-                id,
-                request.getTitle(),
-                request.getContent(),
-                request.getSummary(),
-                request.getCoverImage(),
-                request.getAuthor(),
-                request.getSource(),
-                request.getSourceUrl(),
-                request.getCategory(),
-                request.getTags(),
-                request.getDifficulty(),
-                request.getReadTime(),
-                request.getPublishDate()
+        UpdateDailyArticleCommand command = new UpdateDailyArticleCommand(
+                id, request.getTitle(), request.getContent(), request.getSummary(), request.getCoverImage(),
+                request.getAuthor(), request.getSource(), request.getSourceUrl(), request.getCategory(),
+                request.getTags(), request.getDifficulty(), request.getReadTime(), request.getPublishDate()
         );
+        dailyLearningApplicationService.updateDailyArticle(command);
         return ResultUtils.success(null);
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "删除每日文章（管理员）")
     public BaseResponse<Void> deleteDailyArticle(@PathVariable @Parameter(description = "文章ID") Long id) {
-        deleteDailyArticleCommand.execute(id);
+        dailyLearningApplicationService.deleteDailyArticle(id);
         return ResultUtils.success(null);
     }
 

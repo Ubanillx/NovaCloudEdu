@@ -2,6 +2,7 @@ package com.novacloudedu.backend.interfaces.rest.course;
 
 import com.novacloudedu.backend.application.course.command.*;
 import com.novacloudedu.backend.application.course.query.GetCourseQuery;
+import com.novacloudedu.backend.application.service.CourseApplicationService;
 import com.novacloudedu.backend.common.BaseResponse;
 import com.novacloudedu.backend.common.ErrorCode;
 import com.novacloudedu.backend.common.ResultUtils;
@@ -32,11 +33,7 @@ import java.util.stream.Collectors;
 @Tag(name = "课程管理", description = "课程相关接口")
 public class CourseController {
 
-    private final CreateCourseCommand createCourseCommand;
-    private final UpdateCourseCommand updateCourseCommand;
-    private final PublishCourseCommand publishCourseCommand;
-    private final TakeOfflineCourseCommand takeOfflineCourseCommand;
-    private final DeleteCourseCommand deleteCourseCommand;
+    private final CourseApplicationService courseApplicationService;
     private final GetCourseQuery getCourseQuery;
     private final CourseAssembler courseAssembler;
 
@@ -45,7 +42,7 @@ public class CourseController {
     public BaseResponse<Long> createCourse(@Valid @RequestBody CreateCourseRequest request,
                                           Authentication authentication) {
         Long adminId = Long.parseLong(authentication.getName());
-        Long courseId = createCourseCommand.execute(
+        CreateCourseCommand command = new CreateCourseCommand(
                 request.getTitle(),
                 request.getSubtitle(),
                 request.getDescription(),
@@ -54,9 +51,9 @@ public class CourseController {
                 CourseType.fromCode(request.getCourseType()),
                 CourseDifficulty.fromCode(request.getDifficulty()),
                 request.getTeacherId(),
-                request.getTags(),
-                UserId.of(adminId)
+                request.getTags()
         );
+        Long courseId = courseApplicationService.createCourse(command, UserId.of(adminId));
         return ResultUtils.success(courseId);
     }
 
@@ -64,7 +61,7 @@ public class CourseController {
     @Operation(summary = "更新课程（管理员）")
     public BaseResponse<Void> updateCourse(@PathVariable @Parameter(description = "课程ID") Long id,
                                           @Valid @RequestBody UpdateCourseRequest request) {
-        updateCourseCommand.execute(
+        UpdateCourseCommand command = new UpdateCourseCommand(
                 id,
                 request.getTitle(),
                 request.getSubtitle(),
@@ -75,27 +72,28 @@ public class CourseController {
                 CourseDifficulty.fromCode(request.getDifficulty()),
                 request.getTags()
         );
+        courseApplicationService.updateCourse(command);
         return ResultUtils.success(null);
     }
 
     @PostMapping("/{id}/publish")
     @Operation(summary = "发布课程（管理员）")
     public BaseResponse<Void> publishCourse(@PathVariable @Parameter(description = "课程ID") Long id) {
-        publishCourseCommand.execute(id);
+        courseApplicationService.publishCourse(id);
         return ResultUtils.success(null);
     }
 
     @PostMapping("/{id}/offline")
     @Operation(summary = "下架课程（管理员）")
     public BaseResponse<Void> takeOffline(@PathVariable @Parameter(description = "课程ID") Long id) {
-        takeOfflineCourseCommand.execute(id);
+        courseApplicationService.takeOfflineCourse(id);
         return ResultUtils.success(null);
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "删除课程（管理员）")
     public BaseResponse<Void> deleteCourse(@PathVariable @Parameter(description = "课程ID") Long id) {
-        deleteCourseCommand.execute(id);
+        courseApplicationService.deleteCourse(id);
         return ResultUtils.success(null);
     }
 

@@ -2,7 +2,7 @@ package com.novacloudedu.backend.interfaces.rest.book;
 
 import com.novacloudedu.backend.application.book.command.UpdateReadingProgressCommand;
 import com.novacloudedu.backend.application.book.dto.UserShelfDTO;
-import com.novacloudedu.backend.application.book.service.ReadingProgressApplicationService;
+import com.novacloudedu.backend.application.service.ReadingProgressApplicationService;
 import com.novacloudedu.backend.common.BaseResponse;
 import com.novacloudedu.backend.common.ResultUtils;
 import io.swagger.v3.oas.annotations.Operation;

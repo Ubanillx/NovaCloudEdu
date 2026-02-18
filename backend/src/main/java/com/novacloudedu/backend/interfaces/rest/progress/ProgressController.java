@@ -1,8 +1,6 @@
 package com.novacloudedu.backend.interfaces.rest.progress;
 
-import com.novacloudedu.backend.application.progress.command.CompleteSectionCommand;
-import com.novacloudedu.backend.application.progress.command.ResetProgressCommand;
-import com.novacloudedu.backend.application.progress.command.UpdateProgressCommand;
+import com.novacloudedu.backend.application.service.ProgressApplicationService;
 import com.novacloudedu.backend.application.progress.query.GetProgressQuery;
 import com.novacloudedu.backend.common.BaseResponse;
 import com.novacloudedu.backend.common.ResultUtils;
@@ -30,9 +28,7 @@ import java.util.stream.Collectors;
 @Tag(name = "学习进度", description = "用户学习进度相关接口")
 public class ProgressController {
 
-    private final UpdateProgressCommand updateProgressCommand;
-    private final CompleteSectionCommand completeSectionCommand;
-    private final ResetProgressCommand resetProgressCommand;
+    private final ProgressApplicationService progressApplicationService;
     private final GetProgressQuery getProgressQuery;
     private final ProgressAssembler progressAssembler;
 
@@ -41,7 +37,7 @@ public class ProgressController {
     public BaseResponse<Void> updateProgress(@Valid @RequestBody UpdateProgressRequest request,
                                             Authentication authentication) {
         Long userId = Long.parseLong(authentication.getName());
-        updateProgressCommand.execute(
+        progressApplicationService.updateProgress(
                 UserId.of(userId),
                 request.getCourseId(),
                 request.getSectionId(),
@@ -58,7 +54,7 @@ public class ProgressController {
                                              @RequestParam @Parameter(description = "课程ID") Long courseId,
                                              Authentication authentication) {
         Long userId = Long.parseLong(authentication.getName());
-        completeSectionCommand.execute(UserId.of(userId), courseId, sectionId);
+        progressApplicationService.completeSection(UserId.of(userId), courseId, sectionId);
         return ResultUtils.success(null);
     }
 
@@ -67,7 +63,7 @@ public class ProgressController {
     public BaseResponse<Void> resetProgress(@PathVariable @Parameter(description = "小节ID") Long sectionId,
                                            Authentication authentication) {
         Long userId = Long.parseLong(authentication.getName());
-        resetProgressCommand.execute(UserId.of(userId), sectionId);
+        progressApplicationService.resetProgress(UserId.of(userId), sectionId);
         return ResultUtils.success(null);
     }
 

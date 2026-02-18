@@ -1,6 +1,6 @@
 package com.novacloudedu.backend.interfaces.rest.dailylearning;
 
-import com.novacloudedu.backend.application.dailylearning.command.ArticleInteractionCommand;
+import com.novacloudedu.backend.application.service.DailyLearningApplicationService;
 import com.novacloudedu.backend.application.dailylearning.query.GetDailyArticleQuery;
 import com.novacloudedu.backend.application.dailylearning.query.GetUserDailyArticleQuery;
 import com.novacloudedu.backend.application.recommendation.service.GraphDataSyncService;
@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 @Tag(name = "用户每日文章", description = "用户每日文章阅读相关接口")
 public class UserDailyArticleController {
 
-    private final ArticleInteractionCommand articleInteractionCommand;
+    private final DailyLearningApplicationService dailyLearningApplicationService;
     private final GetUserDailyArticleQuery getUserDailyArticleQuery;
     private final GetDailyArticleQuery getDailyArticleQuery;
     private final PreferenceAnalysisService preferenceAnalysisService;
@@ -43,7 +43,7 @@ public class UserDailyArticleController {
     public BaseResponse<Void> markAsRead(@PathVariable @Parameter(description = "文章ID") Long articleId,
                                          Authentication authentication) {
         Long userId = Long.parseLong(authentication.getName());
-        articleInteractionCommand.markAsRead(userId, articleId);
+        dailyLearningApplicationService.markArticleAsRead(userId, articleId);
         preferenceAnalysisService.recordBehavior(userId, BehaviorType.READ, TargetType.ARTICLE, articleId, null, null);
         graphDataSyncService.syncUserReadArticle(userId, articleId);
         return ResultUtils.success(null);
@@ -54,7 +54,7 @@ public class UserDailyArticleController {
     public BaseResponse<Void> toggleLike(@PathVariable @Parameter(description = "文章ID") Long articleId,
                                          Authentication authentication) {
         Long userId = Long.parseLong(authentication.getName());
-        articleInteractionCommand.toggleLike(userId, articleId);
+        dailyLearningApplicationService.toggleArticleLike(userId, articleId);
         preferenceAnalysisService.recordBehavior(userId, BehaviorType.LIKE, TargetType.ARTICLE, articleId, null, null);
         graphDataSyncService.syncUserLikeArticle(userId, articleId);
         return ResultUtils.success(null);
@@ -65,7 +65,7 @@ public class UserDailyArticleController {
     public BaseResponse<Void> toggleCollect(@PathVariable @Parameter(description = "文章ID") Long articleId,
                                             Authentication authentication) {
         Long userId = Long.parseLong(authentication.getName());
-        articleInteractionCommand.toggleCollect(userId, articleId);
+        dailyLearningApplicationService.toggleArticleCollect(userId, articleId);
         preferenceAnalysisService.recordBehavior(userId, BehaviorType.COLLECT, TargetType.ARTICLE, articleId, null, null);
         graphDataSyncService.syncUserCollectArticle(userId, articleId);
         return ResultUtils.success(null);
@@ -77,7 +77,7 @@ public class UserDailyArticleController {
                                          @Valid @RequestBody AddCommentRequest request,
                                          Authentication authentication) {
         Long userId = Long.parseLong(authentication.getName());
-        articleInteractionCommand.addComment(userId, articleId, request.getContent());
+        dailyLearningApplicationService.addArticleComment(userId, articleId, request.getContent());
         return ResultUtils.success(null);
     }
 

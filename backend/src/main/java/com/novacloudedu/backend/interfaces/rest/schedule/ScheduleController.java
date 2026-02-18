@@ -1,9 +1,9 @@
 package com.novacloudedu.backend.interfaces.rest.schedule;
 
 import com.novacloudedu.backend.annotation.AuthCheck;
-import com.novacloudedu.backend.application.schedule.command.*;
 import com.novacloudedu.backend.application.schedule.query.GetClassScheduleQuery;
 import com.novacloudedu.backend.application.schedule.query.GetTeacherScheduleQuery;
+import com.novacloudedu.backend.application.service.ScheduleApplicationService;
 import com.novacloudedu.backend.common.BaseResponse;
 import com.novacloudedu.backend.common.ResultUtils;
 import com.novacloudedu.backend.application.schedule.query.GetMyScheduleQuery;
@@ -26,12 +26,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ScheduleController {
 
-    private final CreateScheduleSettingCommand createScheduleSettingCommand;
-    private final UpdateScheduleSettingCommand updateScheduleSettingCommand;
-    private final ActivateScheduleSettingCommand activateScheduleSettingCommand;
-    private final AddScheduleItemCommand addScheduleItemCommand;
-    private final UpdateScheduleItemCommand updateScheduleItemCommand;
-    private final DeleteScheduleItemCommand deleteScheduleItemCommand;
+    private final ScheduleApplicationService scheduleApplicationService;
     private final GetClassScheduleQuery getClassScheduleQuery;
     private final GetTeacherScheduleQuery getTeacherScheduleQuery;
     private final GetMyScheduleQuery getMyScheduleQuery;
@@ -43,7 +38,7 @@ public class ScheduleController {
     @PostMapping("/setting")
     @AuthCheck(mustRole = "admin") // Assuming admin for now, or could allow teacher
     public BaseResponse<Long> createSetting(@RequestBody @Valid CreateScheduleSettingRequest request) {
-        Long id = createScheduleSettingCommand.execute(
+        Long id = scheduleApplicationService.createScheduleSetting(
                 request.getClassId(),
                 request.getSemester(),
                 request.getStartDate(),
@@ -59,7 +54,7 @@ public class ScheduleController {
     @PutMapping("/setting/{id}")
     @AuthCheck(mustRole = "admin")
     public BaseResponse<Boolean> updateSetting(@PathVariable Long id, @RequestBody @Valid UpdateScheduleSettingRequest request) {
-        updateScheduleSettingCommand.execute(
+        scheduleApplicationService.updateScheduleSetting(
                 id,
                 request.getSemester(),
                 request.getStartDate(),
@@ -75,7 +70,7 @@ public class ScheduleController {
     @PostMapping("/setting/{id}/activate")
     @AuthCheck(mustRole = "admin")
     public BaseResponse<Boolean> activateSetting(@PathVariable Long id) {
-        activateScheduleSettingCommand.execute(id);
+        scheduleApplicationService.activateScheduleSetting(id);
         return ResultUtils.success(true);
     }
 
@@ -85,7 +80,7 @@ public class ScheduleController {
     @PostMapping("/item")
     public BaseResponse<Long> addItem(@RequestBody @Valid AddScheduleItemRequest request, Authentication authentication) {
         Long userId = Long.parseLong(authentication.getName());
-        Long id = addScheduleItemCommand.execute(
+        Long id = scheduleApplicationService.addScheduleItem(
                 request.getSettingId(),
                 userId,
                 request.getCourseType(),
@@ -109,7 +104,7 @@ public class ScheduleController {
     @Operation(summary = "更新课程项", description = "更新课程项信息")
     @PutMapping("/item/{id}")
     public BaseResponse<Boolean> updateItem(@PathVariable Long id, @RequestBody @Valid UpdateScheduleItemRequest request) {
-        updateScheduleItemCommand.execute(
+        scheduleApplicationService.updateScheduleItem(
                 id,
                 request.getLocation(),
                 request.getDayOfWeek(),
@@ -129,7 +124,7 @@ public class ScheduleController {
     @Operation(summary = "删除课程项", description = "删除课程项")
     @DeleteMapping("/item/{id}")
     public BaseResponse<Boolean> deleteItem(@PathVariable Long id) {
-        deleteScheduleItemCommand.execute(id);
+        scheduleApplicationService.deleteScheduleItem(id);
         return ResultUtils.success(true);
     }
 

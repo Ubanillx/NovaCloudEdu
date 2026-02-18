@@ -116,6 +116,45 @@ public class DailyArticle {
         this.updateTime = LocalDateTime.now();
     }
 
+    /**
+     * 处理用户阅读（含首次阅读计数联动）
+     * @return true 表示首次阅读
+     */
+    public boolean handleRead(UserDailyArticle userArticle) {
+        if (!userArticle.isRead()) {
+            userArticle.markAsRead();
+            incrementViewCount();
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 处理点赞切换（含计数联动）
+     */
+    public void handleLikeToggle(UserDailyArticle userArticle) {
+        boolean wasLiked = userArticle.isLiked();
+        userArticle.toggleLike();
+        if (wasLiked) {
+            decrementLikeCount();
+        } else {
+            incrementLikeCount();
+        }
+    }
+
+    /**
+     * 处理收藏切换（含计数联动）
+     */
+    public void handleCollectToggle(UserDailyArticle userArticle) {
+        boolean wasCollected = userArticle.isCollected();
+        userArticle.toggleCollect();
+        if (wasCollected) {
+            decrementCollectCount();
+        } else {
+            incrementCollectCount();
+        }
+    }
+
     public void incrementViewCount() {
         this.viewCount++;
         this.updateTime = LocalDateTime.now();

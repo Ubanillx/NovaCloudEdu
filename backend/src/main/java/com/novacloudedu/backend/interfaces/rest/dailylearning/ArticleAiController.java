@@ -1,7 +1,7 @@
 package com.novacloudedu.backend.interfaces.rest.dailylearning;
 
 import com.novacloudedu.backend.application.dailylearning.command.AiProcessArticleCommand;
-import com.novacloudedu.backend.application.dailylearning.service.ArticleAiApplicationService;
+import com.novacloudedu.backend.application.service.ArticleAiApplicationService;
 import com.novacloudedu.backend.common.BaseResponse;
 import com.novacloudedu.backend.common.ResultUtils;
 import com.novacloudedu.backend.domain.dailylearning.entity.DailyArticle;

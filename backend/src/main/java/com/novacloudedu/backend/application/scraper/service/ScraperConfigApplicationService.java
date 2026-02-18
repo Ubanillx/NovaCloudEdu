@@ -1,7 +1,7 @@
 package com.novacloudedu.backend.application.scraper.service;
 
 import com.novacloudedu.backend.application.scraper.command.ScraperConfigCommand;
-import com.novacloudedu.backend.application.dailylearning.service.ArticleAiApplicationService;
+import com.novacloudedu.backend.application.service.ArticleAiApplicationService;
 import com.novacloudedu.backend.domain.dailylearning.entity.DailyArticle;
 import com.novacloudedu.backend.domain.dailylearning.repository.DailyArticleRepository;
 import com.novacloudedu.backend.domain.dailylearning.valueobject.Difficulty;
