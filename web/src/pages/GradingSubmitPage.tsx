@@ -402,7 +402,7 @@ const GradingSubmitPage: React.FC = () => {
   const canSubmit = uploadedCount > 0 && !hasUploadingImages && !submitting;
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="max-w-5xl mx-auto space-y-8">
       {/* 页头 */}
       <div className="flex items-center gap-4">
         <button onClick={() => navigate(-1)}
@@ -646,77 +646,91 @@ const GradingSubmitPage: React.FC = () => {
           {/* 图片上传 */}
           <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-6 shadow-sm space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-base font-semibold text-gray-900 dark:text-white">上传作业图片</h2>
+              <div className="flex items-center gap-2">
+                <div className="w-1.5 h-4 bg-brand-500 rounded-full" />
+                <h2 className="text-base font-semibold text-gray-900 dark:text-white">上传作业图片</h2>
+              </div>
               <span className="text-xs text-gray-400">{uploadedCount}/10 张</span>
             </div>
 
-            {/* 图片预览网格 */}
-            {images.length > 0 && (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                {images.map((img) => (
-                  <div key={img.preview} className="relative group aspect-[3/4] rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-                    <img src={img.preview} alt="" className="w-full h-full object-cover" />
-                    {img.uploading && (
-                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                        <Loader2 size={24} className="text-white animate-spin" />
-                      </div>
-                    )}
-                    {img.error && (
-                      <div className="absolute inset-0 bg-red-500/20 flex items-center justify-center">
-                        <AlertCircle size={24} className="text-red-500" />
-                      </div>
-                    )}
-                    {img.url && !img.uploading && (
-                      <div className="absolute top-1.5 right-1.5">
-                        <CheckCircle size={18} className="text-green-500 bg-white rounded-full" />
-                      </div>
-                    )}
-                    <button onClick={() => removeImage(img.preview)}
-                      className="absolute top-1.5 left-1.5 p-1 bg-black/50 hover:bg-black/70 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
-                      <X size={14} className="text-white" />
+            {/* 图片网格 */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+              {/* 已上传的图片 */}
+              {images.map((img) => (
+                <div key={img.preview} className="relative aspect-[3/4] rounded-xl overflow-hidden border-2 border-dashed border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 group">
+                  <img src={img.preview} alt="" className="w-full h-full object-cover" />
+                  
+                  {/* 上传中遮罩 */}
+                  {img.uploading && (
+                    <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center gap-2">
+                      <Loader2 size={32} className="text-white animate-spin" />
+                      <p className="text-sm font-medium text-white">上传中...</p>
+                    </div>
+                  )}
+                  
+                  {/* 错误遮罩 */}
+                  {img.error && (
+                    <div className="absolute inset-0 bg-red-500/20 flex flex-col items-center justify-center gap-2">
+                      <AlertCircle size={32} className="text-red-500" />
+                      <p className="text-xs font-medium text-red-600">{img.error}</p>
+                    </div>
+                  )}
+                  
+                  {/* 成功标记 */}
+                  {img.url && !img.uploading && !img.error && (
+                    <div className="absolute top-2 right-2">
+                      <CheckCircle size={20} className="text-green-500 bg-white rounded-full shadow-sm" />
+                    </div>
+                  )}
+                  
+                  {/* 悬停操作按钮 */}
+                  <div className="absolute inset-0 bg-black/0 hover:bg-black/40 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
+                    <button 
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); removeImage(img.preview); }}
+                      className="p-2 bg-red-500/90 text-white rounded-lg hover:bg-red-600 transition-colors"
+                      title="删除图片"
+                    >
+                      <X size={18} />
                     </button>
                   </div>
-                ))}
-              </div>
-            )}
-
-            {/* 上传区域 */}
-            {images.length < 10 && (
-              <div
-                onClick={() => fileInputRef.current?.click()}
-                onDragOver={e => e.preventDefault()}
-                onDrop={handleDrop}
-                className="cursor-pointer rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-700 hover:border-brand-300 dark:hover:border-brand-700 bg-gray-50/50 dark:bg-gray-800/30 hover:bg-brand-50/30 dark:hover:bg-brand-900/10 transition-all"
-              >
-                <div className="flex flex-col items-center justify-center py-8 gap-2">
-                  <div className="p-3 rounded-2xl bg-brand-50 dark:bg-brand-900/20">
-                    <Image size={28} className="text-brand-500" />
-                  </div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">点击或拖拽上传作业图片</p>
-                  <p className="text-xs text-gray-300 dark:text-gray-600">支持 JPG / PNG / HEIC，单张最大 10MB</p>
                 </div>
-              </div>
-            )}
+              ))}
+
+              {/* 上传按钮 */}
+              {images.length < 10 && (
+                <div
+                  onClick={() => fileInputRef.current?.click()}
+                  onDragOver={e => e.preventDefault()}
+                  onDrop={handleDrop}
+                  className="relative aspect-[3/4] rounded-xl overflow-hidden border-2 border-dashed border-gray-200 dark:border-gray-700 hover:border-brand-400 dark:hover:border-brand-500 bg-gray-50 dark:bg-gray-800/50 cursor-pointer transition-all group"
+                >
+                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
+                    <Image size={32} className="text-gray-300 dark:text-gray-600 group-hover:text-brand-500 transition-colors" />
+                    <p className="text-sm text-gray-400 dark:text-gray-500 group-hover:text-brand-500 transition-colors">点击上传</p>
+                    <p className="text-xs text-gray-300 dark:text-gray-600 px-2 text-center">JPG/PNG/HEIC</p>
+                  </div>
+                </div>
+              )}
+            </div>
+
             <input ref={fileInputRef} type="file" accept="image/*" multiple
               onChange={e => { if (e.target.files?.length) handleFilesSelect(e.target.files); e.target.value = ''; }}
               className="hidden" />
           </div>
 
           <button onClick={handleSubmit} disabled={!canSubmit}
-            className={`w-full py-4 rounded-2xl font-bold text-base transition-all flex items-center justify-center gap-2 group overflow-hidden relative ${
+            className={`w-full py-4 rounded-2xl font-bold text-base transition-all flex items-center justify-center gap-2 group ${
               canSubmit
-                ? 'bg-brand-600 hover:bg-brand-700 text-white shadow-xl shadow-brand-600/20 active:scale-[0.98]'
+                ? 'bg-brand-600 hover:bg-brand-700 text-white shadow-xl shadow-brand-600/20 hover:scale-[1.02] active:scale-[0.98]'
                 : 'bg-gray-100 dark:bg-gray-800 text-gray-400 cursor-not-allowed'
             }`}>
             {hasUploadingImages ? (
               <><Loader2 size={18} className="animate-spin" /> 图片上传中...</>
             ) : (
               <>
-                <BookOpen size={20} className={canSubmit ? 'group-hover:scale-110 transition-transform' : ''} />
+                <BookOpen size={20} />
                 <span>开始批改 {uploadedCount > 0 && `(${uploadedCount} 张图片)`}</span>
-                {canSubmit && (
-                  <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out skew-x-[-20deg]" />
-                )}
               </>
             )}
           </button>
@@ -752,26 +766,41 @@ const GradingProgressPanel: React.FC<{
   const gradedQ = progress.questionResults.length;
   const pct = totalQ > 0 ? Math.round((gradedQ / totalQ) * 100) : 0;
 
+  // 判断当前阶段
+  const getStageInfo = () => {
+    if (progress.done && !progress.error) {
+      return { stage: 'completed', icon: <CheckCircle size={28} className="text-green-500" />, bgClass: 'bg-green-50 dark:bg-green-900/20', title: '批改已完成' };
+    }
+    if (progress.error) {
+      return { stage: 'error', icon: <AlertCircle size={28} className="text-red-500" />, bgClass: 'bg-red-50 dark:bg-red-900/20', title: '批改中断' };
+    }
+    if (progress.step === 'connecting') {
+      return { stage: 'connecting', icon: <Loader2 size={28} className="text-brand-500 animate-spin" />, bgClass: 'bg-brand-50 dark:bg-brand-900/20', title: '连接批改服务' };
+    }
+    if (progress.step === 'ocr') {
+      return { stage: 'ocr', icon: <Loader2 size={28} className="text-blue-500 animate-spin" />, bgClass: 'bg-blue-50 dark:bg-blue-900/20', title: 'OCR 图像识别中' };
+    }
+    if (progress.step === 'ocr_done') {
+      return { stage: 'ocr_done', icon: <CheckCircle size={28} className="text-blue-500" />, bgClass: 'bg-blue-50 dark:bg-blue-900/20', title: '图像识别完成' };
+    }
+    if (progress.step === 'grading' || progress.step === 'done') {
+      return { stage: 'grading', icon: <Loader2 size={28} className="text-yellow-500 animate-spin" />, bgClass: 'bg-yellow-50 dark:bg-yellow-900/20', title: 'AI 智能批改中' };
+    }
+    return { stage: 'processing', icon: <Loader2 size={28} className="text-brand-500 animate-spin" />, bgClass: 'bg-brand-50 dark:bg-brand-900/20', title: '处理中' };
+  };
+
+  const stageInfo = getStageInfo();
+
   return (
     <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-6 shadow-sm space-y-6">
       {/* 状态头 */}
       <div className="flex items-center gap-4">
-        {progress.done && !progress.error ? (
-          <div className="p-3 rounded-2xl bg-green-50 dark:bg-green-900/20 shadow-sm">
-            <CheckCircle size={28} className="text-green-500" />
-          </div>
-        ) : progress.error ? (
-          <div className="p-3 rounded-2xl bg-red-50 dark:bg-red-900/20 shadow-sm">
-            <AlertCircle size={28} className="text-red-500" />
-          </div>
-        ) : (
-          <div className="p-3 rounded-2xl bg-brand-50 dark:bg-brand-900/20 shadow-sm">
-            <Loader2 size={28} className="text-brand-500 animate-spin" />
-          </div>
-        )}
+        <div className={`p-3 rounded-2xl shadow-sm ${stageInfo.bgClass}`}>
+          {stageInfo.icon}
+        </div>
         <div className="flex-1 min-w-0">
           <h3 className="text-lg font-bold text-gray-900 dark:text-white leading-tight">
-            {progress.done && !progress.error ? '批改已完成' : progress.error ? '批改中断' : '正在为您批改'}
+            {stageInfo.title}
           </h3>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 truncate">{progress.message}</p>
         </div>
@@ -784,6 +813,83 @@ const GradingProgressPanel: React.FC<{
           </div>
         )}
       </div>
+
+      {/* 处理阶段指示器 */}
+      {!progress.done && (
+        <div className="flex items-center gap-3">
+          {/* OCR 阶段 */}
+          <div className="flex-1 flex items-center gap-2">
+            <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
+              progress.step === 'ocr' || progress.step === 'ocr_done' || progress.step === 'grading' || progress.step === 'done'
+                ? 'bg-blue-500 text-white'
+                : 'bg-gray-200 dark:bg-gray-700 text-gray-400'
+            }`}>
+              {progress.step === 'ocr' ? <Loader2 size={14} className="animate-spin" /> : '1'}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className={`text-xs font-bold truncate ${
+                progress.step === 'ocr' || progress.step === 'ocr_done' || progress.step === 'grading' || progress.step === 'done'
+                  ? 'text-blue-600 dark:text-blue-400'
+                  : 'text-gray-400'
+              }`}>
+                图像识别
+              </p>
+            </div>
+          </div>
+
+          <div className={`h-0.5 w-8 transition-all ${
+            progress.step === 'ocr_done' || progress.step === 'grading' || progress.step === 'done'
+              ? 'bg-blue-500'
+              : 'bg-gray-200 dark:bg-gray-700'
+          }`} />
+
+          {/* 批改阶段 */}
+          <div className="flex-1 flex items-center gap-2">
+            <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
+              progress.step === 'grading' || progress.step === 'done'
+                ? 'bg-yellow-500 text-white'
+                : 'bg-gray-200 dark:bg-gray-700 text-gray-400'
+            }`}>
+              {progress.step === 'grading' ? <Loader2 size={14} className="animate-spin" /> : '2'}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className={`text-xs font-bold truncate ${
+                progress.step === 'grading' || progress.step === 'done'
+                  ? 'text-yellow-600 dark:text-yellow-400'
+                  : 'text-gray-400'
+              }`}>
+                AI 批改
+              </p>
+            </div>
+          </div>
+
+          <div className={`h-0.5 w-8 transition-all ${
+            progress.step === 'done'
+              ? 'bg-green-500'
+              : 'bg-gray-200 dark:bg-gray-700'
+          }`} />
+
+          {/* 完成阶段 */}
+          <div className="flex-1 flex items-center gap-2">
+            <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
+              progress.step === 'done'
+                ? 'bg-green-500 text-white'
+                : 'bg-gray-200 dark:bg-gray-700 text-gray-400'
+            }`}>
+              3
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className={`text-xs font-bold truncate ${
+                progress.step === 'done'
+                  ? 'text-green-600 dark:text-green-400'
+                  : 'text-gray-400'
+              }`}>
+                生成报告
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 进度条 */}
       {!progress.done && totalQ > 0 && (

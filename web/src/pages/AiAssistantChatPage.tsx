@@ -5,7 +5,7 @@ import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import {
   Bot, Plus, History, Trash2, Send, Square, Loader2,
-  Sparkles, MessageSquarePlus, ChevronRight, Copy, Check,
+  Sparkles, MessageSquarePlus, Copy, Check,
   Image as ImageIcon, FileUp, X, ArrowDown,
 } from 'lucide-react';
 import { AIApi, Configuration, apiClient } from '../api';
@@ -106,7 +106,7 @@ const SessionSidebar: React.FC<SessionSidebarProps> = ({
     <div className="w-72 flex-shrink-0 flex flex-col border-r border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/30">
       {/* 头部 */}
       <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800">
-        <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center justify-between">
           <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
             {assistant?.name || '智慧助手'}
           </h3>
@@ -118,18 +118,6 @@ const SessionSidebar: React.FC<SessionSidebarProps> = ({
             <Plus size={14} />
           </button>
         </div>
-        {/* 助手切换入口 */}
-        <button
-          onClick={onShowOverview}
-          className={`w-full flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition-colors ${
-            showOverview
-              ? 'bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 font-medium'
-              : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800/50'
-          }`}
-        >
-          <Sparkles size={15} />
-          <span>智慧助手中心</span>
-        </button>
       </div>
 
       {/* 助手快速切换列表 */}
@@ -231,101 +219,6 @@ const SessionSidebar: React.FC<SessionSidebarProps> = ({
   );
 };
 
-// ============ 智慧助手概览页（复刻 AiChatPanel.IntelligenceOverview） ============
-
-interface OverviewProps {
-  assistant: AiAssistantVO | null;
-  assistants: AiAssistantVO[];
-  onStartChat: () => void;
-  onViewHistory: () => void;
-  onSelectAssistant: (a: AiAssistantVO) => void;
-}
-
-const AssistantOverview: React.FC<OverviewProps> = ({
-  assistant, assistants, onStartChat, onViewHistory, onSelectAssistant,
-}) => (
-  <div className="flex-1 overflow-y-auto custom-scrollbar">
-    <div className="max-w-3xl mx-auto p-6 space-y-6">
-      {/* 当前助手 Hero Card */}
-      {assistant && (
-        <div
-          onClick={onStartChat}
-          className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-brand-500 to-brand-600 p-6 cursor-pointer group shadow-lg shadow-brand-500/20 hover:shadow-brand-500/30 transition-all"
-        >
-          <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-2xl" />
-          <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-brand-300/20 rounded-full blur-xl" />
-          <div className="relative z-10 flex items-center gap-5">
-            {assistant.avatarUrl ? (
-              <img src={assistant.avatarUrl} alt="" className="w-16 h-16 rounded-2xl object-cover shadow-inner" />
-            ) : (
-              <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-inner">
-                <Bot size={32} className="text-white" />
-              </div>
-            )}
-            <div className="flex-1">
-              <h2 className="text-xl font-bold text-white mb-1">{assistant.name}</h2>
-              <p className="text-white/80 text-sm">{assistant.description || '智能问答 · 学习辅导 · 知识探索'}</p>
-            </div>
-            <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center group-hover:bg-white/30 transition-colors">
-              <ChevronRight size={20} className="text-white" />
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* 快捷操作 */}
-      <div className="grid grid-cols-2 gap-3">
-        <button
-          onClick={onViewHistory}
-          className="flex items-center justify-center gap-2.5 px-4 py-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-brand-300 dark:hover:border-brand-700 hover:shadow-md transition-all group"
-        >
-          <History size={20} className="text-brand-500 group-hover:scale-110 transition-transform" />
-          <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">对话历史</span>
-        </button>
-        <button
-          onClick={onStartChat}
-          className="flex items-center justify-center gap-2.5 px-4 py-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-brand-300 dark:hover:border-brand-700 hover:shadow-md transition-all group"
-        >
-          <MessageSquarePlus size={20} className="text-brand-500 group-hover:scale-110 transition-transform" />
-          <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">新建对话</span>
-        </button>
-      </div>
-
-      {/* 更多助手 */}
-      {assistants.length > 1 && (
-        <div>
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-base font-bold text-gray-800 dark:text-gray-200">更多智慧助手</h3>
-          </div>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-            {assistants.map(a => (
-              <div
-                key={String(a.id)}
-                onClick={() => onSelectAssistant(a)}
-                className="flex flex-col items-center p-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all cursor-pointer"
-              >
-                {a.avatarUrl ? (
-                  <img src={a.avatarUrl} alt="" className="w-12 h-12 rounded-full object-cover mb-2.5 ring-2 ring-brand-100 dark:ring-brand-800" />
-                ) : (
-                  <div className="w-12 h-12 rounded-full bg-brand-50 dark:bg-brand-900/30 flex items-center justify-center text-xl font-bold mb-2.5 ring-2 ring-brand-100 dark:ring-brand-800 text-brand-600 dark:text-brand-400">
-                    {a.name?.[0] || '?'}
-                  </div>
-                )}
-                <p className="text-sm font-semibold text-gray-800 dark:text-gray-200 text-center truncate w-full">
-                  {a.name}
-                </p>
-                <p className="text-xs text-gray-400 text-center mt-1 line-clamp-2">{a.description || '暂无描述'}</p>
-                <button className="mt-3 px-4 py-1.5 text-xs font-medium text-brand-500 bg-brand-50 dark:bg-brand-900/20 rounded-full hover:bg-brand-100 dark:hover:bg-brand-900/40 transition-colors">
-                  开始对话
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  </div>
-);
 
 // ============ AI 对话区域（复刻 AiChatPanel.ChatArea） ============
 
@@ -734,7 +627,6 @@ const AiAssistantChatPage: React.FC = () => {
   const [assistants, setAssistants] = useState<AiAssistantVO[]>([]);
   const [assistantsLoading, setAssistantsLoading] = useState(true);
   const [selectedAssistant, setSelectedAssistant] = useState<AiAssistantVO | null>(null);
-  const [showOverview, setShowOverview] = useState(!assistantId);
 
   const {
     sessions, messages, currentSessionId, isLoading,
@@ -745,11 +637,11 @@ const AiAssistantChatPage: React.FC = () => {
 
   const hasInitRef = useRef(false);
 
-  // 加载公开助手列表
+  // 加载助手信息（仅用于侧边栏快速切换）
   useEffect(() => {
     let mounted = true;
     setAssistantsLoading(true);
-    aiApi.assistantListPublic({ page: 0, size: 20 })
+    aiApi.assistantListPublic({ page: 0, size: 10 })
       .then(res => {
         if (!mounted) return;
         if (res.data?.code === 0 && Array.isArray(res.data.data)) {
@@ -787,13 +679,10 @@ const AiAssistantChatPage: React.FC = () => {
   }, [messages.length, isLoading, refreshSessionTitle, loadSessions]);
 
   const handleSelectAssistant = useCallback((assistant: AiAssistantVO) => {
-    setSelectedAssistant(assistant);
-    setShowOverview(false);
     navigate(`/ai-chat/${String(assistant.id)}`, { replace: true });
   }, [navigate]);
 
   const handleSelectSession = useCallback(async (session: AssistantChatSession) => {
-    setShowOverview(false);
     await loadSessionDetail(String(session.sessionId));
   }, [loadSessionDetail]);
 
@@ -809,7 +698,6 @@ const AiAssistantChatPage: React.FC = () => {
 
   const handleNewSession = useCallback(() => {
     startNewSession();
-    setShowOverview(false);
   }, [startNewSession]);
 
   const handleSend = useCallback((content: string) => {
@@ -831,20 +719,12 @@ const AiAssistantChatPage: React.FC = () => {
         assistantsLoading={assistantsLoading}
         selectedAssistantId={assistantId}
         onSelectAssistant={handleSelectAssistant}
-        showOverview={showOverview}
-        onShowOverview={() => setShowOverview(true)}
+        showOverview={false}
+        onShowOverview={() => {}}
       />
 
       {/* 右侧内容区 */}
-      {showOverview ? (
-        <AssistantOverview
-          assistant={selectedAssistant}
-          assistants={assistants}
-          onStartChat={handleNewSession}
-          onViewHistory={() => setShowOverview(false)}
-          onSelectAssistant={handleSelectAssistant}
-        />
-      ) : selectedAssistant ? (
+      {selectedAssistant ? (
         <ChatArea
           assistant={selectedAssistant}
           messages={messages}
@@ -857,13 +737,12 @@ const AiAssistantChatPage: React.FC = () => {
           onNewSession={handleNewSession}
         />
       ) : (
-        <AssistantOverview
-          assistant={null}
-          assistants={assistants}
-          onStartChat={handleNewSession}
-          onViewHistory={() => setShowOverview(false)}
-          onSelectAssistant={handleSelectAssistant}
-        />
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center text-gray-400">
+            <Loader2 size={32} className="animate-spin mx-auto mb-3 text-brand-500" />
+            <p className="text-sm">正在加载助手信息...</p>
+          </div>
+        </div>
       )}
     </div>
   );
