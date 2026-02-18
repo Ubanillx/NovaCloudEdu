@@ -13,12 +13,13 @@
  */
 
 
+// May contain unused imports in some cases
+// @ts-ignore
+import type { ClassAnalyticsResponse } from './class-analytics-response';
 
-export * from './api/default-api';
-export * from './api/aiapi';
-export * from './api/admin-dashboard-controller-api';
-export * from './api/mcpapi';
-export * from './api/only-office-api';
-export * from './api/pptapi';
-export * from './api/webhook-api';
+export interface BaseResponseClassAnalyticsResponse {
+    'code'?: number;
+    'data'?: ClassAnalyticsResponse;
+    'message'?: string;
+}
 

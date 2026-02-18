@@ -138,8 +138,13 @@ All URIs are relative to *http://localhost:8080*
 |[**getChatHistory**](#getchathistory) | **POST** /api/chat/history | 获取聊天历史|
 |[**getCheckinRanking**](#getcheckinranking) | **GET** /api/user/checkin/ranking | 打卡排行榜|
 |[**getCheckinStatus**](#getcheckinstatus) | **GET** /api/user/checkin/status | 获取打卡状态|
+|[**getClassAiReport**](#getclassaireport) | **GET** /api/analytics/class/{classId}/ai-report | AI班级学情分析报告（SSE流式）|
 |[**getClassInfo**](#getclassinfo) | **GET** /api/classes/{classId} | 获取班级详情|
 |[**getClassMembers**](#getclassmembers) | **GET** /api/classes/{classId}/members | 获取班级成员列表|
+|[**getClassOverview**](#getclassoverview) | **GET** /api/analytics/class/{classId}/overview | 班级学情概览|
+|[**getClassRanking**](#getclassranking) | **GET** /api/analytics/class/{classId}/ranking | 班级成员排名|
+|[**getClassSubjects**](#getclasssubjects) | **GET** /api/analytics/class/{classId}/subjects | 班级各学科分析|
+|[**getClassTrend**](#getclasstrend) | **GET** /api/analytics/class/{classId}/trend | 班级学习趋势|
 |[**getCollectedArticles**](#getcollectedarticles) | **GET** /api/user/daily-article/collected | 获取收藏文章列表|
 |[**getCollectedWords**](#getcollectedwords) | **GET** /api/user/daily-word/collected | 获取收藏单词列表|
 |[**getCommentReplies**](#getcommentreplies) | **GET** /api/posts/comments/{commentId}/replies | 获取评论回复列表|
@@ -230,6 +235,10 @@ All URIs are relative to *http://localhost:8080*
 |[**getStats2**](#getstats2) | **GET** /api/user/daily-article/stats | 获取阅读统计|
 |[**getStats3**](#getstats3) | **GET** /api/grading/stats | 查询批改历史统计|
 |[**getStatus**](#getstatus) | **GET** /api/grading/{submissionId}/status | 查询批改状态|
+|[**getStudentAiReport**](#getstudentaireport) | **GET** /api/analytics/student/ai-report | AI个人学情分析报告（SSE流式）|
+|[**getStudentOverview**](#getstudentoverview) | **GET** /api/analytics/student/overview | 个人学情概览|
+|[**getStudentSubjects**](#getstudentsubjects) | **GET** /api/analytics/student/subjects | 个人各学科学情|
+|[**getStudentTrend**](#getstudenttrend) | **GET** /api/analytics/student/trend | 个人学习趋势|
 |[**getStudiedWords**](#getstudiedwords) | **GET** /api/user/daily-word/studied | 获取已学习单词列表|
 |[**getSubjectProfile**](#getsubjectprofile) | **GET** /api/grading/profile/{subjectCode} | 查询某学科知识画像详情|
 |[**getSupportedSources**](#getsupportedsources) | **GET** /api/scraper/sources | 获取预设来源列表|
@@ -7470,6 +7479,63 @@ This endpoint does not have any parameters.
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **getClassAiReport**
+> SseEmitter getClassAiReport()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let classId: number; // (default to undefined)
+let startDate: string; // (optional) (default to undefined)
+let endDate: string; // (optional) (default to undefined)
+
+const { status, data } = await apiInstance.getClassAiReport(
+    classId,
+    startDate,
+    endDate
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **classId** | [**number**] |  | defaults to undefined|
+| **startDate** | [**string**] |  | (optional) defaults to undefined|
+| **endDate** | [**string**] |  | (optional) defaults to undefined|
+
+
+### Return type
+
+**SseEmitter**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json, text/event-stream
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **getClassInfo**
 > BaseResponseClassResponse getClassInfo()
 
@@ -7559,6 +7625,231 @@ const { status, data } = await apiInstance.getClassMembers(
 ### Return type
 
 **BaseResponsePageResponseClassMemberResponse**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getClassOverview**
+> BaseResponseClassAnalyticsResponse getClassOverview()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let classId: number; // (default to undefined)
+let startDate: string; // (optional) (default to undefined)
+let endDate: string; // (optional) (default to undefined)
+
+const { status, data } = await apiInstance.getClassOverview(
+    classId,
+    startDate,
+    endDate
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **classId** | [**number**] |  | defaults to undefined|
+| **startDate** | [**string**] |  | (optional) defaults to undefined|
+| **endDate** | [**string**] |  | (optional) defaults to undefined|
+
+
+### Return type
+
+**BaseResponseClassAnalyticsResponse**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getClassRanking**
+> BaseResponseListStudentRankingItem getClassRanking()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let classId: number; // (default to undefined)
+let startDate: string; // (optional) (default to undefined)
+let endDate: string; // (optional) (default to undefined)
+
+const { status, data } = await apiInstance.getClassRanking(
+    classId,
+    startDate,
+    endDate
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **classId** | [**number**] |  | defaults to undefined|
+| **startDate** | [**string**] |  | (optional) defaults to undefined|
+| **endDate** | [**string**] |  | (optional) defaults to undefined|
+
+
+### Return type
+
+**BaseResponseListStudentRankingItem**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getClassSubjects**
+> BaseResponseListSubjectAnalyticsItem getClassSubjects()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let classId: number; // (default to undefined)
+
+const { status, data } = await apiInstance.getClassSubjects(
+    classId
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **classId** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseListSubjectAnalyticsItem**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getClassTrend**
+> BaseResponseLearningTrendResponse getClassTrend()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let classId: number; // (default to undefined)
+let granularity: string; // (optional) (default to 'day')
+let startDate: string; // (optional) (default to undefined)
+let endDate: string; // (optional) (default to undefined)
+
+const { status, data } = await apiInstance.getClassTrend(
+    classId,
+    granularity,
+    startDate,
+    endDate
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **classId** | [**number**] |  | defaults to undefined|
+| **granularity** | [**string**] |  | (optional) defaults to 'day'|
+| **startDate** | [**string**] |  | (optional) defaults to undefined|
+| **endDate** | [**string**] |  | (optional) defaults to undefined|
+
+
+### Return type
+
+**BaseResponseLearningTrendResponse**
 
 ### Authorization
 
@@ -12172,6 +12463,215 @@ const { status, data } = await apiInstance.getStatus(
 ### Return type
 
 **BaseResponseSubmissionStatusResponse**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getStudentAiReport**
+> SseEmitter getStudentAiReport()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let startDate: string; // (optional) (default to undefined)
+let endDate: string; // (optional) (default to undefined)
+
+const { status, data } = await apiInstance.getStudentAiReport(
+    startDate,
+    endDate
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **startDate** | [**string**] |  | (optional) defaults to undefined|
+| **endDate** | [**string**] |  | (optional) defaults to undefined|
+
+
+### Return type
+
+**SseEmitter**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json, text/event-stream
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getStudentOverview**
+> BaseResponseStudentAnalyticsResponse getStudentOverview()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let startDate: string; // (optional) (default to undefined)
+let endDate: string; // (optional) (default to undefined)
+
+const { status, data } = await apiInstance.getStudentOverview(
+    startDate,
+    endDate
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **startDate** | [**string**] |  | (optional) defaults to undefined|
+| **endDate** | [**string**] |  | (optional) defaults to undefined|
+
+
+### Return type
+
+**BaseResponseStudentAnalyticsResponse**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getStudentSubjects**
+> BaseResponseListSubjectAnalyticsItem getStudentSubjects()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+const { status, data } = await apiInstance.getStudentSubjects();
+```
+
+### Parameters
+This endpoint does not have any parameters.
+
+
+### Return type
+
+**BaseResponseListSubjectAnalyticsItem**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getStudentTrend**
+> BaseResponseLearningTrendResponse getStudentTrend()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let granularity: string; // (optional) (default to 'day')
+let startDate: string; // (optional) (default to undefined)
+let endDate: string; // (optional) (default to undefined)
+
+const { status, data } = await apiInstance.getStudentTrend(
+    granularity,
+    startDate,
+    endDate
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **granularity** | [**string**] |  | (optional) defaults to 'day'|
+| **startDate** | [**string**] |  | (optional) defaults to undefined|
+| **endDate** | [**string**] |  | (optional) defaults to undefined|
+
+
+### Return type
+
+**BaseResponseLearningTrendResponse**
 
 ### Authorization
 

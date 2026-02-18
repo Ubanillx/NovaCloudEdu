@@ -14,11 +14,14 @@
 
 
 
-export * from './api/default-api';
-export * from './api/aiapi';
-export * from './api/admin-dashboard-controller-api';
-export * from './api/mcpapi';
-export * from './api/only-office-api';
-export * from './api/pptapi';
-export * from './api/webhook-api';
+export interface SubjectAnalyticsItem {
+    'subjectCode'?: string;
+    'subjectName'?: string;
+    'avgMasteryLevel'?: number;
+    'totalKnowledgePoints'?: number;
+    'weakPointCount'?: number;
+    'strongPointCount'?: number;
+    'totalAttempts'?: number;
+    'correctRate'?: number;
+}
 

@@ -76,6 +76,8 @@ import type { BaseResponseCheckinResult } from '../models';
 // @ts-ignore
 import type { BaseResponseCheckinStatusResult } from '../models';
 // @ts-ignore
+import type { BaseResponseClassAnalyticsResponse } from '../models';
+// @ts-ignore
 import type { BaseResponseClassResponse } from '../models';
 // @ts-ignore
 import type { BaseResponseCommentPageResponse } from '../models';
@@ -141,6 +143,8 @@ import type { BaseResponseKnowledgeBaseVO } from '../models';
 import type { BaseResponseKnowledgeDocumentVO } from '../models';
 // @ts-ignore
 import type { BaseResponseLearningStats } from '../models';
+// @ts-ignore
+import type { BaseResponseLearningTrendResponse } from '../models';
 // @ts-ignore
 import type { BaseResponseListArticleSourceResponse } from '../models';
 // @ts-ignore
@@ -223,6 +227,10 @@ import type { BaseResponseListSearchSuggestionDTO } from '../models';
 import type { BaseResponseListSectionResponse } from '../models';
 // @ts-ignore
 import type { BaseResponseListString } from '../models';
+// @ts-ignore
+import type { BaseResponseListStudentRankingItem } from '../models';
+// @ts-ignore
+import type { BaseResponseListSubjectAnalyticsItem } from '../models';
 // @ts-ignore
 import type { BaseResponseListSubjectProfileSummary } from '../models';
 // @ts-ignore
@@ -327,6 +335,8 @@ import type { BaseResponseSectionResponse } from '../models';
 import type { BaseResponseSendResult } from '../models';
 // @ts-ignore
 import type { BaseResponseString } from '../models';
+// @ts-ignore
+import type { BaseResponseStudentAnalyticsResponse } from '../models';
 // @ts-ignore
 import type { BaseResponseSubjectProfileSummary } from '../models';
 // @ts-ignore
@@ -5948,6 +5958,58 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
+         * @summary AI班级学情分析报告（SSE流式）
+         * @param {number} classId 
+         * @param {string} [startDate] 
+         * @param {string} [endDate] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getClassAiReport: async (classId: number, startDate?: string, endDate?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'classId' is not null or undefined
+            assertParamExists('getClassAiReport', 'classId', classId)
+            const localVarPath = `/api/analytics/class/{classId}/ai-report`
+                .replace(`{${"classId"}}`, encodeURIComponent(String(classId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (startDate !== undefined) {
+                localVarQueryParameter['startDate'] = (startDate as any instanceof Date) ?
+                    (startDate as any).toISOString().substring(0,10) :
+                    startDate;
+            }
+
+            if (endDate !== undefined) {
+                localVarQueryParameter['endDate'] = (endDate as any instanceof Date) ?
+                    (endDate as any).toISOString().substring(0,10) :
+                    endDate;
+            }
+
+            localVarHeaderParameter['Accept'] = 'application/json,text/event-stream';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary 获取班级详情
          * @param {number} classId 
          * @param {*} [options] Override http request option.
@@ -6019,6 +6081,205 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
 
             if (pageSize !== undefined) {
                 localVarQueryParameter['pageSize'] = pageSize;
+            }
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 班级学情概览
+         * @param {number} classId 
+         * @param {string} [startDate] 
+         * @param {string} [endDate] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getClassOverview: async (classId: number, startDate?: string, endDate?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'classId' is not null or undefined
+            assertParamExists('getClassOverview', 'classId', classId)
+            const localVarPath = `/api/analytics/class/{classId}/overview`
+                .replace(`{${"classId"}}`, encodeURIComponent(String(classId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (startDate !== undefined) {
+                localVarQueryParameter['startDate'] = (startDate as any instanceof Date) ?
+                    (startDate as any).toISOString().substring(0,10) :
+                    startDate;
+            }
+
+            if (endDate !== undefined) {
+                localVarQueryParameter['endDate'] = (endDate as any instanceof Date) ?
+                    (endDate as any).toISOString().substring(0,10) :
+                    endDate;
+            }
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 班级成员排名
+         * @param {number} classId 
+         * @param {string} [startDate] 
+         * @param {string} [endDate] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getClassRanking: async (classId: number, startDate?: string, endDate?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'classId' is not null or undefined
+            assertParamExists('getClassRanking', 'classId', classId)
+            const localVarPath = `/api/analytics/class/{classId}/ranking`
+                .replace(`{${"classId"}}`, encodeURIComponent(String(classId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (startDate !== undefined) {
+                localVarQueryParameter['startDate'] = (startDate as any instanceof Date) ?
+                    (startDate as any).toISOString().substring(0,10) :
+                    startDate;
+            }
+
+            if (endDate !== undefined) {
+                localVarQueryParameter['endDate'] = (endDate as any instanceof Date) ?
+                    (endDate as any).toISOString().substring(0,10) :
+                    endDate;
+            }
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 班级各学科分析
+         * @param {number} classId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getClassSubjects: async (classId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'classId' is not null or undefined
+            assertParamExists('getClassSubjects', 'classId', classId)
+            const localVarPath = `/api/analytics/class/{classId}/subjects`
+                .replace(`{${"classId"}}`, encodeURIComponent(String(classId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 班级学习趋势
+         * @param {number} classId 
+         * @param {string} [granularity] 
+         * @param {string} [startDate] 
+         * @param {string} [endDate] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getClassTrend: async (classId: number, granularity?: string, startDate?: string, endDate?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'classId' is not null or undefined
+            assertParamExists('getClassTrend', 'classId', classId)
+            const localVarPath = `/api/analytics/class/{classId}/trend`
+                .replace(`{${"classId"}}`, encodeURIComponent(String(classId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (granularity !== undefined) {
+                localVarQueryParameter['granularity'] = granularity;
+            }
+
+            if (startDate !== undefined) {
+                localVarQueryParameter['startDate'] = (startDate as any instanceof Date) ?
+                    (startDate as any).toISOString().substring(0,10) :
+                    startDate;
+            }
+
+            if (endDate !== undefined) {
+                localVarQueryParameter['endDate'] = (endDate as any instanceof Date) ?
+                    (endDate as any).toISOString().substring(0,10) :
+                    endDate;
             }
 
             localVarHeaderParameter['Accept'] = 'application/json';
@@ -9612,6 +9873,189 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             // authentication Bearer Token required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary AI个人学情分析报告（SSE流式）
+         * @param {string} [startDate] 
+         * @param {string} [endDate] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getStudentAiReport: async (startDate?: string, endDate?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/analytics/student/ai-report`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (startDate !== undefined) {
+                localVarQueryParameter['startDate'] = (startDate as any instanceof Date) ?
+                    (startDate as any).toISOString().substring(0,10) :
+                    startDate;
+            }
+
+            if (endDate !== undefined) {
+                localVarQueryParameter['endDate'] = (endDate as any instanceof Date) ?
+                    (endDate as any).toISOString().substring(0,10) :
+                    endDate;
+            }
+
+            localVarHeaderParameter['Accept'] = 'application/json,text/event-stream';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 个人学情概览
+         * @param {string} [startDate] 
+         * @param {string} [endDate] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getStudentOverview: async (startDate?: string, endDate?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/analytics/student/overview`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (startDate !== undefined) {
+                localVarQueryParameter['startDate'] = (startDate as any instanceof Date) ?
+                    (startDate as any).toISOString().substring(0,10) :
+                    startDate;
+            }
+
+            if (endDate !== undefined) {
+                localVarQueryParameter['endDate'] = (endDate as any instanceof Date) ?
+                    (endDate as any).toISOString().substring(0,10) :
+                    endDate;
+            }
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 个人各学科学情
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getStudentSubjects: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/analytics/student/subjects`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 个人学习趋势
+         * @param {string} [granularity] 
+         * @param {string} [startDate] 
+         * @param {string} [endDate] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getStudentTrend: async (granularity?: string, startDate?: string, endDate?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/analytics/student/trend`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (granularity !== undefined) {
+                localVarQueryParameter['granularity'] = granularity;
+            }
+
+            if (startDate !== undefined) {
+                localVarQueryParameter['startDate'] = (startDate as any instanceof Date) ?
+                    (startDate as any).toISOString().substring(0,10) :
+                    startDate;
+            }
+
+            if (endDate !== undefined) {
+                localVarQueryParameter['endDate'] = (endDate as any instanceof Date) ?
+                    (endDate as any).toISOString().substring(0,10) :
+                    endDate;
+            }
 
             localVarHeaderParameter['Accept'] = 'application/json';
 
@@ -20826,6 +21270,21 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary AI班级学情分析报告（SSE流式）
+         * @param {number} classId 
+         * @param {string} [startDate] 
+         * @param {string} [endDate] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getClassAiReport(classId: number, startDate?: string, endDate?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SseEmitter>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getClassAiReport(classId, startDate, endDate, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getClassAiReport']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @summary 获取班级详情
          * @param {number} classId 
          * @param {*} [options] Override http request option.
@@ -20850,6 +21309,65 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getClassMembers(classId, pageNum, pageSize, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.getClassMembers']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 班级学情概览
+         * @param {number} classId 
+         * @param {string} [startDate] 
+         * @param {string} [endDate] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getClassOverview(classId: number, startDate?: string, endDate?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseClassAnalyticsResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getClassOverview(classId, startDate, endDate, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getClassOverview']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 班级成员排名
+         * @param {number} classId 
+         * @param {string} [startDate] 
+         * @param {string} [endDate] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getClassRanking(classId: number, startDate?: string, endDate?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseListStudentRankingItem>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getClassRanking(classId, startDate, endDate, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getClassRanking']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 班级各学科分析
+         * @param {number} classId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getClassSubjects(classId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseListSubjectAnalyticsItem>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getClassSubjects(classId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getClassSubjects']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 班级学习趋势
+         * @param {number} classId 
+         * @param {string} [granularity] 
+         * @param {string} [startDate] 
+         * @param {string} [endDate] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getClassTrend(classId: number, granularity?: string, startDate?: string, endDate?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseLearningTrendResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getClassTrend(classId, granularity, startDate, endDate, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getClassTrend']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -22046,6 +22564,61 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getStatus(submissionId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.getStatus']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary AI个人学情分析报告（SSE流式）
+         * @param {string} [startDate] 
+         * @param {string} [endDate] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getStudentAiReport(startDate?: string, endDate?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SseEmitter>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getStudentAiReport(startDate, endDate, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getStudentAiReport']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 个人学情概览
+         * @param {string} [startDate] 
+         * @param {string} [endDate] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getStudentOverview(startDate?: string, endDate?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseStudentAnalyticsResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getStudentOverview(startDate, endDate, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getStudentOverview']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 个人各学科学情
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getStudentSubjects(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseListSubjectAnalyticsItem>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getStudentSubjects(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getStudentSubjects']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 个人学习趋势
+         * @param {string} [granularity] 
+         * @param {string} [startDate] 
+         * @param {string} [endDate] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getStudentTrend(granularity?: string, startDate?: string, endDate?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseLearningTrendResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getStudentTrend(granularity, startDate, endDate, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getStudentTrend']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -26443,6 +27016,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
+         * @summary AI班级学情分析报告（SSE流式）
+         * @param {DefaultApiGetClassAiReportRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getClassAiReport(requestParameters: DefaultApiGetClassAiReportRequest, options?: RawAxiosRequestConfig): AxiosPromise<SseEmitter> {
+            return localVarFp.getClassAiReport(requestParameters.classId, requestParameters.startDate, requestParameters.endDate, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary 获取班级详情
          * @param {DefaultApiGetClassInfoRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
@@ -26460,6 +27043,46 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         getClassMembers(requestParameters: DefaultApiGetClassMembersRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponsePageResponseClassMemberResponse> {
             return localVarFp.getClassMembers(requestParameters.classId, requestParameters.pageNum, requestParameters.pageSize, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 班级学情概览
+         * @param {DefaultApiGetClassOverviewRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getClassOverview(requestParameters: DefaultApiGetClassOverviewRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseClassAnalyticsResponse> {
+            return localVarFp.getClassOverview(requestParameters.classId, requestParameters.startDate, requestParameters.endDate, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 班级成员排名
+         * @param {DefaultApiGetClassRankingRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getClassRanking(requestParameters: DefaultApiGetClassRankingRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListStudentRankingItem> {
+            return localVarFp.getClassRanking(requestParameters.classId, requestParameters.startDate, requestParameters.endDate, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 班级各学科分析
+         * @param {DefaultApiGetClassSubjectsRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getClassSubjects(requestParameters: DefaultApiGetClassSubjectsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListSubjectAnalyticsItem> {
+            return localVarFp.getClassSubjects(requestParameters.classId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 班级学习趋势
+         * @param {DefaultApiGetClassTrendRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getClassTrend(requestParameters: DefaultApiGetClassTrendRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseLearningTrendResponse> {
+            return localVarFp.getClassTrend(requestParameters.classId, requestParameters.granularity, requestParameters.startDate, requestParameters.endDate, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -27342,6 +27965,45 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         getStatus(requestParameters: DefaultApiGetStatusRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseSubmissionStatusResponse> {
             return localVarFp.getStatus(requestParameters.submissionId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary AI个人学情分析报告（SSE流式）
+         * @param {DefaultApiGetStudentAiReportRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getStudentAiReport(requestParameters: DefaultApiGetStudentAiReportRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<SseEmitter> {
+            return localVarFp.getStudentAiReport(requestParameters.startDate, requestParameters.endDate, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 个人学情概览
+         * @param {DefaultApiGetStudentOverviewRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getStudentOverview(requestParameters: DefaultApiGetStudentOverviewRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseStudentAnalyticsResponse> {
+            return localVarFp.getStudentOverview(requestParameters.startDate, requestParameters.endDate, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 个人各学科学情
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getStudentSubjects(options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListSubjectAnalyticsItem> {
+            return localVarFp.getStudentSubjects(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 个人学习趋势
+         * @param {DefaultApiGetStudentTrendRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getStudentTrend(requestParameters: DefaultApiGetStudentTrendRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseLearningTrendResponse> {
+            return localVarFp.getStudentTrend(requestParameters.granularity, requestParameters.startDate, requestParameters.endDate, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -30766,6 +31428,15 @@ export interface DefaultApiInterface {
 
     /**
      * 
+     * @summary AI班级学情分析报告（SSE流式）
+     * @param {DefaultApiGetClassAiReportRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getClassAiReport(requestParameters: DefaultApiGetClassAiReportRequest, options?: RawAxiosRequestConfig): AxiosPromise<SseEmitter>;
+
+    /**
+     * 
      * @summary 获取班级详情
      * @param {DefaultApiGetClassInfoRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -30781,6 +31452,42 @@ export interface DefaultApiInterface {
      * @throws {RequiredError}
      */
     getClassMembers(requestParameters: DefaultApiGetClassMembersRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponsePageResponseClassMemberResponse>;
+
+    /**
+     * 
+     * @summary 班级学情概览
+     * @param {DefaultApiGetClassOverviewRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getClassOverview(requestParameters: DefaultApiGetClassOverviewRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseClassAnalyticsResponse>;
+
+    /**
+     * 
+     * @summary 班级成员排名
+     * @param {DefaultApiGetClassRankingRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getClassRanking(requestParameters: DefaultApiGetClassRankingRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListStudentRankingItem>;
+
+    /**
+     * 
+     * @summary 班级各学科分析
+     * @param {DefaultApiGetClassSubjectsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getClassSubjects(requestParameters: DefaultApiGetClassSubjectsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListSubjectAnalyticsItem>;
+
+    /**
+     * 
+     * @summary 班级学习趋势
+     * @param {DefaultApiGetClassTrendRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getClassTrend(requestParameters: DefaultApiGetClassTrendRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseLearningTrendResponse>;
 
     /**
      * 
@@ -31573,6 +32280,41 @@ export interface DefaultApiInterface {
      * @throws {RequiredError}
      */
     getStatus(requestParameters: DefaultApiGetStatusRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseSubmissionStatusResponse>;
+
+    /**
+     * 
+     * @summary AI个人学情分析报告（SSE流式）
+     * @param {DefaultApiGetStudentAiReportRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getStudentAiReport(requestParameters?: DefaultApiGetStudentAiReportRequest, options?: RawAxiosRequestConfig): AxiosPromise<SseEmitter>;
+
+    /**
+     * 
+     * @summary 个人学情概览
+     * @param {DefaultApiGetStudentOverviewRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getStudentOverview(requestParameters?: DefaultApiGetStudentOverviewRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseStudentAnalyticsResponse>;
+
+    /**
+     * 
+     * @summary 个人各学科学情
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getStudentSubjects(options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListSubjectAnalyticsItem>;
+
+    /**
+     * 
+     * @summary 个人学习趋势
+     * @param {DefaultApiGetStudentTrendRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getStudentTrend(requestParameters?: DefaultApiGetStudentTrendRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseLearningTrendResponse>;
 
     /**
      * 
@@ -34722,6 +35464,17 @@ export interface DefaultApiGetCheckinRankingRequest {
 }
 
 /**
+ * Request parameters for getClassAiReport operation in DefaultApi.
+ */
+export interface DefaultApiGetClassAiReportRequest {
+    readonly classId: number
+
+    readonly startDate?: string
+
+    readonly endDate?: string
+}
+
+/**
  * Request parameters for getClassInfo operation in DefaultApi.
  */
 export interface DefaultApiGetClassInfoRequest {
@@ -34737,6 +35490,48 @@ export interface DefaultApiGetClassMembersRequest {
     readonly pageNum?: number
 
     readonly pageSize?: number
+}
+
+/**
+ * Request parameters for getClassOverview operation in DefaultApi.
+ */
+export interface DefaultApiGetClassOverviewRequest {
+    readonly classId: number
+
+    readonly startDate?: string
+
+    readonly endDate?: string
+}
+
+/**
+ * Request parameters for getClassRanking operation in DefaultApi.
+ */
+export interface DefaultApiGetClassRankingRequest {
+    readonly classId: number
+
+    readonly startDate?: string
+
+    readonly endDate?: string
+}
+
+/**
+ * Request parameters for getClassSubjects operation in DefaultApi.
+ */
+export interface DefaultApiGetClassSubjectsRequest {
+    readonly classId: number
+}
+
+/**
+ * Request parameters for getClassTrend operation in DefaultApi.
+ */
+export interface DefaultApiGetClassTrendRequest {
+    readonly classId: number
+
+    readonly granularity?: string
+
+    readonly startDate?: string
+
+    readonly endDate?: string
 }
 
 /**
@@ -35464,6 +36259,35 @@ export interface DefaultApiGetSentRequestsRequest {
  */
 export interface DefaultApiGetStatusRequest {
     readonly submissionId: number
+}
+
+/**
+ * Request parameters for getStudentAiReport operation in DefaultApi.
+ */
+export interface DefaultApiGetStudentAiReportRequest {
+    readonly startDate?: string
+
+    readonly endDate?: string
+}
+
+/**
+ * Request parameters for getStudentOverview operation in DefaultApi.
+ */
+export interface DefaultApiGetStudentOverviewRequest {
+    readonly startDate?: string
+
+    readonly endDate?: string
+}
+
+/**
+ * Request parameters for getStudentTrend operation in DefaultApi.
+ */
+export interface DefaultApiGetStudentTrendRequest {
+    readonly granularity?: string
+
+    readonly startDate?: string
+
+    readonly endDate?: string
 }
 
 /**
@@ -39119,6 +39943,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
 
     /**
      * 
+     * @summary AI班级学情分析报告（SSE流式）
+     * @param {DefaultApiGetClassAiReportRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getClassAiReport(requestParameters: DefaultApiGetClassAiReportRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getClassAiReport(requestParameters.classId, requestParameters.startDate, requestParameters.endDate, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @summary 获取班级详情
      * @param {DefaultApiGetClassInfoRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -39137,6 +39972,50 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public getClassMembers(requestParameters: DefaultApiGetClassMembersRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).getClassMembers(requestParameters.classId, requestParameters.pageNum, requestParameters.pageSize, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 班级学情概览
+     * @param {DefaultApiGetClassOverviewRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getClassOverview(requestParameters: DefaultApiGetClassOverviewRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getClassOverview(requestParameters.classId, requestParameters.startDate, requestParameters.endDate, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 班级成员排名
+     * @param {DefaultApiGetClassRankingRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getClassRanking(requestParameters: DefaultApiGetClassRankingRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getClassRanking(requestParameters.classId, requestParameters.startDate, requestParameters.endDate, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 班级各学科分析
+     * @param {DefaultApiGetClassSubjectsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getClassSubjects(requestParameters: DefaultApiGetClassSubjectsRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getClassSubjects(requestParameters.classId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 班级学习趋势
+     * @param {DefaultApiGetClassTrendRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getClassTrend(requestParameters: DefaultApiGetClassTrendRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getClassTrend(requestParameters.classId, requestParameters.granularity, requestParameters.startDate, requestParameters.endDate, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -40109,6 +40988,49 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public getStatus(requestParameters: DefaultApiGetStatusRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).getStatus(requestParameters.submissionId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary AI个人学情分析报告（SSE流式）
+     * @param {DefaultApiGetStudentAiReportRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getStudentAiReport(requestParameters: DefaultApiGetStudentAiReportRequest = {}, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getStudentAiReport(requestParameters.startDate, requestParameters.endDate, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 个人学情概览
+     * @param {DefaultApiGetStudentOverviewRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getStudentOverview(requestParameters: DefaultApiGetStudentOverviewRequest = {}, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getStudentOverview(requestParameters.startDate, requestParameters.endDate, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 个人各学科学情
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getStudentSubjects(options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getStudentSubjects(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 个人学习趋势
+     * @param {DefaultApiGetStudentTrendRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getStudentTrend(requestParameters: DefaultApiGetStudentTrendRequest = {}, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getStudentTrend(requestParameters.granularity, requestParameters.startDate, requestParameters.endDate, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
