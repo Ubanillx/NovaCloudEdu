@@ -1,7 +1,7 @@
 package com.novacloudedu.backend.book;
 
 import com.novacloudedu.backend.application.book.command.UpdateReadingProgressCommand;
-import com.novacloudedu.backend.application.book.service.ReadingProgressApplicationService;
+import com.novacloudedu.backend.application.service.ReadingProgressApplicationService;
 import com.novacloudedu.backend.domain.book.entity.Book;
 import com.novacloudedu.backend.domain.book.entity.UserBookShelf;
 import com.novacloudedu.backend.domain.book.repository.BookRepository;

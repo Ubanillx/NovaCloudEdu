@@ -186,7 +186,7 @@ public class HomeworkGradingController {
         for (var swr : recent) {
             GradingStatsResponse.ScoreTrendItem item = new GradingStatsResponse.ScoreTrendItem();
             item.setSubmissionId(String.valueOf(swr.submission().getId().getValue()));
-            item.setSubject(swr.submission().getSubject().getCode());
+            item.setSubject(swr.submission().getSubject() != null ? swr.submission().getSubject().getCode() : null);
             item.setCreateTime(swr.submission().getCreateTime().toString());
             if (swr.result() != null && swr.result().getMaxScore() != null && swr.result().getMaxScore() > 0) {
                 item.setScore(swr.result().getTotalScore());
@@ -194,7 +194,9 @@ public class HomeworkGradingController {
                 double rate = (double) swr.result().getTotalScore() / swr.result().getMaxScore();
                 totalRate += rate;
                 ratedCount++;
-                subjectRates.computeIfAbsent(swr.submission().getSubject().getCode(), k -> new ArrayList<>()).add(rate);
+                if (swr.submission().getSubject() != null) {
+                    subjectRates.computeIfAbsent(swr.submission().getSubject().getCode(), k -> new ArrayList<>()).add(rate);
+                }
             }
             trend.add(item);
         }
@@ -233,6 +235,11 @@ public class HomeworkGradingController {
                 .orElseThrow(() -> new BusinessException(40400, "作业提交不存在"));
         GradingResult result = gradingService.getGradingResult(submissionId)
                 .orElseThrow(() -> new BusinessException(40400, "批改结果不存在"));
+
+        // 通用模式下 subject 可能为 null,无法推荐同类题
+        if (submission.getSubject() == null) {
+            return ResultUtils.success(List.of());
+        }
 
         List<SimilarQuestionService.QuestionRecommendation> recs =
                 similarQuestionService.recommendForGradingResult(

@@ -73,6 +73,7 @@ workflow:
 logging:
   level:
     com.novacloudedu.backend: debug
+    org.springframework.data.neo4j.cypher.unrecognized: error
 
 # SpringDoc OpenAPI 配置
 springdoc:
