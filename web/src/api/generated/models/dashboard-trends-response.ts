@@ -14,11 +14,9 @@
 
 
 
-export * from './api/default-api';
-export * from './api/aiapi';
-export * from './api/admin-dashboard-controller-api';
-export * from './api/mcpapi';
-export * from './api/only-office-api';
-export * from './api/pptapi';
-export * from './api/webhook-api';
+export interface DashboardTrendsResponse {
+    'userGrowth'?: Array<{ [key: string]: object; }>;
+    'activeTrend'?: Array<{ [key: string]: object; }>;
+    'revenueTrend'?: Array<{ [key: string]: object; }>;
+}
 

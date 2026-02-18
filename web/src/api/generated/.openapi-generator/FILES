@@ -1,6 +1,7 @@
 .gitignore
 .npmignore
 api.ts
+api/admin-dashboard-controller-api.ts
 api/aiapi.ts
 api/default-api.ts
 api/mcpapi.ts
@@ -20,6 +21,7 @@ docs/AddPaperQuestionRequest.md
 docs/AddPaperSectionRequest.md
 docs/AddScheduleItemRequest.md
 docs/AddVariableRequest.md
+docs/AdminDashboardControllerApi.md
 docs/AdminGroupPageResponse.md
 docs/AiAssistantVO.md
 docs/AiConversation.md
@@ -60,6 +62,7 @@ docs/BaseResponseChapterSummary.md
 docs/BaseResponseChatMessagePageResponse.md
 docs/BaseResponseCheckinResult.md
 docs/BaseResponseCheckinStatusResult.md
+docs/BaseResponseClassAnalyticsResponse.md
 docs/BaseResponseClassResponse.md
 docs/BaseResponseCommentPageResponse.md
 docs/BaseResponseCommentResponse.md
@@ -71,6 +74,13 @@ docs/BaseResponseDailyArticlePageResponse.md
 docs/BaseResponseDailyArticleResponse.md
 docs/BaseResponseDailyWordPageResponse.md
 docs/BaseResponseDailyWordResponse.md
+docs/BaseResponseDashboardAiSystemResponse.md
+docs/BaseResponseDashboardAlertsResponse.md
+docs/BaseResponseDashboardContentResponse.md
+docs/BaseResponseDashboardFullResponse.md
+docs/BaseResponseDashboardLearningResponse.md
+docs/BaseResponseDashboardOverviewResponse.md
+docs/BaseResponseDashboardTrendsResponse.md
 docs/BaseResponseExamPaperPageResponse.md
 docs/BaseResponseExamPaperResponse.md
 docs/BaseResponseExamTemplateResponse.md
@@ -94,6 +104,7 @@ docs/BaseResponseJoinRequestResponse.md
 docs/BaseResponseKnowledgeBaseVO.md
 docs/BaseResponseKnowledgeDocumentVO.md
 docs/BaseResponseLearningStats.md
+docs/BaseResponseLearningTrendResponse.md
 docs/BaseResponseListAiAssistantVO.md
 docs/BaseResponseListAiConversation.md
 docs/BaseResponseListArticleSourceResponse.md
@@ -140,6 +151,8 @@ docs/BaseResponseListScraperConfigResponse.md
 docs/BaseResponseListSearchSuggestionDTO.md
 docs/BaseResponseListSectionResponse.md
 docs/BaseResponseListString.md
+docs/BaseResponseListStudentRankingItem.md
+docs/BaseResponseListSubjectAnalyticsItem.md
 docs/BaseResponseListSubjectProfileSummary.md
 docs/BaseResponseListSubmissionStatusResponse.md
 docs/BaseResponseListTeacherApplicationResponse.md
@@ -197,6 +210,7 @@ docs/BaseResponseSearchUserPageResponse.md
 docs/BaseResponseSectionResponse.md
 docs/BaseResponseSendResult.md
 docs/BaseResponseString.md
+docs/BaseResponseStudentAnalyticsResponse.md
 docs/BaseResponseSubjectProfileSummary.md
 docs/BaseResponseSubmissionStatusResponse.md
 docs/BaseResponseTeacherApplicationResponse.md
@@ -248,6 +262,7 @@ docs/CheckinRankingItem.md
 docs/CheckinResult.md
 docs/CheckinStatusResult.md
 docs/ChildrenDefinition.md
+docs/ClassAnalyticsResponse.md
 docs/ClassMemberResponse.md
 docs/ClassResponse.md
 docs/ClassScheduleItemResponse.md
@@ -288,6 +303,13 @@ docs/DailyArticlePageResponse.md
 docs/DailyArticleResponse.md
 docs/DailyWordPageResponse.md
 docs/DailyWordResponse.md
+docs/DashboardAiSystemResponse.md
+docs/DashboardAlertsResponse.md
+docs/DashboardContentResponse.md
+docs/DashboardFullResponse.md
+docs/DashboardLearningResponse.md
+docs/DashboardOverviewResponse.md
+docs/DashboardTrendsResponse.md
 docs/DefaultApi.md
 docs/DynamicScrapeRequest.md
 docs/ErrorCategoryCount.md
@@ -340,6 +362,7 @@ docs/KnowledgePoint.md
 docs/KnowledgePointId.md
 docs/KnowledgeProfileResponse.md
 docs/LearningStats.md
+docs/LearningTrendResponse.md
 docs/LoginUserResponse.md
 docs/MCPApi.md
 docs/MemberPage.md
@@ -417,12 +440,16 @@ docs/SkillOutputVO.md
 docs/SkillParamVO.md
 docs/SourceScrapeRequest.md
 docs/SseEmitter.md
+docs/StudentAnalyticsResponse.md
+docs/StudentRankingItem.md
+docs/SubjectAnalyticsItem.md
 docs/SubjectProfileSummary.md
 docs/SubmissionStatusResponse.md
 docs/SubmitHomeworkRequest.md
 docs/TeacherApplicationResponse.md
 docs/TeacherResponse.md
 docs/TimeConfigItem.md
+docs/TrendItem.md
 docs/TtsRequest.md
 docs/TtsResponse.md
 docs/UpdateAiAssistantCommand.md
@@ -548,6 +575,7 @@ models/base-response-chapter-summary.ts
 models/base-response-chat-message-page-response.ts
 models/base-response-checkin-result.ts
 models/base-response-checkin-status-result.ts
+models/base-response-class-analytics-response.ts
 models/base-response-class-response.ts
 models/base-response-comment-page-response.ts
 models/base-response-comment-response.ts
@@ -559,6 +587,13 @@ models/base-response-daily-article-page-response.ts
 models/base-response-daily-article-response.ts
 models/base-response-daily-word-page-response.ts
 models/base-response-daily-word-response.ts
+models/base-response-dashboard-ai-system-response.ts
+models/base-response-dashboard-alerts-response.ts
+models/base-response-dashboard-content-response.ts
+models/base-response-dashboard-full-response.ts
+models/base-response-dashboard-learning-response.ts
+models/base-response-dashboard-overview-response.ts
+models/base-response-dashboard-trends-response.ts
 models/base-response-exam-paper-page-response.ts
 models/base-response-exam-paper-response.ts
 models/base-response-exam-template-response.ts
@@ -582,6 +617,7 @@ models/base-response-join-request-response.ts
 models/base-response-knowledge-base-vo.ts
 models/base-response-knowledge-document-vo.ts
 models/base-response-learning-stats.ts
+models/base-response-learning-trend-response.ts
 models/base-response-list-ai-assistant-vo.ts
 models/base-response-list-ai-conversation.ts
 models/base-response-list-article-source-response.ts
@@ -628,6 +664,8 @@ models/base-response-list-scraper-config-response.ts
 models/base-response-list-search-suggestion-dto.ts
 models/base-response-list-section-response.ts
 models/base-response-list-string.ts
+models/base-response-list-student-ranking-item.ts
+models/base-response-list-subject-analytics-item.ts
 models/base-response-list-subject-profile-summary.ts
 models/base-response-list-submission-status-response.ts
 models/base-response-list-teacher-application-response.ts
@@ -685,6 +723,7 @@ models/base-response-search-user-page-response.ts
 models/base-response-section-response.ts
 models/base-response-send-result.ts
 models/base-response-string.ts
+models/base-response-student-analytics-response.ts
 models/base-response-subject-profile-summary.ts
 models/base-response-submission-status-response.ts
 models/base-response-teacher-application-response.ts
@@ -736,6 +775,7 @@ models/checkin-ranking-item.ts
 models/checkin-result.ts
 models/checkin-status-result.ts
 models/children-definition.ts
+models/class-analytics-response.ts
 models/class-member-response.ts
 models/class-response.ts
 models/class-schedule-item-response.ts
@@ -776,6 +816,13 @@ models/daily-article-page-response.ts
 models/daily-article-response.ts
 models/daily-word-page-response.ts
 models/daily-word-response.ts
+models/dashboard-ai-system-response.ts
+models/dashboard-alerts-response.ts
+models/dashboard-content-response.ts
+models/dashboard-full-response.ts
+models/dashboard-learning-response.ts
+models/dashboard-overview-response.ts
+models/dashboard-trends-response.ts
 models/dynamic-scrape-request.ts
 models/error-category-count.ts
 models/error-handling-config-dto.ts
@@ -828,6 +875,7 @@ models/knowledge-point-id.ts
 models/knowledge-point.ts
 models/knowledge-profile-response.ts
 models/learning-stats.ts
+models/learning-trend-response.ts
 models/login-user-response.ts
 models/member-page.ts
 models/membership-plan.ts
@@ -902,12 +950,16 @@ models/skill-output-vo.ts
 models/skill-param-vo.ts
 models/source-scrape-request.ts
 models/sse-emitter.ts
+models/student-analytics-response.ts
+models/student-ranking-item.ts
+models/subject-analytics-item.ts
 models/subject-profile-summary.ts
 models/submission-status-response.ts
 models/submit-homework-request.ts
 models/teacher-application-response.ts
 models/teacher-response.ts
 models/time-config-item.ts
+models/trend-item.ts
 models/tts-request.ts
 models/tts-response.ts
 models/update-ai-assistant-command.ts

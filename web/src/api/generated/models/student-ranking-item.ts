@@ -14,11 +14,14 @@
 
 
 
-export * from './api/default-api';
-export * from './api/aiapi';
-export * from './api/admin-dashboard-controller-api';
-export * from './api/mcpapi';
-export * from './api/only-office-api';
-export * from './api/pptapi';
-export * from './api/webhook-api';
+export interface StudentRankingItem {
+    'rank'?: number;
+    'userId'?: string;
+    'userName'?: string;
+    'totalDurationSec'?: number;
+    'durationText'?: string;
+    'activityCount'?: number;
+    'scoreRate'?: number;
+    'compositeScore'?: number;
+}
 
