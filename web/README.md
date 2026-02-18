@@ -33,13 +33,20 @@
 | 页面 | 功能描述 |
 |:---|:---|
 | **AI 对话** | 多模型智能对话（SSE 流式）、文件上传、知识库问答、文生图/文生视频 |
+| **AI 助手对话** | 专属 AI 助手对话、自定义提示词、知识库增强 |
 | **私聊/群聊** | WebSocket 实时消息（STOMP 协议）、已读回执、在线状态 |
 | **学习圈子** | 帖子发布/编辑/详情、评论/回复、点赞、社交互动 |
+| **课程中心** | 课程列表/详情、章节学习、视频播放（HLS）、学习进度 |
+| **电子书阅读** | PDF 阅读器、AI 总结/问答、阅读进度同步、笔记标注 |
+| **智能批改** | 作业提交（拍照/上传）、OCR 识别、AI 批改、知识画像、错题推荐 |
+| **会员中心** | 会员套餐、开通/续费、AI 配额查看 |
 | **每日单词** | 单词列表/详情、发音播放、学习记录 |
 | **每日文章** | 文章列表/详情、AI 文章对话（SSE 流式） |
 | **公告** | 公告列表/详情 |
 | **课程表** | 课程排期管理、日历视图 |
 | **单词本** | 个人生词本管理 |
+| **全局搜索** | 课程/文章/帖子/用户全局搜索 |
+| **反馈** | 用户反馈提交 |
 | **个人中心** | 个人信息、地区/手机修改、学习数据、偏好设置 |
 
 ### 管理后台
@@ -47,9 +54,23 @@
 | 页面 | 功能描述 |
 |:---|:---|
 | **用户管理** | 用户 CRUD、角色权限、分页搜索 |
-| **AI 助手管理** | AI 助手配置、模型选择、系统提示词、知识库关联 |
+| **AI 助手管理** | AI 助手配置、模型选择、系统提示词、知识库关联、MCP 服务器集成 |
 | **知识库管理** | 文档上传（PDF/EPUB/DOCX）、向量化、知识库 CRUD |
 | **工作流管理** | 可视化工作流编排（React Flow）、节点拖拽、定时调度、版本管理 |
+| **MCP 服务器管理** | MCP 服务器配置、工具/资源管理 |
+| **课程管理** | 课程 CRUD、章节/小节管理、视频上传/转码 |
+| **班级管理** | 班级 CRUD、成员管理、作业布置 |
+| **教师管理** | 教师资格审核、教师信息管理 |
+| **群组管理** | 聊天群组管理、成员管理 |
+| **电子书管理** | 电子书上传、章节管理、加密处理 |
+| **试卷管理** | 试卷 CRUD、大题管理、题目关联、Typst 导出 |
+| **题库管理** | 题目 CRUD、分类/标签、AI 生成题目 |
+| **试卷模板管理** | 试卷模板 CRUD、快速创建 |
+| **PPT 生成** | AI 驱动的 PPT 生成、大纲编辑、模板选择 |
+| **PPT 模板管理** | PPT 模板 CRUD、预览 |
+| **PPT 在线编辑** | OnlyOffice 集成编辑器 |
+| **会员管理** | 会员套餐配置、AI 配额调整 |
+| **订单管理** | 订单查询、状态管理 |
 | **公告管理** | 公告 CRUD、发布/下架 |
 | **轮播图管理** | 首页轮播图 CRUD、排序 |
 | **帖子管理** | 社区帖子审核/删除 |
@@ -76,6 +97,21 @@ main.tsx (渲染入口)
 │   ├── /admin/knowledge-bases       #   知识库管理
 │   ├── /admin/workflows             #   工作流管理
 │   ├── /admin/workflows/:id/edit    #   工作流编辑器（全屏画布，不套 AdminLayout）
+│   ├── /admin/mcp-servers           #   MCP 服务器管理
+│   ├── /admin/courses               #   课程管理
+│   ├── /admin/courses/:id           #   课程详情/编辑
+│   ├── /admin/classes               #   班级管理
+│   ├── /admin/teachers              #   教师管理
+│   ├── /admin/groups                #   群组管理
+│   ├── /admin/books                 #   电子书管理
+│   ├── /admin/exam-papers           #   试卷管理
+│   ├── /admin/questions             #   题库管理
+│   ├── /admin/exam-templates        #   试卷模板管理
+│   ├── /admin/ppt-generator         #   PPT 生成
+│   ├── /admin/ppt-templates         #   PPT 模板管理
+│   ├── /admin/ppt-editor            #   PPT 在线编辑器（全屏，不套 AdminLayout）
+│   ├── /admin/membership            #   会员管理
+│   ├── /admin/orders                #   订单管理
 │   ├── /admin/announcements         #   公告管理
 │   ├── /admin/banners               #   轮播图管理
 │   ├── /admin/posts                 #   帖子管理
@@ -88,7 +124,19 @@ main.tsx (渲染入口)
 └── /*                               # 用户端（ProtectedRoute）
     ├── /                            #   首页（Banner/公告/课程表/单词/文章/统计）
     ├── /chat                        #   AI 对话（AI/私聊/群聊三栏切换）
+    ├── /ai-assistant/:id            #   AI 助手对话
     ├── /circle                      #   学习圈子
+    ├── /courses                     #   课程列表
+    ├── /courses/:id                 #   课程详情
+    ├── /courses/:courseId/lessons/:lessonId #   课程小节学习（视频播放）
+    ├── /ebooks                      #   电子书列表
+    ├── /ebooks/:id                  #   电子书阅读器（PDF/AI 问答）
+    ├── /grading                     #   智能批改首页
+    ├── /grading/submit              #   作业提交
+    ├── /grading/result/:id          #   批改结果详情
+    ├── /membership                  #   会员中心
+    ├── /search                      #   全局搜索结果
+    ├── /feedback                    #   用户反馈
     ├── /profile                     #   个人中心
     ├── /schedule                    #   课程表
     ├── /word-book                   #   单词本
@@ -116,7 +164,19 @@ src/pages/
 ├── RegisterPage.tsx                 # 注册页（手机号 + 短信验证码）
 │
 ├── ChatPage.tsx                     # AI 智能对话页（三栏布局：AI/私聊/群聊）
+├── AiAssistantChatPage.tsx          # AI 助手对话页（专属助手/知识库增强）
 ├── CirclePage.tsx                   # 学习圈子（帖子列表/发布/搜索/关注动态）
+├── CourseListPage.tsx               # 课程列表（筛选/搜索/分页）
+├── CourseDetailUserPage.tsx         # 课程详情（章节列表/学习进度）
+├── CourseLessonPage.tsx             # 课程小节学习（HLS 视频播放/进度记录）
+├── EbookListPage.tsx                # 电子书列表（分类/搜索）
+├── EbookReaderPage.tsx              # 电子书阅读器（PDF 渲染/AI 问答/笔记）
+├── GradingDashboardPage.tsx         # 智能批改首页（历史记录/知识画像/统计）
+├── GradingSubmitPage.tsx            # 作业提交（拍照/上传/OCR/AI 批改）
+├── GradingResultPage.tsx            # 批改结果详情（逐题批改/错题推荐）
+├── MembershipPage.tsx               # 会员中心（套餐/开通/续费/配额）
+├── SearchResultsPage.tsx            # 全局搜索结果（课程/文章/帖子/用户）
+├── FeedbackPage.tsx                 # 用户反馈提交
 ├── ProfilePage.tsx                  # 个人中心（信息编辑/签到/学习数据/关注/粉丝）
 ├── SchedulePage.tsx                 # 课程表（周视图/课程排期/新增课程）
 ├── WordBookPage.tsx                 # 单词本（生词列表/复习/删除）
@@ -134,9 +194,24 @@ src/pages/
 │
 ├── admin/                           # ═══ 管理后台 ═══
 │   ├── UserManagementPage.tsx       # 用户管理（CRUD/角色/搜索/分页）
-│   ├── AiAssistantManagementPage.tsx # AI 助手管理（创建/配置/模型选择/提示词/知识库关联）
+│   ├── AiAssistantManagementPage.tsx # AI 助手管理（创建/配置/模型选择/提示词/知识库/MCP 服务器）
 │   ├── KnowledgeBaseManagementPage.tsx # 知识库管理（创建/文档上传/向量化进度/文档列表）
 │   ├── WorkflowManagementPage.tsx   # 工作流管理（列表/创建/删除/定时调度/执行日志）
+│   ├── McpServerManagementPage.tsx  # MCP 服务器管理（配置/工具/资源）
+│   ├── CourseManagementPage.tsx     # 课程管理（CRUD/章节管理）
+│   ├── CourseDetailPage.tsx         # 课程详情/编辑（章节/小节/视频上传）
+│   ├── ClassManagementPage.tsx      # 班级管理（CRUD/成员/作业）
+│   ├── TeacherManagementPage.tsx    # 教师管理（资格审核/信息管理）
+│   ├── GroupManagementPage.tsx      # 群组管理（CRUD/成员管理）
+│   ├── BookManagementPage.tsx       # 电子书管理（上传/章节/加密）
+│   ├── ExamPaperManagementPage.tsx  # 试卷管理（CRUD/大题/题目/导出）
+│   ├── QuestionManagementPage.tsx   # 题库管理（CRUD/分类/AI 生成）
+│   ├── ExamTemplateManagementPage.tsx # 试卷模板管理（CRUD/应用）
+│   ├── PptGeneratorPage.tsx         # PPT 生成（AI 大纲/内容/模板）
+│   ├── PptTemplateManagementPage.tsx # PPT 模板管理（CRUD/预览）
+│   ├── PptEditorPage.tsx            # PPT 在线编辑器（OnlyOffice）
+│   ├── MembershipManagementPage.tsx # 会员管理（套餐配置/配额调整）
+│   ├── OrderManagementPage.tsx      # 订单管理（查询/状态）
 │   │
 │   ├── workflow/                    # ─── 工作流可视化编辑器 ───
 │   │   ├── WorkflowEditorPage.tsx   #   全屏画布编辑器（React Flow 集成）
@@ -212,6 +287,23 @@ src/components/
 │   ├── StudyPlanCard.tsx            #   学习计划卡片（目标/进度）
 │   ├── StudyStatsCard.tsx           #   学习统计卡片（学习时长/天数/签到）
 │   └── index.ts
+│
+├── ppt/                             # ═══ PPT 生成组件 ═══
+│   ├── StepIndicator.tsx            #   步骤指示器（主题/大纲/内容/模板/生成）
+│   ├── PptChatInput.tsx             #   PPT 对话输入框
+│   ├── PptChatMessage.tsx           #   PPT 对话消息渲染（SSE 流式）
+│   ├── OutlineEditor.tsx            #   大纲编辑器（拖拽排序/编辑）
+│   ├── TemplateSelector.tsx         #   模板选择器（预览/选择）
+│   ├── SlideListPanel.tsx           #   幻灯片列表面板
+│   └── PptPreviewPanel.tsx          #   PPT 预览面板
+│
+├── reader/                          # ═══ 电子书阅读器组件 ═══
+│   ├── PdfReaderView.tsx            #   PDF 渲染视图（react-pdf）
+│   ├── ReaderSidebar.tsx            #   阅读器侧边栏（目录/书签）
+│   ├── ReaderAiPanel.tsx            #   AI 问答面板（总结/提问）
+│   ├── ReaderSettingsPanel.tsx      #   阅读设置面板（字体/主题/间距）
+│   ├── FloatingProgressBar.tsx      #   浮动进度条
+│   └── readerConstants.ts           #   阅读器常量配置
 │
 ├── ui/                              # ═══ UI 基础组件 ═══
 │   ├── Toast.tsx                    #   全局 Toast 提示（success/error/info/warning）

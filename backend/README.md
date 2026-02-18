@@ -18,6 +18,8 @@
 | **对象存储** | 阿里云 OSS | 3.17.4 |
 | **语音交互** | 阿里云 NLS (ASR/TTS) | 2.1.6 |
 | **文档解析** | Apache POI / PDFBox / Jsoup / Epublib | 5.2.5 / 3.0.1 / 1.17.2 / 3.1 |
+| **PPT生成** | Python-PPTX (微服务) | 0.6.21 |
+| **试卷排版** | Typst (微服务) | 0.12.0 |
 | **网页爬虫** | Selenium + HtmlUnit + Jsoup | 4.31.0 |
 | **实时通信** | WebSocket (STOMP) | — |
 | **代码沙箱** | Docker Java + GraalJS | 3.4.1 / 24.1.1 |
@@ -69,7 +71,7 @@ HTTP Response ← Controller ← Assembler(Entity→DTO) ← ApplicationService 
 
 ## Interfaces 接口层
 
-22 个 REST 模块，每个模块包含 `Controller`、`assembler/`（DTO ↔ Command 转换器）、`dto/`（请求/响应数据对象）。
+29 个 REST 模块，每个模块包含 `Controller`、`assembler/`（DTO ↔ Command 转换器）、`dto/`（请求/响应数据对象）。
 
 ### AI 智能服务
 
@@ -124,6 +126,33 @@ interfaces/rest/schedule/                # 课程表模块
 interfaces/rest/progress/                # 学习进度模块
 ├── ProgressController.java              #   进度记录/统计/报告
 ├── assembler/ + dto/ (3 个 DTO)
+```
+
+### 考试与批改
+
+```
+interfaces/rest/exam/                    # 考试模块
+├── ExamPaperController.java             #   试卷 CRUD/大题管理/题目关联/发布/导出
+├── ExamTemplateController.java          #   试卷模板管理(CRUD/应用模板)
+├── QuestionBankController.java          #   题库管理(CRUD/分类/标签/AI生成)
+├── assembler/ + dto/ (17 个 DTO)
+
+interfaces/rest/grading/                 # 智能批改模块
+├── HomeworkGradingController.java       #   作业提交/OCR识别/AI批改(SSE流式)/结果查询
+│                                        #   知识画像/批改统计/错题推荐
+├── dto/ (7 个 DTO)
+```
+
+### 会员系统
+
+```
+interfaces/rest/membership/              # 会员模块
+├── MembershipController.java            #   会员套餐查询/开通/续费/状态查询
+├── MembershipAdminController.java       #   会员管理(管理端)/套餐配置/AI配额调整
+├── dto/ (5 个 DTO)
+
+interfaces/rest/payment/                 # 支付模块
+├── PaymentCallbackController.java       #   支付回调处理(支付宝/微信)
 ```
 
 ### 每日学习
@@ -212,6 +241,18 @@ interfaces/rest/scraper/                 # 网页爬虫模块
 ├── ScraperConfigController.java         #   爬虫规则配置（CRUD）
 ├── assembler/ + dto/ (13 个 DTO)
 
+interfaces/rest/ppt/                     # PPT生成模块
+├── PptGenerationController.java         #   AI驱动的多步骤PPT生成（SSE流式）
+├── PptTemplateController.java           #   PPT模板管理（CRUD/预览）
+├── OnlyOfficeController.java            #   OnlyOffice集成（编辑/预览/回调）
+├── assembler/ + dto/ (6 个 DTO)
+
+interfaces/rest/video/                   # 视频模块
+├── VideoController.java                 #   视频转码/HLS切片/缩略图生成
+
+interfaces/rest/search/                  # 搜索模块
+├── SearchController.java                #   全局搜索（课程/文章/帖子/用户）
+
 interfaces/rest/recommendation/          # 智能推荐模块
 ├── assembler/ + dto/ (4 个 DTO)         #   基于 Neo4j 知识图谱推荐
 
@@ -224,7 +265,7 @@ interfaces/rest/common/                  # 通用模块
 
 ## Application 应用层
 
-18 个应用模块，负责业务流程编排。每个模块包含 `command/`（命令对象）、`query/`（查询对象）和/或 `service/`（应用服务）。
+22 个应用模块,负责业务流程编排。每个模块包含 `command/`(命令对象)、`query/`(查询对象)和/或 `service/`(应用服务)。
 
 ```
 application/
@@ -236,6 +277,14 @@ application/
 │   ├── WorkflowApplicationService       #   工作流编排（执行/调度/日志/版本管理）
 │   ├── UserApplicationService           #   用户管理（CRUD/角色/密码/偏好）
 │   ├── ClassApplicationService          #   班级编排
+│   ├── ExamPaperApplicationService      #   试卷管理（创建/编辑/发布/导出）
+│   ├── QuestionBankApplicationService   #   题库管理（CRUD/AI生成题目）
+│   ├── HomeworkGradingApplicationService #  智能批改（OCR/AI批改/知识画像）
+│   ├── KnowledgeProfileApplicationService # 知识画像查询
+│   ├── GradingStatsApplicationService   #   批改统计分析
+│   ├── SimilarQuestionService           #   错题同类题推荐
+│   ├── MembershipApplicationService     #   会员管理（开通/续费/配额控制）
+│   ├── PptGenerationService             #   PPT生成编排（AI大纲/内容/排版）
 │   ├── AnnouncementApplicationService   #   公告管理
 │   ├── BannerApplicationService         #   轮播图管理
 │   ├── FeedbackApplicationService       #   反馈管理
@@ -268,16 +317,20 @@ application/
 │   ├── command/ (4)                     #   SendMessageCmd / CreateGroupCmd 等
 │   └── query/ (4)
 │
+├── exam/          (10 items)            # 考试模块 command/query
+├── grading/       (5 items)             # 批改模块 command/service
+├── membership/    (1 items)             # 会员模块 service
 ├── user/          (10 items)            # 用户模块 command/query
 ├── scraper/       (5 items)             # 爬虫模块 command/dto
 ├── schedule/      (9 items)             # 课程表模块 command/query
-├── teacher/       (6 items)             # 教师模块 command/query
+├── teacher/       (7 items)             # 教师模块 command/query
 ├── announcement/  (3 items)             # 公告模块 command
-├── banner/        (3 items)             # 轮播图模块 command
+├── banner/        (4 items)             # 轮播图模块 command
 ├── feedback/      (4 items)             # 反馈模块 command/query
-├── file/          (3 items)             # 文件模块 command
+├── file/          (2 items)             # 文件模块 command
 ├── order/         (4 items)             # 订单模块 command
 ├── progress/      (4 items)             # 进度模块 command/query
+├── search/        (3 items)             # 搜索模块 query/dto
 └── recommendation/ (4 items)            # 推荐模块 query/dto
 ```
 
@@ -285,7 +338,7 @@ application/
 
 ## Domain 领域层
 
-22 个领域模块，每个模块采用标准 DDD 结构：`entity/`、`valueobject/`、`repository/`（接口）、`service/`（领域服务）。
+26 个领域模块，每个模块采用标准 DDD 结构：`entity/`、`valueobject/`、`repository/`（接口）、`service/`（领域服务）。
 
 ### 领域模块一览
 
@@ -295,8 +348,12 @@ application/
 | **book** | 9 | 15 | 9 | 8 | 电子书/章节/阅读进度/AI 书籍 |
 | **social** | 10 | 16 | 10 | — | 好友/私聊/群聊/聊天群组 |
 | **course** | 5 | 6 | 5 | — | 课程/章节/小节/收藏/评价 |
+| **exam** | 5 | 10 | 5 | — | 试卷/大题/题目/题库/模板 |
+| **grading** | 4 | 5 | 3 | 1 | 作业提交/批改结果/知识画像/AI批改 |
+| **membership** | 3 | 3 | 3 | 1 | 会员套餐/用户会员/AI使用记录/配额控制 |
 | **dailylearning** | 5 | 5 | 5 | 1 | 每日单词/每日文章/生词本 |
 | **post** | 5 | 4 | 5 | — | 帖子/评论/点赞 |
+| **ppt** | 2 | 2 | 2 | — | PPT生成会话/模板 |
 | **scraper** | 3 | 6 | 2 | 1 | 爬虫配置/任务/结果 |
 | **recommendation** | 3 | 3 | 3 | — | 知识图谱推荐 |
 | **clazz** | — | — | — | — | 班级（8 items） |
@@ -308,7 +365,7 @@ application/
 | **banner** | — | — | — | — | 轮播图（5 items） |
 | **checkin** | — | — | — | — | 签到（4 items） |
 | **file** | — | — | — | — | 文件（4 items） |
-| **order** | — | — | — | — | 订单（4 items） |
+| **order** | — | — | — | — | 订单（6 items） |
 | **payment** | — | — | — | — | 支付（4 items） |
 | **knowledge** | — | — | — | 1 | 知识图谱服务 |
 | **progress** | — | — | — | — | 学习进度（2 items） |
@@ -431,12 +488,20 @@ infrastructure/
 │   ├── SeleniumWebScraperService.java   # Selenium 动态页面爬虫
 │   └── JsoupWebScraperService.java      # Jsoup 静态页面爬虫
 │
+├── ppt/
+│   └── PptServiceClient.java            # PPT生成微服务客户端(Python-PPTX)
+│
+├── typst/
+│   └── TypstServiceClient.java          # Typst试卷排版微服务客户端
+│
 ├── search/                              # Elasticsearch 全文检索
 ├── sms/
 │   ├── SmsService.java                  # 短信发送服务
 │   └── SmsCodeService.java              # 验证码生成/校验/限流
 │
-└── payment/                             # 支付集成
+└── payment/                             # 支付集成(预留)
+    ├── AlipayPaymentGateway.java        #   支付宝支付网关
+    └── WechatPayPaymentGateway.java     #   微信支付网关
 ```
 
 ---
@@ -522,6 +587,61 @@ infrastructure/
 
 ---
 
+## 核心功能模块
+
+### 智能批改系统
+
+支持**双模式批改**:
+- **试卷批改模式(EXAM_PAPER)**: 标准化试卷批改,需指定学科
+- **通用作业助手模式(GENERAL)**: 支持作文/日记等非标准化题目,AI自动推断学科
+
+**批改流程**:
+1. OCR识别 → 2. AI学科推断(通用模式) → 3. LLM逐题批改 → 4. 知识点标注 → 5. 错因分析
+
+**核心功能**:
+- **知识画像**: 按学科汇总掌握度/薄弱知识点
+- **批改统计**: 得分趋势/学科得分率/错因分布
+- **错题推荐**: 基于错因+知识点+自适应难度的同类题推荐
+
+### 会员系统
+
+**套餐类型**: FREE(免费) / BASIC(基础) / PRO(专业) / TEACHER(教师)
+
+**AI配额控制**:
+- 按天配额: AI对话/PPT生成/题目生成
+- 按月配额: 智能批改次数
+- 自动重置: 每日0点/每月1日
+
+**集成点**:
+- AI对话、PPT生成、题目生成、智能批改、AI书籍功能
+- 会员课程自动免费开通
+
+### 考试系统
+
+**试卷管理**:
+- 大题(Section)管理: 题型/分值/说明
+- 题目关联: 从题库选题或手动录入
+- 试卷导出: Typst排版引擎生成PDF
+
+**题库管理**:
+- 题目分类/标签/难度
+- AI生成题目(基于知识点)
+
+**试卷模板**:
+- 预设模板快速创建试卷
+
+### PPT生成助手
+
+**多步骤生成流程(SSE流式)**:
+1. 主题输入 → 2. AI生成大纲 → 3. 用户确认/修改 → 4. AI生成内容 → 5. 模板选择 → 6. 生成PPT文件
+
+**技术实现**:
+- Python-PPTX微服务生成PPTX文件
+- OnlyOffice集成在线编辑/预览
+- 模板系统支持自定义样式
+
+---
+
 ## 工作流引擎
 
 内置可视化工作流引擎，支持 **18 种节点执行器**：
@@ -555,15 +675,37 @@ resources/
 
 ```
 sql/
-├── init.sql                         # 数据库初始化
-├── user.sql / user_follow.sql / user_preference.sql
-├── course.sql / class.sql / schedule.sql
-├── book.sql / post.sql / social.sql
-├── ai_chat.sql / ai_chat_session.sql
-├── announcement.sql / banner.sql / feedback.sql
-├── checkin.sql / daily_learning.sql / file_upload.sql
-├── create_scraper_tables.sql
-└── (共 19 个 SQL 文件)
+├── 00_init_extensions.sql           # PostgreSQL扩展初始化(pgvector等)
+├── 10_user.sql                      # 用户表
+├── 11_user_follow.sql               # 用户关注表
+├── 12_user_preference.sql           # 用户偏好表
+├── 20_social.sql                    # 社交模块(好友/私聊/群聊)
+├── 30_course.sql                    # 课程表
+├── 31_class.sql                     # 班级表
+├── 31_course_section_hls.sql        # 课程小节HLS视频
+├── 32_course_section_thumbnail.sql  # 课程小节缩略图
+├── 40_book.sql                      # 电子书表
+├── 41_post.sql                      # 帖子表
+├── 42_ai_book_tables.sql            # AI书籍功能表
+├── 50_ai_chat.sql                   # AI对话表
+├── 51_ai_chat_session.sql           # AI会话表
+├── 52_ppt_generation_session.sql    # PPT生成会话表
+├── 53_ppt_template.sql              # PPT模板表
+├── 60_daily_learning.sql            # 每日学习表
+├── 61_schedule.sql                  # 课程表
+├── 70_announcement.sql              # 公告表
+├── 71_banner.sql                    # 轮播图表
+├── 80_feedback.sql                  # 反馈表
+├── 81_checkin.sql                   # 签到表
+├── 82_file_upload.sql               # 文件上传表
+├── 90_create_scraper_tables.sql     # 爬虫表
+├── 91_exam.sql                      # 考试试卷表
+├── 92_exam_template.sql             # 试卷模板表
+├── 93_membership.sql                # 会员系统表
+├── 94_grading.sql                   # 智能批改表
+├── 95_membership_add_grading_quota.sql # 会员批改配额
+├── 96_grading_add_mode_title.sql    # 批改模式和标题字段
+└── 99_seed_data.sql                 # 种子数据
 ```
 
 ---
