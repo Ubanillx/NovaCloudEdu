@@ -35,6 +35,7 @@ import { GroupManagementPage } from './pages/admin/GroupManagementPage'
 import { BookManagementPage } from './pages/admin/BookManagementPage'
 import { MembershipManagementPage } from './pages/admin/MembershipManagementPage'
 import { OrderManagementPage } from './pages/admin/OrderManagementPage'
+import { DashboardPage } from './pages/admin/DashboardPage'
 import CourseLessonPage from './pages/CourseLessonPage'
 import EbookReaderPage from './pages/EbookReaderPage'
 import { getToken } from './api'
@@ -125,7 +126,7 @@ createRoot(document.getElementById('root')!).render(
               <ProtectedRoute requireAdmin>
                 <AdminLayout>
                   <Routes>
-                    <Route index element={<div className="text-2xl font-bold">欢迎进入管理后台</div>} />
+                    <Route index element={<DashboardPage />} />
                     <Route path="users" element={<UserManagementPage />} />
                     <Route path="courses" element={<CourseManagementPage />} />
                     <Route path="courses/:courseId" element={<CourseDetailPage />} />
