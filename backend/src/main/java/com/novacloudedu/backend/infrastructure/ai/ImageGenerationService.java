@@ -107,9 +107,9 @@ public class ImageGenerationService {
                 default -> throw new IllegalArgumentException("不支持的文生图供应商类型: " + providerConfig.getType());
             };
 
-            // 如果配置了上传到OSS，则下载图片并上传
-            if (properties.isUploadToOss() && imageUrl != null) {
-                imageUrl = uploadImageToOss(imageUrl);
+            // 文生图返回的是临时URL，必须转存到OSS持久化
+            if (imageUrl != null) {
+                imageUrl = forceUploadImageToOss(imageUrl);
             }
 
             log.info("{}成功: url={}", hasRef ? "图参生图" : "文生图", imageUrl);
@@ -446,28 +446,6 @@ public class ImageGenerationService {
 
     // ==================== 工具方法 ====================
 
-    /**
-     * 下载图片并上传到OSS
-     */
-    private String uploadImageToOss(String imageUrl) {
-        try {
-            ResponseEntity<byte[]> response = restTemplate.getForEntity(imageUrl, byte[].class);
-            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
-                String extension = ".png";
-                if (imageUrl.contains(".jpg") || imageUrl.contains(".jpeg")) {
-                    extension = ".jpg";
-                } else if (imageUrl.contains(".webp")) {
-                    extension = ".webp";
-                }
-                return ossService.uploadBytes(response.getBody(), extension, FileBusinessType.AI_GENERATED_IMAGE);
-            }
-            log.warn("下载图片失败，使用原始URL: {}", imageUrl);
-            return imageUrl;
-        } catch (Exception e) {
-            log.warn("上传图片到OSS失败，使用原始URL: {}", imageUrl, e);
-            return imageUrl;
-        }
-    }
 
     private JsonNode parseJson(String json) {
         try {
