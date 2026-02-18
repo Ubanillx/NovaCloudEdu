@@ -18,9 +18,12 @@ import com.novacloudedu.backend.domain.dailylearning.valueobject.Difficulty;
 import com.novacloudedu.backend.domain.dailylearning.valueobject.LearningStatus;
 import com.novacloudedu.backend.domain.dailylearning.valueobject.MasteryLevel;
 import com.novacloudedu.backend.domain.user.valueobject.UserId;
+import com.novacloudedu.backend.application.analytics.event.LearningActivityEvent;
+import com.novacloudedu.backend.domain.analytics.valueobject.ActivityType;
 import com.novacloudedu.backend.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,6 +42,7 @@ public class DailyLearningApplicationService {
     private final UserDailyWordRepository userDailyWordRepository;
     private final UserWordBookRepository userWordBookRepository;
     private final GraphDataSyncService graphDataSyncService;
+    private final ApplicationEventPublisher eventPublisher;
 
     // ==================== 每日文章管理 ====================
 
@@ -91,6 +95,10 @@ public class DailyLearningApplicationService {
         article.handleRead(userDailyArticle);
         dailyArticleRepository.save(article);
         userDailyArticleRepository.save(userDailyArticle);
+
+        eventPublisher.publishEvent(LearningActivityEvent.of(
+                this, userId, ActivityType.ARTICLE_READ,
+                articleId, null, null, 0));
     }
 
     @Transactional
@@ -194,6 +202,10 @@ public class DailyLearningApplicationService {
 
         userDailyWord.markAsStudied();
         userDailyWordRepository.save(userDailyWord);
+
+        eventPublisher.publishEvent(LearningActivityEvent.of(
+                this, userId, ActivityType.WORD_STUDY,
+                wordId, null, null, 0));
     }
 
     @Transactional

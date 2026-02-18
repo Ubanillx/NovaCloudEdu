@@ -6,9 +6,12 @@ import com.novacloudedu.backend.domain.course.valueobject.SectionId;
 import com.novacloudedu.backend.domain.progress.entity.UserCourseProgress;
 import com.novacloudedu.backend.domain.progress.repository.UserCourseProgressRepository;
 import com.novacloudedu.backend.domain.user.valueobject.UserId;
+import com.novacloudedu.backend.application.analytics.event.LearningActivityEvent;
+import com.novacloudedu.backend.domain.analytics.valueobject.ActivityType;
 import com.novacloudedu.backend.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +26,7 @@ public class ProgressApplicationService {
 
     private final UserCourseProgressRepository progressRepository;
     private final CourseSectionRepository sectionRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public void updateProgress(UserId userId, Long courseId, Long sectionId,
@@ -36,6 +40,10 @@ public class ProgressApplicationService {
 
         userProgress.updateProgress(lastPosition, watchDuration, progress);
         progressRepository.save(userProgress);
+
+        eventPublisher.publishEvent(LearningActivityEvent.of(
+                this, userId.value(), ActivityType.COURSE_WATCH,
+                courseId, null, null, watchDuration != null ? watchDuration : 0));
     }
 
     @Transactional

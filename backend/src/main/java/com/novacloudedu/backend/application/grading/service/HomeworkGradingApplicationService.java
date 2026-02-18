@@ -27,9 +27,12 @@ import com.novacloudedu.backend.domain.membership.valueobject.AiFeatureType;
 import com.novacloudedu.backend.domain.user.valueobject.UserId;
 import com.novacloudedu.backend.infrastructure.ai.LangchainChatService;
 import com.novacloudedu.backend.infrastructure.ocr.OcrService;
+import com.novacloudedu.backend.application.analytics.event.LearningActivityEvent;
+import com.novacloudedu.backend.domain.analytics.valueobject.ActivityType;
 import com.novacloudedu.backend.config.ChatModelProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -63,6 +66,7 @@ public class HomeworkGradingApplicationService {
     private final QuestionRepository questionRepository;
     private final ObjectMapper objectMapper;
     private final ChatModelProperties chatModelProperties;
+    private final ApplicationEventPublisher eventPublisher;
 
     private final ExecutorService executor = Executors.newCachedThreadPool();
 
@@ -272,6 +276,13 @@ public class HomeworkGradingApplicationService {
 
         log.info("批改完成: submissionId={}, score={}/{}", submissionId,
                 gradingResult.getTotalScore(), gradingResult.getMaxScore());
+
+        eventPublisher.publishEvent(LearningActivityEvent.withScore(
+                this, submission.getStudentId().value(), ActivityType.HOMEWORK_SUBMIT,
+                submissionId,
+                submission.getSubject() != null ? submission.getSubject().getCode() : null,
+                submission.getClassId(),
+                gradingResult.getTotalScore(), gradingResult.getMaxScore()));
     }
 
     // ==================== 标准答案加载 ====================
