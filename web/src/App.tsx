@@ -29,6 +29,9 @@ import EbookListPage from './pages/EbookListPage';
 import SearchResultsPage from './pages/SearchResultsPage';
 import MembershipPage from './pages/MembershipPage';
 import CourseListPage from './pages/CourseListPage';
+import GradingSubmitPage from './pages/GradingSubmitPage';
+import GradingResultPage from './pages/GradingResultPage';
+import GradingDashboardPage from './pages/GradingDashboardPage';
 
 const homeApi = new DefaultApi(new Configuration(), '', apiClient);
 
@@ -220,6 +223,9 @@ function App() {
               <Route path="courses" element={<CourseListPage />} />
               <Route path="membership" element={<MembershipPage />} />
               <Route path="search" element={<SearchResultsPage />} />
+              <Route path="grading" element={<GradingSubmitPage />} />
+              <Route path="grading/:submissionId" element={<GradingResultPage />} />
+              <Route path="grading-dashboard" element={<GradingDashboardPage />} />
             </Routes>
           </Content>
         </div>
