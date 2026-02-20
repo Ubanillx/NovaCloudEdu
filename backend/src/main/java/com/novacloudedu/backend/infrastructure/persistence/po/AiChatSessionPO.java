@@ -16,6 +16,7 @@ public class AiChatSessionPO {
     private Long id;
 
     private Long userId;
+    private Long assistantId;
     private String title;
     private String memorySummary;
     private Integer messageCount;
