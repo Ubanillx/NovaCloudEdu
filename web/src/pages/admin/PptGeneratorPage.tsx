@@ -16,6 +16,7 @@ import type { PptSessionSummary } from '../../hooks/usePptChat';
 import PptChatMessageComponent from '../../components/ppt/PptChatMessage';
 import PptPreviewPanel from '../../components/ppt/PptPreviewPanel';
 import PptChatInput from '../../components/ppt/PptChatInput';
+import { useTextToSpeech } from '../../hooks/useTextToSpeech';
 import { TemplateSelector } from '../../components/ppt/TemplateSelector';
 
 // ============ 会话时间格式化 ============
@@ -143,6 +144,7 @@ const SessionSidebar: React.FC<SessionSidebarProps> = ({
 const PptGeneratorPage: React.FC = () => {
   const navigate = useNavigate();
   const chat = usePptChat();
+  const tts = useTextToSpeech();
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [showScrollBtn, setShowScrollBtn] = React.useState(false);
@@ -290,10 +292,12 @@ const PptGeneratorPage: React.FC = () => {
               </div>
             ) : (
               <div className="max-w-3xl mx-auto px-4 py-6 space-y-5">
-                {chat.messages.map((msg) => (
+                {chat.messages.map((msg, index) => (
                   <PptChatMessageComponent
                     key={msg.id}
                     message={msg}
+                    messageIndex={index}
+                    tts={tts}
                     onConfirmOutline={chat.confirmOutline}
                     onReviseOutline={chat.reviseOutline}
                   />

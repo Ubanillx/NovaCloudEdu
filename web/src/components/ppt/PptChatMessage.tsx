@@ -2,33 +2,13 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Bot, Download, Check, Edit3, Loader2, FileText,
-  AlertCircle, ChevronRight, Copy, ExternalLink,
+  AlertCircle, ChevronRight, ExternalLink,
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import type { PptChatMessage as PptChatMessageData } from '../../hooks/usePptChat';
-
-// ============ 复制按钮 ============
-
-const CopyButton: React.FC<{ text: string }> = ({ text }) => {
-  const [copied, setCopied] = useState(false);
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch { /* ignore */ }
-  };
-  return (
-    <button
-      onClick={handleCopy}
-      className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-      title="复制"
-    >
-      {copied ? <Check size={14} className="text-emerald-500" /> : <Copy size={14} />}
-    </button>
-  );
-};
+import type { useTextToSpeech } from '../../hooks/useTextToSpeech';
+import AiMessageActions from '../chat/AiMessageActions';
 
 // ============ 大纲卡片 ============
 
@@ -201,12 +181,16 @@ const DownloadCard: React.FC<{ url: string; fileName?: string }> = ({ url, fileN
 
 interface PptChatMessageProps {
   message: PptChatMessageData;
+  messageIndex: number;
+  tts: ReturnType<typeof useTextToSpeech>;
   onConfirmOutline?: () => void;
   onReviseOutline?: (feedback: string) => void;
 }
 
 const PptChatMessageComponent: React.FC<PptChatMessageProps> = ({
   message,
+  messageIndex,
+  tts,
   onConfirmOutline,
   onReviseOutline,
 }) => {
@@ -254,9 +238,11 @@ const PptChatMessageComponent: React.FC<PptChatMessageProps> = ({
             ) : null}
           </div>
           {!isStreaming && content && (
-            <div className="flex items-center gap-1 mt-1 ml-1">
-              <CopyButton text={content} />
-            </div>
+            <AiMessageActions
+              text={content}
+              messageIndex={messageIndex}
+              tts={tts}
+            />
           )}
         </div>
       </div>

@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Square } from 'lucide-react';
+import VoiceInputButton from '../chat/VoiceInputButton';
 
 const QUICK_PROMPTS = [
   '帮我做一个关于人工智能的PPT',
@@ -25,6 +26,7 @@ const PptChatInput: React.FC<PptChatInputProps> = ({
 }) => {
   const [input, setInput] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const voiceBaseInputRef = useRef('');
 
   useEffect(() => {
     const el = textareaRef.current;
@@ -72,6 +74,11 @@ const PptChatInput: React.FC<PptChatInputProps> = ({
       )}
 
       <div className="p-3 flex items-end gap-2">
+        <VoiceInputButton
+          onTextChange={(text) => setInput(voiceBaseInputRef.current + text)}
+          onRecordingStart={() => { voiceBaseInputRef.current = input; }}
+          disabled={isGenerating || disabled}
+        />
         <div className="flex-1 relative">
           <textarea
             ref={textareaRef}
