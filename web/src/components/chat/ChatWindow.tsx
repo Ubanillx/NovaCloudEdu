@@ -89,6 +89,8 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
       // 如果是自己发的消息（服务器回传），替换乐观更新的占位消息，避免重复
       if (currentUserId.current && senderStr === currentUserId.current) {
         setMessages((prev) => {
+          // 防重
+          if (latest.messageId && prev.some((m) => String(m.messageId) === String(latest.messageId) && String(m.messageId) !== '-1')) return prev;
           let idx = -1;
           for (let i = prev.length - 1; i >= 0; i--) {
             if (String(prev[i].senderId) === '-1' && prev[i].content === latest.content) { idx = i; break; }
@@ -98,7 +100,8 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
             updated[idx] = newMsg;
             return updated;
           }
-          return prev;
+          // 没有乐观占位（如 CALL 通话记录由后端生成），直接追加
+          return [...prev, newMsg];
         });
       } else {
         setMessages((prev) => {

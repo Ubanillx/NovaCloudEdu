@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   ArrowLeft, Send, User, Loader2, MessageCircle, Check, CheckCheck,
-  Image, Paperclip, Upload,
+  Image, Paperclip, Upload, Phone, Video,
 } from 'lucide-react';
 import { apiClient, DefaultApi, Configuration } from '../../api';
 import type { ChatSessionResponse, ChatMessageResponse } from '../../api/generated/models';
 import { useChat } from '../../context/ChatContext';
+import { useRtc } from '../../context/RtcContext';
 import toast from '../ui/Toast';
 import { MessageBubble } from './MessageContent';
 import { useChatUpload } from './useChatUpload';
@@ -140,6 +141,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   partnerId, partnerName, partnerAvatar, onBack,
 }) => {
   const { sendPrivateMessage, markAsRead, chatMessages, readReceipts } = useChat();
+  const { startCall } = useRtc();
   const [messages, setMessages] = useState<ChatMessageResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [inputValue, setInputValue] = useState('');
@@ -216,6 +218,8 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
       // 自己发的消息（服务器回传），替换乐观更新占位消息
       if (currentUserId.current && senderStr === currentUserId.current) {
         setMessages((prev) => {
+          // 防重
+          if (prev.some((m) => String(m.messageId) === String(newMsg.messageId) && String(m.messageId) !== '-1')) return prev;
           let idx = -1;
           for (let i = prev.length - 1; i >= 0; i--) {
             if (prev[i].senderId === -1 && prev[i].content === latest.content) { idx = i; break; }
@@ -225,7 +229,8 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
             updated[idx] = newMsg;
             return updated;
           }
-          return prev;
+          // 没有乐观占位（如 CALL 通话记录由后端生成），直接追加
+          return [...prev, newMsg];
         });
       } else {
         setMessages((prev) => [...prev, newMsg]);
@@ -306,6 +311,22 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
           <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
             {partnerName || '未知用户'}
           </p>
+        </div>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => startCall(String(partnerId), partnerName || '未知用户', partnerAvatar, 'audio')}
+            className="p-2 rounded-lg text-gray-400 hover:text-brand-500 hover:bg-brand-50 dark:hover:bg-brand-900/20 transition-colors"
+            title="语音通话"
+          >
+            <Phone size={18} />
+          </button>
+          <button
+            onClick={() => startCall(String(partnerId), partnerName || '未知用户', partnerAvatar, 'video')}
+            className="p-2 rounded-lg text-gray-400 hover:text-brand-500 hover:bg-brand-50 dark:hover:bg-brand-900/20 transition-colors"
+            title="视频通话"
+          >
+            <Video size={18} />
+          </button>
         </div>
       </div>
 
