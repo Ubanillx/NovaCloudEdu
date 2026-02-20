@@ -50,6 +50,14 @@ public class SpeechRecognitionWebSocketHandler extends AbstractWebSocketHandler 
         // 启动语音转写会话
         boolean started = speechRecognitionService.startTranscription(
                 sessionId,
+                // 转写就绪回调（NLS 真正连接成功后触发）
+                taskId -> {
+                    log.info("NLS 转写就绪: sessionId={}, taskId={}", sessionId, taskId);
+                    sendMessage(session, Map.of(
+                            "type", "ready",
+                            "message", "语音识别服务已就绪"
+                    ));
+                },
                 // 句子开始回调
                 sentenceIndex -> {
                     sendMessage(session, Map.of(
@@ -86,21 +94,20 @@ public class SpeechRecognitionWebSocketHandler extends AbstractWebSocketHandler 
                 }
         );
         
-        if (started) {
-            sendMessage(session, Map.of(
-                    "type", "ready",
-                    "message", "语音识别服务已就绪，请开始发送音频数据"
-            ));
-        } else {
+        if (!started) {
             session.close(CloseStatus.SERVER_ERROR.withReason("语音识别服务启动失败"));
         }
+        // 注意：不再在这里发送 ready，而是等 onTranscriberStart 回调触发后发送
     }
 
     @Override
     protected void handleBinaryMessage(WebSocketSession session, BinaryMessage message) throws Exception {
         String sessionId = session.getId();
-        byte[] audioData = message.getPayload().array();
+        java.nio.ByteBuffer payload = message.getPayload();
+        byte[] audioData = new byte[payload.remaining()];
+        payload.get(audioData);
         
+        log.debug("收到音频数据: sessionId={}, size={}", sessionId, audioData.length);
         // 发送音频数据到 NLS 服务
         speechRecognitionService.sendAudio(sessionId, audioData);
     }
