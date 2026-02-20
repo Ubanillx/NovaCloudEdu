@@ -10,7 +10,7 @@ import type {
   ChapterResponse,
   SectionResponse,
 } from '../api/generated/models';
-import { toast, ArtPlayerWrapper } from '../components/ui';
+import { toast, ArtPlayerWrapper, FocusMonitor } from '../components/ui';
 
 const api = new DefaultApi(new Configuration(), '', apiClient);
 
@@ -311,6 +311,8 @@ const CourseLessonPage: React.FC = () => {
                   title="下一节">
                   <SkipForward size={16} />
                 </button>
+                <div className="h-5 w-px bg-gray-200 dark:bg-gray-700" />
+                <FocusMonitor enabled={!!videoUrl} />
                 <div className="h-5 w-px bg-gray-200 dark:bg-gray-700" />
                 {currentSection?.resourceUrl && (
                   <a href={currentSection.resourceUrl} target="_blank" rel="noopener noreferrer"
