@@ -144,10 +144,15 @@ CREATE TABLE IF NOT EXISTS course_section
     title        VARCHAR(256)                       NOT NULL,
     description  TEXT                               NULL,
     video_url    VARCHAR(1024)                      NULL,
+    hls_url      VARCHAR(1024)                      NULL,
+    encryption_key_id VARCHAR(64)                   NULL,
+    transcode_status SMALLINT DEFAULT 0             NOT NULL,
     duration     INT      DEFAULT 0                 NOT NULL,
     sort         INT      DEFAULT 0                 NOT NULL,
     is_free      SMALLINT DEFAULT 0                 NOT NULL,
     resource_url VARCHAR(1024)                      NULL,
+    thumbnail_url VARCHAR(1024)                     NULL,
+    thumbnail_count INTEGER DEFAULT 0               NULL,
     admin_id     BIGINT                             NOT NULL,
     create_time  TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     update_time  TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
@@ -163,10 +168,15 @@ COMMENT ON COLUMN course_section.chapter_id IS '章节id';
 COMMENT ON COLUMN course_section.title IS '小节标题';
 COMMENT ON COLUMN course_section.description IS '小节描述';
 COMMENT ON COLUMN course_section.video_url IS '视频URL';
+COMMENT ON COLUMN course_section.hls_url IS 'HLS播放地址(m3u8)';
+COMMENT ON COLUMN course_section.encryption_key_id IS 'AES-128加密密钥ID';
+COMMENT ON COLUMN course_section.transcode_status IS '转码状态: 0-未转码, 1-转码中, 2-已完成, 3-失败';
 COMMENT ON COLUMN course_section.duration IS '时长(秒)';
 COMMENT ON COLUMN course_section.sort IS '排序，数字越小排序越靠前';
 COMMENT ON COLUMN course_section.is_free IS '是否免费：0-否，1-是';
 COMMENT ON COLUMN course_section.resource_url IS '资源URL';
+COMMENT ON COLUMN course_section.thumbnail_url IS '视频缩略图雪碧图URL';
+COMMENT ON COLUMN course_section.thumbnail_count IS '缩略图数量';
 COMMENT ON COLUMN course_section.admin_id IS '创建管理员id';
 COMMENT ON COLUMN course_section.create_time IS '创建时间';
 COMMENT ON COLUMN course_section.update_time IS '更新时间';
