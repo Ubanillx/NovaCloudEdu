@@ -238,6 +238,9 @@ services:
       - TYPST_SERVICE_URL=${TYPST_SERVICE_URL:-http://typst-service:8200}
       # 工作流代码沙箱配置
       - CODE_SANDBOX_DOCKER_ENABLED=true
+      # SRS 直播媒体服务器
+      - SRS_RTMP_URL=rtmp://srs:1935/live
+      - SRS_HTTP_BASE=http://localhost:${SRS_HTTP_PORT:-8085}
     volumes:
       # Docker socket - 允许容器内创建其他容器
       # macOS Docker Desktop 使用特殊路径，需要读写权限
@@ -318,6 +321,90 @@ services:
         max-size: "10m"
         max-file: "3"
 
+  # ========== 实时音视频服务 ==========
+
+  # Go RTC 通话信令服务
+  rtc-service:
+    build:
+      context: ../rtc-service
+      dockerfile: Dockerfile
+    container_name: nova-rtc-service
+    ports:
+      - "${RTC_WS_PORT:-8300}:8300"
+    environment:
+      - JWT_SECRET=${JWT_SECRET:-NovaCloudEduSecretKey123456789012345678901234567890}
+      - REDIS_ADDR=redis:6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-}
+      - JAVA_BACKEND_URL=http://host.docker.internal:8080
+      - LIVEKIT_URL=${LIVEKIT_URL:-ws://livekit:7880}
+      - LIVEKIT_API_KEY=${LIVEKIT_API_KEY:-devkey}
+      - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET:-devsecret}
+      - TURN_URL=turn:coturn:3478
+      - TURN_USER=${TURN_USER:-nova}
+      - TURN_PASSWORD=${TURN_PASSWORD:-changeme}
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8300/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      - nova-network
+
+  # SRS 直播媒体服务器
+  srs:
+    image: ossrs/srs:5
+    container_name: nova-srs
+    command: ["./objs/srs", "-c", "conf/srs.conf"]
+    ports:
+      - "${SRS_RTMP_PORT:-1935}:1935"
+      - "${SRS_HTTP_PORT:-8085}:8080"
+      - "${SRS_API_PORT:-1985}:1985"
+    volumes:
+      - ../rtc-service/srs/srs.conf:/usr/local/srs/conf/srs.conf:ro
+      - srs_data:/usr/local/srs/objs
+    restart: unless-stopped
+    networks:
+      - nova-network
+
+  # coturn TURN/STUN 中继服务器
+  coturn:
+    image: coturn/coturn:latest
+    container_name: nova-coturn
+    ports:
+      - "3478:3478"
+      - "3478:3478/udp"
+      - "5349:5349"
+      - "49152-49200:49152-49200/udp"
+    command: >
+      -n --log-file=stdout
+      --min-port=49152 --max-port=49200
+      --realm=${TURN_REALM:-novacloudedu.com}
+      --user=${TURN_USER:-nova}:${TURN_PASSWORD:-changeme}
+      --lt-cred-mech
+    restart: unless-stopped
+    networks:
+      - nova-network
+
+  # LiveKit SFU（P2P 降级用）
+  livekit:
+    image: livekit/livekit-server:latest
+    container_name: nova-livekit
+    ports:
+      - "${LIVEKIT_PORT:-7880}:7880"
+      - "${LIVEKIT_RTC_TCP:-7881}:7881"
+      - "7882:7882/udp"
+    volumes:
+      - ../rtc-service/livekit/livekit.yaml:/etc/livekit.yaml:ro
+    command: ["--config", "/etc/livekit.yaml"]
+    restart: unless-stopped
+    networks:
+      - nova-network
+
 networks:
   nova-network:
     driver: bridge
@@ -332,3 +419,5 @@ volumes:
   # Python 代码沙箱缓存和临时目录
   python-sandbox-venvs:
   python-sandbox-tmp:
+  # SRS 直播数据
+  srs_data:
