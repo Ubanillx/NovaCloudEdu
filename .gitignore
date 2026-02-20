@@ -9,3 +9,6 @@
 
 # Docker 数据
 docker/data/
+
+# Java compiled classes in backend
+backend/com/
