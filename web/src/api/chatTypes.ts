@@ -1,6 +1,6 @@
 // ============ WebSocket 消息类型 ============
 
-export type MessageType = 'TEXT' | 'IMAGE' | 'FILE' | 'AUDIO' | 'VIDEO';
+export type MessageType = 'TEXT' | 'IMAGE' | 'FILE' | 'AUDIO' | 'VIDEO' | 'CALL';
 
 export interface WsChatMessage {
   messageId: number;
