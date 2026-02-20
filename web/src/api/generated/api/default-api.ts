@@ -264,6 +264,8 @@ import type { BaseResponseListWorkflowVariableResponse } from '../models';
 // @ts-ignore
 import type { BaseResponseListWorkflowVersionResponse } from '../models';
 // @ts-ignore
+import type { BaseResponseLiveRoomResponse } from '../models';
+// @ts-ignore
 import type { BaseResponseLoginUserResponse } from '../models';
 // @ts-ignore
 import type { BaseResponseLong } from '../models';
@@ -421,6 +423,8 @@ import type { CreateFeedbackRequest } from '../models';
 import type { CreateGroupRequest } from '../models';
 // @ts-ignore
 import type { CreateKnowledgeBaseCommand } from '../models';
+// @ts-ignore
+import type { CreateLiveRoomRequest } from '../models';
 // @ts-ignore
 import type { CreateOrderRequest } from '../models';
 // @ts-ignore
@@ -2975,6 +2979,45 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 教师创建直播间，支持公开和班级专属
+         * @summary 创建直播间
+         * @param {CreateLiveRoomRequest} createLiveRoomRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createRoom: async (createLiveRoomRequest: CreateLiveRoomRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'createLiveRoomRequest' is not null or undefined
+            assertParamExists('createRoom', 'createLiveRoomRequest', createLiveRoomRequest)
+            const localVarPath = `/api/livestream/rooms`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(createLiveRoomRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 
          * @summary 创建定时触发器
          * @param {number} id 工作流ID
@@ -4267,6 +4310,44 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('deleteReply', 'replyId', replyId)
             const localVarPath = `/api/posts/replies/{replyId}`
                 .replace(`{${"replyId"}}`, encodeURIComponent(String(replyId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 主播或管理员删除直播间
+         * @summary 删除直播间
+         * @param {number} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteRoom: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('deleteRoom', 'id', id)
+            const localVarPath = `/api/livestream/rooms/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -5877,6 +5958,54 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(chatHistoryRequestDTO, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 分页获取直播间聊天消息
+         * @summary 直播间聊天历史
+         * @param {number} id 
+         * @param {number} [page] 
+         * @param {number} [size] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getChatHistory1: async (id: number, page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('getChatHistory1', 'id', id)
+            const localVarPath = `/api/livestream/rooms/{id}/messages`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (size !== undefined) {
+                localVarQueryParameter['size'] = size;
+            }
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -9388,6 +9517,44 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('getReviewCount', 'courseId', courseId)
             const localVarPath = `/api/course/review/{courseId}/count`
                 .replace(`{${"courseId"}}`, encodeURIComponent(String(courseId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 获取直播间详情，含播放地址
+         * @summary 直播间详情
+         * @param {number} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getRoomDetail: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('getRoomDetail', 'id', id)
+            const localVarPath = `/api/livestream/rooms/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -13258,6 +13425,60 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 分页获取直播间列表，可按状态筛选
+         * @summary 直播间列表
+         * @param {string} [status] 状态: CREATED/LIVE/ENDED
+         * @param {number} [classId] 班级ID
+         * @param {number} [page] 页码
+         * @param {number} [size] 每页数量
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listRooms: async (status?: string, classId?: number, page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/livestream/rooms`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (status !== undefined) {
+                localVarQueryParameter['status'] = status;
+            }
+
+            if (classId !== undefined) {
+                localVarQueryParameter['classId'] = classId;
+            }
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (size !== undefined) {
+                localVarQueryParameter['size'] = size;
+            }
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 
          * @summary 获取课程的所有小节
          * @param {number} courseId 课程ID
@@ -13724,6 +13945,50 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             // authentication Bearer Token required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 获取当前用户创建的直播间列表
+         * @summary 我的直播间
+         * @param {number} [page] 
+         * @param {number} [size] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        myRooms: async (page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/livestream/rooms/my`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (size !== undefined) {
+                localVarQueryParameter['size'] = size;
+            }
 
             localVarHeaderParameter['Accept'] = 'application/json';
 
@@ -16819,6 +17084,82 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             if (maxArticles !== undefined) {
                 localVarQueryParameter['maxArticles'] = maxArticles;
             }
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 主播获取推流地址和密钥
+         * @summary 获取推流信息
+         * @param {number} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        startStreaming: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('startStreaming', 'id', id)
+            const localVarPath = `/api/livestream/rooms/{id}/start`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 主播手动结束直播
+         * @summary 结束直播
+         * @param {number} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        stopStreaming: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('stopStreaming', 'id', id)
+            const localVarPath = `/api/livestream/rooms/{id}/stop`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
             localVarHeaderParameter['Accept'] = 'application/json';
 
@@ -20271,6 +20612,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 教师创建直播间，支持公开和班级专属
+         * @summary 创建直播间
+         * @param {CreateLiveRoomRequest} createLiveRoomRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async createRoom(createLiveRoomRequest: CreateLiveRoomRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseLiveRoomResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createRoom(createLiveRoomRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.createRoom']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 
          * @summary 创建定时触发器
          * @param {number} id 工作流ID
@@ -20703,6 +21057,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.deleteReply(replyId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.deleteReply']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 主播或管理员删除直播间
+         * @summary 删除直播间
+         * @param {number} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deleteRoom(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseBoolean>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteRoom(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.deleteRoom']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -21241,6 +21608,21 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getChatHistory(chatHistoryRequestDTO, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.getChatHistory']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 分页获取直播间聊天消息
+         * @summary 直播间聊天历史
+         * @param {number} id 
+         * @param {number} [page] 
+         * @param {number} [size] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getChatHistory1(id: number, page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseMapStringObject>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getChatHistory1(id, page, size, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getChatHistory1']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -22401,6 +22783,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getReviewCount(courseId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.getReviewCount']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 获取直播间详情，含播放地址
+         * @summary 直播间详情
+         * @param {number} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getRoomDetail(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseLiveRoomResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getRoomDetail(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getRoomDetail']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -23662,6 +24057,22 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 分页获取直播间列表，可按状态筛选
+         * @summary 直播间列表
+         * @param {string} [status] 状态: CREATED/LIVE/ENDED
+         * @param {number} [classId] 班级ID
+         * @param {number} [page] 页码
+         * @param {number} [size] 每页数量
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async listRooms(status?: string, classId?: number, page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseMapStringObject>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listRooms(status, classId, page, size, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.listRooms']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 
          * @summary 获取课程的所有小节
          * @param {number} courseId 课程ID
@@ -23819,6 +24230,20 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.markRepliesAsRead(id, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.markRepliesAsRead']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 获取当前用户创建的直播间列表
+         * @summary 我的直播间
+         * @param {number} [page] 
+         * @param {number} [size] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async myRooms(page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseMapStringObject>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.myRooms(page, size, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.myRooms']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -24807,6 +25232,32 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.smartScrape(url, maxArticles, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.smartScrape']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 主播获取推流地址和密钥
+         * @summary 获取推流信息
+         * @param {number} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async startStreaming(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseLiveRoomResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.startStreaming(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.startStreaming']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 主播手动结束直播
+         * @summary 结束直播
+         * @param {number} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async stopStreaming(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseLiveRoomResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.stopStreaming(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.stopStreaming']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -26272,6 +26723,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.createReply(requestParameters.commentId, requestParameters.createReplyRequest, options).then((request) => request(axios, basePath));
         },
         /**
+         * 教师创建直播间，支持公开和班级专属
+         * @summary 创建直播间
+         * @param {DefaultApiCreateRoomRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createRoom(requestParameters: DefaultApiCreateRoomRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseLiveRoomResponse> {
+            return localVarFp.createRoom(requestParameters.createLiveRoomRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 
          * @summary 创建定时触发器
          * @param {DefaultApiCreateScheduleTriggerRequest} requestParameters Request parameters.
@@ -26590,6 +27051,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         deleteReply(requestParameters: DefaultApiDeleteReplyRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid> {
             return localVarFp.deleteReply(requestParameters.replyId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 主播或管理员删除直播间
+         * @summary 删除直播间
+         * @param {DefaultApiDeleteRoomRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteRoom(requestParameters: DefaultApiDeleteRoomRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseBoolean> {
+            return localVarFp.deleteRoom(requestParameters.id, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -26994,6 +27465,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         getChatHistory(requestParameters: DefaultApiGetChatHistoryRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseChatMessagePageResponse> {
             return localVarFp.getChatHistory(requestParameters.chatHistoryRequestDTO, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 分页获取直播间聊天消息
+         * @summary 直播间聊天历史
+         * @param {DefaultApiGetChatHistory1Request} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getChatHistory1(requestParameters: DefaultApiGetChatHistory1Request, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringObject> {
+            return localVarFp.getChatHistory1(requestParameters.id, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
         },
         /**
          * 获取打卡排行榜前10名，公开接口
@@ -27842,6 +28323,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         getReviewCount(requestParameters: DefaultApiGetReviewCountRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseLong> {
             return localVarFp.getReviewCount(requestParameters.courseId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 获取直播间详情，含播放地址
+         * @summary 直播间详情
+         * @param {DefaultApiGetRoomDetailRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getRoomDetail(requestParameters: DefaultApiGetRoomDetailRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseLiveRoomResponse> {
+            return localVarFp.getRoomDetail(requestParameters.id, options).then((request) => request(axios, basePath));
         },
         /**
          * 根据配置ID获取课表预览
@@ -28755,6 +29246,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.listReviews(requestParameters.courseId, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
         },
         /**
+         * 分页获取直播间列表，可按状态筛选
+         * @summary 直播间列表
+         * @param {DefaultApiListRoomsRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listRooms(requestParameters: DefaultApiListRoomsRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringObject> {
+            return localVarFp.listRooms(requestParameters.status, requestParameters.classId, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 
          * @summary 获取课程的所有小节
          * @param {DefaultApiListSectionsRequest} requestParameters Request parameters.
@@ -28871,6 +29372,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         markRepliesAsRead(requestParameters: DefaultApiMarkRepliesAsReadRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseBoolean> {
             return localVarFp.markRepliesAsRead(requestParameters.id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 获取当前用户创建的直播间列表
+         * @summary 我的直播间
+         * @param {DefaultApiMyRoomsRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        myRooms(requestParameters: DefaultApiMyRoomsRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringObject> {
+            return localVarFp.myRooms(requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
         },
         /**
          * 将公告状态改为已下线
@@ -29591,6 +30102,26 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         smartScrape(requestParameters: DefaultApiSmartScrapeRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseScrapeResultResponse> {
             return localVarFp.smartScrape(requestParameters.url, requestParameters.maxArticles, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 主播获取推流地址和密钥
+         * @summary 获取推流信息
+         * @param {DefaultApiStartStreamingRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        startStreaming(requestParameters: DefaultApiStartStreamingRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseLiveRoomResponse> {
+            return localVarFp.startStreaming(requestParameters.id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 主播手动结束直播
+         * @summary 结束直播
+         * @param {DefaultApiStopStreamingRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        stopStreaming(requestParameters: DefaultApiStopStreamingRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseLiveRoomResponse> {
+            return localVarFp.stopStreaming(requestParameters.id, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -30759,6 +31290,15 @@ export interface DefaultApiInterface {
     createReply(requestParameters: DefaultApiCreateReplyRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseReplyResponse>;
 
     /**
+     * 教师创建直播间，支持公开和班级专属
+     * @summary 创建直播间
+     * @param {DefaultApiCreateRoomRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    createRoom(requestParameters: DefaultApiCreateRoomRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseLiveRoomResponse>;
+
+    /**
      * 
      * @summary 创建定时触发器
      * @param {DefaultApiCreateScheduleTriggerRequest} requestParameters Request parameters.
@@ -31045,6 +31585,15 @@ export interface DefaultApiInterface {
      * @throws {RequiredError}
      */
     deleteReply(requestParameters: DefaultApiDeleteReplyRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid>;
+
+    /**
+     * 主播或管理员删除直播间
+     * @summary 删除直播间
+     * @param {DefaultApiDeleteRoomRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    deleteRoom(requestParameters: DefaultApiDeleteRoomRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseBoolean>;
 
     /**
      * 
@@ -31408,6 +31957,15 @@ export interface DefaultApiInterface {
      * @throws {RequiredError}
      */
     getChatHistory(requestParameters: DefaultApiGetChatHistoryRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseChatMessagePageResponse>;
+
+    /**
+     * 分页获取直播间聊天消息
+     * @summary 直播间聊天历史
+     * @param {DefaultApiGetChatHistory1Request} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getChatHistory1(requestParameters: DefaultApiGetChatHistory1Request, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringObject>;
 
     /**
      * 获取打卡排行榜前10名，公开接口
@@ -32170,6 +32728,15 @@ export interface DefaultApiInterface {
      * @throws {RequiredError}
      */
     getReviewCount(requestParameters: DefaultApiGetReviewCountRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseLong>;
+
+    /**
+     * 获取直播间详情，含播放地址
+     * @summary 直播间详情
+     * @param {DefaultApiGetRoomDetailRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getRoomDetail(requestParameters: DefaultApiGetRoomDetailRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseLiveRoomResponse>;
 
     /**
      * 根据配置ID获取课表预览
@@ -32990,6 +33557,15 @@ export interface DefaultApiInterface {
     listReviews(requestParameters: DefaultApiListReviewsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListCourseReviewResponse>;
 
     /**
+     * 分页获取直播间列表，可按状态筛选
+     * @summary 直播间列表
+     * @param {DefaultApiListRoomsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    listRooms(requestParameters?: DefaultApiListRoomsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringObject>;
+
+    /**
      * 
      * @summary 获取课程的所有小节
      * @param {DefaultApiListSectionsRequest} requestParameters Request parameters.
@@ -33094,6 +33670,15 @@ export interface DefaultApiInterface {
      * @throws {RequiredError}
      */
     markRepliesAsRead(requestParameters: DefaultApiMarkRepliesAsReadRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseBoolean>;
+
+    /**
+     * 获取当前用户创建的直播间列表
+     * @summary 我的直播间
+     * @param {DefaultApiMyRoomsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    myRooms(requestParameters?: DefaultApiMyRoomsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringObject>;
 
     /**
      * 将公告状态改为已下线
@@ -33742,6 +34327,24 @@ export interface DefaultApiInterface {
      * @throws {RequiredError}
      */
     smartScrape(requestParameters: DefaultApiSmartScrapeRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseScrapeResultResponse>;
+
+    /**
+     * 主播获取推流地址和密钥
+     * @summary 获取推流信息
+     * @param {DefaultApiStartStreamingRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    startStreaming(requestParameters: DefaultApiStartStreamingRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseLiveRoomResponse>;
+
+    /**
+     * 主播手动结束直播
+     * @summary 结束直播
+     * @param {DefaultApiStopStreamingRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    stopStreaming(requestParameters: DefaultApiStopStreamingRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseLiveRoomResponse>;
 
     /**
      * 
@@ -34829,6 +35432,13 @@ export interface DefaultApiCreateReplyRequest {
 }
 
 /**
+ * Request parameters for createRoom operation in DefaultApi.
+ */
+export interface DefaultApiCreateRoomRequest {
+    readonly createLiveRoomRequest: CreateLiveRoomRequest
+}
+
+/**
  * Request parameters for createScheduleTrigger operation in DefaultApi.
  */
 export interface DefaultApiCreateScheduleTriggerRequest {
@@ -35133,6 +35743,13 @@ export interface DefaultApiDeleteQuestionRequest {
  */
 export interface DefaultApiDeleteReplyRequest {
     readonly replyId: number
+}
+
+/**
+ * Request parameters for deleteRoom operation in DefaultApi.
+ */
+export interface DefaultApiDeleteRoomRequest {
+    readonly id: number
 }
 
 /**
@@ -35454,6 +36071,17 @@ export interface DefaultApiGetChapterContentRequest {
  */
 export interface DefaultApiGetChatHistoryRequest {
     readonly chatHistoryRequestDTO: ChatHistoryRequestDTO
+}
+
+/**
+ * Request parameters for getChatHistory1 operation in DefaultApi.
+ */
+export interface DefaultApiGetChatHistory1Request {
+    readonly id: number
+
+    readonly page?: number
+
+    readonly size?: number
 }
 
 /**
@@ -36206,6 +36834,13 @@ export interface DefaultApiGetReviewCountRequest {
      * 课程ID
      */
     readonly courseId: number
+}
+
+/**
+ * Request parameters for getRoomDetail operation in DefaultApi.
+ */
+export interface DefaultApiGetRoomDetailRequest {
+    readonly id: number
 }
 
 /**
@@ -37019,6 +37654,31 @@ export interface DefaultApiListReviewsRequest {
 }
 
 /**
+ * Request parameters for listRooms operation in DefaultApi.
+ */
+export interface DefaultApiListRoomsRequest {
+    /**
+     * 状态: CREATED/LIVE/ENDED
+     */
+    readonly status?: string
+
+    /**
+     * 班级ID
+     */
+    readonly classId?: number
+
+    /**
+     * 页码
+     */
+    readonly page?: number
+
+    /**
+     * 每页数量
+     */
+    readonly size?: number
+}
+
+/**
  * Request parameters for listSections operation in DefaultApi.
  */
 export interface DefaultApiListSectionsRequest {
@@ -37131,6 +37791,15 @@ export interface DefaultApiMarkAsRead3Request {
  */
 export interface DefaultApiMarkRepliesAsReadRequest {
     readonly id: number
+}
+
+/**
+ * Request parameters for myRooms operation in DefaultApi.
+ */
+export interface DefaultApiMyRoomsRequest {
+    readonly page?: number
+
+    readonly size?: number
 }
 
 /**
@@ -37829,6 +38498,20 @@ export interface DefaultApiSmartScrapeRequest {
     readonly url: string
 
     readonly maxArticles?: number
+}
+
+/**
+ * Request parameters for startStreaming operation in DefaultApi.
+ */
+export interface DefaultApiStartStreamingRequest {
+    readonly id: number
+}
+
+/**
+ * Request parameters for stopStreaming operation in DefaultApi.
+ */
+export interface DefaultApiStopStreamingRequest {
+    readonly id: number
 }
 
 /**
@@ -39124,6 +39807,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * 教师创建直播间，支持公开和班级专属
+     * @summary 创建直播间
+     * @param {DefaultApiCreateRoomRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public createRoom(requestParameters: DefaultApiCreateRoomRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).createRoom(requestParameters.createLiveRoomRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 
      * @summary 创建定时触发器
      * @param {DefaultApiCreateScheduleTriggerRequest} requestParameters Request parameters.
@@ -39473,6 +40167,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public deleteReply(requestParameters: DefaultApiDeleteReplyRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).deleteReply(requestParameters.replyId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 主播或管理员删除直播间
+     * @summary 删除直播间
+     * @param {DefaultApiDeleteRoomRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public deleteRoom(requestParameters: DefaultApiDeleteRoomRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).deleteRoom(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -39918,6 +40623,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public getChatHistory(requestParameters: DefaultApiGetChatHistoryRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).getChatHistory(requestParameters.chatHistoryRequestDTO, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 分页获取直播间聊天消息
+     * @summary 直播间聊天历史
+     * @param {DefaultApiGetChatHistory1Request} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getChatHistory1(requestParameters: DefaultApiGetChatHistory1Request, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getChatHistory1(requestParameters.id, requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -40852,6 +41568,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public getReviewCount(requestParameters: DefaultApiGetReviewCountRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).getReviewCount(requestParameters.courseId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 获取直播间详情，含播放地址
+     * @summary 直播间详情
+     * @param {DefaultApiGetRoomDetailRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getRoomDetail(requestParameters: DefaultApiGetRoomDetailRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getRoomDetail(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -41859,6 +42586,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * 分页获取直播间列表，可按状态筛选
+     * @summary 直播间列表
+     * @param {DefaultApiListRoomsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public listRooms(requestParameters: DefaultApiListRoomsRequest = {}, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).listRooms(requestParameters.status, requestParameters.classId, requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 
      * @summary 获取课程的所有小节
      * @param {DefaultApiListSectionsRequest} requestParameters Request parameters.
@@ -41986,6 +42724,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public markRepliesAsRead(requestParameters: DefaultApiMarkRepliesAsReadRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).markRepliesAsRead(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 获取当前用户创建的直播间列表
+     * @summary 我的直播间
+     * @param {DefaultApiMyRoomsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public myRooms(requestParameters: DefaultApiMyRoomsRequest = {}, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).myRooms(requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -42778,6 +43527,28 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public smartScrape(requestParameters: DefaultApiSmartScrapeRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).smartScrape(requestParameters.url, requestParameters.maxArticles, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 主播获取推流地址和密钥
+     * @summary 获取推流信息
+     * @param {DefaultApiStartStreamingRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public startStreaming(requestParameters: DefaultApiStartStreamingRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).startStreaming(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 主播手动结束直播
+     * @summary 结束直播
+     * @param {DefaultApiStopStreamingRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public stopStreaming(requestParameters: DefaultApiStopStreamingRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).stopStreaming(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

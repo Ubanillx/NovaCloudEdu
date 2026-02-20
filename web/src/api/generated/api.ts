@@ -20,5 +20,7 @@ export * from './api/admin-dashboard-controller-api';
 export * from './api/mcpapi';
 export * from './api/only-office-api';
 export * from './api/pptapi';
+export * from './api/rtc-internal-controller-api';
+export * from './api/srs-callback-controller-api';
 export * from './api/webhook-api';
 
