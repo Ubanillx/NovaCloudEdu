@@ -36,6 +36,9 @@ export interface AiChatSession {
   messageCount: number;
   createTime?: string;
   updateTime?: string;
+  assistantId?: number;
+  assistantName?: string;
+  assistantAvatar?: string;
 }
 
 // ============ AI 聊天 Hook ============
@@ -72,6 +75,9 @@ export function useAiChat() {
           messageCount: s.messageCount ?? 0,
           createTime: s.createTime,
           updateTime: s.updateTime,
+          assistantId: s.assistantId as number | undefined,
+          assistantName: s.assistantName as string | undefined,
+          assistantAvatar: s.assistantAvatar as string | undefined,
         })));
       }
     } catch (e) {
@@ -472,6 +478,38 @@ export function useAiChat() {
     }
   }, []);
 
+  /** 重试：删除最后一对用户+AI消息，重新发送用户消息 */
+  const retryMessage = useCallback((messageIndex: number) => {
+    if (isStreamingRef.current) return;
+
+    setMessages(prev => {
+      // 找到该 AI 消息对应的上一条用户消息
+      const aiMsg = prev[messageIndex];
+      if (!aiMsg || aiMsg.role !== 'assistant') return prev;
+
+      // 往前找最近的 user 消息
+      let userMsgIndex = messageIndex - 1;
+      while (userMsgIndex >= 0 && prev[userMsgIndex].role !== 'user') {
+        userMsgIndex--;
+      }
+      if (userMsgIndex < 0) return prev;
+
+      const userMsg = prev[userMsgIndex];
+      // 删除 user 消息和 AI 消息
+      const newMessages = prev.filter((_, i) => i !== userMsgIndex && i !== messageIndex);
+
+      // 异步重新发送
+      setTimeout(() => {
+        sendMessage(userMsg.content, userMsg.attachments?.length ? {
+          imageUrls: userMsg.attachments.filter(a => !a.startsWith('doc:')),
+          documentUrls: userMsg.attachments.filter(a => a.startsWith('doc:')).map(a => a.slice(4)),
+        } : undefined);
+      }, 50);
+
+      return newMessages;
+    });
+  }, [sendMessage]);
+
   /** 刷新会话标题 */
   const refreshTitle = useCallback(async () => {
     if (currentSessionId == null) return;
@@ -528,5 +566,6 @@ export function useAiChat() {
     sendMessage,
     cancelStream,
     refreshTitle,
+    retryMessage,
   };
 }
