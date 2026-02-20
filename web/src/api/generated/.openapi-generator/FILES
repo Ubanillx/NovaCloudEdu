@@ -7,6 +7,8 @@ api/default-api.ts
 api/mcpapi.ts
 api/only-office-api.ts
 api/pptapi.ts
+api/rtc-internal-controller-api.ts
+api/srs-callback-controller-api.ts
 api/webhook-api.ts
 base.ts
 common.ts
@@ -170,6 +172,7 @@ docs/BaseResponseListWorkflowTemplateResponse.md
 docs/BaseResponseListWorkflowTriggerResponse.md
 docs/BaseResponseListWorkflowVariableResponse.md
 docs/BaseResponseListWorkflowVersionResponse.md
+docs/BaseResponseLiveRoomResponse.md
 docs/BaseResponseLoginUserResponse.md
 docs/BaseResponseLong.md
 docs/BaseResponseMapStringInteger.md
@@ -258,6 +261,7 @@ docs/ChatMessagePageResponse.md
 docs/ChatMessageResponse.md
 docs/ChatRequest.md
 docs/ChatSessionResponse.md
+docs/CheckPermissionRequest.md
 docs/CheckinRankingItem.md
 docs/CheckinResult.md
 docs/CheckinStatusResult.md
@@ -289,6 +293,7 @@ docs/CreateExamPaperRequest.md
 docs/CreateFeedbackRequest.md
 docs/CreateGroupRequest.md
 docs/CreateKnowledgeBaseCommand.md
+docs/CreateLiveRoomRequest.md
 docs/CreateOrderRequest.md
 docs/CreatePlanRequest.md
 docs/CreatePostRequest.md
@@ -363,6 +368,7 @@ docs/KnowledgePointId.md
 docs/KnowledgeProfileResponse.md
 docs/LearningStats.md
 docs/LearningTrendResponse.md
+docs/LiveRoomResponse.md
 docs/LoginUserResponse.md
 docs/MCPApi.md
 docs/MemberPage.md
@@ -415,6 +421,8 @@ docs/ReplyResponse.md
 docs/ResetPasswordRequest.md
 docs/ReviewApplicationRequest.md
 docs/ReviewCourseRequest.md
+docs/RtcInternalControllerApi.md
+docs/SaveCallRecordRequest.md
 docs/ScheduleResponse.md
 docs/ScoreTrendItem.md
 docs/ScrapeConfigRequest.md
@@ -439,6 +447,8 @@ docs/SessionChatRequest.md
 docs/SkillOutputVO.md
 docs/SkillParamVO.md
 docs/SourceScrapeRequest.md
+docs/SrsCallbackControllerApi.md
+docs/SrsCallbackRequest.md
 docs/SseEmitter.md
 docs/StudentAnalyticsResponse.md
 docs/StudentRankingItem.md
@@ -683,6 +693,7 @@ models/base-response-list-workflow-template-response.ts
 models/base-response-list-workflow-trigger-response.ts
 models/base-response-list-workflow-variable-response.ts
 models/base-response-list-workflow-version-response.ts
+models/base-response-live-room-response.ts
 models/base-response-login-user-response.ts
 models/base-response-long.ts
 models/base-response-map-string-integer.ts
@@ -771,6 +782,7 @@ models/chat-message-page-response.ts
 models/chat-message-response.ts
 models/chat-request.ts
 models/chat-session-response.ts
+models/check-permission-request.ts
 models/checkin-ranking-item.ts
 models/checkin-result.ts
 models/checkin-status-result.ts
@@ -802,6 +814,7 @@ models/create-exam-paper-request.ts
 models/create-feedback-request.ts
 models/create-group-request.ts
 models/create-knowledge-base-command.ts
+models/create-live-room-request.ts
 models/create-order-request.ts
 models/create-plan-request.ts
 models/create-post-request.ts
@@ -876,6 +889,7 @@ models/knowledge-point.ts
 models/knowledge-profile-response.ts
 models/learning-stats.ts
 models/learning-trend-response.ts
+models/live-room-response.ts
 models/login-user-response.ts
 models/member-page.ts
 models/membership-plan.ts
@@ -925,6 +939,7 @@ models/reply-response.ts
 models/reset-password-request.ts
 models/review-application-request.ts
 models/review-course-request.ts
+models/save-call-record-request.ts
 models/schedule-response.ts
 models/score-trend-item.ts
 models/scrape-config-request.ts
@@ -949,6 +964,7 @@ models/session-chat-request.ts
 models/skill-output-vo.ts
 models/skill-param-vo.ts
 models/source-scrape-request.ts
+models/srs-callback-request.ts
 models/sse-emitter.ts
 models/student-analytics-response.ts
 models/student-ranking-item.ts

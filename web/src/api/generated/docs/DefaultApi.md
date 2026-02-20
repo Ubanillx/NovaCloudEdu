@@ -63,6 +63,7 @@ All URIs are relative to *http://localhost:8080*
 |[**createPost**](#createpost) | **POST** /api/posts | 发布帖子|
 |[**createQuestion**](#createquestion) | **POST** /api/questions | 创建题目|
 |[**createReply**](#createreply) | **POST** /api/posts/comments/{commentId}/replies | 发表回复|
+|[**createRoom**](#createroom) | **POST** /api/livestream/rooms | 创建直播间|
 |[**createScheduleTrigger**](#createscheduletrigger) | **POST** /api/workflows/{id}/triggers/schedule | 创建定时触发器|
 |[**createSection**](#createsection) | **POST** /api/course/{courseId}/section | 创建小节（管理员）|
 |[**createSetting**](#createsetting) | **POST** /api/schedule/setting | 创建课表配置|
@@ -95,6 +96,7 @@ All URIs are relative to *http://localhost:8080*
 |[**deletePost**](#deletepost) | **DELETE** /api/posts/{postId} | 删除帖子|
 |[**deleteQuestion**](#deletequestion) | **DELETE** /api/questions/{id} | 删除题目|
 |[**deleteReply**](#deletereply) | **DELETE** /api/posts/replies/{replyId} | 删除回复|
+|[**deleteRoom**](#deleteroom) | **DELETE** /api/livestream/rooms/{id} | 删除直播间|
 |[**deleteSection**](#deletesection) | **DELETE** /api/exam-papers/{paperId}/sections/{sectionId} | 删除大题|
 |[**deleteSection1**](#deletesection1) | **DELETE** /api/course/{courseId}/section/{sectionId} | 删除小节（管理员）|
 |[**deleteTemplate**](#deletetemplate) | **DELETE** /api/workflows/templates/{templateId} | 删除模板|
@@ -136,6 +138,7 @@ All URIs are relative to *http://localhost:8080*
 |[**getChapter**](#getchapter) | **GET** /api/course/{courseId}/chapter/{chapterId} | 获取章节详情|
 |[**getChapterContent**](#getchaptercontent) | **GET** /api/books/{bookId}/chapters/{chapterIndex} | 获取章节内容|
 |[**getChatHistory**](#getchathistory) | **POST** /api/chat/history | 获取聊天历史|
+|[**getChatHistory1**](#getchathistory1) | **GET** /api/livestream/rooms/{id}/messages | 直播间聊天历史|
 |[**getCheckinRanking**](#getcheckinranking) | **GET** /api/user/checkin/ranking | 打卡排行榜|
 |[**getCheckinStatus**](#getcheckinstatus) | **GET** /api/user/checkin/status | 获取打卡状态|
 |[**getClassAiReport**](#getclassaireport) | **GET** /api/analytics/class/{classId}/ai-report | AI班级学情分析报告（SSE流式）|
@@ -222,6 +225,7 @@ All URIs are relative to *http://localhost:8080*
 |[**getRecommendations**](#getrecommendations) | **GET** /api/grading/{submissionId}/recommend | 获取错题的同类题推荐|
 |[**getResult**](#getresult) | **GET** /api/grading/{submissionId}/result | 获取批改结果|
 |[**getReviewCount**](#getreviewcount) | **GET** /api/course/review/{courseId}/count | 获取课程评价数|
+|[**getRoomDetail**](#getroomdetail) | **GET** /api/livestream/rooms/{id} | 直播间详情|
 |[**getScheduleBySetting**](#getschedulebysetting) | **GET** /api/schedule/setting/{settingId} | 获取特定配置的课表|
 |[**getSection**](#getsection) | **GET** /api/course/{courseId}/section/{sectionId} | 获取小节详情|
 |[**getSectionProgress**](#getsectionprogress) | **GET** /api/progress/section/{sectionId} | 获取小节学习进度|
@@ -315,6 +319,7 @@ All URIs are relative to *http://localhost:8080*
 |[**listPlans1**](#listplans1) | **GET** /api/membership/plans | 获取所有会员计划|
 |[**listPublic**](#listpublic) | **GET** /api/workflows/public | 获取公开的工作流列表|
 |[**listReviews**](#listreviews) | **GET** /api/course/review/{courseId}/list | 获取课程评价列表|
+|[**listRooms**](#listrooms) | **GET** /api/livestream/rooms | 直播间列表|
 |[**listSections**](#listsections) | **GET** /api/course/{courseId}/section | 获取课程的所有小节|
 |[**listSystemTemplates**](#listsystemtemplates) | **GET** /api/workflows/templates/system | 获取系统预置模板|
 |[**listTeachers**](#listteachers) | **GET** /api/teacher/list | 获取讲师列表|
@@ -327,6 +332,7 @@ All URIs are relative to *http://localhost:8080*
 |[**markAsRead2**](#markasread2) | **POST** /api/chat/read/{senderId} | 标记消息已读|
 |[**markAsRead3**](#markasread3) | **POST** /api/announcement/{id}/read | 标记公告已读|
 |[**markRepliesAsRead**](#markrepliesasread) | **POST** /api/feedback/{id}/read | 标记回复为已读|
+|[**myRooms**](#myrooms) | **GET** /api/livestream/rooms/my | 我的直播间|
 |[**offlineAnnouncement**](#offlineannouncement) | **POST** /api/announcement/admin/offline/{id} | 下线公告|
 |[**offlineBanner**](#offlinebanner) | **POST** /api/admin/banner/{id}/offline | 下线轮播图|
 |[**phoneLogin**](#phonelogin) | **POST** /api/auth/login/phone | 手机验证码登录|
@@ -399,6 +405,8 @@ All URIs are relative to *http://localhost:8080*
 |[**setMute**](#setmute) | **POST** /api/admin/groups/{groupId}/mute | 设置群全员禁言|
 |[**smartDynamicScrape**](#smartdynamicscrape) | **POST** /api/scraper/dynamic/smart | 智能动态抓取|
 |[**smartScrape**](#smartscrape) | **POST** /api/scraper/smart | 智能抓取|
+|[**startStreaming**](#startstreaming) | **POST** /api/livestream/rooms/{id}/start | 获取推流信息|
+|[**stopStreaming**](#stopstreaming) | **POST** /api/livestream/rooms/{id}/stop | 结束直播|
 |[**studyWord**](#studyword) | **POST** /api/user/daily-word/{wordId}/study | 标记单词为已学习|
 |[**submitHomework**](#submithomework) | **POST** /api/grading/submit | 提交作业并开始批改（SSE流式返回进度）|
 |[**suggest**](#suggest) | **GET** /api/search/suggest | 搜索建议（即时联想）|
@@ -3578,6 +3586,59 @@ const { status, data } = await apiInstance.createReply(
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **createRoom**
+> BaseResponseLiveRoomResponse createRoom(createLiveRoomRequest)
+
+教师创建直播间，支持公开和班级专属
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration,
+    CreateLiveRoomRequest
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let createLiveRoomRequest: CreateLiveRoomRequest; //
+
+const { status, data } = await apiInstance.createRoom(
+    createLiveRoomRequest
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **createLiveRoomRequest** | **CreateLiveRoomRequest**|  | |
+
+
+### Return type
+
+**BaseResponseLiveRoomResponse**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **createScheduleTrigger**
 > BaseResponseWorkflowTriggerResponse createScheduleTrigger()
 
@@ -5260,6 +5321,58 @@ const { status, data } = await apiInstance.deleteReply(
 ### Return type
 
 **BaseResponseVoid**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **deleteRoom**
+> BaseResponseBoolean deleteRoom()
+
+主播或管理员删除直播间
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let id: number; // (default to undefined)
+
+const { status, data } = await apiInstance.deleteRoom(
+    id
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **id** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseBoolean**
 
 ### Authorization
 
@@ -7371,6 +7484,64 @@ const { status, data } = await apiInstance.getChatHistory(
 ### HTTP request headers
 
  - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getChatHistory1**
+> BaseResponseMapStringObject getChatHistory1()
+
+分页获取直播间聊天消息
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let id: number; // (default to undefined)
+let page: number; // (optional) (default to 1)
+let size: number; // (optional) (default to 50)
+
+const { status, data } = await apiInstance.getChatHistory1(
+    id,
+    page,
+    size
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **id** | [**number**] |  | defaults to undefined|
+| **page** | [**number**] |  | (optional) defaults to 1|
+| **size** | [**number**] |  | (optional) defaults to 50|
+
+
+### Return type
+
+**BaseResponseMapStringObject**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
  - **Accept**: application/json
 
 
@@ -11842,6 +12013,58 @@ const { status, data } = await apiInstance.getReviewCount(
 ### Return type
 
 **BaseResponseLong**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getRoomDetail**
+> BaseResponseLiveRoomResponse getRoomDetail()
+
+获取直播间详情，含播放地址
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let id: number; // (default to undefined)
+
+const { status, data } = await apiInstance.getRoomDetail(
+    id
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **id** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseLiveRoomResponse**
 
 ### Authorization
 
@@ -16699,6 +16922,67 @@ const { status, data } = await apiInstance.listReviews(
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **listRooms**
+> BaseResponseMapStringObject listRooms()
+
+分页获取直播间列表，可按状态筛选
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let status: string; //状态: CREATED/LIVE/ENDED (optional) (default to undefined)
+let classId: number; //班级ID (optional) (default to undefined)
+let page: number; //页码 (optional) (default to 1)
+let size: number; //每页数量 (optional) (default to 10)
+
+const { status, data } = await apiInstance.listRooms(
+    status,
+    classId,
+    page,
+    size
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **status** | [**string**] | 状态: CREATED/LIVE/ENDED | (optional) defaults to undefined|
+| **classId** | [**number**] | 班级ID | (optional) defaults to undefined|
+| **page** | [**number**] | 页码 | (optional) defaults to 1|
+| **size** | [**number**] | 每页数量 | (optional) defaults to 10|
+
+
+### Return type
+
+**BaseResponseMapStringObject**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **listSections**
 > BaseResponseListSectionResponse listSections()
 
@@ -17299,6 +17583,61 @@ const { status, data } = await apiInstance.markRepliesAsRead(
 ### Return type
 
 **BaseResponseBoolean**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **myRooms**
+> BaseResponseMapStringObject myRooms()
+
+获取当前用户创建的直播间列表
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let page: number; // (optional) (default to 1)
+let size: number; // (optional) (default to 10)
+
+const { status, data } = await apiInstance.myRooms(
+    page,
+    size
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **page** | [**number**] |  | (optional) defaults to 1|
+| **size** | [**number**] |  | (optional) defaults to 10|
+
+
+### Return type
+
+**BaseResponseMapStringObject**
 
 ### Authorization
 
@@ -21190,6 +21529,110 @@ const { status, data } = await apiInstance.smartScrape(
 ### Return type
 
 **BaseResponseScrapeResultResponse**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **startStreaming**
+> BaseResponseLiveRoomResponse startStreaming()
+
+主播获取推流地址和密钥
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let id: number; // (default to undefined)
+
+const { status, data } = await apiInstance.startStreaming(
+    id
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **id** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseLiveRoomResponse**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **stopStreaming**
+> BaseResponseLiveRoomResponse stopStreaming()
+
+主播手动结束直播
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let id: number; // (default to undefined)
+
+const { status, data } = await apiInstance.stopStreaming(
+    id
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **id** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseLiveRoomResponse**
 
 ### Authorization
 
