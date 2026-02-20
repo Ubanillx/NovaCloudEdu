@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
   Bot, Plus, History, Trash2, Send, Square, Loader2,
-  Sparkles, MessageSquarePlus, ChevronRight, Copy, Check,
+  Sparkles, MessageSquarePlus, ChevronRight,
   Image as ImageIcon, FileUp, X, ArrowDown, Palette, Video,
   FileText, FileCode, FileSpreadsheet, Globe, Braces, BookOpen, Paperclip, ChevronLeft,
 } from 'lucide-react';
@@ -10,9 +11,14 @@ import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import { useAiChat } from './useAiChat';
 import type { AiChatSession, ImageGeneration, VideoGeneration } from './useAiChat';
+import { useAssistantChat } from '../../hooks/useAssistantChat';
+import type { AssistantChatSession } from '../../hooks/useAssistantChat';
 import { apiClient, AIApi, Configuration } from '../../api';
 import type { AiAssistantVO } from '../../api/generated/models';
 import toast from '../ui/Toast';
+import { useTextToSpeech } from '../../hooks/useTextToSpeech';
+import AiMessageActions from './AiMessageActions';
+import VoiceInputButton from './VoiceInputButton';
 
 const aiApi = new AIApi(new Configuration(), '', apiClient);
 
@@ -58,54 +64,37 @@ const getCurrentUserInfo = () => {
   return { avatar: '', name: '' };
 };
 
-// ============ 复制按钮 ============
-
-const CopyButton: React.FC<{ text: string }> = ({ text }) => {
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      toast.error('复制失败');
-    }
-  };
-
-  return (
-    <button
-      onClick={handleCopy}
-      className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-      title="复制"
-    >
-      {copied ? <Check size={14} className="text-emerald-500" /> : <Copy size={14} />}
-    </button>
-  );
-};
 
 // ============ 会话列表侧边栏 ============
 
 interface SessionSidebarProps {
-  sessions: AiChatSession[];
-  currentSessionId: number | null;
+  sessions: (AiChatSession | AssistantChatSession)[];
+  currentSessionId: number | string | null;
   isLoading: boolean;
-  onSelect: (session: AiChatSession) => void;
-  onDelete: (session: AiChatSession) => void;
+  onSelect: (session: AiChatSession | AssistantChatSession) => void;
+  onDelete: (session: AiChatSession | AssistantChatSession) => void;
   onNew: () => void;
   showOverview: boolean;
   onShowOverview: () => void;
+  // 助手模式可选字段
+  assistant?: AiAssistantVO | null;
+  assistants?: AiAssistantVO[];
+  assistantsLoading?: boolean;
+  selectedAssistantId?: string;
+  onSelectAssistant?: (a: AiAssistantVO) => void;
 }
 
 const SessionSidebar: React.FC<SessionSidebarProps> = ({
   sessions, currentSessionId, isLoading,
   onSelect, onDelete, onNew, showOverview, onShowOverview,
+  assistant, assistants, assistantsLoading, selectedAssistantId, onSelectAssistant,
 }) => {
-  const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const isAssistantMode = !!assistant;
 
-  const handleDelete = async (e: React.MouseEvent, session: AiChatSession) => {
+  const handleDelete = async (e: React.MouseEvent, session: AiChatSession | AssistantChatSession) => {
     e.stopPropagation();
-    setDeletingId(session.sessionId);
+    setDeletingId(String(session.sessionId));
     await onDelete(session);
     setDeletingId(null);
   };
@@ -114,8 +103,10 @@ const SessionSidebar: React.FC<SessionSidebarProps> = ({
     <div className="w-72 flex-shrink-0 flex flex-col border-r border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/30">
       {/* 头部 */}
       <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800">
-        <div className="flex items-center justify-between mb-2">
-          <h3 className="text-sm font-semibold text-gray-900 dark:text-white">智慧体</h3>
+        <div className={`flex items-center justify-between ${!isAssistantMode ? 'mb-2' : ''}`}>
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+            {isAssistantMode ? (assistant?.name || '智慧助手') : '智慧体'}
+          </h3>
           <button
             onClick={onNew}
             className="p-1.5 rounded-lg bg-brand-500 hover:bg-brand-600 text-white transition-colors shadow-sm"
@@ -124,19 +115,55 @@ const SessionSidebar: React.FC<SessionSidebarProps> = ({
             <Plus size={14} />
           </button>
         </div>
-        {/* 概览入口 */}
-        <button
-          onClick={onShowOverview}
-          className={`w-full flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition-colors ${
-            showOverview
-              ? 'bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 font-medium'
-              : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800/50'
-          }`}
-        >
-          <Sparkles size={15} />
-          <span>智慧体中心</span>
-        </button>
+        {/* 概览入口（仅通用模式） */}
+        {!isAssistantMode && (
+          <button
+            onClick={onShowOverview}
+            className={`w-full flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition-colors ${
+              showOverview
+                ? 'bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 font-medium'
+                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800/50'
+            }`}
+          >
+            <Sparkles size={15} />
+            <span>智慧体中心</span>
+          </button>
+        )}
       </div>
+
+      {/* 助手快速切换列表（仅助手模式） */}
+      {isAssistantMode && !assistantsLoading && assistants && assistants.length > 1 && onSelectAssistant && (
+        <div className="px-2 py-2 border-b border-gray-100 dark:border-gray-800">
+          <div className="space-y-0.5">
+            {assistants.map(a => {
+              const isActive = String(a.id) === selectedAssistantId;
+              return (
+                <button
+                  key={String(a.id)}
+                  onClick={() => onSelectAssistant(a)}
+                  className={`w-full flex items-center gap-2 px-2.5 py-1.5 text-sm rounded-lg transition-all ${
+                    isActive
+                      ? 'bg-brand-50 dark:bg-brand-900/30 text-brand-700 dark:text-brand-300 font-medium'
+                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800/50'
+                  }`}
+                >
+                  {a.avatarUrl ? (
+                    <img src={a.avatarUrl} alt="" className="w-6 h-6 rounded-lg object-cover flex-shrink-0" />
+                  ) : (
+                    <div className={`w-6 h-6 rounded-lg flex-shrink-0 flex items-center justify-center text-[10px] font-bold ${
+                      isActive ? 'bg-brand-500 text-white' : 'bg-brand-100 dark:bg-brand-900/50 text-brand-600 dark:text-brand-400'
+                    }`}>
+                      {a.name?.[0] || '?'}
+                    </div>
+                  )}
+                  <span className="truncate text-xs">{a.name}</span>
+                  {isActive && <div className="w-1.5 h-1.5 rounded-full bg-brand-500 ml-auto flex-shrink-0" />}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* 会话列表 */}
       <div className="flex-1 overflow-y-auto custom-scrollbar">
@@ -158,6 +185,8 @@ const SessionSidebar: React.FC<SessionSidebarProps> = ({
             <div className="space-y-0.5 mt-1">
               {sessions.map(session => {
                 const isActive = !showOverview && String(session.sessionId) === String(currentSessionId);
+                const s = session as AiChatSession;
+                const hasAssistant = !!(s.assistantName);
                 return (
                   <div
                     key={String(session.sessionId)}
@@ -168,26 +197,38 @@ const SessionSidebar: React.FC<SessionSidebarProps> = ({
                         : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/50'
                     }`}
                   >
-                    <Bot size={14} className={`flex-shrink-0 ${isActive ? 'text-brand-500' : 'text-gray-400'}`} />
+                    {hasAssistant && s.assistantAvatar ? (
+                      <img src={s.assistantAvatar} alt="" className="w-6 h-6 rounded-md object-cover flex-shrink-0" />
+                    ) : hasAssistant ? (
+                      <div className={`w-6 h-6 rounded-md flex-shrink-0 flex items-center justify-center text-[10px] font-bold ${
+                        isActive ? 'bg-brand-500 text-white' : 'bg-brand-100 dark:bg-brand-900/50 text-brand-600 dark:text-brand-400'
+                      }`}>
+                        {s.assistantName?.[0] || '?'}
+                      </div>
+                    ) : (
+                      <Bot size={14} className={`flex-shrink-0 ${isActive ? 'text-brand-500' : 'text-gray-400'}`} />
+                    )}
                     <div className="flex-1 min-w-0">
                       <p className="text-sm truncate font-medium">
                         {session.title || '新对话'}
                       </p>
                       <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5">
+                        {hasAssistant && <span className="text-brand-500 dark:text-brand-400">{s.assistantName}</span>}
+                        {hasAssistant && ' · '}
                         {formatSessionTime(session.updateTime || session.createTime)}
-                        {session.messageCount > 0 && ` · ${session.messageCount} 条消息`}
+                        {session.messageCount > 0 && ` · ${session.messageCount} 条`}
                       </p>
                     </div>
                     <button
                       onClick={(e) => handleDelete(e, session)}
                       className={`p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity ${
-                        String(deletingId) === String(session.sessionId)
+                        deletingId === String(session.sessionId)
                           ? 'opacity-100'
                           : 'hover:bg-red-50 dark:hover:bg-red-900/20 text-gray-400 hover:text-red-500'
                       }`}
                       title="删除"
                     >
-                      {String(deletingId) === String(session.sessionId)
+                      {deletingId === String(session.sessionId)
                         ? <Loader2 size={13} className="animate-spin text-red-500" />
                         : <Trash2 size={13} />
                       }
@@ -648,18 +689,24 @@ interface ChatAreaProps {
   isLoading: boolean;
   isInitializing: boolean;
   sessionTitle: string;
-  imageGenerations: ImageGeneration[];
-  videoGenerations: VideoGeneration[];
+  imageGenerations?: ImageGeneration[];
+  videoGenerations?: VideoGeneration[];
   onSend: (content: string, options?: { imageUrls?: string[]; documentUrls?: string[] }) => void;
   onCancel: () => void;
   onNewSession: () => void;
+  onRetry: (messageIndex: number) => void;
+  // 助手模式可选字段
+  assistant?: AiAssistantVO | null;
+  ragStatus?: string;
 }
 
 const ChatArea: React.FC<ChatAreaProps> = ({
   messages, streamingContent, isLoading, isInitializing,
-  sessionTitle, imageGenerations, videoGenerations, onSend, onCancel, onNewSession,
+  sessionTitle, imageGenerations = [], videoGenerations = [], onSend, onCancel, onNewSession, onRetry,
+  assistant, ragStatus,
 }) => {
   const currentUser = useMemo(() => getCurrentUserInfo(), []);
+  const tts = useTextToSpeech();
   const [input, setInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -670,6 +717,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
   const [isUploading, setIsUploading] = useState(false);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const docInputRef = useRef<HTMLInputElement>(null);
+  const voiceBaseInputRef = useRef('');
 
   const scrollToBottom = useCallback(() => {
     const container = messagesContainerRef.current;
@@ -804,11 +852,17 @@ const ChatArea: React.FC<ChatAreaProps> = ({
       {/* 头部 */}
       <div className="flex items-center justify-between px-5 py-3 border-b border-gray-200/60 dark:border-gray-700/40 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
         <div className="flex items-center gap-2.5 min-w-0">
-          <div className="w-8 h-8 rounded-lg bg-brand-500 flex items-center justify-center shadow-sm">
-            <Bot size={16} className="text-white" />
-          </div>
+          {assistant?.avatarUrl ? (
+            <img src={assistant.avatarUrl} alt="" className="w-8 h-8 rounded-lg object-cover shadow-sm" />
+          ) : (
+            <div className="w-8 h-8 rounded-lg bg-brand-500 flex items-center justify-center shadow-sm">
+              <Bot size={16} className="text-white" />
+            </div>
+          )}
           <div className="min-w-0">
-            <h3 className="text-sm font-bold text-gray-800 dark:text-gray-200 truncate">{sessionTitle}</h3>
+            <h3 className="text-sm font-bold text-gray-800 dark:text-gray-200 truncate">
+              {assistant ? assistant.name : sessionTitle}
+            </h3>
             <p className="text-[11px] text-gray-400">AI 智能助手</p>
           </div>
         </div>
@@ -822,30 +876,46 @@ const ChatArea: React.FC<ChatAreaProps> = ({
         </button>
       </div>
 
+      {/* RAG 状态提示（助手模式） */}
+      {ragStatus === 'searching' && (
+        <div className="flex items-center gap-2 px-5 py-2 bg-brand-50 dark:bg-brand-900/10 border-b border-brand-100 dark:border-brand-800/30">
+          <Loader2 size={12} className="animate-spin text-brand-500" />
+          <span className="text-[11px] text-brand-600 dark:text-brand-400">正在检索知识库...</span>
+        </div>
+      )}
+
       {/* 消息列表 */}
       <div ref={messagesContainerRef} className="flex-1 overflow-y-auto custom-scrollbar relative">
         {allMessages.length === 0 ? (
           /* 空状态 */
           <div className="flex items-center justify-center h-full">
             <div className="text-center px-8 max-w-lg">
-              <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-brand-500 flex items-center justify-center shadow-lg shadow-brand-500/20">
-                <Bot size={40} className="text-white" />
-              </div>
+              {assistant?.avatarUrl ? (
+                <img src={assistant.avatarUrl} alt="" className="w-20 h-20 mx-auto mb-6 rounded-2xl object-cover shadow-lg shadow-brand-500/20" />
+              ) : (
+                <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-brand-500 flex items-center justify-center shadow-lg shadow-brand-500/20">
+                  <Bot size={40} className="text-white" />
+                </div>
+              )}
               <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-2">
-                你好，我是智云星课 AI 助手
+                {assistant ? `你好，我是${assistant.name}` : '你好，我是智云星课 AI 助手'}
               </h2>
-              <p className="text-gray-400 text-sm mb-6">有什么我可以帮助你的吗？</p>
-              <div className="flex flex-wrap justify-center gap-2">
-                {QUICK_PROMPTS.map(text => (
-                  <button
-                    key={text}
-                    onClick={() => handleQuickPrompt(text)}
-                    className="px-3.5 py-2 text-sm text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-900/20 hover:bg-brand-100 dark:hover:bg-brand-900/40 rounded-xl border border-brand-100 dark:border-brand-800 transition-colors"
-                  >
-                    {text}
-                  </button>
-                ))}
-              </div>
+              <p className="text-gray-400 text-sm mb-6">
+                {assistant?.openingMessage || '有什么我可以帮助你的吗？'}
+              </p>
+              {!assistant && (
+                <div className="flex flex-wrap justify-center gap-2">
+                  {QUICK_PROMPTS.map(text => (
+                    <button
+                      key={text}
+                      onClick={() => handleQuickPrompt(text)}
+                      className="px-3.5 py-2 text-sm text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-900/20 hover:bg-brand-100 dark:hover:bg-brand-900/40 rounded-xl border border-brand-100 dark:border-brand-800 transition-colors"
+                    >
+                      {text}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         ) : (
@@ -857,9 +927,13 @@ const ChatArea: React.FC<ChatAreaProps> = ({
                 <React.Fragment key={index}>
                   <div className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                     {msg.role === 'assistant' && (
-                      <div className="w-8 h-8 rounded-lg bg-brand-500 flex items-center justify-center flex-shrink-0 shadow-sm mt-0.5">
-                        <Bot size={16} className="text-white" />
-                      </div>
+                      assistant?.avatarUrl ? (
+                        <img src={assistant.avatarUrl} alt="" className="w-8 h-8 rounded-lg object-cover flex-shrink-0 shadow-sm mt-0.5" />
+                      ) : (
+                        <div className="w-8 h-8 rounded-lg bg-brand-500 flex items-center justify-center flex-shrink-0 shadow-sm mt-0.5">
+                          <Bot size={16} className="text-white" />
+                        </div>
+                      )
                     )}
                     <div className={`max-w-[75%] ${msg.role === 'user' ? '' : ''}`}>
                       {/* 附件预览（用户消息） */}
@@ -926,9 +1000,12 @@ const ChatArea: React.FC<ChatAreaProps> = ({
                       </div>
                       {/* AI 消息操作 */}
                       {msg.role === 'assistant' && !msg.isStreaming && (
-                        <div className="flex items-center gap-1 mt-1 ml-1">
-                          <CopyButton text={msg.content} />
-                        </div>
+                        <AiMessageActions
+                          text={msg.content}
+                          messageIndex={index}
+                          onRetry={() => onRetry(index)}
+                          tts={tts}
+                        />
                       )}
                     </div>
                     {msg.role === 'user' && (
@@ -977,8 +1054,8 @@ const ChatArea: React.FC<ChatAreaProps> = ({
         )}
       </div>
 
-      {/* 输入区域 */}
-      <div className="border-t border-gray-200/60 dark:border-gray-700/40 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
+      {/* 输入区域 - 现代整合式设计 */}
+      <div className="border-t border-gray-200/60 dark:border-gray-700/40 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl">
         {/* 附件预览 */}
         {(pendingImages.length > 0 || pendingDocs.length > 0) && (
           <div className="px-4 pt-3 flex flex-wrap gap-2">
@@ -991,108 +1068,86 @@ const ChatArea: React.FC<ChatAreaProps> = ({
           </div>
         )}
 
-        <div className="p-3 flex items-end gap-2">
-          {/* 附件按钮 */}
-          <div className="flex items-center gap-1 pb-1">
-            <button
-              onClick={() => imageInputRef.current?.click()}
-              className="p-2 rounded-lg text-gray-400 hover:text-brand-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-              title="上传图片"
-            >
-              <ImageIcon size={18} />
-            </button>
-            <button
-              onClick={() => docInputRef.current?.click()}
-              className="p-2 rounded-lg text-gray-400 hover:text-brand-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-              title="上传文档"
-            >
-              <FileUp size={18} />
-            </button>
-          </div>
-
-          {/* 隐藏的 file input */}
-          <input
-            ref={imageInputRef}
-            type="file"
-            accept="image/*"
-            multiple
-            className="hidden"
-            onChange={e => {
-              if (e.target.files) {
-                setPendingImages(prev => [...prev, ...Array.from(e.target.files!)].slice(0, 3));
-              }
-              e.target.value = '';
-            }}
-          />
-          <input
-            ref={docInputRef}
-            type="file"
-            accept=".pdf,.docx,.txt,.md,.csv,.html,.json,.xml,.epub"
-            className="hidden"
-            onChange={e => {
-              if (e.target.files) {
-                setPendingDocs(prev => [...prev, ...Array.from(e.target.files!)].slice(0, 3));
-              }
-              e.target.value = '';
-            }}
-          />
-
-          {/* 输入框 */}
-          <div className="flex-1 relative">
-            <textarea
-              ref={textareaRef}
-              value={input}
-              onChange={e => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="输入消息，Shift+Enter 换行..."
-              rows={1}
-              disabled={isLoading || isUploading}
-              className="w-full px-4 py-2.5 text-sm bg-gray-50 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 rounded-xl outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 dark:focus:ring-brand-900/30 resize-none transition-all disabled:opacity-50 text-gray-800 dark:text-gray-200 placeholder-gray-400"
-              style={{ maxHeight: 160, minHeight: 40 }}
-            />
-          </div>
-
-          {/* 发送/停止按钮 */}
-          <div className="pb-0.5">
-            {isLoading ? (
+        {/* 主输入容器 - 整合输入框和按钮 */}
+        <div className="p-3">
+          <div className="flex items-end gap-2 bg-gray-50/80 dark:bg-gray-800/60 border border-gray-200/80 dark:border-gray-700/60 rounded-2xl p-2 shadow-sm hover:shadow-md transition-shadow focus-within:ring-2 focus-within:ring-brand-100 dark:focus-within:ring-brand-900/20 focus-within:border-brand-300">
+            {/* 左侧功能按钮组 */}
+            <div className="flex items-center gap-0.5 shrink-0 pb-1">
               <button
-                onClick={onCancel}
-                className="p-2.5 rounded-xl bg-red-500 hover:bg-red-600 text-white transition-colors shadow-sm"
-                title="停止生成"
+                onClick={() => imageInputRef.current?.click()}
+                className="p-2 rounded-xl text-gray-400 hover:text-brand-500 hover:bg-brand-50 dark:hover:bg-gray-700/50 transition-all"
+                title="上传图片"
               >
-                <Square size={16} fill="currentColor" />
+                <ImageIcon size={18} />
               </button>
-            ) : (
               <button
-                onClick={handleSend}
-                disabled={!input.trim() || isUploading}
-                className="p-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 disabled:opacity-40 disabled:cursor-not-allowed text-white transition-colors shadow-sm"
-                title="发送"
+                onClick={() => docInputRef.current?.click()}
+                className="p-2 rounded-xl text-gray-400 hover:text-brand-500 hover:bg-brand-50 dark:hover:bg-gray-700/50 transition-all"
+                title="上传文档"
               >
-                {isUploading ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+                <FileUp size={18} />
               </button>
-            )}
+              <VoiceInputButton
+                onTextChange={(text) => setInput(voiceBaseInputRef.current + text)}
+                onRecordingStart={() => { voiceBaseInputRef.current = input; }}
+                disabled={isLoading}
+              />
+            </div>
+
+            {/* 输入框 */}
+            <div className="flex-1 min-w-0">
+              <textarea
+                ref={textareaRef}
+                value={input}
+                onChange={e => setInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="输入消息，Shift+Enter 换行..."
+                rows={1}
+                disabled={isLoading || isUploading}
+                className="w-full px-2 py-2.5 text-sm bg-transparent border-0 outline-none resize-none disabled:opacity-50 text-gray-800 dark:text-gray-200 placeholder-gray-400 leading-relaxed"
+                style={{ maxHeight: 160, minHeight: 36 }}
+              />
+            </div>
+
+            {/* 发送/停止按钮 */}
+            <div className="shrink-0 pb-0.5">
+              {isLoading ? (
+                <button
+                  onClick={onCancel}
+                  className="p-2.5 rounded-xl bg-red-500 hover:bg-red-600 text-white transition-all shadow-sm hover:shadow"
+                  title="停止生成"
+                >
+                  <Square size={16} fill="currentColor" />
+                </button>
+              ) : (
+                <button
+                  onClick={handleSend}
+                  disabled={!input.trim() || isUploading}
+                  className="p-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 disabled:opacity-40 disabled:cursor-not-allowed text-white transition-all shadow-sm hover:shadow"
+                  title="发送"
+                >
+                  {isUploading ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+                </button>
+              )}
+            </div>
           </div>
         </div>
 
-        {/* 提示 */}
-        <p className="px-4 pb-2 text-[11px] text-gray-400 text-center">
-          AI 助手可能会犯错，请核实重要信息
-        </p>
+
       </div>
     </div>
   );
 };
 
-// ============ 主面板 ============
+// ============ 通用模式面板 ============
 
-const AiChatPanel: React.FC = () => {
+const GeneralModePanel: React.FC = () => {
   const {
     sessions, messages, currentSessionId, sessionTitle,
     isLoading, isLoadingSessions, isInitializing, streamingContent,
     imageGenerations, videoGenerations,
     loadSessions, deleteSession, startNewSession, openSession,
-    sendMessage, cancelStream, refreshTitle,
+    sendMessage, cancelStream, refreshTitle, retryMessage,
   } = useAiChat();
 
   const [showOverview, setShowOverview] = useState(true);
@@ -1161,13 +1216,13 @@ const AiChatPanel: React.FC = () => {
     }
   }, [startNewSession]);
 
-  const handleSelectSession = useCallback(async (session: AiChatSession) => {
-    await openSession(session);
+  const handleSelectSession = useCallback(async (session: AiChatSession | AssistantChatSession) => {
+    await openSession(session as AiChatSession);
     setShowOverview(false);
   }, [openSession]);
 
-  const handleDeleteSession = useCallback(async (session: AiChatSession) => {
-    const success = await deleteSession(session.sessionId);
+  const handleDeleteSession = useCallback(async (session: AiChatSession | AssistantChatSession) => {
+    const success = await deleteSession((session as AiChatSession).sessionId);
     if (success) {
       toast.success('已删除');
       loadSessions();
@@ -1192,14 +1247,13 @@ const AiChatPanel: React.FC = () => {
     sendMessage(content, options);
   }, [currentSessionId, startNewSession, sendMessage]);
 
-  const handleSelectAssistant = useCallback((assistant: AiAssistantVO) => {
+  const handleSelectAssistant = useCallback((a: AiAssistantVO) => {
     // 跳转到专用的 AI 助手聊天页面
-    window.location.href = `/ai-chat/${String(assistant.id)}`;
+    window.location.href = `/ai-chat/${String(a.id)}`;
   }, []);
 
   return (
-    <div className="flex h-full">
-      {/* 左侧会话列表 */}
+    <div className="flex-1 flex h-full min-w-0">
       <SessionSidebar
         sessions={sessions}
         currentSessionId={currentSessionId}
@@ -1211,7 +1265,6 @@ const AiChatPanel: React.FC = () => {
         onShowOverview={() => setShowOverview(true)}
       />
 
-      {/* 右侧内容区 */}
       {showOverview ? (
         <IntelligenceOverview
           onStartChat={handleNewSession}
@@ -1235,10 +1288,155 @@ const AiChatPanel: React.FC = () => {
           onSend={handleSend}
           onCancel={cancelStream}
           onNewSession={handleNewSession}
+          onRetry={retryMessage}
         />
       )}
     </div>
   );
+};
+
+// ============ 助手模式面板 ============
+
+const AssistantModePanel: React.FC<{ assistantId: string }> = ({ assistantId }) => {
+  const navigate = useNavigate();
+
+  const [assistants, setAssistants] = useState<AiAssistantVO[]>([]);
+  const [assistantsLoading, setAssistantsLoading] = useState(true);
+  const [selectedAssistant, setSelectedAssistant] = useState<AiAssistantVO | null>(null);
+
+  const {
+    sessions, messages, currentSessionId, isLoading,
+    isLoadingSessions, isInitializing, streamingContent, ragStatus,
+    loadSessions, loadSessionDetail, deleteSession, startNewSession,
+    sendMessage, cancelStream, refreshSessionTitle, retryMessage,
+  } = useAssistantChat(assistantId);
+
+  const hasInitRef = useRef(false);
+
+  // 加载助手信息（仅用于侧边栏快速切换）
+  useEffect(() => {
+    let mounted = true;
+    setAssistantsLoading(true);
+    aiApi.assistantListPublic({ page: 0, size: 10 })
+      .then(res => {
+        if (!mounted) return;
+        if (res.data?.code === 0 && Array.isArray(res.data.data)) {
+          setAssistants(res.data.data);
+          const found = res.data.data.find((a: AiAssistantVO) => String(a.id) === assistantId);
+          if (found) setSelectedAssistant(found);
+        }
+      })
+      .catch(err => console.error('获取助手列表失败:', err))
+      .finally(() => { if (mounted) setAssistantsLoading(false); });
+    return () => { mounted = false; };
+  }, [assistantId]);
+
+  // 加载会话列表
+  useEffect(() => {
+    if (assistantId && !hasInitRef.current) {
+      hasInitRef.current = true;
+      loadSessions();
+    }
+  }, [assistantId, loadSessions]);
+
+  // assistantId 变化时重置
+  useEffect(() => {
+    hasInitRef.current = false;
+  }, [assistantId]);
+
+  // 消息数 ≤ 4 时自动刷新标题
+  useEffect(() => {
+    if (messages.length > 0 && messages.length <= 4 && !isLoading) {
+      refreshSessionTitle();
+      loadSessions();
+    }
+  }, [messages.length, isLoading, refreshSessionTitle, loadSessions]);
+
+  const handleSelectAssistant = useCallback((a: AiAssistantVO) => {
+    navigate(`/ai-chat/${String(a.id)}`, { replace: true });
+  }, [navigate]);
+
+  const handleSelectSession = useCallback(async (session: AiChatSession | AssistantChatSession) => {
+    await loadSessionDetail(String(session.sessionId));
+  }, [loadSessionDetail]);
+
+  const handleDeleteSession = useCallback(async (session: AiChatSession | AssistantChatSession) => {
+    const success = await deleteSession(String(session.sessionId));
+    if (success) {
+      toast.success('已删除');
+      loadSessions();
+    } else {
+      toast.error('删除失败');
+    }
+  }, [deleteSession, loadSessions]);
+
+  const handleNewSession = useCallback(() => {
+    startNewSession();
+  }, [startNewSession]);
+
+  const handleSend = useCallback((content: string) => {
+    sendMessage(content);
+  }, [sendMessage]);
+
+  return (
+    <div className="flex-1 flex h-full min-w-0">
+      <SessionSidebar
+        sessions={sessions}
+        currentSessionId={currentSessionId}
+        isLoading={isLoadingSessions}
+        onSelect={handleSelectSession}
+        onDelete={handleDeleteSession}
+        onNew={handleNewSession}
+        showOverview={false}
+        onShowOverview={() => {}}
+        assistant={selectedAssistant}
+        assistants={assistants}
+        assistantsLoading={assistantsLoading}
+        selectedAssistantId={assistantId}
+        onSelectAssistant={handleSelectAssistant}
+      />
+
+      {selectedAssistant ? (
+        <ChatArea
+          assistant={selectedAssistant}
+          messages={messages}
+          streamingContent={streamingContent}
+          isLoading={isLoading}
+          isInitializing={isInitializing}
+          sessionTitle={selectedAssistant.name || ''}
+          ragStatus={ragStatus}
+          onSend={handleSend}
+          onCancel={cancelStream}
+          onNewSession={handleNewSession}
+          onRetry={retryMessage}
+        />
+      ) : (
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center text-gray-400">
+            <Loader2 size={32} className="animate-spin mx-auto mb-3 text-brand-500" />
+            <p className="text-sm">正在加载助手信息...</p>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ============ 主面板（支持通用 / 助手双模式） ============
+
+interface AiChatPanelProps {
+  assistantId?: string;
+}
+
+const AiChatPanel: React.FC<AiChatPanelProps> = ({ assistantId }) => {
+  // 也支持从路由参数获取 assistantId
+  const params = useParams<{ assistantId?: string }>();
+  const resolvedAssistantId = assistantId || params.assistantId;
+
+  if (resolvedAssistantId) {
+    return <AssistantModePanel assistantId={resolvedAssistantId} />;
+  }
+  return <GeneralModePanel />;
 };
 
 export default AiChatPanel;
