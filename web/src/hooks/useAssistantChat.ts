@@ -390,6 +390,31 @@ export function useAssistantChat(assistantId: string | undefined) {
     }
   }, []);
 
+  /** 重试：删除最后一对用户+AI消息，重新发送用户消息 */
+  const retryMessage = useCallback((messageIndex: number) => {
+    if (isStreamingRef.current) return;
+
+    setMessages(prev => {
+      const aiMsg = prev[messageIndex];
+      if (!aiMsg || aiMsg.role !== 'assistant') return prev;
+
+      let userMsgIndex = messageIndex - 1;
+      while (userMsgIndex >= 0 && prev[userMsgIndex].role !== 'user') {
+        userMsgIndex--;
+      }
+      if (userMsgIndex < 0) return prev;
+
+      const userMsg = prev[userMsgIndex];
+      const newMessages = prev.filter((_, i) => i !== userMsgIndex && i !== messageIndex);
+
+      setTimeout(() => {
+        sendMessage(userMsg.content);
+      }, 50);
+
+      return newMessages;
+    });
+  }, [sendMessage]);
+
   /** 新建对话（重置状态，首条消息发送时自动创建会话） */
   const startNewSession = useCallback(() => {
     if (isStreamingRef.current) return;
@@ -443,5 +468,6 @@ export function useAssistantChat(assistantId: string | undefined) {
     // 对话
     sendMessage,
     cancelStream,
+    retryMessage,
   };
 }
