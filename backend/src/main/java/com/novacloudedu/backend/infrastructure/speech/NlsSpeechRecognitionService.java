@@ -33,6 +33,7 @@ public class NlsSpeechRecognitionService {
     private long tokenExpireTime;
     
     private final ConcurrentHashMap<String, SpeechTranscriber> transcriberMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, Boolean> readyMap = new ConcurrentHashMap<>();
 
     @PostConstruct
     public void init() {
@@ -97,6 +98,7 @@ public class NlsSpeechRecognitionService {
      * 创建实时语音转写会话
      *
      * @param sessionId 会话ID
+     * @param onReady 转写就绪回调（NLS连接成功后触发，参数为taskId）
      * @param onSentenceBegin 句子开始回调
      * @param onSentenceEnd 句子结束回调（返回最终识别结果）
      * @param onTranscriptionResultChange 中间结果回调
@@ -104,6 +106,7 @@ public class NlsSpeechRecognitionService {
      * @return 是否创建成功
      */
     public boolean startTranscription(String sessionId,
+                                       Consumer<String> onReady,
                                        Consumer<String> onSentenceBegin,
                                        Consumer<TranscriptionResult> onSentenceEnd,
                                        Consumer<TranscriptionResult> onTranscriptionResultChange,
@@ -116,7 +119,11 @@ public class NlsSpeechRecognitionService {
                 
                 @Override
                 public void onTranscriberStart(SpeechTranscriberResponse response) {
-                    log.debug("语音转写开始: sessionId={}, taskId={}", sessionId, response.getTaskId());
+                    log.info("语音转写就绪: sessionId={}, taskId={}", sessionId, response.getTaskId());
+                    readyMap.put(sessionId, Boolean.TRUE);
+                    if (onReady != null) {
+                        onReady.accept(response.getTaskId());
+                    }
                 }
 
                 @Override
@@ -135,7 +142,7 @@ public class NlsSpeechRecognitionService {
                         TranscriptionResult result = new TranscriptionResult(
                                 currentSentenceIndex,
                                 response.getTransSentenceText(),
-                                response.getSentenceBeginTime(),
+                                response.getSentenceBeginTime() != null ? response.getSentenceBeginTime() : 0L,
                                 System.currentTimeMillis(),
                                 true
                         );
@@ -150,7 +157,7 @@ public class NlsSpeechRecognitionService {
                         TranscriptionResult result = new TranscriptionResult(
                                 currentSentenceIndex,
                                 response.getTransSentenceText(),
-                                response.getSentenceBeginTime(),
+                                response.getSentenceBeginTime() != null ? response.getSentenceBeginTime() : 0L,
                                 System.currentTimeMillis(),
                                 false
                         );
@@ -165,13 +172,18 @@ public class NlsSpeechRecognitionService {
 
                 @Override
                 public void onFail(SpeechTranscriberResponse response) {
-                    log.error("语音转写失败: sessionId={}, status={}, message={}",
-                            sessionId, response.getStatus(), response.getStatusText());
+                    log.error("语音转写失败: sessionId={}, status={}, statusText={}, taskId={}",
+                            sessionId, response.getStatus(), response.getStatusText(), response.getTaskId());
+                    readyMap.remove(sessionId);
                     if (onError != null) {
-                        onError.accept(response.getStatusText());
+                        onError.accept("语音转写失败: " + response.getStatusText());
                     }
                 }
             };
+
+            log.info("创建NLS转写: sessionId={}, appKey={}, tokenExpireTime={}, currentTime={}",
+                    sessionId, nlsSpeechConfig.getAppKey(),
+                    tokenExpireTime, System.currentTimeMillis() / 1000);
 
             SpeechTranscriber transcriber = new SpeechTranscriber(nlsClient, listener);
             transcriber.setAppKey(nlsSpeechConfig.getAppKey());
@@ -183,10 +195,11 @@ public class NlsSpeechRecognitionService {
             transcriber.setEnablePunctuation(config.isEnablePunctuation());
             transcriber.setEnableITN(config.isEnableItn());
 
+            log.info("调用 transcriber.start()...");
             transcriber.start();
             transcriberMap.put(sessionId, transcriber);
             
-            log.info("语音转写会话创建成功: sessionId={}", sessionId);
+            log.info("transcriber.start() 返回成功: sessionId={}", sessionId);
             return true;
             
         } catch (Exception e) {
@@ -205,6 +218,10 @@ public class NlsSpeechRecognitionService {
      * @param audioData 音频数据（PCM格式）
      */
     public void sendAudio(String sessionId, byte[] audioData) {
+        if (!Boolean.TRUE.equals(readyMap.get(sessionId))) {
+            log.debug("NLS 尚未就绪，丢弃音频帧: sessionId={}", sessionId);
+            return;
+        }
         SpeechTranscriber transcriber = transcriberMap.get(sessionId);
         if (transcriber != null) {
             try {
@@ -223,6 +240,7 @@ public class NlsSpeechRecognitionService {
      * @param sessionId 会话ID
      */
     public void stopTranscription(String sessionId) {
+        readyMap.remove(sessionId);
         SpeechTranscriber transcriber = transcriberMap.remove(sessionId);
         if (transcriber != null) {
             try {
