@@ -59,7 +59,9 @@ public class SecurityConfig {
             "/api/onlyoffice/callback",  // OnlyOffice 文档保存回调（外部调用，无需认证）
             "/api/video/key",            // HLS 视频密钥分发（播放器无法附加JWT，通过一次性Token验证）
             "/api/payment/callback/**",  // 支付回调（外部调用，无需认证）
-            "/api/membership/plans"      // 会员计划列表（公开查询）
+            "/api/membership/plans",     // 会员计划列表（公开查询）
+            "/api/internal/srs/**",      // SRS 媒体服务器回调（内部调用，无需认证）
+            "/api/internal/rtc/**"       // RTC 通话服务内部接口（Go微服务调用，无需认证）
     };
 
     /**
