@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS book
     total_chapters    INT            DEFAULT 0                 NOT NULL,
     word_count        INT            DEFAULT 0                 NOT NULL,
     file_size         BIGINT         DEFAULT 0                 NOT NULL,
+    search_vector     tsvector                                NULL,
     admin_id          BIGINT                                   NOT NULL,
     create_time       TIMESTAMP      DEFAULT CURRENT_TIMESTAMP NOT NULL,
     update_time       TIMESTAMP      DEFAULT CURRENT_TIMESTAMP NOT NULL,
@@ -52,6 +53,10 @@ CREATE TABLE IF NOT EXISTS chapter
     content         TEXT                                     NOT NULL,
     content_hash    VARCHAR(64)                              NULL,
     encryption_iv   VARCHAR(64)                              NULL,
+    content_vector  vector(1536)                             NULL,
+    vector_model    VARCHAR(100)                             NULL,
+    vectorized_at   TIMESTAMP                                NULL,
+    content_search_vector tsvector                           NULL,
     create_time     TIMESTAMP      DEFAULT CURRENT_TIMESTAMP NOT NULL,
     update_time     TIMESTAMP      DEFAULT CURRENT_TIMESTAMP NOT NULL,
     is_delete       SMALLINT       DEFAULT 0                 NOT NULL,
@@ -125,17 +130,19 @@ COMMENT ON COLUMN book_tag.tag_name IS '标签名称';
 COMMENT ON COLUMN book_tag.create_time IS '创建时间';
 
 
--- 阅读笔记表（可选，为后续功能预留）
+-- 阅读笔记表
 CREATE TABLE IF NOT EXISTS reading_note
 (
     id              BIGSERIAL PRIMARY KEY,
     user_id         BIGINT                                   NOT NULL,
     book_id         BIGINT                                   NOT NULL,
     chapter_id      BIGINT                                   NOT NULL,
+    chapter_index   INT                                      NULL,
     note_content    TEXT                                     NOT NULL,
     selected_text   TEXT                                     NULL,
     position_start  INT                                      NULL,
     position_end    INT                                      NULL,
+    note_color      VARCHAR(20)   DEFAULT '#FFEB3B'          NULL,
     create_time     TIMESTAMP      DEFAULT CURRENT_TIMESTAMP NOT NULL,
     update_time     TIMESTAMP      DEFAULT CURRENT_TIMESTAMP NOT NULL,
     is_delete       SMALLINT       DEFAULT 0                 NOT NULL
@@ -158,7 +165,7 @@ COMMENT ON COLUMN reading_note.update_time IS '更新时间';
 COMMENT ON COLUMN reading_note.is_delete IS '是否删除：0-否，1-是';
 
 
--- 书签表（可选，为后续功能预留）
+-- 书签表
 CREATE TABLE IF NOT EXISTS reading_bookmark
 (
     id              BIGSERIAL PRIMARY KEY,
@@ -168,6 +175,7 @@ CREATE TABLE IF NOT EXISTS reading_bookmark
     chapter_index   INT                                      NOT NULL,
     position        INT            DEFAULT 0                 NOT NULL,
     bookmark_name   VARCHAR(100)                             NULL,
+    note            TEXT                                     NULL,
     create_time     TIMESTAMP      DEFAULT CURRENT_TIMESTAMP NOT NULL,
     is_delete       SMALLINT       DEFAULT 0                 NOT NULL
 );
@@ -191,33 +199,18 @@ COMMENT ON COLUMN reading_bookmark.is_delete IS '是否删除：0-否，1-是';
 -- 向量化和全文搜索支持
 -- ========================================
 
--- 1. 添加 pgvector 扩展(用于向量相似度搜索)
+-- 添加 pgvector 扩展(用于向量相似度搜索)
 CREATE EXTENSION IF NOT EXISTS vector;
 
--- 2. 为笔记表添加字段
-ALTER TABLE reading_note ADD COLUMN IF NOT EXISTS chapter_index INT;
-ALTER TABLE reading_note ADD COLUMN IF NOT EXISTS note_color VARCHAR(20) DEFAULT '#FFEB3B';
-
--- 3. 为书签表添加字段
-ALTER TABLE reading_bookmark ADD COLUMN IF NOT EXISTS note TEXT;
-
--- 4. 为章节表添加向量列
-ALTER TABLE chapter ADD COLUMN IF NOT EXISTS content_vector vector(1536);
-ALTER TABLE chapter ADD COLUMN IF NOT EXISTS vector_model VARCHAR(100);
-ALTER TABLE chapter ADD COLUMN IF NOT EXISTS vectorized_at TIMESTAMP;
-
--- 5. 创建向量索引(使用 HNSW 算法,适合大规模向量检索)
+-- 创建向量索引(使用 HNSW 算法,适合大规模向量检索)
 CREATE INDEX IF NOT EXISTS idx_chapter_content_vector 
 ON chapter USING hnsw (content_vector vector_cosine_ops);
 
--- 6. 为书籍表添加全文搜索列
-ALTER TABLE book ADD COLUMN IF NOT EXISTS search_vector tsvector;
-
--- 7. 创建全文搜索索引
+-- 创建全文搜索索引
 CREATE INDEX IF NOT EXISTS idx_book_search_vector 
 ON book USING gin(search_vector);
 
--- 8. 创建触发器函数,自动更新全文搜索向量
+-- 创建触发器函数,自动更新全文搜索向量
 CREATE OR REPLACE FUNCTION update_book_search_vector()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -228,27 +221,24 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- 9. 创建触发器
+-- 创建触发器
 DROP TRIGGER IF EXISTS trigger_update_book_search_vector ON book;
 CREATE TRIGGER trigger_update_book_search_vector
     BEFORE INSERT OR UPDATE ON book
     FOR EACH ROW
     EXECUTE FUNCTION update_book_search_vector();
 
--- 10. 为现有数据更新全文搜索向量
+-- 为现有数据更新全文搜索向量
 UPDATE book SET search_vector = 
     setweight(to_tsvector('simple', COALESCE(title, '')), 'A') ||
     setweight(to_tsvector('simple', COALESCE(author, '')), 'B')
 WHERE search_vector IS NULL;
 
--- 11. 为章节表添加全文搜索列
-ALTER TABLE chapter ADD COLUMN IF NOT EXISTS content_search_vector tsvector;
-
--- 12. 创建章节内容全文搜索索引
+-- 创建章节内容全文搜索索引
 CREATE INDEX IF NOT EXISTS idx_chapter_content_search_vector 
 ON chapter USING gin(content_search_vector);
 
--- 13. 创建章节全文搜索触发器函数
+-- 创建章节全文搜索触发器函数
 CREATE OR REPLACE FUNCTION update_chapter_search_vector()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -260,14 +250,14 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- 14. 创建章节触发器
+-- 创建章节触发器
 DROP TRIGGER IF EXISTS trigger_update_chapter_search_vector ON chapter;
 CREATE TRIGGER trigger_update_chapter_search_vector
     BEFORE INSERT OR UPDATE ON chapter
     FOR EACH ROW
     EXECUTE FUNCTION update_chapter_search_vector();
 
--- 15. 添加向量搜索辅助函数
+-- 添加向量搜索辅助函数
 CREATE OR REPLACE FUNCTION search_similar_chapters(
     query_vector vector(1536),
     similarity_threshold FLOAT DEFAULT 0.7,
@@ -295,7 +285,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- 16. 添加全文搜索辅助函数
+-- 添加全文搜索辅助函数
 CREATE OR REPLACE FUNCTION search_books_fulltext(
     search_query TEXT,
     result_limit INT DEFAULT 20
@@ -321,7 +311,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- 17. 添加章节内容全文搜索函数
+-- 添加章节内容全文搜索函数
 CREATE OR REPLACE FUNCTION search_chapters_fulltext(
     search_query TEXT,
     book_id_filter BIGINT DEFAULT NULL,
@@ -351,7 +341,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- 18. 添加注释
+-- 添加列注释
 COMMENT ON COLUMN chapter.content_vector IS '章节内容的向量表示,用于语义相似度搜索';
 COMMENT ON COLUMN chapter.vector_model IS '生成向量使用的模型名称';
 COMMENT ON COLUMN chapter.vectorized_at IS '向量化时间';
