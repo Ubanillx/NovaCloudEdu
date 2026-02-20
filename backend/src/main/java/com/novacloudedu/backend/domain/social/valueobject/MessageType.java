@@ -9,7 +9,8 @@ public enum MessageType {
     FILE("file"),
     AUDIO("audio"),
     VIDEO("video"),
-    SYSTEM("system");
+    SYSTEM("system"),
+    CALL("call");
 
     private final String value;
 
