@@ -74,6 +74,7 @@ public class AiChatSessionRepositoryImpl implements AiChatSessionRepository {
             po.setId(session.getId().value());
         }
         po.setUserId(session.getUserId().value());
+        po.setAssistantId(session.getAssistantId());
         po.setTitle(session.getTitle());
         po.setMemorySummary(session.getMemorySummary());
         po.setMessageCount(session.getMessageCount());
@@ -84,6 +85,7 @@ public class AiChatSessionRepositoryImpl implements AiChatSessionRepository {
         return AiChatSession.reconstruct(
                 AiChatSessionId.of(po.getId()),
                 UserId.of(po.getUserId()),
+                po.getAssistantId(),
                 po.getTitle(),
                 po.getMemorySummary(),
                 po.getMessageCount() != null ? po.getMessageCount() : 0,

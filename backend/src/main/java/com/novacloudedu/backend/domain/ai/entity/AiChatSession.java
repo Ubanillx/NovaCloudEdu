@@ -17,6 +17,7 @@ public class AiChatSession {
 
     private AiChatSessionId id;
     private UserId userId;
+    private Long assistantId;
     private String title;
     private String memorySummary;
     private int messageCount;
@@ -27,12 +28,20 @@ public class AiChatSession {
      * 创建新会话
      */
     public static AiChatSession create(UserId userId) {
+        return create(userId, null);
+    }
+
+    /**
+     * 创建关联助手的新会话
+     */
+    public static AiChatSession create(UserId userId, Long assistantId) {
         if (userId == null) {
             throw new IllegalArgumentException("用户ID不能为空");
         }
 
         AiChatSession session = new AiChatSession();
         session.userId = userId;
+        session.assistantId = assistantId;
         session.title = null;
         session.memorySummary = null;
         session.messageCount = 0;
@@ -44,12 +53,13 @@ public class AiChatSession {
     /**
      * 重构（从数据库加载）
      */
-    public static AiChatSession reconstruct(AiChatSessionId id, UserId userId, String title,
-                                             String memorySummary, int messageCount,
+    public static AiChatSession reconstruct(AiChatSessionId id, UserId userId, Long assistantId,
+                                             String title, String memorySummary, int messageCount,
                                              LocalDateTime createTime, LocalDateTime updateTime) {
         AiChatSession session = new AiChatSession();
         session.id = id;
         session.userId = userId;
+        session.assistantId = assistantId;
         session.title = title;
         session.memorySummary = memorySummary;
         session.messageCount = messageCount;
