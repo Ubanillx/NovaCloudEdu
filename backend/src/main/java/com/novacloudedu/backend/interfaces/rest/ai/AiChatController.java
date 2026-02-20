@@ -55,18 +55,7 @@ public class AiChatController {
             @RequestParam(defaultValue = "0") @Parameter(description = "页码") int page,
             @RequestParam(defaultValue = "20") @Parameter(description = "每页大小") int size) {
         Long userId = Long.parseLong(authentication.getName());
-        List<AiChatSession> sessions = aiChatApplicationService.listSessions(userId, page, size);
-
-        List<Map<String, Object>> result = sessions.stream().map(s -> {
-            Map<String, Object> map = new HashMap<>();
-            map.put("sessionId", s.getId().value());
-            map.put("title", s.getTitle());
-            map.put("messageCount", s.getMessageCount());
-            map.put("createTime", s.getCreateTime());
-            map.put("updateTime", s.getUpdateTime());
-            return map;
-        }).collect(Collectors.toList());
-
+        List<Map<String, Object>> result = aiChatApplicationService.listSessionsWithAssistantInfo(userId, page, size);
         return ResultUtils.success(result);
     }
 

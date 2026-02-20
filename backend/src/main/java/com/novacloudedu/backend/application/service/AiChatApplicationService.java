@@ -118,6 +118,42 @@ public class AiChatApplicationService {
     }
 
     /**
+     * 获取用户的会话列表（含关联助手信息）
+     */
+    public List<Map<String, Object>> listSessionsWithAssistantInfo(Long userId, int page, int size) {
+        List<AiChatSession> sessions = sessionRepository.findByUserId(UserId.of(userId), page, size);
+
+        // 收集所有 assistantId，批量查询
+        java.util.Set<Long> assistantIds = sessions.stream()
+                .map(AiChatSession::getAssistantId)
+                .filter(java.util.Objects::nonNull)
+                .collect(java.util.stream.Collectors.toSet());
+
+        Map<Long, AiAssistant> assistantMap = new HashMap<>();
+        for (Long aid : assistantIds) {
+            assistantRepository.findById(AiAssistantId.of(aid)).ifPresent(a -> assistantMap.put(aid, a));
+        }
+
+        return sessions.stream().map(s -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("sessionId", s.getId().value());
+            map.put("assistantId", s.getAssistantId());
+            map.put("title", s.getTitle());
+            map.put("messageCount", s.getMessageCount());
+            map.put("createTime", s.getCreateTime());
+            map.put("updateTime", s.getUpdateTime());
+            if (s.getAssistantId() != null) {
+                AiAssistant assistant = assistantMap.get(s.getAssistantId());
+                if (assistant != null) {
+                    map.put("assistantName", assistant.getName());
+                    map.put("assistantAvatar", assistant.getAvatarUrl());
+                }
+            }
+            return map;
+        }).collect(java.util.stream.Collectors.toList());
+    }
+
+    /**
      * 获取会话详情（含消息列表）
      */
     public Map<String, Object> getSessionDetail(Long sessionId, Long userId) {
@@ -754,7 +790,7 @@ public class AiChatApplicationService {
         if (sessionId != null) {
             session = getSessionAndVerifyOwner(sessionId, userId);
         } else {
-            session = AiChatSession.create(UserId.of(userId));
+            session = AiChatSession.create(UserId.of(userId), assistantId);
             session = sessionRepository.save(session);
             isNewSession = true;
         }
