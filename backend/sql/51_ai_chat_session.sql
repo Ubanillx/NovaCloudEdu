@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS ai_chat_session
 (
     id              BIGSERIAL PRIMARY KEY,
     user_id         BIGINT                                  NOT NULL,
+    assistant_id    BIGINT                                  NULL,
 
     -- 会话信息
     title           VARCHAR(256)                            NULL,
@@ -26,10 +27,12 @@ CREATE TABLE IF NOT EXISTS ai_chat_session
 
 CREATE INDEX IF NOT EXISTS idx_acs_user_id ON ai_chat_session(user_id);
 CREATE INDEX IF NOT EXISTS idx_acs_update_time ON ai_chat_session(update_time DESC);
+CREATE INDEX IF NOT EXISTS idx_chat_session_assistant ON ai_chat_session(assistant_id) WHERE assistant_id IS NOT NULL;
 
 COMMENT ON TABLE ai_chat_session IS 'AI通用聊天会话';
 COMMENT ON COLUMN ai_chat_session.id IS 'id';
 COMMENT ON COLUMN ai_chat_session.user_id IS '用户id';
+COMMENT ON COLUMN ai_chat_session.assistant_id IS '关联的AI助手ID，NULL表示通用AI对话';
 COMMENT ON COLUMN ai_chat_session.title IS '会话标题（首次对话后由AI自动生成）';
 COMMENT ON COLUMN ai_chat_session.memory_summary IS '记忆摘要（旧消息的压缩摘要，用于长对话的上下文保持）';
 COMMENT ON COLUMN ai_chat_session.message_count IS '消息总数';
