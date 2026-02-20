@@ -86,7 +86,7 @@ aliyun:
     access-key-id: ${ALIYUN_ACCESS_KEY_ID:your-nls-access-key-id}
     access-key-secret: ${ALIYUN_ACCESS_KEY_SECRET:your-nls-access-key-secret}
     app-key: ${ALIYUN_NLS_APP_KEY:your-nls-app-key}
-    url: wss://nls-gateway.cn-shanghai.aliyuncs.com/ws/v1
+    url: wss://nls-gateway-cn-shanghai.aliyuncs.com/ws/v1
     asr:
       enable-intermediate-result: true
       enable-punctuation: true
