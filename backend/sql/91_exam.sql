@@ -50,6 +50,7 @@ CREATE TABLE IF NOT EXISTS exam_paper
     total_score     INT          DEFAULT 0                 NOT NULL,
     duration_min    INT                                    NULL,
     layout          JSONB        DEFAULT '{}'::jsonb       NOT NULL,
+    template_id     BIGINT                                 NULL,
     status          VARCHAR(20)  DEFAULT 'DRAFT'           NOT NULL,
     creator_id      BIGINT                                 NOT NULL,
     create_time     TIMESTAMP    DEFAULT CURRENT_TIMESTAMP NOT NULL,
@@ -67,6 +68,7 @@ COMMENT ON COLUMN exam_paper.subject IS '学科';
 COMMENT ON COLUMN exam_paper.total_score IS '总分';
 COMMENT ON COLUMN exam_paper.duration_min IS '考试时长(分钟)';
 COMMENT ON COLUMN exam_paper.layout IS '排版配置JSON {paperSize,columns,fontSize}';
+COMMENT ON COLUMN exam_paper.template_id IS '关联的试卷模板ID，NULL使用系统默认模板';
 COMMENT ON COLUMN exam_paper.status IS '状态: DRAFT/PUBLISHED';
 
 -- 试卷大题表
