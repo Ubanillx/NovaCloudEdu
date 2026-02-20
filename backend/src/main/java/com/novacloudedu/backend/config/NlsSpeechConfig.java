@@ -33,7 +33,7 @@ public class NlsSpeechConfig {
     /**
      * NLS 服务地址 (默认为公网地址)
      */
-    private String url = "wss://nls-gateway.cn-shanghai.aliyuncs.com/ws/v1";
+    private String url = "wss://nls-gateway-cn-shanghai.aliyuncs.com/ws/v1";
 
     /**
      * 语音识别 (ASR) 配置
