@@ -3,6 +3,7 @@ import {
   Users, UsersRound, Search, UserPlus,
   Check, X, Clock, Send, ArrowLeft,
   MailPlus, UserCheck, Loader2, RefreshCw, MessageCircle, WifiOff, Bot,
+  Phone, Video,
 } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import { apiClient, DefaultApi, Configuration } from '../api';
@@ -17,6 +18,7 @@ import { useChat } from '../context/ChatContext';
 import PrivateChatPanel from '../components/chat/PrivateChatPanel';
 import GroupChatPanel from '../components/chat/GroupChatPanel';
 import AiChatPanel from '../components/chat/AiChatPanel';
+import { useRtc } from '../context/RtcContext';
 
 const api = new DefaultApi(new Configuration(), '', apiClient);
 
@@ -73,6 +75,7 @@ type RequestTab = 'received' | 'sent';
 // ============ 好友列表 Tab ============
 
 const FriendsTab: React.FC<{ onChatWith?: (userId: number, userName?: string, userAvatar?: string) => void }> = ({ onChatWith }) => {
+  const { startCall } = useRtc();
   const [friends, setFriends] = useState<FriendResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchKeyword, setSearchKeyword] = useState('');
@@ -158,11 +161,22 @@ const FriendsTab: React.FC<{ onChatWith?: (userId: number, userName?: string, us
                     {friend.userProfile || `@${friend.userAccount || ''}`}
                   </p>
                 </div>
-                {friend.friendSince && (
-                  <span className="text-xs text-gray-400 whitespace-nowrap">
-                    {formatTime(friend.friendSince)}
-                  </span>
-                )}
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); startCall(String(friend.userId), friend.userName || '未知用户', friend.userAvatar, 'audio'); }}
+                    className="p-1.5 rounded-lg text-gray-400 hover:text-brand-500 hover:bg-brand-50 dark:hover:bg-brand-900/20 transition-colors"
+                    title="语音通话"
+                  >
+                    <Phone size={16} />
+                  </button>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); startCall(String(friend.userId), friend.userName || '未知用户', friend.userAvatar, 'video'); }}
+                    className="p-1.5 rounded-lg text-gray-400 hover:text-brand-500 hover:bg-brand-50 dark:hover:bg-brand-900/20 transition-colors"
+                    title="视频通话"
+                  >
+                    <Video size={16} />
+                  </button>
+                </div>
               </div>
             ))}
           </div>
