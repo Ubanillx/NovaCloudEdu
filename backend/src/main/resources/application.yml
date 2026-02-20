@@ -69,6 +69,11 @@ workflow:
     venv-cache-dir: ${CODE_SANDBOX_VENV_DIR:${user.home}/.novacloudedu/venvs}
     temp-dir: ${CODE_SANDBOX_TEMP_DIR:${java.io.tmpdir}/novacloudedu-sandbox}
 
+# SRS 直播媒体服务器配置
+srs:
+  rtmp-url: ${SRS_RTMP_URL:rtmp://localhost:1935/live}
+  http-base: ${SRS_HTTP_BASE:http://localhost:8085}
+
 # 日志配置
 logging:
   level:
