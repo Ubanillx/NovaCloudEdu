@@ -40,6 +40,9 @@ import CourseLessonPage from './pages/CourseLessonPage'
 import EbookReaderPage from './pages/EbookReaderPage'
 import { getToken } from './api'
 import { useEffect } from 'react'
+import { RtcProvider } from './context/RtcContext'
+import IncomingCallModal from './components/call/IncomingCallModal'
+import CallScreen from './components/call/CallScreen'
 
 // 路由切换时滚动到顶部
 const ScrollToTop = () => {
@@ -69,6 +72,7 @@ const InitialRedirect = () => {
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ThemeProvider>
+      <RtcProvider>
       <BrowserRouter>
         <ScrollToTop />
         <Routes>
@@ -170,7 +174,11 @@ createRoot(document.getElementById('root')!).render(
             } 
           />
         </Routes>
+        {/* 全局通话 UI（覆盖所有页面，包括管理后台） */}
+        <IncomingCallModal />
+        <CallScreen />
       </BrowserRouter>
+      </RtcProvider>
     </ThemeProvider>
   </StrictMode>,
 )
