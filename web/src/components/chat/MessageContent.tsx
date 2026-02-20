@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import {
   FileText, FileSpreadsheet, FileImage, FileArchive, FileAudio, FileVideo,
   File, Download, X, Loader2, Presentation, Eye, ExternalLink,
+  Phone, PhoneMissed, PhoneOff, Video,
 } from 'lucide-react';
 
 // ============ 工具函数 ============
@@ -348,6 +349,72 @@ const FileMessage: React.FC<FileMessageProps> = ({ content, isSelf }) => {
   );
 };
 
+// ============ 通话消息 ============
+
+interface CallMessageProps {
+  content: string;
+  isSelf: boolean;
+}
+
+const formatCallDuration = (seconds: number): string => {
+  if (seconds <= 0) return '';
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  if (m > 0) return `${m}分${s.toString().padStart(2, '0')}秒`;
+  return `${s}秒`;
+};
+
+const callStatusConfig: Record<string, { label: string; icon: React.ReactNode; color: string }> = {
+  completed: { label: '通话结束', icon: <Phone size={16} />, color: 'text-green-500' },
+  rejected:  { label: '已拒接',   icon: <PhoneOff size={16} />, color: 'text-red-400' },
+  missed:    { label: '未接听',   icon: <PhoneMissed size={16} />, color: 'text-orange-400' },
+  busy:      { label: '对方忙',   icon: <PhoneOff size={16} />, color: 'text-gray-400' },
+  cancelled: { label: '已取消',   icon: <PhoneOff size={16} />, color: 'text-gray-400' },
+};
+
+const CallMessage: React.FC<CallMessageProps> = ({ content, isSelf }) => {
+  let mediaType = 'audio';
+  let status = 'completed';
+  let duration = 0;
+
+  try {
+    const data = JSON.parse(content);
+    mediaType = data.mediaType || 'audio';
+    status = data.status || 'completed';
+    duration = data.duration || 0;
+  } catch { /* 解析失败使用默认值 */ }
+
+  const cfg = callStatusConfig[status] || callStatusConfig.completed;
+  const isVideo = mediaType === 'video';
+  const durationStr = status === 'completed' && duration > 0 ? formatCallDuration(duration) : '';
+
+  return (
+    <div
+      className={`flex items-center gap-3 px-4 py-3 rounded-2xl shadow-sm min-w-[180px] ${
+        isSelf
+          ? 'bg-brand-500 text-white rounded-tr-sm'
+          : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-tl-sm border border-gray-100 dark:border-gray-800'
+      }`}
+    >
+      <div className={`flex items-center justify-center w-9 h-9 rounded-full ${
+        isSelf ? 'bg-white/20' : 'bg-gray-100 dark:bg-gray-700'
+      }`}>
+        <span className={isSelf ? 'text-white' : cfg.color}>
+          {isVideo ? <Video size={18} /> : cfg.icon}
+        </span>
+      </div>
+      <div className="flex flex-col">
+        <span className={`text-sm font-medium ${isSelf ? 'text-white' : ''}`}>
+          {isVideo ? '视频通话' : '语音通话'}
+        </span>
+        <span className={`text-xs ${isSelf ? 'text-white/70' : 'text-gray-500 dark:text-gray-400'}`}>
+          {cfg.label}{durationStr ? ` · ${durationStr}` : ''}
+        </span>
+      </div>
+    </div>
+  );
+};
+
 // ============ MessageBubble：带气泡包裹的消息渲染 ============
 
 interface MessageBubbleProps {
@@ -373,6 +440,11 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ content, type, isS
   // 文件消息：自带卡片样式，不需要气泡
   if (upperType === 'FILE') {
     return <FileMessage content={content} isSelf={isSelf} />;
+  }
+
+  // 通话消息：自带卡片样式，不需要气泡
+  if (upperType === 'CALL') {
+    return <CallMessage content={content} isSelf={isSelf} />;
   }
 
   // 其他消息（TEXT/AUDIO/VIDEO）：包裹气泡
