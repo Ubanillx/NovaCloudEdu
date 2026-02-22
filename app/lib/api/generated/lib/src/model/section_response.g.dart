@@ -28,6 +28,16 @@ class _$SectionResponse extends SectionResponse {
   @override
   final String? resourceUrl;
   @override
+  final String? hlsUrl;
+  @override
+  final bool? accessible;
+  @override
+  final int? transcodeStatus;
+  @override
+  final String? thumbnailUrl;
+  @override
+  final int? thumbnailCount;
+  @override
   final DateTime? createTime;
   @override
   final DateTime? updateTime;
@@ -46,6 +56,11 @@ class _$SectionResponse extends SectionResponse {
     this.sort,
     this.isFree,
     this.resourceUrl,
+    this.hlsUrl,
+    this.accessible,
+    this.transcodeStatus,
+    this.thumbnailUrl,
+    this.thumbnailCount,
     this.createTime,
     this.updateTime,
   }) : super._();
@@ -70,6 +85,11 @@ class _$SectionResponse extends SectionResponse {
         sort == other.sort &&
         isFree == other.isFree &&
         resourceUrl == other.resourceUrl &&
+        hlsUrl == other.hlsUrl &&
+        accessible == other.accessible &&
+        transcodeStatus == other.transcodeStatus &&
+        thumbnailUrl == other.thumbnailUrl &&
+        thumbnailCount == other.thumbnailCount &&
         createTime == other.createTime &&
         updateTime == other.updateTime;
   }
@@ -87,6 +107,11 @@ class _$SectionResponse extends SectionResponse {
     _$hash = $jc(_$hash, sort.hashCode);
     _$hash = $jc(_$hash, isFree.hashCode);
     _$hash = $jc(_$hash, resourceUrl.hashCode);
+    _$hash = $jc(_$hash, hlsUrl.hashCode);
+    _$hash = $jc(_$hash, accessible.hashCode);
+    _$hash = $jc(_$hash, transcodeStatus.hashCode);
+    _$hash = $jc(_$hash, thumbnailUrl.hashCode);
+    _$hash = $jc(_$hash, thumbnailCount.hashCode);
     _$hash = $jc(_$hash, createTime.hashCode);
     _$hash = $jc(_$hash, updateTime.hashCode);
     _$hash = $jf(_$hash);
@@ -106,6 +131,11 @@ class _$SectionResponse extends SectionResponse {
           ..add('sort', sort)
           ..add('isFree', isFree)
           ..add('resourceUrl', resourceUrl)
+          ..add('hlsUrl', hlsUrl)
+          ..add('accessible', accessible)
+          ..add('transcodeStatus', transcodeStatus)
+          ..add('thumbnailUrl', thumbnailUrl)
+          ..add('thumbnailCount', thumbnailCount)
           ..add('createTime', createTime)
           ..add('updateTime', updateTime))
         .toString();
@@ -156,6 +186,28 @@ class SectionResponseBuilder
   String? get resourceUrl => _$this._resourceUrl;
   set resourceUrl(String? resourceUrl) => _$this._resourceUrl = resourceUrl;
 
+  String? _hlsUrl;
+  String? get hlsUrl => _$this._hlsUrl;
+  set hlsUrl(String? hlsUrl) => _$this._hlsUrl = hlsUrl;
+
+  bool? _accessible;
+  bool? get accessible => _$this._accessible;
+  set accessible(bool? accessible) => _$this._accessible = accessible;
+
+  int? _transcodeStatus;
+  int? get transcodeStatus => _$this._transcodeStatus;
+  set transcodeStatus(int? transcodeStatus) =>
+      _$this._transcodeStatus = transcodeStatus;
+
+  String? _thumbnailUrl;
+  String? get thumbnailUrl => _$this._thumbnailUrl;
+  set thumbnailUrl(String? thumbnailUrl) => _$this._thumbnailUrl = thumbnailUrl;
+
+  int? _thumbnailCount;
+  int? get thumbnailCount => _$this._thumbnailCount;
+  set thumbnailCount(int? thumbnailCount) =>
+      _$this._thumbnailCount = thumbnailCount;
+
   DateTime? _createTime;
   DateTime? get createTime => _$this._createTime;
   set createTime(DateTime? createTime) => _$this._createTime = createTime;
@@ -181,6 +233,11 @@ class SectionResponseBuilder
       _sort = $v.sort;
       _isFree = $v.isFree;
       _resourceUrl = $v.resourceUrl;
+      _hlsUrl = $v.hlsUrl;
+      _accessible = $v.accessible;
+      _transcodeStatus = $v.transcodeStatus;
+      _thumbnailUrl = $v.thumbnailUrl;
+      _thumbnailCount = $v.thumbnailCount;
       _createTime = $v.createTime;
       _updateTime = $v.updateTime;
       _$v = null;
@@ -215,6 +272,11 @@ class SectionResponseBuilder
           sort: sort,
           isFree: isFree,
           resourceUrl: resourceUrl,
+          hlsUrl: hlsUrl,
+          accessible: accessible,
+          transcodeStatus: transcodeStatus,
+          thumbnailUrl: thumbnailUrl,
+          thumbnailCount: thumbnailCount,
           createTime: createTime,
           updateTime: updateTime,
         );

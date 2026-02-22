@@ -16,6 +16,8 @@ part 'course_structure_response.g.dart';
 /// Properties:
 /// * [course]
 /// * [chapters] - 章节列表（包含小节）
+/// * [hasAccess] - 当前用户是否有权访问付费内容
+/// * [purchased] - 当前用户是否已购买此课程（有有效订单）
 @BuiltValue()
 abstract class CourseStructureResponse
     implements Built<CourseStructureResponse, CourseStructureResponseBuilder> {
@@ -25,6 +27,14 @@ abstract class CourseStructureResponse
   /// 章节列表（包含小节）
   @BuiltValueField(wireName: r'chapters')
   BuiltList<ChapterResponse>? get chapters;
+
+  /// 当前用户是否有权访问付费内容
+  @BuiltValueField(wireName: r'hasAccess')
+  bool? get hasAccess;
+
+  /// 当前用户是否已购买此课程（有有效订单）
+  @BuiltValueField(wireName: r'purchased')
+  bool? get purchased;
 
   CourseStructureResponse._();
 
@@ -70,6 +80,20 @@ class _$CourseStructureResponseSerializer
         specifiedType: const FullType(BuiltList, [FullType(ChapterResponse)]),
       );
     }
+    if (object.hasAccess != null) {
+      yield r'hasAccess';
+      yield serializers.serialize(
+        object.hasAccess,
+        specifiedType: const FullType(bool),
+      );
+    }
+    if (object.purchased != null) {
+      yield r'purchased';
+      yield serializers.serialize(
+        object.purchased,
+        specifiedType: const FullType(bool),
+      );
+    }
   }
 
   @override
@@ -109,6 +133,20 @@ class _$CourseStructureResponseSerializer
                 const FullType(BuiltList, [FullType(ChapterResponse)]),
           ) as BuiltList<ChapterResponse>;
           result.chapters.replace(valueDes);
+          break;
+        case r'hasAccess':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(bool),
+          ) as bool;
+          result.hasAccess = valueDes;
+          break;
+        case r'purchased':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(bool),
+          ) as bool;
+          result.purchased = valueDes;
           break;
         default:
           unhandled.add(key);

@@ -18,6 +18,7 @@ import 'package:nova_api/src/model/base_response_ai_conversation.dart';
 import 'package:nova_api/src/model/base_response_ai_process_result_response.dart';
 import 'package:nova_api/src/model/base_response_chapter_summary.dart';
 import 'package:nova_api/src/model/base_response_daily_article_response.dart';
+import 'package:nova_api/src/model/base_response_generate_avatar_response.dart';
 import 'package:nova_api/src/model/base_response_list_ai_assistant_vo.dart';
 import 'package:nova_api/src/model/base_response_list_ai_conversation.dart';
 import 'package:nova_api/src/model/base_response_list_chapter_summary.dart';
@@ -32,6 +33,7 @@ import 'package:nova_api/src/model/base_response_void.dart';
 import 'package:nova_api/src/model/batch_ai_process_request.dart';
 import 'package:nova_api/src/model/chat_request.dart';
 import 'package:nova_api/src/model/create_ai_assistant_command.dart';
+import 'package:nova_api/src/model/generate_avatar_request.dart';
 import 'package:nova_api/src/model/preview_ai_process_request.dart';
 import 'package:nova_api/src/model/session_chat_request.dart';
 import 'package:nova_api/src/model/sse_emitter.dart';
@@ -832,6 +834,108 @@ class AIApi {
     }
 
     return Response<BaseResponseMapStringObject>(
+      data: _responseData,
+      headers: _response.headers,
+      isRedirect: _response.isRedirect,
+      requestOptions: _response.requestOptions,
+      redirects: _response.redirects,
+      statusCode: _response.statusCode,
+      statusMessage: _response.statusMessage,
+      extra: _response.extra,
+    );
+  }
+
+  /// AI生成助手头像
+  /// 根据提示词使用AI生成助手头像图片，图片会自动上传到OSS持久化存储，返回OSS图片URL
+  ///
+  /// Parameters:
+  /// * [generateAvatarRequest]
+  /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
+  /// * [headers] - Can be used to add additional headers to the request
+  /// * [extras] - Can be used to add flags to the request
+  /// * [validateStatus] - A [ValidateStatus] callback that can be used to determine request success based on the HTTP status of the response
+  /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
+  /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
+  ///
+  /// Returns a [Future] containing a [Response] with a [BaseResponseGenerateAvatarResponse] as data
+  /// Throws [DioException] if API call or serialization fails
+  Future<Response<BaseResponseGenerateAvatarResponse>> assistantGenerateAvatar({
+    required GenerateAvatarRequest generateAvatarRequest,
+    CancelToken? cancelToken,
+    Map<String, dynamic>? headers,
+    Map<String, dynamic>? extra,
+    ValidateStatus? validateStatus,
+    ProgressCallback? onSendProgress,
+    ProgressCallback? onReceiveProgress,
+  }) async {
+    final _path = r'/api/ai/assistants/generate-avatar';
+    final _options = Options(
+      method: r'POST',
+      headers: <String, dynamic>{
+        ...?headers,
+      },
+      extra: <String, dynamic>{
+        'secure': <Map<String, String>>[
+          {
+            'type': 'http',
+            'scheme': 'bearer',
+            'name': 'Bearer Token',
+          },
+        ],
+        ...?extra,
+      },
+      contentType: 'application/json',
+      validateStatus: validateStatus,
+    );
+
+    dynamic _bodyData;
+
+    try {
+      const _type = FullType(GenerateAvatarRequest);
+      _bodyData =
+          _serializers.serialize(generateAvatarRequest, specifiedType: _type);
+    } catch (error, stackTrace) {
+      throw DioException(
+        requestOptions: _options.compose(
+          _dio.options,
+          _path,
+        ),
+        type: DioExceptionType.unknown,
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    final _response = await _dio.request<Object>(
+      _path,
+      data: _bodyData,
+      options: _options,
+      cancelToken: cancelToken,
+      onSendProgress: onSendProgress,
+      onReceiveProgress: onReceiveProgress,
+    );
+
+    BaseResponseGenerateAvatarResponse? _responseData;
+
+    try {
+      final rawResponse = _response.data;
+      _responseData = rawResponse == null
+          ? null
+          : _serializers.deserialize(
+              rawResponse,
+              specifiedType: const FullType(BaseResponseGenerateAvatarResponse),
+            ) as BaseResponseGenerateAvatarResponse;
+    } catch (error, stackTrace) {
+      throw DioException(
+        requestOptions: _response.requestOptions,
+        response: _response,
+        type: DioExceptionType.unknown,
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    return Response<BaseResponseGenerateAvatarResponse>(
       data: _responseData,
       headers: _response.headers,
       isRedirect: _response.isRedirect,
@@ -2161,7 +2265,7 @@ class AIApi {
   ///
   /// Returns a [Future] containing a [Response] with a [BaseResponseVoid] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<BaseResponseVoid>> deleteSession({
+  Future<Response<BaseResponseVoid>> deleteSession1({
     required int sessionId,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
@@ -3019,7 +3123,7 @@ class AIApi {
   ///
   /// Returns a [Future] containing a [Response] with a [BaseResponseMapStringObject] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<BaseResponseMapStringObject>> getSessionDetail({
+  Future<Response<BaseResponseMapStringObject>> getSessionDetail1({
     required int sessionId,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,

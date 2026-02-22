@@ -11,12 +11,21 @@ class _$CourseStructureResponse extends CourseStructureResponse {
   final CourseResponse? course;
   @override
   final BuiltList<ChapterResponse>? chapters;
+  @override
+  final bool? hasAccess;
+  @override
+  final bool? purchased;
 
   factory _$CourseStructureResponse([
     void Function(CourseStructureResponseBuilder)? updates,
   ]) => (CourseStructureResponseBuilder()..update(updates))._build();
 
-  _$CourseStructureResponse._({this.course, this.chapters}) : super._();
+  _$CourseStructureResponse._({
+    this.course,
+    this.chapters,
+    this.hasAccess,
+    this.purchased,
+  }) : super._();
   @override
   CourseStructureResponse rebuild(
     void Function(CourseStructureResponseBuilder) updates,
@@ -31,7 +40,9 @@ class _$CourseStructureResponse extends CourseStructureResponse {
     if (identical(other, this)) return true;
     return other is CourseStructureResponse &&
         course == other.course &&
-        chapters == other.chapters;
+        chapters == other.chapters &&
+        hasAccess == other.hasAccess &&
+        purchased == other.purchased;
   }
 
   @override
@@ -39,6 +50,8 @@ class _$CourseStructureResponse extends CourseStructureResponse {
     var _$hash = 0;
     _$hash = $jc(_$hash, course.hashCode);
     _$hash = $jc(_$hash, chapters.hashCode);
+    _$hash = $jc(_$hash, hasAccess.hashCode);
+    _$hash = $jc(_$hash, purchased.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -47,7 +60,9 @@ class _$CourseStructureResponse extends CourseStructureResponse {
   String toString() {
     return (newBuiltValueToStringHelper(r'CourseStructureResponse')
           ..add('course', course)
-          ..add('chapters', chapters))
+          ..add('chapters', chapters)
+          ..add('hasAccess', hasAccess)
+          ..add('purchased', purchased))
         .toString();
   }
 }
@@ -68,6 +83,14 @@ class CourseStructureResponseBuilder
   set chapters(ListBuilder<ChapterResponse>? chapters) =>
       _$this._chapters = chapters;
 
+  bool? _hasAccess;
+  bool? get hasAccess => _$this._hasAccess;
+  set hasAccess(bool? hasAccess) => _$this._hasAccess = hasAccess;
+
+  bool? _purchased;
+  bool? get purchased => _$this._purchased;
+  set purchased(bool? purchased) => _$this._purchased = purchased;
+
   CourseStructureResponseBuilder() {
     CourseStructureResponse._defaults(this);
   }
@@ -77,6 +100,8 @@ class CourseStructureResponseBuilder
     if ($v != null) {
       _course = $v.course?.toBuilder();
       _chapters = $v.chapters?.toBuilder();
+      _hasAccess = $v.hasAccess;
+      _purchased = $v.purchased;
       _$v = null;
     }
     return this;
@@ -103,6 +128,8 @@ class CourseStructureResponseBuilder
           _$CourseStructureResponse._(
             course: _course?.build(),
             chapters: _chapters?.build(),
+            hasAccess: hasAccess,
+            purchased: purchased,
           );
     } catch (_) {
       late String _$failedField;

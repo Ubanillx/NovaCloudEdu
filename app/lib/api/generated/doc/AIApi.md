@@ -17,6 +17,7 @@ Method | HTTP request | Description
 [**assistantCreate**](AIApi.md#assistantcreate) | **POST** /api/ai/assistants | 创建AI助手
 [**assistantDelete**](AIApi.md#assistantdelete) | **DELETE** /api/ai/assistants/{id} | 删除AI助手
 [**assistantExecuteWorkflow**](AIApi.md#assistantexecuteworkflow) | **POST** /api/ai/assistants/{id}/workflows/{workflowId}/execute | 执行AI助手绑定的工作流
+[**assistantGenerateAvatar**](AIApi.md#assistantgenerateavatar) | **POST** /api/ai/assistants/generate-avatar | AI生成助手头像
 [**assistantGetById**](AIApi.md#assistantgetbyid) | **GET** /api/ai/assistants/{id} | 获取AI助手详情
 [**assistantGetWorkflowSkills**](AIApi.md#assistantgetworkflowskills) | **GET** /api/ai/assistants/{id}/workflow-skills | 获取AI助手的工作流技能列表
 [**assistantGetWorkflows**](AIApi.md#assistantgetworkflows) | **GET** /api/ai/assistants/{id}/workflows | 获取AI助手绑定的工作流列表
@@ -31,7 +32,7 @@ Method | HTTP request | Description
 [**chat**](AIApi.md#chat) | **POST** /api/articles/chat | 非流式对话
 [**continueConversation**](AIApi.md#continueconversation) | **POST** /api/books/{bookId}/ai/chat/{conversationId} | 继续对话
 [**createSession**](AIApi.md#createsession) | **POST** /api/ai/chat/sessions | 创建新会话
-[**deleteSession**](AIApi.md#deletesession) | **DELETE** /api/ai/chat/sessions/{sessionId} | 删除会话
+[**deleteSession1**](AIApi.md#deletesession1) | **DELETE** /api/ai/chat/sessions/{sessionId} | 删除会话
 [**extractKnowledgePoints**](AIApi.md#extractknowledgepoints) | **POST** /api/books/{bookId}/ai/chapters/{chapterId}/knowledge-points | 提取章节知识点
 [**generateQuiz**](AIApi.md#generatequiz) | **POST** /api/books/{bookId}/ai/chapters/{chapterId}/quiz | 生成阅读测试
 [**generateSummary**](AIApi.md#generatesummary) | **POST** /api/books/{bookId}/ai/chapters/{chapterId}/summary | 生成章节总结
@@ -40,7 +41,7 @@ Method | HTTP request | Description
 [**getKnowledgePoints**](AIApi.md#getknowledgepoints) | **GET** /api/books/{bookId}/ai/chapters/{chapterId}/knowledge-points | 获取章节知识点
 [**getLatestQuiz**](AIApi.md#getlatestquiz) | **GET** /api/books/{bookId}/ai/chapters/{chapterId}/quiz/latest | 获取章节最新测试
 [**getQuiz**](AIApi.md#getquiz) | **GET** /api/books/{bookId}/ai/quiz/{quizId} | 获取测试
-[**getSessionDetail**](AIApi.md#getsessiondetail) | **GET** /api/ai/chat/sessions/{sessionId} | 获取会话详情（含消息列表）
+[**getSessionDetail1**](AIApi.md#getsessiondetail1) | **GET** /api/ai/chat/sessions/{sessionId} | 获取会话详情（含消息列表）
 [**getSummary**](AIApi.md#getsummary) | **GET** /api/books/{bookId}/ai/chapters/{chapterId}/summary | 获取章节总结
 [**getUserConversations**](AIApi.md#getuserconversations) | **GET** /api/books/{bookId}/ai/conversations | 获取用户对话列表
 [**listAllModels**](AIApi.md#listallmodels) | **GET** /api/ai/chat/models/all | 获取全量模型配置
@@ -392,6 +393,49 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**BaseResponseMapStringObject**](BaseResponseMapStringObject.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **assistantGenerateAvatar**
+> BaseResponseGenerateAvatarResponse assistantGenerateAvatar(generateAvatarRequest)
+
+AI生成助手头像
+
+根据提示词使用AI生成助手头像图片，图片会自动上传到OSS持久化存储，返回OSS图片URL
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getAIApi();
+final GenerateAvatarRequest generateAvatarRequest = ; // GenerateAvatarRequest | 
+
+try {
+    final response = api.assistantGenerateAvatar(generateAvatarRequest);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling AIApi->assistantGenerateAvatar: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **generateAvatarRequest** | [**GenerateAvatarRequest**](GenerateAvatarRequest.md)|  | 
+
+### Return type
+
+[**BaseResponseGenerateAvatarResponse**](BaseResponseGenerateAvatarResponse.md)
 
 ### Authorization
 
@@ -1000,8 +1044,8 @@ This endpoint does not need any parameter.
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **deleteSession**
-> BaseResponseVoid deleteSession(sessionId)
+# **deleteSession1**
+> BaseResponseVoid deleteSession1(sessionId)
 
 删除会话
 
@@ -1013,10 +1057,10 @@ final api = NovaApi().getAIApi();
 final int sessionId = 789; // int | 会话ID
 
 try {
-    final response = api.deleteSession(sessionId);
+    final response = api.deleteSession1(sessionId);
     print(response);
 } catch on DioException (e) {
-    print('Exception when calling AIApi->deleteSession: $e\n');
+    print('Exception when calling AIApi->deleteSession1: $e\n');
 }
 ```
 
@@ -1393,8 +1437,8 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **getSessionDetail**
-> BaseResponseMapStringObject getSessionDetail(sessionId)
+# **getSessionDetail1**
+> BaseResponseMapStringObject getSessionDetail1(sessionId)
 
 获取会话详情（含消息列表）
 
@@ -1406,10 +1450,10 @@ final api = NovaApi().getAIApi();
 final int sessionId = 789; // int | 会话ID
 
 try {
-    final response = api.getSessionDetail(sessionId);
+    final response = api.getSessionDetail1(sessionId);
     print(response);
 } catch on DioException (e) {
-    print('Exception when calling AIApi->getSessionDetail: $e\n');
+    print('Exception when calling AIApi->getSessionDetail1: $e\n');
 }
 ```
 

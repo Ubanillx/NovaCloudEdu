@@ -8,6 +8,10 @@ part of 'order_response.dart';
 
 class _$OrderResponse extends OrderResponse {
   @override
+  final String? orderType;
+  @override
+  final String? productName;
+  @override
   final int? id;
   @override
   final int? userId;
@@ -40,6 +44,8 @@ class _$OrderResponse extends OrderResponse {
       (OrderResponseBuilder()..update(updates))._build();
 
   _$OrderResponse._({
+    this.orderType,
+    this.productName,
     this.id,
     this.userId,
     this.courseId,
@@ -66,6 +72,8 @@ class _$OrderResponse extends OrderResponse {
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
     return other is OrderResponse &&
+        orderType == other.orderType &&
+        productName == other.productName &&
         id == other.id &&
         userId == other.userId &&
         courseId == other.courseId &&
@@ -85,6 +93,8 @@ class _$OrderResponse extends OrderResponse {
   @override
   int get hashCode {
     var _$hash = 0;
+    _$hash = $jc(_$hash, orderType.hashCode);
+    _$hash = $jc(_$hash, productName.hashCode);
     _$hash = $jc(_$hash, id.hashCode);
     _$hash = $jc(_$hash, userId.hashCode);
     _$hash = $jc(_$hash, courseId.hashCode);
@@ -106,6 +116,8 @@ class _$OrderResponse extends OrderResponse {
   @override
   String toString() {
     return (newBuiltValueToStringHelper(r'OrderResponse')
+          ..add('orderType', orderType)
+          ..add('productName', productName)
           ..add('id', id)
           ..add('userId', userId)
           ..add('courseId', courseId)
@@ -127,6 +139,14 @@ class _$OrderResponse extends OrderResponse {
 class OrderResponseBuilder
     implements Builder<OrderResponse, OrderResponseBuilder> {
   _$OrderResponse? _$v;
+
+  String? _orderType;
+  String? get orderType => _$this._orderType;
+  set orderType(String? orderType) => _$this._orderType = orderType;
+
+  String? _productName;
+  String? get productName => _$this._productName;
+  set productName(String? productName) => _$this._productName = productName;
 
   int? _id;
   int? get id => _$this._id;
@@ -193,6 +213,8 @@ class OrderResponseBuilder
   OrderResponseBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
+      _orderType = $v.orderType;
+      _productName = $v.productName;
       _id = $v.id;
       _userId = $v.userId;
       _courseId = $v.courseId;
@@ -229,6 +251,8 @@ class OrderResponseBuilder
     final _$result =
         _$v ??
         _$OrderResponse._(
+          orderType: orderType,
+          productName: productName,
           id: id,
           userId: userId,
           courseId: courseId,

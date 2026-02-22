@@ -72,10 +72,14 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**addItem**](doc/DefaultApi.md#additem) | **POST** /api/schedule/item | 添加课程项
 [*DefaultApi*](doc/DefaultApi.md) | [**addMember**](doc/DefaultApi.md#addmember) | **POST** /api/classes/{classId}/members | 添加成员
 [*DefaultApi*](doc/DefaultApi.md) | [**addNode**](doc/DefaultApi.md#addnode) | **POST** /api/workflows/{id}/nodes | 添加节点
+[*DefaultApi*](doc/DefaultApi.md) | [**addQuestionToSection**](doc/DefaultApi.md#addquestiontosection) | **POST** /api/exam-papers/{paperId}/sections/{sectionId}/questions | 向大题添加题目
+[*DefaultApi*](doc/DefaultApi.md) | [**addSection**](doc/DefaultApi.md#addsection) | **POST** /api/exam-papers/{paperId}/sections | 添加大题
 [*DefaultApi*](doc/DefaultApi.md) | [**addToShelf**](doc/DefaultApi.md#addtoshelf) | **POST** /api/reading/shelf | 添加书籍到书架
 [*DefaultApi*](doc/DefaultApi.md) | [**addToWordBook**](doc/DefaultApi.md#addtowordbook) | **POST** /api/user/word-book/add/{wordId} | 添加单词到生词本
 [*DefaultApi*](doc/DefaultApi.md) | [**addVariable**](doc/DefaultApi.md#addvariable) | **POST** /api/workflows/{id}/variables | 添加变量
 [*DefaultApi*](doc/DefaultApi.md) | [**adminDeletePost**](doc/DefaultApi.md#admindeletepost) | **DELETE** /api/posts/admin/{postId} | 管理员删除帖子
+[*DefaultApi*](doc/DefaultApi.md) | [**aiGenerateQuestions**](doc/DefaultApi.md#aigeneratequestions) | **POST** /api/questions/ai-generate | AI 智能出题
+[*DefaultApi*](doc/DefaultApi.md) | [**alipayCallback**](doc/DefaultApi.md#alipaycallback) | **POST** /api/payment/callback/alipay | 支付宝异步回调（预留）
 [*DefaultApi*](doc/DefaultApi.md) | [**applyTeacher**](doc/DefaultApi.md#applyteacher) | **POST** /api/teacher/apply | 申请成为讲师
 [*DefaultApi*](doc/DefaultApi.md) | [**applyToJoin**](doc/DefaultApi.md#applytojoin) | **POST** /api/groups/{groupId}/join | 申请加入群
 [*DefaultApi*](doc/DefaultApi.md) | [**archive**](doc/DefaultApi.md#archive) | **POST** /api/workflows/{id}/archive | 归档工作流
@@ -87,16 +91,20 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**batchUpdate**](doc/DefaultApi.md#batchupdate) | **POST** /api/workflows/{id}/batch-update | 批量更新节点和连接线
 [*DefaultApi*](doc/DefaultApi.md) | [**bindToAssistant**](doc/DefaultApi.md#bindtoassistant) | **POST** /api/workflows/{id}/assistants/{assistantId} | 绑定工作流到AI助手
 [*DefaultApi*](doc/DefaultApi.md) | [**cancelExecution**](doc/DefaultApi.md#cancelexecution) | **POST** /api/workflows/executions/{executionId}/cancel | 取消执行
+[*DefaultApi*](doc/DefaultApi.md) | [**cancelMembership**](doc/DefaultApi.md#cancelmembership) | **POST** /api/membership/cancel | 取消会员
+[*DefaultApi*](doc/DefaultApi.md) | [**cancelMembership1**](doc/DefaultApi.md#cancelmembership1) | **POST** /api/admin/membership/cancel/{userId} | 取消用户会员
 [*DefaultApi*](doc/DefaultApi.md) | [**changePassword**](doc/DefaultApi.md#changepassword) | **POST** /api/user/password | 修改密码
 [*DefaultApi*](doc/DefaultApi.md) | [**checkFavourite**](doc/DefaultApi.md#checkfavourite) | **GET** /api/course/favourite/{courseId}/check | 检查是否已收藏
 [*DefaultApi*](doc/DefaultApi.md) | [**checkFriendship**](doc/DefaultApi.md#checkfriendship) | **GET** /api/friend/check/{userId} | 检查好友关系
 [*DefaultApi*](doc/DefaultApi.md) | [**checkin**](doc/DefaultApi.md#checkin) | **POST** /api/user/checkin | 用户打卡
 [*DefaultApi*](doc/DefaultApi.md) | [**completeSection**](doc/DefaultApi.md#completesection) | **POST** /api/progress/section/{sectionId}/complete | 标记小节为已完成
 [*DefaultApi*](doc/DefaultApi.md) | [**confirmPayment**](doc/DefaultApi.md#confirmpayment) | **POST** /api/admin/order/confirm | 确认收款（管理员手动确认）
+[*DefaultApi*](doc/DefaultApi.md) | [**confirmPayment1**](doc/DefaultApi.md#confirmpayment1) | **POST** /api/admin/membership/confirm | 确认会员支付（管理员手动确认）
 [*DefaultApi*](doc/DefaultApi.md) | [**copy**](doc/DefaultApi.md#copy) | **POST** /api/workflows/{id}/copy | 复制工作流
 [*DefaultApi*](doc/DefaultApi.md) | [**create**](doc/DefaultApi.md#create) | **POST** /api/workflows | 创建工作流
 [*DefaultApi*](doc/DefaultApi.md) | [**createAnnouncement**](doc/DefaultApi.md#createannouncement) | **POST** /api/announcement/admin/create | 创建公告
 [*DefaultApi*](doc/DefaultApi.md) | [**createBanner**](doc/DefaultApi.md#createbanner) | **POST** /api/admin/banner | 创建轮播图
+[*DefaultApi*](doc/DefaultApi.md) | [**createBookmark**](doc/DefaultApi.md#createbookmark) | **POST** /api/books/{bookId}/bookmarks | 创建书签
 [*DefaultApi*](doc/DefaultApi.md) | [**createChapter**](doc/DefaultApi.md#createchapter) | **POST** /api/course/{courseId}/chapter | 创建章节（管理员）
 [*DefaultApi*](doc/DefaultApi.md) | [**createClass**](doc/DefaultApi.md#createclass) | **POST** /api/classes | 创建班级
 [*DefaultApi*](doc/DefaultApi.md) | [**createComment**](doc/DefaultApi.md#createcomment) | **POST** /api/posts/{postId}/comments | 发表评论
@@ -104,13 +112,18 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**createCourse**](doc/DefaultApi.md#createcourse) | **POST** /api/course | 创建课程（管理员）
 [*DefaultApi*](doc/DefaultApi.md) | [**createDailyArticle**](doc/DefaultApi.md#createdailyarticle) | **POST** /api/daily-article | 创建每日文章（管理员）
 [*DefaultApi*](doc/DefaultApi.md) | [**createDailyWord**](doc/DefaultApi.md#createdailyword) | **POST** /api/daily-word | 创建每日单词（管理员）
+[*DefaultApi*](doc/DefaultApi.md) | [**createExamPaper**](doc/DefaultApi.md#createexampaper) | **POST** /api/exam-papers | 创建试卷
 [*DefaultApi*](doc/DefaultApi.md) | [**createFeedback**](doc/DefaultApi.md#createfeedback) | **POST** /api/feedback | 创建反馈
 [*DefaultApi*](doc/DefaultApi.md) | [**createFromTemplate**](doc/DefaultApi.md#createfromtemplate) | **POST** /api/workflows/templates/{templateId}/create-workflow | 从模板创建工作流
 [*DefaultApi*](doc/DefaultApi.md) | [**createGroup**](doc/DefaultApi.md#creategroup) | **POST** /api/groups | 创建群聊
 [*DefaultApi*](doc/DefaultApi.md) | [**createGroupFromClass**](doc/DefaultApi.md#creategroupfromclass) | **POST** /api/classes/{classId}/chat-group | 基于班级创建群聊
+[*DefaultApi*](doc/DefaultApi.md) | [**createNote**](doc/DefaultApi.md#createnote) | **POST** /api/books/{bookId}/notes | 创建阅读笔记
 [*DefaultApi*](doc/DefaultApi.md) | [**createOrder**](doc/DefaultApi.md#createorder) | **POST** /api/order | 创建订单（用户下单）
+[*DefaultApi*](doc/DefaultApi.md) | [**createPlan**](doc/DefaultApi.md#createplan) | **POST** /api/admin/membership/plans | 创建会员计划
 [*DefaultApi*](doc/DefaultApi.md) | [**createPost**](doc/DefaultApi.md#createpost) | **POST** /api/posts | 发布帖子
+[*DefaultApi*](doc/DefaultApi.md) | [**createQuestion**](doc/DefaultApi.md#createquestion) | **POST** /api/questions | 创建题目
 [*DefaultApi*](doc/DefaultApi.md) | [**createReply**](doc/DefaultApi.md#createreply) | **POST** /api/posts/comments/{commentId}/replies | 发表回复
+[*DefaultApi*](doc/DefaultApi.md) | [**createRoom**](doc/DefaultApi.md#createroom) | **POST** /api/livestream/rooms | 创建直播间
 [*DefaultApi*](doc/DefaultApi.md) | [**createScheduleTrigger**](doc/DefaultApi.md#createscheduletrigger) | **POST** /api/workflows/{id}/triggers/schedule | 创建定时触发器
 [*DefaultApi*](doc/DefaultApi.md) | [**createSection**](doc/DefaultApi.md#createsection) | **POST** /api/course/{courseId}/section | 创建小节（管理员）
 [*DefaultApi*](doc/DefaultApi.md) | [**createSetting**](doc/DefaultApi.md#createsetting) | **POST** /api/schedule/setting | 创建课表配置
@@ -122,6 +135,7 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**deleteAnnouncement**](doc/DefaultApi.md#deleteannouncement) | **DELETE** /api/announcement/admin/delete/{id} | 删除公告
 [*DefaultApi*](doc/DefaultApi.md) | [**deleteBanner**](doc/DefaultApi.md#deletebanner) | **DELETE** /api/admin/banner/{id} | 删除轮播图
 [*DefaultApi*](doc/DefaultApi.md) | [**deleteBook**](doc/DefaultApi.md#deletebook) | **DELETE** /api/books/{bookId} | 删除书籍
+[*DefaultApi*](doc/DefaultApi.md) | [**deleteBookmark**](doc/DefaultApi.md#deletebookmark) | **DELETE** /api/books/{bookId}/bookmarks/{bookmarkId} | 删除书签
 [*DefaultApi*](doc/DefaultApi.md) | [**deleteChapter**](doc/DefaultApi.md#deletechapter) | **DELETE** /api/course/{courseId}/chapter/{chapterId} | 删除章节（管理员）
 [*DefaultApi*](doc/DefaultApi.md) | [**deleteClass**](doc/DefaultApi.md#deleteclass) | **DELETE** /api/classes/{classId} | 删除班级
 [*DefaultApi*](doc/DefaultApi.md) | [**deleteComment**](doc/DefaultApi.md#deletecomment) | **DELETE** /api/posts/comments/{commentId} | 删除评论
@@ -130,6 +144,7 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**deleteDailyArticle**](doc/DefaultApi.md#deletedailyarticle) | **DELETE** /api/daily-article/{id} | 删除每日文章（管理员）
 [*DefaultApi*](doc/DefaultApi.md) | [**deleteDailyWord**](doc/DefaultApi.md#deletedailyword) | **DELETE** /api/daily-word/{id} | 删除每日单词（管理员）
 [*DefaultApi*](doc/DefaultApi.md) | [**deleteEdge**](doc/DefaultApi.md#deleteedge) | **DELETE** /api/workflows/{id}/edges/{edgeId} | 删除连接线
+[*DefaultApi*](doc/DefaultApi.md) | [**deleteExamPaper**](doc/DefaultApi.md#deleteexampaper) | **DELETE** /api/exam-papers/{id} | 删除试卷
 [*DefaultApi*](doc/DefaultApi.md) | [**deleteFeedback**](doc/DefaultApi.md#deletefeedback) | **DELETE** /api/feedback/{id} | 删除反馈
 [*DefaultApi*](doc/DefaultApi.md) | [**deleteFeedback1**](doc/DefaultApi.md#deletefeedback1) | **DELETE** /api/feedback/admin/{id} | 删除反馈
 [*DefaultApi*](doc/DefaultApi.md) | [**deleteFile**](doc/DefaultApi.md#deletefile) | **DELETE** /api/file/{fileId} | 删除文件
@@ -137,26 +152,38 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**deleteItem**](doc/DefaultApi.md#deleteitem) | **DELETE** /api/schedule/item/{id} | 删除课程项
 [*DefaultApi*](doc/DefaultApi.md) | [**deleteMessage**](doc/DefaultApi.md#deletemessage) | **DELETE** /api/group-chat/{groupId}/messages/{messageId} | 删除消息
 [*DefaultApi*](doc/DefaultApi.md) | [**deleteNode**](doc/DefaultApi.md#deletenode) | **DELETE** /api/workflows/{id}/nodes/{nodeId} | 删除节点
+[*DefaultApi*](doc/DefaultApi.md) | [**deleteNote**](doc/DefaultApi.md#deletenote) | **DELETE** /api/books/{bookId}/notes/{noteId} | 删除笔记
+[*DefaultApi*](doc/DefaultApi.md) | [**deletePlan**](doc/DefaultApi.md#deleteplan) | **DELETE** /api/admin/membership/plans/{planId} | 删除会员计划
 [*DefaultApi*](doc/DefaultApi.md) | [**deletePost**](doc/DefaultApi.md#deletepost) | **DELETE** /api/posts/{postId} | 删除帖子
+[*DefaultApi*](doc/DefaultApi.md) | [**deleteQuestion**](doc/DefaultApi.md#deletequestion) | **DELETE** /api/questions/{id} | 删除题目
 [*DefaultApi*](doc/DefaultApi.md) | [**deleteReply**](doc/DefaultApi.md#deletereply) | **DELETE** /api/posts/replies/{replyId} | 删除回复
-[*DefaultApi*](doc/DefaultApi.md) | [**deleteSection**](doc/DefaultApi.md#deletesection) | **DELETE** /api/course/{courseId}/section/{sectionId} | 删除小节（管理员）
+[*DefaultApi*](doc/DefaultApi.md) | [**deleteRoom**](doc/DefaultApi.md#deleteroom) | **DELETE** /api/livestream/rooms/{id} | 删除直播间
+[*DefaultApi*](doc/DefaultApi.md) | [**deleteSection**](doc/DefaultApi.md#deletesection) | **DELETE** /api/exam-papers/{paperId}/sections/{sectionId} | 删除大题
+[*DefaultApi*](doc/DefaultApi.md) | [**deleteSection1**](doc/DefaultApi.md#deletesection1) | **DELETE** /api/course/{courseId}/section/{sectionId} | 删除小节（管理员）
 [*DefaultApi*](doc/DefaultApi.md) | [**deleteTemplate**](doc/DefaultApi.md#deletetemplate) | **DELETE** /api/workflows/templates/{templateId} | 删除模板
+[*DefaultApi*](doc/DefaultApi.md) | [**deleteTemplate2**](doc/DefaultApi.md#deletetemplate2) | **DELETE** /api/exam-templates/{id} | 删除模板
 [*DefaultApi*](doc/DefaultApi.md) | [**deleteTrigger**](doc/DefaultApi.md#deletetrigger) | **DELETE** /api/workflows/triggers/{triggerId} | 删除触发器
 [*DefaultApi*](doc/DefaultApi.md) | [**deleteVariable**](doc/DefaultApi.md#deletevariable) | **DELETE** /api/workflows/{id}/variables/{variableName} | 删除变量
 [*DefaultApi*](doc/DefaultApi.md) | [**disableConfig**](doc/DefaultApi.md#disableconfig) | **POST** /api/admin/scraper/config/{id}/disable | 禁用配置
 [*DefaultApi*](doc/DefaultApi.md) | [**disableTrigger**](doc/DefaultApi.md#disabletrigger) | **POST** /api/workflows/triggers/{triggerId}/disable | 禁用触发器
 [*DefaultApi*](doc/DefaultApi.md) | [**dissolveGroup**](doc/DefaultApi.md#dissolvegroup) | **DELETE** /api/groups/{groupId} | 解散群
+[*DefaultApi*](doc/DefaultApi.md) | [**dissolveGroup1**](doc/DefaultApi.md#dissolvegroup1) | **DELETE** /api/admin/groups/{groupId} | 解散群
 [*DefaultApi*](doc/DefaultApi.md) | [**enableConfig**](doc/DefaultApi.md#enableconfig) | **POST** /api/admin/scraper/config/{id}/enable | 启用配置
 [*DefaultApi*](doc/DefaultApi.md) | [**enableTrigger**](doc/DefaultApi.md#enabletrigger) | **POST** /api/workflows/triggers/{triggerId}/enable | 启用触发器
+[*DefaultApi*](doc/DefaultApi.md) | [**encryptAllChapters**](doc/DefaultApi.md#encryptallchapters) | **POST** /api/books/{bookId}/chapters/encrypt-all | 批量加密所有章节
 [*DefaultApi*](doc/DefaultApi.md) | [**encryptChapterContent**](doc/DefaultApi.md#encryptchaptercontent) | **POST** /api/books/{bookId}/chapters/{chapterIndex}/encrypt | 加密章节内容
 [*DefaultApi*](doc/DefaultApi.md) | [**execute**](doc/DefaultApi.md#execute) | **POST** /api/workflows/{id}/execute | 执行工作流
 [*DefaultApi*](doc/DefaultApi.md) | [**executeAllTasks**](doc/DefaultApi.md#executealltasks) | **POST** /api/admin/scraper/config/execute-all | 触发所有抓取
 [*DefaultApi*](doc/DefaultApi.md) | [**executeAsync**](doc/DefaultApi.md#executeasync) | **POST** /api/workflows/{id}/execute-async | 异步执行工作流
 [*DefaultApi*](doc/DefaultApi.md) | [**executeTask**](doc/DefaultApi.md#executetask) | **POST** /api/admin/scraper/config/execute | 执行抓取任务
+[*DefaultApi*](doc/DefaultApi.md) | [**exportAnswerKey**](doc/DefaultApi.md#exportanswerkey) | **POST** /api/exam-papers/{id}/export-answer-key | 导出参考答案PDF
 [*DefaultApi*](doc/DefaultApi.md) | [**favouriteCourse**](doc/DefaultApi.md#favouritecourse) | **POST** /api/course/favourite/{courseId} | 收藏课程
 [*DefaultApi*](doc/DefaultApi.md) | [**follow**](doc/DefaultApi.md#follow) | **POST** /api/follow/{targetUserId} | 关注用户
+[*DefaultApi*](doc/DefaultApi.md) | [**generateBannerImage**](doc/DefaultApi.md#generatebannerimage) | **POST** /api/admin/banner/generate-image | AI生成轮播图图片
+[*DefaultApi*](doc/DefaultApi.md) | [**getAiQuota**](doc/DefaultApi.md#getaiquota) | **GET** /api/membership/ai-quota | 查询我的AI功能剩余额度
 [*DefaultApi*](doc/DefaultApi.md) | [**getAllConfigs**](doc/DefaultApi.md#getallconfigs) | **GET** /api/admin/scraper/config | 获取所有配置
 [*DefaultApi*](doc/DefaultApi.md) | [**getAllFriends**](doc/DefaultApi.md#getallfriends) | **GET** /api/friend/all | 获取全部好友
+[*DefaultApi*](doc/DefaultApi.md) | [**getAllProfiles**](doc/DefaultApi.md#getallprofiles) | **GET** /api/grading/profile | 查询学生全部知识画像
 [*DefaultApi*](doc/DefaultApi.md) | [**getAllTasks**](doc/DefaultApi.md#getalltasks) | **GET** /api/admin/scraper/config/tasks | 获取所有任务
 [*DefaultApi*](doc/DefaultApi.md) | [**getAnnouncement**](doc/DefaultApi.md#getannouncement) | **GET** /api/announcement/admin/{id} | 获取公告详情
 [*DefaultApi*](doc/DefaultApi.md) | [**getAnnouncementDetail**](doc/DefaultApi.md#getannouncementdetail) | **GET** /api/announcement/{id} | 获取公告详情
@@ -167,14 +194,21 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**getBannerList**](doc/DefaultApi.md#getbannerlist) | **GET** /api/banner/list | 获取轮播图列表
 [*DefaultApi*](doc/DefaultApi.md) | [**getBook**](doc/DefaultApi.md#getbook) | **GET** /api/books/{bookId} | 获取书籍详情
 [*DefaultApi*](doc/DefaultApi.md) | [**getBookChapters**](doc/DefaultApi.md#getbookchapters) | **GET** /api/books/{bookId}/chapters | 获取书籍章节列表
+[*DefaultApi*](doc/DefaultApi.md) | [**getBookmarksByBook**](doc/DefaultApi.md#getbookmarksbybook) | **GET** /api/books/{bookId}/bookmarks | 获取用户在该书的书签列表
 [*DefaultApi*](doc/DefaultApi.md) | [**getById**](doc/DefaultApi.md#getbyid) | **GET** /api/workflows/{id} | 获取工作流详情
 [*DefaultApi*](doc/DefaultApi.md) | [**getChapter**](doc/DefaultApi.md#getchapter) | **GET** /api/course/{courseId}/chapter/{chapterId} | 获取章节详情
 [*DefaultApi*](doc/DefaultApi.md) | [**getChapterContent**](doc/DefaultApi.md#getchaptercontent) | **GET** /api/books/{bookId}/chapters/{chapterIndex} | 获取章节内容
 [*DefaultApi*](doc/DefaultApi.md) | [**getChatHistory**](doc/DefaultApi.md#getchathistory) | **POST** /api/chat/history | 获取聊天历史
+[*DefaultApi*](doc/DefaultApi.md) | [**getChatHistory1**](doc/DefaultApi.md#getchathistory1) | **GET** /api/livestream/rooms/{id}/messages | 直播间聊天历史
 [*DefaultApi*](doc/DefaultApi.md) | [**getCheckinRanking**](doc/DefaultApi.md#getcheckinranking) | **GET** /api/user/checkin/ranking | 打卡排行榜
 [*DefaultApi*](doc/DefaultApi.md) | [**getCheckinStatus**](doc/DefaultApi.md#getcheckinstatus) | **GET** /api/user/checkin/status | 获取打卡状态
+[*DefaultApi*](doc/DefaultApi.md) | [**getClassAiReport**](doc/DefaultApi.md#getclassaireport) | **GET** /api/analytics/class/{classId}/ai-report | AI班级学情分析报告（SSE流式）
 [*DefaultApi*](doc/DefaultApi.md) | [**getClassInfo**](doc/DefaultApi.md#getclassinfo) | **GET** /api/classes/{classId} | 获取班级详情
 [*DefaultApi*](doc/DefaultApi.md) | [**getClassMembers**](doc/DefaultApi.md#getclassmembers) | **GET** /api/classes/{classId}/members | 获取班级成员列表
+[*DefaultApi*](doc/DefaultApi.md) | [**getClassOverview**](doc/DefaultApi.md#getclassoverview) | **GET** /api/analytics/class/{classId}/overview | 班级学情概览
+[*DefaultApi*](doc/DefaultApi.md) | [**getClassRanking**](doc/DefaultApi.md#getclassranking) | **GET** /api/analytics/class/{classId}/ranking | 班级成员排名
+[*DefaultApi*](doc/DefaultApi.md) | [**getClassSubjects**](doc/DefaultApi.md#getclasssubjects) | **GET** /api/analytics/class/{classId}/subjects | 班级各学科分析
+[*DefaultApi*](doc/DefaultApi.md) | [**getClassTrend**](doc/DefaultApi.md#getclasstrend) | **GET** /api/analytics/class/{classId}/trend | 班级学习趋势
 [*DefaultApi*](doc/DefaultApi.md) | [**getCollectedArticles**](doc/DefaultApi.md#getcollectedarticles) | **GET** /api/user/daily-article/collected | 获取收藏文章列表
 [*DefaultApi*](doc/DefaultApi.md) | [**getCollectedWords**](doc/DefaultApi.md#getcollectedwords) | **GET** /api/user/daily-word/collected | 获取收藏单词列表
 [*DefaultApi*](doc/DefaultApi.md) | [**getCommentReplies**](doc/DefaultApi.md#getcommentreplies) | **GET** /api/posts/comments/{commentId}/replies | 获取评论回复列表
@@ -184,10 +218,12 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**getCourseProgress**](doc/DefaultApi.md#getcourseprogress) | **GET** /api/progress/course/{courseId} | 获取课程所有小节的学习进度
 [*DefaultApi*](doc/DefaultApi.md) | [**getCourseProgressSummary**](doc/DefaultApi.md#getcourseprogresssummary) | **GET** /api/progress/course/{courseId}/summary | 获取课程进度汇总
 [*DefaultApi*](doc/DefaultApi.md) | [**getCourseStructure**](doc/DefaultApi.md#getcoursestructure) | **GET** /api/course/{courseId}/structure | 获取课程完整结构（课程+章节+小节）
+[*DefaultApi*](doc/DefaultApi.md) | [**getCurrentMembership**](doc/DefaultApi.md#getcurrentmembership) | **GET** /api/membership/current | 查询我的当前会员详细信息
 [*DefaultApi*](doc/DefaultApi.md) | [**getDailyArticle**](doc/DefaultApi.md#getdailyarticle) | **GET** /api/daily-article/{id} | 获取文章详情
 [*DefaultApi*](doc/DefaultApi.md) | [**getDailyWord**](doc/DefaultApi.md#getdailyword) | **GET** /api/daily-word/{id} | 获取单词详情
 [*DefaultApi*](doc/DefaultApi.md) | [**getDefinition**](doc/DefaultApi.md#getdefinition) | **GET** /api/workflows/{id}/definition | 获取工作流定义详情
 [*DefaultApi*](doc/DefaultApi.md) | [**getEdges**](doc/DefaultApi.md#getedges) | **GET** /api/workflows/{id}/edges | 获取工作流所有连接线
+[*DefaultApi*](doc/DefaultApi.md) | [**getExamPaper**](doc/DefaultApi.md#getexampaper) | **GET** /api/exam-papers/{id} | 获取试卷详情
 [*DefaultApi*](doc/DefaultApi.md) | [**getExecutionLogs**](doc/DefaultApi.md#getexecutionlogs) | **GET** /api/workflows/executions/{executionId}/logs | 获取执行日志
 [*DefaultApi*](doc/DefaultApi.md) | [**getExecutionStatistics**](doc/DefaultApi.md#getexecutionstatistics) | **GET** /api/workflows/{id}/execution-statistics | 获取工作流执行统计
 [*DefaultApi*](doc/DefaultApi.md) | [**getExecutionStatus**](doc/DefaultApi.md#getexecutionstatus) | **GET** /api/workflows/executions/{executionId} | 获取执行状态
@@ -200,11 +236,16 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**getFollowingPosts**](doc/DefaultApi.md#getfollowingposts) | **GET** /api/posts/following | 获取关注用户的帖子列表
 [*DefaultApi*](doc/DefaultApi.md) | [**getFriendList**](doc/DefaultApi.md#getfriendlist) | **POST** /api/friend/list | 获取好友列表
 [*DefaultApi*](doc/DefaultApi.md) | [**getGroupInfo**](doc/DefaultApi.md#getgroupinfo) | **GET** /api/groups/{groupId} | 获取群详情
+[*DefaultApi*](doc/DefaultApi.md) | [**getGroupInfo1**](doc/DefaultApi.md#getgroupinfo1) | **GET** /api/admin/groups/{groupId} | 获取群详情
 [*DefaultApi*](doc/DefaultApi.md) | [**getGroupMembers**](doc/DefaultApi.md#getgroupmembers) | **GET** /api/groups/{groupId}/members | 获取群成员列表
+[*DefaultApi*](doc/DefaultApi.md) | [**getGroupMembers1**](doc/DefaultApi.md#getgroupmembers1) | **GET** /api/admin/groups/{groupId}/members | 分页获取群成员
 [*DefaultApi*](doc/DefaultApi.md) | [**getGroupMembersPage**](doc/DefaultApi.md#getgroupmemberspage) | **GET** /api/groups/{groupId}/members/page | 分页获取群成员
+[*DefaultApi*](doc/DefaultApi.md) | [**getHistory**](doc/DefaultApi.md#gethistory) | **GET** /api/grading/history | 查询批改历史
+[*DefaultApi*](doc/DefaultApi.md) | [**getKey**](doc/DefaultApi.md#getkey) | **GET** /api/video/key | 获取视频解密密钥（HLS播放器自动调用）
 [*DefaultApi*](doc/DefaultApi.md) | [**getLatestMessages**](doc/DefaultApi.md#getlatestmessages) | **GET** /api/group-chat/{groupId}/messages/latest | 获取群最新消息
 [*DefaultApi*](doc/DefaultApi.md) | [**getLikedArticles**](doc/DefaultApi.md#getlikedarticles) | **GET** /api/user/daily-article/liked | 获取点赞文章列表
 [*DefaultApi*](doc/DefaultApi.md) | [**getLoginUser**](doc/DefaultApi.md#getloginuser) | **GET** /api/auth/current | 获取当前用户
+[*DefaultApi*](doc/DefaultApi.md) | [**getMembershipHistory**](doc/DefaultApi.md#getmembershiphistory) | **GET** /api/membership/history | 查询我的会员历史
 [*DefaultApi*](doc/DefaultApi.md) | [**getMessages**](doc/DefaultApi.md#getmessages) | **GET** /api/group-chat/{groupId}/messages | 获取群聊历史消息（分页）
 [*DefaultApi*](doc/DefaultApi.md) | [**getMessagesBefore**](doc/DefaultApi.md#getmessagesbefore) | **GET** /api/group-chat/{groupId}/messages/before | 获取群聊历史消息（游标分页，获取某消息之前的消息）
 [*DefaultApi*](doc/DefaultApi.md) | [**getMyApplication**](doc/DefaultApi.md#getmyapplication) | **GET** /api/teacher/application/my | 获取当前用户的申请
@@ -224,28 +265,47 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**getNode**](doc/DefaultApi.md#getnode) | **GET** /api/workflows/{id}/nodes/{nodeId} | 获取单个节点详情
 [*DefaultApi*](doc/DefaultApi.md) | [**getNodeTypes**](doc/DefaultApi.md#getnodetypes) | **GET** /api/workflows/node-types | 获取所有可用的节点类型
 [*DefaultApi*](doc/DefaultApi.md) | [**getNodes**](doc/DefaultApi.md#getnodes) | **GET** /api/workflows/{id}/nodes | 获取工作流所有节点
+[*DefaultApi*](doc/DefaultApi.md) | [**getNotesByBook**](doc/DefaultApi.md#getnotesbybook) | **GET** /api/books/{bookId}/notes | 获取用户在该书的笔记列表
+[*DefaultApi*](doc/DefaultApi.md) | [**getNotesByChapter**](doc/DefaultApi.md#getnotesbychapter) | **GET** /api/books/{bookId}/notes/chapters/{chapterId} | 获取用户在该章节的笔记
 [*DefaultApi*](doc/DefaultApi.md) | [**getOrder**](doc/DefaultApi.md#getorder) | **GET** /api/order/{orderNo} | 查询订单详情
+[*DefaultApi*](doc/DefaultApi.md) | [**getPaperQuestions**](doc/DefaultApi.md#getpaperquestions) | **GET** /api/exam-papers/{paperId}/sections/{sectionId}/questions | 获取大题下的所有题目关联
+[*DefaultApi*](doc/DefaultApi.md) | [**getPdfUrl**](doc/DefaultApi.md#getpdfurl) | **GET** /api/books/{bookId}/pdf-url | 获取PDF预签名URL
 [*DefaultApi*](doc/DefaultApi.md) | [**getPendingCount**](doc/DefaultApi.md#getpendingcount) | **GET** /api/teacher/application/pending/count | 获取待审核申请数量（管理员）
 [*DefaultApi*](doc/DefaultApi.md) | [**getPendingRequests**](doc/DefaultApi.md#getpendingrequests) | **GET** /api/groups/{groupId}/requests | 获取群待审批申请列表
+[*DefaultApi*](doc/DefaultApi.md) | [**getPlan**](doc/DefaultApi.md#getplan) | **GET** /api/membership/plans/{planId} | 获取计划详情
 [*DefaultApi*](doc/DefaultApi.md) | [**getPostComments**](doc/DefaultApi.md#getpostcomments) | **GET** /api/posts/{postId}/comments | 获取帖子评论列表
 [*DefaultApi*](doc/DefaultApi.md) | [**getPostDetail**](doc/DefaultApi.md#getpostdetail) | **GET** /api/posts/{postId} | 获取帖子详情
 [*DefaultApi*](doc/DefaultApi.md) | [**getPostList**](doc/DefaultApi.md#getpostlist) | **GET** /api/posts | 分页获取帖子列表
 [*DefaultApi*](doc/DefaultApi.md) | [**getPostListByType**](doc/DefaultApi.md#getpostlistbytype) | **GET** /api/posts/type/{postType} | 根据类型获取帖子列表
+[*DefaultApi*](doc/DefaultApi.md) | [**getPublishedPapers**](doc/DefaultApi.md#getpublishedpapers) | **GET** /api/grading/papers | 查询已发布试卷列表（供批改选择）
+[*DefaultApi*](doc/DefaultApi.md) | [**getQuestion**](doc/DefaultApi.md#getquestion) | **GET** /api/questions/{id} | 获取题目详情
 [*DefaultApi*](doc/DefaultApi.md) | [**getReadArticles**](doc/DefaultApi.md#getreadarticles) | **GET** /api/user/daily-article/read | 获取已阅读文章列表
 [*DefaultApi*](doc/DefaultApi.md) | [**getReadCount**](doc/DefaultApi.md#getreadcount) | **GET** /api/group-chat/messages/{messageId}/read-count | 获取消息已读人数
 [*DefaultApi*](doc/DefaultApi.md) | [**getReadUsers**](doc/DefaultApi.md#getreadusers) | **GET** /api/group-chat/messages/{messageId}/read-users | 获取消息已读用户列表（含昵称头像）
 [*DefaultApi*](doc/DefaultApi.md) | [**getReceivedRequests**](doc/DefaultApi.md#getreceivedrequests) | **POST** /api/friend/request/received | 获取收到的好友申请
+[*DefaultApi*](doc/DefaultApi.md) | [**getRecommendations**](doc/DefaultApi.md#getrecommendations) | **GET** /api/grading/{submissionId}/recommend | 获取错题的同类题推荐
+[*DefaultApi*](doc/DefaultApi.md) | [**getResult**](doc/DefaultApi.md#getresult) | **GET** /api/grading/{submissionId}/result | 获取批改结果
 [*DefaultApi*](doc/DefaultApi.md) | [**getReviewCount**](doc/DefaultApi.md#getreviewcount) | **GET** /api/course/review/{courseId}/count | 获取课程评价数
+[*DefaultApi*](doc/DefaultApi.md) | [**getRoomDetail**](doc/DefaultApi.md#getroomdetail) | **GET** /api/livestream/rooms/{id} | 直播间详情
 [*DefaultApi*](doc/DefaultApi.md) | [**getScheduleBySetting**](doc/DefaultApi.md#getschedulebysetting) | **GET** /api/schedule/setting/{settingId} | 获取特定配置的课表
 [*DefaultApi*](doc/DefaultApi.md) | [**getSection**](doc/DefaultApi.md#getsection) | **GET** /api/course/{courseId}/section/{sectionId} | 获取小节详情
 [*DefaultApi*](doc/DefaultApi.md) | [**getSectionProgress**](doc/DefaultApi.md#getsectionprogress) | **GET** /api/progress/section/{sectionId} | 获取小节学习进度
+[*DefaultApi*](doc/DefaultApi.md) | [**getSections**](doc/DefaultApi.md#getsections) | **GET** /api/exam-papers/{paperId}/sections | 获取试卷的所有大题
 [*DefaultApi*](doc/DefaultApi.md) | [**getSentRequests**](doc/DefaultApi.md#getsentrequests) | **POST** /api/friend/request/sent | 获取发送的好友申请
 [*DefaultApi*](doc/DefaultApi.md) | [**getSessionList**](doc/DefaultApi.md#getsessionlist) | **GET** /api/chat/sessions | 获取会话列表
-[*DefaultApi*](doc/DefaultApi.md) | [**getStatistics**](doc/DefaultApi.md#getstatistics) | **GET** /api/admin/order/statistics | 订单统计（管理员）
+[*DefaultApi*](doc/DefaultApi.md) | [**getStatistics**](doc/DefaultApi.md#getstatistics) | **GET** /api/admin/order/statistics | 订单统计（管理员，包含课程+会员）
+[*DefaultApi*](doc/DefaultApi.md) | [**getStatistics1**](doc/DefaultApi.md#getstatistics1) | **GET** /api/admin/membership/statistics | 会员统计
 [*DefaultApi*](doc/DefaultApi.md) | [**getStats**](doc/DefaultApi.md#getstats) | **GET** /api/user/word-book/stats | 获取生词本统计
 [*DefaultApi*](doc/DefaultApi.md) | [**getStats1**](doc/DefaultApi.md#getstats1) | **GET** /api/user/daily-word/stats | 获取学习统计
 [*DefaultApi*](doc/DefaultApi.md) | [**getStats2**](doc/DefaultApi.md#getstats2) | **GET** /api/user/daily-article/stats | 获取阅读统计
+[*DefaultApi*](doc/DefaultApi.md) | [**getStats3**](doc/DefaultApi.md#getstats3) | **GET** /api/grading/stats | 查询批改历史统计
+[*DefaultApi*](doc/DefaultApi.md) | [**getStatus**](doc/DefaultApi.md#getstatus) | **GET** /api/grading/{submissionId}/status | 查询批改状态
+[*DefaultApi*](doc/DefaultApi.md) | [**getStudentAiReport**](doc/DefaultApi.md#getstudentaireport) | **GET** /api/analytics/student/ai-report | AI个人学情分析报告（SSE流式）
+[*DefaultApi*](doc/DefaultApi.md) | [**getStudentOverview**](doc/DefaultApi.md#getstudentoverview) | **GET** /api/analytics/student/overview | 个人学情概览
+[*DefaultApi*](doc/DefaultApi.md) | [**getStudentSubjects**](doc/DefaultApi.md#getstudentsubjects) | **GET** /api/analytics/student/subjects | 个人各学科学情
+[*DefaultApi*](doc/DefaultApi.md) | [**getStudentTrend**](doc/DefaultApi.md#getstudenttrend) | **GET** /api/analytics/student/trend | 个人学习趋势
 [*DefaultApi*](doc/DefaultApi.md) | [**getStudiedWords**](doc/DefaultApi.md#getstudiedwords) | **GET** /api/user/daily-word/studied | 获取已学习单词列表
+[*DefaultApi*](doc/DefaultApi.md) | [**getSubjectProfile**](doc/DefaultApi.md#getsubjectprofile) | **GET** /api/grading/profile/{subjectCode} | 查询某学科知识画像详情
 [*DefaultApi*](doc/DefaultApi.md) | [**getSupportedSources**](doc/DefaultApi.md#getsupportedsources) | **GET** /api/scraper/sources | 获取预设来源列表
 [*DefaultApi*](doc/DefaultApi.md) | [**getSupportedVoices**](doc/DefaultApi.md#getsupportedvoices) | **GET** /api/speech/tts/voices | 获取支持的发音人列表
 [*DefaultApi*](doc/DefaultApi.md) | [**getTableColumns**](doc/DefaultApi.md#gettablecolumns) | **GET** /api/workflows/database/tables/{tableName}/columns | 获取指定表的字段信息
@@ -254,6 +314,7 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**getTeacher**](doc/DefaultApi.md#getteacher) | **GET** /api/teacher/{id} | 获取讲师信息
 [*DefaultApi*](doc/DefaultApi.md) | [**getTeacherByUserId**](doc/DefaultApi.md#getteacherbyuserid) | **GET** /api/teacher/user/{userId} | 根据用户ID获取讲师信息
 [*DefaultApi*](doc/DefaultApi.md) | [**getTemplate**](doc/DefaultApi.md#gettemplate) | **GET** /api/workflows/templates/{templateId} | 获取模板详情
+[*DefaultApi*](doc/DefaultApi.md) | [**getTemplate1**](doc/DefaultApi.md#gettemplate1) | **GET** /api/exam-templates/{id} | 获取模板详情
 [*DefaultApi*](doc/DefaultApi.md) | [**getTodayArticles**](doc/DefaultApi.md#gettodayarticles) | **GET** /api/daily-article/today | 获取今日推荐文章（个性化推荐）
 [*DefaultApi*](doc/DefaultApi.md) | [**getTodayWords**](doc/DefaultApi.md#gettodaywords) | **GET** /api/daily-word/today | 获取今日推荐单词（个性化推荐）
 [*DefaultApi*](doc/DefaultApi.md) | [**getTopPosts**](doc/DefaultApi.md#gettopposts) | **GET** /api/posts/top | 获取点赞排行榜（全部时间）
@@ -261,6 +322,7 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**getUnreadCount**](doc/DefaultApi.md#getunreadcount) | **GET** /api/group-chat/{groupId}/unread/count | 获取群未读消息数
 [*DefaultApi*](doc/DefaultApi.md) | [**getUnreadCount1**](doc/DefaultApi.md#getunreadcount1) | **GET** /api/chat/unread/count | 获取未读消息数
 [*DefaultApi*](doc/DefaultApi.md) | [**getUnreadCount2**](doc/DefaultApi.md#getunreadcount2) | **GET** /api/announcement/unread-count | 获取未读公告数量
+[*DefaultApi*](doc/DefaultApi.md) | [**getUserAiQuota**](doc/DefaultApi.md#getuseraiquota) | **GET** /api/admin/membership/users/{userId}/ai-quota | 查询指定用户的AI额度
 [*DefaultApi*](doc/DefaultApi.md) | [**getUserDetail**](doc/DefaultApi.md#getuserdetail) | **GET** /api/user/admin/{id} | 获取用户详情
 [*DefaultApi*](doc/DefaultApi.md) | [**getUserDetailInfo**](doc/DefaultApi.md#getuserdetailinfo) | **GET** /api/user/detail/{id} | 获取用户详细信息
 [*DefaultApi*](doc/DefaultApi.md) | [**getUserFollowStats**](doc/DefaultApi.md#getuserfollowstats) | **GET** /api/follow/user/{targetUserId}/stats | 获取指定用户的关注统计
@@ -272,9 +334,11 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**getUserStats**](doc/DefaultApi.md#getuserstats) | **GET** /api/user/stats | 获取用户统计数据
 [*DefaultApi*](doc/DefaultApi.md) | [**getVariables**](doc/DefaultApi.md#getvariables) | **GET** /api/workflows/{id}/variables | 获取工作流所有变量
 [*DefaultApi*](doc/DefaultApi.md) | [**getVersion**](doc/DefaultApi.md#getversion) | **GET** /api/workflows/{id}/versions/{versionNumber} | 获取指定版本详情
+[*DefaultApi*](doc/DefaultApi.md) | [**getWeakPoints**](doc/DefaultApi.md#getweakpoints) | **GET** /api/grading/profile/{subjectCode}/weak | 查询某学科薄弱知识点
 [*DefaultApi*](doc/DefaultApi.md) | [**getWordBookList**](doc/DefaultApi.md#getwordbooklist) | **GET** /api/user/word-book/list | 获取生词本列表
 [*DefaultApi*](doc/DefaultApi.md) | [**getWordsByDate**](doc/DefaultApi.md#getwordsbydate) | **GET** /api/daily-word/date/{date} | 获取指定日期单词
 [*DefaultApi*](doc/DefaultApi.md) | [**getWorkflowAssistants**](doc/DefaultApi.md#getworkflowassistants) | **GET** /api/workflows/{id}/assistants | 获取使用该工作流的AI助手ID列表
+[*DefaultApi*](doc/DefaultApi.md) | [**grantMembership**](doc/DefaultApi.md#grantmembership) | **POST** /api/admin/membership/grant | 为用户直接开通会员
 [*DefaultApi*](doc/DefaultApi.md) | [**handleFriendRequest**](doc/DefaultApi.md#handlefriendrequest) | **POST** /api/friend/request/handle | 处理好友申请
 [*DefaultApi*](doc/DefaultApi.md) | [**handleJoinRequest**](doc/DefaultApi.md#handlejoinrequest) | **POST** /api/groups/requests/{requestId}/handle | 处理加入申请
 [*DefaultApi*](doc/DefaultApi.md) | [**health**](doc/DefaultApi.md#health) | **GET** /api/health | 健康检查
@@ -297,6 +361,7 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**kbUpdate**](doc/DefaultApi.md#kbupdate) | **PUT** /api/ai/knowledge-bases/{id} | 更新知识库
 [*DefaultApi*](doc/DefaultApi.md) | [**kbUpdateDocument**](doc/DefaultApi.md#kbupdatedocument) | **PUT** /api/ai/knowledge-bases/{id}/documents/{docId} | 更新文档元信息
 [*DefaultApi*](doc/DefaultApi.md) | [**leaveGroup**](doc/DefaultApi.md#leavegroup) | **POST** /api/groups/{groupId}/leave | 退出群
+[*DefaultApi*](doc/DefaultApi.md) | [**listAllTemplates**](doc/DefaultApi.md#listalltemplates) | **GET** /api/exam-templates/all | 列出所有模板（管理员）
 [*DefaultApi*](doc/DefaultApi.md) | [**listAllowedTables**](doc/DefaultApi.md#listallowedtables) | **GET** /api/workflows/database/tables | 获取可查询的数据库表列表
 [*DefaultApi*](doc/DefaultApi.md) | [**listApplications**](doc/DefaultApi.md#listapplications) | **GET** /api/teacher/application/list | 获取申请列表（管理员）
 [*DefaultApi*](doc/DefaultApi.md) | [**listArticles**](doc/DefaultApi.md#listarticles) | **GET** /api/daily-article/list | 获取文章列表
@@ -304,15 +369,22 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**listBooks**](doc/DefaultApi.md#listbooks) | **GET** /api/books | 获取书籍列表
 [*DefaultApi*](doc/DefaultApi.md) | [**listByUser**](doc/DefaultApi.md#listbyuser) | **GET** /api/workflows | 获取用户的工作流列表
 [*DefaultApi*](doc/DefaultApi.md) | [**listChapters**](doc/DefaultApi.md#listchapters) | **GET** /api/course/{courseId}/chapter | 获取课程的章节列表
+[*DefaultApi*](doc/DefaultApi.md) | [**listClasses**](doc/DefaultApi.md#listclasses) | **GET** /api/classes/list | 获取班级列表
 [*DefaultApi*](doc/DefaultApi.md) | [**listCourses**](doc/DefaultApi.md#listcourses) | **GET** /api/course/list | 获取课程列表
 [*DefaultApi*](doc/DefaultApi.md) | [**listCoursesByTeacher**](doc/DefaultApi.md#listcoursesbyteacher) | **GET** /api/course/teacher/{teacherId} | 获取讲师的课程列表
 [*DefaultApi*](doc/DefaultApi.md) | [**listExecutions**](doc/DefaultApi.md#listexecutions) | **GET** /api/workflows/{id}/executions | 获取工作流执行历史列表
-[*DefaultApi*](doc/DefaultApi.md) | [**listOrders**](doc/DefaultApi.md#listorders) | **GET** /api/admin/order/list | 获取订单列表（管理员）
+[*DefaultApi*](doc/DefaultApi.md) | [**listGroups**](doc/DefaultApi.md#listgroups) | **GET** /api/admin/groups/list | 分页获取群列表
+[*DefaultApi*](doc/DefaultApi.md) | [**listMemberships**](doc/DefaultApi.md#listmemberships) | **GET** /api/admin/membership/list | 按状态查询会员列表
+[*DefaultApi*](doc/DefaultApi.md) | [**listOrders**](doc/DefaultApi.md#listorders) | **GET** /api/admin/order/list | 获取订单列表（管理员，包含课程订单和会员订单）
+[*DefaultApi*](doc/DefaultApi.md) | [**listPlans**](doc/DefaultApi.md#listplans) | **GET** /api/admin/membership/plans | 获取所有会员计划
+[*DefaultApi*](doc/DefaultApi.md) | [**listPlans1**](doc/DefaultApi.md#listplans1) | **GET** /api/membership/plans | 获取所有会员计划
 [*DefaultApi*](doc/DefaultApi.md) | [**listPublic**](doc/DefaultApi.md#listpublic) | **GET** /api/workflows/public | 获取公开的工作流列表
 [*DefaultApi*](doc/DefaultApi.md) | [**listReviews**](doc/DefaultApi.md#listreviews) | **GET** /api/course/review/{courseId}/list | 获取课程评价列表
+[*DefaultApi*](doc/DefaultApi.md) | [**listRooms**](doc/DefaultApi.md#listrooms) | **GET** /api/livestream/rooms | 直播间列表
 [*DefaultApi*](doc/DefaultApi.md) | [**listSections**](doc/DefaultApi.md#listsections) | **GET** /api/course/{courseId}/section | 获取课程的所有小节
 [*DefaultApi*](doc/DefaultApi.md) | [**listSystemTemplates**](doc/DefaultApi.md#listsystemtemplates) | **GET** /api/workflows/templates/system | 获取系统预置模板
 [*DefaultApi*](doc/DefaultApi.md) | [**listTeachers**](doc/DefaultApi.md#listteachers) | **GET** /api/teacher/list | 获取讲师列表
+[*DefaultApi*](doc/DefaultApi.md) | [**listTemplates1**](doc/DefaultApi.md#listtemplates1) | **GET** /api/exam-templates | 列出所有可用模板
 [*DefaultApi*](doc/DefaultApi.md) | [**listTriggers**](doc/DefaultApi.md#listtriggers) | **GET** /api/workflows/{id}/triggers | 获取工作流触发器列表
 [*DefaultApi*](doc/DefaultApi.md) | [**listVersions**](doc/DefaultApi.md#listversions) | **GET** /api/workflows/{id}/versions | 获取工作流版本列表
 [*DefaultApi*](doc/DefaultApi.md) | [**listWords**](doc/DefaultApi.md#listwords) | **GET** /api/daily-word/list | 获取单词列表
@@ -321,27 +393,39 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**markAsRead2**](doc/DefaultApi.md#markasread2) | **POST** /api/chat/read/{senderId} | 标记消息已读
 [*DefaultApi*](doc/DefaultApi.md) | [**markAsRead3**](doc/DefaultApi.md#markasread3) | **POST** /api/announcement/{id}/read | 标记公告已读
 [*DefaultApi*](doc/DefaultApi.md) | [**markRepliesAsRead**](doc/DefaultApi.md#markrepliesasread) | **POST** /api/feedback/{id}/read | 标记回复为已读
+[*DefaultApi*](doc/DefaultApi.md) | [**myRooms**](doc/DefaultApi.md#myrooms) | **GET** /api/livestream/rooms/my | 我的直播间
 [*DefaultApi*](doc/DefaultApi.md) | [**offlineAnnouncement**](doc/DefaultApi.md#offlineannouncement) | **POST** /api/announcement/admin/offline/{id} | 下线公告
 [*DefaultApi*](doc/DefaultApi.md) | [**offlineBanner**](doc/DefaultApi.md#offlinebanner) | **POST** /api/admin/banner/{id}/offline | 下线轮播图
 [*DefaultApi*](doc/DefaultApi.md) | [**phoneLogin**](doc/DefaultApi.md#phonelogin) | **POST** /api/auth/login/phone | 手机验证码登录
+[*DefaultApi*](doc/DefaultApi.md) | [**previewPdf**](doc/DefaultApi.md#previewpdf) | **POST** /api/exam-papers/{id}/preview | 预览试卷PDF
+[*DefaultApi*](doc/DefaultApi.md) | [**previewTemplate**](doc/DefaultApi.md#previewtemplate) | **POST** /api/exam-templates/{id}/preview | 预览模板效果（用示例数据编译PDF）
 [*DefaultApi*](doc/DefaultApi.md) | [**publish**](doc/DefaultApi.md#publish) | **POST** /api/workflows/{id}/publish | 发布工作流
 [*DefaultApi*](doc/DefaultApi.md) | [**publishAnnouncement**](doc/DefaultApi.md#publishannouncement) | **PUT** /api/groups/{groupId}/announcement | 发布群公告
 [*DefaultApi*](doc/DefaultApi.md) | [**publishAnnouncement1**](doc/DefaultApi.md#publishannouncement1) | **POST** /api/announcement/admin/publish/{id} | 发布公告
 [*DefaultApi*](doc/DefaultApi.md) | [**publishBanner**](doc/DefaultApi.md#publishbanner) | **POST** /api/admin/banner/{id}/publish | 发布轮播图
 [*DefaultApi*](doc/DefaultApi.md) | [**publishCourse**](doc/DefaultApi.md#publishcourse) | **POST** /api/course/{id}/publish | 发布课程（管理员）
+[*DefaultApi*](doc/DefaultApi.md) | [**publishExamPaper**](doc/DefaultApi.md#publishexampaper) | **POST** /api/exam-papers/{id}/publish | 发布试卷
+[*DefaultApi*](doc/DefaultApi.md) | [**purchaseMembership**](doc/DefaultApi.md#purchasemembership) | **POST** /api/membership/purchase | 购买会员（创建待支付订单）
 [*DefaultApi*](doc/DefaultApi.md) | [**queryAnnouncements**](doc/DefaultApi.md#queryannouncements) | **POST** /api/announcement/admin/list | 分页查询公告
 [*DefaultApi*](doc/DefaultApi.md) | [**queryBanners**](doc/DefaultApi.md#querybanners) | **GET** /api/admin/banner/list | 分页查询轮播图
+[*DefaultApi*](doc/DefaultApi.md) | [**queryExamPapers**](doc/DefaultApi.md#queryexampapers) | **GET** /api/exam-papers | 分页查询我的试卷
 [*DefaultApi*](doc/DefaultApi.md) | [**queryFeedbacks**](doc/DefaultApi.md#queryfeedbacks) | **POST** /api/feedback/admin/list | 分页查询反馈
+[*DefaultApi*](doc/DefaultApi.md) | [**queryMyQuestions**](doc/DefaultApi.md#querymyquestions) | **GET** /api/questions/mine | 查询我的题目
+[*DefaultApi*](doc/DefaultApi.md) | [**queryQuestions**](doc/DefaultApi.md#queryquestions) | **GET** /api/questions | 分页查询题目
 [*DefaultApi*](doc/DefaultApi.md) | [**queryUsers**](doc/DefaultApi.md#queryusers) | **POST** /api/user/admin/list | 分页查询用户
 [*DefaultApi*](doc/DefaultApi.md) | [**quickDynamicScrape**](doc/DefaultApi.md#quickdynamicscrape) | **GET** /api/scraper/dynamic/quick | 快速动态抓取
 [*DefaultApi*](doc/DefaultApi.md) | [**quickScrape**](doc/DefaultApi.md#quickscrape) | **GET** /api/scraper/quick | 快速抓取
 [*DefaultApi*](doc/DefaultApi.md) | [**refreshToken**](doc/DefaultApi.md#refreshtoken) | **POST** /api/auth/refresh | 刷新Token
 [*DefaultApi*](doc/DefaultApi.md) | [**refund**](doc/DefaultApi.md#refund) | **POST** /api/admin/order/{orderNo}/refund | 退款（管理员）
+[*DefaultApi*](doc/DefaultApi.md) | [**reindex**](doc/DefaultApi.md#reindex) | **POST** /api/search/admin/reindex | 全量重建索引（管理员）
 [*DefaultApi*](doc/DefaultApi.md) | [**removeCourse**](doc/DefaultApi.md#removecourse) | **DELETE** /api/classes/{classId}/courses/{courseId} | 移除课程
 [*DefaultApi*](doc/DefaultApi.md) | [**removeFromShelf**](doc/DefaultApi.md#removefromshelf) | **DELETE** /api/reading/shelf | 从书架移除书籍
 [*DefaultApi*](doc/DefaultApi.md) | [**removeFromWordBook**](doc/DefaultApi.md#removefromwordbook) | **DELETE** /api/user/word-book/{wordBookId} | 从生词本移除单词
 [*DefaultApi*](doc/DefaultApi.md) | [**removeMember**](doc/DefaultApi.md#removemember) | **DELETE** /api/groups/{groupId}/members/{targetUserId} | 移除成员
 [*DefaultApi*](doc/DefaultApi.md) | [**removeMember1**](doc/DefaultApi.md#removemember1) | **DELETE** /api/classes/{classId}/members/{userId} | 移除成员
+[*DefaultApi*](doc/DefaultApi.md) | [**removeMember2**](doc/DefaultApi.md#removemember2) | **DELETE** /api/admin/groups/{groupId}/members/{targetUserId} | 移除群成员
+[*DefaultApi*](doc/DefaultApi.md) | [**removePaperQuestion**](doc/DefaultApi.md#removepaperquestion) | **DELETE** /api/exam-papers/{paperId}/sections/{sectionId}/questions/{pqId} | 从大题移除题目
+[*DefaultApi*](doc/DefaultApi.md) | [**removeTeacher**](doc/DefaultApi.md#removeteacher) | **DELETE** /api/teacher/{id} | 移除讲师
 [*DefaultApi*](doc/DefaultApi.md) | [**replyFeedback**](doc/DefaultApi.md#replyfeedback) | **POST** /api/feedback/reply | 回复反馈
 [*DefaultApi*](doc/DefaultApi.md) | [**replyFeedback1**](doc/DefaultApi.md#replyfeedback1) | **POST** /api/feedback/admin/reply | 回复反馈
 [*DefaultApi*](doc/DefaultApi.md) | [**resetPassword**](doc/DefaultApi.md#resetpassword) | **POST** /api/user/admin/reset-password | 重置用户密码
@@ -359,11 +443,17 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**scrapeMultiplePages**](doc/DefaultApi.md#scrapemultiplepages) | **POST** /api/scraper/batch | 批量抓取
 [*DefaultApi*](doc/DefaultApi.md) | [**scrapeRecursively**](doc/DefaultApi.md#scraperecursively) | **POST** /api/scraper/recursive | 递归抓取
 [*DefaultApi*](doc/DefaultApi.md) | [**scrapeSinglePage**](doc/DefaultApi.md#scrapesinglepage) | **POST** /api/scraper/single | 抓取单个页面
+[*DefaultApi*](doc/DefaultApi.md) | [**searchAll**](doc/DefaultApi.md#searchall) | **GET** /api/search | 聚合搜索（书籍+章节+帖子）
 [*DefaultApi*](doc/DefaultApi.md) | [**searchArticles**](doc/DefaultApi.md#searcharticles) | **GET** /api/daily-article/search | 搜索文章
-[*DefaultApi*](doc/DefaultApi.md) | [**searchBooks**](doc/DefaultApi.md#searchbooks) | **GET** /api/books/search | 搜索书籍
+[*DefaultApi*](doc/DefaultApi.md) | [**searchBookChapters**](doc/DefaultApi.md#searchbookchapters) | **GET** /api/search/books/{bookId}/chapters | 书内搜索
+[*DefaultApi*](doc/DefaultApi.md) | [**searchBooks**](doc/DefaultApi.md#searchbooks) | **GET** /api/search/books | 搜索书籍
+[*DefaultApi*](doc/DefaultApi.md) | [**searchBooks1**](doc/DefaultApi.md#searchbooks1) | **GET** /api/books/search | 搜索书籍
+[*DefaultApi*](doc/DefaultApi.md) | [**searchChapters**](doc/DefaultApi.md#searchchapters) | **GET** /api/search/chapters | 搜索章节内容
 [*DefaultApi*](doc/DefaultApi.md) | [**searchCourses**](doc/DefaultApi.md#searchcourses) | **GET** /api/course/search | 搜索课程
 [*DefaultApi*](doc/DefaultApi.md) | [**searchGroups**](doc/DefaultApi.md#searchgroups) | **GET** /api/groups/search | 搜索群
-[*DefaultApi*](doc/DefaultApi.md) | [**searchPosts**](doc/DefaultApi.md#searchposts) | **GET** /api/posts/search | 搜索帖子
+[*DefaultApi*](doc/DefaultApi.md) | [**searchGroups1**](doc/DefaultApi.md#searchgroups1) | **GET** /api/admin/groups/search | 搜索群
+[*DefaultApi*](doc/DefaultApi.md) | [**searchPosts**](doc/DefaultApi.md#searchposts) | **GET** /api/search/posts | 搜索帖子
+[*DefaultApi*](doc/DefaultApi.md) | [**searchPosts1**](doc/DefaultApi.md#searchposts1) | **GET** /api/posts/search | 搜索帖子
 [*DefaultApi*](doc/DefaultApi.md) | [**searchPostsByTag**](doc/DefaultApi.md#searchpostsbytag) | **GET** /api/posts/tag | 根据标签搜索帖子
 [*DefaultApi*](doc/DefaultApi.md) | [**searchTemplates**](doc/DefaultApi.md#searchtemplates) | **GET** /api/workflows/templates | 搜索工作流模板
 [*DefaultApi*](doc/DefaultApi.md) | [**searchUsers**](doc/DefaultApi.md#searchusers) | **POST** /api/friend/search | 搜索用户
@@ -373,9 +463,14 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**sendSms**](doc/DefaultApi.md#sendsms) | **POST** /api/user/admin/send-sms | 发送短信验证码
 [*DefaultApi*](doc/DefaultApi.md) | [**setAdmin**](doc/DefaultApi.md#setadmin) | **PUT** /api/groups/{groupId}/members/{targetUserId}/admin | 设置/取消管理员
 [*DefaultApi*](doc/DefaultApi.md) | [**setJoinMode**](doc/DefaultApi.md#setjoinmode) | **PUT** /api/groups/{groupId}/join-mode | 设置群加入模式
+[*DefaultApi*](doc/DefaultApi.md) | [**setMute**](doc/DefaultApi.md#setmute) | **POST** /api/admin/groups/{groupId}/mute | 设置群全员禁言
 [*DefaultApi*](doc/DefaultApi.md) | [**smartDynamicScrape**](doc/DefaultApi.md#smartdynamicscrape) | **POST** /api/scraper/dynamic/smart | 智能动态抓取
 [*DefaultApi*](doc/DefaultApi.md) | [**smartScrape**](doc/DefaultApi.md#smartscrape) | **POST** /api/scraper/smart | 智能抓取
+[*DefaultApi*](doc/DefaultApi.md) | [**startStreaming**](doc/DefaultApi.md#startstreaming) | **POST** /api/livestream/rooms/{id}/start | 获取推流信息
+[*DefaultApi*](doc/DefaultApi.md) | [**stopStreaming**](doc/DefaultApi.md#stopstreaming) | **POST** /api/livestream/rooms/{id}/stop | 结束直播
 [*DefaultApi*](doc/DefaultApi.md) | [**studyWord**](doc/DefaultApi.md#studyword) | **POST** /api/user/daily-word/{wordId}/study | 标记单词为已学习
+[*DefaultApi*](doc/DefaultApi.md) | [**submitHomework**](doc/DefaultApi.md#submithomework) | **POST** /api/grading/submit | 提交作业并开始批改（SSE流式返回进度）
+[*DefaultApi*](doc/DefaultApi.md) | [**suggest**](doc/DefaultApi.md#suggest) | **GET** /api/search/suggest | 搜索建议（即时联想）
 [*DefaultApi*](doc/DefaultApi.md) | [**takeOffline**](doc/DefaultApi.md#takeoffline) | **POST** /api/course/{id}/offline | 下架课程（管理员）
 [*DefaultApi*](doc/DefaultApi.md) | [**textToSpeech**](doc/DefaultApi.md#texttospeech) | **POST** /api/speech/tts | 文本转语音
 [*DefaultApi*](doc/DefaultApi.md) | [**textToSpeechBase64**](doc/DefaultApi.md#texttospeechbase64) | **POST** /api/speech/tts/base64 | 文本转语音 (Base64)
@@ -389,9 +484,13 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**unbindFromAssistant**](doc/DefaultApi.md#unbindfromassistant) | **DELETE** /api/workflows/{id}/assistants/{assistantId} | 解绑工作流与AI助手
 [*DefaultApi*](doc/DefaultApi.md) | [**unfavouriteCourse**](doc/DefaultApi.md#unfavouritecourse) | **DELETE** /api/course/favourite/{courseId} | 取消收藏
 [*DefaultApi*](doc/DefaultApi.md) | [**unfollow**](doc/DefaultApi.md#unfollow) | **DELETE** /api/follow/{targetUserId} | 取消关注
+[*DefaultApi*](doc/DefaultApi.md) | [**unpublishExamPaper**](doc/DefaultApi.md#unpublishexampaper) | **POST** /api/exam-papers/{id}/unpublish | 撤回试卷为草稿
 [*DefaultApi*](doc/DefaultApi.md) | [**update**](doc/DefaultApi.md#update) | **PUT** /api/workflows/{id} | 更新工作流基本信息
 [*DefaultApi*](doc/DefaultApi.md) | [**updateAnnouncement**](doc/DefaultApi.md#updateannouncement) | **PUT** /api/announcement/admin/update | 更新公告
 [*DefaultApi*](doc/DefaultApi.md) | [**updateBanner**](doc/DefaultApi.md#updatebanner) | **PUT** /api/admin/banner | 更新轮播图
+[*DefaultApi*](doc/DefaultApi.md) | [**updateBook**](doc/DefaultApi.md#updatebook) | **PUT** /api/books/{bookId} | 编辑书籍信息
+[*DefaultApi*](doc/DefaultApi.md) | [**updateBookCover**](doc/DefaultApi.md#updatebookcover) | **PUT** /api/books/{bookId}/cover | 更新书籍封面
+[*DefaultApi*](doc/DefaultApi.md) | [**updateBookmark**](doc/DefaultApi.md#updatebookmark) | **PUT** /api/books/{bookId}/bookmarks/{bookmarkId} | 更新书签备注/标题
 [*DefaultApi*](doc/DefaultApi.md) | [**updateChapter**](doc/DefaultApi.md#updatechapter) | **PUT** /api/course/{courseId}/chapter/{chapterId} | 更新章节（管理员）
 [*DefaultApi*](doc/DefaultApi.md) | [**updateClass**](doc/DefaultApi.md#updateclass) | **PUT** /api/classes/{classId} | 更新班级信息
 [*DefaultApi*](doc/DefaultApi.md) | [**updateConfig**](doc/DefaultApi.md#updateconfig) | **PUT** /api/admin/scraper/config/{id} | 更新抓取配置
@@ -400,28 +499,38 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**updateDailyWord**](doc/DefaultApi.md#updatedailyword) | **PUT** /api/daily-word/{id} | 更新每日单词（管理员）
 [*DefaultApi*](doc/DefaultApi.md) | [**updateDefinition**](doc/DefaultApi.md#updatedefinition) | **PUT** /api/workflows/{id}/definition | 更新工作流定义
 [*DefaultApi*](doc/DefaultApi.md) | [**updateEdge**](doc/DefaultApi.md#updateedge) | **PUT** /api/workflows/{id}/edges/{edgeId} | 更新连接线
+[*DefaultApi*](doc/DefaultApi.md) | [**updateExamPaper**](doc/DefaultApi.md#updateexampaper) | **PUT** /api/exam-papers | 更新试卷基本信息
 [*DefaultApi*](doc/DefaultApi.md) | [**updateFeedbackStatus**](doc/DefaultApi.md#updatefeedbackstatus) | **PUT** /api/feedback/admin/status | 更新反馈状态
 [*DefaultApi*](doc/DefaultApi.md) | [**updateGroupInfo**](doc/DefaultApi.md#updategroupinfo) | **PUT** /api/groups/{groupId} | 更新群信息
+[*DefaultApi*](doc/DefaultApi.md) | [**updateGroupInfo1**](doc/DefaultApi.md#updategroupinfo1) | **PUT** /api/admin/groups/{groupId} | 更新群信息
 [*DefaultApi*](doc/DefaultApi.md) | [**updateItem**](doc/DefaultApi.md#updateitem) | **PUT** /api/schedule/item/{id} | 更新课程项
 [*DefaultApi*](doc/DefaultApi.md) | [**updateLearningStatus**](doc/DefaultApi.md#updatelearningstatus) | **PUT** /api/user/word-book/{wordBookId}/status | 更新学习状态
 [*DefaultApi*](doc/DefaultApi.md) | [**updateMastery**](doc/DefaultApi.md#updatemastery) | **POST** /api/user/daily-word/{wordId}/mastery | 更新单词掌握程度
 [*DefaultApi*](doc/DefaultApi.md) | [**updateNode**](doc/DefaultApi.md#updatenode) | **PUT** /api/workflows/{id}/nodes/{nodeId} | 更新节点
 [*DefaultApi*](doc/DefaultApi.md) | [**updateNodeConfig**](doc/DefaultApi.md#updatenodeconfig) | **PUT** /api/workflows/{id}/nodes/{nodeId}/config | 更新节点配置
+[*DefaultApi*](doc/DefaultApi.md) | [**updateNote**](doc/DefaultApi.md#updatenote) | **PUT** /api/books/{bookId}/notes/{noteId} | 更新笔记内容/颜色
+[*DefaultApi*](doc/DefaultApi.md) | [**updatePaperQuestion**](doc/DefaultApi.md#updatepaperquestion) | **PUT** /api/exam-papers/{paperId}/sections/{sectionId}/questions/{pqId} | 更新试卷题目分值/排序
+[*DefaultApi*](doc/DefaultApi.md) | [**updatePlan**](doc/DefaultApi.md#updateplan) | **PUT** /api/admin/membership/plans | 更新会员计划基本信息
+[*DefaultApi*](doc/DefaultApi.md) | [**updatePlanQuota**](doc/DefaultApi.md#updateplanquota) | **PUT** /api/admin/membership/plans/{planId}/quota | 修改计划AI配额
 [*DefaultApi*](doc/DefaultApi.md) | [**updatePost**](doc/DefaultApi.md#updatepost) | **PUT** /api/posts/{postId} | 更新帖子
 [*DefaultApi*](doc/DefaultApi.md) | [**updateProfile**](doc/DefaultApi.md#updateprofile) | **PUT** /api/user/profile | 更新个人资料
 [*DefaultApi*](doc/DefaultApi.md) | [**updateProgress**](doc/DefaultApi.md#updateprogress) | **PUT** /api/reading/progress | 更新阅读进度
 [*DefaultApi*](doc/DefaultApi.md) | [**updateProgress1**](doc/DefaultApi.md#updateprogress1) | **POST** /api/progress | 更新学习进度
+[*DefaultApi*](doc/DefaultApi.md) | [**updateQuestion**](doc/DefaultApi.md#updatequestion) | **PUT** /api/questions | 更新题目
 [*DefaultApi*](doc/DefaultApi.md) | [**updateReview**](doc/DefaultApi.md#updatereview) | **PUT** /api/course/review/{reviewId} | 更新评价
-[*DefaultApi*](doc/DefaultApi.md) | [**updateSection**](doc/DefaultApi.md#updatesection) | **PUT** /api/course/{courseId}/section/{sectionId} | 更新小节（管理员）
+[*DefaultApi*](doc/DefaultApi.md) | [**updateSection**](doc/DefaultApi.md#updatesection) | **PUT** /api/exam-papers/{paperId}/sections/{sectionId} | 更新大题
+[*DefaultApi*](doc/DefaultApi.md) | [**updateSection1**](doc/DefaultApi.md#updatesection1) | **PUT** /api/course/{courseId}/section/{sectionId} | 更新小节（管理员）
 [*DefaultApi*](doc/DefaultApi.md) | [**updateSetting**](doc/DefaultApi.md#updatesetting) | **PUT** /api/schedule/setting/{id} | 更新课表配置
 [*DefaultApi*](doc/DefaultApi.md) | [**updateSettings**](doc/DefaultApi.md#updatesettings) | **PUT** /api/workflows/{id}/settings | 更新工作流设置
 [*DefaultApi*](doc/DefaultApi.md) | [**updateTeacher**](doc/DefaultApi.md#updateteacher) | **PUT** /api/teacher/{id} | 更新讲师信息
 [*DefaultApi*](doc/DefaultApi.md) | [**updateUser**](doc/DefaultApi.md#updateuser) | **PUT** /api/user/admin/update | 更新用户
 [*DefaultApi*](doc/DefaultApi.md) | [**updateVariable**](doc/DefaultApi.md#updatevariable) | **PUT** /api/workflows/{id}/variables/{variableName} | 更新变量
 [*DefaultApi*](doc/DefaultApi.md) | [**uploadBook**](doc/DefaultApi.md#uploadbook) | **POST** /api/books/upload | 上传书籍
+[*DefaultApi*](doc/DefaultApi.md) | [**uploadTemplate1**](doc/DefaultApi.md#uploadtemplate1) | **POST** /api/exam-templates | 上传试卷模板
 [*DefaultApi*](doc/DefaultApi.md) | [**userLogin**](doc/DefaultApi.md#userlogin) | **POST** /api/auth/login | 用户登录
 [*DefaultApi*](doc/DefaultApi.md) | [**userRegister**](doc/DefaultApi.md#userregister) | **POST** /api/auth/register | 用户注册
 [*DefaultApi*](doc/DefaultApi.md) | [**validate**](doc/DefaultApi.md#validate) | **POST** /api/workflows/{id}/validate | 验证工作流定义
+[*DefaultApi*](doc/DefaultApi.md) | [**wechatCallback**](doc/DefaultApi.md#wechatcallback) | **POST** /api/payment/callback/wechat | 微信支付异步回调（预留）
 [*AIApi*](doc/AIApi.md) | [**askQuestion**](doc/AIApi.md#askquestion) | **POST** /api/books/{bookId}/ai/chat | 提问（新对话）
 [*AIApi*](doc/AIApi.md) | [**assistantArchive**](doc/AIApi.md#assistantarchive) | **PUT** /api/ai/assistants/{id}/archive | 归档AI助手
 [*AIApi*](doc/AIApi.md) | [**assistantBindKnowledgeBase**](doc/AIApi.md#assistantbindknowledgebase) | **POST** /api/ai/assistants/{id}/knowledge-bases/{kbId} | 绑定知识库
@@ -430,6 +539,7 @@ Class | Method | HTTP request | Description
 [*AIApi*](doc/AIApi.md) | [**assistantCreate**](doc/AIApi.md#assistantcreate) | **POST** /api/ai/assistants | 创建AI助手
 [*AIApi*](doc/AIApi.md) | [**assistantDelete**](doc/AIApi.md#assistantdelete) | **DELETE** /api/ai/assistants/{id} | 删除AI助手
 [*AIApi*](doc/AIApi.md) | [**assistantExecuteWorkflow**](doc/AIApi.md#assistantexecuteworkflow) | **POST** /api/ai/assistants/{id}/workflows/{workflowId}/execute | 执行AI助手绑定的工作流
+[*AIApi*](doc/AIApi.md) | [**assistantGenerateAvatar**](doc/AIApi.md#assistantgenerateavatar) | **POST** /api/ai/assistants/generate-avatar | AI生成助手头像
 [*AIApi*](doc/AIApi.md) | [**assistantGetById**](doc/AIApi.md#assistantgetbyid) | **GET** /api/ai/assistants/{id} | 获取AI助手详情
 [*AIApi*](doc/AIApi.md) | [**assistantGetWorkflowSkills**](doc/AIApi.md#assistantgetworkflowskills) | **GET** /api/ai/assistants/{id}/workflow-skills | 获取AI助手的工作流技能列表
 [*AIApi*](doc/AIApi.md) | [**assistantGetWorkflows**](doc/AIApi.md#assistantgetworkflows) | **GET** /api/ai/assistants/{id}/workflows | 获取AI助手绑定的工作流列表
@@ -444,7 +554,7 @@ Class | Method | HTTP request | Description
 [*AIApi*](doc/AIApi.md) | [**chat**](doc/AIApi.md#chat) | **POST** /api/articles/chat | 非流式对话
 [*AIApi*](doc/AIApi.md) | [**continueConversation**](doc/AIApi.md#continueconversation) | **POST** /api/books/{bookId}/ai/chat/{conversationId} | 继续对话
 [*AIApi*](doc/AIApi.md) | [**createSession**](doc/AIApi.md#createsession) | **POST** /api/ai/chat/sessions | 创建新会话
-[*AIApi*](doc/AIApi.md) | [**deleteSession**](doc/AIApi.md#deletesession) | **DELETE** /api/ai/chat/sessions/{sessionId} | 删除会话
+[*AIApi*](doc/AIApi.md) | [**deleteSession1**](doc/AIApi.md#deletesession1) | **DELETE** /api/ai/chat/sessions/{sessionId} | 删除会话
 [*AIApi*](doc/AIApi.md) | [**extractKnowledgePoints**](doc/AIApi.md#extractknowledgepoints) | **POST** /api/books/{bookId}/ai/chapters/{chapterId}/knowledge-points | 提取章节知识点
 [*AIApi*](doc/AIApi.md) | [**generateQuiz**](doc/AIApi.md#generatequiz) | **POST** /api/books/{bookId}/ai/chapters/{chapterId}/quiz | 生成阅读测试
 [*AIApi*](doc/AIApi.md) | [**generateSummary**](doc/AIApi.md#generatesummary) | **POST** /api/books/{bookId}/ai/chapters/{chapterId}/summary | 生成章节总结
@@ -453,7 +563,7 @@ Class | Method | HTTP request | Description
 [*AIApi*](doc/AIApi.md) | [**getKnowledgePoints**](doc/AIApi.md#getknowledgepoints) | **GET** /api/books/{bookId}/ai/chapters/{chapterId}/knowledge-points | 获取章节知识点
 [*AIApi*](doc/AIApi.md) | [**getLatestQuiz**](doc/AIApi.md#getlatestquiz) | **GET** /api/books/{bookId}/ai/chapters/{chapterId}/quiz/latest | 获取章节最新测试
 [*AIApi*](doc/AIApi.md) | [**getQuiz**](doc/AIApi.md#getquiz) | **GET** /api/books/{bookId}/ai/quiz/{quizId} | 获取测试
-[*AIApi*](doc/AIApi.md) | [**getSessionDetail**](doc/AIApi.md#getsessiondetail) | **GET** /api/ai/chat/sessions/{sessionId} | 获取会话详情（含消息列表）
+[*AIApi*](doc/AIApi.md) | [**getSessionDetail1**](doc/AIApi.md#getsessiondetail1) | **GET** /api/ai/chat/sessions/{sessionId} | 获取会话详情（含消息列表）
 [*AIApi*](doc/AIApi.md) | [**getSummary**](doc/AIApi.md#getsummary) | **GET** /api/books/{bookId}/ai/chapters/{chapterId}/summary | 获取章节总结
 [*AIApi*](doc/AIApi.md) | [**getUserConversations**](doc/AIApi.md#getuserconversations) | **GET** /api/books/{bookId}/ai/conversations | 获取用户对话列表
 [*AIApi*](doc/AIApi.md) | [**listAllModels**](doc/AIApi.md#listallmodels) | **GET** /api/ai/chat/models/all | 获取全量模型配置
@@ -469,6 +579,13 @@ Class | Method | HTTP request | Description
 [*AIApi*](doc/AIApi.md) | [**streamChat1**](doc/AIApi.md#streamchat1) | **POST** /api/ai/chat/stream | 无状态流式对话
 [*AIApi*](doc/AIApi.md) | [**streamChatGet**](doc/AIApi.md#streamchatget) | **GET** /api/articles/{articleId}/chat/stream | GET流式对话
 [*AIApi*](doc/AIApi.md) | [**submitAnswers**](doc/AIApi.md#submitanswers) | **POST** /api/books/{bookId}/ai/quiz/{quizId}/submit | 提交答案并评分
+[*AdminDashboardControllerApi*](doc/AdminDashboardControllerApi.md) | [**getAiSystem**](doc/AdminDashboardControllerApi.md#getaisystem) | **GET** /api/admin/dashboard/ai-system | 
+[*AdminDashboardControllerApi*](doc/AdminDashboardControllerApi.md) | [**getAlerts**](doc/AdminDashboardControllerApi.md#getalerts) | **GET** /api/admin/dashboard/alerts | 
+[*AdminDashboardControllerApi*](doc/AdminDashboardControllerApi.md) | [**getContent**](doc/AdminDashboardControllerApi.md#getcontent) | **GET** /api/admin/dashboard/content | 
+[*AdminDashboardControllerApi*](doc/AdminDashboardControllerApi.md) | [**getFull**](doc/AdminDashboardControllerApi.md#getfull) | **GET** /api/admin/dashboard/full | 
+[*AdminDashboardControllerApi*](doc/AdminDashboardControllerApi.md) | [**getLearning**](doc/AdminDashboardControllerApi.md#getlearning) | **GET** /api/admin/dashboard/learning | 
+[*AdminDashboardControllerApi*](doc/AdminDashboardControllerApi.md) | [**getOverview**](doc/AdminDashboardControllerApi.md#getoverview) | **GET** /api/admin/dashboard/overview | 
+[*AdminDashboardControllerApi*](doc/AdminDashboardControllerApi.md) | [**getTrends**](doc/AdminDashboardControllerApi.md#gettrends) | **GET** /api/admin/dashboard/trends | 
 [*MCPApi*](doc/MCPApi.md) | [**mcpServerCreate**](doc/MCPApi.md#mcpservercreate) | **POST** /api/ai/mcp-servers | 创建MCP服务器
 [*MCPApi*](doc/MCPApi.md) | [**mcpServerDelete**](doc/MCPApi.md#mcpserverdelete) | **DELETE** /api/ai/mcp-servers/{id} | 删除MCP服务器
 [*MCPApi*](doc/MCPApi.md) | [**mcpServerGetById**](doc/MCPApi.md#mcpservergetbyid) | **GET** /api/ai/mcp-servers/{id} | 获取MCP服务器详情
@@ -477,6 +594,23 @@ Class | Method | HTTP request | Description
 [*MCPApi*](doc/MCPApi.md) | [**mcpServerSetEnabled**](doc/MCPApi.md#mcpserversetenabled) | **PATCH** /api/ai/mcp-servers/{id}/enabled | 启用/禁用MCP服务器
 [*MCPApi*](doc/MCPApi.md) | [**mcpServerTestConnection**](doc/MCPApi.md#mcpservertestconnection) | **POST** /api/ai/mcp-servers/{id}/test | 测试MCP服务器连接
 [*MCPApi*](doc/MCPApi.md) | [**mcpServerUpdate**](doc/MCPApi.md#mcpserverupdate) | **PUT** /api/ai/mcp-servers/{id} | 更新MCP服务器
+[*OnlyOfficeApi*](doc/OnlyOfficeApi.md) | [**getEditorConfig**](doc/OnlyOfficeApi.md#geteditorconfig) | **GET** /api/onlyoffice/config | 获取OnlyOffice编辑器配置
+[*OnlyOfficeApi*](doc/OnlyOfficeApi.md) | [**handleCallback**](doc/OnlyOfficeApi.md#handlecallback) | **POST** /api/onlyoffice/callback | OnlyOffice保存回调
+[*PPTApi*](doc/PPTApi.md) | [**deleteSession**](doc/PPTApi.md#deletesession) | **DELETE** /api/ppt/generation/sessions/{sessionId} | 删除PPT会话
+[*PPTApi*](doc/PPTApi.md) | [**deleteTemplate1**](doc/PPTApi.md#deletetemplate1) | **DELETE** /api/ppt/templates/{id} | 删除模板
+[*PPTApi*](doc/PPTApi.md) | [**generatePpt**](doc/PPTApi.md#generateppt) | **POST** /api/ppt/generate | 基于模板生成PPT
+[*PPTApi*](doc/PPTApi.md) | [**getSessionDetail**](doc/PPTApi.md#getsessiondetail) | **GET** /api/ppt/generation/sessions/{sessionId} | 获取PPT会话详情
+[*PPTApi*](doc/PPTApi.md) | [**getTemplateDetail**](doc/PPTApi.md#gettemplatedetail) | **GET** /api/ppt/templates/{id} | 查看模板详情
+[*PPTApi*](doc/PPTApi.md) | [**listSessions1**](doc/PPTApi.md#listsessions1) | **GET** /api/ppt/generation/sessions | 获取PPT会话列表
+[*PPTApi*](doc/PPTApi.md) | [**listTemplates**](doc/PPTApi.md#listtemplates) | **GET** /api/ppt/templates | 列出所有可用模板
+[*PPTApi*](doc/PPTApi.md) | [**stream**](doc/PPTApi.md#stream) | **POST** /api/ppt/generation/stream | PPT生成助手（SSE流式）
+[*PPTApi*](doc/PPTApi.md) | [**uploadTemplate**](doc/PPTApi.md#uploadtemplate) | **POST** /api/ppt/templates | 上传PPT模板
+[*RtcInternalControllerApi*](doc/RtcInternalControllerApi.md) | [**checkPermission**](doc/RtcInternalControllerApi.md#checkpermission) | **POST** /api/internal/rtc/check-permission | 
+[*RtcInternalControllerApi*](doc/RtcInternalControllerApi.md) | [**saveCallRecord**](doc/RtcInternalControllerApi.md#savecallrecord) | **POST** /api/internal/rtc/call-record | 
+[*SrsCallbackControllerApi*](doc/SrsCallbackControllerApi.md) | [**onPlay**](doc/SrsCallbackControllerApi.md#onplay) | **POST** /api/internal/srs/on_play | 
+[*SrsCallbackControllerApi*](doc/SrsCallbackControllerApi.md) | [**onPublish**](doc/SrsCallbackControllerApi.md#onpublish) | **POST** /api/internal/srs/on_publish | 
+[*SrsCallbackControllerApi*](doc/SrsCallbackControllerApi.md) | [**onStop**](doc/SrsCallbackControllerApi.md#onstop) | **POST** /api/internal/srs/on_stop | 
+[*SrsCallbackControllerApi*](doc/SrsCallbackControllerApi.md) | [**onUnpublish**](doc/SrsCallbackControllerApi.md#onunpublish) | **POST** /api/internal/srs/on_unpublish | 
 [*WebhookApi*](doc/WebhookApi.md) | [**getWebhookInfo**](doc/WebhookApi.md#getwebhookinfo) | **GET** /api/v1/webhook/workflow/{webhookId}/info | 获取Webhook信息
 [*WebhookApi*](doc/WebhookApi.md) | [**triggerWorkflow**](doc/WebhookApi.md#triggerworkflow) | **POST** /api/v1/webhook/workflow/{webhookId} | Webhook触发工作流
 
@@ -488,11 +622,15 @@ Class | Method | HTTP request | Description
  - [AddCommentRequest](doc/AddCommentRequest.md)
  - [AddEdgeRequest](doc/AddEdgeRequest.md)
  - [AddNodeRequest](doc/AddNodeRequest.md)
+ - [AddPaperQuestionRequest](doc/AddPaperQuestionRequest.md)
+ - [AddPaperSectionRequest](doc/AddPaperSectionRequest.md)
  - [AddScheduleItemRequest](doc/AddScheduleItemRequest.md)
  - [AddVariableRequest](doc/AddVariableRequest.md)
+ - [AdminGroupPageResponse](doc/AdminGroupPageResponse.md)
  - [AiAssistantVO](doc/AiAssistantVO.md)
  - [AiConversation](doc/AiConversation.md)
  - [AiConversationId](doc/AiConversationId.md)
+ - [AiGenerateQuestionsRequest](doc/AiGenerateQuestionsRequest.md)
  - [AiProcessArticleRequest](doc/AiProcessArticleRequest.md)
  - [AiProcessResultResponse](doc/AiProcessResultResponse.md)
  - [AnnouncementDetailResponse](doc/AnnouncementDetailResponse.md)
@@ -508,6 +646,7 @@ Class | Method | HTTP request | Description
  - [BannerListResponse](doc/BannerListResponse.md)
  - [BannerPageResponse](doc/BannerPageResponse.md)
  - [BannerResponse](doc/BannerResponse.md)
+ - [BaseResponseAdminGroupPageResponse](doc/BaseResponseAdminGroupPageResponse.md)
  - [BaseResponseAiAssistantVO](doc/BaseResponseAiAssistantVO.md)
  - [BaseResponseAiConversation](doc/BaseResponseAiConversation.md)
  - [BaseResponseAiProcessResultResponse](doc/BaseResponseAiProcessResultResponse.md)
@@ -527,6 +666,7 @@ Class | Method | HTTP request | Description
  - [BaseResponseChatMessagePageResponse](doc/BaseResponseChatMessagePageResponse.md)
  - [BaseResponseCheckinResult](doc/BaseResponseCheckinResult.md)
  - [BaseResponseCheckinStatusResult](doc/BaseResponseCheckinStatusResult.md)
+ - [BaseResponseClassAnalyticsResponse](doc/BaseResponseClassAnalyticsResponse.md)
  - [BaseResponseClassResponse](doc/BaseResponseClassResponse.md)
  - [BaseResponseCommentPageResponse](doc/BaseResponseCommentPageResponse.md)
  - [BaseResponseCommentResponse](doc/BaseResponseCommentResponse.md)
@@ -538,6 +678,16 @@ Class | Method | HTTP request | Description
  - [BaseResponseDailyArticleResponse](doc/BaseResponseDailyArticleResponse.md)
  - [BaseResponseDailyWordPageResponse](doc/BaseResponseDailyWordPageResponse.md)
  - [BaseResponseDailyWordResponse](doc/BaseResponseDailyWordResponse.md)
+ - [BaseResponseDashboardAiSystemResponse](doc/BaseResponseDashboardAiSystemResponse.md)
+ - [BaseResponseDashboardAlertsResponse](doc/BaseResponseDashboardAlertsResponse.md)
+ - [BaseResponseDashboardContentResponse](doc/BaseResponseDashboardContentResponse.md)
+ - [BaseResponseDashboardFullResponse](doc/BaseResponseDashboardFullResponse.md)
+ - [BaseResponseDashboardLearningResponse](doc/BaseResponseDashboardLearningResponse.md)
+ - [BaseResponseDashboardOverviewResponse](doc/BaseResponseDashboardOverviewResponse.md)
+ - [BaseResponseDashboardTrendsResponse](doc/BaseResponseDashboardTrendsResponse.md)
+ - [BaseResponseExamPaperPageResponse](doc/BaseResponseExamPaperPageResponse.md)
+ - [BaseResponseExamPaperResponse](doc/BaseResponseExamPaperResponse.md)
+ - [BaseResponseExamTemplateResponse](doc/BaseResponseExamTemplateResponse.md)
  - [BaseResponseExecutionResultResponse](doc/BaseResponseExecutionResultResponse.md)
  - [BaseResponseExecutionStatisticsResponse](doc/BaseResponseExecutionStatisticsResponse.md)
  - [BaseResponseFeedbackDetailResponse](doc/BaseResponseFeedbackDetailResponse.md)
@@ -546,6 +696,10 @@ Class | Method | HTTP request | Description
  - [BaseResponseFollowStatsResponse](doc/BaseResponseFollowStatsResponse.md)
  - [BaseResponseFriendPageResponse](doc/BaseResponseFriendPageResponse.md)
  - [BaseResponseFriendRequestPageResponse](doc/BaseResponseFriendRequestPageResponse.md)
+ - [BaseResponseGenerateAvatarResponse](doc/BaseResponseGenerateAvatarResponse.md)
+ - [BaseResponseGenerateBannerImageResponse](doc/BaseResponseGenerateBannerImageResponse.md)
+ - [BaseResponseGradingResultResponse](doc/BaseResponseGradingResultResponse.md)
+ - [BaseResponseGradingStatsResponse](doc/BaseResponseGradingStatsResponse.md)
  - [BaseResponseGroupMessagePageResponse](doc/BaseResponseGroupMessagePageResponse.md)
  - [BaseResponseGroupPage](doc/BaseResponseGroupPage.md)
  - [BaseResponseGroupResponse](doc/BaseResponseGroupResponse.md)
@@ -554,6 +708,7 @@ Class | Method | HTTP request | Description
  - [BaseResponseKnowledgeBaseVO](doc/BaseResponseKnowledgeBaseVO.md)
  - [BaseResponseKnowledgeDocumentVO](doc/BaseResponseKnowledgeDocumentVO.md)
  - [BaseResponseLearningStats](doc/BaseResponseLearningStats.md)
+ - [BaseResponseLearningTrendResponse](doc/BaseResponseLearningTrendResponse.md)
  - [BaseResponseListAiAssistantVO](doc/BaseResponseListAiAssistantVO.md)
  - [BaseResponseListAiConversation](doc/BaseResponseListAiConversation.md)
  - [BaseResponseListArticleSourceResponse](doc/BaseResponseListArticleSourceResponse.md)
@@ -569,6 +724,7 @@ Class | Method | HTTP request | Description
  - [BaseResponseListCourseReviewResponse](doc/BaseResponseListCourseReviewResponse.md)
  - [BaseResponseListDailyArticleResponse](doc/BaseResponseListDailyArticleResponse.md)
  - [BaseResponseListDailyWordResponse](doc/BaseResponseListDailyWordResponse.md)
+ - [BaseResponseListExamTemplateResponse](doc/BaseResponseListExamTemplateResponse.md)
  - [BaseResponseListExecutionLogResponse](doc/BaseResponseListExecutionLogResponse.md)
  - [BaseResponseListExecutionResultResponse](doc/BaseResponseListExecutionResultResponse.md)
  - [BaseResponseListFeedbackReplyResponse](doc/BaseResponseListFeedbackReplyResponse.md)
@@ -581,20 +737,33 @@ Class | Method | HTTP request | Description
  - [BaseResponseListKnowledgeBaseVO](doc/BaseResponseListKnowledgeBaseVO.md)
  - [BaseResponseListKnowledgeDocumentVO](doc/BaseResponseListKnowledgeDocumentVO.md)
  - [BaseResponseListKnowledgePoint](doc/BaseResponseListKnowledgePoint.md)
+ - [BaseResponseListKnowledgeProfileResponse](doc/BaseResponseListKnowledgeProfileResponse.md)
  - [BaseResponseListLong](doc/BaseResponseListLong.md)
  - [BaseResponseListMapStringObject](doc/BaseResponseListMapStringObject.md)
+ - [BaseResponseListMembershipPlan](doc/BaseResponseListMembershipPlan.md)
  - [BaseResponseListMessageReadUserResponse](doc/BaseResponseListMessageReadUserResponse.md)
  - [BaseResponseListNodeTypeResponse](doc/BaseResponseListNodeTypeResponse.md)
  - [BaseResponseListOrderResponse](doc/BaseResponseListOrderResponse.md)
+ - [BaseResponseListPaperQuestionResponse](doc/BaseResponseListPaperQuestionResponse.md)
+ - [BaseResponseListPaperSectionResponse](doc/BaseResponseListPaperSectionResponse.md)
  - [BaseResponseListPostResponse](doc/BaseResponseListPostResponse.md)
+ - [BaseResponseListPptTemplateListResponse](doc/BaseResponseListPptTemplateListResponse.md)
  - [BaseResponseListProgressResponse](doc/BaseResponseListProgressResponse.md)
+ - [BaseResponseListReadingBookmarkDTO](doc/BaseResponseListReadingBookmarkDTO.md)
+ - [BaseResponseListReadingNoteDTO](doc/BaseResponseListReadingNoteDTO.md)
  - [BaseResponseListScraperConfigResponse](doc/BaseResponseListScraperConfigResponse.md)
+ - [BaseResponseListSearchSuggestionDTO](doc/BaseResponseListSearchSuggestionDTO.md)
  - [BaseResponseListSectionResponse](doc/BaseResponseListSectionResponse.md)
  - [BaseResponseListString](doc/BaseResponseListString.md)
+ - [BaseResponseListStudentRankingItem](doc/BaseResponseListStudentRankingItem.md)
+ - [BaseResponseListSubjectAnalyticsItem](doc/BaseResponseListSubjectAnalyticsItem.md)
+ - [BaseResponseListSubjectProfileSummary](doc/BaseResponseListSubjectProfileSummary.md)
+ - [BaseResponseListSubmissionStatusResponse](doc/BaseResponseListSubmissionStatusResponse.md)
  - [BaseResponseListTeacherApplicationResponse](doc/BaseResponseListTeacherApplicationResponse.md)
  - [BaseResponseListTeacherResponse](doc/BaseResponseListTeacherResponse.md)
  - [BaseResponseListUserDailyArticleResponse](doc/BaseResponseListUserDailyArticleResponse.md)
  - [BaseResponseListUserDailyWordResponse](doc/BaseResponseListUserDailyWordResponse.md)
+ - [BaseResponseListUserMembership](doc/BaseResponseListUserMembership.md)
  - [BaseResponseListUserShelfDTO](doc/BaseResponseListUserShelfDTO.md)
  - [BaseResponseListUserWordBookResponse](doc/BaseResponseListUserWordBookResponse.md)
  - [BaseResponseListWorkflowEdgeResponse](doc/BaseResponseListWorkflowEdgeResponse.md)
@@ -605,19 +774,32 @@ Class | Method | HTTP request | Description
  - [BaseResponseListWorkflowTriggerResponse](doc/BaseResponseListWorkflowTriggerResponse.md)
  - [BaseResponseListWorkflowVariableResponse](doc/BaseResponseListWorkflowVariableResponse.md)
  - [BaseResponseListWorkflowVersionResponse](doc/BaseResponseListWorkflowVersionResponse.md)
+ - [BaseResponseLiveRoomResponse](doc/BaseResponseLiveRoomResponse.md)
  - [BaseResponseLoginUserResponse](doc/BaseResponseLoginUserResponse.md)
  - [BaseResponseLong](doc/BaseResponseLong.md)
+ - [BaseResponseMapStringInteger](doc/BaseResponseMapStringInteger.md)
+ - [BaseResponseMapStringLong](doc/BaseResponseMapStringLong.md)
+ - [BaseResponseMapStringMapStringInteger](doc/BaseResponseMapStringMapStringInteger.md)
  - [BaseResponseMapStringObject](doc/BaseResponseMapStringObject.md)
  - [BaseResponseMapStringString](doc/BaseResponseMapStringString.md)
  - [BaseResponseMemberPage](doc/BaseResponseMemberPage.md)
+ - [BaseResponseMembershipPlan](doc/BaseResponseMembershipPlan.md)
  - [BaseResponseObject](doc/BaseResponseObject.md)
  - [BaseResponseOrderResponse](doc/BaseResponseOrderResponse.md)
  - [BaseResponseOrderStatistics](doc/BaseResponseOrderStatistics.md)
  - [BaseResponsePageResponseClassMemberResponse](doc/BaseResponsePageResponseClassMemberResponse.md)
+ - [BaseResponsePageResponseClassResponse](doc/BaseResponsePageResponseClassResponse.md)
+ - [BaseResponsePageResult](doc/BaseResponsePageResult.md)
  - [BaseResponsePostDetailResponse](doc/BaseResponsePostDetailResponse.md)
  - [BaseResponsePostPageResponse](doc/BaseResponsePostPageResponse.md)
  - [BaseResponsePostResponse](doc/BaseResponsePostResponse.md)
+ - [BaseResponsePptGenerateResponse](doc/BaseResponsePptGenerateResponse.md)
+ - [BaseResponsePptTemplateDetailResponse](doc/BaseResponsePptTemplateDetailResponse.md)
  - [BaseResponseProgressResponse](doc/BaseResponseProgressResponse.md)
+ - [BaseResponseQuestionPageResponse](doc/BaseResponseQuestionPageResponse.md)
+ - [BaseResponseQuestionResponse](doc/BaseResponseQuestionResponse.md)
+ - [BaseResponseReadingBookmarkDTO](doc/BaseResponseReadingBookmarkDTO.md)
+ - [BaseResponseReadingNoteDTO](doc/BaseResponseReadingNoteDTO.md)
  - [BaseResponseReadingQuiz](doc/BaseResponseReadingQuiz.md)
  - [BaseResponseReadingStats](doc/BaseResponseReadingStats.md)
  - [BaseResponseRefreshTokenResponse](doc/BaseResponseRefreshTokenResponse.md)
@@ -633,11 +815,15 @@ Class | Method | HTTP request | Description
  - [BaseResponseSectionResponse](doc/BaseResponseSectionResponse.md)
  - [BaseResponseSendResult](doc/BaseResponseSendResult.md)
  - [BaseResponseString](doc/BaseResponseString.md)
+ - [BaseResponseStudentAnalyticsResponse](doc/BaseResponseStudentAnalyticsResponse.md)
+ - [BaseResponseSubjectProfileSummary](doc/BaseResponseSubjectProfileSummary.md)
+ - [BaseResponseSubmissionStatusResponse](doc/BaseResponseSubmissionStatusResponse.md)
  - [BaseResponseTeacherApplicationResponse](doc/BaseResponseTeacherApplicationResponse.md)
  - [BaseResponseTeacherResponse](doc/BaseResponseTeacherResponse.md)
  - [BaseResponseTtsResponse](doc/BaseResponseTtsResponse.md)
  - [BaseResponseUserAnnouncementPageResponse](doc/BaseResponseUserAnnouncementPageResponse.md)
  - [BaseResponseUserDetailResponse](doc/BaseResponseUserDetailResponse.md)
+ - [BaseResponseUserMembershipDetailResponse](doc/BaseResponseUserMembershipDetailResponse.md)
  - [BaseResponseUserPageResponse](doc/BaseResponseUserPageResponse.md)
  - [BaseResponseUserPublicResponse](doc/BaseResponseUserPublicResponse.md)
  - [BaseResponseUserStatsResult](doc/BaseResponseUserStatsResult.md)
@@ -677,10 +863,12 @@ Class | Method | HTTP request | Description
  - [ChatMessageResponse](doc/ChatMessageResponse.md)
  - [ChatRequest](doc/ChatRequest.md)
  - [ChatSessionResponse](doc/ChatSessionResponse.md)
+ - [CheckPermissionRequest](doc/CheckPermissionRequest.md)
  - [CheckinRankingItem](doc/CheckinRankingItem.md)
  - [CheckinResult](doc/CheckinResult.md)
  - [CheckinStatusResult](doc/CheckinStatusResult.md)
  - [ChildrenDefinition](doc/ChildrenDefinition.md)
+ - [ClassAnalyticsResponse](doc/ClassAnalyticsResponse.md)
  - [ClassMemberResponse](doc/ClassMemberResponse.md)
  - [ClassResponse](doc/ClassResponse.md)
  - [ClassScheduleItemResponse](doc/ClassScheduleItemResponse.md)
@@ -703,11 +891,16 @@ Class | Method | HTTP request | Description
  - [CreateCourseRequest](doc/CreateCourseRequest.md)
  - [CreateDailyArticleRequest](doc/CreateDailyArticleRequest.md)
  - [CreateDailyWordRequest](doc/CreateDailyWordRequest.md)
+ - [CreateExamPaperRequest](doc/CreateExamPaperRequest.md)
  - [CreateFeedbackRequest](doc/CreateFeedbackRequest.md)
  - [CreateGroupRequest](doc/CreateGroupRequest.md)
  - [CreateKnowledgeBaseCommand](doc/CreateKnowledgeBaseCommand.md)
+ - [CreateLiveRoomRequest](doc/CreateLiveRoomRequest.md)
  - [CreateOrderRequest](doc/CreateOrderRequest.md)
+ - [CreatePlanRequest](doc/CreatePlanRequest.md)
  - [CreatePostRequest](doc/CreatePostRequest.md)
+ - [CreateQuestionRequest](doc/CreateQuestionRequest.md)
+ - [CreateReadingNoteCommand](doc/CreateReadingNoteCommand.md)
  - [CreateReplyRequest](doc/CreateReplyRequest.md)
  - [CreateScheduleSettingRequest](doc/CreateScheduleSettingRequest.md)
  - [CreateSectionRequest](doc/CreateSectionRequest.md)
@@ -717,9 +910,20 @@ Class | Method | HTTP request | Description
  - [DailyArticleResponse](doc/DailyArticleResponse.md)
  - [DailyWordPageResponse](doc/DailyWordPageResponse.md)
  - [DailyWordResponse](doc/DailyWordResponse.md)
+ - [DashboardAiSystemResponse](doc/DashboardAiSystemResponse.md)
+ - [DashboardAlertsResponse](doc/DashboardAlertsResponse.md)
+ - [DashboardContentResponse](doc/DashboardContentResponse.md)
+ - [DashboardFullResponse](doc/DashboardFullResponse.md)
+ - [DashboardLearningResponse](doc/DashboardLearningResponse.md)
+ - [DashboardOverviewResponse](doc/DashboardOverviewResponse.md)
+ - [DashboardTrendsResponse](doc/DashboardTrendsResponse.md)
  - [DynamicScrapeRequest](doc/DynamicScrapeRequest.md)
+ - [ErrorCategoryCount](doc/ErrorCategoryCount.md)
  - [ErrorHandlingConfig](doc/ErrorHandlingConfig.md)
  - [ErrorHandlingConfigDTO](doc/ErrorHandlingConfigDTO.md)
+ - [ExamPaperPageResponse](doc/ExamPaperPageResponse.md)
+ - [ExamPaperResponse](doc/ExamPaperResponse.md)
+ - [ExamTemplateResponse](doc/ExamTemplateResponse.md)
  - [ExecuteTaskRequest](doc/ExecuteTaskRequest.md)
  - [ExecuteWorkflowRequest](doc/ExecuteWorkflowRequest.md)
  - [ExecutionLogResponse](doc/ExecutionLogResponse.md)
@@ -740,6 +944,14 @@ Class | Method | HTTP request | Description
  - [FriendRequestPageResponse](doc/FriendRequestPageResponse.md)
  - [FriendRequestResponse](doc/FriendRequestResponse.md)
  - [FriendResponse](doc/FriendResponse.md)
+ - [GenerateAvatarRequest](doc/GenerateAvatarRequest.md)
+ - [GenerateAvatarResponse](doc/GenerateAvatarResponse.md)
+ - [GenerateBannerImageRequest](doc/GenerateBannerImageRequest.md)
+ - [GenerateBannerImageResponse](doc/GenerateBannerImageResponse.md)
+ - [GeneratePptRequest](doc/GeneratePptRequest.md)
+ - [GradingResultResponse](doc/GradingResultResponse.md)
+ - [GradingStatsResponse](doc/GradingStatsResponse.md)
+ - [GrantMembershipRequest](doc/GrantMembershipRequest.md)
  - [GroupId](doc/GroupId.md)
  - [GroupMemberResponse](doc/GroupMemberResponse.md)
  - [GroupMessageItem](doc/GroupMessageItem.md)
@@ -754,9 +966,13 @@ Class | Method | HTTP request | Description
  - [KnowledgeDocumentVO](doc/KnowledgeDocumentVO.md)
  - [KnowledgePoint](doc/KnowledgePoint.md)
  - [KnowledgePointId](doc/KnowledgePointId.md)
+ - [KnowledgeProfileResponse](doc/KnowledgeProfileResponse.md)
  - [LearningStats](doc/LearningStats.md)
+ - [LearningTrendResponse](doc/LearningTrendResponse.md)
+ - [LiveRoomResponse](doc/LiveRoomResponse.md)
  - [LoginUserResponse](doc/LoginUserResponse.md)
  - [MemberPage](doc/MemberPage.md)
+ - [MembershipPlan](doc/MembershipPlan.md)
  - [MessageReadUserResponse](doc/MessageReadUserResponse.md)
  - [NodeExecutionDTO](doc/NodeExecutionDTO.md)
  - [NodeTypeResponse](doc/NodeTypeResponse.md)
@@ -764,19 +980,35 @@ Class | Method | HTTP request | Description
  - [OrderResponse](doc/OrderResponse.md)
  - [OrderStatistics](doc/OrderStatistics.md)
  - [PageResponseClassMemberResponse](doc/PageResponseClassMemberResponse.md)
+ - [PageResponseClassResponse](doc/PageResponseClassResponse.md)
+ - [PageResult](doc/PageResult.md)
+ - [PaperQuestionResponse](doc/PaperQuestionResponse.md)
+ - [PaperSectionResponse](doc/PaperSectionResponse.md)
  - [PhoneLoginRequest](doc/PhoneLoginRequest.md)
  - [Position](doc/Position.md)
  - [PositionDTO](doc/PositionDTO.md)
  - [PostDetailResponse](doc/PostDetailResponse.md)
  - [PostPageResponse](doc/PostPageResponse.md)
  - [PostResponse](doc/PostResponse.md)
+ - [PptGenerateResponse](doc/PptGenerateResponse.md)
+ - [PptGenerationRequest](doc/PptGenerationRequest.md)
+ - [PptTemplateDetailResponse](doc/PptTemplateDetailResponse.md)
+ - [PptTemplateListResponse](doc/PptTemplateListResponse.md)
  - [PreviewAiProcessRequest](doc/PreviewAiProcessRequest.md)
  - [ProgressResponse](doc/ProgressResponse.md)
+ - [PurchaseMembershipRequest](doc/PurchaseMembershipRequest.md)
  - [QueryAnnouncementRequest](doc/QueryAnnouncementRequest.md)
  - [QueryBannerRequest](doc/QueryBannerRequest.md)
+ - [QueryExamPaperRequest](doc/QueryExamPaperRequest.md)
  - [QueryFeedbackRequest](doc/QueryFeedbackRequest.md)
+ - [QueryQuestionRequest](doc/QueryQuestionRequest.md)
  - [QueryUserRequest](doc/QueryUserRequest.md)
+ - [QuestionGradingItem](doc/QuestionGradingItem.md)
+ - [QuestionPageResponse](doc/QuestionPageResponse.md)
+ - [QuestionResponse](doc/QuestionResponse.md)
  - [QuizQuestion](doc/QuizQuestion.md)
+ - [ReadingBookmarkDTO](doc/ReadingBookmarkDTO.md)
+ - [ReadingNoteDTO](doc/ReadingNoteDTO.md)
  - [ReadingQuiz](doc/ReadingQuiz.md)
  - [ReadingQuizId](doc/ReadingQuizId.md)
  - [ReadingStats](doc/ReadingStats.md)
@@ -787,7 +1019,9 @@ Class | Method | HTTP request | Description
  - [ResetPasswordRequest](doc/ResetPasswordRequest.md)
  - [ReviewApplicationRequest](doc/ReviewApplicationRequest.md)
  - [ReviewCourseRequest](doc/ReviewCourseRequest.md)
+ - [SaveCallRecordRequest](doc/SaveCallRecordRequest.md)
  - [ScheduleResponse](doc/ScheduleResponse.md)
+ - [ScoreTrendItem](doc/ScoreTrendItem.md)
  - [ScrapeConfigRequest](doc/ScrapeConfigRequest.md)
  - [ScrapeRequest](doc/ScrapeRequest.md)
  - [ScrapeResultResponse](doc/ScrapeResultResponse.md)
@@ -796,6 +1030,8 @@ Class | Method | HTTP request | Description
  - [ScraperConfigResponse](doc/ScraperConfigResponse.md)
  - [ScraperTaskPageResponse](doc/ScraperTaskPageResponse.md)
  - [ScraperTaskResponse](doc/ScraperTaskResponse.md)
+ - [SearchResultDTO](doc/SearchResultDTO.md)
+ - [SearchSuggestionDTO](doc/SearchSuggestionDTO.md)
  - [SearchUserPageResponse](doc/SearchUserPageResponse.md)
  - [SearchUserRequestDTO](doc/SearchUserRequestDTO.md)
  - [SearchUserResponse](doc/SearchUserResponse.md)
@@ -808,29 +1044,43 @@ Class | Method | HTTP request | Description
  - [SkillOutputVO](doc/SkillOutputVO.md)
  - [SkillParamVO](doc/SkillParamVO.md)
  - [SourceScrapeRequest](doc/SourceScrapeRequest.md)
+ - [SrsCallbackRequest](doc/SrsCallbackRequest.md)
  - [SseEmitter](doc/SseEmitter.md)
+ - [StudentAnalyticsResponse](doc/StudentAnalyticsResponse.md)
+ - [StudentRankingItem](doc/StudentRankingItem.md)
+ - [SubjectAnalyticsItem](doc/SubjectAnalyticsItem.md)
+ - [SubjectProfileSummary](doc/SubjectProfileSummary.md)
+ - [SubmissionStatusResponse](doc/SubmissionStatusResponse.md)
+ - [SubmitHomeworkRequest](doc/SubmitHomeworkRequest.md)
  - [TeacherApplicationResponse](doc/TeacherApplicationResponse.md)
  - [TeacherResponse](doc/TeacherResponse.md)
  - [TimeConfigItem](doc/TimeConfigItem.md)
+ - [TrendItem](doc/TrendItem.md)
  - [TtsRequest](doc/TtsRequest.md)
  - [TtsResponse](doc/TtsResponse.md)
  - [UpdateAiAssistantCommand](doc/UpdateAiAssistantCommand.md)
  - [UpdateAnnouncementRequest](doc/UpdateAnnouncementRequest.md)
  - [UpdateBannerRequest](doc/UpdateBannerRequest.md)
+ - [UpdateBookCoverRequest](doc/UpdateBookCoverRequest.md)
  - [UpdateChapterRequest](doc/UpdateChapterRequest.md)
  - [UpdateClassRequest](doc/UpdateClassRequest.md)
  - [UpdateCourseRequest](doc/UpdateCourseRequest.md)
  - [UpdateDailyArticleRequest](doc/UpdateDailyArticleRequest.md)
  - [UpdateDailyWordRequest](doc/UpdateDailyWordRequest.md)
  - [UpdateEdgeRequest](doc/UpdateEdgeRequest.md)
+ - [UpdateExamPaperRequest](doc/UpdateExamPaperRequest.md)
  - [UpdateFeedbackStatusRequest](doc/UpdateFeedbackStatusRequest.md)
  - [UpdateGroupRequest](doc/UpdateGroupRequest.md)
  - [UpdateKnowledgeBaseCommand](doc/UpdateKnowledgeBaseCommand.md)
  - [UpdateNodeConfigRequest](doc/UpdateNodeConfigRequest.md)
  - [UpdateNodeRequest](doc/UpdateNodeRequest.md)
+ - [UpdatePaperQuestionRequest](doc/UpdatePaperQuestionRequest.md)
+ - [UpdatePlanQuotaRequest](doc/UpdatePlanQuotaRequest.md)
+ - [UpdatePlanRequest](doc/UpdatePlanRequest.md)
  - [UpdatePostRequest](doc/UpdatePostRequest.md)
  - [UpdateProfileRequest](doc/UpdateProfileRequest.md)
  - [UpdateProgressRequest](doc/UpdateProgressRequest.md)
+ - [UpdateQuestionRequest](doc/UpdateQuestionRequest.md)
  - [UpdateReadingProgressCommand](doc/UpdateReadingProgressCommand.md)
  - [UpdateScheduleItemRequest](doc/UpdateScheduleItemRequest.md)
  - [UpdateScheduleSettingRequest](doc/UpdateScheduleSettingRequest.md)
@@ -842,12 +1092,16 @@ Class | Method | HTTP request | Description
  - [UpdateWorkflowRequest](doc/UpdateWorkflowRequest.md)
  - [UpdateWorkflowSettingsRequest](doc/UpdateWorkflowSettingsRequest.md)
  - [UploadBookCommand](doc/UploadBookCommand.md)
+ - [UploadTemplate1Request](doc/UploadTemplate1Request.md)
+ - [UploadTemplateRequest](doc/UploadTemplateRequest.md)
  - [UserAnnouncementPageResponse](doc/UserAnnouncementPageResponse.md)
  - [UserDailyArticleResponse](doc/UserDailyArticleResponse.md)
  - [UserDailyWordResponse](doc/UserDailyWordResponse.md)
  - [UserDetailResponse](doc/UserDetailResponse.md)
  - [UserId](doc/UserId.md)
  - [UserLoginRequest](doc/UserLoginRequest.md)
+ - [UserMembership](doc/UserMembership.md)
+ - [UserMembershipDetailResponse](doc/UserMembershipDetailResponse.md)
  - [UserPageResponse](doc/UserPageResponse.md)
  - [UserPublicResponse](doc/UserPublicResponse.md)
  - [UserRegisterRequest](doc/UserRegisterRequest.md)

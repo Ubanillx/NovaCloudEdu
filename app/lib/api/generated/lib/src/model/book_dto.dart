@@ -15,6 +15,7 @@ part 'book_dto.g.dart';
 /// * [title]
 /// * [author]
 /// * [coverUrl]
+/// * [originFileUrl]
 /// * [fileType]
 /// * [status]
 /// * [totalChapters]
@@ -35,6 +36,9 @@ abstract class BookDTO implements Built<BookDTO, BookDTOBuilder> {
 
   @BuiltValueField(wireName: r'coverUrl')
   String? get coverUrl;
+
+  @BuiltValueField(wireName: r'originFileUrl')
+  String? get originFileUrl;
 
   @BuiltValueField(wireName: r'fileType')
   String? get fileType;
@@ -105,6 +109,13 @@ class _$BookDTOSerializer implements PrimitiveSerializer<BookDTO> {
       yield r'coverUrl';
       yield serializers.serialize(
         object.coverUrl,
+        specifiedType: const FullType(String),
+      );
+    }
+    if (object.originFileUrl != null) {
+      yield r'originFileUrl';
+      yield serializers.serialize(
+        object.originFileUrl,
         specifiedType: const FullType(String),
       );
     }
@@ -209,6 +220,13 @@ class _$BookDTOSerializer implements PrimitiveSerializer<BookDTO> {
             specifiedType: const FullType(String),
           ) as String;
           result.coverUrl = valueDes;
+          break;
+        case r'originFileUrl':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.originFileUrl = valueDes;
           break;
         case r'fileType':
           final valueDes = serializers.deserialize(

@@ -11,7 +11,12 @@ import 'package:nova_api/src/auth/bearer_auth.dart';
 import 'package:nova_api/src/auth/oauth.dart';
 import 'package:nova_api/src/api/default_api.dart';
 import 'package:nova_api/src/api/ai_api.dart';
+import 'package:nova_api/src/api/admin_dashboard_controller_api.dart';
 import 'package:nova_api/src/api/mcp_api.dart';
+import 'package:nova_api/src/api/only_office_api.dart';
+import 'package:nova_api/src/api/ppt_api.dart';
+import 'package:nova_api/src/api/rtc_internal_controller_api.dart';
+import 'package:nova_api/src/api/srs_callback_controller_api.dart';
 import 'package:nova_api/src/api/webhook_api.dart';
 
 class NovaApi {
@@ -91,10 +96,40 @@ class NovaApi {
     return AIApi(dio, serializers);
   }
 
+  /// Get AdminDashboardControllerApi instance, base route and serializer can be overridden by a given but be careful,
+  /// by doing that all interceptors will not be executed
+  AdminDashboardControllerApi getAdminDashboardControllerApi() {
+    return AdminDashboardControllerApi(dio, serializers);
+  }
+
   /// Get MCPApi instance, base route and serializer can be overridden by a given but be careful,
   /// by doing that all interceptors will not be executed
   MCPApi getMCPApi() {
     return MCPApi(dio, serializers);
+  }
+
+  /// Get OnlyOfficeApi instance, base route and serializer can be overridden by a given but be careful,
+  /// by doing that all interceptors will not be executed
+  OnlyOfficeApi getOnlyOfficeApi() {
+    return OnlyOfficeApi(dio, serializers);
+  }
+
+  /// Get PPTApi instance, base route and serializer can be overridden by a given but be careful,
+  /// by doing that all interceptors will not be executed
+  PPTApi getPPTApi() {
+    return PPTApi(dio, serializers);
+  }
+
+  /// Get RtcInternalControllerApi instance, base route and serializer can be overridden by a given but be careful,
+  /// by doing that all interceptors will not be executed
+  RtcInternalControllerApi getRtcInternalControllerApi() {
+    return RtcInternalControllerApi(dio, serializers);
+  }
+
+  /// Get SrsCallbackControllerApi instance, base route and serializer can be overridden by a given but be careful,
+  /// by doing that all interceptors will not be executed
+  SrsCallbackControllerApi getSrsCallbackControllerApi() {
+    return SrsCallbackControllerApi(dio, serializers);
   }
 
   /// Get WebhookApi instance, base route and serializer can be overridden by a given but be careful,
