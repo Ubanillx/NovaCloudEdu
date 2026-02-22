@@ -11,6 +11,8 @@ part 'order_response.g.dart';
 /// 订单信息响应
 ///
 /// Properties:
+/// * [orderType] - 订单类型：COURSE-课程订单，MEMBERSHIP-会员订单
+/// * [productName] - 商品名称（课程名/会员计划名）
 /// * [id] - 订单ID
 /// * [userId] - 用户ID
 /// * [courseId] - 课程ID
@@ -28,6 +30,14 @@ part 'order_response.g.dart';
 @BuiltValue()
 abstract class OrderResponse
     implements Built<OrderResponse, OrderResponseBuilder> {
+  /// 订单类型：COURSE-课程订单，MEMBERSHIP-会员订单
+  @BuiltValueField(wireName: r'orderType')
+  String? get orderType;
+
+  /// 商品名称（课程名/会员计划名）
+  @BuiltValueField(wireName: r'productName')
+  String? get productName;
+
   /// 订单ID
   @BuiltValueField(wireName: r'id')
   int? get id;
@@ -109,6 +119,20 @@ class _$OrderResponseSerializer implements PrimitiveSerializer<OrderResponse> {
     OrderResponse object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
+    if (object.orderType != null) {
+      yield r'orderType';
+      yield serializers.serialize(
+        object.orderType,
+        specifiedType: const FullType(String),
+      );
+    }
+    if (object.productName != null) {
+      yield r'productName';
+      yield serializers.serialize(
+        object.productName,
+        specifiedType: const FullType(String),
+      );
+    }
     if (object.id != null) {
       yield r'id';
       yield serializers.serialize(
@@ -232,6 +256,20 @@ class _$OrderResponseSerializer implements PrimitiveSerializer<OrderResponse> {
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
+        case r'orderType':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.orderType = valueDes;
+          break;
+        case r'productName':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.productName = valueDes;
+          break;
         case r'id':
           final valueDes = serializers.deserialize(
             value,

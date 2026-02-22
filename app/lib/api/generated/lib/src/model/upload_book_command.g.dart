@@ -15,6 +15,8 @@ class _$UploadBookCommand extends UploadBookCommand {
   final int adminId;
   @override
   final String? author;
+  @override
+  final Uint8List? cover;
 
   factory _$UploadBookCommand([
     void Function(UploadBookCommandBuilder)? updates,
@@ -25,6 +27,7 @@ class _$UploadBookCommand extends UploadBookCommand {
     required this.title,
     required this.adminId,
     this.author,
+    this.cover,
   }) : super._();
   @override
   UploadBookCommand rebuild(void Function(UploadBookCommandBuilder) updates) =>
@@ -41,7 +44,8 @@ class _$UploadBookCommand extends UploadBookCommand {
         file == other.file &&
         title == other.title &&
         adminId == other.adminId &&
-        author == other.author;
+        author == other.author &&
+        cover == other.cover;
   }
 
   @override
@@ -51,6 +55,7 @@ class _$UploadBookCommand extends UploadBookCommand {
     _$hash = $jc(_$hash, title.hashCode);
     _$hash = $jc(_$hash, adminId.hashCode);
     _$hash = $jc(_$hash, author.hashCode);
+    _$hash = $jc(_$hash, cover.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -61,7 +66,8 @@ class _$UploadBookCommand extends UploadBookCommand {
           ..add('file', file)
           ..add('title', title)
           ..add('adminId', adminId)
-          ..add('author', author))
+          ..add('author', author)
+          ..add('cover', cover))
         .toString();
   }
 }
@@ -86,6 +92,10 @@ class UploadBookCommandBuilder
   String? get author => _$this._author;
   set author(String? author) => _$this._author = author;
 
+  Uint8List? _cover;
+  Uint8List? get cover => _$this._cover;
+  set cover(Uint8List? cover) => _$this._cover = cover;
+
   UploadBookCommandBuilder() {
     UploadBookCommand._defaults(this);
   }
@@ -97,6 +107,7 @@ class UploadBookCommandBuilder
       _title = $v.title;
       _adminId = $v.adminId;
       _author = $v.author;
+      _cover = $v.cover;
       _$v = null;
     }
     return this;
@@ -135,6 +146,7 @@ class UploadBookCommandBuilder
             'adminId',
           ),
           author: author,
+          cover: cover,
         );
     replace(_$result);
     return _$result;

@@ -16,6 +16,8 @@ class _$BookDTO extends BookDTO {
   @override
   final String? coverUrl;
   @override
+  final String? originFileUrl;
+  @override
   final String? fileType;
   @override
   final String? status;
@@ -38,6 +40,7 @@ class _$BookDTO extends BookDTO {
     this.title,
     this.author,
     this.coverUrl,
+    this.originFileUrl,
     this.fileType,
     this.status,
     this.totalChapters,
@@ -61,6 +64,7 @@ class _$BookDTO extends BookDTO {
         title == other.title &&
         author == other.author &&
         coverUrl == other.coverUrl &&
+        originFileUrl == other.originFileUrl &&
         fileType == other.fileType &&
         status == other.status &&
         totalChapters == other.totalChapters &&
@@ -77,6 +81,7 @@ class _$BookDTO extends BookDTO {
     _$hash = $jc(_$hash, title.hashCode);
     _$hash = $jc(_$hash, author.hashCode);
     _$hash = $jc(_$hash, coverUrl.hashCode);
+    _$hash = $jc(_$hash, originFileUrl.hashCode);
     _$hash = $jc(_$hash, fileType.hashCode);
     _$hash = $jc(_$hash, status.hashCode);
     _$hash = $jc(_$hash, totalChapters.hashCode);
@@ -95,6 +100,7 @@ class _$BookDTO extends BookDTO {
           ..add('title', title)
           ..add('author', author)
           ..add('coverUrl', coverUrl)
+          ..add('originFileUrl', originFileUrl)
           ..add('fileType', fileType)
           ..add('status', status)
           ..add('totalChapters', totalChapters)
@@ -124,6 +130,11 @@ class BookDTOBuilder implements Builder<BookDTO, BookDTOBuilder> {
   String? _coverUrl;
   String? get coverUrl => _$this._coverUrl;
   set coverUrl(String? coverUrl) => _$this._coverUrl = coverUrl;
+
+  String? _originFileUrl;
+  String? get originFileUrl => _$this._originFileUrl;
+  set originFileUrl(String? originFileUrl) =>
+      _$this._originFileUrl = originFileUrl;
 
   String? _fileType;
   String? get fileType => _$this._fileType;
@@ -165,6 +176,7 @@ class BookDTOBuilder implements Builder<BookDTO, BookDTOBuilder> {
       _title = $v.title;
       _author = $v.author;
       _coverUrl = $v.coverUrl;
+      _originFileUrl = $v.originFileUrl;
       _fileType = $v.fileType;
       _status = $v.status;
       _totalChapters = $v.totalChapters;
@@ -198,6 +210,7 @@ class BookDTOBuilder implements Builder<BookDTO, BookDTOBuilder> {
           title: title,
           author: author,
           coverUrl: coverUrl,
+          originFileUrl: originFileUrl,
           fileType: fileType,
           status: status,
           totalChapters: totalChapters,

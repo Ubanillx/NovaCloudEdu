@@ -12,6 +12,7 @@ Name | Type | Description | Notes
 **title** | **String** |  | [optional] 
 **author** | **String** |  | [optional] 
 **coverUrl** | **String** |  | [optional] 
+**originFileUrl** | **String** |  | [optional] 
 **fileType** | **String** |  | [optional] 
 **status** | **String** |  | [optional] 
 **totalChapters** | **int** |  | [optional] 

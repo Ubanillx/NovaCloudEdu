@@ -16,10 +16,14 @@ Method | HTTP request | Description
 [**addItem**](DefaultApi.md#additem) | **POST** /api/schedule/item | 添加课程项
 [**addMember**](DefaultApi.md#addmember) | **POST** /api/classes/{classId}/members | 添加成员
 [**addNode**](DefaultApi.md#addnode) | **POST** /api/workflows/{id}/nodes | 添加节点
+[**addQuestionToSection**](DefaultApi.md#addquestiontosection) | **POST** /api/exam-papers/{paperId}/sections/{sectionId}/questions | 向大题添加题目
+[**addSection**](DefaultApi.md#addsection) | **POST** /api/exam-papers/{paperId}/sections | 添加大题
 [**addToShelf**](DefaultApi.md#addtoshelf) | **POST** /api/reading/shelf | 添加书籍到书架
 [**addToWordBook**](DefaultApi.md#addtowordbook) | **POST** /api/user/word-book/add/{wordId} | 添加单词到生词本
 [**addVariable**](DefaultApi.md#addvariable) | **POST** /api/workflows/{id}/variables | 添加变量
 [**adminDeletePost**](DefaultApi.md#admindeletepost) | **DELETE** /api/posts/admin/{postId} | 管理员删除帖子
+[**aiGenerateQuestions**](DefaultApi.md#aigeneratequestions) | **POST** /api/questions/ai-generate | AI 智能出题
+[**alipayCallback**](DefaultApi.md#alipaycallback) | **POST** /api/payment/callback/alipay | 支付宝异步回调（预留）
 [**applyTeacher**](DefaultApi.md#applyteacher) | **POST** /api/teacher/apply | 申请成为讲师
 [**applyToJoin**](DefaultApi.md#applytojoin) | **POST** /api/groups/{groupId}/join | 申请加入群
 [**archive**](DefaultApi.md#archive) | **POST** /api/workflows/{id}/archive | 归档工作流
@@ -31,16 +35,20 @@ Method | HTTP request | Description
 [**batchUpdate**](DefaultApi.md#batchupdate) | **POST** /api/workflows/{id}/batch-update | 批量更新节点和连接线
 [**bindToAssistant**](DefaultApi.md#bindtoassistant) | **POST** /api/workflows/{id}/assistants/{assistantId} | 绑定工作流到AI助手
 [**cancelExecution**](DefaultApi.md#cancelexecution) | **POST** /api/workflows/executions/{executionId}/cancel | 取消执行
+[**cancelMembership**](DefaultApi.md#cancelmembership) | **POST** /api/membership/cancel | 取消会员
+[**cancelMembership1**](DefaultApi.md#cancelmembership1) | **POST** /api/admin/membership/cancel/{userId} | 取消用户会员
 [**changePassword**](DefaultApi.md#changepassword) | **POST** /api/user/password | 修改密码
 [**checkFavourite**](DefaultApi.md#checkfavourite) | **GET** /api/course/favourite/{courseId}/check | 检查是否已收藏
 [**checkFriendship**](DefaultApi.md#checkfriendship) | **GET** /api/friend/check/{userId} | 检查好友关系
 [**checkin**](DefaultApi.md#checkin) | **POST** /api/user/checkin | 用户打卡
 [**completeSection**](DefaultApi.md#completesection) | **POST** /api/progress/section/{sectionId}/complete | 标记小节为已完成
 [**confirmPayment**](DefaultApi.md#confirmpayment) | **POST** /api/admin/order/confirm | 确认收款（管理员手动确认）
+[**confirmPayment1**](DefaultApi.md#confirmpayment1) | **POST** /api/admin/membership/confirm | 确认会员支付（管理员手动确认）
 [**copy**](DefaultApi.md#copy) | **POST** /api/workflows/{id}/copy | 复制工作流
 [**create**](DefaultApi.md#create) | **POST** /api/workflows | 创建工作流
 [**createAnnouncement**](DefaultApi.md#createannouncement) | **POST** /api/announcement/admin/create | 创建公告
 [**createBanner**](DefaultApi.md#createbanner) | **POST** /api/admin/banner | 创建轮播图
+[**createBookmark**](DefaultApi.md#createbookmark) | **POST** /api/books/{bookId}/bookmarks | 创建书签
 [**createChapter**](DefaultApi.md#createchapter) | **POST** /api/course/{courseId}/chapter | 创建章节（管理员）
 [**createClass**](DefaultApi.md#createclass) | **POST** /api/classes | 创建班级
 [**createComment**](DefaultApi.md#createcomment) | **POST** /api/posts/{postId}/comments | 发表评论
@@ -48,13 +56,18 @@ Method | HTTP request | Description
 [**createCourse**](DefaultApi.md#createcourse) | **POST** /api/course | 创建课程（管理员）
 [**createDailyArticle**](DefaultApi.md#createdailyarticle) | **POST** /api/daily-article | 创建每日文章（管理员）
 [**createDailyWord**](DefaultApi.md#createdailyword) | **POST** /api/daily-word | 创建每日单词（管理员）
+[**createExamPaper**](DefaultApi.md#createexampaper) | **POST** /api/exam-papers | 创建试卷
 [**createFeedback**](DefaultApi.md#createfeedback) | **POST** /api/feedback | 创建反馈
 [**createFromTemplate**](DefaultApi.md#createfromtemplate) | **POST** /api/workflows/templates/{templateId}/create-workflow | 从模板创建工作流
 [**createGroup**](DefaultApi.md#creategroup) | **POST** /api/groups | 创建群聊
 [**createGroupFromClass**](DefaultApi.md#creategroupfromclass) | **POST** /api/classes/{classId}/chat-group | 基于班级创建群聊
+[**createNote**](DefaultApi.md#createnote) | **POST** /api/books/{bookId}/notes | 创建阅读笔记
 [**createOrder**](DefaultApi.md#createorder) | **POST** /api/order | 创建订单（用户下单）
+[**createPlan**](DefaultApi.md#createplan) | **POST** /api/admin/membership/plans | 创建会员计划
 [**createPost**](DefaultApi.md#createpost) | **POST** /api/posts | 发布帖子
+[**createQuestion**](DefaultApi.md#createquestion) | **POST** /api/questions | 创建题目
 [**createReply**](DefaultApi.md#createreply) | **POST** /api/posts/comments/{commentId}/replies | 发表回复
+[**createRoom**](DefaultApi.md#createroom) | **POST** /api/livestream/rooms | 创建直播间
 [**createScheduleTrigger**](DefaultApi.md#createscheduletrigger) | **POST** /api/workflows/{id}/triggers/schedule | 创建定时触发器
 [**createSection**](DefaultApi.md#createsection) | **POST** /api/course/{courseId}/section | 创建小节（管理员）
 [**createSetting**](DefaultApi.md#createsetting) | **POST** /api/schedule/setting | 创建课表配置
@@ -66,6 +79,7 @@ Method | HTTP request | Description
 [**deleteAnnouncement**](DefaultApi.md#deleteannouncement) | **DELETE** /api/announcement/admin/delete/{id} | 删除公告
 [**deleteBanner**](DefaultApi.md#deletebanner) | **DELETE** /api/admin/banner/{id} | 删除轮播图
 [**deleteBook**](DefaultApi.md#deletebook) | **DELETE** /api/books/{bookId} | 删除书籍
+[**deleteBookmark**](DefaultApi.md#deletebookmark) | **DELETE** /api/books/{bookId}/bookmarks/{bookmarkId} | 删除书签
 [**deleteChapter**](DefaultApi.md#deletechapter) | **DELETE** /api/course/{courseId}/chapter/{chapterId} | 删除章节（管理员）
 [**deleteClass**](DefaultApi.md#deleteclass) | **DELETE** /api/classes/{classId} | 删除班级
 [**deleteComment**](DefaultApi.md#deletecomment) | **DELETE** /api/posts/comments/{commentId} | 删除评论
@@ -74,6 +88,7 @@ Method | HTTP request | Description
 [**deleteDailyArticle**](DefaultApi.md#deletedailyarticle) | **DELETE** /api/daily-article/{id} | 删除每日文章（管理员）
 [**deleteDailyWord**](DefaultApi.md#deletedailyword) | **DELETE** /api/daily-word/{id} | 删除每日单词（管理员）
 [**deleteEdge**](DefaultApi.md#deleteedge) | **DELETE** /api/workflows/{id}/edges/{edgeId} | 删除连接线
+[**deleteExamPaper**](DefaultApi.md#deleteexampaper) | **DELETE** /api/exam-papers/{id} | 删除试卷
 [**deleteFeedback**](DefaultApi.md#deletefeedback) | **DELETE** /api/feedback/{id} | 删除反馈
 [**deleteFeedback1**](DefaultApi.md#deletefeedback1) | **DELETE** /api/feedback/admin/{id} | 删除反馈
 [**deleteFile**](DefaultApi.md#deletefile) | **DELETE** /api/file/{fileId} | 删除文件
@@ -81,26 +96,38 @@ Method | HTTP request | Description
 [**deleteItem**](DefaultApi.md#deleteitem) | **DELETE** /api/schedule/item/{id} | 删除课程项
 [**deleteMessage**](DefaultApi.md#deletemessage) | **DELETE** /api/group-chat/{groupId}/messages/{messageId} | 删除消息
 [**deleteNode**](DefaultApi.md#deletenode) | **DELETE** /api/workflows/{id}/nodes/{nodeId} | 删除节点
+[**deleteNote**](DefaultApi.md#deletenote) | **DELETE** /api/books/{bookId}/notes/{noteId} | 删除笔记
+[**deletePlan**](DefaultApi.md#deleteplan) | **DELETE** /api/admin/membership/plans/{planId} | 删除会员计划
 [**deletePost**](DefaultApi.md#deletepost) | **DELETE** /api/posts/{postId} | 删除帖子
+[**deleteQuestion**](DefaultApi.md#deletequestion) | **DELETE** /api/questions/{id} | 删除题目
 [**deleteReply**](DefaultApi.md#deletereply) | **DELETE** /api/posts/replies/{replyId} | 删除回复
-[**deleteSection**](DefaultApi.md#deletesection) | **DELETE** /api/course/{courseId}/section/{sectionId} | 删除小节（管理员）
+[**deleteRoom**](DefaultApi.md#deleteroom) | **DELETE** /api/livestream/rooms/{id} | 删除直播间
+[**deleteSection**](DefaultApi.md#deletesection) | **DELETE** /api/exam-papers/{paperId}/sections/{sectionId} | 删除大题
+[**deleteSection1**](DefaultApi.md#deletesection1) | **DELETE** /api/course/{courseId}/section/{sectionId} | 删除小节（管理员）
 [**deleteTemplate**](DefaultApi.md#deletetemplate) | **DELETE** /api/workflows/templates/{templateId} | 删除模板
+[**deleteTemplate2**](DefaultApi.md#deletetemplate2) | **DELETE** /api/exam-templates/{id} | 删除模板
 [**deleteTrigger**](DefaultApi.md#deletetrigger) | **DELETE** /api/workflows/triggers/{triggerId} | 删除触发器
 [**deleteVariable**](DefaultApi.md#deletevariable) | **DELETE** /api/workflows/{id}/variables/{variableName} | 删除变量
 [**disableConfig**](DefaultApi.md#disableconfig) | **POST** /api/admin/scraper/config/{id}/disable | 禁用配置
 [**disableTrigger**](DefaultApi.md#disabletrigger) | **POST** /api/workflows/triggers/{triggerId}/disable | 禁用触发器
 [**dissolveGroup**](DefaultApi.md#dissolvegroup) | **DELETE** /api/groups/{groupId} | 解散群
+[**dissolveGroup1**](DefaultApi.md#dissolvegroup1) | **DELETE** /api/admin/groups/{groupId} | 解散群
 [**enableConfig**](DefaultApi.md#enableconfig) | **POST** /api/admin/scraper/config/{id}/enable | 启用配置
 [**enableTrigger**](DefaultApi.md#enabletrigger) | **POST** /api/workflows/triggers/{triggerId}/enable | 启用触发器
+[**encryptAllChapters**](DefaultApi.md#encryptallchapters) | **POST** /api/books/{bookId}/chapters/encrypt-all | 批量加密所有章节
 [**encryptChapterContent**](DefaultApi.md#encryptchaptercontent) | **POST** /api/books/{bookId}/chapters/{chapterIndex}/encrypt | 加密章节内容
 [**execute**](DefaultApi.md#execute) | **POST** /api/workflows/{id}/execute | 执行工作流
 [**executeAllTasks**](DefaultApi.md#executealltasks) | **POST** /api/admin/scraper/config/execute-all | 触发所有抓取
 [**executeAsync**](DefaultApi.md#executeasync) | **POST** /api/workflows/{id}/execute-async | 异步执行工作流
 [**executeTask**](DefaultApi.md#executetask) | **POST** /api/admin/scraper/config/execute | 执行抓取任务
+[**exportAnswerKey**](DefaultApi.md#exportanswerkey) | **POST** /api/exam-papers/{id}/export-answer-key | 导出参考答案PDF
 [**favouriteCourse**](DefaultApi.md#favouritecourse) | **POST** /api/course/favourite/{courseId} | 收藏课程
 [**follow**](DefaultApi.md#follow) | **POST** /api/follow/{targetUserId} | 关注用户
+[**generateBannerImage**](DefaultApi.md#generatebannerimage) | **POST** /api/admin/banner/generate-image | AI生成轮播图图片
+[**getAiQuota**](DefaultApi.md#getaiquota) | **GET** /api/membership/ai-quota | 查询我的AI功能剩余额度
 [**getAllConfigs**](DefaultApi.md#getallconfigs) | **GET** /api/admin/scraper/config | 获取所有配置
 [**getAllFriends**](DefaultApi.md#getallfriends) | **GET** /api/friend/all | 获取全部好友
+[**getAllProfiles**](DefaultApi.md#getallprofiles) | **GET** /api/grading/profile | 查询学生全部知识画像
 [**getAllTasks**](DefaultApi.md#getalltasks) | **GET** /api/admin/scraper/config/tasks | 获取所有任务
 [**getAnnouncement**](DefaultApi.md#getannouncement) | **GET** /api/announcement/admin/{id} | 获取公告详情
 [**getAnnouncementDetail**](DefaultApi.md#getannouncementdetail) | **GET** /api/announcement/{id} | 获取公告详情
@@ -111,14 +138,21 @@ Method | HTTP request | Description
 [**getBannerList**](DefaultApi.md#getbannerlist) | **GET** /api/banner/list | 获取轮播图列表
 [**getBook**](DefaultApi.md#getbook) | **GET** /api/books/{bookId} | 获取书籍详情
 [**getBookChapters**](DefaultApi.md#getbookchapters) | **GET** /api/books/{bookId}/chapters | 获取书籍章节列表
+[**getBookmarksByBook**](DefaultApi.md#getbookmarksbybook) | **GET** /api/books/{bookId}/bookmarks | 获取用户在该书的书签列表
 [**getById**](DefaultApi.md#getbyid) | **GET** /api/workflows/{id} | 获取工作流详情
 [**getChapter**](DefaultApi.md#getchapter) | **GET** /api/course/{courseId}/chapter/{chapterId} | 获取章节详情
 [**getChapterContent**](DefaultApi.md#getchaptercontent) | **GET** /api/books/{bookId}/chapters/{chapterIndex} | 获取章节内容
 [**getChatHistory**](DefaultApi.md#getchathistory) | **POST** /api/chat/history | 获取聊天历史
+[**getChatHistory1**](DefaultApi.md#getchathistory1) | **GET** /api/livestream/rooms/{id}/messages | 直播间聊天历史
 [**getCheckinRanking**](DefaultApi.md#getcheckinranking) | **GET** /api/user/checkin/ranking | 打卡排行榜
 [**getCheckinStatus**](DefaultApi.md#getcheckinstatus) | **GET** /api/user/checkin/status | 获取打卡状态
+[**getClassAiReport**](DefaultApi.md#getclassaireport) | **GET** /api/analytics/class/{classId}/ai-report | AI班级学情分析报告（SSE流式）
 [**getClassInfo**](DefaultApi.md#getclassinfo) | **GET** /api/classes/{classId} | 获取班级详情
 [**getClassMembers**](DefaultApi.md#getclassmembers) | **GET** /api/classes/{classId}/members | 获取班级成员列表
+[**getClassOverview**](DefaultApi.md#getclassoverview) | **GET** /api/analytics/class/{classId}/overview | 班级学情概览
+[**getClassRanking**](DefaultApi.md#getclassranking) | **GET** /api/analytics/class/{classId}/ranking | 班级成员排名
+[**getClassSubjects**](DefaultApi.md#getclasssubjects) | **GET** /api/analytics/class/{classId}/subjects | 班级各学科分析
+[**getClassTrend**](DefaultApi.md#getclasstrend) | **GET** /api/analytics/class/{classId}/trend | 班级学习趋势
 [**getCollectedArticles**](DefaultApi.md#getcollectedarticles) | **GET** /api/user/daily-article/collected | 获取收藏文章列表
 [**getCollectedWords**](DefaultApi.md#getcollectedwords) | **GET** /api/user/daily-word/collected | 获取收藏单词列表
 [**getCommentReplies**](DefaultApi.md#getcommentreplies) | **GET** /api/posts/comments/{commentId}/replies | 获取评论回复列表
@@ -128,10 +162,12 @@ Method | HTTP request | Description
 [**getCourseProgress**](DefaultApi.md#getcourseprogress) | **GET** /api/progress/course/{courseId} | 获取课程所有小节的学习进度
 [**getCourseProgressSummary**](DefaultApi.md#getcourseprogresssummary) | **GET** /api/progress/course/{courseId}/summary | 获取课程进度汇总
 [**getCourseStructure**](DefaultApi.md#getcoursestructure) | **GET** /api/course/{courseId}/structure | 获取课程完整结构（课程+章节+小节）
+[**getCurrentMembership**](DefaultApi.md#getcurrentmembership) | **GET** /api/membership/current | 查询我的当前会员详细信息
 [**getDailyArticle**](DefaultApi.md#getdailyarticle) | **GET** /api/daily-article/{id} | 获取文章详情
 [**getDailyWord**](DefaultApi.md#getdailyword) | **GET** /api/daily-word/{id} | 获取单词详情
 [**getDefinition**](DefaultApi.md#getdefinition) | **GET** /api/workflows/{id}/definition | 获取工作流定义详情
 [**getEdges**](DefaultApi.md#getedges) | **GET** /api/workflows/{id}/edges | 获取工作流所有连接线
+[**getExamPaper**](DefaultApi.md#getexampaper) | **GET** /api/exam-papers/{id} | 获取试卷详情
 [**getExecutionLogs**](DefaultApi.md#getexecutionlogs) | **GET** /api/workflows/executions/{executionId}/logs | 获取执行日志
 [**getExecutionStatistics**](DefaultApi.md#getexecutionstatistics) | **GET** /api/workflows/{id}/execution-statistics | 获取工作流执行统计
 [**getExecutionStatus**](DefaultApi.md#getexecutionstatus) | **GET** /api/workflows/executions/{executionId} | 获取执行状态
@@ -144,11 +180,16 @@ Method | HTTP request | Description
 [**getFollowingPosts**](DefaultApi.md#getfollowingposts) | **GET** /api/posts/following | 获取关注用户的帖子列表
 [**getFriendList**](DefaultApi.md#getfriendlist) | **POST** /api/friend/list | 获取好友列表
 [**getGroupInfo**](DefaultApi.md#getgroupinfo) | **GET** /api/groups/{groupId} | 获取群详情
+[**getGroupInfo1**](DefaultApi.md#getgroupinfo1) | **GET** /api/admin/groups/{groupId} | 获取群详情
 [**getGroupMembers**](DefaultApi.md#getgroupmembers) | **GET** /api/groups/{groupId}/members | 获取群成员列表
+[**getGroupMembers1**](DefaultApi.md#getgroupmembers1) | **GET** /api/admin/groups/{groupId}/members | 分页获取群成员
 [**getGroupMembersPage**](DefaultApi.md#getgroupmemberspage) | **GET** /api/groups/{groupId}/members/page | 分页获取群成员
+[**getHistory**](DefaultApi.md#gethistory) | **GET** /api/grading/history | 查询批改历史
+[**getKey**](DefaultApi.md#getkey) | **GET** /api/video/key | 获取视频解密密钥（HLS播放器自动调用）
 [**getLatestMessages**](DefaultApi.md#getlatestmessages) | **GET** /api/group-chat/{groupId}/messages/latest | 获取群最新消息
 [**getLikedArticles**](DefaultApi.md#getlikedarticles) | **GET** /api/user/daily-article/liked | 获取点赞文章列表
 [**getLoginUser**](DefaultApi.md#getloginuser) | **GET** /api/auth/current | 获取当前用户
+[**getMembershipHistory**](DefaultApi.md#getmembershiphistory) | **GET** /api/membership/history | 查询我的会员历史
 [**getMessages**](DefaultApi.md#getmessages) | **GET** /api/group-chat/{groupId}/messages | 获取群聊历史消息（分页）
 [**getMessagesBefore**](DefaultApi.md#getmessagesbefore) | **GET** /api/group-chat/{groupId}/messages/before | 获取群聊历史消息（游标分页，获取某消息之前的消息）
 [**getMyApplication**](DefaultApi.md#getmyapplication) | **GET** /api/teacher/application/my | 获取当前用户的申请
@@ -168,28 +209,47 @@ Method | HTTP request | Description
 [**getNode**](DefaultApi.md#getnode) | **GET** /api/workflows/{id}/nodes/{nodeId} | 获取单个节点详情
 [**getNodeTypes**](DefaultApi.md#getnodetypes) | **GET** /api/workflows/node-types | 获取所有可用的节点类型
 [**getNodes**](DefaultApi.md#getnodes) | **GET** /api/workflows/{id}/nodes | 获取工作流所有节点
+[**getNotesByBook**](DefaultApi.md#getnotesbybook) | **GET** /api/books/{bookId}/notes | 获取用户在该书的笔记列表
+[**getNotesByChapter**](DefaultApi.md#getnotesbychapter) | **GET** /api/books/{bookId}/notes/chapters/{chapterId} | 获取用户在该章节的笔记
 [**getOrder**](DefaultApi.md#getorder) | **GET** /api/order/{orderNo} | 查询订单详情
+[**getPaperQuestions**](DefaultApi.md#getpaperquestions) | **GET** /api/exam-papers/{paperId}/sections/{sectionId}/questions | 获取大题下的所有题目关联
+[**getPdfUrl**](DefaultApi.md#getpdfurl) | **GET** /api/books/{bookId}/pdf-url | 获取PDF预签名URL
 [**getPendingCount**](DefaultApi.md#getpendingcount) | **GET** /api/teacher/application/pending/count | 获取待审核申请数量（管理员）
 [**getPendingRequests**](DefaultApi.md#getpendingrequests) | **GET** /api/groups/{groupId}/requests | 获取群待审批申请列表
+[**getPlan**](DefaultApi.md#getplan) | **GET** /api/membership/plans/{planId} | 获取计划详情
 [**getPostComments**](DefaultApi.md#getpostcomments) | **GET** /api/posts/{postId}/comments | 获取帖子评论列表
 [**getPostDetail**](DefaultApi.md#getpostdetail) | **GET** /api/posts/{postId} | 获取帖子详情
 [**getPostList**](DefaultApi.md#getpostlist) | **GET** /api/posts | 分页获取帖子列表
 [**getPostListByType**](DefaultApi.md#getpostlistbytype) | **GET** /api/posts/type/{postType} | 根据类型获取帖子列表
+[**getPublishedPapers**](DefaultApi.md#getpublishedpapers) | **GET** /api/grading/papers | 查询已发布试卷列表（供批改选择）
+[**getQuestion**](DefaultApi.md#getquestion) | **GET** /api/questions/{id} | 获取题目详情
 [**getReadArticles**](DefaultApi.md#getreadarticles) | **GET** /api/user/daily-article/read | 获取已阅读文章列表
 [**getReadCount**](DefaultApi.md#getreadcount) | **GET** /api/group-chat/messages/{messageId}/read-count | 获取消息已读人数
 [**getReadUsers**](DefaultApi.md#getreadusers) | **GET** /api/group-chat/messages/{messageId}/read-users | 获取消息已读用户列表（含昵称头像）
 [**getReceivedRequests**](DefaultApi.md#getreceivedrequests) | **POST** /api/friend/request/received | 获取收到的好友申请
+[**getRecommendations**](DefaultApi.md#getrecommendations) | **GET** /api/grading/{submissionId}/recommend | 获取错题的同类题推荐
+[**getResult**](DefaultApi.md#getresult) | **GET** /api/grading/{submissionId}/result | 获取批改结果
 [**getReviewCount**](DefaultApi.md#getreviewcount) | **GET** /api/course/review/{courseId}/count | 获取课程评价数
+[**getRoomDetail**](DefaultApi.md#getroomdetail) | **GET** /api/livestream/rooms/{id} | 直播间详情
 [**getScheduleBySetting**](DefaultApi.md#getschedulebysetting) | **GET** /api/schedule/setting/{settingId} | 获取特定配置的课表
 [**getSection**](DefaultApi.md#getsection) | **GET** /api/course/{courseId}/section/{sectionId} | 获取小节详情
 [**getSectionProgress**](DefaultApi.md#getsectionprogress) | **GET** /api/progress/section/{sectionId} | 获取小节学习进度
+[**getSections**](DefaultApi.md#getsections) | **GET** /api/exam-papers/{paperId}/sections | 获取试卷的所有大题
 [**getSentRequests**](DefaultApi.md#getsentrequests) | **POST** /api/friend/request/sent | 获取发送的好友申请
 [**getSessionList**](DefaultApi.md#getsessionlist) | **GET** /api/chat/sessions | 获取会话列表
-[**getStatistics**](DefaultApi.md#getstatistics) | **GET** /api/admin/order/statistics | 订单统计（管理员）
+[**getStatistics**](DefaultApi.md#getstatistics) | **GET** /api/admin/order/statistics | 订单统计（管理员，包含课程+会员）
+[**getStatistics1**](DefaultApi.md#getstatistics1) | **GET** /api/admin/membership/statistics | 会员统计
 [**getStats**](DefaultApi.md#getstats) | **GET** /api/user/word-book/stats | 获取生词本统计
 [**getStats1**](DefaultApi.md#getstats1) | **GET** /api/user/daily-word/stats | 获取学习统计
 [**getStats2**](DefaultApi.md#getstats2) | **GET** /api/user/daily-article/stats | 获取阅读统计
+[**getStats3**](DefaultApi.md#getstats3) | **GET** /api/grading/stats | 查询批改历史统计
+[**getStatus**](DefaultApi.md#getstatus) | **GET** /api/grading/{submissionId}/status | 查询批改状态
+[**getStudentAiReport**](DefaultApi.md#getstudentaireport) | **GET** /api/analytics/student/ai-report | AI个人学情分析报告（SSE流式）
+[**getStudentOverview**](DefaultApi.md#getstudentoverview) | **GET** /api/analytics/student/overview | 个人学情概览
+[**getStudentSubjects**](DefaultApi.md#getstudentsubjects) | **GET** /api/analytics/student/subjects | 个人各学科学情
+[**getStudentTrend**](DefaultApi.md#getstudenttrend) | **GET** /api/analytics/student/trend | 个人学习趋势
 [**getStudiedWords**](DefaultApi.md#getstudiedwords) | **GET** /api/user/daily-word/studied | 获取已学习单词列表
+[**getSubjectProfile**](DefaultApi.md#getsubjectprofile) | **GET** /api/grading/profile/{subjectCode} | 查询某学科知识画像详情
 [**getSupportedSources**](DefaultApi.md#getsupportedsources) | **GET** /api/scraper/sources | 获取预设来源列表
 [**getSupportedVoices**](DefaultApi.md#getsupportedvoices) | **GET** /api/speech/tts/voices | 获取支持的发音人列表
 [**getTableColumns**](DefaultApi.md#gettablecolumns) | **GET** /api/workflows/database/tables/{tableName}/columns | 获取指定表的字段信息
@@ -198,6 +258,7 @@ Method | HTTP request | Description
 [**getTeacher**](DefaultApi.md#getteacher) | **GET** /api/teacher/{id} | 获取讲师信息
 [**getTeacherByUserId**](DefaultApi.md#getteacherbyuserid) | **GET** /api/teacher/user/{userId} | 根据用户ID获取讲师信息
 [**getTemplate**](DefaultApi.md#gettemplate) | **GET** /api/workflows/templates/{templateId} | 获取模板详情
+[**getTemplate1**](DefaultApi.md#gettemplate1) | **GET** /api/exam-templates/{id} | 获取模板详情
 [**getTodayArticles**](DefaultApi.md#gettodayarticles) | **GET** /api/daily-article/today | 获取今日推荐文章（个性化推荐）
 [**getTodayWords**](DefaultApi.md#gettodaywords) | **GET** /api/daily-word/today | 获取今日推荐单词（个性化推荐）
 [**getTopPosts**](DefaultApi.md#gettopposts) | **GET** /api/posts/top | 获取点赞排行榜（全部时间）
@@ -205,6 +266,7 @@ Method | HTTP request | Description
 [**getUnreadCount**](DefaultApi.md#getunreadcount) | **GET** /api/group-chat/{groupId}/unread/count | 获取群未读消息数
 [**getUnreadCount1**](DefaultApi.md#getunreadcount1) | **GET** /api/chat/unread/count | 获取未读消息数
 [**getUnreadCount2**](DefaultApi.md#getunreadcount2) | **GET** /api/announcement/unread-count | 获取未读公告数量
+[**getUserAiQuota**](DefaultApi.md#getuseraiquota) | **GET** /api/admin/membership/users/{userId}/ai-quota | 查询指定用户的AI额度
 [**getUserDetail**](DefaultApi.md#getuserdetail) | **GET** /api/user/admin/{id} | 获取用户详情
 [**getUserDetailInfo**](DefaultApi.md#getuserdetailinfo) | **GET** /api/user/detail/{id} | 获取用户详细信息
 [**getUserFollowStats**](DefaultApi.md#getuserfollowstats) | **GET** /api/follow/user/{targetUserId}/stats | 获取指定用户的关注统计
@@ -216,9 +278,11 @@ Method | HTTP request | Description
 [**getUserStats**](DefaultApi.md#getuserstats) | **GET** /api/user/stats | 获取用户统计数据
 [**getVariables**](DefaultApi.md#getvariables) | **GET** /api/workflows/{id}/variables | 获取工作流所有变量
 [**getVersion**](DefaultApi.md#getversion) | **GET** /api/workflows/{id}/versions/{versionNumber} | 获取指定版本详情
+[**getWeakPoints**](DefaultApi.md#getweakpoints) | **GET** /api/grading/profile/{subjectCode}/weak | 查询某学科薄弱知识点
 [**getWordBookList**](DefaultApi.md#getwordbooklist) | **GET** /api/user/word-book/list | 获取生词本列表
 [**getWordsByDate**](DefaultApi.md#getwordsbydate) | **GET** /api/daily-word/date/{date} | 获取指定日期单词
 [**getWorkflowAssistants**](DefaultApi.md#getworkflowassistants) | **GET** /api/workflows/{id}/assistants | 获取使用该工作流的AI助手ID列表
+[**grantMembership**](DefaultApi.md#grantmembership) | **POST** /api/admin/membership/grant | 为用户直接开通会员
 [**handleFriendRequest**](DefaultApi.md#handlefriendrequest) | **POST** /api/friend/request/handle | 处理好友申请
 [**handleJoinRequest**](DefaultApi.md#handlejoinrequest) | **POST** /api/groups/requests/{requestId}/handle | 处理加入申请
 [**health**](DefaultApi.md#health) | **GET** /api/health | 健康检查
@@ -241,6 +305,7 @@ Method | HTTP request | Description
 [**kbUpdate**](DefaultApi.md#kbupdate) | **PUT** /api/ai/knowledge-bases/{id} | 更新知识库
 [**kbUpdateDocument**](DefaultApi.md#kbupdatedocument) | **PUT** /api/ai/knowledge-bases/{id}/documents/{docId} | 更新文档元信息
 [**leaveGroup**](DefaultApi.md#leavegroup) | **POST** /api/groups/{groupId}/leave | 退出群
+[**listAllTemplates**](DefaultApi.md#listalltemplates) | **GET** /api/exam-templates/all | 列出所有模板（管理员）
 [**listAllowedTables**](DefaultApi.md#listallowedtables) | **GET** /api/workflows/database/tables | 获取可查询的数据库表列表
 [**listApplications**](DefaultApi.md#listapplications) | **GET** /api/teacher/application/list | 获取申请列表（管理员）
 [**listArticles**](DefaultApi.md#listarticles) | **GET** /api/daily-article/list | 获取文章列表
@@ -248,15 +313,22 @@ Method | HTTP request | Description
 [**listBooks**](DefaultApi.md#listbooks) | **GET** /api/books | 获取书籍列表
 [**listByUser**](DefaultApi.md#listbyuser) | **GET** /api/workflows | 获取用户的工作流列表
 [**listChapters**](DefaultApi.md#listchapters) | **GET** /api/course/{courseId}/chapter | 获取课程的章节列表
+[**listClasses**](DefaultApi.md#listclasses) | **GET** /api/classes/list | 获取班级列表
 [**listCourses**](DefaultApi.md#listcourses) | **GET** /api/course/list | 获取课程列表
 [**listCoursesByTeacher**](DefaultApi.md#listcoursesbyteacher) | **GET** /api/course/teacher/{teacherId} | 获取讲师的课程列表
 [**listExecutions**](DefaultApi.md#listexecutions) | **GET** /api/workflows/{id}/executions | 获取工作流执行历史列表
-[**listOrders**](DefaultApi.md#listorders) | **GET** /api/admin/order/list | 获取订单列表（管理员）
+[**listGroups**](DefaultApi.md#listgroups) | **GET** /api/admin/groups/list | 分页获取群列表
+[**listMemberships**](DefaultApi.md#listmemberships) | **GET** /api/admin/membership/list | 按状态查询会员列表
+[**listOrders**](DefaultApi.md#listorders) | **GET** /api/admin/order/list | 获取订单列表（管理员，包含课程订单和会员订单）
+[**listPlans**](DefaultApi.md#listplans) | **GET** /api/admin/membership/plans | 获取所有会员计划
+[**listPlans1**](DefaultApi.md#listplans1) | **GET** /api/membership/plans | 获取所有会员计划
 [**listPublic**](DefaultApi.md#listpublic) | **GET** /api/workflows/public | 获取公开的工作流列表
 [**listReviews**](DefaultApi.md#listreviews) | **GET** /api/course/review/{courseId}/list | 获取课程评价列表
+[**listRooms**](DefaultApi.md#listrooms) | **GET** /api/livestream/rooms | 直播间列表
 [**listSections**](DefaultApi.md#listsections) | **GET** /api/course/{courseId}/section | 获取课程的所有小节
 [**listSystemTemplates**](DefaultApi.md#listsystemtemplates) | **GET** /api/workflows/templates/system | 获取系统预置模板
 [**listTeachers**](DefaultApi.md#listteachers) | **GET** /api/teacher/list | 获取讲师列表
+[**listTemplates1**](DefaultApi.md#listtemplates1) | **GET** /api/exam-templates | 列出所有可用模板
 [**listTriggers**](DefaultApi.md#listtriggers) | **GET** /api/workflows/{id}/triggers | 获取工作流触发器列表
 [**listVersions**](DefaultApi.md#listversions) | **GET** /api/workflows/{id}/versions | 获取工作流版本列表
 [**listWords**](DefaultApi.md#listwords) | **GET** /api/daily-word/list | 获取单词列表
@@ -265,27 +337,39 @@ Method | HTTP request | Description
 [**markAsRead2**](DefaultApi.md#markasread2) | **POST** /api/chat/read/{senderId} | 标记消息已读
 [**markAsRead3**](DefaultApi.md#markasread3) | **POST** /api/announcement/{id}/read | 标记公告已读
 [**markRepliesAsRead**](DefaultApi.md#markrepliesasread) | **POST** /api/feedback/{id}/read | 标记回复为已读
+[**myRooms**](DefaultApi.md#myrooms) | **GET** /api/livestream/rooms/my | 我的直播间
 [**offlineAnnouncement**](DefaultApi.md#offlineannouncement) | **POST** /api/announcement/admin/offline/{id} | 下线公告
 [**offlineBanner**](DefaultApi.md#offlinebanner) | **POST** /api/admin/banner/{id}/offline | 下线轮播图
 [**phoneLogin**](DefaultApi.md#phonelogin) | **POST** /api/auth/login/phone | 手机验证码登录
+[**previewPdf**](DefaultApi.md#previewpdf) | **POST** /api/exam-papers/{id}/preview | 预览试卷PDF
+[**previewTemplate**](DefaultApi.md#previewtemplate) | **POST** /api/exam-templates/{id}/preview | 预览模板效果（用示例数据编译PDF）
 [**publish**](DefaultApi.md#publish) | **POST** /api/workflows/{id}/publish | 发布工作流
 [**publishAnnouncement**](DefaultApi.md#publishannouncement) | **PUT** /api/groups/{groupId}/announcement | 发布群公告
 [**publishAnnouncement1**](DefaultApi.md#publishannouncement1) | **POST** /api/announcement/admin/publish/{id} | 发布公告
 [**publishBanner**](DefaultApi.md#publishbanner) | **POST** /api/admin/banner/{id}/publish | 发布轮播图
 [**publishCourse**](DefaultApi.md#publishcourse) | **POST** /api/course/{id}/publish | 发布课程（管理员）
+[**publishExamPaper**](DefaultApi.md#publishexampaper) | **POST** /api/exam-papers/{id}/publish | 发布试卷
+[**purchaseMembership**](DefaultApi.md#purchasemembership) | **POST** /api/membership/purchase | 购买会员（创建待支付订单）
 [**queryAnnouncements**](DefaultApi.md#queryannouncements) | **POST** /api/announcement/admin/list | 分页查询公告
 [**queryBanners**](DefaultApi.md#querybanners) | **GET** /api/admin/banner/list | 分页查询轮播图
+[**queryExamPapers**](DefaultApi.md#queryexampapers) | **GET** /api/exam-papers | 分页查询我的试卷
 [**queryFeedbacks**](DefaultApi.md#queryfeedbacks) | **POST** /api/feedback/admin/list | 分页查询反馈
+[**queryMyQuestions**](DefaultApi.md#querymyquestions) | **GET** /api/questions/mine | 查询我的题目
+[**queryQuestions**](DefaultApi.md#queryquestions) | **GET** /api/questions | 分页查询题目
 [**queryUsers**](DefaultApi.md#queryusers) | **POST** /api/user/admin/list | 分页查询用户
 [**quickDynamicScrape**](DefaultApi.md#quickdynamicscrape) | **GET** /api/scraper/dynamic/quick | 快速动态抓取
 [**quickScrape**](DefaultApi.md#quickscrape) | **GET** /api/scraper/quick | 快速抓取
 [**refreshToken**](DefaultApi.md#refreshtoken) | **POST** /api/auth/refresh | 刷新Token
 [**refund**](DefaultApi.md#refund) | **POST** /api/admin/order/{orderNo}/refund | 退款（管理员）
+[**reindex**](DefaultApi.md#reindex) | **POST** /api/search/admin/reindex | 全量重建索引（管理员）
 [**removeCourse**](DefaultApi.md#removecourse) | **DELETE** /api/classes/{classId}/courses/{courseId} | 移除课程
 [**removeFromShelf**](DefaultApi.md#removefromshelf) | **DELETE** /api/reading/shelf | 从书架移除书籍
 [**removeFromWordBook**](DefaultApi.md#removefromwordbook) | **DELETE** /api/user/word-book/{wordBookId} | 从生词本移除单词
 [**removeMember**](DefaultApi.md#removemember) | **DELETE** /api/groups/{groupId}/members/{targetUserId} | 移除成员
 [**removeMember1**](DefaultApi.md#removemember1) | **DELETE** /api/classes/{classId}/members/{userId} | 移除成员
+[**removeMember2**](DefaultApi.md#removemember2) | **DELETE** /api/admin/groups/{groupId}/members/{targetUserId} | 移除群成员
+[**removePaperQuestion**](DefaultApi.md#removepaperquestion) | **DELETE** /api/exam-papers/{paperId}/sections/{sectionId}/questions/{pqId} | 从大题移除题目
+[**removeTeacher**](DefaultApi.md#removeteacher) | **DELETE** /api/teacher/{id} | 移除讲师
 [**replyFeedback**](DefaultApi.md#replyfeedback) | **POST** /api/feedback/reply | 回复反馈
 [**replyFeedback1**](DefaultApi.md#replyfeedback1) | **POST** /api/feedback/admin/reply | 回复反馈
 [**resetPassword**](DefaultApi.md#resetpassword) | **POST** /api/user/admin/reset-password | 重置用户密码
@@ -303,11 +387,17 @@ Method | HTTP request | Description
 [**scrapeMultiplePages**](DefaultApi.md#scrapemultiplepages) | **POST** /api/scraper/batch | 批量抓取
 [**scrapeRecursively**](DefaultApi.md#scraperecursively) | **POST** /api/scraper/recursive | 递归抓取
 [**scrapeSinglePage**](DefaultApi.md#scrapesinglepage) | **POST** /api/scraper/single | 抓取单个页面
+[**searchAll**](DefaultApi.md#searchall) | **GET** /api/search | 聚合搜索（书籍+章节+帖子）
 [**searchArticles**](DefaultApi.md#searcharticles) | **GET** /api/daily-article/search | 搜索文章
-[**searchBooks**](DefaultApi.md#searchbooks) | **GET** /api/books/search | 搜索书籍
+[**searchBookChapters**](DefaultApi.md#searchbookchapters) | **GET** /api/search/books/{bookId}/chapters | 书内搜索
+[**searchBooks**](DefaultApi.md#searchbooks) | **GET** /api/search/books | 搜索书籍
+[**searchBooks1**](DefaultApi.md#searchbooks1) | **GET** /api/books/search | 搜索书籍
+[**searchChapters**](DefaultApi.md#searchchapters) | **GET** /api/search/chapters | 搜索章节内容
 [**searchCourses**](DefaultApi.md#searchcourses) | **GET** /api/course/search | 搜索课程
 [**searchGroups**](DefaultApi.md#searchgroups) | **GET** /api/groups/search | 搜索群
-[**searchPosts**](DefaultApi.md#searchposts) | **GET** /api/posts/search | 搜索帖子
+[**searchGroups1**](DefaultApi.md#searchgroups1) | **GET** /api/admin/groups/search | 搜索群
+[**searchPosts**](DefaultApi.md#searchposts) | **GET** /api/search/posts | 搜索帖子
+[**searchPosts1**](DefaultApi.md#searchposts1) | **GET** /api/posts/search | 搜索帖子
 [**searchPostsByTag**](DefaultApi.md#searchpostsbytag) | **GET** /api/posts/tag | 根据标签搜索帖子
 [**searchTemplates**](DefaultApi.md#searchtemplates) | **GET** /api/workflows/templates | 搜索工作流模板
 [**searchUsers**](DefaultApi.md#searchusers) | **POST** /api/friend/search | 搜索用户
@@ -317,9 +407,14 @@ Method | HTTP request | Description
 [**sendSms**](DefaultApi.md#sendsms) | **POST** /api/user/admin/send-sms | 发送短信验证码
 [**setAdmin**](DefaultApi.md#setadmin) | **PUT** /api/groups/{groupId}/members/{targetUserId}/admin | 设置/取消管理员
 [**setJoinMode**](DefaultApi.md#setjoinmode) | **PUT** /api/groups/{groupId}/join-mode | 设置群加入模式
+[**setMute**](DefaultApi.md#setmute) | **POST** /api/admin/groups/{groupId}/mute | 设置群全员禁言
 [**smartDynamicScrape**](DefaultApi.md#smartdynamicscrape) | **POST** /api/scraper/dynamic/smart | 智能动态抓取
 [**smartScrape**](DefaultApi.md#smartscrape) | **POST** /api/scraper/smart | 智能抓取
+[**startStreaming**](DefaultApi.md#startstreaming) | **POST** /api/livestream/rooms/{id}/start | 获取推流信息
+[**stopStreaming**](DefaultApi.md#stopstreaming) | **POST** /api/livestream/rooms/{id}/stop | 结束直播
 [**studyWord**](DefaultApi.md#studyword) | **POST** /api/user/daily-word/{wordId}/study | 标记单词为已学习
+[**submitHomework**](DefaultApi.md#submithomework) | **POST** /api/grading/submit | 提交作业并开始批改（SSE流式返回进度）
+[**suggest**](DefaultApi.md#suggest) | **GET** /api/search/suggest | 搜索建议（即时联想）
 [**takeOffline**](DefaultApi.md#takeoffline) | **POST** /api/course/{id}/offline | 下架课程（管理员）
 [**textToSpeech**](DefaultApi.md#texttospeech) | **POST** /api/speech/tts | 文本转语音
 [**textToSpeechBase64**](DefaultApi.md#texttospeechbase64) | **POST** /api/speech/tts/base64 | 文本转语音 (Base64)
@@ -333,9 +428,13 @@ Method | HTTP request | Description
 [**unbindFromAssistant**](DefaultApi.md#unbindfromassistant) | **DELETE** /api/workflows/{id}/assistants/{assistantId} | 解绑工作流与AI助手
 [**unfavouriteCourse**](DefaultApi.md#unfavouritecourse) | **DELETE** /api/course/favourite/{courseId} | 取消收藏
 [**unfollow**](DefaultApi.md#unfollow) | **DELETE** /api/follow/{targetUserId} | 取消关注
+[**unpublishExamPaper**](DefaultApi.md#unpublishexampaper) | **POST** /api/exam-papers/{id}/unpublish | 撤回试卷为草稿
 [**update**](DefaultApi.md#update) | **PUT** /api/workflows/{id} | 更新工作流基本信息
 [**updateAnnouncement**](DefaultApi.md#updateannouncement) | **PUT** /api/announcement/admin/update | 更新公告
 [**updateBanner**](DefaultApi.md#updatebanner) | **PUT** /api/admin/banner | 更新轮播图
+[**updateBook**](DefaultApi.md#updatebook) | **PUT** /api/books/{bookId} | 编辑书籍信息
+[**updateBookCover**](DefaultApi.md#updatebookcover) | **PUT** /api/books/{bookId}/cover | 更新书籍封面
+[**updateBookmark**](DefaultApi.md#updatebookmark) | **PUT** /api/books/{bookId}/bookmarks/{bookmarkId} | 更新书签备注/标题
 [**updateChapter**](DefaultApi.md#updatechapter) | **PUT** /api/course/{courseId}/chapter/{chapterId} | 更新章节（管理员）
 [**updateClass**](DefaultApi.md#updateclass) | **PUT** /api/classes/{classId} | 更新班级信息
 [**updateConfig**](DefaultApi.md#updateconfig) | **PUT** /api/admin/scraper/config/{id} | 更新抓取配置
@@ -344,28 +443,38 @@ Method | HTTP request | Description
 [**updateDailyWord**](DefaultApi.md#updatedailyword) | **PUT** /api/daily-word/{id} | 更新每日单词（管理员）
 [**updateDefinition**](DefaultApi.md#updatedefinition) | **PUT** /api/workflows/{id}/definition | 更新工作流定义
 [**updateEdge**](DefaultApi.md#updateedge) | **PUT** /api/workflows/{id}/edges/{edgeId} | 更新连接线
+[**updateExamPaper**](DefaultApi.md#updateexampaper) | **PUT** /api/exam-papers | 更新试卷基本信息
 [**updateFeedbackStatus**](DefaultApi.md#updatefeedbackstatus) | **PUT** /api/feedback/admin/status | 更新反馈状态
 [**updateGroupInfo**](DefaultApi.md#updategroupinfo) | **PUT** /api/groups/{groupId} | 更新群信息
+[**updateGroupInfo1**](DefaultApi.md#updategroupinfo1) | **PUT** /api/admin/groups/{groupId} | 更新群信息
 [**updateItem**](DefaultApi.md#updateitem) | **PUT** /api/schedule/item/{id} | 更新课程项
 [**updateLearningStatus**](DefaultApi.md#updatelearningstatus) | **PUT** /api/user/word-book/{wordBookId}/status | 更新学习状态
 [**updateMastery**](DefaultApi.md#updatemastery) | **POST** /api/user/daily-word/{wordId}/mastery | 更新单词掌握程度
 [**updateNode**](DefaultApi.md#updatenode) | **PUT** /api/workflows/{id}/nodes/{nodeId} | 更新节点
 [**updateNodeConfig**](DefaultApi.md#updatenodeconfig) | **PUT** /api/workflows/{id}/nodes/{nodeId}/config | 更新节点配置
+[**updateNote**](DefaultApi.md#updatenote) | **PUT** /api/books/{bookId}/notes/{noteId} | 更新笔记内容/颜色
+[**updatePaperQuestion**](DefaultApi.md#updatepaperquestion) | **PUT** /api/exam-papers/{paperId}/sections/{sectionId}/questions/{pqId} | 更新试卷题目分值/排序
+[**updatePlan**](DefaultApi.md#updateplan) | **PUT** /api/admin/membership/plans | 更新会员计划基本信息
+[**updatePlanQuota**](DefaultApi.md#updateplanquota) | **PUT** /api/admin/membership/plans/{planId}/quota | 修改计划AI配额
 [**updatePost**](DefaultApi.md#updatepost) | **PUT** /api/posts/{postId} | 更新帖子
 [**updateProfile**](DefaultApi.md#updateprofile) | **PUT** /api/user/profile | 更新个人资料
 [**updateProgress**](DefaultApi.md#updateprogress) | **PUT** /api/reading/progress | 更新阅读进度
 [**updateProgress1**](DefaultApi.md#updateprogress1) | **POST** /api/progress | 更新学习进度
+[**updateQuestion**](DefaultApi.md#updatequestion) | **PUT** /api/questions | 更新题目
 [**updateReview**](DefaultApi.md#updatereview) | **PUT** /api/course/review/{reviewId} | 更新评价
-[**updateSection**](DefaultApi.md#updatesection) | **PUT** /api/course/{courseId}/section/{sectionId} | 更新小节（管理员）
+[**updateSection**](DefaultApi.md#updatesection) | **PUT** /api/exam-papers/{paperId}/sections/{sectionId} | 更新大题
+[**updateSection1**](DefaultApi.md#updatesection1) | **PUT** /api/course/{courseId}/section/{sectionId} | 更新小节（管理员）
 [**updateSetting**](DefaultApi.md#updatesetting) | **PUT** /api/schedule/setting/{id} | 更新课表配置
 [**updateSettings**](DefaultApi.md#updatesettings) | **PUT** /api/workflows/{id}/settings | 更新工作流设置
 [**updateTeacher**](DefaultApi.md#updateteacher) | **PUT** /api/teacher/{id} | 更新讲师信息
 [**updateUser**](DefaultApi.md#updateuser) | **PUT** /api/user/admin/update | 更新用户
 [**updateVariable**](DefaultApi.md#updatevariable) | **PUT** /api/workflows/{id}/variables/{variableName} | 更新变量
 [**uploadBook**](DefaultApi.md#uploadbook) | **POST** /api/books/upload | 上传书籍
+[**uploadTemplate1**](DefaultApi.md#uploadtemplate1) | **POST** /api/exam-templates | 上传试卷模板
 [**userLogin**](DefaultApi.md#userlogin) | **POST** /api/auth/login | 用户登录
 [**userRegister**](DefaultApi.md#userregister) | **POST** /api/auth/register | 用户注册
 [**validate**](DefaultApi.md#validate) | **POST** /api/workflows/{id}/validate | 验证工作流定义
+[**wechatCallback**](DefaultApi.md#wechatcallback) | **POST** /api/payment/callback/wechat | 微信支付异步回调（预留）
 
 
 # **activateSetting**
@@ -669,6 +778,94 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **addQuestionToSection**
+> BaseResponseLong addQuestionToSection(paperId, sectionId, addPaperQuestionRequest)
+
+向大题添加题目
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int paperId = 789; // int | 
+final int sectionId = 789; // int | 
+final AddPaperQuestionRequest addPaperQuestionRequest = ; // AddPaperQuestionRequest | 
+
+try {
+    final response = api.addQuestionToSection(paperId, sectionId, addPaperQuestionRequest);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->addQuestionToSection: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **paperId** | **int**|  | 
+ **sectionId** | **int**|  | 
+ **addPaperQuestionRequest** | [**AddPaperQuestionRequest**](AddPaperQuestionRequest.md)|  | 
+
+### Return type
+
+[**BaseResponseLong**](BaseResponseLong.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **addSection**
+> BaseResponseLong addSection(paperId, addPaperSectionRequest)
+
+添加大题
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int paperId = 789; // int | 
+final AddPaperSectionRequest addPaperSectionRequest = ; // AddPaperSectionRequest | 
+
+try {
+    final response = api.addSection(paperId, addPaperSectionRequest);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->addSection: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **paperId** | **int**|  | 
+ **addPaperSectionRequest** | [**AddPaperSectionRequest**](AddPaperSectionRequest.md)|  | 
+
+### Return type
+
+[**BaseResponseLong**](BaseResponseLong.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **addToShelf**
 > BaseResponseVoid addToShelf(userId, bookId)
 
@@ -833,6 +1030,90 @@ Name | Type | Description  | Notes
 ### HTTP request headers
 
  - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **aiGenerateQuestions**
+> SseEmitter aiGenerateQuestions(aiGenerateQuestionsRequest)
+
+AI 智能出题
+
+支持联网搜索热点、几何图形渲染、文生图配图
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final AiGenerateQuestionsRequest aiGenerateQuestionsRequest = ; // AiGenerateQuestionsRequest | 
+
+try {
+    final response = api.aiGenerateQuestions(aiGenerateQuestionsRequest);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->aiGenerateQuestions: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **aiGenerateQuestionsRequest** | [**AiGenerateQuestionsRequest**](AiGenerateQuestionsRequest.md)|  | 
+
+### Return type
+
+[**SseEmitter**](SseEmitter.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json, text/event-stream
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **alipayCallback**
+> String alipayCallback(body)
+
+支付宝异步回调（预留）
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final String body = body_example; // String | 
+
+try {
+    final response = api.alipayCallback(body);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->alipayCallback: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **body** | **String**|  | 
+
+### Return type
+
+**String**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
  - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
@@ -1298,6 +1579,84 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **cancelMembership**
+> BaseResponseVoid cancelMembership()
+
+取消会员
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+
+try {
+    final response = api.cancelMembership();
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->cancelMembership: $e\n');
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**BaseResponseVoid**](BaseResponseVoid.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **cancelMembership1**
+> BaseResponseVoid cancelMembership1(userId)
+
+取消用户会员
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int userId = 789; // int | 
+
+try {
+    final response = api.cancelMembership1(userId);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->cancelMembership1: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **userId** | **int**|  | 
+
+### Return type
+
+[**BaseResponseVoid**](BaseResponseVoid.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **changePassword**
 > BaseResponseBoolean changePassword(changePasswordRequest)
 
@@ -1548,6 +1907,47 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **confirmPayment1**
+> BaseResponseVoid confirmPayment1(orderNo)
+
+确认会员支付（管理员手动确认）
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final String orderNo = orderNo_example; // String | 会员订单号
+
+try {
+    final response = api.confirmPayment1(orderNo);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->confirmPayment1: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **orderNo** | **String**| 会员订单号 | 
+
+### Return type
+
+[**BaseResponseVoid**](BaseResponseVoid.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **copy**
 > BaseResponseWorkflowResponse copy(id, newName, userId)
 
@@ -1708,6 +2108,49 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**BaseResponseLong**](BaseResponseLong.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **createBookmark**
+> BaseResponseReadingBookmarkDTO createBookmark(bookId, requestBody)
+
+创建书签
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int bookId = 789; // int | 
+final BuiltMap<String, JsonObject> requestBody = Object; // BuiltMap<String, JsonObject> | 
+
+try {
+    final response = api.createBookmark(bookId, requestBody);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->createBookmark: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **bookId** | **int**|  | 
+ **requestBody** | [**BuiltMap&lt;String, JsonObject&gt;**](JsonObject.md)|  | 
+
+### Return type
+
+[**BaseResponseReadingBookmarkDTO**](BaseResponseReadingBookmarkDTO.md)
 
 ### Authorization
 
@@ -2013,6 +2456,47 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **createExamPaper**
+> BaseResponseLong createExamPaper(createExamPaperRequest)
+
+创建试卷
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final CreateExamPaperRequest createExamPaperRequest = ; // CreateExamPaperRequest | 
+
+try {
+    final response = api.createExamPaper(createExamPaperRequest);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->createExamPaper: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **createExamPaperRequest** | [**CreateExamPaperRequest**](CreateExamPaperRequest.md)|  | 
+
+### Return type
+
+[**BaseResponseLong**](BaseResponseLong.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **createFeedback**
 > BaseResponseLong createFeedback(createFeedbackRequest)
 
@@ -2185,6 +2669,49 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **createNote**
+> BaseResponseReadingNoteDTO createNote(bookId, createReadingNoteCommand)
+
+创建阅读笔记
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int bookId = 789; // int | 
+final CreateReadingNoteCommand createReadingNoteCommand = ; // CreateReadingNoteCommand | 
+
+try {
+    final response = api.createNote(bookId, createReadingNoteCommand);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->createNote: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **bookId** | **int**|  | 
+ **createReadingNoteCommand** | [**CreateReadingNoteCommand**](CreateReadingNoteCommand.md)|  | 
+
+### Return type
+
+[**BaseResponseReadingNoteDTO**](BaseResponseReadingNoteDTO.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **createOrder**
 > BaseResponseString createOrder(createOrderRequest)
 
@@ -2214,6 +2741,47 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**BaseResponseString**](BaseResponseString.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **createPlan**
+> BaseResponseMembershipPlan createPlan(createPlanRequest)
+
+创建会员计划
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final CreatePlanRequest createPlanRequest = ; // CreatePlanRequest | 
+
+try {
+    final response = api.createPlan(createPlanRequest);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->createPlan: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **createPlanRequest** | [**CreatePlanRequest**](CreatePlanRequest.md)|  | 
+
+### Return type
+
+[**BaseResponseMembershipPlan**](BaseResponseMembershipPlan.md)
 
 ### Authorization
 
@@ -2267,6 +2835,47 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **createQuestion**
+> BaseResponseLong createQuestion(createQuestionRequest)
+
+创建题目
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final CreateQuestionRequest createQuestionRequest = ; // CreateQuestionRequest | 
+
+try {
+    final response = api.createQuestion(createQuestionRequest);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->createQuestion: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **createQuestionRequest** | [**CreateQuestionRequest**](CreateQuestionRequest.md)|  | 
+
+### Return type
+
+[**BaseResponseLong**](BaseResponseLong.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **createReply**
 > BaseResponseReplyResponse createReply(commentId, createReplyRequest)
 
@@ -2298,6 +2907,49 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**BaseResponseReplyResponse**](BaseResponseReplyResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **createRoom**
+> BaseResponseLiveRoomResponse createRoom(createLiveRoomRequest)
+
+创建直播间
+
+教师创建直播间，支持公开和班级专属
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final CreateLiveRoomRequest createLiveRoomRequest = ; // CreateLiveRoomRequest | 
+
+try {
+    final response = api.createRoom(createLiveRoomRequest);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->createRoom: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **createLiveRoomRequest** | [**CreateLiveRoomRequest**](CreateLiveRoomRequest.md)|  | 
+
+### Return type
+
+[**BaseResponseLiveRoomResponse**](BaseResponseLiveRoomResponse.md)
 
 ### Authorization
 
@@ -2795,6 +3447,49 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **deleteBookmark**
+> BaseResponseVoid deleteBookmark(bookId, bookmarkId)
+
+删除书签
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int bookId = 789; // int | 
+final int bookmarkId = 789; // int | 
+
+try {
+    final response = api.deleteBookmark(bookId, bookmarkId);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->deleteBookmark: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **bookId** | **int**|  | 
+ **bookmarkId** | **int**|  | 
+
+### Return type
+
+[**BaseResponseVoid**](BaseResponseVoid.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **deleteChapter**
 > BaseResponseVoid deleteChapter(courseId, chapterId)
 
@@ -3129,6 +3824,47 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **deleteExamPaper**
+> BaseResponseBoolean deleteExamPaper(id)
+
+删除试卷
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int id = 789; // int | 
+
+try {
+    final response = api.deleteExamPaper(id);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->deleteExamPaper: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **int**|  | 
+
+### Return type
+
+[**BaseResponseBoolean**](BaseResponseBoolean.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **deleteFeedback**
 > BaseResponseBoolean deleteFeedback(id)
 
@@ -3428,6 +4164,90 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **deleteNote**
+> BaseResponseVoid deleteNote(bookId, noteId)
+
+删除笔记
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int bookId = 789; // int | 
+final int noteId = 789; // int | 
+
+try {
+    final response = api.deleteNote(bookId, noteId);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->deleteNote: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **bookId** | **int**|  | 
+ **noteId** | **int**|  | 
+
+### Return type
+
+[**BaseResponseVoid**](BaseResponseVoid.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **deletePlan**
+> BaseResponseVoid deletePlan(planId)
+
+删除会员计划
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int planId = 789; // int | 
+
+try {
+    final response = api.deletePlan(planId);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->deletePlan: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **planId** | **int**|  | 
+
+### Return type
+
+[**BaseResponseVoid**](BaseResponseVoid.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **deletePost**
 > BaseResponseVoid deletePost(postId)
 
@@ -3457,6 +4277,47 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**BaseResponseVoid**](BaseResponseVoid.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **deleteQuestion**
+> BaseResponseBoolean deleteQuestion(id)
+
+删除题目
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int id = 789; // int | 
+
+try {
+    final response = api.deleteQuestion(id);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->deleteQuestion: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **int**|  | 
+
+### Return type
+
+[**BaseResponseBoolean**](BaseResponseBoolean.md)
 
 ### Authorization
 
@@ -3510,8 +4371,94 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **deleteRoom**
+> BaseResponseBoolean deleteRoom(id)
+
+删除直播间
+
+主播或管理员删除直播间
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int id = 789; // int | 
+
+try {
+    final response = api.deleteRoom(id);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->deleteRoom: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **int**|  | 
+
+### Return type
+
+[**BaseResponseBoolean**](BaseResponseBoolean.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **deleteSection**
-> BaseResponseVoid deleteSection(courseId, sectionId)
+> BaseResponseBoolean deleteSection(paperId, sectionId)
+
+删除大题
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int paperId = 789; // int | 
+final int sectionId = 789; // int | 
+
+try {
+    final response = api.deleteSection(paperId, sectionId);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->deleteSection: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **paperId** | **int**|  | 
+ **sectionId** | **int**|  | 
+
+### Return type
+
+[**BaseResponseBoolean**](BaseResponseBoolean.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **deleteSection1**
+> BaseResponseVoid deleteSection1(courseId, sectionId)
 
 删除小节（管理员）
 
@@ -3524,10 +4471,10 @@ final int courseId = 789; // int | 课程ID
 final int sectionId = 789; // int | 小节ID
 
 try {
-    final response = api.deleteSection(courseId, sectionId);
+    final response = api.deleteSection1(courseId, sectionId);
     print(response);
 } catch on DioException (e) {
-    print('Exception when calling DefaultApi->deleteSection: $e\n');
+    print('Exception when calling DefaultApi->deleteSection1: $e\n');
 }
 ```
 
@@ -3578,6 +4525,47 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **templateId** | **int**| 模板ID | 
+
+### Return type
+
+[**BaseResponseVoid**](BaseResponseVoid.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **deleteTemplate2**
+> BaseResponseVoid deleteTemplate2(id)
+
+删除模板
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int id = 789; // int | 模板ID
+
+try {
+    final response = api.deleteTemplate2(id);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->deleteTemplate2: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **int**| 模板ID | 
 
 ### Return type
 
@@ -3803,6 +4791,47 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **dissolveGroup1**
+> BaseResponseVoid dissolveGroup1(groupId)
+
+解散群
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int groupId = 789; // int | 群ID
+
+try {
+    final response = api.dissolveGroup1(groupId);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->dissolveGroup1: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **groupId** | **int**| 群ID | 
+
+### Return type
+
+[**BaseResponseVoid**](BaseResponseVoid.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **enableConfig**
 > BaseResponseVoid enableConfig(id)
 
@@ -3875,6 +4904,49 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**BaseResponseWorkflowTriggerResponse**](BaseResponseWorkflowTriggerResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **encryptAllChapters**
+> BaseResponseInteger encryptAllChapters(bookId)
+
+批量加密所有章节
+
+对整本书所有未加密章节进行AES加密存储
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int bookId = 789; // int | 
+
+try {
+    final response = api.encryptAllChapters(bookId);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->encryptAllChapters: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **bookId** | **int**|  | 
+
+### Return type
+
+[**BaseResponseInteger**](BaseResponseInteger.md)
 
 ### Authorization
 
@@ -4100,6 +5172,47 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **exportAnswerKey**
+> String exportAnswerKey(id)
+
+导出参考答案PDF
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int id = 789; // int | 
+
+try {
+    final response = api.exportAnswerKey(id);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->exportAnswerKey: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **int**|  | 
+
+### Return type
+
+**String**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **favouriteCourse**
 > BaseResponseVoid favouriteCourse(courseId)
 
@@ -4182,6 +5295,86 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **generateBannerImage**
+> BaseResponseGenerateBannerImageResponse generateBannerImage(generateBannerImageRequest)
+
+AI生成轮播图图片
+
+根据标题和图片描述，使用AI生成轮播图图片
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final GenerateBannerImageRequest generateBannerImageRequest = ; // GenerateBannerImageRequest | 
+
+try {
+    final response = api.generateBannerImage(generateBannerImageRequest);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->generateBannerImage: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **generateBannerImageRequest** | [**GenerateBannerImageRequest**](GenerateBannerImageRequest.md)|  | 
+
+### Return type
+
+[**BaseResponseGenerateBannerImageResponse**](BaseResponseGenerateBannerImageResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getAiQuota**
+> BaseResponseMapStringMapStringInteger getAiQuota()
+
+查询我的AI功能剩余额度
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+
+try {
+    final response = api.getAiQuota();
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getAiQuota: $e\n');
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**BaseResponseMapStringMapStringInteger**](BaseResponseMapStringMapStringInteger.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **getAllConfigs**
 > BaseResponseListScraperConfigResponse getAllConfigs()
 
@@ -4248,6 +5441,43 @@ This endpoint does not need any parameter.
 ### Return type
 
 [**BaseResponseListFriendResponse**](BaseResponseListFriendResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getAllProfiles**
+> BaseResponseListSubjectProfileSummary getAllProfiles()
+
+查询学生全部知识画像
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+
+try {
+    final response = api.getAllProfiles();
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getAllProfiles: $e\n');
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**BaseResponseListSubjectProfileSummary**](BaseResponseListSubjectProfileSummary.md)
 
 ### Authorization
 
@@ -4682,6 +5912,49 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **getBookmarksByBook**
+> BaseResponseListReadingBookmarkDTO getBookmarksByBook(bookId, userId)
+
+获取用户在该书的书签列表
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int bookId = 789; // int | 
+final int userId = 789; // int | 
+
+try {
+    final response = api.getBookmarksByBook(bookId, userId);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getBookmarksByBook: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **bookId** | **int**|  | 
+ **userId** | **int**|  | 
+
+### Return type
+
+[**BaseResponseListReadingBookmarkDTO**](BaseResponseListReadingBookmarkDTO.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **getById**
 > BaseResponseWorkflowResponse getById(id)
 
@@ -4852,6 +6125,53 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **getChatHistory1**
+> BaseResponseMapStringObject getChatHistory1(id, page, size)
+
+直播间聊天历史
+
+分页获取直播间聊天消息
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int id = 789; // int | 
+final int page = 56; // int | 
+final int size = 56; // int | 
+
+try {
+    final response = api.getChatHistory1(id, page, size);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getChatHistory1: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **int**|  | 
+ **page** | **int**|  | [optional] [default to 1]
+ **size** | **int**|  | [optional] [default to 50]
+
+### Return type
+
+[**BaseResponseMapStringObject**](BaseResponseMapStringObject.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **getCheckinRanking**
 > BaseResponseListCheckinRankingItem getCheckinRanking(limit)
 
@@ -4934,6 +6254,51 @@ This endpoint does not need any parameter.
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **getClassAiReport**
+> SseEmitter getClassAiReport(classId, startDate, endDate)
+
+AI班级学情分析报告（SSE流式）
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int classId = 789; // int | 
+final Date startDate = 2013-10-20; // Date | 
+final Date endDate = 2013-10-20; // Date | 
+
+try {
+    final response = api.getClassAiReport(classId, startDate, endDate);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getClassAiReport: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **classId** | **int**|  | 
+ **startDate** | **Date**|  | [optional] 
+ **endDate** | **Date**|  | [optional] 
+
+### Return type
+
+[**SseEmitter**](SseEmitter.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json, text/event-stream
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **getClassInfo**
 > BaseResponseClassResponse getClassInfo(classId)
 
@@ -5008,6 +6373,184 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**BaseResponsePageResponseClassMemberResponse**](BaseResponsePageResponseClassMemberResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getClassOverview**
+> BaseResponseClassAnalyticsResponse getClassOverview(classId, startDate, endDate)
+
+班级学情概览
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int classId = 789; // int | 
+final Date startDate = 2013-10-20; // Date | 
+final Date endDate = 2013-10-20; // Date | 
+
+try {
+    final response = api.getClassOverview(classId, startDate, endDate);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getClassOverview: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **classId** | **int**|  | 
+ **startDate** | **Date**|  | [optional] 
+ **endDate** | **Date**|  | [optional] 
+
+### Return type
+
+[**BaseResponseClassAnalyticsResponse**](BaseResponseClassAnalyticsResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getClassRanking**
+> BaseResponseListStudentRankingItem getClassRanking(classId, startDate, endDate)
+
+班级成员排名
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int classId = 789; // int | 
+final Date startDate = 2013-10-20; // Date | 
+final Date endDate = 2013-10-20; // Date | 
+
+try {
+    final response = api.getClassRanking(classId, startDate, endDate);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getClassRanking: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **classId** | **int**|  | 
+ **startDate** | **Date**|  | [optional] 
+ **endDate** | **Date**|  | [optional] 
+
+### Return type
+
+[**BaseResponseListStudentRankingItem**](BaseResponseListStudentRankingItem.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getClassSubjects**
+> BaseResponseListSubjectAnalyticsItem getClassSubjects(classId)
+
+班级各学科分析
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int classId = 789; // int | 
+
+try {
+    final response = api.getClassSubjects(classId);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getClassSubjects: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **classId** | **int**|  | 
+
+### Return type
+
+[**BaseResponseListSubjectAnalyticsItem**](BaseResponseListSubjectAnalyticsItem.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getClassTrend**
+> BaseResponseLearningTrendResponse getClassTrend(classId, granularity, startDate, endDate)
+
+班级学习趋势
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int classId = 789; // int | 
+final String granularity = granularity_example; // String | 
+final Date startDate = 2013-10-20; // Date | 
+final Date endDate = 2013-10-20; // Date | 
+
+try {
+    final response = api.getClassTrend(classId, granularity, startDate, endDate);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getClassTrend: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **classId** | **int**|  | 
+ **granularity** | **String**|  | [optional] [default to 'day']
+ **startDate** | **Date**|  | [optional] 
+ **endDate** | **Date**|  | [optional] 
+
+### Return type
+
+[**BaseResponseLearningTrendResponse**](BaseResponseLearningTrendResponse.md)
 
 ### Authorization
 
@@ -5403,6 +6946,43 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **getCurrentMembership**
+> BaseResponseUserMembershipDetailResponse getCurrentMembership()
+
+查询我的当前会员详细信息
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+
+try {
+    final response = api.getCurrentMembership();
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getCurrentMembership: $e\n');
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**BaseResponseUserMembershipDetailResponse**](BaseResponseUserMembershipDetailResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **getDailyArticle**
 > BaseResponseDailyArticleResponse getDailyArticle(id)
 
@@ -5555,6 +7135,47 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**BaseResponseListWorkflowEdgeResponse**](BaseResponseListWorkflowEdgeResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getExamPaper**
+> BaseResponseExamPaperResponse getExamPaper(id)
+
+获取试卷详情
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int id = 789; // int | 
+
+try {
+    final response = api.getExamPaper(id);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getExamPaper: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **int**|  | 
+
+### Return type
+
+[**BaseResponseExamPaperResponse**](BaseResponseExamPaperResponse.md)
 
 ### Authorization
 
@@ -6077,6 +7698,47 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **getGroupInfo1**
+> BaseResponseGroupResponse getGroupInfo1(groupId)
+
+获取群详情
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int groupId = 789; // int | 群ID
+
+try {
+    final response = api.getGroupInfo1(groupId);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getGroupInfo1: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **groupId** | **int**| 群ID | 
+
+### Return type
+
+[**BaseResponseGroupResponse**](BaseResponseGroupResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **getGroupMembers**
 > BaseResponseListGroupMemberResponse getGroupMembers(groupId)
 
@@ -6106,6 +7768,51 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**BaseResponseListGroupMemberResponse**](BaseResponseListGroupMemberResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getGroupMembers1**
+> BaseResponseMemberPage getGroupMembers1(groupId, pageNum, pageSize)
+
+分页获取群成员
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int groupId = 789; // int | 群ID
+final int pageNum = 56; // int | 页码
+final int pageSize = 56; // int | 每页数量
+
+try {
+    final response = api.getGroupMembers1(groupId, pageNum, pageSize);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getGroupMembers1: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **groupId** | **int**| 群ID | 
+ **pageNum** | **int**| 页码 | [optional] [default to 1]
+ **pageSize** | **int**| 每页数量 | [optional] [default to 20]
+
+### Return type
+
+[**BaseResponseMemberPage**](BaseResponseMemberPage.md)
 
 ### Authorization
 
@@ -6151,6 +7858,91 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**BaseResponseMemberPage**](BaseResponseMemberPage.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getHistory**
+> BaseResponseListSubmissionStatusResponse getHistory(page, size)
+
+查询批改历史
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int page = 56; // int | 
+final int size = 56; // int | 
+
+try {
+    final response = api.getHistory(page, size);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getHistory: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **page** | **int**|  | [optional] [default to 1]
+ **size** | **int**|  | [optional] [default to 20]
+
+### Return type
+
+[**BaseResponseListSubmissionStatusResponse**](BaseResponseListSubmissionStatusResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getKey**
+> getKey(keyId, token)
+
+获取视频解密密钥（HLS播放器自动调用）
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final String keyId = keyId_example; // String | 密钥ID
+final String token = token_example; // String | 一次性播放令牌（可选）
+
+try {
+    api.getKey(keyId, token);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getKey: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **keyId** | **String**| 密钥ID | 
+ **token** | **String**| 一次性播放令牌（可选） | [optional] 
+
+### Return type
+
+void (empty response body)
 
 ### Authorization
 
@@ -6276,6 +8068,43 @@ This endpoint does not need any parameter.
 ### Return type
 
 [**BaseResponseLoginUserResponse**](BaseResponseLoginUserResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getMembershipHistory**
+> BaseResponseListUserMembership getMembershipHistory()
+
+查询我的会员历史
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+
+try {
+    final response = api.getMembershipHistory();
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getMembershipHistory: $e\n');
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**BaseResponseListUserMembership**](BaseResponseListUserMembership.md)
 
 ### Authorization
 
@@ -7067,6 +8896,94 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **getNotesByBook**
+> BaseResponseListReadingNoteDTO getNotesByBook(bookId, userId)
+
+获取用户在该书的笔记列表
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int bookId = 789; // int | 
+final int userId = 789; // int | 
+
+try {
+    final response = api.getNotesByBook(bookId, userId);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getNotesByBook: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **bookId** | **int**|  | 
+ **userId** | **int**|  | 
+
+### Return type
+
+[**BaseResponseListReadingNoteDTO**](BaseResponseListReadingNoteDTO.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getNotesByChapter**
+> BaseResponseListReadingNoteDTO getNotesByChapter(bookId, chapterId, userId)
+
+获取用户在该章节的笔记
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int bookId = 789; // int | 
+final int chapterId = 789; // int | 
+final int userId = 789; // int | 
+
+try {
+    final response = api.getNotesByChapter(bookId, chapterId, userId);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getNotesByChapter: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **bookId** | **int**|  | 
+ **chapterId** | **int**|  | 
+ **userId** | **int**|  | 
+
+### Return type
+
+[**BaseResponseListReadingNoteDTO**](BaseResponseListReadingNoteDTO.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **getOrder**
 > BaseResponseOrderResponse getOrder(orderNo)
 
@@ -7096,6 +9013,90 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**BaseResponseOrderResponse**](BaseResponseOrderResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getPaperQuestions**
+> BaseResponseListPaperQuestionResponse getPaperQuestions(paperId, sectionId)
+
+获取大题下的所有题目关联
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int paperId = 789; // int | 
+final int sectionId = 789; // int | 
+
+try {
+    final response = api.getPaperQuestions(paperId, sectionId);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getPaperQuestions: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **paperId** | **int**|  | 
+ **sectionId** | **int**|  | 
+
+### Return type
+
+[**BaseResponseListPaperQuestionResponse**](BaseResponseListPaperQuestionResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getPdfUrl**
+> BaseResponseString getPdfUrl(bookId)
+
+获取PDF预签名URL
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int bookId = 789; // int | 
+
+try {
+    final response = api.getPdfUrl(bookId);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getPdfUrl: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **bookId** | **int**|  | 
+
+### Return type
+
+[**BaseResponseString**](BaseResponseString.md)
 
 ### Authorization
 
@@ -7174,6 +9175,47 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**BaseResponseListJoinRequestResponse**](BaseResponseListJoinRequestResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getPlan**
+> BaseResponseMembershipPlan getPlan(planId)
+
+获取计划详情
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int planId = 789; // int | 
+
+try {
+    final response = api.getPlan(planId);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getPlan: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **planId** | **int**|  | 
+
+### Return type
+
+[**BaseResponseMembershipPlan**](BaseResponseMembershipPlan.md)
 
 ### Authorization
 
@@ -7360,6 +9402,96 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **getPublishedPapers**
+> BaseResponseMapStringObject getPublishedPapers(keyword, subject, grade, page, size)
+
+查询已发布试卷列表（供批改选择）
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final String keyword = keyword_example; // String | 
+final String subject = subject_example; // String | 
+final String grade = grade_example; // String | 
+final int page = 56; // int | 
+final int size = 56; // int | 
+
+try {
+    final response = api.getPublishedPapers(keyword, subject, grade, page, size);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getPublishedPapers: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **keyword** | **String**|  | [optional] 
+ **subject** | **String**|  | [optional] 
+ **grade** | **String**|  | [optional] 
+ **page** | **int**|  | [optional] [default to 1]
+ **size** | **int**|  | [optional] [default to 20]
+
+### Return type
+
+[**BaseResponseMapStringObject**](BaseResponseMapStringObject.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getQuestion**
+> BaseResponseQuestionResponse getQuestion(id)
+
+获取题目详情
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int id = 789; // int | 
+
+try {
+    final response = api.getQuestion(id);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getQuestion: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **int**|  | 
+
+### Return type
+
+[**BaseResponseQuestionResponse**](BaseResponseQuestionResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **getReadArticles**
 > BaseResponseListUserDailyArticleResponse getReadArticles(page, size)
 
@@ -7528,6 +9660,88 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **getRecommendations**
+> BaseResponseListMapStringObject getRecommendations(submissionId)
+
+获取错题的同类题推荐
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int submissionId = 789; // int | 
+
+try {
+    final response = api.getRecommendations(submissionId);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getRecommendations: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **submissionId** | **int**|  | 
+
+### Return type
+
+[**BaseResponseListMapStringObject**](BaseResponseListMapStringObject.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getResult**
+> BaseResponseGradingResultResponse getResult(submissionId)
+
+获取批改结果
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int submissionId = 789; // int | 
+
+try {
+    final response = api.getResult(submissionId);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getResult: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **submissionId** | **int**|  | 
+
+### Return type
+
+[**BaseResponseGradingResultResponse**](BaseResponseGradingResultResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **getReviewCount**
 > BaseResponseLong getReviewCount(courseId)
 
@@ -7557,6 +9771,49 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**BaseResponseLong**](BaseResponseLong.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getRoomDetail**
+> BaseResponseLiveRoomResponse getRoomDetail(id)
+
+直播间详情
+
+获取直播间详情，含播放地址
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int id = 789; // int | 
+
+try {
+    final response = api.getRoomDetail(id);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getRoomDetail: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **int**|  | 
+
+### Return type
+
+[**BaseResponseLiveRoomResponse**](BaseResponseLiveRoomResponse.md)
 
 ### Authorization
 
@@ -7696,6 +9953,47 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **getSections**
+> BaseResponseListPaperSectionResponse getSections(paperId)
+
+获取试卷的所有大题
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int paperId = 789; // int | 
+
+try {
+    final response = api.getSections(paperId);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getSections: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **paperId** | **int**|  | 
+
+### Return type
+
+[**BaseResponseListPaperSectionResponse**](BaseResponseListPaperSectionResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **getSentRequests**
 > BaseResponseFriendRequestPageResponse getSentRequests(friendRequestListDTO)
 
@@ -7781,7 +10079,7 @@ This endpoint does not need any parameter.
 # **getStatistics**
 > BaseResponseOrderStatistics getStatistics()
 
-订单统计（管理员）
+订单统计（管理员，包含课程+会员）
 
 ### Example
 ```dart
@@ -7803,6 +10101,43 @@ This endpoint does not need any parameter.
 ### Return type
 
 [**BaseResponseOrderStatistics**](BaseResponseOrderStatistics.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getStatistics1**
+> BaseResponseMapStringLong getStatistics1()
+
+会员统计
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+
+try {
+    final response = api.getStatistics1();
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getStatistics1: $e\n');
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**BaseResponseMapStringLong**](BaseResponseMapStringLong.md)
 
 ### Authorization
 
@@ -7926,6 +10261,252 @@ This endpoint does not need any parameter.
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **getStats3**
+> BaseResponseGradingStatsResponse getStats3()
+
+查询批改历史统计
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+
+try {
+    final response = api.getStats3();
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getStats3: $e\n');
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**BaseResponseGradingStatsResponse**](BaseResponseGradingStatsResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getStatus**
+> BaseResponseSubmissionStatusResponse getStatus(submissionId)
+
+查询批改状态
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int submissionId = 789; // int | 
+
+try {
+    final response = api.getStatus(submissionId);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getStatus: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **submissionId** | **int**|  | 
+
+### Return type
+
+[**BaseResponseSubmissionStatusResponse**](BaseResponseSubmissionStatusResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getStudentAiReport**
+> SseEmitter getStudentAiReport(startDate, endDate)
+
+AI个人学情分析报告（SSE流式）
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final Date startDate = 2013-10-20; // Date | 
+final Date endDate = 2013-10-20; // Date | 
+
+try {
+    final response = api.getStudentAiReport(startDate, endDate);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getStudentAiReport: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **startDate** | **Date**|  | [optional] 
+ **endDate** | **Date**|  | [optional] 
+
+### Return type
+
+[**SseEmitter**](SseEmitter.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json, text/event-stream
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getStudentOverview**
+> BaseResponseStudentAnalyticsResponse getStudentOverview(startDate, endDate)
+
+个人学情概览
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final Date startDate = 2013-10-20; // Date | 
+final Date endDate = 2013-10-20; // Date | 
+
+try {
+    final response = api.getStudentOverview(startDate, endDate);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getStudentOverview: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **startDate** | **Date**|  | [optional] 
+ **endDate** | **Date**|  | [optional] 
+
+### Return type
+
+[**BaseResponseStudentAnalyticsResponse**](BaseResponseStudentAnalyticsResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getStudentSubjects**
+> BaseResponseListSubjectAnalyticsItem getStudentSubjects()
+
+个人各学科学情
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+
+try {
+    final response = api.getStudentSubjects();
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getStudentSubjects: $e\n');
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**BaseResponseListSubjectAnalyticsItem**](BaseResponseListSubjectAnalyticsItem.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getStudentTrend**
+> BaseResponseLearningTrendResponse getStudentTrend(granularity, startDate, endDate)
+
+个人学习趋势
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final String granularity = granularity_example; // String | 
+final Date startDate = 2013-10-20; // Date | 
+final Date endDate = 2013-10-20; // Date | 
+
+try {
+    final response = api.getStudentTrend(granularity, startDate, endDate);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getStudentTrend: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **granularity** | **String**|  | [optional] [default to 'day']
+ **startDate** | **Date**|  | [optional] 
+ **endDate** | **Date**|  | [optional] 
+
+### Return type
+
+[**BaseResponseLearningTrendResponse**](BaseResponseLearningTrendResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **getStudiedWords**
 > BaseResponseListUserDailyWordResponse getStudiedWords(page, size)
 
@@ -7957,6 +10538,47 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**BaseResponseListUserDailyWordResponse**](BaseResponseListUserDailyWordResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getSubjectProfile**
+> BaseResponseSubjectProfileSummary getSubjectProfile(subjectCode)
+
+查询某学科知识画像详情
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final String subjectCode = subjectCode_example; // String | 
+
+try {
+    final response = api.getSubjectProfile(subjectCode);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getSubjectProfile: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **subjectCode** | **String**|  | 
+
+### Return type
+
+[**BaseResponseSubjectProfileSummary**](BaseResponseSubjectProfileSummary.md)
 
 ### Authorization
 
@@ -8301,6 +10923,47 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **getTemplate1**
+> BaseResponseExamTemplateResponse getTemplate1(id)
+
+获取模板详情
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int id = 789; // int | 模板ID
+
+try {
+    final response = api.getTemplate1(id);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getTemplate1: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **int**| 模板ID | 
+
+### Return type
+
+[**BaseResponseExamTemplateResponse**](BaseResponseExamTemplateResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **getTodayArticles**
 > BaseResponseListDailyArticleResponse getTodayArticles(size)
 
@@ -8580,6 +11243,47 @@ This endpoint does not need any parameter.
 ### Return type
 
 [**BaseResponseLong**](BaseResponseLong.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getUserAiQuota**
+> BaseResponseMapStringMapStringInteger getUserAiQuota(userId)
+
+查询指定用户的AI额度
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int userId = 789; // int | 
+
+try {
+    final response = api.getUserAiQuota(userId);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getUserAiQuota: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **userId** | **int**|  | 
+
+### Return type
+
+[**BaseResponseMapStringMapStringInteger**](BaseResponseMapStringMapStringInteger.md)
 
 ### Authorization
 
@@ -9061,6 +11765,47 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **getWeakPoints**
+> BaseResponseListKnowledgeProfileResponse getWeakPoints(subjectCode)
+
+查询某学科薄弱知识点
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final String subjectCode = subjectCode_example; // String | 
+
+try {
+    final response = api.getWeakPoints(subjectCode);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getWeakPoints: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **subjectCode** | **String**|  | 
+
+### Return type
+
+[**BaseResponseListKnowledgeProfileResponse**](BaseResponseListKnowledgeProfileResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **getWordBookList**
 > BaseResponseListUserWordBookResponse getWordBookList(status, page, size)
 
@@ -9184,6 +11929,47 @@ Name | Type | Description  | Notes
 ### HTTP request headers
 
  - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **grantMembership**
+> BaseResponseVoid grantMembership(grantMembershipRequest)
+
+为用户直接开通会员
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final GrantMembershipRequest grantMembershipRequest = ; // GrantMembershipRequest | 
+
+try {
+    final response = api.grantMembership(grantMembershipRequest);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->grantMembership: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **grantMembershipRequest** | [**GrantMembershipRequest**](GrantMembershipRequest.md)|  | 
+
+### Return type
+
+[**BaseResponseVoid**](BaseResponseVoid.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
  - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
@@ -10138,6 +12924,43 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **listAllTemplates**
+> BaseResponseListExamTemplateResponse listAllTemplates()
+
+列出所有模板（管理员）
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+
+try {
+    final response = api.listAllTemplates();
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->listAllTemplates: $e\n');
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**BaseResponseListExamTemplateResponse**](BaseResponseListExamTemplateResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **listAllowedTables**
 > BaseResponseListMapStringObject listAllowedTables()
 
@@ -10437,6 +13260,51 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **listClasses**
+> BaseResponsePageResponseClassResponse listClasses(pageNum, pageSize, keyword)
+
+获取班级列表
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int pageNum = 56; // int | 
+final int pageSize = 56; // int | 
+final String keyword = keyword_example; // String | 
+
+try {
+    final response = api.listClasses(pageNum, pageSize, keyword);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->listClasses: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **pageNum** | **int**|  | [optional] [default to 1]
+ **pageSize** | **int**|  | [optional] [default to 10]
+ **keyword** | **String**|  | [optional] 
+
+### Return type
+
+[**BaseResponsePageResponseClassResponse**](BaseResponsePageResponseClassResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **listCourses**
 > BaseResponseListCourseResponse listCourses(status, page, size)
 
@@ -10572,17 +13440,105 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **listOrders**
-> BaseResponseListOrderResponse listOrders(status, page, size)
+# **listGroups**
+> BaseResponseAdminGroupPageResponse listGroups(pageNum, pageSize)
 
-获取订单列表（管理员）
+分页获取群列表
 
 ### Example
 ```dart
 import 'package:nova_api/api.dart';
 
 final api = NovaApi().getDefaultApi();
-final int status = 56; // int | 订单状态：0-未支付，1-已支付，2-已过期，3-已退款
+final int pageNum = 56; // int | 页码
+final int pageSize = 56; // int | 每页数量
+
+try {
+    final response = api.listGroups(pageNum, pageSize);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->listGroups: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **pageNum** | **int**| 页码 | [optional] [default to 1]
+ **pageSize** | **int**| 每页数量 | [optional] [default to 10]
+
+### Return type
+
+[**BaseResponseAdminGroupPageResponse**](BaseResponseAdminGroupPageResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **listMemberships**
+> BaseResponseListUserMembership listMemberships(status, page, size)
+
+按状态查询会员列表
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int status = 56; // int | 状态：0-待支付，1-生效中，2-已过期，3-已取消
+final int page = 56; // int | 
+final int size = 56; // int | 
+
+try {
+    final response = api.listMemberships(status, page, size);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->listMemberships: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **status** | **int**| 状态：0-待支付，1-生效中，2-已过期，3-已取消 | [optional] 
+ **page** | **int**|  | [optional] [default to 1]
+ **size** | **int**|  | [optional] [default to 10]
+
+### Return type
+
+[**BaseResponseListUserMembership**](BaseResponseListUserMembership.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **listOrders**
+> BaseResponseListOrderResponse listOrders(status, page, size)
+
+获取订单列表（管理员，包含课程订单和会员订单）
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int status = 56; // int | 订单状态：0-未支付，1-已支付，2-已过期，3-已退款/已取消
 final int page = 56; // int | 页码
 final int size = 56; // int | 每页数量
 
@@ -10598,13 +13554,87 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **status** | **int**| 订单状态：0-未支付，1-已支付，2-已过期，3-已退款 | [optional] 
+ **status** | **int**| 订单状态：0-未支付，1-已支付，2-已过期，3-已退款/已取消 | [optional] 
  **page** | **int**| 页码 | [optional] [default to 1]
  **size** | **int**| 每页数量 | [optional] [default to 10]
 
 ### Return type
 
 [**BaseResponseListOrderResponse**](BaseResponseListOrderResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **listPlans**
+> BaseResponseListMembershipPlan listPlans()
+
+获取所有会员计划
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+
+try {
+    final response = api.listPlans();
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->listPlans: $e\n');
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**BaseResponseListMembershipPlan**](BaseResponseListMembershipPlan.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **listPlans1**
+> BaseResponseListMembershipPlan listPlans1()
+
+获取所有会员计划
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+
+try {
+    final response = api.listPlans1();
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->listPlans1: $e\n');
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**BaseResponseListMembershipPlan**](BaseResponseListMembershipPlan.md)
 
 ### Authorization
 
@@ -10705,6 +13735,55 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **listRooms**
+> BaseResponseMapStringObject listRooms(status, classId, page, size)
+
+直播间列表
+
+分页获取直播间列表，可按状态筛选
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final String status = status_example; // String | 状态: CREATED/LIVE/ENDED
+final int classId = 789; // int | 班级ID
+final int page = 56; // int | 页码
+final int size = 56; // int | 每页数量
+
+try {
+    final response = api.listRooms(status, classId, page, size);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->listRooms: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **status** | **String**| 状态: CREATED/LIVE/ENDED | [optional] 
+ **classId** | **int**| 班级ID | [optional] 
+ **page** | **int**| 页码 | [optional] [default to 1]
+ **size** | **int**| 每页数量 | [optional] [default to 10]
+
+### Return type
+
+[**BaseResponseMapStringObject**](BaseResponseMapStringObject.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **listSections**
 > BaseResponseListSectionResponse listSections(courseId)
 
@@ -10784,7 +13863,7 @@ This endpoint does not need any parameter.
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **listTeachers**
-> BaseResponseListTeacherResponse listTeachers(page, size)
+> BaseResponseListTeacherResponse listTeachers(page, size, keyword)
 
 获取讲师列表
 
@@ -10795,9 +13874,10 @@ import 'package:nova_api/api.dart';
 final api = NovaApi().getDefaultApi();
 final int page = 56; // int | 页码
 final int size = 56; // int | 每页数量
+final String keyword = keyword_example; // String | 搜索关键词（讲师姓名）
 
 try {
-    final response = api.listTeachers(page, size);
+    final response = api.listTeachers(page, size, keyword);
     print(response);
 } catch on DioException (e) {
     print('Exception when calling DefaultApi->listTeachers: $e\n');
@@ -10810,10 +13890,48 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **page** | **int**| 页码 | [optional] [default to 1]
  **size** | **int**| 每页数量 | [optional] [default to 10]
+ **keyword** | **String**| 搜索关键词（讲师姓名） | [optional] 
 
 ### Return type
 
 [**BaseResponseListTeacherResponse**](BaseResponseListTeacherResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **listTemplates1**
+> BaseResponseListExamTemplateResponse listTemplates1()
+
+列出所有可用模板
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+
+try {
+    final response = api.listTemplates1();
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->listTemplates1: $e\n');
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**BaseResponseListExamTemplateResponse**](BaseResponseListExamTemplateResponse.md)
 
 ### Authorization
 
@@ -11168,6 +14286,51 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **myRooms**
+> BaseResponseMapStringObject myRooms(page, size)
+
+我的直播间
+
+获取当前用户创建的直播间列表
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int page = 56; // int | 
+final int size = 56; // int | 
+
+try {
+    final response = api.myRooms(page, size);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->myRooms: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **page** | **int**|  | [optional] [default to 1]
+ **size** | **int**|  | [optional] [default to 10]
+
+### Return type
+
+[**BaseResponseMapStringObject**](BaseResponseMapStringObject.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **offlineAnnouncement**
 > BaseResponseBoolean offlineAnnouncement(id)
 
@@ -11293,6 +14456,88 @@ Name | Type | Description  | Notes
 ### HTTP request headers
 
  - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **previewPdf**
+> String previewPdf(id)
+
+预览试卷PDF
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int id = 789; // int | 
+
+try {
+    final response = api.previewPdf(id);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->previewPdf: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **int**|  | 
+
+### Return type
+
+**String**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **previewTemplate**
+> String previewTemplate(id)
+
+预览模板效果（用示例数据编译PDF）
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int id = 789; // int | 模板ID
+
+try {
+    final response = api.previewTemplate(id);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->previewTemplate: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **int**| 模板ID | 
+
+### Return type
+
+**String**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
  - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
@@ -11508,6 +14753,88 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **publishExamPaper**
+> BaseResponseBoolean publishExamPaper(id)
+
+发布试卷
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int id = 789; // int | 
+
+try {
+    final response = api.publishExamPaper(id);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->publishExamPaper: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **int**|  | 
+
+### Return type
+
+[**BaseResponseBoolean**](BaseResponseBoolean.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **purchaseMembership**
+> BaseResponseString purchaseMembership(purchaseMembershipRequest)
+
+购买会员（创建待支付订单）
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final PurchaseMembershipRequest purchaseMembershipRequest = ; // PurchaseMembershipRequest | 
+
+try {
+    final response = api.purchaseMembership(purchaseMembershipRequest);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->purchaseMembership: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **purchaseMembershipRequest** | [**PurchaseMembershipRequest**](PurchaseMembershipRequest.md)|  | 
+
+### Return type
+
+[**BaseResponseString**](BaseResponseString.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **queryAnnouncements**
 > BaseResponseAnnouncementPageResponse queryAnnouncements(queryAnnouncementRequest)
 
@@ -11594,6 +14921,47 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **queryExamPapers**
+> BaseResponseExamPaperPageResponse queryExamPapers(request)
+
+分页查询我的试卷
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final QueryExamPaperRequest request = ; // QueryExamPaperRequest | 
+
+try {
+    final response = api.queryExamPapers(request);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->queryExamPapers: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **request** | [**QueryExamPaperRequest**](.md)|  | 
+
+### Return type
+
+[**BaseResponseExamPaperPageResponse**](BaseResponseExamPaperPageResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **queryFeedbacks**
 > BaseResponseFeedbackPageResponse queryFeedbacks(queryFeedbackRequest)
 
@@ -11633,6 +15001,88 @@ Name | Type | Description  | Notes
 ### HTTP request headers
 
  - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **queryMyQuestions**
+> BaseResponseQuestionPageResponse queryMyQuestions(request)
+
+查询我的题目
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final QueryQuestionRequest request = ; // QueryQuestionRequest | 
+
+try {
+    final response = api.queryMyQuestions(request);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->queryMyQuestions: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **request** | [**QueryQuestionRequest**](.md)|  | 
+
+### Return type
+
+[**BaseResponseQuestionPageResponse**](BaseResponseQuestionPageResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **queryQuestions**
+> BaseResponseQuestionPageResponse queryQuestions(request)
+
+分页查询题目
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final QueryQuestionRequest request = ; // QueryQuestionRequest | 
+
+try {
+    final response = api.queryQuestions(request);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->queryQuestions: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **request** | [**QueryQuestionRequest**](.md)|  | 
+
+### Return type
+
+[**BaseResponseQuestionPageResponse**](BaseResponseQuestionPageResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
  - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
@@ -11852,6 +15302,47 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **reindex**
+> BaseResponseMapStringInteger reindex(type)
+
+全量重建索引（管理员）
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final String type = type_example; // String | 
+
+try {
+    final response = api.reindex(type);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->reindex: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **type** | **String**|  | [optional] [default to 'all']
+
+### Return type
+
+[**BaseResponseMapStringInteger**](BaseResponseMapStringInteger.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **removeCourse**
 > BaseResponseVoid removeCourse(classId, courseId)
 
@@ -12049,6 +15540,137 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **classId** | **int**|  | 
  **userId** | **int**|  | 
+
+### Return type
+
+[**BaseResponseVoid**](BaseResponseVoid.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **removeMember2**
+> BaseResponseVoid removeMember2(groupId, targetUserId)
+
+移除群成员
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int groupId = 789; // int | 群ID
+final int targetUserId = 789; // int | 目标用户ID
+
+try {
+    final response = api.removeMember2(groupId, targetUserId);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->removeMember2: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **groupId** | **int**| 群ID | 
+ **targetUserId** | **int**| 目标用户ID | 
+
+### Return type
+
+[**BaseResponseVoid**](BaseResponseVoid.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **removePaperQuestion**
+> BaseResponseBoolean removePaperQuestion(paperId, sectionId, pqId)
+
+从大题移除题目
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int paperId = 789; // int | 
+final int sectionId = 789; // int | 
+final int pqId = 789; // int | 
+
+try {
+    final response = api.removePaperQuestion(paperId, sectionId, pqId);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->removePaperQuestion: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **paperId** | **int**|  | 
+ **sectionId** | **int**|  | 
+ **pqId** | **int**|  | 
+
+### Return type
+
+[**BaseResponseBoolean**](BaseResponseBoolean.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **removeTeacher**
+> BaseResponseVoid removeTeacher(id)
+
+移除讲师
+
+管理员移除讲师，用户角色降回学生，需重新申请
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int id = 789; // int | 讲师ID
+
+try {
+    final response = api.removeTeacher(id);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->removeTeacher: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **int**| 讲师ID | 
 
 ### Return type
 
@@ -12794,6 +16416,53 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **searchAll**
+> BaseResponsePageResult searchAll(q, type, page, size)
+
+聚合搜索（书籍+章节+帖子）
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final String q = q_example; // String | 
+final String type = type_example; // String | 
+final int page = 56; // int | 
+final int size = 56; // int | 
+
+try {
+    final response = api.searchAll(q, type, page, size);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->searchAll: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **q** | **String**|  | 
+ **type** | **String**|  | [optional] [default to 'all']
+ **page** | **int**|  | [optional] [default to 1]
+ **size** | **int**|  | [optional] [default to 20]
+
+### Return type
+
+[**BaseResponsePageResult**](BaseResponsePageResult.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **searchArticles**
 > BaseResponseDailyArticlePageResponse searchArticles(keyword, page, size)
 
@@ -12839,8 +16508,100 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **searchBookChapters**
+> BaseResponsePageResult searchBookChapters(bookId, q, page, size)
+
+书内搜索
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int bookId = 789; // int | 
+final String q = q_example; // String | 
+final int page = 56; // int | 
+final int size = 56; // int | 
+
+try {
+    final response = api.searchBookChapters(bookId, q, page, size);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->searchBookChapters: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **bookId** | **int**|  | 
+ **q** | **String**|  | 
+ **page** | **int**|  | [optional] [default to 1]
+ **size** | **int**|  | [optional] [default to 20]
+
+### Return type
+
+[**BaseResponsePageResult**](BaseResponsePageResult.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **searchBooks**
-> BaseResponseListBookDTO searchBooks(keyword, page, size)
+> BaseResponsePageResult searchBooks(q, page, size)
+
+搜索书籍
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final String q = q_example; // String | 
+final int page = 56; // int | 
+final int size = 56; // int | 
+
+try {
+    final response = api.searchBooks(q, page, size);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->searchBooks: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **q** | **String**|  | 
+ **page** | **int**|  | [optional] [default to 1]
+ **size** | **int**|  | [optional] [default to 20]
+
+### Return type
+
+[**BaseResponsePageResult**](BaseResponsePageResult.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **searchBooks1**
+> BaseResponseListBookDTO searchBooks1(keyword, page, size)
 
 搜索书籍
 
@@ -12854,10 +16615,10 @@ final int page = 56; // int |
 final int size = 56; // int | 
 
 try {
-    final response = api.searchBooks(keyword, page, size);
+    final response = api.searchBooks1(keyword, page, size);
     print(response);
 } catch on DioException (e) {
-    print('Exception when calling DefaultApi->searchBooks: $e\n');
+    print('Exception when calling DefaultApi->searchBooks1: $e\n');
 }
 ```
 
@@ -12872,6 +16633,53 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**BaseResponseListBookDTO**](BaseResponseListBookDTO.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **searchChapters**
+> BaseResponsePageResult searchChapters(q, bookId, page, size)
+
+搜索章节内容
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final String q = q_example; // String | 
+final int bookId = 789; // int | 
+final int page = 56; // int | 
+final int size = 56; // int | 
+
+try {
+    final response = api.searchChapters(q, bookId, page, size);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->searchChapters: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **q** | **String**|  | 
+ **bookId** | **int**|  | [optional] 
+ **page** | **int**|  | [optional] [default to 1]
+ **size** | **int**|  | [optional] [default to 20]
+
+### Return type
+
+[**BaseResponsePageResult**](BaseResponsePageResult.md)
 
 ### Authorization
 
@@ -12974,8 +16782,100 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **searchGroups1**
+> BaseResponseAdminGroupPageResponse searchGroups1(keyword, pageNum, pageSize)
+
+搜索群
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final String keyword = keyword_example; // String | 关键词
+final int pageNum = 56; // int | 页码
+final int pageSize = 56; // int | 每页数量
+
+try {
+    final response = api.searchGroups1(keyword, pageNum, pageSize);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->searchGroups1: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **keyword** | **String**| 关键词 | 
+ **pageNum** | **int**| 页码 | [optional] [default to 1]
+ **pageSize** | **int**| 每页数量 | [optional] [default to 10]
+
+### Return type
+
+[**BaseResponseAdminGroupPageResponse**](BaseResponseAdminGroupPageResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **searchPosts**
-> BaseResponsePostPageResponse searchPosts(keyword, pageNum, pageSize)
+> BaseResponsePageResult searchPosts(q, postType, page, size)
+
+搜索帖子
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final String q = q_example; // String | 
+final String postType = postType_example; // String | 
+final int page = 56; // int | 
+final int size = 56; // int | 
+
+try {
+    final response = api.searchPosts(q, postType, page, size);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->searchPosts: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **q** | **String**|  | 
+ **postType** | **String**|  | [optional] 
+ **page** | **int**|  | [optional] [default to 1]
+ **size** | **int**|  | [optional] [default to 20]
+
+### Return type
+
+[**BaseResponsePageResult**](BaseResponsePageResult.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **searchPosts1**
+> BaseResponsePostPageResponse searchPosts1(keyword, pageNum, pageSize)
 
 搜索帖子
 
@@ -12989,10 +16889,10 @@ final int pageNum = 56; // int |
 final int pageSize = 56; // int | 
 
 try {
-    final response = api.searchPosts(keyword, pageNum, pageSize);
+    final response = api.searchPosts1(keyword, pageNum, pageSize);
     print(response);
 } catch on DioException (e) {
-    print('Exception when calling DefaultApi->searchPosts: $e\n');
+    print('Exception when calling DefaultApi->searchPosts1: $e\n');
 }
 ```
 
@@ -13420,6 +17320,49 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **setMute**
+> BaseResponseVoid setMute(groupId, mute)
+
+设置群全员禁言
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int groupId = 789; // int | 群ID
+final bool mute = true; // bool | 是否禁言
+
+try {
+    final response = api.setMute(groupId, mute);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->setMute: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **groupId** | **int**| 群ID | 
+ **mute** | **bool**| 是否禁言 | 
+
+### Return type
+
+[**BaseResponseVoid**](BaseResponseVoid.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **smartDynamicScrape**
 > BaseResponseScrapeResultResponse smartDynamicScrape(url, maxArticles, forceDynamic)
 
@@ -13512,6 +17455,92 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **startStreaming**
+> BaseResponseLiveRoomResponse startStreaming(id)
+
+获取推流信息
+
+主播获取推流地址和密钥
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int id = 789; // int | 
+
+try {
+    final response = api.startStreaming(id);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->startStreaming: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **int**|  | 
+
+### Return type
+
+[**BaseResponseLiveRoomResponse**](BaseResponseLiveRoomResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **stopStreaming**
+> BaseResponseLiveRoomResponse stopStreaming(id)
+
+结束直播
+
+主播手动结束直播
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int id = 789; // int | 
+
+try {
+    final response = api.stopStreaming(id);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->stopStreaming: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **int**|  | 
+
+### Return type
+
+[**BaseResponseLiveRoomResponse**](BaseResponseLiveRoomResponse.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **studyWord**
 > BaseResponseVoid studyWord(wordId)
 
@@ -13541,6 +17570,90 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**BaseResponseVoid**](BaseResponseVoid.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **submitHomework**
+> SseEmitter submitHomework(submitHomeworkRequest)
+
+提交作业并开始批改（SSE流式返回进度）
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final SubmitHomeworkRequest submitHomeworkRequest = ; // SubmitHomeworkRequest | 
+
+try {
+    final response = api.submitHomework(submitHomeworkRequest);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->submitHomework: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **submitHomeworkRequest** | [**SubmitHomeworkRequest**](SubmitHomeworkRequest.md)|  | 
+
+### Return type
+
+[**SseEmitter**](SseEmitter.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json, text/event-stream
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **suggest**
+> BaseResponseListSearchSuggestionDTO suggest(q, type)
+
+搜索建议（即时联想）
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final String q = q_example; // String | 
+final String type = type_example; // String | 
+
+try {
+    final response = api.suggest(q, type);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->suggest: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **q** | **String**|  | 
+ **type** | **String**|  | [optional] [default to 'all']
+
+### Return type
+
+[**BaseResponseListSearchSuggestionDTO**](BaseResponseListSearchSuggestionDTO.md)
 
 ### Authorization
 
@@ -14094,6 +18207,47 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **unpublishExamPaper**
+> BaseResponseBoolean unpublishExamPaper(id)
+
+撤回试卷为草稿
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int id = 789; // int | 
+
+try {
+    final response = api.unpublishExamPaper(id);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->unpublishExamPaper: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **int**|  | 
+
+### Return type
+
+[**BaseResponseBoolean**](BaseResponseBoolean.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **update**
 > BaseResponseWorkflowResponse update(id, updateWorkflowRequest)
 
@@ -14211,6 +18365,137 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**BaseResponseBoolean**](BaseResponseBoolean.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **updateBook**
+> BaseResponseBookDTO updateBook(bookId, requestBody)
+
+编辑书籍信息
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int bookId = 789; // int | 
+final BuiltMap<String, String> requestBody = ; // BuiltMap<String, String> | 
+
+try {
+    final response = api.updateBook(bookId, requestBody);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->updateBook: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **bookId** | **int**|  | 
+ **requestBody** | [**BuiltMap&lt;String, String&gt;**](String.md)|  | 
+
+### Return type
+
+[**BaseResponseBookDTO**](BaseResponseBookDTO.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **updateBookCover**
+> BaseResponseBookDTO updateBookCover(bookId, updateBookCoverRequest)
+
+更新书籍封面
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int bookId = 789; // int | 
+final UpdateBookCoverRequest updateBookCoverRequest = ; // UpdateBookCoverRequest | 
+
+try {
+    final response = api.updateBookCover(bookId, updateBookCoverRequest);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->updateBookCover: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **bookId** | **int**|  | 
+ **updateBookCoverRequest** | [**UpdateBookCoverRequest**](UpdateBookCoverRequest.md)|  | [optional] 
+
+### Return type
+
+[**BaseResponseBookDTO**](BaseResponseBookDTO.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **updateBookmark**
+> BaseResponseReadingBookmarkDTO updateBookmark(bookId, bookmarkId, requestBody)
+
+更新书签备注/标题
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int bookId = 789; // int | 
+final int bookmarkId = 789; // int | 
+final BuiltMap<String, String> requestBody = ; // BuiltMap<String, String> | 
+
+try {
+    final response = api.updateBookmark(bookId, bookmarkId, requestBody);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->updateBookmark: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **bookId** | **int**|  | 
+ **bookmarkId** | **int**|  | 
+ **requestBody** | [**BuiltMap&lt;String, String&gt;**](String.md)|  | 
+
+### Return type
+
+[**BaseResponseReadingBookmarkDTO**](BaseResponseReadingBookmarkDTO.md)
 
 ### Authorization
 
@@ -14573,6 +18858,47 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **updateExamPaper**
+> BaseResponseBoolean updateExamPaper(updateExamPaperRequest)
+
+更新试卷基本信息
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final UpdateExamPaperRequest updateExamPaperRequest = ; // UpdateExamPaperRequest | 
+
+try {
+    final response = api.updateExamPaper(updateExamPaperRequest);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->updateExamPaper: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **updateExamPaperRequest** | [**UpdateExamPaperRequest**](UpdateExamPaperRequest.md)|  | 
+
+### Return type
+
+[**BaseResponseBoolean**](BaseResponseBoolean.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **updateFeedbackStatus**
 > BaseResponseBoolean updateFeedbackStatus(updateFeedbackStatusRequest)
 
@@ -14642,6 +18968,49 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **groupId** | **int**|  | 
+ **updateGroupRequest** | [**UpdateGroupRequest**](UpdateGroupRequest.md)|  | 
+
+### Return type
+
+[**BaseResponseVoid**](BaseResponseVoid.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **updateGroupInfo1**
+> BaseResponseVoid updateGroupInfo1(groupId, updateGroupRequest)
+
+更新群信息
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int groupId = 789; // int | 群ID
+final UpdateGroupRequest updateGroupRequest = ; // UpdateGroupRequest | 
+
+try {
+    final response = api.updateGroupInfo1(groupId, updateGroupRequest);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->updateGroupInfo1: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **groupId** | **int**| 群ID | 
  **updateGroupRequest** | [**UpdateGroupRequest**](UpdateGroupRequest.md)|  | 
 
 ### Return type
@@ -14880,6 +19249,182 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **updateNote**
+> BaseResponseReadingNoteDTO updateNote(bookId, noteId, requestBody)
+
+更新笔记内容/颜色
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int bookId = 789; // int | 
+final int noteId = 789; // int | 
+final BuiltMap<String, String> requestBody = ; // BuiltMap<String, String> | 
+
+try {
+    final response = api.updateNote(bookId, noteId, requestBody);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->updateNote: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **bookId** | **int**|  | 
+ **noteId** | **int**|  | 
+ **requestBody** | [**BuiltMap&lt;String, String&gt;**](String.md)|  | 
+
+### Return type
+
+[**BaseResponseReadingNoteDTO**](BaseResponseReadingNoteDTO.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **updatePaperQuestion**
+> BaseResponseBoolean updatePaperQuestion(paperId, sectionId, pqId, updatePaperQuestionRequest)
+
+更新试卷题目分值/排序
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int paperId = 789; // int | 
+final int sectionId = 789; // int | 
+final int pqId = 789; // int | 
+final UpdatePaperQuestionRequest updatePaperQuestionRequest = ; // UpdatePaperQuestionRequest | 
+
+try {
+    final response = api.updatePaperQuestion(paperId, sectionId, pqId, updatePaperQuestionRequest);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->updatePaperQuestion: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **paperId** | **int**|  | 
+ **sectionId** | **int**|  | 
+ **pqId** | **int**|  | 
+ **updatePaperQuestionRequest** | [**UpdatePaperQuestionRequest**](UpdatePaperQuestionRequest.md)|  | 
+
+### Return type
+
+[**BaseResponseBoolean**](BaseResponseBoolean.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **updatePlan**
+> BaseResponseVoid updatePlan(updatePlanRequest)
+
+更新会员计划基本信息
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final UpdatePlanRequest updatePlanRequest = ; // UpdatePlanRequest | 
+
+try {
+    final response = api.updatePlan(updatePlanRequest);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->updatePlan: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **updatePlanRequest** | [**UpdatePlanRequest**](UpdatePlanRequest.md)|  | 
+
+### Return type
+
+[**BaseResponseVoid**](BaseResponseVoid.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **updatePlanQuota**
+> BaseResponseVoid updatePlanQuota(planId, updatePlanQuotaRequest)
+
+修改计划AI配额
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int planId = 789; // int | 
+final UpdatePlanQuotaRequest updatePlanQuotaRequest = ; // UpdatePlanQuotaRequest | 
+
+try {
+    final response = api.updatePlanQuota(planId, updatePlanQuotaRequest);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->updatePlanQuota: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **planId** | **int**|  | 
+ **updatePlanQuotaRequest** | [**UpdatePlanQuotaRequest**](UpdatePlanQuotaRequest.md)|  | 
+
+### Return type
+
+[**BaseResponseVoid**](BaseResponseVoid.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **updatePost**
 > BaseResponseVoid updatePost(postId, updatePostRequest)
 
@@ -15048,6 +19593,47 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **updateQuestion**
+> BaseResponseBoolean updateQuestion(updateQuestionRequest)
+
+更新题目
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final UpdateQuestionRequest updateQuestionRequest = ; // UpdateQuestionRequest | 
+
+try {
+    final response = api.updateQuestion(updateQuestionRequest);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->updateQuestion: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **updateQuestionRequest** | [**UpdateQuestionRequest**](UpdateQuestionRequest.md)|  | 
+
+### Return type
+
+[**BaseResponseBoolean**](BaseResponseBoolean.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **updateReview**
 > BaseResponseVoid updateReview(reviewId, reviewCourseRequest)
 
@@ -15092,7 +19678,52 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **updateSection**
-> BaseResponseVoid updateSection(courseId, sectionId, updateSectionRequest)
+> BaseResponseBoolean updateSection(paperId, sectionId, addPaperSectionRequest)
+
+更新大题
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int paperId = 789; // int | 
+final int sectionId = 789; // int | 
+final AddPaperSectionRequest addPaperSectionRequest = ; // AddPaperSectionRequest | 
+
+try {
+    final response = api.updateSection(paperId, sectionId, addPaperSectionRequest);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->updateSection: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **paperId** | **int**|  | 
+ **sectionId** | **int**|  | 
+ **addPaperSectionRequest** | [**AddPaperSectionRequest**](AddPaperSectionRequest.md)|  | 
+
+### Return type
+
+[**BaseResponseBoolean**](BaseResponseBoolean.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **updateSection1**
+> BaseResponseVoid updateSection1(courseId, sectionId, updateSectionRequest)
 
 更新小节（管理员）
 
@@ -15106,10 +19737,10 @@ final int sectionId = 789; // int | 小节ID
 final UpdateSectionRequest updateSectionRequest = ; // UpdateSectionRequest | 
 
 try {
-    final response = api.updateSection(courseId, sectionId, updateSectionRequest);
+    final response = api.updateSection1(courseId, sectionId, updateSectionRequest);
     print(response);
 } catch on DioException (e) {
-    print('Exception when calling DefaultApi->updateSection: $e\n');
+    print('Exception when calling DefaultApi->updateSection1: $e\n');
 }
 ```
 
@@ -15396,6 +20027,51 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **uploadTemplate1**
+> BaseResponseLong uploadTemplate1(name, description, uploadTemplate1Request)
+
+上传试卷模板
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final String name = name_example; // String | 模板名称
+final String description = description_example; // String | 模板描述
+final UploadTemplate1Request uploadTemplate1Request = ; // UploadTemplate1Request | 
+
+try {
+    final response = api.uploadTemplate1(name, description, uploadTemplate1Request);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->uploadTemplate1: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **name** | **String**| 模板名称 | 
+ **description** | **String**| 模板描述 | [optional] 
+ **uploadTemplate1Request** | [**UploadTemplate1Request**](UploadTemplate1Request.md)|  | [optional] 
+
+### Return type
+
+[**BaseResponseLong**](BaseResponseLong.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **userLogin**
 > BaseResponseLoginUserResponse userLogin(userLoginRequest)
 
@@ -15519,6 +20195,47 @@ Name | Type | Description  | Notes
 ### HTTP request headers
 
  - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **wechatCallback**
+> String wechatCallback(body)
+
+微信支付异步回调（预留）
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final String body = body_example; // String | 
+
+try {
+    final response = api.wechatCallback(body);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->wechatCallback: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **body** | **String**|  | 
+
+### Return type
+
+**String**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
  - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)

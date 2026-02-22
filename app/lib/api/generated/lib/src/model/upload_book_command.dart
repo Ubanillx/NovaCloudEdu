@@ -16,6 +16,7 @@ part 'upload_book_command.g.dart';
 /// * [title]
 /// * [adminId]
 /// * [author]
+/// * [cover]
 @BuiltValue()
 abstract class UploadBookCommand
     implements Built<UploadBookCommand, UploadBookCommandBuilder> {
@@ -30,6 +31,9 @@ abstract class UploadBookCommand
 
   @BuiltValueField(wireName: r'author')
   String? get author;
+
+  @BuiltValueField(wireName: r'cover')
+  Uint8List? get cover;
 
   UploadBookCommand._();
 
@@ -77,6 +81,13 @@ class _$UploadBookCommandSerializer
       yield serializers.serialize(
         object.author,
         specifiedType: const FullType(String),
+      );
+    }
+    if (object.cover != null) {
+      yield r'cover';
+      yield serializers.serialize(
+        object.cover,
+        specifiedType: const FullType(Uint8List),
       );
     }
   }
@@ -131,6 +142,13 @@ class _$UploadBookCommandSerializer
             specifiedType: const FullType(String),
           ) as String;
           result.author = valueDes;
+          break;
+        case r'cover':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(Uint8List),
+          ) as Uint8List;
+          result.cover = valueDes;
           break;
         default:
           unhandled.add(key);

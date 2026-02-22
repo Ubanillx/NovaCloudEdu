@@ -23,8 +23,8 @@ Name | Type | Description | Notes
 **announcementTime** | [**DateTime**](DateTime.md) |  | [optional] 
 **createTime** | [**DateTime**](DateTime.md) |  | [optional] 
 **updateTime** | [**DateTime**](DateTime.md) |  | [optional] 
-**mute** | **bool** |  | [optional] 
 **full** | **bool** |  | [optional] 
+**mute** | **bool** |  | [optional] 
 **delete** | **bool** |  | [optional] 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

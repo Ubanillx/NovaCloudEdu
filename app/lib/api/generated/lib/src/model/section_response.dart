@@ -21,6 +21,11 @@ part 'section_response.g.dart';
 /// * [sort] - 排序
 /// * [isFree] - 是否免费
 /// * [resourceUrl] - 资源URL
+/// * [hlsUrl] - HLS播放地址(m3u8)
+/// * [accessible] - 当前用户是否可访问此小节
+/// * [transcodeStatus] - 转码状态: 0-未转码, 1-转码中, 2-已完成, 3-失败
+/// * [thumbnailUrl] - 缩略图雪碧图URL
+/// * [thumbnailCount] - 缩略图数量
 /// * [createTime] - 创建时间
 /// * [updateTime] - 更新时间
 @BuiltValue()
@@ -65,6 +70,26 @@ abstract class SectionResponse
   /// 资源URL
   @BuiltValueField(wireName: r'resourceUrl')
   String? get resourceUrl;
+
+  /// HLS播放地址(m3u8)
+  @BuiltValueField(wireName: r'hlsUrl')
+  String? get hlsUrl;
+
+  /// 当前用户是否可访问此小节
+  @BuiltValueField(wireName: r'accessible')
+  bool? get accessible;
+
+  /// 转码状态: 0-未转码, 1-转码中, 2-已完成, 3-失败
+  @BuiltValueField(wireName: r'transcodeStatus')
+  int? get transcodeStatus;
+
+  /// 缩略图雪碧图URL
+  @BuiltValueField(wireName: r'thumbnailUrl')
+  String? get thumbnailUrl;
+
+  /// 缩略图数量
+  @BuiltValueField(wireName: r'thumbnailCount')
+  int? get thumbnailCount;
 
   /// 创建时间
   @BuiltValueField(wireName: r'createTime')
@@ -168,6 +193,41 @@ class _$SectionResponseSerializer
       yield serializers.serialize(
         object.resourceUrl,
         specifiedType: const FullType(String),
+      );
+    }
+    if (object.hlsUrl != null) {
+      yield r'hlsUrl';
+      yield serializers.serialize(
+        object.hlsUrl,
+        specifiedType: const FullType(String),
+      );
+    }
+    if (object.accessible != null) {
+      yield r'accessible';
+      yield serializers.serialize(
+        object.accessible,
+        specifiedType: const FullType(bool),
+      );
+    }
+    if (object.transcodeStatus != null) {
+      yield r'transcodeStatus';
+      yield serializers.serialize(
+        object.transcodeStatus,
+        specifiedType: const FullType(int),
+      );
+    }
+    if (object.thumbnailUrl != null) {
+      yield r'thumbnailUrl';
+      yield serializers.serialize(
+        object.thumbnailUrl,
+        specifiedType: const FullType(String),
+      );
+    }
+    if (object.thumbnailCount != null) {
+      yield r'thumbnailCount';
+      yield serializers.serialize(
+        object.thumbnailCount,
+        specifiedType: const FullType(int),
       );
     }
     if (object.createTime != null) {
@@ -278,6 +338,41 @@ class _$SectionResponseSerializer
             specifiedType: const FullType(String),
           ) as String;
           result.resourceUrl = valueDes;
+          break;
+        case r'hlsUrl':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.hlsUrl = valueDes;
+          break;
+        case r'accessible':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(bool),
+          ) as bool;
+          result.accessible = valueDes;
+          break;
+        case r'transcodeStatus':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(int),
+          ) as int;
+          result.transcodeStatus = valueDes;
+          break;
+        case r'thumbnailUrl':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.thumbnailUrl = valueDes;
+          break;
+        case r'thumbnailCount':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(int),
+          ) as int;
+          result.thumbnailCount = valueDes;
           break;
         case r'createTime':
           final valueDes = serializers.deserialize(

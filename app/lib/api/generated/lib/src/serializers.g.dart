@@ -14,13 +14,17 @@ Serializers _$serializers =
           ..add(AddEdgeRequest.serializer)
           ..add(AddNodeRequest.serializer)
           ..add(AddNodeRequestTypeEnum.serializer)
+          ..add(AddPaperQuestionRequest.serializer)
+          ..add(AddPaperSectionRequest.serializer)
           ..add(AddScheduleItemRequest.serializer)
           ..add(AddVariableRequest.serializer)
           ..add(AddVariableRequestTypeEnum.serializer)
+          ..add(AdminGroupPageResponse.serializer)
           ..add(AiAssistantVO.serializer)
           ..add(AiConversation.serializer)
           ..add(AiConversationConversationTypeEnum.serializer)
           ..add(AiConversationId.serializer)
+          ..add(AiGenerateQuestionsRequest.serializer)
           ..add(AiProcessArticleRequest.serializer)
           ..add(AiProcessResultResponse.serializer)
           ..add(AnnouncementDetailResponse.serializer)
@@ -36,6 +40,7 @@ Serializers _$serializers =
           ..add(BannerListResponse.serializer)
           ..add(BannerPageResponse.serializer)
           ..add(BannerResponse.serializer)
+          ..add(BaseResponseAdminGroupPageResponse.serializer)
           ..add(BaseResponseAiAssistantVO.serializer)
           ..add(BaseResponseAiConversation.serializer)
           ..add(BaseResponseAiProcessResultResponse.serializer)
@@ -55,6 +60,7 @@ Serializers _$serializers =
           ..add(BaseResponseChatMessagePageResponse.serializer)
           ..add(BaseResponseCheckinResult.serializer)
           ..add(BaseResponseCheckinStatusResult.serializer)
+          ..add(BaseResponseClassAnalyticsResponse.serializer)
           ..add(BaseResponseClassResponse.serializer)
           ..add(BaseResponseCommentPageResponse.serializer)
           ..add(BaseResponseCommentResponse.serializer)
@@ -66,6 +72,16 @@ Serializers _$serializers =
           ..add(BaseResponseDailyArticleResponse.serializer)
           ..add(BaseResponseDailyWordPageResponse.serializer)
           ..add(BaseResponseDailyWordResponse.serializer)
+          ..add(BaseResponseDashboardAiSystemResponse.serializer)
+          ..add(BaseResponseDashboardAlertsResponse.serializer)
+          ..add(BaseResponseDashboardContentResponse.serializer)
+          ..add(BaseResponseDashboardFullResponse.serializer)
+          ..add(BaseResponseDashboardLearningResponse.serializer)
+          ..add(BaseResponseDashboardOverviewResponse.serializer)
+          ..add(BaseResponseDashboardTrendsResponse.serializer)
+          ..add(BaseResponseExamPaperPageResponse.serializer)
+          ..add(BaseResponseExamPaperResponse.serializer)
+          ..add(BaseResponseExamTemplateResponse.serializer)
           ..add(BaseResponseExecutionResultResponse.serializer)
           ..add(BaseResponseExecutionStatisticsResponse.serializer)
           ..add(BaseResponseFeedbackDetailResponse.serializer)
@@ -74,6 +90,10 @@ Serializers _$serializers =
           ..add(BaseResponseFollowStatsResponse.serializer)
           ..add(BaseResponseFriendPageResponse.serializer)
           ..add(BaseResponseFriendRequestPageResponse.serializer)
+          ..add(BaseResponseGenerateAvatarResponse.serializer)
+          ..add(BaseResponseGenerateBannerImageResponse.serializer)
+          ..add(BaseResponseGradingResultResponse.serializer)
+          ..add(BaseResponseGradingStatsResponse.serializer)
           ..add(BaseResponseGroupMessagePageResponse.serializer)
           ..add(BaseResponseGroupPage.serializer)
           ..add(BaseResponseGroupResponse.serializer)
@@ -82,6 +102,7 @@ Serializers _$serializers =
           ..add(BaseResponseKnowledgeBaseVO.serializer)
           ..add(BaseResponseKnowledgeDocumentVO.serializer)
           ..add(BaseResponseLearningStats.serializer)
+          ..add(BaseResponseLearningTrendResponse.serializer)
           ..add(BaseResponseListAiAssistantVO.serializer)
           ..add(BaseResponseListAiConversation.serializer)
           ..add(BaseResponseListArticleSourceResponse.serializer)
@@ -97,6 +118,7 @@ Serializers _$serializers =
           ..add(BaseResponseListCourseReviewResponse.serializer)
           ..add(BaseResponseListDailyArticleResponse.serializer)
           ..add(BaseResponseListDailyWordResponse.serializer)
+          ..add(BaseResponseListExamTemplateResponse.serializer)
           ..add(BaseResponseListExecutionLogResponse.serializer)
           ..add(BaseResponseListExecutionResultResponse.serializer)
           ..add(BaseResponseListFeedbackReplyResponse.serializer)
@@ -109,20 +131,33 @@ Serializers _$serializers =
           ..add(BaseResponseListKnowledgeBaseVO.serializer)
           ..add(BaseResponseListKnowledgeDocumentVO.serializer)
           ..add(BaseResponseListKnowledgePoint.serializer)
+          ..add(BaseResponseListKnowledgeProfileResponse.serializer)
           ..add(BaseResponseListLong.serializer)
           ..add(BaseResponseListMapStringObject.serializer)
+          ..add(BaseResponseListMembershipPlan.serializer)
           ..add(BaseResponseListMessageReadUserResponse.serializer)
           ..add(BaseResponseListNodeTypeResponse.serializer)
           ..add(BaseResponseListOrderResponse.serializer)
+          ..add(BaseResponseListPaperQuestionResponse.serializer)
+          ..add(BaseResponseListPaperSectionResponse.serializer)
           ..add(BaseResponseListPostResponse.serializer)
+          ..add(BaseResponseListPptTemplateListResponse.serializer)
           ..add(BaseResponseListProgressResponse.serializer)
+          ..add(BaseResponseListReadingBookmarkDTO.serializer)
+          ..add(BaseResponseListReadingNoteDTO.serializer)
           ..add(BaseResponseListScraperConfigResponse.serializer)
+          ..add(BaseResponseListSearchSuggestionDTO.serializer)
           ..add(BaseResponseListSectionResponse.serializer)
           ..add(BaseResponseListString.serializer)
+          ..add(BaseResponseListStudentRankingItem.serializer)
+          ..add(BaseResponseListSubjectAnalyticsItem.serializer)
+          ..add(BaseResponseListSubjectProfileSummary.serializer)
+          ..add(BaseResponseListSubmissionStatusResponse.serializer)
           ..add(BaseResponseListTeacherApplicationResponse.serializer)
           ..add(BaseResponseListTeacherResponse.serializer)
           ..add(BaseResponseListUserDailyArticleResponse.serializer)
           ..add(BaseResponseListUserDailyWordResponse.serializer)
+          ..add(BaseResponseListUserMembership.serializer)
           ..add(BaseResponseListUserShelfDTO.serializer)
           ..add(BaseResponseListUserWordBookResponse.serializer)
           ..add(BaseResponseListWorkflowEdgeResponse.serializer)
@@ -133,19 +168,32 @@ Serializers _$serializers =
           ..add(BaseResponseListWorkflowTriggerResponse.serializer)
           ..add(BaseResponseListWorkflowVariableResponse.serializer)
           ..add(BaseResponseListWorkflowVersionResponse.serializer)
+          ..add(BaseResponseLiveRoomResponse.serializer)
           ..add(BaseResponseLoginUserResponse.serializer)
           ..add(BaseResponseLong.serializer)
+          ..add(BaseResponseMapStringInteger.serializer)
+          ..add(BaseResponseMapStringLong.serializer)
+          ..add(BaseResponseMapStringMapStringInteger.serializer)
           ..add(BaseResponseMapStringObject.serializer)
           ..add(BaseResponseMapStringString.serializer)
           ..add(BaseResponseMemberPage.serializer)
+          ..add(BaseResponseMembershipPlan.serializer)
           ..add(BaseResponseObject.serializer)
           ..add(BaseResponseOrderResponse.serializer)
           ..add(BaseResponseOrderStatistics.serializer)
           ..add(BaseResponsePageResponseClassMemberResponse.serializer)
+          ..add(BaseResponsePageResponseClassResponse.serializer)
+          ..add(BaseResponsePageResult.serializer)
           ..add(BaseResponsePostDetailResponse.serializer)
           ..add(BaseResponsePostPageResponse.serializer)
           ..add(BaseResponsePostResponse.serializer)
+          ..add(BaseResponsePptGenerateResponse.serializer)
+          ..add(BaseResponsePptTemplateDetailResponse.serializer)
           ..add(BaseResponseProgressResponse.serializer)
+          ..add(BaseResponseQuestionPageResponse.serializer)
+          ..add(BaseResponseQuestionResponse.serializer)
+          ..add(BaseResponseReadingBookmarkDTO.serializer)
+          ..add(BaseResponseReadingNoteDTO.serializer)
           ..add(BaseResponseReadingQuiz.serializer)
           ..add(BaseResponseReadingStats.serializer)
           ..add(BaseResponseRefreshTokenResponse.serializer)
@@ -161,11 +209,15 @@ Serializers _$serializers =
           ..add(BaseResponseSectionResponse.serializer)
           ..add(BaseResponseSendResult.serializer)
           ..add(BaseResponseString.serializer)
+          ..add(BaseResponseStudentAnalyticsResponse.serializer)
+          ..add(BaseResponseSubjectProfileSummary.serializer)
+          ..add(BaseResponseSubmissionStatusResponse.serializer)
           ..add(BaseResponseTeacherApplicationResponse.serializer)
           ..add(BaseResponseTeacherResponse.serializer)
           ..add(BaseResponseTtsResponse.serializer)
           ..add(BaseResponseUserAnnouncementPageResponse.serializer)
           ..add(BaseResponseUserDetailResponse.serializer)
+          ..add(BaseResponseUserMembershipDetailResponse.serializer)
           ..add(BaseResponseUserPageResponse.serializer)
           ..add(BaseResponseUserPublicResponse.serializer)
           ..add(BaseResponseUserStatsResult.serializer)
@@ -210,10 +262,12 @@ Serializers _$serializers =
           ..add(ChatMessageResponse.serializer)
           ..add(ChatRequest.serializer)
           ..add(ChatSessionResponse.serializer)
+          ..add(CheckPermissionRequest.serializer)
           ..add(CheckinRankingItem.serializer)
           ..add(CheckinResult.serializer)
           ..add(CheckinStatusResult.serializer)
           ..add(ChildrenDefinition.serializer)
+          ..add(ClassAnalyticsResponse.serializer)
           ..add(ClassMemberResponse.serializer)
           ..add(ClassResponse.serializer)
           ..add(ClassScheduleItemResponse.serializer)
@@ -237,11 +291,16 @@ Serializers _$serializers =
           ..add(CreateCourseRequest.serializer)
           ..add(CreateDailyArticleRequest.serializer)
           ..add(CreateDailyWordRequest.serializer)
+          ..add(CreateExamPaperRequest.serializer)
           ..add(CreateFeedbackRequest.serializer)
           ..add(CreateGroupRequest.serializer)
           ..add(CreateKnowledgeBaseCommand.serializer)
+          ..add(CreateLiveRoomRequest.serializer)
           ..add(CreateOrderRequest.serializer)
+          ..add(CreatePlanRequest.serializer)
           ..add(CreatePostRequest.serializer)
+          ..add(CreateQuestionRequest.serializer)
+          ..add(CreateReadingNoteCommand.serializer)
           ..add(CreateReplyRequest.serializer)
           ..add(CreateScheduleSettingRequest.serializer)
           ..add(CreateSectionRequest.serializer)
@@ -251,11 +310,22 @@ Serializers _$serializers =
           ..add(DailyArticleResponse.serializer)
           ..add(DailyWordPageResponse.serializer)
           ..add(DailyWordResponse.serializer)
+          ..add(DashboardAiSystemResponse.serializer)
+          ..add(DashboardAlertsResponse.serializer)
+          ..add(DashboardContentResponse.serializer)
+          ..add(DashboardFullResponse.serializer)
+          ..add(DashboardLearningResponse.serializer)
+          ..add(DashboardOverviewResponse.serializer)
+          ..add(DashboardTrendsResponse.serializer)
           ..add(DynamicScrapeRequest.serializer)
+          ..add(ErrorCategoryCount.serializer)
           ..add(ErrorHandlingConfig.serializer)
           ..add(ErrorHandlingConfigDTO.serializer)
           ..add(ErrorHandlingConfigDTOOnErrorEnum.serializer)
           ..add(ErrorHandlingConfigOnErrorEnum.serializer)
+          ..add(ExamPaperPageResponse.serializer)
+          ..add(ExamPaperResponse.serializer)
+          ..add(ExamTemplateResponse.serializer)
           ..add(ExecuteTaskRequest.serializer)
           ..add(ExecuteWorkflowRequest.serializer)
           ..add(ExecutionLogResponse.serializer)
@@ -279,6 +349,14 @@ Serializers _$serializers =
           ..add(FriendRequestPageResponse.serializer)
           ..add(FriendRequestResponse.serializer)
           ..add(FriendResponse.serializer)
+          ..add(GenerateAvatarRequest.serializer)
+          ..add(GenerateAvatarResponse.serializer)
+          ..add(GenerateBannerImageRequest.serializer)
+          ..add(GenerateBannerImageResponse.serializer)
+          ..add(GeneratePptRequest.serializer)
+          ..add(GradingResultResponse.serializer)
+          ..add(GradingStatsResponse.serializer)
+          ..add(GrantMembershipRequest.serializer)
           ..add(GroupId.serializer)
           ..add(GroupMemberResponse.serializer)
           ..add(GroupMessageItem.serializer)
@@ -294,9 +372,14 @@ Serializers _$serializers =
           ..add(KnowledgePoint.serializer)
           ..add(KnowledgePointId.serializer)
           ..add(KnowledgePointPointTypeEnum.serializer)
+          ..add(KnowledgeProfileResponse.serializer)
           ..add(LearningStats.serializer)
+          ..add(LearningTrendResponse.serializer)
+          ..add(LiveRoomResponse.serializer)
           ..add(LoginUserResponse.serializer)
           ..add(MemberPage.serializer)
+          ..add(MembershipPlan.serializer)
+          ..add(MembershipPlanCodeEnum.serializer)
           ..add(MessageReadUserResponse.serializer)
           ..add(NodeExecutionDTO.serializer)
           ..add(NodeTypeResponse.serializer)
@@ -304,21 +387,37 @@ Serializers _$serializers =
           ..add(OrderResponse.serializer)
           ..add(OrderStatistics.serializer)
           ..add(PageResponseClassMemberResponse.serializer)
+          ..add(PageResponseClassResponse.serializer)
+          ..add(PageResult.serializer)
+          ..add(PaperQuestionResponse.serializer)
+          ..add(PaperSectionResponse.serializer)
           ..add(PhoneLoginRequest.serializer)
           ..add(Position.serializer)
           ..add(PositionDTO.serializer)
           ..add(PostDetailResponse.serializer)
           ..add(PostPageResponse.serializer)
           ..add(PostResponse.serializer)
+          ..add(PptGenerateResponse.serializer)
+          ..add(PptGenerationRequest.serializer)
+          ..add(PptTemplateDetailResponse.serializer)
+          ..add(PptTemplateListResponse.serializer)
           ..add(PreviewAiProcessRequest.serializer)
           ..add(ProgressResponse.serializer)
+          ..add(PurchaseMembershipRequest.serializer)
           ..add(QueryAnnouncementRequest.serializer)
           ..add(QueryBannerRequest.serializer)
+          ..add(QueryExamPaperRequest.serializer)
           ..add(QueryFeedbackRequest.serializer)
+          ..add(QueryQuestionRequest.serializer)
           ..add(QueryUserRequest.serializer)
+          ..add(QuestionGradingItem.serializer)
+          ..add(QuestionPageResponse.serializer)
+          ..add(QuestionResponse.serializer)
           ..add(QuizQuestion.serializer)
           ..add(QuizQuestionDifficultyEnum.serializer)
           ..add(QuizQuestionTypeEnum.serializer)
+          ..add(ReadingBookmarkDTO.serializer)
+          ..add(ReadingNoteDTO.serializer)
           ..add(ReadingQuiz.serializer)
           ..add(ReadingQuizId.serializer)
           ..add(ReadingStats.serializer)
@@ -329,7 +428,9 @@ Serializers _$serializers =
           ..add(ResetPasswordRequest.serializer)
           ..add(ReviewApplicationRequest.serializer)
           ..add(ReviewCourseRequest.serializer)
+          ..add(SaveCallRecordRequest.serializer)
           ..add(ScheduleResponse.serializer)
+          ..add(ScoreTrendItem.serializer)
           ..add(ScrapeConfigRequest.serializer)
           ..add(ScrapeRequest.serializer)
           ..add(ScrapeResultResponse.serializer)
@@ -338,6 +439,8 @@ Serializers _$serializers =
           ..add(ScraperConfigResponse.serializer)
           ..add(ScraperTaskPageResponse.serializer)
           ..add(ScraperTaskResponse.serializer)
+          ..add(SearchResultDTO.serializer)
+          ..add(SearchSuggestionDTO.serializer)
           ..add(SearchUserPageResponse.serializer)
           ..add(SearchUserRequestDTO.serializer)
           ..add(SearchUserResponse.serializer)
@@ -350,30 +453,44 @@ Serializers _$serializers =
           ..add(SkillOutputVO.serializer)
           ..add(SkillParamVO.serializer)
           ..add(SourceScrapeRequest.serializer)
+          ..add(SrsCallbackRequest.serializer)
           ..add(SseEmitter.serializer)
+          ..add(StudentAnalyticsResponse.serializer)
+          ..add(StudentRankingItem.serializer)
+          ..add(SubjectAnalyticsItem.serializer)
+          ..add(SubjectProfileSummary.serializer)
+          ..add(SubmissionStatusResponse.serializer)
+          ..add(SubmitHomeworkRequest.serializer)
           ..add(TeacherApplicationResponse.serializer)
           ..add(TeacherResponse.serializer)
           ..add(TimeConfigItem.serializer)
+          ..add(TrendItem.serializer)
           ..add(TtsRequest.serializer)
           ..add(TtsResponse.serializer)
           ..add(UpdateAiAssistantCommand.serializer)
           ..add(UpdateAnnouncementRequest.serializer)
           ..add(UpdateBannerRequest.serializer)
+          ..add(UpdateBookCoverRequest.serializer)
           ..add(UpdateChapterRequest.serializer)
           ..add(UpdateClassRequest.serializer)
           ..add(UpdateCourseRequest.serializer)
           ..add(UpdateDailyArticleRequest.serializer)
           ..add(UpdateDailyWordRequest.serializer)
           ..add(UpdateEdgeRequest.serializer)
+          ..add(UpdateExamPaperRequest.serializer)
           ..add(UpdateFeedbackStatusRequest.serializer)
           ..add(UpdateGroupRequest.serializer)
           ..add(UpdateKnowledgeBaseCommand.serializer)
           ..add(UpdateNodeConfigRequest.serializer)
           ..add(UpdateNodeRequest.serializer)
           ..add(UpdateNodeRequestTypeEnum.serializer)
+          ..add(UpdatePaperQuestionRequest.serializer)
+          ..add(UpdatePlanQuotaRequest.serializer)
+          ..add(UpdatePlanRequest.serializer)
           ..add(UpdatePostRequest.serializer)
           ..add(UpdateProfileRequest.serializer)
           ..add(UpdateProgressRequest.serializer)
+          ..add(UpdateQuestionRequest.serializer)
           ..add(UpdateReadingProgressCommand.serializer)
           ..add(UpdateScheduleItemRequest.serializer)
           ..add(UpdateScheduleSettingRequest.serializer)
@@ -387,12 +504,17 @@ Serializers _$serializers =
           ..add(UpdateWorkflowSettingsRequest.serializer)
           ..add(UpdateWorkflowSettingsRequestLogLevelEnum.serializer)
           ..add(UploadBookCommand.serializer)
+          ..add(UploadTemplate1Request.serializer)
+          ..add(UploadTemplateRequest.serializer)
           ..add(UserAnnouncementPageResponse.serializer)
           ..add(UserDailyArticleResponse.serializer)
           ..add(UserDailyWordResponse.serializer)
           ..add(UserDetailResponse.serializer)
           ..add(UserId.serializer)
           ..add(UserLoginRequest.serializer)
+          ..add(UserMembership.serializer)
+          ..add(UserMembershipDetailResponse.serializer)
+          ..add(UserMembershipStatusEnum.serializer)
           ..add(UserPageResponse.serializer)
           ..add(UserPublicResponse.serializer)
           ..add(UserRegisterRequest.serializer)
@@ -500,6 +622,159 @@ Serializers _$serializers =
             const FullType(BuiltList, const [
               const FullType(BuiltMap, const [
                 const FullType(String),
+                const FullType(JsonObject),
+              ]),
+            ]),
+            () => ListBuilder<BuiltMap<String, JsonObject>>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [
+              const FullType(BuiltMap, const [
+                const FullType(String),
+                const FullType(JsonObject),
+              ]),
+            ]),
+            () => ListBuilder<BuiltMap<String, JsonObject>>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [
+              const FullType(BuiltMap, const [
+                const FullType(String),
+                const FullType(JsonObject),
+              ]),
+            ]),
+            () => ListBuilder<BuiltMap<String, JsonObject>>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [
+              const FullType(BuiltMap, const [
+                const FullType(String),
+                const FullType(JsonObject),
+              ]),
+            ]),
+            () => ListBuilder<BuiltMap<String, JsonObject>>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [
+              const FullType(BuiltMap, const [
+                const FullType(String),
+                const FullType(JsonObject),
+              ]),
+            ]),
+            () => ListBuilder<BuiltMap<String, JsonObject>>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [
+              const FullType(BuiltMap, const [
+                const FullType(String),
+                const FullType(JsonObject),
+              ]),
+            ]),
+            () => ListBuilder<BuiltMap<String, JsonObject>>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [
+              const FullType(BuiltMap, const [
+                const FullType(String),
+                const FullType(JsonObject),
+              ]),
+            ]),
+            () => ListBuilder<BuiltMap<String, JsonObject>>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [
+              const FullType(BuiltMap, const [
+                const FullType(String),
+                const FullType(JsonObject),
+              ]),
+            ]),
+            () => ListBuilder<BuiltMap<String, JsonObject>>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [
+              const FullType(BuiltMap, const [
+                const FullType(String),
+                const FullType(JsonObject),
+              ]),
+            ]),
+            () => ListBuilder<BuiltMap<String, JsonObject>>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [
+              const FullType(BuiltMap, const [
+                const FullType(String),
+                const FullType(JsonObject),
+              ]),
+            ]),
+            () => ListBuilder<BuiltMap<String, JsonObject>>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [
+              const FullType(BuiltMap, const [
+                const FullType(String),
+                const FullType(JsonObject),
+              ]),
+            ]),
+            () => ListBuilder<BuiltMap<String, JsonObject>>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [
+              const FullType(BuiltMap, const [
+                const FullType(String),
+                const FullType(JsonObject),
+              ]),
+            ]),
+            () => ListBuilder<BuiltMap<String, JsonObject>>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [
+              const FullType(BuiltMap, const [
+                const FullType(String),
+                const FullType(JsonObject),
+              ]),
+            ]),
+            () => ListBuilder<BuiltMap<String, JsonObject>>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [
+              const FullType(BuiltMap, const [
+                const FullType(String),
+                const FullType(JsonObject),
+              ]),
+            ]),
+            () => ListBuilder<BuiltMap<String, JsonObject>>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [
+              const FullType(BuiltMap, const [
+                const FullType(String),
+                const FullType(JsonObject),
+              ]),
+            ]),
+            () => ListBuilder<BuiltMap<String, JsonObject>>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [
+              const FullType(BuiltMap, const [
+                const FullType(String),
+                const FullType(JsonObject),
+              ]),
+            ]),
+            () => ListBuilder<BuiltMap<String, JsonObject>>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [
+              const FullType(BuiltMap, const [
+                const FullType(String),
+                const FullType(JsonObject),
+              ]),
+            ]),
+            () => ListBuilder<BuiltMap<String, JsonObject>>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [
+              const FullType(BuiltMap, const [
+                const FullType(String),
                 const FullType(String),
               ]),
             ]),
@@ -567,6 +842,10 @@ Serializers _$serializers =
             () => ListBuilder<ClassMemberResponse>(),
           )
           ..addBuilderFactory(
+            const FullType(BuiltList, const [const FullType(ClassResponse)]),
+            () => ListBuilder<ClassResponse>(),
+          )
+          ..addBuilderFactory(
             const FullType(BuiltList, const [
               const FullType(ClassScheduleItemResponse),
             ]),
@@ -631,6 +910,18 @@ Serializers _$serializers =
               const FullType(DailyWordResponse),
             ]),
             () => ListBuilder<DailyWordResponse>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [
+              const FullType(ExamPaperResponse),
+            ]),
+            () => ListBuilder<ExamPaperResponse>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [
+              const FullType(ExamTemplateResponse),
+            ]),
+            () => ListBuilder<ExamTemplateResponse>(),
           )
           ..addBuilderFactory(
             const FullType(BuiltList, const [
@@ -703,6 +994,10 @@ Serializers _$serializers =
             () => ListBuilder<GroupResponse>(),
           )
           ..addBuilderFactory(
+            const FullType(BuiltList, const [const FullType(GroupResponse)]),
+            () => ListBuilder<GroupResponse>(),
+          )
+          ..addBuilderFactory(
             const FullType(BuiltList, const [
               const FullType(JoinRequestResponse),
             ]),
@@ -721,6 +1016,28 @@ Serializers _$serializers =
           ..addBuilderFactory(
             const FullType(BuiltList, const [const FullType(KnowledgePoint)]),
             () => ListBuilder<KnowledgePoint>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [
+              const FullType(KnowledgeProfileResponse),
+            ]),
+            () => ListBuilder<KnowledgeProfileResponse>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [
+              const FullType(KnowledgeProfileResponse),
+            ]),
+            () => ListBuilder<KnowledgeProfileResponse>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [
+              const FullType(KnowledgeProfileResponse),
+            ]),
+            () => ListBuilder<KnowledgeProfileResponse>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [const FullType(MembershipPlan)]),
+            () => ListBuilder<MembershipPlan>(),
           )
           ..addBuilderFactory(
             const FullType(BuiltList, const [
@@ -748,24 +1065,79 @@ Serializers _$serializers =
             () => ListBuilder<OrderResponse>(),
           )
           ..addBuilderFactory(
+            const FullType(BuiltList, const [
+              const FullType(PaperQuestionResponse),
+            ]),
+            () => ListBuilder<PaperQuestionResponse>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [
+              const FullType(PaperSectionResponse),
+            ]),
+            () => ListBuilder<PaperSectionResponse>(),
+          )
+          ..addBuilderFactory(
             const FullType(BuiltList, const [const FullType(PostResponse)]),
             () => ListBuilder<PostResponse>(),
           )
           ..addBuilderFactory(
             const FullType(BuiltList, const [const FullType(PostResponse)]),
             () => ListBuilder<PostResponse>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [
+              const FullType(PptTemplateListResponse),
+            ]),
+            () => ListBuilder<PptTemplateListResponse>(),
           )
           ..addBuilderFactory(
             const FullType(BuiltList, const [const FullType(ProgressResponse)]),
             () => ListBuilder<ProgressResponse>(),
           )
           ..addBuilderFactory(
+            const FullType(BuiltList, const [
+              const FullType(QuestionGradingItem),
+            ]),
+            () => ListBuilder<QuestionGradingItem>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [const FullType(QuestionResponse)]),
+            () => ListBuilder<QuestionResponse>(),
+          )
+          ..addBuilderFactory(
             const FullType(BuiltList, const [const FullType(QuizQuestion)]),
             () => ListBuilder<QuizQuestion>(),
           )
           ..addBuilderFactory(
+            const FullType(BuiltList, const [
+              const FullType(ReadingBookmarkDTO),
+            ]),
+            () => ListBuilder<ReadingBookmarkDTO>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [const FullType(ReadingNoteDTO)]),
+            () => ListBuilder<ReadingNoteDTO>(),
+          )
+          ..addBuilderFactory(
             const FullType(BuiltList, const [const FullType(ReplyResponse)]),
             () => ListBuilder<ReplyResponse>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [const FullType(ScoreTrendItem)]),
+            () => ListBuilder<ScoreTrendItem>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltMap, const [
+              const FullType(String),
+              const FullType(double),
+            ]),
+            () => MapBuilder<String, double>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [
+              const FullType(ErrorCategoryCount),
+            ]),
+            () => ListBuilder<ErrorCategoryCount>(),
           )
           ..addBuilderFactory(
             const FullType(BuiltList, const [
@@ -784,6 +1156,16 @@ Serializers _$serializers =
               const FullType(ScraperTaskResponse),
             ]),
             () => ListBuilder<ScraperTaskResponse>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [const FullType(SearchResultDTO)]),
+            () => ListBuilder<SearchResultDTO>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [
+              const FullType(SearchSuggestionDTO),
+            ]),
+            () => ListBuilder<SearchSuggestionDTO>(),
           )
           ..addBuilderFactory(
             const FullType(BuiltList, const [
@@ -916,6 +1298,38 @@ Serializers _$serializers =
             () => ListBuilder<String>(),
           )
           ..addBuilderFactory(
+            const FullType(BuiltList, const [const FullType(String)]),
+            () => ListBuilder<String>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [const FullType(String)]),
+            () => ListBuilder<String>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [const FullType(String)]),
+            () => ListBuilder<String>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [const FullType(String)]),
+            () => ListBuilder<String>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [const FullType(String)]),
+            () => ListBuilder<String>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [const FullType(String)]),
+            () => ListBuilder<String>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [const FullType(String)]),
+            () => ListBuilder<String>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [const FullType(String)]),
+            () => ListBuilder<String>(),
+          )
+          ..addBuilderFactory(
             const FullType(BuiltList, const [const FullType(KnowledgeBaseVO)]),
             () => ListBuilder<KnowledgeBaseVO>(),
           )
@@ -953,6 +1367,30 @@ Serializers _$serializers =
           )
           ..addBuilderFactory(
             const FullType(BuiltList, const [
+              const FullType(StudentRankingItem),
+            ]),
+            () => ListBuilder<StudentRankingItem>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [
+              const FullType(SubjectAnalyticsItem),
+            ]),
+            () => ListBuilder<SubjectAnalyticsItem>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [
+              const FullType(SubjectProfileSummary),
+            ]),
+            () => ListBuilder<SubjectProfileSummary>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [
+              const FullType(SubmissionStatusResponse),
+            ]),
+            () => ListBuilder<SubmissionStatusResponse>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [
               const FullType(TeacherApplicationResponse),
             ]),
             () => ListBuilder<TeacherApplicationResponse>(),
@@ -974,6 +1412,10 @@ Serializers _$serializers =
             () => ListBuilder<TimeConfigItem>(),
           )
           ..addBuilderFactory(
+            const FullType(BuiltList, const [const FullType(TrendItem)]),
+            () => ListBuilder<TrendItem>(),
+          )
+          ..addBuilderFactory(
             const FullType(BuiltList, const [
               const FullType(UserDailyArticleResponse),
             ]),
@@ -990,6 +1432,10 @@ Serializers _$serializers =
               const FullType(UserDetailResponse),
             ]),
             () => ListBuilder<UserDetailResponse>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [const FullType(UserMembership)]),
+            () => ListBuilder<UserMembership>(),
           )
           ..addBuilderFactory(
             const FullType(BuiltList, const [const FullType(UserShelfDTO)]),
@@ -1130,6 +1576,27 @@ Serializers _$serializers =
           ..addBuilderFactory(
             const FullType(BuiltMap, const [
               const FullType(String),
+              const FullType(BuiltList, const [const FullType(String)]),
+            ]),
+            () => MapBuilder<String, BuiltList<String>>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltList, const [const FullType(String)]),
+            () => ListBuilder<String>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltMap, const [
+              const FullType(String),
+              const FullType(BuiltMap, const [
+                const FullType(String),
+                const FullType(int),
+              ]),
+            ]),
+            () => MapBuilder<String, BuiltMap<String, int>>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltMap, const [
+              const FullType(String),
               const FullType(JsonObject),
             ]),
             () => MapBuilder<String, JsonObject>(),
@@ -1228,6 +1695,55 @@ Serializers _$serializers =
               const FullType(String),
             ]),
             () => MapBuilder<String, String>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltMap, const [
+              const FullType(String),
+              const FullType(double),
+            ]),
+            () => MapBuilder<String, double>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltMap, const [
+              const FullType(String),
+              const FullType(int),
+            ]),
+            () => MapBuilder<String, int>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltMap, const [
+              const FullType(String),
+              const FullType(int),
+            ]),
+            () => MapBuilder<String, int>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltMap, const [
+              const FullType(String),
+              const FullType(int),
+            ]),
+            () => MapBuilder<String, int>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltMap, const [
+              const FullType(String),
+              const FullType(int),
+            ]),
+            () => MapBuilder<String, int>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltMap, const [
+              const FullType(String),
+              const FullType(int),
+            ]),
+            () => MapBuilder<String, int>(),
+          )
+          ..addBuilderFactory(
+            const FullType(BuiltMap, const [
+              const FullType(String),
+              const FullType(int),
+            ]),
+            () => MapBuilder<String, int>(),
           ))
         .build();
 

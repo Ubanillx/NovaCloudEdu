@@ -8,6 +8,8 @@ import 'package:nova_api/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
+**orderType** | **String** | 订单类型：COURSE-课程订单，MEMBERSHIP-会员订单 | [optional] 
+**productName** | **String** | 商品名称（课程名/会员计划名） | [optional] 
 **id** | **int** | 订单ID | [optional] 
 **userId** | **int** | 用户ID | [optional] 
 **courseId** | **int** | 课程ID | [optional] 
