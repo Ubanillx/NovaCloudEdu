@@ -77,6 +77,10 @@ dependencies:
   # 权限管理
   permission_handler: ^11.3.1
   
+  # WebRTC 音视频通话
+  flutter_webrtc: ^0.12.4
+  livekit_client: ^2.3.2
+  
   # 路径工具
   path_provider: ^2.1.4
   
