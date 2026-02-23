@@ -3,12 +3,12 @@ import { useParams, useNavigate } from 'react-router-dom';
 import parse from 'html-react-parser';
 import 'katex/dist/katex.min.css';
 import renderMathInElement from 'katex/contrib/auto-render';
-import { ArrowLeft, Menu, Settings, BookOpen, Loader2, Sparkles, Type } from 'lucide-react';
+import { ArrowLeft, Menu, Settings, BookOpen, Loader2, Sparkles, Type, Bookmark } from 'lucide-react';
 import { apiClient, DefaultApi, AIApi, Configuration } from '../api';
 import type {
   BookDTO, ChapterDTO, ChapterContentDTO,
   ChapterSummary, KnowledgePoint, ConversationMessage,
-  ReadingQuiz,
+  ReadingQuiz, ReadingBookmarkDTO,
 } from '../api/generated/models';
 import { toast } from '../components/ui';
 import { useReaderSettingsStore } from '../stores/useReaderSettingsStore';
@@ -44,6 +44,10 @@ const EbookReaderPage: React.FC = () => {
   const [aiPanelOpen, setAiPanelOpen] = useState(false);
   const [aiTab, setAiTab] = useState<AiTab>('summary');
 
+  // ── 书签状态 ──
+  const [bookmarks, setBookmarks] = useState<ReadingBookmarkDTO[]>([]);
+  const [bookmarkLoading, setBookmarkLoading] = useState(false);
+
   // ── 设置 ──
   const settings = useReaderSettingsStore();
   const themeVars = THEMES[settings.theme];
@@ -73,6 +77,10 @@ const EbookReaderPage: React.FC = () => {
       return info ? String(JSON.parse(info)?.id ?? '') : '';
     } catch { return ''; }
   })();
+
+  // ── 当前章节 ID ──
+  const currentChapter = chapters[currentIndex];
+  const currentChapterId = currentChapter?.id;
 
   // ── 加载书籍和章节 ──
   const fetchBookData = useCallback(async () => {
@@ -157,6 +165,71 @@ const EbookReaderPage: React.FC = () => {
     }
   }, [contentLoading, content]);
 
+  // ── 加载书签 ──
+  const loadBookmarks = useCallback(async () => {
+    if (!bookId || !userId) return;
+    try {
+      const res = await api.getBookmarksByBook({
+        bookId: bookId as unknown as number,
+        userId: userId as unknown as number,
+      });
+      if (res.data?.code === 0) setBookmarks(res.data.data || []);
+    } catch { /* silent */ }
+  }, [bookId, userId]);
+
+  useEffect(() => { loadBookmarks(); }, [loadBookmarks]);
+
+  const isCurrentChapterBookmarked = bookmarks.some(
+    b => b.chapterIndex === (currentChapter?.chapterIndex ?? currentIndex)
+  );
+
+  const handleToggleBookmark = async () => {
+    if (!bookId || !userId || bookmarkLoading) return;
+    setBookmarkLoading(true);
+    try {
+      const chapterIndex = currentChapter?.chapterIndex ?? currentIndex;
+      const existing = bookmarks.find(b => b.chapterIndex === chapterIndex);
+      if (existing) {
+        await api.deleteBookmark({
+          bookId: bookId as unknown as number,
+          bookmarkId: String(existing.id) as unknown as number,
+        });
+        toast.success('已移除书签');
+      } else {
+        await api.createBookmark({
+          bookId: bookId as unknown as number,
+          requestBody: {
+            userId,
+            chapterId: currentChapterId || 0,
+            chapterIndex,
+            position: 0,
+            bookmarkTitle: currentChapter?.title || `第 ${chapterIndex + 1} 章`,
+          } as any,
+        });
+        toast.success('已添加书签');
+      }
+      await loadBookmarks();
+    } catch (e: any) {
+      toast.error(e?.response?.data?.message || '书签操作失败');
+    } finally {
+      setBookmarkLoading(false);
+    }
+  };
+
+  const handleDeleteBookmark = async (bookmarkId: number) => {
+    if (!bookId) return;
+    try {
+      await api.deleteBookmark({
+        bookId: bookId as unknown as number,
+        bookmarkId: String(bookmarkId) as unknown as number,
+      });
+      toast.success('已删除书签');
+      await loadBookmarks();
+    } catch (e: any) {
+      toast.error(e?.response?.data?.message || '删除书签失败');
+    }
+  };
+
   const saveProgress = useCallback(async () => {
     if (!bookId || !userId) return;
     try {
@@ -188,10 +261,6 @@ const EbookReaderPage: React.FC = () => {
     return () => window.removeEventListener('keydown', handler);
   }, [currentIndex, goChapter]);
 
-  // ── 当前章节 ID ──
-  const currentChapter = chapters[currentIndex];
-  const currentChapterId = currentChapter?.id;
-
   // ━━━━━━━━━━ AI 功能 ━━━━━━━━━━
 
   const handleGenerateSummary = async () => {
@@ -222,12 +291,14 @@ const EbookReaderPage: React.FC = () => {
         chapterId: currentChapterId as unknown as number,
         summaryType,
       });
-      if (res.data?.code === 0 && res.data.data) setSummary(res.data.data);
-      else handleGenerateSummary();
+      if (res.data?.code === 0 && res.data.data) {
+        setSummary(res.data.data);
+        setSummaryLoading(false);
+      } else {
+        await handleGenerateSummary();
+      }
     } catch {
-      handleGenerateSummary();
-    } finally {
-      setSummaryLoading(false);
+      await handleGenerateSummary();
     }
   };
 
@@ -259,15 +330,12 @@ const EbookReaderPage: React.FC = () => {
       });
       if (res.data?.code === 0 && res.data.data && res.data.data.length > 0) {
         setKnowledgePoints(res.data.data);
+        setKpLoading(false);
       } else {
-        handleExtractKP();
-        return;
+        await handleExtractKP();
       }
     } catch {
-      handleExtractKP();
-      return;
-    } finally {
-      setKpLoading(false);
+      await handleExtractKP();
     }
   };
 
@@ -398,7 +466,7 @@ const EbookReaderPage: React.FC = () => {
         <div className="flex items-center gap-3">
           <button
             onClick={() => { saveProgress(); navigate(-1); }}
-            className="p-2 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 transition-all active:scale-95 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
+            className="p-2 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 transition-all hover:scale-[1.02] text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
             title="返回"
           >
             <ArrowLeft size={18} />
@@ -406,7 +474,7 @@ const EbookReaderPage: React.FC = () => {
           <div className="w-px h-5 mx-1 opacity-20" style={{ background: themeVars.text }} />
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className={`p-2 rounded-xl transition-all active:scale-95 ${sidebarOpen ? 'bg-brand-500/10 text-brand-600' : 'hover:bg-black/5 dark:hover:bg-white/5 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100'}`}
+            className={`p-2 rounded-xl transition-all hover:scale-[1.02] ${sidebarOpen ? 'bg-brand-500/10 text-brand-600' : 'hover:bg-black/5 dark:hover:bg-white/5 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100'}`}
             title="目录"
             style={{ color: sidebarOpen ? themeVars.accent : undefined }}
           >
@@ -421,8 +489,16 @@ const EbookReaderPage: React.FC = () => {
 
         <div className="flex items-center gap-2">
           <button
+            onClick={handleToggleBookmark}
+            disabled={bookmarkLoading}
+            className={`p-2 rounded-xl transition-all hover:scale-[1.02] ${isCurrentChapterBookmarked ? 'text-amber-500' : 'hover:bg-black/5 dark:hover:bg-white/5 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100'}`}
+            title={isCurrentChapterBookmarked ? '移除书签' : '添加书签'}
+          >
+            <Bookmark size={18} fill={isCurrentChapterBookmarked ? 'currentColor' : 'none'} />
+          </button>
+          <button
             onClick={() => { setAiPanelOpen(!aiPanelOpen); if (!aiPanelOpen) setSettingsOpen(false); }}
-            className={`p-2 rounded-xl transition-all active:scale-95 ${aiPanelOpen ? 'bg-brand-500/10 text-brand-600' : 'hover:bg-black/5 dark:hover:bg-white/5 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100'}`}
+            className={`p-2 rounded-xl transition-all hover:scale-[1.02] ${aiPanelOpen ? 'bg-brand-500/10 text-brand-600' : 'hover:bg-black/5 dark:hover:bg-white/5 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100'}`}
             title="AI 助手"
             style={{ color: aiPanelOpen ? themeVars.accent : undefined }}
           >
@@ -430,7 +506,7 @@ const EbookReaderPage: React.FC = () => {
           </button>
           <button
             onClick={() => { setSettingsOpen(!settingsOpen); if (!settingsOpen) setAiPanelOpen(false); }}
-            className={`p-2 rounded-xl transition-all active:scale-95 ${settingsOpen ? 'bg-brand-500/10 text-brand-600' : 'hover:bg-black/5 dark:hover:bg-white/5 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100'}`}
+            className={`p-2 rounded-xl transition-all hover:scale-[1.02] ${settingsOpen ? 'bg-brand-500/10 text-brand-600' : 'hover:bg-black/5 dark:hover:bg-white/5 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100'}`}
             title="设置"
             style={{ color: settingsOpen ? themeVars.accent : undefined }}
           >
@@ -449,6 +525,8 @@ const EbookReaderPage: React.FC = () => {
             currentIndex={currentIndex}
             themeVars={themeVars}
             onGoChapter={goChapter}
+            bookmarks={bookmarks}
+            onDeleteBookmark={handleDeleteBookmark}
           />
         )}
 
@@ -506,7 +584,7 @@ const EbookReaderPage: React.FC = () => {
                   <button
                     onClick={() => goChapter(currentIndex - 1)}
                     disabled={currentIndex === 0}
-                    className="flex flex-col items-start gap-1 p-6 rounded-2xl border-2 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-20 disabled:hover:scale-100 group w-64"
+                    className="flex flex-col items-start gap-1 p-6 rounded-2xl border-2 transition-all hover:scale-[1.02] disabled:opacity-20 disabled:hover:scale-100 group w-64"
                     style={{ borderColor: themeVars.border, background: themeVars.card }}
                   >
                     <span className="text-[10px] font-black uppercase tracking-widest opacity-40 group-hover:opacity-100 transition-opacity">上一章</span>
@@ -517,7 +595,7 @@ const EbookReaderPage: React.FC = () => {
                   <button
                     onClick={() => goChapter(currentIndex + 1)}
                     disabled={currentIndex >= chapters.length - 1}
-                    className="flex flex-col items-end gap-1 p-6 rounded-2xl border-2 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-20 disabled:hover:scale-100 group w-64 text-right"
+                    className="flex flex-col items-end gap-1 p-6 rounded-2xl border-2 transition-all hover:scale-[1.02] disabled:opacity-20 disabled:hover:scale-100 group w-64 text-right"
                     style={{ borderColor: themeVars.accent, background: `${themeVars.accent}05` }}
                   >
                     <span className="text-[10px] font-black uppercase tracking-widest opacity-60 group-hover:opacity-100 transition-opacity" style={{ color: themeVars.accent }}>下一章</span>

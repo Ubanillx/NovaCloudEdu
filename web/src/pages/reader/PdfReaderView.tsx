@@ -68,7 +68,7 @@ const PdfReaderView: React.FC<PdfReaderViewProps> = ({ pdfUrl, themeVars, title,
   const zoomOut = useCallback(() => setScale(s => Math.max(ZOOM_MIN, +(s - ZOOM_STEP).toFixed(2))), []);
   const zoomFit = useCallback(() => setScale(1.0), []);
 
-  const btnClass = 'p-2 rounded-xl transition-all active:scale-95 hover:bg-black/5 dark:hover:bg-white/5 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent';
+  const btnClass = 'p-2 rounded-xl transition-all hover:scale-[1.02] hover:bg-black/5 dark:hover:bg-white/5 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent';
 
   return (
     <div className="h-screen flex flex-col overflow-hidden" style={{ background: themeVars.bg, color: themeVars.text }}>
@@ -115,7 +115,7 @@ const PdfReaderView: React.FC<PdfReaderViewProps> = ({ pdfUrl, themeVars, title,
           </button>
           <button
             onClick={zoomFit}
-            className="px-2 py-1 rounded-lg text-[11px] font-bold transition-all hover:bg-black/5 dark:hover:bg-white/5 active:scale-95"
+            className="px-2 py-1 rounded-lg text-[11px] font-bold transition-all hover:bg-black/5 dark:hover:bg-white/5 hover:scale-[1.02]"
             style={{ color: themeVars.muted }}
             title="重置缩放"
           >
