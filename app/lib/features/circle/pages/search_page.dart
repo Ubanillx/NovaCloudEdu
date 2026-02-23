@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:nova_api/nova_api.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../../config/app_theme.dart';
 import '../../../core/network/api_client.dart';
 import '../../../widgets/cards/app_card.dart';
 import '../../../widgets/common/empty_widget.dart';
 import '../../../widgets/common/loading_widget.dart';
+import '../../../widgets/common/skeleton_widgets.dart';
 import '../services/post_service.dart';
 import 'post_detail_page.dart';
 import 'user_profile_page.dart';
@@ -214,7 +216,7 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
         foregroundColor: context.colors.textPrimary,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: context.colors.textPrimary),
+          icon: Icon(PhosphorIcons.caretLeft(), color: context.colors.textPrimary),
           onPressed: () => Navigator.pop(context),
         ),
         titleSpacing: 0,
@@ -236,7 +238,7 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
       ),
       child: Row(
         children: [
-          Icon(Icons.search, size: 20, color: colors.textTertiary),
+          Icon(PhosphorIcons.magnifyingGlass(), size: 20, color: colors.textTertiary),
           const SizedBox(width: 8),
           Expanded(
             child: TextField(
@@ -257,7 +259,7 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
           if (_searchController.text.isNotEmpty)
             GestureDetector(
               onTap: _clearSearch,
-              child: Icon(Icons.cancel, size: 18, color: colors.textTertiary),
+              child: Icon(PhosphorIcons.x(), size: 18, color: colors.textTertiary),
             ),
         ],
       ),
@@ -270,7 +272,7 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.search_rounded, size: 64, color: colors.textTertiary),
+          Icon(PhosphorIcons.magnifyingGlass(), size: 64, color: colors.textTertiary),
           const SizedBox(height: 16),
           Text(
             '搜索帖子或用户',
@@ -318,7 +320,7 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
 
   Widget _buildPostResults() {
     if (_isLoadingPosts && _posts.isEmpty) {
-      return const Center(child: LoadingWidget());
+      return const PostListSkeleton();
     }
 
     if (_posts.isEmpty) {
@@ -396,6 +398,7 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
       },
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
+      borderRadius: 24,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -411,7 +414,7 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
                   : CircleAvatar(
                       radius: 18,
                       backgroundColor: AppTheme.brand.withOpacity(isDark ? 0.2 : 0.1),
-                      child: const Icon(Icons.person, size: 20, color: AppTheme.brand),
+                      child: Icon(PhosphorIcons.user(), size: 20, color: AppTheme.brand),
                     ),
               const SizedBox(width: 10),
               Expanded(
@@ -493,7 +496,7 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
           Row(
             children: [
               _buildActionButton(
-                icon: hasThumb ? Icons.thumb_up : Icons.thumb_up_outlined,
+                icon: hasThumb ? PhosphorIcons.thumbsUp(PhosphorIconsStyle.fill) : PhosphorIcons.thumbsUp(),
                 count: post.thumbNum ?? 0,
                 isActive: hasThumb,
                 activeColor: AppTheme.brand,
@@ -501,12 +504,12 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
               ),
               const SizedBox(width: 24),
               _buildActionButton(
-                icon: Icons.chat_bubble_outline,
+                icon: PhosphorIcons.chatTeardropText(),
                 count: post.commentNum ?? 0,
               ),
               const SizedBox(width: 24),
               _buildActionButton(
-                icon: hasFavour ? Icons.star : Icons.star_outline,
+                icon: hasFavour ? PhosphorIcons.star(PhosphorIconsStyle.fill) : PhosphorIcons.star(),
                 count: post.favourNum ?? 0,
                 isActive: hasFavour,
                 activeColor: colors.warning,
@@ -562,7 +565,7 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
 
   Widget _buildUserResults() {
     if (_isLoadingUsers) {
-      return const Center(child: LoadingWidget());
+      return const ListItemSkeleton(itemCount: 4);
     }
 
     if (_users.isEmpty) {
@@ -591,6 +594,7 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
       },
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
+      borderRadius: 24,
       child: Row(
         children: [
           CircleAvatar(
@@ -600,7 +604,7 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
                 ? NetworkImage(user.userAvatar!)
                 : null,
             child: (user.userAvatar == null || user.userAvatar!.isEmpty)
-                ? const Icon(Icons.person, color: AppTheme.brand)
+                ? Icon(PhosphorIcons.user(), color: AppTheme.brand)
                 : null,
           ),
           const SizedBox(width: 12),
@@ -631,7 +635,7 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
               ],
             ),
           ),
-          Icon(Icons.chevron_right, color: colors.iconSecondary),
+          Icon(PhosphorIcons.caretRight(), color: colors.iconSecondary),
         ],
       ),
     );

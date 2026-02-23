@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import '../../../widgets/common/skeleton_widgets.dart';
+import '../../../widgets/common/loading_widget.dart';
 import 'package:nova_api/nova_api.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../../config/app_theme.dart';
 import '../services/post_service.dart';
 import 'post_detail_page.dart';
@@ -103,7 +106,7 @@ class _MyFavouritesPageState extends State<MyFavouritesPage> {
         centerTitle: true,
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const PostListSkeleton()
           : _posts.isEmpty
               ? _buildEmptyState()
               : RefreshIndicator(
@@ -124,7 +127,7 @@ class _MyFavouritesPageState extends State<MyFavouritesPage> {
                         if (index >= _posts.length) {
                           return const Padding(
                             padding: EdgeInsets.all(16),
-                            child: Center(child: CircularProgressIndicator()),
+                            child: Center(child: LoadingWidget(size: 24)),
                           );
                         }
                         return _buildPostItem(_posts[index]);
@@ -207,7 +210,7 @@ class _MyFavouritesPageState extends State<MyFavouritesPage> {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(24),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -223,7 +226,7 @@ class _MyFavouritesPageState extends State<MyFavouritesPage> {
                     : CircleAvatar(
                         radius: 16,
                         backgroundColor: AppTheme.brand.withOpacity(0.1),
-                        child: const Icon(Icons.person, size: 16, color: AppTheme.brand),
+                        child: Icon(PhosphorIcons.user(), size: 20, color: AppTheme.brand),
                       ),
                 const SizedBox(width: 8),
                 Text(
@@ -290,21 +293,21 @@ class _MyFavouritesPageState extends State<MyFavouritesPage> {
             const SizedBox(height: 12),
             Row(
               children: [
-                Icon(Icons.thumb_up_outlined, size: 14, color: Colors.grey[400]),
+                Icon(PhosphorIcons.thumbsUp(), size: 14, color: Colors.grey[400]),
                 const SizedBox(width: 4),
                 Text(
                   '${post.thumbNum ?? 0}',
                   style: TextStyle(fontSize: 12, color: Colors.grey[500]),
                 ),
                 const SizedBox(width: 16),
-                Icon(Icons.chat_bubble_outline, size: 14, color: Colors.grey[400]),
+                Icon(PhosphorIcons.chatTeardropText(), size: 14, color: Colors.grey[400]),
                 const SizedBox(width: 4),
                 Text(
                   '${post.commentNum ?? 0}',
                   style: TextStyle(fontSize: 12, color: Colors.grey[500]),
                 ),
                 const SizedBox(width: 16),
-                const Icon(Icons.star, size: 14, color: Colors.amber),
+                Icon(PhosphorIcons.star(), size: 14, color: Colors.amber),
                 const SizedBox(width: 4),
                 Text(
                   '${post.favourNum ?? 0}',
