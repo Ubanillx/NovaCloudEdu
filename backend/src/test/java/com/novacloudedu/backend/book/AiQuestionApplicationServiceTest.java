@@ -5,6 +5,7 @@ import com.novacloudedu.backend.domain.book.entity.AiConversation;
 import com.novacloudedu.backend.domain.book.entity.Chapter;
 import com.novacloudedu.backend.domain.book.repository.AiConversationRepository;
 import com.novacloudedu.backend.domain.book.repository.ChapterRepository;
+import com.novacloudedu.backend.domain.book.service.ContentSecurityService;
 import com.novacloudedu.backend.domain.book.service.LlmService;
 import com.novacloudedu.backend.domain.book.valueobject.*;
 import com.novacloudedu.backend.domain.user.valueobject.UserId;
@@ -38,6 +39,9 @@ class AiQuestionApplicationServiceTest {
 
     @Mock
     private LlmService llmService;
+
+    @Mock
+    private ContentSecurityService contentSecurityService;
 
     @InjectMocks
     private AiQuestionApplicationService service;
