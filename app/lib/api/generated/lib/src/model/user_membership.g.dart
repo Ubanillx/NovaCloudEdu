@@ -98,9 +98,9 @@ class _$UserMembership extends UserMembership {
   @override
   final DateTime? updateTime;
   @override
-  final bool? delete;
-  @override
   final bool? expired;
+  @override
+  final bool? delete;
   @override
   final bool? active;
 
@@ -117,8 +117,8 @@ class _$UserMembership extends UserMembership {
     this.status,
     this.createTime,
     this.updateTime,
-    this.delete,
     this.expired,
+    this.delete,
     this.active,
   }) : super._();
   @override
@@ -141,8 +141,8 @@ class _$UserMembership extends UserMembership {
         status == other.status &&
         createTime == other.createTime &&
         updateTime == other.updateTime &&
-        delete == other.delete &&
         expired == other.expired &&
+        delete == other.delete &&
         active == other.active;
   }
 
@@ -158,8 +158,8 @@ class _$UserMembership extends UserMembership {
     _$hash = $jc(_$hash, status.hashCode);
     _$hash = $jc(_$hash, createTime.hashCode);
     _$hash = $jc(_$hash, updateTime.hashCode);
-    _$hash = $jc(_$hash, delete.hashCode);
     _$hash = $jc(_$hash, expired.hashCode);
+    _$hash = $jc(_$hash, delete.hashCode);
     _$hash = $jc(_$hash, active.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
@@ -177,8 +177,8 @@ class _$UserMembership extends UserMembership {
           ..add('status', status)
           ..add('createTime', createTime)
           ..add('updateTime', updateTime)
-          ..add('delete', delete)
           ..add('expired', expired)
+          ..add('delete', delete)
           ..add('active', active))
         .toString();
   }
@@ -224,13 +224,13 @@ class UserMembershipBuilder
   DateTime? get updateTime => _$this._updateTime;
   set updateTime(DateTime? updateTime) => _$this._updateTime = updateTime;
 
-  bool? _delete;
-  bool? get delete => _$this._delete;
-  set delete(bool? delete) => _$this._delete = delete;
-
   bool? _expired;
   bool? get expired => _$this._expired;
   set expired(bool? expired) => _$this._expired = expired;
+
+  bool? _delete;
+  bool? get delete => _$this._delete;
+  set delete(bool? delete) => _$this._delete = delete;
 
   bool? _active;
   bool? get active => _$this._active;
@@ -252,8 +252,8 @@ class UserMembershipBuilder
       _status = $v.status;
       _createTime = $v.createTime;
       _updateTime = $v.updateTime;
-      _delete = $v.delete;
       _expired = $v.expired;
+      _delete = $v.delete;
       _active = $v.active;
       _$v = null;
     }
@@ -288,8 +288,8 @@ class UserMembershipBuilder
             status: status,
             createTime: createTime,
             updateTime: updateTime,
-            delete: delete,
             expired: expired,
+            delete: delete,
             active: active,
           );
     } catch (_) {

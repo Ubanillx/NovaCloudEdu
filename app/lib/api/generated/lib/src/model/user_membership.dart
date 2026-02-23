@@ -22,8 +22,8 @@ part 'user_membership.g.dart';
 /// * [status]
 /// * [createTime]
 /// * [updateTime]
-/// * [delete]
 /// * [expired]
+/// * [delete]
 /// * [active]
 @BuiltValue()
 abstract class UserMembership
@@ -56,11 +56,11 @@ abstract class UserMembership
   @BuiltValueField(wireName: r'updateTime')
   DateTime? get updateTime;
 
-  @BuiltValueField(wireName: r'delete')
-  bool? get delete;
-
   @BuiltValueField(wireName: r'expired')
   bool? get expired;
+
+  @BuiltValueField(wireName: r'delete')
+  bool? get delete;
 
   @BuiltValueField(wireName: r'active')
   bool? get active;
@@ -154,17 +154,17 @@ class _$UserMembershipSerializer
         specifiedType: const FullType(DateTime),
       );
     }
-    if (object.delete != null) {
-      yield r'delete';
-      yield serializers.serialize(
-        object.delete,
-        specifiedType: const FullType(bool),
-      );
-    }
     if (object.expired != null) {
       yield r'expired';
       yield serializers.serialize(
         object.expired,
+        specifiedType: const FullType(bool),
+      );
+    }
+    if (object.delete != null) {
+      yield r'delete';
+      yield serializers.serialize(
+        object.delete,
         specifiedType: const FullType(bool),
       );
     }
@@ -263,19 +263,19 @@ class _$UserMembershipSerializer
           ) as DateTime;
           result.updateTime = valueDes;
           break;
-        case r'delete':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(bool),
-          ) as bool;
-          result.delete = valueDes;
-          break;
         case r'expired':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(bool),
           ) as bool;
           result.expired = valueDes;
+          break;
+        case r'delete':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(bool),
+          ) as bool;
+          result.delete = valueDes;
           break;
         case r'active':
           final valueDes = serializers.deserialize(

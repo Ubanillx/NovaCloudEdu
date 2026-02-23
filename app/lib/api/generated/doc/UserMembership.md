@@ -17,8 +17,8 @@ Name | Type | Description | Notes
 **status** | **String** |  | [optional] 
 **createTime** | [**DateTime**](DateTime.md) |  | [optional] 
 **updateTime** | [**DateTime**](DateTime.md) |  | [optional] 
-**delete** | **bool** |  | [optional] 
 **expired** | **bool** |  | [optional] 
+**delete** | **bool** |  | [optional] 
 **active** | **bool** |  | [optional] 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

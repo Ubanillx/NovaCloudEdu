@@ -185,6 +185,7 @@ Method | HTTP request | Description
 [**getGroupMembers1**](DefaultApi.md#getgroupmembers1) | **GET** /api/admin/groups/{groupId}/members | 分页获取群成员
 [**getGroupMembersPage**](DefaultApi.md#getgroupmemberspage) | **GET** /api/groups/{groupId}/members/page | 分页获取群成员
 [**getHistory**](DefaultApi.md#gethistory) | **GET** /api/grading/history | 查询批改历史
+[**getHlsStream**](DefaultApi.md#gethlsstream) | **GET** /api/video/hls/{sectionId} | 获取HLS播放流（带Token）
 [**getKey**](DefaultApi.md#getkey) | **GET** /api/video/key | 获取视频解密密钥（HLS播放器自动调用）
 [**getLatestMessages**](DefaultApi.md#getlatestmessages) | **GET** /api/group-chat/{groupId}/messages/latest | 获取群最新消息
 [**getLikedArticles**](DefaultApi.md#getlikedarticles) | **GET** /api/user/daily-article/liked | 获取点赞文章列表
@@ -217,6 +218,7 @@ Method | HTTP request | Description
 [**getPendingCount**](DefaultApi.md#getpendingcount) | **GET** /api/teacher/application/pending/count | 获取待审核申请数量（管理员）
 [**getPendingRequests**](DefaultApi.md#getpendingrequests) | **GET** /api/groups/{groupId}/requests | 获取群待审批申请列表
 [**getPlan**](DefaultApi.md#getplan) | **GET** /api/membership/plans/{planId} | 获取计划详情
+[**getPlayToken**](DefaultApi.md#getplaytoken) | **GET** /api/video/play-token | 获取视频播放令牌
 [**getPostComments**](DefaultApi.md#getpostcomments) | **GET** /api/posts/{postId}/comments | 获取帖子评论列表
 [**getPostDetail**](DefaultApi.md#getpostdetail) | **GET** /api/posts/{postId} | 获取帖子详情
 [**getPostList**](DefaultApi.md#getpostlist) | **GET** /api/posts | 分页获取帖子列表
@@ -7913,6 +7915,48 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **getHlsStream**
+> getHlsStream(sectionId)
+
+获取HLS播放流（带Token）
+
+获取带Token验证的HLS m3u8播放内容。 流程： 1. 后端生成一次性播放token 2. 下载原始m3u8，修改#EXT-X-KEY的URI，附加token参数 3. 返回修改后的m3u8内容，播放器可直接播放 播放器只需将此URL作为视频源即可播放加密视频。 
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int sectionId = 789; // int | 小节ID
+
+try {
+    api.getHlsStream(sectionId);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getHlsStream: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **sectionId** | **int**| 小节ID | 
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **getKey**
 > getKey(keyId, token)
 
@@ -9216,6 +9260,51 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**BaseResponseMembershipPlan**](BaseResponseMembershipPlan.md)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getPlayToken**
+> BaseResponseString getPlayToken(sectionId, keyId)
+
+获取视频播放令牌
+
+获取一次性播放令牌，用于请求HLS解密密钥。令牌5分钟有效且只能使用一次。
+
+### Example
+```dart
+import 'package:nova_api/api.dart';
+
+final api = NovaApi().getDefaultApi();
+final int sectionId = 789; // int | 小节ID
+final String keyId = keyId_example; // String | 加密密钥ID
+
+try {
+    final response = api.getPlayToken(sectionId, keyId);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getPlayToken: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **sectionId** | **int**| 小节ID | 
+ **keyId** | **String**| 加密密钥ID | 
+
+### Return type
+
+[**BaseResponseString**](BaseResponseString.md)
 
 ### Authorization
 

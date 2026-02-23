@@ -38,6 +38,8 @@ class _$SectionResponse extends SectionResponse {
   @override
   final int? thumbnailCount;
   @override
+  final String? encryptionKeyId;
+  @override
   final DateTime? createTime;
   @override
   final DateTime? updateTime;
@@ -61,6 +63,7 @@ class _$SectionResponse extends SectionResponse {
     this.transcodeStatus,
     this.thumbnailUrl,
     this.thumbnailCount,
+    this.encryptionKeyId,
     this.createTime,
     this.updateTime,
   }) : super._();
@@ -90,6 +93,7 @@ class _$SectionResponse extends SectionResponse {
         transcodeStatus == other.transcodeStatus &&
         thumbnailUrl == other.thumbnailUrl &&
         thumbnailCount == other.thumbnailCount &&
+        encryptionKeyId == other.encryptionKeyId &&
         createTime == other.createTime &&
         updateTime == other.updateTime;
   }
@@ -112,6 +116,7 @@ class _$SectionResponse extends SectionResponse {
     _$hash = $jc(_$hash, transcodeStatus.hashCode);
     _$hash = $jc(_$hash, thumbnailUrl.hashCode);
     _$hash = $jc(_$hash, thumbnailCount.hashCode);
+    _$hash = $jc(_$hash, encryptionKeyId.hashCode);
     _$hash = $jc(_$hash, createTime.hashCode);
     _$hash = $jc(_$hash, updateTime.hashCode);
     _$hash = $jf(_$hash);
@@ -136,6 +141,7 @@ class _$SectionResponse extends SectionResponse {
           ..add('transcodeStatus', transcodeStatus)
           ..add('thumbnailUrl', thumbnailUrl)
           ..add('thumbnailCount', thumbnailCount)
+          ..add('encryptionKeyId', encryptionKeyId)
           ..add('createTime', createTime)
           ..add('updateTime', updateTime))
         .toString();
@@ -208,6 +214,11 @@ class SectionResponseBuilder
   set thumbnailCount(int? thumbnailCount) =>
       _$this._thumbnailCount = thumbnailCount;
 
+  String? _encryptionKeyId;
+  String? get encryptionKeyId => _$this._encryptionKeyId;
+  set encryptionKeyId(String? encryptionKeyId) =>
+      _$this._encryptionKeyId = encryptionKeyId;
+
   DateTime? _createTime;
   DateTime? get createTime => _$this._createTime;
   set createTime(DateTime? createTime) => _$this._createTime = createTime;
@@ -238,6 +249,7 @@ class SectionResponseBuilder
       _transcodeStatus = $v.transcodeStatus;
       _thumbnailUrl = $v.thumbnailUrl;
       _thumbnailCount = $v.thumbnailCount;
+      _encryptionKeyId = $v.encryptionKeyId;
       _createTime = $v.createTime;
       _updateTime = $v.updateTime;
       _$v = null;
@@ -277,6 +289,7 @@ class SectionResponseBuilder
           transcodeStatus: transcodeStatus,
           thumbnailUrl: thumbnailUrl,
           thumbnailCount: thumbnailCount,
+          encryptionKeyId: encryptionKeyId,
           createTime: createTime,
           updateTime: updateTime,
         );
