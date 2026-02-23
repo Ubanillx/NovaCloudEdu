@@ -35,6 +35,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String BEARER_PREFIX = "Bearer ";
 
+    /** 外部服务回调路径，这些路径可能携带非本系统JWT，跳过验证 */
+    private static final String[] SKIP_PATHS = {
+            "/api/onlyoffice/callback",
+            "/api/internal/srs/",
+            "/api/v1/webhook/",
+            "/api/payment/callback/",
+    };
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getRequestURI();
+        for (String skip : SKIP_PATHS) {
+            if (path.startsWith(skip)) return true;
+        }
+        return false;
+    }
+
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
