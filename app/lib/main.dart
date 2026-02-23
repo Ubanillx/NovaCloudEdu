@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -16,6 +17,11 @@ import 'features/chat/pages/chat_page.dart';
 import 'features/profile/pages/profile_page.dart';
 import 'features/auth/pages/login_page.dart';
 import 'features/auth/services/auth_service.dart';
+import 'features/chat/services/call_service.dart';
+import 'features/chat/services/notification_service.dart';
+import 'features/chat/services/rtc_models.dart';
+import 'features/chat/pages/incoming_call_overlay.dart';
+import 'features/chat/pages/call_screen_page.dart';
 
 // 圈子相关页面
 import 'features/circle/pages/post_edit_page.dart';
@@ -317,6 +323,11 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   int _currentIndex = 0;
+  StreamSubscription<CallState>? _callStateSubscription;
+  StreamSubscription<String>? _callErrorSubscription;
+  StreamSubscription<UnreadCount>? _unreadSubscription;
+  final _notificationService = NotificationService();
+  int _chatUnreadCount = 0;
 
   final List<Widget> _pages = const [
     HomePage(),
@@ -335,6 +346,55 @@ class _MainPageState extends State<MainPage> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _initUnreadBadge();
+    _callErrorSubscription = CallService().errorMessage.listen((msg) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(msg), duration: const Duration(seconds: 2)),
+        );
+      }
+    });
+    _callStateSubscription = CallService().callStateStream.listen((state) {
+      if (state == CallState.ringingIn) {
+        final call = CallService().currentCall;
+        if (call != null && mounted) {
+          IncomingCallOverlayManager.show(context, call);
+        }
+      } else if (state == CallState.ringingOut || state == CallState.connecting || state == CallState.connected) {
+        IncomingCallOverlayManager.dismiss();
+        // 如果是主叫方发起的呼叫，跳转到通话页
+        if (state == CallState.ringingOut) {
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const CallScreenPage()),
+          );
+        }
+      } else if (state == CallState.idle || state == CallState.ended) {
+        IncomingCallOverlayManager.dismiss();
+      }
+    });
+  }
+
+  void _initUnreadBadge() {
+    _unreadSubscription = _notificationService.unreadCountStream.listen((count) {
+      if (mounted) {
+        setState(() => _chatUnreadCount = count.totalCount);
+      }
+    });
+    // 用当前值初始化
+    _chatUnreadCount = _notificationService.currentUnreadCount.totalCount;
+  }
+
+  @override
+  void dispose() {
+    _callStateSubscription?.cancel();
+    _callErrorSubscription?.cancel();
+    _unreadSubscription?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: const SystemUiOverlayStyle(
@@ -348,6 +408,7 @@ class _MainPageState extends State<MainPage> {
           currentIndex: _currentIndex,
           tabs: _tabs,
           onTap: (index) => setState(() => _currentIndex = index),
+          badgeCounts: {3: _chatUnreadCount},
         ),
       ),
     );
@@ -365,11 +426,13 @@ class _AnimatedBottomBar extends StatelessWidget {
   final int currentIndex;
   final List<_TabItem> tabs;
   final ValueChanged<int> onTap;
+  final Map<int, int> badgeCounts;
 
   const _AnimatedBottomBar({
     required this.currentIndex,
     required this.tabs,
     required this.onTap,
+    this.badgeCounts = const {},
   });
 
   @override
@@ -392,6 +455,7 @@ class _AnimatedBottomBar extends StatelessWidget {
           child: Row(
             children: List.generate(tabs.length, (index) {
               final isSelected = index == currentIndex;
+              final badgeCount = badgeCounts[index] ?? 0;
               return Expanded(
                 child: GestureDetector(
                   onTap: () => onTap(index),
@@ -399,20 +463,47 @@ class _AnimatedBottomBar extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      AnimatedScale(
-                        scale: isSelected ? 1.1 : 1.0,
-                        duration: const Duration(milliseconds: 200),
-                        child: SvgPicture.asset(
-                          tabs[index].icon,
-                          width: 24,
-                          height: 24,
-                          colorFilter: isSelected
-                              ? null
-                              : const ColorFilter.mode(
-                                  Colors.grey,
-                                  BlendMode.srcIn,
+                      Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          AnimatedScale(
+                            scale: isSelected ? 1.1 : 1.0,
+                            duration: const Duration(milliseconds: 200),
+                            child: SvgPicture.asset(
+                              tabs[index].icon,
+                              width: 24,
+                              height: 24,
+                              colorFilter: isSelected
+                                  ? null
+                                  : const ColorFilter.mode(
+                                      Colors.grey,
+                                      BlendMode.srcIn,
+                                    ),
+                            ),
+                          ),
+                          if (badgeCount > 0)
+                            Positioned(
+                              right: -8,
+                              top: -4,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                                decoration: BoxDecoration(
+                                  color: Colors.red,
+                                  borderRadius: BorderRadius.circular(8),
                                 ),
-                        ),
+                                constraints: const BoxConstraints(minWidth: 16, minHeight: 14),
+                                child: Text(
+                                  badgeCount > 99 ? '99+' : '$badgeCount',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
                       const SizedBox(height: 2),
                       AnimatedDefaultTextStyle(

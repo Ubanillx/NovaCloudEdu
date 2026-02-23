@@ -34,4 +34,15 @@ class EnvConfig {
 
   /// OpenAPI 文档地址
   static String get openApiDocsUrl => '$apiBaseUrl/v3/api-docs';
+
+  /// RTC 信令 WebSocket 地址
+  static String get rtcWsUrl {
+    switch (_current) {
+      case Environment.dev:
+        final host = Platform.isAndroid ? '10.0.2.2' : 'localhost';
+        return 'ws://$host:8300';
+      case Environment.prod:
+        return 'wss://rtc.novacloudedu.com'; // TODO: 替换为生产环境地址
+    }
+  }
 }
