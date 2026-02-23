@@ -903,8 +903,9 @@ public class AiChatApplicationService {
                 String aiResponse = fullResponse.toString();
                 aiResponse = processGenerationMarkers(aiResponse, emitter, safeImageUrls);
 
-                // 8.5 处理工作流技能调用标记
-                aiResponse = processWorkflowCallMarkers(aiResponse, assistantId, userId, emitter);
+                // 8.5 处理工作流技能调用标记（执行工作流后二次调用LLM继续输出）
+                aiResponse = processWorkflowCallMarkers(aiResponse, assistantId, userId, emitter,
+                        contextMessages, modelId, temperature, topP, maxTokens, fullResponse, callback);
 
                 // 9. 保存AI回复
                 AiChatMessage assistantMsg = AiChatMessage.create(
@@ -1085,9 +1086,15 @@ public class AiChatApplicationService {
 
     /**
      * 处理工作流技能调用标记
-     * 检测 LLM 回复中的 [CALL_WORKFLOW:{...}] 标记，执行对应工作流并将结果追加到回复中
+     * 检测 LLM 回复中的 [CALL_WORKFLOW:{...}] 标记，执行对应工作流，
+     * 然后将工作流结果注入上下文，二次调用 LLM 流式输出，让 AI 基于工作流结果继续分析/总结。
      */
-    private String processWorkflowCallMarkers(String response, Long assistantId, Long userId, SseEmitter emitter) {
+    private String processWorkflowCallMarkers(String response, Long assistantId, Long userId,
+                                               SseEmitter emitter,
+                                               List<Map<String, String>> contextMessages,
+                                               String modelId, Double temperature, Double topP, Integer maxTokens,
+                                               StringBuilder fullResponse,
+                                               LangchainChatService.StreamCallback callback) {
         // 匹配 [CALL_WORKFLOW:{"workflowId":xxx, "params":{...}}]
         java.util.regex.Pattern pattern = java.util.regex.Pattern.compile(
                 "\\[CALL_WORKFLOW:\\s*(\\{.*?\\})\\s*\\]", 
@@ -1100,6 +1107,9 @@ public class AiChatApplicationService {
 
         String jsonStr = matcher.group(1);
         log.info("助手[{}] 检测到工作流调用标记: {}", assistantId, jsonStr);
+
+        // 去掉原回复中的 [CALL_WORKFLOW:...] 标记，保留标记前的文字
+        String firstPartResponse = matcher.replaceFirst("").trim();
 
         try {
             // 发送工作流调用开始事件
@@ -1128,36 +1138,80 @@ public class AiChatApplicationService {
             @SuppressWarnings("unchecked")
             Map<String, Object> params = (Map<String, Object>) callSpec.getOrDefault("params", Map.of());
 
-            // 执行工作流
+            // ---- 第一步：执行工作流 ----
             log.info("助手[{}] 执行工作流: workflowId={}, params={}", assistantId, workflowId, params);
-            Map<String, Object> workflowResult = workflowSkillService.executeWorkflow(assistantId, workflowId, params, userId);
+            Map<String, Object> workflowResult;
+            String resultJson;
+            try {
+                workflowResult = workflowSkillService.executeWorkflow(assistantId, workflowId, params, userId);
+                resultJson = objectMapper.writeValueAsString(workflowResult);
+            } catch (Exception wfEx) {
+                log.error("助手[{}] 工作流执行失败: workflowId={}", assistantId, workflowId, wfEx);
+                emitter.send(SseEmitter.event()
+                        .name("workflow_error")
+                        .data(Map.of("error", "工作流执行失败: " + wfEx.getMessage())));
+                return firstPartResponse;
+            }
 
-            // 发送工作流执行完成事件
+            // 发送工作流执行完成事件（仅状态，不含完整结果）
             emitter.send(SseEmitter.event()
                     .name("workflow_completed")
-                    .data(Map.of(
-                            "workflowId", workflowId,
-                            "result", workflowResult
-                    )));
+                    .data(Map.of("workflowId", workflowId)));
 
-            // 将工作流结果追加到回复中（替换原标记）
-            String resultJson = objectMapper.writeValueAsString(workflowResult);
-            String replacement = "\n\n**工作流执行结果：**\n```json\n" + resultJson + "\n```\n";
-            String newResponse = matcher.replaceFirst(java.util.regex.Matcher.quoteReplacement(replacement));
-
-            log.info("助手[{}] 工作流执行成功: workflowId={}, resultKeys={}", 
+            log.info("助手[{}] 工作流执行成功: workflowId={}, resultKeys={}",
                     assistantId, workflowId, workflowResult.keySet());
-            return newResponse;
+
+            // ---- 第二步：二次调用 LLM，让 AI 基于工作流结果继续输出 ----
+
+            // 构建二次调用的上下文：在原有上下文基础上追加
+            List<Map<String, String>> secondCallMessages = new ArrayList<>(contextMessages);
+
+            // 追加第一次 LLM 的回复（去掉标记部分）
+            if (!firstPartResponse.isEmpty()) {
+                secondCallMessages.add(makeMsg("assistant", firstPartResponse));
+            }
+
+            // 追加工作流结果作为 user 角色消息（DashScope 要求最后一条必须是 user）
+            String workflowResultPrompt = "以下是我调用工作流技能后得到的执行结果（JSON格式）：\n" +
+                    "```json\n" + resultJson + "\n```\n\n" +
+                    "请基于以上工作流执行结果，用自然语言为我分析、解读或总结。" +
+                    "不要重复输出原始JSON，而是提取关键信息，用清晰易懂的方式呈现。";
+            secondCallMessages.add(makeMsg("user", workflowResultPrompt));
+
+            log.info("助手[{}] 开始二次LLM调用，上下文消息数: {}", assistantId, secondCallMessages.size());
+
+            // 清空 fullResponse 并重新累积（firstPart + 二次输出）
+            fullResponse.setLength(0);
+            fullResponse.append(firstPartResponse);
+
+            try {
+                // 二次流式调用 LLM
+                langchainChatService.streamChatWithParams(
+                        modelId, secondCallMessages,
+                        temperature, topP, maxTokens, callback);
+            } catch (Exception llmEx) {
+                // 二次 LLM 调用失败时，回退：直接将工作流结果追加到回复中
+                log.error("助手[{}] 二次LLM调用失败，回退到原始结果展示", assistantId, llmEx);
+                String fallback = "\n\n**工作流执行结果：**\n```json\n" + resultJson + "\n```\n";
+                fullResponse.append(fallback);
+                try {
+                    emitter.send(SseEmitter.event()
+                            .name("message")
+                            .data(fallback));
+                } catch (IOException ignored) {}
+            }
+
+            // 返回完整的组合响应
+            return fullResponse.toString();
 
         } catch (Exception e) {
-            log.error("助手[{}] 工作流调用失败: json={}", assistantId, jsonStr, e);
+            log.error("助手[{}] 工作流处理异常: json={}", assistantId, jsonStr, e);
             try {
                 emitter.send(SseEmitter.event()
                         .name("workflow_error")
                         .data(Map.of("error", e.getMessage())));
             } catch (Exception ignored) {}
-            // 调用失败时保留原文
-            return response;
+            return firstPartResponse;
         }
     }
 }
