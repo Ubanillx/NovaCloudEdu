@@ -104,7 +104,7 @@ class _SettingsPageState extends State<SettingsPage> {
               _buildSettingsCard([
                 _buildSettingsItem(
                   icon: Icons.lock_outline_rounded,
-                  iconColor: const Color(0xFF3B82F6),
+                  iconColor: colors.info,
                   title: '修改密码',
                   onTap: () {
                     NovaMessage.show(context, '请联系管理员重置密码');
@@ -332,7 +332,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 themeProvider.toggleTheme();
                 NovaMessage.success(context, value ? '已切换到深色模式' : '已切换到浅色模式');
               },
-              activeThumbColor: const Color(0xFF3B82F6),
+              activeThumbColor: colors.info,
             ),
           ],
         ),

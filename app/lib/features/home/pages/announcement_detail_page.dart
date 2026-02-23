@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nova_api/nova_api.dart';
 import '../../../config/app_theme.dart';
 import '../../../core/network/api_client.dart';
-import '../../../widgets/common/loading_widget.dart';
+import '../../../widgets/common/skeleton_widgets.dart';
 import '../../../widgets/common/empty_widget.dart';
 
 /// 公告详情页面
@@ -86,7 +86,7 @@ class _AnnouncementDetailPageState extends State<AnnouncementDetailPage> {
 
   Widget _buildBody() {
     if (_isLoading) {
-      return const Center(child: LoadingWidget());
+      return const DetailPageSkeleton();
     }
 
     if (_errorMessage != null) {

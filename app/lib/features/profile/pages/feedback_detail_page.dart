@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nova_api/nova_api.dart';
 import '../../../config/app_theme.dart';
 import '../../../widgets/toast/nova_message.dart';
-import '../../../widgets/common/loading_widget.dart';
+import '../../../widgets/common/skeleton_widgets.dart';
 import '../../../widgets/common/empty_widget.dart';
 import '../services/feedback_service.dart';
 
@@ -120,7 +120,7 @@ class _FeedbackDetailPageState extends State<FeedbackDetailPage> {
       ),
       body: SafeArea(
         child: _isLoading
-            ? const LoadingWidget(message: '加载中...')
+            ? const DetailPageSkeleton()
             : _feedback == null
                 ? NetworkErrorWidget(onRetry: _loadFeedbackDetail, message: '加载失败')
                 : _buildContent(colors),
@@ -282,11 +282,11 @@ class _FeedbackDetailPageState extends State<FeedbackDetailPage> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: isAdmin
-            ? const Color(0xFF3B82F6).withOpacity(context.isDarkMode ? 0.15 : 0.08)
+            ? colors.info.withOpacity(context.isDarkMode ? 0.15 : 0.08)
             : colors.surface,
         borderRadius: BorderRadius.circular(16),
         border: isAdmin
-            ? Border.all(color: const Color(0xFF3B82F6).withOpacity(0.3))
+            ? Border.all(color: colors.info.withOpacity(0.3))
             : null,
       ),
       child: Column(
@@ -298,7 +298,7 @@ class _FeedbackDetailPageState extends State<FeedbackDetailPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   color: isAdmin
-                      ? const Color(0xFF3B82F6).withOpacity(context.isDarkMode ? 0.3 : 0.15)
+                      ? colors.info.withOpacity(context.isDarkMode ? 0.3 : 0.15)
                       : colors.surfaceVariant,
                   borderRadius: BorderRadius.circular(6),
                 ),
@@ -307,7 +307,7 @@ class _FeedbackDetailPageState extends State<FeedbackDetailPage> {
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    color: isAdmin ? const Color(0xFF3B82F6) : colors.textSecondary,
+                    color: isAdmin ? colors.info : colors.textSecondary,
                   ),
                 ),
               ),
@@ -340,7 +340,7 @@ class _FeedbackDetailPageState extends State<FeedbackDetailPage> {
       case 0:
         return const Color(0xFFF59E0B);
       case 1:
-        return const Color(0xFF3B82F6);
+        return context.colors.info;
       case 2:
         return const Color(0xFF10B981);
       case 3:
@@ -372,7 +372,7 @@ class _FeedbackDetailPageState extends State<FeedbackDetailPage> {
       case 'FEATURE':
         return {'label': '功能建议', 'icon': Icons.lightbulb_rounded, 'color': const Color(0xFF8B5CF6)};
       case 'CONTENT':
-        return {'label': '内容问题', 'icon': Icons.article_rounded, 'color': const Color(0xFF3B82F6)};
+        return {'label': '内容问题', 'icon': Icons.article_rounded, 'color': context.colors.info};
       case 'OTHER':
         return {'label': '其他', 'icon': Icons.more_horiz_rounded, 'color': const Color(0xFF94A3B8)};
       default:

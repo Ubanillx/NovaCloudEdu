@@ -17,14 +17,14 @@ class _FeedbackCreatePageState extends State<FeedbackCreatePage> {
   final _titleController = TextEditingController();
   final _contentController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  
+
   String _selectedType = 'BUG';
   bool _isSubmitting = false;
 
   final List<Map<String, dynamic>> _feedbackTypes = [
     {'value': 'BUG', 'label': 'Bug反馈', 'icon': Icons.bug_report_rounded, 'color': const Color(0xFFEF4444)},
     {'value': 'FEATURE', 'label': '功能建议', 'icon': Icons.lightbulb_rounded, 'color': const Color(0xFF8B5CF6)},
-    {'value': 'CONTENT', 'label': '内容问题', 'icon': Icons.article_rounded, 'color': const Color(0xFF3B82F6)},
+    {'value': 'CONTENT', 'label': '内容问题', 'icon': Icons.article_rounded, 'color': null},
     {'value': 'OTHER', 'label': '其他', 'icon': Icons.more_horiz_rounded, 'color': const Color(0xFF94A3B8)},
   ];
 
@@ -136,7 +136,7 @@ class _FeedbackCreatePageState extends State<FeedbackCreatePage> {
       runSpacing: 12,
       children: _feedbackTypes.map((type) {
         final isSelected = _selectedType == type['value'];
-        final color = type['color'] as Color;
+        final color = type['color'] as Color? ?? colors.info;
 
         return GestureDetector(
           onTap: () => setState(() => _selectedType = type['value']),
@@ -144,7 +144,7 @@ class _FeedbackCreatePageState extends State<FeedbackCreatePage> {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
               color: isSelected
-                  ? color.withOpacity(context.isDarkMode ? 0.2 : 0.1)
+                  ? color.withValues(alpha: context.isDarkMode ? 0.2 : 0.1)
                   : colors.surface,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
@@ -196,7 +196,7 @@ class _FeedbackCreatePageState extends State<FeedbackCreatePage> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFF3B82F6), width: 2),
+          borderSide: BorderSide(color: colors.info, width: 2),
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       ),
@@ -224,7 +224,7 @@ class _FeedbackCreatePageState extends State<FeedbackCreatePage> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFF3B82F6), width: 2),
+          borderSide: BorderSide(color: colors.info, width: 2),
         ),
         contentPadding: const EdgeInsets.all(16),
         counterStyle: TextStyle(color: colors.textTertiary),

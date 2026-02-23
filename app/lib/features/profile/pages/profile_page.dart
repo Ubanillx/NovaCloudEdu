@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../../data/mock_data.dart';
 import '../../../config/app_theme.dart';
 import '../../../core/database/models/study_plan.dart';
 import '../../../core/database/repositories/study_plan_repository.dart';
 import '../../../widgets/toast/nova_message.dart';
 import '../../../widgets/common/nova_refresh_header.dart';
-import '../../../widgets/common/loading_widget.dart';
+import '../../../widgets/common/skeleton_widgets.dart';
 import '../../auth/services/auth_service.dart';
 import '../widgets/add_plan_dialog.dart';
 import '../services/checkin_service.dart';
@@ -222,7 +223,7 @@ class _ProfilePageState extends State<ProfilePage> {
       final g = int.tryParse(genderValue.toString()) ?? 2;
       if (g == 0) {
         genderIcon = Icons.male_rounded;
-        genderColor = const Color(0xFF3B82F6);
+        genderColor = colors.info;
         genderLabel = '男';
       } else if (g == 1) {
         genderIcon = Icons.female_rounded;
@@ -314,7 +315,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    _buildUserTag('Lv.${_userInfo?['level'] ?? user.level}', const Color(0xFF3B82F6)),
+                    _buildUserTag('Lv.${_userInfo?['level'] ?? user.level}', colors.info),
                     const SizedBox(width: 8),
                     _buildUserTag(roleLabel, const Color(0xFFF59E0B)),
                     if (genderLabel != null) ...[
@@ -326,14 +327,28 @@ class _ProfilePageState extends State<ProfilePage> {
               ],
             ),
           ),
-          // 设置按钮
-          IconButton(
-            onPressed: () {
+          // 设置按钮 - SVG（圆形背景）
+          GestureDetector(
+            onTap: () {
               Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => const SettingsPage()),
               );
             },
-            icon: Icon(Icons.settings_outlined, color: colors.iconPrimary),
+            child: Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: colors.surfaceVariant,
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: SvgPicture.asset(
+                  'lib/assests/fonts/icons/设置.svg',
+                  width: 22,
+                  height: 22,
+                ),
+              ),
+            ),
           ),
         ],
       ),
@@ -370,7 +385,7 @@ class _ProfilePageState extends State<ProfilePage> {
           color: colors.surface,
           borderRadius: BorderRadius.circular(24),
         ),
-        child: const LoadingWidget(),
+        child: const HomeSectionSkeleton(height: 200),
       );
     }
 
@@ -400,7 +415,7 @@ class _ProfilePageState extends State<ProfilePage> {
             padding: const EdgeInsets.fromLTRB(12, 28, 12, 24),
             child: Row(
               children: [
-                _buildStatItem('学习天数', '$registerDays', Icons.calendar_today_rounded, const Color(0xFF3B82F6)),
+                _buildStatItem('学习天数', '$registerDays', Icons.calendar_today_rounded, colors.info),
                 _buildStatLine(),
                 _buildStatItem('打卡天数', '$checkinDays', Icons.local_fire_department_rounded, const Color(0xFFEF4444)),
                 _buildStatLine(),
@@ -680,7 +695,7 @@ class _ProfilePageState extends State<ProfilePage> {
           const SizedBox(height: 16),
           // 计划列表
           if (_isLoadingPlans)
-            const LoadingWidget(size: 24)
+            const ListItemSkeleton(itemCount: 3, showAvatar: false)
           else if (_todayPlans.isEmpty)
             _buildEmptyPlanState()
           else
@@ -866,7 +881,7 @@ class _ProfilePageState extends State<ProfilePage> {
       case 1:
         return const Color(0xFFF59E0B); // 重要 - 橙色
       default:
-        return const Color(0xFF3B82F6); // 普通 - 蓝色
+        return context.colors.info; // 普通 - 蓝色
     }
   }
 
@@ -879,7 +894,7 @@ class _ProfilePageState extends State<ProfilePage> {
       {'icon': Icons.history_rounded, 'title': '学习历史', 'color': const Color(0xFF6366F1), 'action': 'history'},
       {'icon': Icons.bookmark_rounded, 'title': '我的收藏', 'color': const Color(0xFFEC4899), 'action': 'bookmark'},
       {'icon': Icons.download_rounded, 'title': '离线下载', 'color': const Color(0xFF10B981), 'action': 'download'},
-      {'icon': Icons.help_outline_rounded, 'title': '帮助中心', 'color': const Color(0xFF3B82F6), 'action': 'help'},
+      {'icon': Icons.help_outline_rounded, 'title': '帮助中心', 'color': colors.info, 'action': 'help'},
       {'icon': Icons.info_outline_rounded, 'title': '关于我们', 'color': const Color(0xFF94A3B8), 'action': 'about'},
     ];
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../config/app_theme.dart';
 
 /// Nova 下拉刷新组件
 /// 
@@ -19,10 +20,10 @@ class NovaRefreshHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return RefreshIndicator(
       onRefresh: onRefresh,
-      color: color ?? const Color(0xFFFF4B2B),
+      color: color ?? AppTheme.brand,
       backgroundColor: Colors.white,
       displacement: 40,
-      strokeWidth: 2.5,
+      strokeWidth: 3.0,
       child: child,
     );
   }
@@ -47,10 +48,10 @@ class NovaRefreshableList extends StatelessWidget {
   Widget build(BuildContext context) {
     return RefreshIndicator(
       onRefresh: onRefresh,
-      color: color ?? const Color(0xFFFF4B2B),
+      color: color ?? AppTheme.brand,
       backgroundColor: Colors.white,
       displacement: 40,
-      strokeWidth: 2.5,
+      strokeWidth: 3.0,
       child: CustomScrollView(
         physics: physics ?? const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
         slivers: slivers,

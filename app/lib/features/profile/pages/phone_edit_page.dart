@@ -198,7 +198,7 @@ class _PhoneEditPageState extends State<PhoneEditPage> {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: const Color(0xFF3B82F6), width: 2),
+                  borderSide: BorderSide(color: colors.info, width: 2),
                 ),
               ),
               validator: (value) {
@@ -245,7 +245,7 @@ class _PhoneEditPageState extends State<PhoneEditPage> {
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: const Color(0xFF3B82F6), width: 2),
+                        borderSide: BorderSide(color: colors.info, width: 2),
                       ),
                     ),
                     validator: (value) {
@@ -266,7 +266,7 @@ class _PhoneEditPageState extends State<PhoneEditPage> {
                   child: ElevatedButton(
                     onPressed: (_codeCountdown > 0 || _isSendingCode) ? null : _sendVerifyCode,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF3B82F6),
+                      backgroundColor: colors.info,
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -291,7 +291,7 @@ class _PhoneEditPageState extends State<PhoneEditPage> {
               child: ElevatedButton(
                 onPressed: _isLoading ? null : _updatePhone,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF3B82F6),
+                  backgroundColor: colors.info,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),

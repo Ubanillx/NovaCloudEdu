@@ -6,7 +6,7 @@ import 'package:tdesign_flutter/tdesign_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../config/app_theme.dart';
 import '../../../widgets/toast/nova_message.dart';
-import '../../../widgets/common/loading_widget.dart';
+import '../../../widgets/common/skeleton_widgets.dart';
 import '../../auth/services/auth_service.dart';
 import 'phone_edit_page.dart';
 
@@ -163,10 +163,10 @@ class _ProfileDetailPageState extends State<ProfileDetailPage> {
                                   valueColor: AlwaysStoppedAnimation<Color>(colors.textPrimary),
                                 ),
                               )
-                            : const Text(
+                            : Text(
                                 '保存',
                                 style: TextStyle(
-                                  color: Color(0xFF3B82F6),
+                                  color: colors.info,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -180,7 +180,7 @@ class _ProfileDetailPageState extends State<ProfileDetailPage> {
         ],
       ),
       body: _isLoading
-          ? const LoadingWidget(message: '加载中...')
+          ? const ProfileSkeleton()
           : _userDetail == null
               ? Center(
                   child: Column(
@@ -342,12 +342,12 @@ class _ProfileDetailPageState extends State<ProfileDetailPage> {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: _isEditing ? const Color(0xFF3B82F6) : colors.border.withOpacity(0.2),
+                    color: _isEditing ? colors.info : colors.border.withOpacity(0.2),
                     width: 3,
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: (_isEditing ? const Color(0xFF3B82F6) : Colors.black).withOpacity(0.1),
+                      color: (_isEditing ? colors.info : Colors.black).withOpacity(0.1),
                       blurRadius: 20,
                       spreadRadius: _isEditing ? 4 : 0,
                       offset: const Offset(0, 10),
@@ -400,7 +400,7 @@ class _ProfileDetailPageState extends State<ProfileDetailPage> {
                   child: Container(
                     padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF3B82F6),
+                      color: colors.info,
                       shape: BoxShape.circle,
                       border: Border.all(color: colors.surface, width: 2),
                       boxShadow: [
@@ -462,6 +462,7 @@ class _ProfileDetailPageState extends State<ProfileDetailPage> {
   }
 
   Widget _buildPhoneEditButton() {
+    final colors = context.colors;
     return GestureDetector(
       onTap: () async {
         final result = await Navigator.of(context).push<bool>(
@@ -476,14 +477,14 @@ class _ProfileDetailPageState extends State<ProfileDetailPage> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
         decoration: BoxDecoration(
-          color: const Color(0xFF3B82F6).withOpacity(0.1),
+          color: colors.info.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(20),
         ),
-        child: const Text(
+        child: Text(
           '修改',
           style: TextStyle(
             fontSize: 12,
-            color: Color(0xFF3B82F6),
+            color: colors.info,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -605,10 +606,10 @@ class _ProfileDetailPageState extends State<ProfileDetailPage> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: const Color(0xFF3B82F6).withOpacity(0.1),
+                color: colors.info.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: Icon(icon, color: const Color(0xFF3B82F6), size: 26),
+              child: Icon(icon, color: colors.info, size: 26),
             ),
             const SizedBox(width: 20),
             Expanded(
@@ -679,11 +680,12 @@ class _ProfileDetailPageState extends State<ProfileDetailPage> {
   }
 
   Future<void> _showCityPicker() async {
+    final colors = context.colors;
     final result = await CityPickers.showCityPicker(
       context: context,
       showType: ShowType.pca, // 省市区三级联动
-      cancelWidget: Text('取消', style: TextStyle(color: context.colors.textSecondary)),
-      confirmWidget: const Text('确定', style: TextStyle(color: Color(0xFF3B82F6), fontWeight: FontWeight.w600)),
+      cancelWidget: Text('取消', style: TextStyle(color: colors.textSecondary)),
+      confirmWidget: Text('确定', style: TextStyle(color: colors.info, fontWeight: FontWeight.w600)),
     );
     if (result != null) {
       final address = [
@@ -761,22 +763,23 @@ class _ProfileDetailPageState extends State<ProfileDetailPage> {
 
   Widget _buildGenderOption(int value, String label) {
     final isSelected = _selectedGender == value;
+    final colors = context.colors;
     return GestureDetector(
       onTap: () => setState(() => _selectedGender = value),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF3B82F6) : Colors.transparent,
+          color: isSelected ? colors.info : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isSelected ? const Color(0xFF3B82F6) : context.colors.border.withOpacity(0.5),
+            color: isSelected ? colors.info : colors.border.withValues(alpha: 0.5),
           ),
         ),
         child: Text(
           label,
           style: TextStyle(
             fontSize: 13,
-            color: isSelected ? Colors.white : context.colors.textPrimary,
+            color: isSelected ? Colors.white : colors.textPrimary,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
           ),
         ),

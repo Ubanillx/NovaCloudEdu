@@ -4,6 +4,7 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:tdesign_flutter/tdesign_flutter.dart';
+import '../../config/app_theme.dart';
 
 /// 主要按钮
 class PrimaryButton extends StatelessWidget {
@@ -37,6 +38,11 @@ class PrimaryButton extends StatelessWidget {
         disabled: disabled || isLoading,
         onTap: isLoading ? null : onTap,
         icon: isLoading ? TDIcons.loading : null,
+        style: TDButtonStyle(
+          radius: BorderRadius.circular(24),
+          backgroundColor: AppTheme.brand,
+          textColor: Colors.white,
+        ),
       ),
     );
   }

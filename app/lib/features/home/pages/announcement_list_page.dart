@@ -3,6 +3,7 @@ import 'package:nova_api/nova_api.dart';
 import '../../../config/app_theme.dart';
 import '../../../core/network/api_client.dart';
 import '../../../widgets/common/loading_widget.dart';
+import '../../../widgets/common/skeleton_widgets.dart';
 import '../../../widgets/common/empty_widget.dart';
 import '../../../widgets/common/nova_refresh_header.dart';
 import 'announcement_detail_page.dart';
@@ -119,7 +120,7 @@ class _AnnouncementListPageState extends State<AnnouncementListPage> {
 
   Widget _buildBody() {
     if (_isLoading) {
-      return const Center(child: LoadingWidget());
+      return const ListItemSkeleton(showAvatar: false);
     }
 
     if (_announcements.isEmpty) {
@@ -263,7 +264,7 @@ class _AnnouncementListPageState extends State<AnnouncementListPage> {
         child: SizedBox(
           width: 24,
           height: 24,
-          child: CircularProgressIndicator(strokeWidth: 2),
+          child: LoadingWidget(size: 24),
         ),
       ),
     );
