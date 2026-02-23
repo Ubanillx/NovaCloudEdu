@@ -5,6 +5,7 @@ import com.novacloudedu.backend.domain.book.entity.Chapter;
 import com.novacloudedu.backend.domain.book.entity.ReadingQuiz;
 import com.novacloudedu.backend.domain.book.repository.ChapterRepository;
 import com.novacloudedu.backend.domain.book.repository.ReadingQuizRepository;
+import com.novacloudedu.backend.domain.book.service.ContentSecurityService;
 import com.novacloudedu.backend.domain.book.service.LlmService;
 import com.novacloudedu.backend.domain.book.valueobject.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,6 +40,9 @@ class ReadingQuizApplicationServiceTest {
     @Mock
     private LlmService llmService;
 
+    @Mock
+    private ContentSecurityService contentSecurityService;
+
     private ReadingQuizApplicationService service;
 
     private BookId bookId;
@@ -51,6 +55,7 @@ class ReadingQuizApplicationServiceTest {
                 chapterRepository,
                 quizRepository,
                 llmService,
+                contentSecurityService,
                 new Gson()
         );
         

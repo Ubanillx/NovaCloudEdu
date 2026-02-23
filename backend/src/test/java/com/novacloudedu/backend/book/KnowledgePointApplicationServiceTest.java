@@ -5,6 +5,7 @@ import com.novacloudedu.backend.domain.book.entity.Chapter;
 import com.novacloudedu.backend.domain.book.entity.KnowledgePoint;
 import com.novacloudedu.backend.domain.book.repository.ChapterRepository;
 import com.novacloudedu.backend.domain.book.repository.KnowledgePointRepository;
+import com.novacloudedu.backend.domain.book.service.ContentSecurityService;
 import com.novacloudedu.backend.domain.book.service.LlmService;
 import com.novacloudedu.backend.domain.book.valueobject.BookId;
 import com.novacloudedu.backend.domain.book.valueobject.ChapterId;
@@ -42,6 +43,9 @@ class KnowledgePointApplicationServiceTest {
 
     @Mock
     private LlmService llmService;
+
+    @Mock
+    private ContentSecurityService contentSecurityService;
 
     @InjectMocks
     private KnowledgePointApplicationService service;

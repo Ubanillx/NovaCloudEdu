@@ -5,6 +5,7 @@ import com.novacloudedu.backend.domain.book.entity.Chapter;
 import com.novacloudedu.backend.domain.book.entity.ChapterSummary;
 import com.novacloudedu.backend.domain.book.repository.ChapterRepository;
 import com.novacloudedu.backend.domain.book.repository.ChapterSummaryRepository;
+import com.novacloudedu.backend.domain.book.service.ContentSecurityService;
 import com.novacloudedu.backend.domain.book.service.LlmService;
 import com.novacloudedu.backend.domain.book.valueobject.BookId;
 import com.novacloudedu.backend.domain.book.valueobject.ChapterId;
@@ -42,6 +43,9 @@ class ChapterSummaryApplicationServiceTest {
 
     @Mock
     private LlmService llmService;
+
+    @Mock
+    private ContentSecurityService contentSecurityService;
 
     @InjectMocks
     private ChapterSummaryApplicationService service;
