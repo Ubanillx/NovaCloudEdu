@@ -152,7 +152,7 @@ services:
       - "${ONLYOFFICE_PORT:-9980}:80"
     environment:
       - JWT_ENABLED=${ONLYOFFICE_JWT_ENABLED:-true}
-      - JWT_SECRET=${ONLYOFFICE_JWT_SECRET:-change-me-in-production}
+      - JWT_SECRET=${ONLYOFFICE_JWT_SECRET:-changeme_onlyoffice_secret_1234567}
       - JWT_HEADER=Authorization
     volumes:
       - onlyoffice_data:/var/www/onlyoffice/Data
