@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactMarkdown from 'react-markdown';
+import MarkdownRenderer from '../../components/chat/MarkdownRenderer';
 import {
   X, Sparkles, BookMarked, Brain, MessageSquare, GraduationCap,
   Lightbulb, RefreshCw, Send, Check, Loader2,
@@ -53,7 +53,7 @@ const ReaderAiPanel: React.FC<ReaderAiPanelProps> = (props) => {
 
   return (
     <div
-      className="absolute top-6 right-6 bottom-6 w-[400px] z-30 shadow-[0_20px_50px_rgba(0,0,0,0.15)] animate-in slide-in-from-right-4 fade-in duration-300 rounded-[28px] border flex flex-col overflow-hidden ring-1 ring-black/5 dark:ring-white/10"
+      className="absolute top-6 right-6 bottom-6 w-[400px] z-30 shadow-[0_20px_50px_rgba(0,0,0,0.15)] animate-in fade-in duration-200 rounded-[28px] border flex flex-col overflow-hidden ring-1 ring-black/5 dark:ring-white/10"
       style={floatingPanelStyle(themeVars.bg, themeVars.border)}
     >
       {/* AI Tab 头 */}
@@ -131,12 +131,11 @@ const SummaryTab: React.FC<ReaderAiPanelProps> = ({
     {!summary && !summaryLoading && (
       <button
         onClick={onGetSummary}
-        className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-2xl text-white text-sm font-black transition-all active:scale-95 shadow-lg shadow-brand-500/20 group overflow-hidden relative"
+        className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-2xl text-white text-sm font-black transition-all hover:scale-[1.02] shadow-lg shadow-brand-500/20"
         style={{ background: themeVars.accent }}
       >
-        <Brain size={18} className="group-hover:rotate-12 transition-transform" />
+        <Brain size={18} />
         生成本章总结
-        <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform" />
       </button>
     )}
     {summaryLoading && (
@@ -148,10 +147,11 @@ const SummaryTab: React.FC<ReaderAiPanelProps> = ({
       </div>
     )}
     {summary && (
-      <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-        <div className="prose prose-sm max-w-none reader-ai-content" style={{ color: themeVars.text }}>
-          <ReactMarkdown>{summary.content || ''}</ReactMarkdown>
-        </div>
+      <div className="space-y-6 animate-in fade-in duration-300">
+        <MarkdownRenderer
+          content={summary.content || ''}
+          className="prose prose-sm max-w-none reader-ai-content"
+        />
         {summary.keyPoints && summary.keyPoints.length > 0 && (
           <div className="space-y-3">
             <h4 className="text-[10px] font-black uppercase tracking-widest opacity-50">核心知识要点</h4>
@@ -167,7 +167,8 @@ const SummaryTab: React.FC<ReaderAiPanelProps> = ({
         )}
         <button
           onClick={() => { setSummary(null); onGenerateSummary(); }}
-          className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-black border-2 transition-all hover:bg-black/5 active:scale-95"
+          disabled={summaryLoading}
+          className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-black border-2 transition-all hover:scale-[1.02] disabled:opacity-50"
           style={{ borderColor: themeVars.border, color: themeVars.muted }}
         >
           <RefreshCw size={14} />
@@ -195,7 +196,7 @@ const KnowledgeTab: React.FC<ReaderAiPanelProps> = ({
         </div>
         <button
           onClick={onGetKP}
-          className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-2xl text-white text-sm font-black transition-all active:scale-95 shadow-lg shadow-amber-500/20 bg-amber-500 hover:bg-amber-600"
+          className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-2xl text-white text-sm font-black transition-all hover:scale-[1.02] shadow-lg shadow-amber-500/20 bg-amber-500"
         >
           <Sparkles size={18} />
           开始提取知识点
@@ -211,12 +212,12 @@ const KnowledgeTab: React.FC<ReaderAiPanelProps> = ({
       </div>
     )}
     {knowledgePoints.length > 0 && (
-      <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="space-y-4 animate-in fade-in duration-300">
         <div className="grid grid-cols-1 gap-3">
           {knowledgePoints.map((kp, i) => {
             const typeStr = kp.pointType || 'CONCEPT';
             return (
-              <div key={i} className="rounded-2xl border p-5 transition-all hover:scale-[1.01] hover:shadow-lg group" style={{ borderColor: themeVars.border, background: themeVars.card }}>
+              <div key={i} className="rounded-2xl border p-5 transition-all hover:scale-[1.02] group" style={{ borderColor: themeVars.border, background: themeVars.card }}>
                 <div className="flex items-center gap-2 mb-3">
                   <span className={`inline-flex items-center px-2 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border ${KP_COLORS[typeStr] || KP_COLORS.CONCEPT}`}>
                     {KP_LABELS[typeStr] || typeStr}
@@ -232,7 +233,8 @@ const KnowledgeTab: React.FC<ReaderAiPanelProps> = ({
         </div>
         <button
           onClick={() => { setKnowledgePoints([]); onExtractKP(); }}
-          className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-black border transition-all hover:bg-black/5 dark:hover:bg-white/5 active:scale-95"
+          disabled={kpLoading}
+          className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-black border transition-all hover:scale-[1.02] disabled:opacity-50"
           style={{ borderColor: themeVars.border, color: themeVars.muted }}
         >
           <RefreshCw size={14} />
@@ -262,7 +264,7 @@ const ChatTab: React.FC<ReaderAiPanelProps> = ({
         </div>
       )}
       {chatMessages.map((msg, i) => (
-        <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-2 duration-300`}>
+        <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-in fade-in duration-200`}>
           <div
             className={`max-w-[90%] rounded-[20px] px-4 py-3 text-[13px] leading-relaxed shadow-sm ${msg.role === 'user' ? 'rounded-tr-none' : 'rounded-tl-none border'}`}
             style={{
@@ -272,9 +274,10 @@ const ChatTab: React.FC<ReaderAiPanelProps> = ({
             }}
           >
             {msg.role === 'assistant' ? (
-              <div className="prose prose-sm max-w-none reader-ai-chat" style={{ color: themeVars.text, fontSize: '13px' }}>
-                <ReactMarkdown>{msg.content || ''}</ReactMarkdown>
-              </div>
+              <MarkdownRenderer
+                content={msg.content || ''}
+                className="prose prose-sm max-w-none reader-ai-chat"
+              />
             ) : (
               <span className="font-medium">{msg.content}</span>
             )}
@@ -312,7 +315,7 @@ const ChatTab: React.FC<ReaderAiPanelProps> = ({
         <button
           onClick={onSendChat}
           disabled={!chatInput.trim() || chatLoading}
-          className="w-9 h-9 flex items-center justify-center rounded-xl text-white transition-all active:scale-95 disabled:opacity-40 shadow-sm flex-shrink-0 hover:brightness-110"
+          className="w-9 h-9 flex items-center justify-center rounded-xl text-white transition-all hover:scale-[1.02] disabled:opacity-40 shadow-sm flex-shrink-0"
           style={{ background: themeVars.accent }}
         >
           <Send size={15} />
@@ -340,7 +343,7 @@ const QuizTab: React.FC<ReaderAiPanelProps> = ({
         </div>
         <button
           onClick={onGenerateQuiz}
-          className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-2xl text-white text-sm font-black transition-all active:scale-95 shadow-lg shadow-emerald-500/20 bg-emerald-500"
+          className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-2xl text-white text-sm font-black transition-all hover:scale-[1.02] shadow-lg shadow-emerald-500/20 bg-emerald-500"
         >
           <Sparkles size={18} />
           开始智能出题
@@ -356,7 +359,7 @@ const QuizTab: React.FC<ReaderAiPanelProps> = ({
       </div>
     )}
     {quiz && quiz.questions && (
-      <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="space-y-6 animate-in fade-in duration-300">
         {quizScore !== null && (
           <div className="rounded-3xl border p-8 text-center relative overflow-hidden shadow-sm" style={{ borderColor: themeVars.accent, background: `${themeVars.accent}05` }}>
             <div className="relative z-10">
@@ -393,7 +396,7 @@ const QuizTab: React.FC<ReaderAiPanelProps> = ({
             <button
               onClick={onSubmitQuiz}
               disabled={quizSubmitting || userAnswers.some(a => !a)}
-              className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-2xl text-white text-sm font-black transition-all active:scale-95 disabled:opacity-40 shadow-xl shadow-brand-500/20"
+              className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-2xl text-white text-sm font-black transition-all hover:scale-[1.02] disabled:opacity-40 shadow-xl shadow-brand-500/20"
               style={{ background: themeVars.accent }}
             >
               {quizSubmitting ? <Loader2 size={20} className="animate-spin" /> : <Check size={20} />}
@@ -402,7 +405,7 @@ const QuizTab: React.FC<ReaderAiPanelProps> = ({
           ) : (
             <button
               onClick={() => { setQuiz(null); setQuizScore(null); setUserAnswers([]); onGenerateQuiz(); }}
-              className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-2xl text-white text-sm font-black transition-all active:scale-95 shadow-xl shadow-emerald-500/20 bg-emerald-500"
+              className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-2xl text-white text-sm font-black transition-all hover:scale-[1.02] shadow-xl shadow-emerald-500/20 bg-emerald-500"
             >
               <RefreshCw size={20} />
               再战一组题目
