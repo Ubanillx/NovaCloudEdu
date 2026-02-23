@@ -22,18 +22,7 @@ const USER_INFO_KEY = 'user_info';
 
 const NotificationBell: React.FC = () => {
   const navigate = useNavigate();
-  const { notifications, chatMessages, groupMessages } = useChat();
-
-  // 获取当前用户 ID（保持字符串，避免大整数精度丢失）
-  const currentUserId = (() => {
-    try { return String(JSON.parse(localStorage.getItem('user_info') || '{}')?.id ?? ''); } catch { return ''; }
-  })();
-
-  // 未读数 = 新通知 + 新私聊消息 + 非自己发的群消息
-  const otherGroupMessages = currentUserId
-    ? groupMessages.filter((m) => String(m.senderId) !== currentUserId)
-    : groupMessages;
-  const unreadCount = notifications.length + chatMessages.length + otherGroupMessages.length;
+  const { totalUnread } = useChat();
 
   return (
     <button
@@ -42,9 +31,9 @@ const NotificationBell: React.FC = () => {
       aria-label="消息通知"
     >
       <Bell className="w-5 h-5" />
-      {unreadCount > 0 && (
+      {totalUnread > 0 && (
         <span className="absolute -top-0.5 -right-0.5 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold text-white bg-rose-500 rounded-full ring-2 ring-white dark:ring-gray-900 animate-in zoom-in duration-200">
-          {unreadCount > 99 ? '99+' : unreadCount}
+          {totalUnread > 99 ? '99+' : totalUnread}
         </span>
       )}
     </button>
