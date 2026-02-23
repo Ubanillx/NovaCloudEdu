@@ -272,12 +272,12 @@ services:
     environment:
       - PORT=8100
       - GOTENBERG_URL=http://gotenberg:3000
-      # 阿里云 OSS（与 Spring Boot 配置保持一致）
-      - ALIYUN_OSS_ENDPOINT=${ALIYUN_OSS_ENDPOINT:-oss-cn-hangzhou.aliyuncs.com}
-      - ALIYUN_OSS_ACCESS_KEY_ID=${ALIYUN_OSS_ACCESS_KEY_ID:-}
-      - ALIYUN_OSS_ACCESS_KEY_SECRET=${ALIYUN_OSS_ACCESS_KEY_SECRET:-}
-      - ALIYUN_OSS_BUCKET_NAME=${ALIYUN_OSS_BUCKET_NAME:-}
-      - ALIYUN_OSS_DOMAIN=${ALIYUN_OSS_DOMAIN:-}
+      # 阿里云 OSS — Python oss_client.py 读取 OSS_* 变量名
+      - OSS_ENDPOINT=${ALIYUN_OSS_ENDPOINT:-oss-cn-hangzhou.aliyuncs.com}
+      - OSS_ACCESS_KEY_ID=${ALIYUN_OSS_ACCESS_KEY_ID:-}
+      - OSS_ACCESS_KEY_SECRET=${ALIYUN_OSS_ACCESS_KEY_SECRET:-}
+      - OSS_BUCKET_NAME=${ALIYUN_OSS_BUCKET_NAME:-}
+      - OSS_DOMAIN=${ALIYUN_OSS_DOMAIN:-}
     depends_on:
       gotenberg:
         condition: service_healthy
