@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import Markdown from 'react-markdown';
+import MarkdownRenderer from '../../components/chat/MarkdownRenderer';
 import { 
   Search, 
   ChevronLeft,
@@ -147,7 +147,7 @@ const PostDetailModal: React.FC<PostDetailModalProps> = ({ isOpen, onClose, post
                 
                 {/* 内容 */}
                 <div className="pt-3 border-t border-gray-200 dark:border-gray-700 prose prose-sm dark:prose-invert max-w-none">
-                  <Markdown>{detail.content || ''}</Markdown>
+                  <MarkdownRenderer content={detail.content || ''} />
                 </div>
               </div>
 
