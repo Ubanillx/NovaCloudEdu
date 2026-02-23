@@ -60,6 +60,9 @@ public class SectionResponse {
     @Schema(description = "缩略图数量")
     private Integer thumbnailCount;
 
+    @Schema(description = "加密密钥ID（用于HLS解密）")
+    private String encryptionKeyId;
+
     @Schema(description = "创建时间")
     private LocalDateTime createTime;
 
