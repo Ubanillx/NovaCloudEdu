@@ -33,7 +33,7 @@ public class EsBookSearchService {
             SearchResponse<BookDocument> response = client.search(SearchRequest.of(s -> s
                     .index(props.getBookIndex())
                     .query(q -> q.bool(b -> b
-                            .should(sh -> sh.multiMatch(m -> m
+                            .must(mu -> mu.multiMatch(m -> m
                                     .query(keyword)
                                     .fields("title^3", "title.pinyin^2", "author^2", "author.pinyin")
                                     .type(co.elastic.clients.elasticsearch._types.query_dsl.TextQueryType.BestFields)
