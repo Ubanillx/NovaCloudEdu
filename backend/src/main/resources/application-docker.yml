@@ -140,6 +140,7 @@ typst:
 onlyoffice:
   document-server-url: ${ONLYOFFICE_URL:http://onlyoffice:80}
   callback-url: ${ONLYOFFICE_CALLBACK_URL:http://localhost:8080/api/onlyoffice/callback}
+  jwt-secret: "${ONLYOFFICE_JWT_SECRET:changeme_onlyoffice_secret_1234567}"
 
 # Elasticsearch 配置
 spring.elasticsearch.uris: http://elasticsearch:9200

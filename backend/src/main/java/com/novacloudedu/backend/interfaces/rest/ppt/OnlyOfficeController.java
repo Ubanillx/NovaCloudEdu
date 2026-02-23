@@ -2,6 +2,8 @@ package com.novacloudedu.backend.interfaces.rest.ppt;
 
 import com.novacloudedu.backend.domain.file.service.OssService;
 import com.novacloudedu.backend.domain.file.valueobject.FileBusinessType;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -9,10 +11,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
+import javax.crypto.SecretKey;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.HexFormat;
 import java.util.HashMap;
@@ -37,6 +41,9 @@ public class OnlyOfficeController {
 
     @Value("${onlyoffice.callback-url:http://host.docker.internal:8080/api/onlyoffice/callback}")
     private String callbackUrl;
+
+    @Value("${onlyoffice.jwt-secret:}")
+    private String jwtSecret;
 
     /**
      * 获取 OnlyOffice 编辑器配置
@@ -70,6 +77,12 @@ public class OnlyOfficeController {
         config.put("editorConfig", editorConfig);
         config.put("documentType", "slide");
         config.put("type", "desktop");
+
+        // 如果配置了 JWT secret，签名 config
+        if (jwtSecret != null && !jwtSecret.isBlank()) {
+            String token = generateOnlyOfficeToken(config);
+            config.put("token", token);
+        }
 
         Map<String, Object> result = new HashMap<>();
         result.put("documentServerUrl", documentServerUrl);
@@ -131,10 +144,16 @@ public class OnlyOfficeController {
     }
 
     /**
-     * 根据文件 URL 生成唯一的 document key
-     * OnlyOffice 要求：相同 key = 相同文档缓存版本
-     * 文件内容变化时 key 必须变化
+     * 使用 OnlyOffice JWT secret 对 config 进行签名
      */
+    private String generateOnlyOfficeToken(Map<String, Object> config) {
+        SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
+        return Jwts.builder()
+                .claims(config)
+                .signWith(key)
+                .compact();
+    }
+
     private String generateDocumentKey(String fileUrl) {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
