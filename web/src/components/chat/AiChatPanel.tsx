@@ -6,9 +6,7 @@ import {
   Image as ImageIcon, FileUp, X, ArrowDown, Palette, Video,
   FileText, FileCode, FileSpreadsheet, Globe, Braces, BookOpen, Paperclip, ChevronLeft,
 } from 'lucide-react';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import rehypeRaw from 'rehype-raw';
+import MarkdownRenderer from './MarkdownRenderer';
 import { useAiChat } from './useAiChat';
 import type { AiChatSession, ImageGeneration, VideoGeneration } from './useAiChat';
 import { useAssistantChat } from '../../hooks/useAssistantChat';
@@ -980,43 +978,13 @@ const ChatArea: React.FC<ChatAreaProps> = ({
                         {msg.role === 'user' ? (
                           <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
                         ) : (
-                          <div className="prose prose-sm dark:prose-invert max-w-none prose-p:my-1 prose-pre:my-2 prose-headings:my-2 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5 prose-pre:bg-gray-100 prose-pre:text-gray-800 dark:prose-pre:bg-gray-900 dark:prose-pre:text-gray-200 prose-pre:rounded-xl prose-pre:overflow-x-auto [&_pre_code]:bg-transparent [&_pre_code]:text-inherit [&_pre_code]:p-0 prose-code:text-brand-600 dark:prose-code:text-brand-400 prose-code:bg-brand-50 dark:prose-code:bg-brand-900/30 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:before:content-none prose-code:after:content-none">
-                            <ReactMarkdown
-                              remarkPlugins={[remarkGfm]}
-                              rehypePlugins={[rehypeRaw]}
-                              components={{
-                                // 渲染 <video> 标签为视频播放器
-                                video: (props: React.ComponentProps<'video'>) => (
-                                  <video
-                                    {...props}
-                                    controls
-                                    className="rounded-xl border border-gray-200 dark:border-gray-700 shadow-md max-w-full not-prose"
-                                    style={{ maxHeight: 320, maxWidth: '100%', borderRadius: 12 }}
-                                  />
-                                ),
-                                // 兼容旧数据：[点击播放 AI 生成视频](url) 渲染为视频播放器
-                                a: ({ children, href, ...rest }: React.ComponentProps<'a'>) => {
-                                  const text = typeof children === 'string' ? children : '';
-                                  if (text === '点击播放 AI 生成视频' && href) {
-                                    return (
-                                      <video
-                                        controls
-                                        src={href}
-                                        className="rounded-xl border border-gray-200 dark:border-gray-700 shadow-md max-w-full not-prose"
-                                        style={{ maxHeight: 320, maxWidth: '100%', borderRadius: 12 }}
-                                      />
-                                    );
-                                  }
-                                  return <a href={href} {...rest} target="_blank" rel="noopener noreferrer">{children}</a>;
-                                },
-                              }}
-                            >
-                              {msg.content}
-                            </ReactMarkdown>
-                            {msg.isStreaming && (
-                              <span className="inline-block w-2 h-4 bg-brand-500 animate-pulse rounded-sm ml-0.5 align-middle" />
-                            )}
-                          </div>
+                          <MarkdownRenderer
+                            content={msg.content}
+                            isStreaming={!!msg.isStreaming}
+                            showCursor={!!msg.isStreaming}
+                            enableVideo
+                            className="prose prose-sm dark:prose-invert max-w-none prose-p:my-1 prose-pre:my-2 prose-headings:my-2 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5 prose-pre:bg-gray-100 prose-pre:text-gray-800 dark:prose-pre:bg-gray-900 dark:prose-pre:text-gray-200 prose-pre:rounded-xl prose-pre:overflow-x-auto [&_pre_code]:bg-transparent [&_pre_code]:text-inherit [&_pre_code]:p-0 prose-code:text-brand-600 dark:prose-code:text-brand-400 prose-code:bg-brand-50 dark:prose-code:bg-brand-900/30 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:before:content-none prose-code:after:content-none"
+                          />
                         )}
                       </div>
                       {/* AI 消息操作 */}

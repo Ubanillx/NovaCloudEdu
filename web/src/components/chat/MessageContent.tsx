@@ -190,11 +190,11 @@ const FilePreviewModal: React.FC<FilePreviewModalProps> = ({ fileName, fileUrl, 
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
             <a
-              href={fileUrl}
+              href={previewSrc}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
-              title="在新窗口打开"
+              title="在新窗口预览"
             >
               <ExternalLink size={13} />
               新窗口

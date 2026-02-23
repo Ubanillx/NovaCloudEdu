@@ -211,21 +211,22 @@ export function useAiChat() {
     abortControllerRef.current = controller;
 
     let accumulated = '';
-    // RAF 节流：避免每个 token 都触发 React 重渲染 + ReactMarkdown 全量解析
-    let rafId: number | null = null;
+    // 时间节流（~80ms）：避免每个 token 都触发 React 重渲染 + ReactMarkdown 全量解析
+    let throttleTimer: ReturnType<typeof setTimeout> | null = null;
+    const THROTTLE_MS = 80;
     const flushStreaming = () => {
-      if (rafId !== null) {
-        cancelAnimationFrame(rafId);
-        rafId = null;
+      if (throttleTimer !== null) {
+        clearTimeout(throttleTimer);
+        throttleTimer = null;
       }
       setStreamingContent(accumulated);
     };
     const scheduleStreamingUpdate = () => {
-      if (rafId === null) {
-        rafId = requestAnimationFrame(() => {
+      if (throttleTimer === null) {
+        throttleTimer = setTimeout(() => {
           setStreamingContent(accumulated);
-          rafId = null;
-        });
+          throttleTimer = null;
+        }, THROTTLE_MS);
       }
     };
     // 本地追踪生成结果（避免闭包读不到最新 React state）
@@ -254,7 +255,117 @@ export function useAiChat() {
 
       const decoder = new TextDecoder();
       let buffer = '';
-      let currentEventType = 'message';
+      // SSE 事件缓冲：按 SSE 规范，同一事件内的多个 data: 行用 \n 拼接
+      let pendingEventType = 'message';
+      let pendingDataLines: string[] = [];
+
+      // 处理一个完整的 SSE 事件
+      const dispatchEvent = (eventType: string, data: string) => {
+        if (data === '[DONE]') return;
+
+        if (eventType === 'done') return;
+
+        if (eventType === 'image_generating') {
+          try {
+            const payload = JSON.parse(data);
+            setImageGenerations(prev => [
+              ...prev,
+              { index: payload.index, prompt: payload.prompt, status: 'generating' },
+            ]);
+          } catch { /* ignore */ }
+          return;
+        }
+
+        if (eventType === 'image_generated') {
+          try {
+            const payload = JSON.parse(data);
+            imageResultsMap.set(payload.index, { url: payload.url });
+            setImageGenerations(prev =>
+              prev.map(ig =>
+                ig.index === payload.index
+                  ? { ...ig, status: 'done' as const, url: payload.url }
+                  : ig
+              )
+            );
+          } catch { /* ignore */ }
+          return;
+        }
+
+        if (eventType === 'image_error') {
+          try {
+            const payload = JSON.parse(data);
+            imageResultsMap.set(payload.index, { error: payload.error });
+            setImageGenerations(prev =>
+              prev.map(ig =>
+                ig.index === payload.index
+                  ? { ...ig, status: 'error' as const, error: payload.error }
+                  : ig
+              )
+            );
+          } catch { /* ignore */ }
+          return;
+        }
+
+        if (eventType === 'video_generating') {
+          try {
+            const payload = JSON.parse(data);
+            setVideoGenerations(prev => [
+              ...prev,
+              { index: payload.index, prompt: payload.prompt, status: 'generating' },
+            ]);
+          } catch { /* ignore */ }
+          return;
+        }
+
+        if (eventType === 'video_generated') {
+          try {
+            const payload = JSON.parse(data);
+            videoResultsMap.set(payload.index, { url: payload.url });
+            setVideoGenerations(prev =>
+              prev.map(vg =>
+                vg.index === payload.index
+                  ? { ...vg, status: 'done' as const, url: payload.url }
+                  : vg
+              )
+            );
+          } catch { /* ignore */ }
+          return;
+        }
+
+        if (eventType === 'video_error') {
+          try {
+            const payload = JSON.parse(data);
+            videoResultsMap.set(payload.index, { error: payload.error });
+            setVideoGenerations(prev =>
+              prev.map(vg =>
+                vg.index === payload.index
+                  ? { ...vg, status: 'error' as const, error: payload.error }
+                  : vg
+              )
+            );
+          } catch { /* ignore */ }
+          return;
+        }
+
+        if (eventType === 'error') return;
+
+        // 普通 message 事件：data 是 LLM token（可能含换行）
+        if (eventType === 'message') {
+          try {
+            const jsonData = JSON.parse(data);
+            if (typeof jsonData === 'object' && jsonData !== null) {
+              const token = jsonData.content ?? jsonData.text ?? data;
+              accumulated += String(token);
+            } else {
+              accumulated += String(jsonData);
+            }
+          } catch {
+            // 纯文本 token（Spring SseEmitter.data(String) 直接发送）
+            accumulated += data;
+          }
+          scheduleStreamingUpdate();
+        }
+      };
 
       while (true) {
         const { done, value } = await reader.read();
@@ -265,131 +376,35 @@ export function useAiChat() {
         buffer = lines.pop() || '';
 
         for (const line of lines) {
-          if (line.startsWith('event:')) {
-            currentEventType = line.slice(6).trim();
-            if (currentEventType === 'done') {
-              break;
+          // 空行 = SSE 事件分隔符 → 派发已缓冲的事件
+          if (line.trim() === '') {
+            if (pendingDataLines.length > 0) {
+              const eventData = pendingDataLines.join('\n');
+              dispatchEvent(pendingEventType, eventData);
+              pendingDataLines = [];
             }
+            pendingEventType = 'message';
+            continue;
+          }
+
+          if (line.startsWith('event:')) {
+            pendingEventType = line.slice(6).trim();
             continue;
           }
 
           if (line.startsWith('data:')) {
-            const data = line.slice(5).trim();
-            if (data === '[DONE]') break;
-            if (!data) continue;
-
-            // 根据事件类型分发处理
-            if (currentEventType === 'image_generating') {
-              try {
-                const payload = JSON.parse(data);
-                setImageGenerations(prev => [
-                  ...prev,
-                  { index: payload.index, prompt: payload.prompt, status: 'generating' },
-                ]);
-              } catch { /* ignore */ }
-              currentEventType = 'message';
-              continue;
-            }
-
-            if (currentEventType === 'image_generated') {
-              try {
-                const payload = JSON.parse(data);
-                imageResultsMap.set(payload.index, { url: payload.url });
-                setImageGenerations(prev =>
-                  prev.map(ig =>
-                    ig.index === payload.index
-                      ? { ...ig, status: 'done' as const, url: payload.url }
-                      : ig
-                  )
-                );
-              } catch { /* ignore */ }
-              currentEventType = 'message';
-              continue;
-            }
-
-            if (currentEventType === 'image_error') {
-              try {
-                const payload = JSON.parse(data);
-                imageResultsMap.set(payload.index, { error: payload.error });
-                setImageGenerations(prev =>
-                  prev.map(ig =>
-                    ig.index === payload.index
-                      ? { ...ig, status: 'error' as const, error: payload.error }
-                      : ig
-                  )
-                );
-              } catch { /* ignore */ }
-              currentEventType = 'message';
-              continue;
-            }
-
-            if (currentEventType === 'video_generating') {
-              try {
-                const payload = JSON.parse(data);
-                setVideoGenerations(prev => [
-                  ...prev,
-                  { index: payload.index, prompt: payload.prompt, status: 'generating' },
-                ]);
-              } catch { /* ignore */ }
-              currentEventType = 'message';
-              continue;
-            }
-
-            if (currentEventType === 'video_generated') {
-              try {
-                const payload = JSON.parse(data);
-                videoResultsMap.set(payload.index, { url: payload.url });
-                setVideoGenerations(prev =>
-                  prev.map(vg =>
-                    vg.index === payload.index
-                      ? { ...vg, status: 'done' as const, url: payload.url }
-                      : vg
-                  )
-                );
-              } catch { /* ignore */ }
-              currentEventType = 'message';
-              continue;
-            }
-
-            if (currentEventType === 'video_error') {
-              try {
-                const payload = JSON.parse(data);
-                videoResultsMap.set(payload.index, { error: payload.error });
-                setVideoGenerations(prev =>
-                  prev.map(vg =>
-                    vg.index === payload.index
-                      ? { ...vg, status: 'error' as const, error: payload.error }
-                      : vg
-                  )
-                );
-              } catch { /* ignore */ }
-              currentEventType = 'message';
-              continue;
-            }
-
-            if (currentEventType === 'error') {
-              currentEventType = 'message';
-              continue;
-            }
-
-            // 普通 message 事件
-            try {
-              const jsonData = JSON.parse(data);
-              if (typeof jsonData === 'object' && jsonData !== null) {
-                const token = jsonData.content ?? jsonData.text ?? data;
-                accumulated += String(token);
-              } else {
-                accumulated += String(jsonData);
-              }
-            } catch {
-              // 纯文本 token
-              accumulated += data;
-            }
-
-            scheduleStreamingUpdate();
-            currentEventType = 'message';
+            // SSE 规范：data: 后面如果有一个空格则去掉该空格
+            const dataContent = line.charAt(5) === ' ' ? line.slice(6) : line.slice(5);
+            pendingDataLines.push(dataContent);
+            continue;
           }
         }
+      }
+
+      // 流结束后处理剩余的未派发事件
+      if (pendingDataLines.length > 0) {
+        const eventData = pendingDataLines.join('\n');
+        dispatchEvent(pendingEventType, eventData);
       }
 
       // 流结束前 flush 最后的 streaming 内容
