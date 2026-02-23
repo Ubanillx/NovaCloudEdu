@@ -57,7 +57,7 @@ class _AddPlanDialogState extends State<AddPlanDialog> {
               children: [
                 Icon(
                   isEditing ? Icons.edit_note_rounded : Icons.add_task_rounded,
-                  color: const Color(0xFF3B82F6),
+                  color: colors.info,
                   size: 28,
                 ),
                 const SizedBox(width: 12),
@@ -140,7 +140,7 @@ class _AddPlanDialogState extends State<AddPlanDialog> {
             const SizedBox(height: 8),
             Row(
               children: [
-                _buildPriorityChip(0, '普通', const Color(0xFF3B82F6)),
+                _buildPriorityChip(0, '普通', colors.info),
                 const SizedBox(width: 8),
                 _buildPriorityChip(1, '重要', const Color(0xFFF59E0B)),
                 const SizedBox(width: 8),
@@ -214,7 +214,7 @@ class _AddPlanDialogState extends State<AddPlanDialog> {
                   child: ElevatedButton(
                     onPressed: _submit,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF3B82F6),
+                      backgroundColor: colors.info,
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),

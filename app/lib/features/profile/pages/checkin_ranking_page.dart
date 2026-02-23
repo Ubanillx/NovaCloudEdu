@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../config/app_theme.dart';
 import '../../../widgets/common/nova_refresh_header.dart';
-import '../../../widgets/common/loading_widget.dart';
+import '../../../widgets/common/skeleton_widgets.dart';
 import '../services/checkin_service.dart';
 import '../../../widgets/toast/nova_message.dart';
 
@@ -69,7 +69,7 @@ class _CheckinRankingPageState extends State<CheckinRankingPage> {
         centerTitle: true,
       ),
       body: _isLoading
-          ? const LoadingWidget(message: '加载中...')
+          ? const RankingListSkeleton()
           : NovaRefreshableList(
               onRefresh: _loadRanking,
               slivers: [

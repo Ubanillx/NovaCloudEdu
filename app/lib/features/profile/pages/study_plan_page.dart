@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../config/app_theme.dart';
-import '../../../widgets/common/loading_widget.dart';
+import '../../../widgets/common/skeleton_widgets.dart';
 import '../../../core/database/models/study_plan.dart';
 import '../../../core/database/repositories/study_plan_repository.dart';
 import '../../../widgets/toast/nova_message.dart';
@@ -66,7 +66,7 @@ class _StudyPlanPageState extends State<StudyPlanPage> {
         centerTitle: true,
       ),
       body: _isLoading
-          ? const LoadingWidget(message: '加载中...')
+          ? const ListItemSkeleton(showAvatar: false)
           : _groupedPlans.isEmpty
               ? _buildEmptyState()
               : RefreshIndicator(
@@ -131,7 +131,7 @@ class _StudyPlanPageState extends State<StudyPlanPage> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: isToday ? const Color(0xFF3B82F6) : colors.surfaceVariant,
+                  color: isToday ? colors.info : colors.surfaceVariant,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
@@ -343,7 +343,7 @@ class _StudyPlanPageState extends State<StudyPlanPage> {
       case 1:
         return const Color(0xFFF59E0B); // 重要 - 橙色
       default:
-        return const Color(0xFF3B82F6); // 普通 - 蓝色
+        return context.colors.info; // 普通 - 蓝色
     }
   }
 

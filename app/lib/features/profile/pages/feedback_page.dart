@@ -3,6 +3,7 @@ import 'package:nova_api/nova_api.dart';
 import '../../../config/app_theme.dart';
 import '../../../widgets/toast/nova_message.dart';
 import '../../../widgets/common/loading_widget.dart';
+import '../../../widgets/common/skeleton_widgets.dart';
 import '../../../widgets/common/empty_widget.dart';
 import '../../../widgets/common/nova_refresh_header.dart';
 import '../services/feedback_service.dart';
@@ -153,14 +154,14 @@ class _FeedbackPageState extends State<FeedbackPage> {
       ),
       body: SafeArea(
         child: _isLoading
-            ? const LoadingWidget(message: '加载中...')
+            ? const ListItemSkeleton(showAvatar: false)
             : _feedbacks.isEmpty
                 ? const EmptyWidget(message: '暂无反馈记录')
                 : _buildFeedbackList(colors),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _navigateToCreate,
-        backgroundColor: const Color(0xFF3B82F6),
+        backgroundColor: colors.info,
         child: const Icon(Icons.edit_rounded, color: Colors.white),
       ),
     );
@@ -298,7 +299,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
       case 0:
         return const Color(0xFFF59E0B); // 待处理 - 橙色
       case 1:
-        return const Color(0xFF3B82F6); // 处理中 - 蓝色
+        return context.colors.info; // 处理中 - 蓝色
       case 2:
         return const Color(0xFF10B981); // 已完成 - 绿色
       case 3:
@@ -330,7 +331,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
       case 'FEATURE':
         return {'label': '功能建议', 'color': const Color(0xFF8B5CF6)};
       case 'CONTENT':
-        return {'label': '内容问题', 'color': const Color(0xFF3B82F6)};
+        return {'label': '内容问题', 'color': context.colors.info};
       case 'OTHER':
         return {'label': '其他', 'color': const Color(0xFF94A3B8)};
       default:
