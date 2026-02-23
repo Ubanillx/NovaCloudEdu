@@ -25,14 +25,16 @@ public class ReadingBookmarkController {
     public BaseResponse<ReadingBookmarkDTO> createBookmark(
             @PathVariable Long bookId,
             @RequestBody Map<String, Object> request) {
-        Long userId = ((Number) request.get("userId")).longValue();
-        Long chapterId = ((Number) request.get("chapterId")).longValue();
+        Long userId = Long.parseLong(String.valueOf(request.get("userId")));
+        Long chapterId = Long.parseLong(String.valueOf(request.get("chapterId")));
         Integer chapterIndex = request.get("chapterIndex") != null ?
-                ((Number) request.get("chapterIndex")).intValue() : 0;
+                Integer.parseInt(String.valueOf(request.get("chapterIndex"))) : 0;
         Integer position = request.get("position") != null ?
-                ((Number) request.get("position")).intValue() : 0;
-        String bookmarkTitle = (String) request.get("bookmarkTitle");
-        String note = (String) request.get("note");
+                Integer.parseInt(String.valueOf(request.get("position"))) : 0;
+        String bookmarkTitle = request.get("bookmarkTitle") != null ?
+                String.valueOf(request.get("bookmarkTitle")) : null;
+        String note = request.get("note") != null ?
+                String.valueOf(request.get("note")) : null;
 
         ReadingBookmarkDTO bookmark = readingBookmarkApplicationService.createBookmark(
                 bookId, userId, chapterId, chapterIndex, position, bookmarkTitle, note);
