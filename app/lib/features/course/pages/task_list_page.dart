@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:tdesign_flutter/tdesign_flutter.dart';
 import '../../../config/app_theme.dart';
 import '../../../core/database/models/study_plan.dart';
 import '../../../core/database/repositories/study_plan_repository.dart';
 import '../../../widgets/toast/nova_message.dart';
 import '../../../widgets/common/nova_refresh_header.dart';
-import '../../../widgets/common/loading_widget.dart';
+import '../../../widgets/common/skeleton_widgets.dart';
 import '../../../widgets/buttons/primary_button.dart';
 import '../../../widgets/dialogs/app_dialog.dart';
 import '../../../widgets/cards/app_card.dart';
@@ -105,7 +106,7 @@ class _TaskListPageState extends State<TaskListPage> {
         backgroundColor: colors.surface,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new_rounded, color: colors.iconPrimary, size: 20),
+          icon: Icon(PhosphorIcons.caretLeft(), color: colors.iconPrimary, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -119,7 +120,7 @@ class _TaskListPageState extends State<TaskListPage> {
         centerTitle: true,
         actions: [
           IconButton(
-            icon: Icon(Icons.history_rounded, color: colors.iconPrimary, size: 22),
+            icon: Icon(PhosphorIcons.clockCounterClockwise(), color: colors.iconPrimary, size: 22),
             onPressed: () {
               Navigator.push(
                 context,
@@ -220,8 +221,8 @@ class _TaskListPageState extends State<TaskListPage> {
                         valueColor: const AlwaysStoppedAnimation<Color>(AppTheme.brand),
                       ),
                     ),
-                    const Icon(
-                      Icons.auto_awesome_rounded,
+                    Icon(
+                      PhosphorIcons.sparkle(),
                       color: AppTheme.brand,
                       size: 28,
                     ),
@@ -233,11 +234,11 @@ class _TaskListPageState extends State<TaskListPage> {
           const SizedBox(height: 24),
           Row(
             children: [
-              _buildStatBadge(Icons.check_circle_rounded, '$completedCount', '已达成', colors.success),
+              _buildStatBadge(PhosphorIcons.checkCircle(PhosphorIconsStyle.fill), '$completedCount', '已达成', colors.success),
               const SizedBox(width: 12),
-              _buildStatBadge(Icons.radio_button_unchecked_rounded, '${totalCount - completedCount}', '进行中', AppTheme.brand),
+              _buildStatBadge(PhosphorIcons.circle(), '${totalCount - completedCount}', '进行中', AppTheme.brand),
               const SizedBox(width: 12),
-              _buildStatBadge(Icons.format_list_bulleted_rounded, '$totalCount', '总任务', colors.textSecondary),
+              _buildStatBadge(PhosphorIcons.listBullets(), '$totalCount', '总任务', colors.textSecondary),
             ],
           ),
         ],
@@ -288,7 +289,7 @@ class _TaskListPageState extends State<TaskListPage> {
     if (_isLoading) {
       return Container(
         padding: const EdgeInsets.symmetric(vertical: 60),
-        child: const LoadingWidget(),
+        child: const ListItemSkeleton(itemCount: 4, showAvatar: false),
       );
     }
 
@@ -340,9 +341,9 @@ class _TaskListPageState extends State<TaskListPage> {
         margin: const EdgeInsets.only(bottom: 12),
         decoration: BoxDecoration(
           color: colors.error,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(24),
         ),
-        child: const Icon(Icons.delete_outline_rounded, color: Colors.white, size: 24),
+        child: Icon(PhosphorIcons.trash(), color: Colors.white, size: 24),
       ),
       confirmDismiss: (direction) async {
         return await showConfirmDialog(
@@ -357,7 +358,7 @@ class _TaskListPageState extends State<TaskListPage> {
         onTap: () => _togglePlanComplete(plan),
         margin: const EdgeInsets.only(bottom: 12, left: 20, right: 20),
         padding: const EdgeInsets.all(16),
-        borderRadius: 16,
+        borderRadius: 24,
         child: Row(
           children: [
             // 完成状态按钮
@@ -376,7 +377,7 @@ class _TaskListPageState extends State<TaskListPage> {
                   ),
                 ),
                 child: plan.isCompleted
-                    ? const Icon(Icons.check_rounded, size: 18, color: Colors.white)
+                    ? Icon(PhosphorIcons.check(), size: 18, color: Colors.white)
                     : null,
               ),
             ),
@@ -443,7 +444,7 @@ class _TaskListPageState extends State<TaskListPage> {
       case 1:
         return const Color(0xFFF59E0B); // 重要 - 橙色
       default:
-        return const Color(0xFF3B82F6); // 普通 - 蓝色
+        return context.colors.info; // 普通 - 蓝色
     }
   }
 }
