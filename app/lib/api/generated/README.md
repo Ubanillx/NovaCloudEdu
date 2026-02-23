@@ -241,6 +241,7 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**getGroupMembers1**](doc/DefaultApi.md#getgroupmembers1) | **GET** /api/admin/groups/{groupId}/members | 分页获取群成员
 [*DefaultApi*](doc/DefaultApi.md) | [**getGroupMembersPage**](doc/DefaultApi.md#getgroupmemberspage) | **GET** /api/groups/{groupId}/members/page | 分页获取群成员
 [*DefaultApi*](doc/DefaultApi.md) | [**getHistory**](doc/DefaultApi.md#gethistory) | **GET** /api/grading/history | 查询批改历史
+[*DefaultApi*](doc/DefaultApi.md) | [**getHlsStream**](doc/DefaultApi.md#gethlsstream) | **GET** /api/video/hls/{sectionId} | 获取HLS播放流（带Token）
 [*DefaultApi*](doc/DefaultApi.md) | [**getKey**](doc/DefaultApi.md#getkey) | **GET** /api/video/key | 获取视频解密密钥（HLS播放器自动调用）
 [*DefaultApi*](doc/DefaultApi.md) | [**getLatestMessages**](doc/DefaultApi.md#getlatestmessages) | **GET** /api/group-chat/{groupId}/messages/latest | 获取群最新消息
 [*DefaultApi*](doc/DefaultApi.md) | [**getLikedArticles**](doc/DefaultApi.md#getlikedarticles) | **GET** /api/user/daily-article/liked | 获取点赞文章列表
@@ -273,6 +274,7 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**getPendingCount**](doc/DefaultApi.md#getpendingcount) | **GET** /api/teacher/application/pending/count | 获取待审核申请数量（管理员）
 [*DefaultApi*](doc/DefaultApi.md) | [**getPendingRequests**](doc/DefaultApi.md#getpendingrequests) | **GET** /api/groups/{groupId}/requests | 获取群待审批申请列表
 [*DefaultApi*](doc/DefaultApi.md) | [**getPlan**](doc/DefaultApi.md#getplan) | **GET** /api/membership/plans/{planId} | 获取计划详情
+[*DefaultApi*](doc/DefaultApi.md) | [**getPlayToken**](doc/DefaultApi.md#getplaytoken) | **GET** /api/video/play-token | 获取视频播放令牌
 [*DefaultApi*](doc/DefaultApi.md) | [**getPostComments**](doc/DefaultApi.md#getpostcomments) | **GET** /api/posts/{postId}/comments | 获取帖子评论列表
 [*DefaultApi*](doc/DefaultApi.md) | [**getPostDetail**](doc/DefaultApi.md#getpostdetail) | **GET** /api/posts/{postId} | 获取帖子详情
 [*DefaultApi*](doc/DefaultApi.md) | [**getPostList**](doc/DefaultApi.md#getpostlist) | **GET** /api/posts | 分页获取帖子列表

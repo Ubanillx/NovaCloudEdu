@@ -26,6 +26,7 @@ part 'section_response.g.dart';
 /// * [transcodeStatus] - 转码状态: 0-未转码, 1-转码中, 2-已完成, 3-失败
 /// * [thumbnailUrl] - 缩略图雪碧图URL
 /// * [thumbnailCount] - 缩略图数量
+/// * [encryptionKeyId] - 加密密钥ID（用于HLS解密）
 /// * [createTime] - 创建时间
 /// * [updateTime] - 更新时间
 @BuiltValue()
@@ -90,6 +91,10 @@ abstract class SectionResponse
   /// 缩略图数量
   @BuiltValueField(wireName: r'thumbnailCount')
   int? get thumbnailCount;
+
+  /// 加密密钥ID（用于HLS解密）
+  @BuiltValueField(wireName: r'encryptionKeyId')
+  String? get encryptionKeyId;
 
   /// 创建时间
   @BuiltValueField(wireName: r'createTime')
@@ -228,6 +233,13 @@ class _$SectionResponseSerializer
       yield serializers.serialize(
         object.thumbnailCount,
         specifiedType: const FullType(int),
+      );
+    }
+    if (object.encryptionKeyId != null) {
+      yield r'encryptionKeyId';
+      yield serializers.serialize(
+        object.encryptionKeyId,
+        specifiedType: const FullType(String),
       );
     }
     if (object.createTime != null) {
@@ -373,6 +385,13 @@ class _$SectionResponseSerializer
             specifiedType: const FullType(int),
           ) as int;
           result.thumbnailCount = valueDes;
+          break;
+        case r'encryptionKeyId':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.encryptionKeyId = valueDes;
           break;
         case r'createTime':
           final valueDes = serializers.deserialize(

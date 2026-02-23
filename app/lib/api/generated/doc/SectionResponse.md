@@ -23,6 +23,7 @@ Name | Type | Description | Notes
 **transcodeStatus** | **int** | 转码状态: 0-未转码, 1-转码中, 2-已完成, 3-失败 | [optional] 
 **thumbnailUrl** | **String** | 缩略图雪碧图URL | [optional] 
 **thumbnailCount** | **int** | 缩略图数量 | [optional] 
+**encryptionKeyId** | **String** | 加密密钥ID（用于HLS解密） | [optional] 
 **createTime** | [**DateTime**](DateTime.md) | 创建时间 | [optional] 
 **updateTime** | [**DateTime**](DateTime.md) | 更新时间 | [optional] 
 

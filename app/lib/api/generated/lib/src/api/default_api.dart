@@ -9,6 +9,7 @@ import 'package:built_value/serializer.dart';
 import 'package:dio/dio.dart';
 
 import 'package:built_collection/built_collection.dart';
+import 'package:built_value/json_object.dart';
 import 'package:nova_api/src/api_util.dart';
 import 'package:nova_api/src/model/add_class_course_request.dart';
 import 'package:nova_api/src/model/add_class_member_request.dart';
@@ -140,6 +141,7 @@ import 'package:nova_api/src/model/base_response_map_string_map_string_integer.d
 import 'package:nova_api/src/model/base_response_map_string_object.dart';
 import 'package:nova_api/src/model/base_response_member_page.dart';
 import 'package:nova_api/src/model/base_response_membership_plan.dart';
+import 'package:nova_api/src/model/base_response_object.dart';
 import 'package:nova_api/src/model/base_response_order_response.dart';
 import 'package:nova_api/src/model/base_response_order_statistics.dart';
 import 'package:nova_api/src/model/base_response_page_response_class_member_response.dart';
@@ -16505,6 +16507,62 @@ class DefaultApi {
     );
   }
 
+  /// 获取HLS播放流（带Token）
+  /// 获取带Token验证的HLS m3u8播放内容。 流程： 1. 后端生成一次性播放token 2. 下载原始m3u8，修改#EXT-X-KEY的URI，附加token参数 3. 返回修改后的m3u8内容，播放器可直接播放 播放器只需将此URL作为视频源即可播放加密视频。
+  ///
+  /// Parameters:
+  /// * [sectionId] - 小节ID
+  /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
+  /// * [headers] - Can be used to add additional headers to the request
+  /// * [extras] - Can be used to add flags to the request
+  /// * [validateStatus] - A [ValidateStatus] callback that can be used to determine request success based on the HTTP status of the response
+  /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
+  /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
+  ///
+  /// Returns a [Future]
+  /// Throws [DioException] if API call or serialization fails
+  Future<Response<void>> getHlsStream({
+    required int sectionId,
+    CancelToken? cancelToken,
+    Map<String, dynamic>? headers,
+    Map<String, dynamic>? extra,
+    ValidateStatus? validateStatus,
+    ProgressCallback? onSendProgress,
+    ProgressCallback? onReceiveProgress,
+  }) async {
+    final _path = r'/api/video/hls/{sectionId}'.replaceAll(
+        '{' r'sectionId' '}',
+        encodeQueryParameter(_serializers, sectionId, const FullType(int))
+            .toString());
+    final _options = Options(
+      method: r'GET',
+      headers: <String, dynamic>{
+        ...?headers,
+      },
+      extra: <String, dynamic>{
+        'secure': <Map<String, String>>[
+          {
+            'type': 'http',
+            'scheme': 'bearer',
+            'name': 'Bearer Token',
+          },
+        ],
+        ...?extra,
+      },
+      validateStatus: validateStatus,
+    );
+
+    final _response = await _dio.request<Object>(
+      _path,
+      options: _options,
+      cancelToken: cancelToken,
+      onSendProgress: onSendProgress,
+      onReceiveProgress: onReceiveProgress,
+    );
+
+    return _response;
+  }
+
   /// 获取视频解密密钥（HLS播放器自动调用）
   ///
   ///
@@ -19285,6 +19343,98 @@ class DefaultApi {
     }
 
     return Response<BaseResponseMembershipPlan>(
+      data: _responseData,
+      headers: _response.headers,
+      isRedirect: _response.isRedirect,
+      requestOptions: _response.requestOptions,
+      redirects: _response.redirects,
+      statusCode: _response.statusCode,
+      statusMessage: _response.statusMessage,
+      extra: _response.extra,
+    );
+  }
+
+  /// 获取视频播放令牌
+  /// 获取一次性播放令牌，用于请求HLS解密密钥。令牌5分钟有效且只能使用一次。
+  ///
+  /// Parameters:
+  /// * [sectionId] - 小节ID
+  /// * [keyId] - 加密密钥ID
+  /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
+  /// * [headers] - Can be used to add additional headers to the request
+  /// * [extras] - Can be used to add flags to the request
+  /// * [validateStatus] - A [ValidateStatus] callback that can be used to determine request success based on the HTTP status of the response
+  /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
+  /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
+  ///
+  /// Returns a [Future] containing a [Response] with a [BaseResponseString] as data
+  /// Throws [DioException] if API call or serialization fails
+  Future<Response<BaseResponseString>> getPlayToken({
+    required int sectionId,
+    required String keyId,
+    CancelToken? cancelToken,
+    Map<String, dynamic>? headers,
+    Map<String, dynamic>? extra,
+    ValidateStatus? validateStatus,
+    ProgressCallback? onSendProgress,
+    ProgressCallback? onReceiveProgress,
+  }) async {
+    final _path = r'/api/video/play-token';
+    final _options = Options(
+      method: r'GET',
+      headers: <String, dynamic>{
+        ...?headers,
+      },
+      extra: <String, dynamic>{
+        'secure': <Map<String, String>>[
+          {
+            'type': 'http',
+            'scheme': 'bearer',
+            'name': 'Bearer Token',
+          },
+        ],
+        ...?extra,
+      },
+      validateStatus: validateStatus,
+    );
+
+    final _queryParameters = <String, dynamic>{
+      r'sectionId':
+          encodeQueryParameter(_serializers, sectionId, const FullType(int)),
+      r'keyId':
+          encodeQueryParameter(_serializers, keyId, const FullType(String)),
+    };
+
+    final _response = await _dio.request<Object>(
+      _path,
+      options: _options,
+      queryParameters: _queryParameters,
+      cancelToken: cancelToken,
+      onSendProgress: onSendProgress,
+      onReceiveProgress: onReceiveProgress,
+    );
+
+    BaseResponseString? _responseData;
+
+    try {
+      final rawResponse = _response.data;
+      _responseData = rawResponse == null
+          ? null
+          : _serializers.deserialize(
+              rawResponse,
+              specifiedType: const FullType(BaseResponseString),
+            ) as BaseResponseString;
+    } catch (error, stackTrace) {
+      throw DioException(
+        requestOptions: _response.requestOptions,
+        response: _response,
+        type: DioExceptionType.unknown,
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    return Response<BaseResponseString>(
       data: _responseData,
       headers: _response.headers,
       isRedirect: _response.isRedirect,
