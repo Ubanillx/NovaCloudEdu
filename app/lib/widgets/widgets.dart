@@ -6,6 +6,7 @@ export 'buttons/primary_button.dart';
 
 // 通用组件
 export 'common/loading_widget.dart';
+export 'common/skeleton_widgets.dart';
 export 'common/empty_widget.dart';
 
 // 输入组件

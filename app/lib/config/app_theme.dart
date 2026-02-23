@@ -6,8 +6,66 @@ class AppTheme {
   AppTheme._();
 
   // ==================== 品牌色 ====================
-  static const Color brand = Color(0xFF1989FA);
-  static const Color brand2 = Color(0xFF3B82F6);
+  static const Color brand = Color(0xFF007BFF);
+  static const Color brand2 = Color(0xFF008CFF);
+
+  // ==================== 主题色板 ====================
+  /// 蓝色 - 主品牌色
+  static const Color blue = Color(0xFF007BFF);
+  /// 紫色 - 创意/艺术
+  static const Color purple = Color(0xFF8B5CF6);
+  /// 粉色 - 社交/互动
+  static const Color pink = Color(0xFFEC4899);
+  /// 红色 - 紧急/重要
+  static const Color red = Color(0xFFEF4444);
+  /// 橙色 - 活力/警告
+  static const Color orange = Color(0xFFF59E0B);
+  /// 黄色 - 金牌/高亮
+  static const Color yellow = Color(0xFFFFD700);
+  /// 绿色 - 成功/完成
+  static const Color green = Color(0xFF10B981);
+  /// 青色 - 科技/未来
+  static const Color cyan = Color(0xFF06B6D4);
+  /// 蓝绿色 - 清新/自然
+  static const Color teal = Color(0xFF14B8A6);
+  /// 靛蓝色 - 深度/专业
+  static const Color indigo = Color(0xFF6366F1);
+
+  // ==================== 渐变色组合 ====================
+  /// 日落渐变 (橙 -> 粉)
+  static const LinearGradient sunsetGradient = LinearGradient(
+    colors: [Color(0xFFFF6B6B), Color(0xFFEC4899)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  /// 海洋渐变 (蓝 -> 青)
+  static const LinearGradient oceanGradient = LinearGradient(
+    colors: [Color(0xFF007BFF), Color(0xFF06B6D4)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  /// 森林渐变 (绿 -> 青)
+  static const LinearGradient forestGradient = LinearGradient(
+    colors: [Color(0xFF10B981), Color(0xFF14B8A6)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  /// 紫色渐变 (紫 -> 粉)
+  static const LinearGradient violetGradient = LinearGradient(
+    colors: [purple, pink],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  /// 极光渐变 (青 -> 蓝 -> 紫)
+  static const LinearGradient auroraGradient = LinearGradient(
+    colors: [Color(0xFF06B6D4), Color(0xFF007BFF), Color(0xFF8B5CF6)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
 
   // ==================== 亮色模式颜色 ====================
   static const _LightColors light = _LightColors();
@@ -17,98 +75,88 @@ class AppTheme {
 
   // ==================== 主题数据 ====================
   static ThemeData get lightTheme => ThemeData(
-        useMaterial3: true,
-        brightness: Brightness.light,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: brand,
-          brightness: Brightness.light,
-        ),
-        scaffoldBackgroundColor: light.background,
-        appBarTheme: AppBarTheme(
-          backgroundColor: light.surface,
-          foregroundColor: light.textPrimary,
-          elevation: 0,
-          scrolledUnderElevation: 0,
-        ),
-        cardTheme: CardThemeData(
-          color: light.surface,
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(24),
-          ),
-        ),
-        dividerTheme: DividerThemeData(
-          color: light.divider,
-          thickness: 1,
-        ),
-        textTheme: _buildTextTheme(light),
-        iconTheme: IconThemeData(color: light.iconPrimary),
-        extensions: [
-          AppColors(
-            background: light.background,
-            surface: light.surface,
-            surfaceVariant: light.surfaceVariant,
-            textPrimary: light.textPrimary,
-            textSecondary: light.textSecondary,
-            textTertiary: light.textTertiary,
-            divider: light.divider,
-            border: light.border,
-            iconPrimary: light.iconPrimary,
-            iconSecondary: light.iconSecondary,
-            success: light.success,
-            warning: light.warning,
-            error: light.error,
-            info: light.info,
-          ),
-        ],
-      );
+    useMaterial3: true,
+    brightness: Brightness.light,
+    colorScheme: ColorScheme.fromSeed(
+      seedColor: brand,
+      brightness: Brightness.light,
+    ),
+    scaffoldBackgroundColor: light.background,
+    appBarTheme: AppBarTheme(
+      backgroundColor: light.surface,
+      foregroundColor: light.textPrimary,
+      elevation: 0,
+      scrolledUnderElevation: 0,
+    ),
+    cardTheme: CardThemeData(
+      color: light.surface,
+      elevation: 0,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+    ),
+    dividerTheme: DividerThemeData(color: light.divider, thickness: 1),
+    textTheme: _buildTextTheme(light),
+    iconTheme: IconThemeData(color: light.iconPrimary),
+    extensions: [
+      AppColors(
+        background: light.background,
+        surface: light.surface,
+        surfaceVariant: light.surfaceVariant,
+        textPrimary: light.textPrimary,
+        textSecondary: light.textSecondary,
+        textTertiary: light.textTertiary,
+        divider: light.divider,
+        border: light.border,
+        iconPrimary: light.iconPrimary,
+        iconSecondary: light.iconSecondary,
+        success: light.success,
+        warning: light.warning,
+        error: light.error,
+        info: light.info,
+      ),
+    ],
+  );
 
   static ThemeData get darkTheme => ThemeData(
-        useMaterial3: true,
-        brightness: Brightness.dark,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: brand,
-          brightness: Brightness.dark,
-        ),
-        scaffoldBackgroundColor: dark.background,
-        appBarTheme: AppBarTheme(
-          backgroundColor: dark.surface,
-          foregroundColor: dark.textPrimary,
-          elevation: 0,
-          scrolledUnderElevation: 0,
-        ),
-        cardTheme: CardThemeData(
-          color: dark.surface,
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(24),
-          ),
-        ),
-        dividerTheme: DividerThemeData(
-          color: dark.divider,
-          thickness: 1,
-        ),
-        textTheme: _buildTextTheme(dark),
-        iconTheme: IconThemeData(color: dark.iconPrimary),
-        extensions: [
-          AppColors(
-            background: dark.background,
-            surface: dark.surface,
-            surfaceVariant: dark.surfaceVariant,
-            textPrimary: dark.textPrimary,
-            textSecondary: dark.textSecondary,
-            textTertiary: dark.textTertiary,
-            divider: dark.divider,
-            border: dark.border,
-            iconPrimary: dark.iconPrimary,
-            iconSecondary: dark.iconSecondary,
-            success: dark.success,
-            warning: dark.warning,
-            error: dark.error,
-            info: dark.info,
-          ),
-        ],
-      );
+    useMaterial3: true,
+    brightness: Brightness.dark,
+    colorScheme: ColorScheme.fromSeed(
+      seedColor: brand,
+      brightness: Brightness.dark,
+    ),
+    scaffoldBackgroundColor: dark.background,
+    appBarTheme: AppBarTheme(
+      backgroundColor: dark.surface,
+      foregroundColor: dark.textPrimary,
+      elevation: 0,
+      scrolledUnderElevation: 0,
+    ),
+    cardTheme: CardThemeData(
+      color: dark.surface,
+      elevation: 0,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+    ),
+    dividerTheme: DividerThemeData(color: dark.divider, thickness: 1),
+    textTheme: _buildTextTheme(dark),
+    iconTheme: IconThemeData(color: dark.iconPrimary),
+    extensions: [
+      AppColors(
+        background: dark.background,
+        surface: dark.surface,
+        surfaceVariant: dark.surfaceVariant,
+        textPrimary: dark.textPrimary,
+        textSecondary: dark.textSecondary,
+        textTertiary: dark.textTertiary,
+        divider: dark.divider,
+        border: dark.border,
+        iconPrimary: dark.iconPrimary,
+        iconSecondary: dark.iconSecondary,
+        success: dark.success,
+        warning: dark.warning,
+        error: dark.error,
+        info: dark.info,
+      ),
+    ],
+  );
 
   static TextTheme _buildTextTheme(_BaseColors colors) {
     return TextTheme(
@@ -215,13 +263,13 @@ class _LightColors extends _BaseColors {
   @override
   Color get iconSecondary => const Color(0xFF94A3B8);
   @override
-  Color get success => const Color(0xFF10B981);
+  Color get success => AppTheme.green;
   @override
-  Color get warning => const Color(0xFFF59E0B);
+  Color get warning => AppTheme.orange;
   @override
-  Color get error => const Color(0xFFEF4444);
+  Color get error => AppTheme.red;
   @override
-  Color get info => const Color(0xFF3B82F6);
+  Color get info => AppTheme.blue;
 }
 
 // ==================== 暗色模式颜色定义 ====================
@@ -255,7 +303,7 @@ class _DarkColors extends _BaseColors {
   @override
   Color get error => const Color(0xFFF87171);
   @override
-  Color get info => const Color(0xFF60A5FA);
+  Color get info => AppTheme.blue;
 }
 
 // ==================== 主题扩展 - 用于在组件中访问颜色 ====================
