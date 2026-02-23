@@ -47,6 +47,7 @@ public class ChapterAssembler {
                 .isFree(section.getIsFree())
                 .resourceUrl(videoUrlService.toPresignedUrl(section.getResourceUrl()))
                 .hlsUrl(videoUrlService.toPresignedUrl(section.getHlsUrl()))
+                .encryptionKeyId(section.getEncryptionKeyId())
                 .transcodeStatus(section.getTranscodeStatus())
                 .thumbnailUrl(videoUrlService.toPresignedUrl(section.getThumbnailUrl()))
                 .thumbnailCount(section.getThumbnailCount())
