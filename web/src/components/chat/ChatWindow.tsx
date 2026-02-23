@@ -35,7 +35,7 @@ const formatMessageTime = (dateStr?: string) => {
 export const ChatWindow: React.FC<ChatWindowProps> = ({
   partnerId, partnerName, partnerAvatar, onBack,
 }) => {
-  const { sendPrivateMessage, markAsRead, chatMessages, readReceipts } = useChat();
+  const { sendPrivateMessage, markPrivateAsRead, chatMessages, readReceipts } = useChat();
   const [messages, setMessages] = useState<ChatMessageResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [inputValue, setInputValue] = useState('');
@@ -62,8 +62,8 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
 
   useEffect(() => {
     loadMessages();
-    markAsRead(partnerId);
-  }, [loadMessages, markAsRead, partnerId]);
+    markPrivateAsRead(partnerId);
+  }, [loadMessages, markPrivateAsRead, partnerId]);
 
   // 监听 WebSocket 新消息
   useEffect(() => {
@@ -111,10 +111,10 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
           }
           return [...prev, newMsg];
         });
-        markAsRead(partnerId);
+        markPrivateAsRead(partnerId);
       }
     }
-  }, [chatMessages, partnerId, markAsRead]);
+  }, [chatMessages, partnerId, markPrivateAsRead]);
 
   // 监听已读回执
   useEffect(() => {

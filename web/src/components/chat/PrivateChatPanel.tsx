@@ -140,7 +140,7 @@ const getCurrentUserId = (): string => {
 const ChatWindow: React.FC<ChatWindowProps> = ({
   partnerId, partnerName, partnerAvatar, onBack,
 }) => {
-  const { sendPrivateMessage, markAsRead, chatMessages, readReceipts } = useChat();
+  const { sendPrivateMessage, markPrivateAsRead, chatMessages, readReceipts } = useChat();
   const { startCall } = useRtc();
   const [messages, setMessages] = useState<ChatMessageResponse[]>([]);
   const [loading, setLoading] = useState(true);
@@ -192,8 +192,8 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
 
   useEffect(() => {
     loadMessages();
-    markAsRead(partnerId);
-  }, [loadMessages, markAsRead, partnerId]);
+    markPrivateAsRead(partnerId);
+  }, [loadMessages, markPrivateAsRead, partnerId]);
 
   // 监听 WebSocket 新消息
   useEffect(() => {
@@ -234,10 +234,10 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
         });
       } else {
         setMessages((prev) => [...prev, newMsg]);
-        markAsRead(partnerId);
+        markPrivateAsRead(partnerId);
       }
     }
-  }, [chatMessages, partnerId, markAsRead]);
+  }, [chatMessages, partnerId, markPrivateAsRead]);
 
   // 监听已读回执
   useEffect(() => {

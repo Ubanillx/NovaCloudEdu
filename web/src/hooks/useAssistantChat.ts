@@ -65,6 +65,7 @@ export function useAssistantChat(assistantId: string | undefined) {
   const [isInitializing, setIsInitializing] = useState(false);
   const [streamingContent, setStreamingContent] = useState('');
   const [ragStatus, setRagStatus] = useState<'idle' | 'searching' | 'found' | 'not_found'>('idle');
+  const [workflowStatus, setWorkflowStatus] = useState<'idle' | 'calling' | 'completed' | 'error'>('idle');
 
   const abortControllerRef = useRef<AbortController | null>(null);
   const isStreamingRef = useRef(false);
@@ -185,6 +186,7 @@ export function useAssistantChat(assistantId: string | undefined) {
     setIsLoading(true);
     setStreamingContent('');
     setRagStatus('idle');
+    setWorkflowStatus('idle');
 
     // 添加用户消息
     setMessages(prev => [...prev, {
@@ -307,6 +309,35 @@ export function useAssistantChat(assistantId: string | undefined) {
               continue;
             }
 
+            // 工作流事件处理
+            if (currentEvent === 'workflow_calling') {
+              // 从已累积文本中剥离 [CALL_WORKFLOW:...] 标记
+              accumulated = accumulated.replace(/\[CALL_WORKFLOW:\s*\{[\s\S]*?\}\s*\]/, '');
+              flushStreaming();
+              setWorkflowStatus('calling');
+              currentEvent = '';
+              continue;
+            }
+
+            if (currentEvent === 'workflow_completed') {
+              // 后端会二次调用LLM，后续 message tokens 会自然流入
+              // 这里只更新状态，不拼接JSON结果
+              setWorkflowStatus('completed');
+              currentEvent = '';
+              continue;
+            }
+
+            if (currentEvent === 'workflow_error') {
+              try {
+                const wfData = JSON.parse(data);
+                accumulated += `\n\n> 工作流执行失败: ${wfData.error}`;
+                flushStreaming();
+              } catch { /* ignore */ }
+              setWorkflowStatus('error');
+              currentEvent = '';
+              continue;
+            }
+
             if (currentEvent === 'image_generating' || currentEvent === 'video_generating') {
               try {
                 const genData = JSON.parse(data);
@@ -366,6 +397,8 @@ export function useAssistantChat(assistantId: string | undefined) {
       isStreamingRef.current = false;
       setIsLoading(false);
       abortControllerRef.current = null;
+      // 延迟重置工作流状态，让用户短暂看到完成/错误提示
+      setTimeout(() => setWorkflowStatus('idle'), 1500);
     }
   }, [assistantId]);
 
@@ -457,6 +490,7 @@ export function useAssistantChat(assistantId: string | undefined) {
     isInitializing,
     streamingContent,
     ragStatus,
+    workflowStatus,
 
     // 会话管理
     loadSessions,

@@ -7,7 +7,9 @@ import type {
   NotificationEvent,
   ReadReceipt,
   ConnectionState,
+  UnreadCount,
 } from '../api/chatTypes';
+import { EMPTY_UNREAD } from '../api/chatTypes';
 import { getToken } from '../api';
 
 // ============ Context 类型 ============
@@ -36,6 +38,13 @@ interface ChatContextValue {
   clearNotifications: () => void;
   refreshUnreadCount: () => void;
 
+  // 未读数（服务端权威值）
+  unreadCount: UnreadCount;
+  totalUnread: number;
+  markPrivateAsRead: (senderId: number) => void;
+  markGroupAsRead: (groupId: number) => void;
+  clearFriendRequestUnread: () => void;
+
   // 已读回执
   readReceipts: ReadReceipt[];
 
@@ -60,7 +69,38 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [groupReadReceipts, setGroupReadReceipts] = useState<WsGroupReadReceipt[]>([]);
   const [groupMessagesSent, setGroupMessagesSent] = useState<WsGroupMessage[]>([]);
 
+  const [unreadCount, setUnreadCount] = useState<UnreadCount>(EMPTY_UNREAD);
+
   const wsRef = useRef(WebSocketService.getInstance());
+
+  // 处理通知事件，更新未读数（与 Flutter NotificationService._handleNotification 对齐）
+  const handleNotification = useCallback((evt: NotificationEvent) => {
+    switch (evt.type) {
+      case 'UNREAD_COUNT_CHANGED':
+        // 服务器推送的权威未读数
+        setUnreadCount({
+          privateMessageCount: (evt.data.privateUnread as number) ?? 0,
+          groupMessageCount: (evt.data.groupUnread as number) ?? 0,
+          friendRequestCount: (evt.data.friendRequestCount as number) ?? 0,
+          systemNotificationCount: (evt.data.systemNotificationCount as number) ?? 0,
+        });
+        break;
+      case 'NEW_PRIVATE_MESSAGE':
+        setUnreadCount((prev) => ({ ...prev, privateMessageCount: prev.privateMessageCount + 1 }));
+        break;
+      case 'NEW_GROUP_MESSAGE':
+        setUnreadCount((prev) => ({ ...prev, groupMessageCount: prev.groupMessageCount + 1 }));
+        break;
+      case 'FRIEND_REQUEST_RECEIVED':
+        setUnreadCount((prev) => ({ ...prev, friendRequestCount: prev.friendRequestCount + 1 }));
+        break;
+      case 'SYSTEM_NOTIFICATION':
+        setUnreadCount((prev) => ({ ...prev, systemNotificationCount: prev.systemNotificationCount + 1 }));
+        break;
+      default:
+        break;
+    }
+  }, []);
 
   // 注册事件监听
   useEffect(() => {
@@ -75,6 +115,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       },
       onNotification: (evt: NotificationEvent) => {
         setNotifications((prev) => [evt, ...prev]);
+        handleNotification(evt);
       },
       onReadReceipt: (receipt: ReadReceipt) => {
         setReadReceipts((prev) => [receipt, ...prev]);
@@ -87,6 +128,10 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       },
       onConnectionChange: (state: ConnectionState) => {
         setConnectionState(state);
+        // 连接成功后请求服务端刷新未读数（与 Flutter NotificationService.init 对齐）
+        if (state === 'connected') {
+          ws.refreshUnreadCount();
+        }
       },
     });
 
@@ -99,7 +144,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => {
       removeListener();
     };
-  }, []);
+  }, [handleNotification]);
 
   const connect = useCallback(() => {
     wsRef.current.connect();
@@ -137,6 +182,31 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     wsRef.current.refreshUnreadCount();
   }, []);
 
+  // 未读数总计
+  const totalUnread = unreadCount.privateMessageCount + unreadCount.groupMessageCount
+    + unreadCount.friendRequestCount + unreadCount.systemNotificationCount;
+
+  // 标记私聊已读（本地 -1 + 发 WS）
+  const markPrivateAsRead = useCallback((senderId: number) => {
+    wsRef.current.markAsRead(senderId);
+    setUnreadCount((prev) => ({
+      ...prev,
+      privateMessageCount: Math.max(0, prev.privateMessageCount - 1),
+    }));
+  }, []);
+
+  // 标记群已读（本地清零该群）
+  const markGroupAsRead = useCallback((groupId: number) => {
+    // 触发服务端刷新
+    wsRef.current.refreshUnreadCount();
+    void groupId; // 目前依赖服务端 UNREAD_COUNT_CHANGED 精确更新
+  }, []);
+
+  // 清除好友申请未读
+  const clearFriendRequestUnread = useCallback(() => {
+    setUnreadCount((prev) => ({ ...prev, friendRequestCount: 0 }));
+  }, []);
+
   const clearChatMessages = useCallback(() => setChatMessages([]), []);
   const clearGroupMessages = useCallback(() => setGroupMessages([]), []);
   const clearNotifications = useCallback(() => setNotifications([]), []);
@@ -159,6 +229,11 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     notifications,
     clearNotifications,
     refreshUnreadCount,
+    unreadCount,
+    totalUnread,
+    markPrivateAsRead,
+    markGroupAsRead,
+    clearFriendRequestUnread,
     readReceipts,
     groupReadReceipts,
     clearGroupReadReceipts,

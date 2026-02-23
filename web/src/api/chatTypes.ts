@@ -65,6 +65,22 @@ export interface NotificationEvent {
   timestamp?: string;
 }
 
+// ============ 未读数统计（与 Flutter NotificationService 对齐） ============
+
+export interface UnreadCount {
+  privateMessageCount: number;
+  groupMessageCount: number;
+  friendRequestCount: number;
+  systemNotificationCount: number;
+}
+
+export const EMPTY_UNREAD: UnreadCount = {
+  privateMessageCount: 0,
+  groupMessageCount: 0,
+  friendRequestCount: 0,
+  systemNotificationCount: 0,
+};
+
 // ============ 连接状态 ============
 
 export type ConnectionState = 'disconnected' | 'connecting' | 'connected' | 'error';

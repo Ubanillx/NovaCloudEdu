@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Bot, Plus, History, Trash2, Send, Square, Loader2,
-  Sparkles, MessageSquarePlus, ChevronRight,
+  Sparkles, MessageSquarePlus, ChevronRight, Zap,
   Image as ImageIcon, FileUp, X, ArrowDown, Palette, Video,
   FileText, FileCode, FileSpreadsheet, Globe, Braces, BookOpen, Paperclip, ChevronLeft,
 } from 'lucide-react';
@@ -698,12 +698,13 @@ interface ChatAreaProps {
   // 助手模式可选字段
   assistant?: AiAssistantVO | null;
   ragStatus?: string;
+  workflowStatus?: 'idle' | 'calling' | 'completed' | 'error';
 }
 
 const ChatArea: React.FC<ChatAreaProps> = ({
   messages, streamingContent, isLoading, isInitializing,
   sessionTitle, imageGenerations = [], videoGenerations = [], onSend, onCancel, onNewSession, onRetry,
-  assistant, ragStatus,
+  assistant, ragStatus, workflowStatus,
 }) => {
   const currentUser = useMemo(() => getCurrentUserInfo(), []);
   const tts = useTextToSpeech();
@@ -884,6 +885,26 @@ const ChatArea: React.FC<ChatAreaProps> = ({
         </div>
       )}
 
+      {/* 工作流执行状态提示 */}
+      {workflowStatus === 'calling' && (
+        <div className="flex items-center gap-2 px-5 py-2 bg-amber-50 dark:bg-amber-900/10 border-b border-amber-100 dark:border-amber-800/30 animate-pulse">
+          <Zap size={12} className="text-amber-500" />
+          <span className="text-[11px] text-amber-600 dark:text-amber-400">正在执行工作流...</span>
+        </div>
+      )}
+      {workflowStatus === 'completed' && (
+        <div className="flex items-center gap-2 px-5 py-2 bg-green-50 dark:bg-green-900/10 border-b border-green-100 dark:border-green-800/30">
+          <Zap size={12} className="text-green-500" />
+          <span className="text-[11px] text-green-600 dark:text-green-400">工作流执行完成</span>
+        </div>
+      )}
+      {workflowStatus === 'error' && (
+        <div className="flex items-center gap-2 px-5 py-2 bg-red-50 dark:bg-red-900/10 border-b border-red-100 dark:border-red-800/30">
+          <Zap size={12} className="text-red-500" />
+          <span className="text-[11px] text-red-600 dark:text-red-400">工作流执行失败</span>
+        </div>
+      )}
+
       {/* 消息列表 */}
       <div ref={messagesContainerRef} className="flex-1 overflow-y-auto custom-scrollbar relative">
         {allMessages.length === 0 ? (
@@ -959,7 +980,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
                         {msg.role === 'user' ? (
                           <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
                         ) : (
-                          <div className="prose prose-sm dark:prose-invert max-w-none prose-p:my-1 prose-pre:my-2 prose-headings:my-2 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5 prose-code:text-brand-600 dark:prose-code:text-brand-400 prose-code:bg-brand-50 dark:prose-code:bg-brand-900/30 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:before:content-none prose-code:after:content-none">
+                          <div className="prose prose-sm dark:prose-invert max-w-none prose-p:my-1 prose-pre:my-2 prose-headings:my-2 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5 prose-pre:bg-gray-100 prose-pre:text-gray-800 dark:prose-pre:bg-gray-900 dark:prose-pre:text-gray-200 prose-pre:rounded-xl prose-pre:overflow-x-auto [&_pre_code]:bg-transparent [&_pre_code]:text-inherit [&_pre_code]:p-0 prose-code:text-brand-600 dark:prose-code:text-brand-400 prose-code:bg-brand-50 dark:prose-code:bg-brand-900/30 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:before:content-none prose-code:after:content-none">
                             <ReactMarkdown
                               remarkPlugins={[remarkGfm]}
                               rehypePlugins={[rehypeRaw]}
@@ -1306,7 +1327,7 @@ const AssistantModePanel: React.FC<{ assistantId: string }> = ({ assistantId }) 
 
   const {
     sessions, messages, currentSessionId, isLoading,
-    isLoadingSessions, isInitializing, streamingContent, ragStatus,
+    isLoadingSessions, isInitializing, streamingContent, ragStatus, workflowStatus,
     loadSessions, loadSessionDetail, deleteSession, startNewSession,
     sendMessage, cancelStream, refreshSessionTitle, retryMessage,
   } = useAssistantChat(assistantId);
@@ -1405,6 +1426,7 @@ const AssistantModePanel: React.FC<{ assistantId: string }> = ({ assistantId }) 
           isInitializing={isInitializing}
           sessionTitle={selectedAssistant.name || ''}
           ragStatus={ragStatus}
+          workflowStatus={workflowStatus}
           onSend={handleSend}
           onCancel={cancelStream}
           onNewSession={handleNewSession}
