@@ -33,8 +33,10 @@
     "react-markdown": "^10.1.0",
     "react-pdf": "^10.3.0",
     "react-router-dom": "^7.13.0",
+    "rehype-katex": "^7.0.1",
     "rehype-raw": "^7.0.0",
     "remark-gfm": "^4.0.1",
+    "remark-math": "^6.0.0",
     "sockjs-client": "^1.6.1",
     "tailwindcss": "^4.1.18",
     "zustand": "^5.0.11"
