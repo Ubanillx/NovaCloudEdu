@@ -32,6 +32,7 @@ import CourseListPage from './pages/CourseListPage';
 import GradingSubmitPage from './pages/GradingSubmitPage';
 import GradingResultPage from './pages/GradingResultPage';
 import GradingDashboardPage from './pages/GradingDashboardPage';
+import BookshelfPage from './pages/BookshelfPage';
 
 const homeApi = new DefaultApi(new Configuration(), '', apiClient);
 
@@ -220,6 +221,7 @@ function App() {
               <Route path="ai-chat/:assistantId" element={<AiAssistantChatPage />} />
               <Route path="course/:courseId" element={<CourseDetailUserPage />} />
               <Route path="ebooks" element={<EbookListPage />} />
+              <Route path="bookshelf" element={<BookshelfPage />} />
               <Route path="courses" element={<CourseListPage />} />
               <Route path="membership" element={<MembershipPage />} />
               <Route path="search" element={<SearchResultsPage />} />

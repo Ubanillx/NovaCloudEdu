@@ -32,9 +32,7 @@ import {
   Sparkles,
   Image as ImageIcon,
 } from 'lucide-react';
-import Markdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import rehypeRaw from 'rehype-raw';
+import MarkdownRenderer from '../../components/chat/MarkdownRenderer';
 import { apiClient, AIApi, DefaultApi, Configuration, getToken } from '../../api';
 import type { AiAssistantVO, CreateAiAssistantCommand, UpdateAiAssistantCommand, KnowledgeBaseVO, WorkflowResponse, WorkflowSkillVO } from '../../api/generated/models';
 import { toast, TruncateWithTooltip, ImageUploadArea } from '../../components/ui';
@@ -1497,6 +1495,78 @@ const TestChatModal: React.FC<TestChatModalProps> = ({ isOpen, onClose, assistan
 
       const decoder = new TextDecoder();
       let buffer = '';
+      let pendingDataLines: string[] = [];
+
+      const dispatchAdminEvent = (eventType: string, data: string) => {
+        if (data === '[DONE]' || eventType === 'done') return;
+
+        if (eventType === 'session') {
+          try {
+            const sessionData = JSON.parse(data);
+            if (sessionData.sessionId) {
+              setSessionId(sessionData.sessionId as unknown as number);
+            }
+          } catch { /* ignore parse error */ }
+          return;
+        }
+
+        if (eventType === 'rag_searching') {
+          setRagStatus('searching');
+          return;
+        }
+
+        if (eventType === 'rag_completed') {
+          try {
+            const ragData = JSON.parse(data);
+            setRagStatus(ragData.found ? 'found' : 'not_found');
+            if (ragData.found && ragData.references) {
+              setRagReferences(ragData.references);
+            }
+          } catch {
+            setRagStatus('not_found');
+          }
+          return;
+        }
+
+        if (eventType === 'error') {
+          accumulated += `\n\n⚠️ ${data}`;
+          setStreamingContent(accumulated);
+          return;
+        }
+
+        if (eventType === 'image_generating' || eventType === 'video_generating') {
+          try {
+            const genData = JSON.parse(data);
+            accumulated += `\n\n🎨 *正在生成${eventType === 'video_generating' ? '视频' : '图片'}：${genData.prompt}...*`;
+            setStreamingContent(accumulated);
+          } catch { /* ignore */ }
+          return;
+        }
+
+        if (eventType === 'image_generated' || eventType === 'video_generated') {
+          try {
+            const genData = JSON.parse(data);
+            const url = genData.url || genData.imageUrl;
+            if (url) {
+              accumulated += eventType === 'video_generated'
+                ? `\n\n<video controls src="${url}" style="max-width:100%;border-radius:12px"></video>`
+                : `\n\n![生成图片](${url})`;
+              setStreamingContent(accumulated);
+            }
+          } catch { /* ignore */ }
+          return;
+        }
+
+        // message 事件或未标记事件：累积文本token（可能含换行）
+        try {
+          const json = JSON.parse(data);
+          const chunk = json.content ?? json.text ?? data;
+          accumulated += String(chunk);
+        } catch {
+          accumulated += data;
+        }
+        setStreamingContent(accumulated);
+      };
 
       while (true) {
         const { done, value } = await reader.read();
@@ -1507,97 +1577,27 @@ const TestChatModal: React.FC<TestChatModalProps> = ({ isOpen, onClose, assistan
         buffer = lines.pop() || '';
 
         for (const line of lines) {
+          if (line.trim() === '') {
+            if (pendingDataLines.length > 0) {
+              dispatchAdminEvent(currentEvent, pendingDataLines.join('\n'));
+              pendingDataLines = [];
+            }
+            currentEvent = '';
+            continue;
+          }
           if (line.startsWith('event:')) {
             currentEvent = line.slice(6).trim();
             continue;
           }
           if (line.startsWith('data:')) {
-            const data = line.slice(5).trim();
-            if (data === '[DONE]' || !data) continue;
-
-            // 根据事件类型处理
-            if (currentEvent === 'session') {
-              // 接收后端返回的会话元数据
-              try {
-                const sessionData = JSON.parse(data);
-                if (sessionData.sessionId) {
-                  // 雪花ID，保持原始值不做 Number() 转换
-                  setSessionId(sessionData.sessionId as unknown as number);
-                }
-              } catch { /* ignore parse error */ }
-              currentEvent = '';
-              continue;
-            }
-
-            if (currentEvent === 'rag_searching') {
-              setRagStatus('searching');
-              currentEvent = '';
-              continue;
-            }
-
-            if (currentEvent === 'rag_completed') {
-              try {
-                const ragData = JSON.parse(data);
-                setRagStatus(ragData.found ? 'found' : 'not_found');
-                if (ragData.found && ragData.references) {
-                  setRagReferences(ragData.references);
-                }
-              } catch {
-                setRagStatus('not_found');
-              }
-              currentEvent = '';
-              continue;
-            }
-
-            if (currentEvent === 'error') {
-              accumulated += `\n\n⚠️ ${data}`;
-              setStreamingContent(accumulated);
-              currentEvent = '';
-              continue;
-            }
-
-            if (currentEvent === 'image_generating' || currentEvent === 'video_generating') {
-              try {
-                const genData = JSON.parse(data);
-                accumulated += `\n\n🎨 *正在生成${currentEvent === 'video_generating' ? '视频' : '图片'}：${genData.prompt}...*`;
-                setStreamingContent(accumulated);
-              } catch { /* ignore */ }
-              currentEvent = '';
-              continue;
-            }
-
-            if (currentEvent === 'image_generated' || currentEvent === 'video_generated') {
-              try {
-                const genData = JSON.parse(data);
-                const url = genData.url || genData.imageUrl;
-                if (url) {
-                  accumulated += currentEvent === 'video_generated'
-                    ? `\n\n<video controls src="${url}" style="max-width:100%;border-radius:12px"></video>`
-                    : `\n\n![生成图片](${url})`;
-                  setStreamingContent(accumulated);
-                }
-              } catch { /* ignore */ }
-              currentEvent = '';
-              continue;
-            }
-
-            if (currentEvent === 'done') {
-              currentEvent = '';
-              continue;
-            }
-
-            // message 事件或未标记事件：累积文本token
-            try {
-              const json = JSON.parse(data);
-              const chunk = json.content ?? json.text ?? data;
-              accumulated += String(chunk);
-            } catch {
-              accumulated += data;
-            }
-            setStreamingContent(accumulated);
-            currentEvent = '';
+            const dc = line.charAt(5) === ' ' ? line.slice(6) : line.slice(5);
+            pendingDataLines.push(dc);
+            continue;
           }
         }
+      }
+      if (pendingDataLines.length > 0) {
+        dispatchAdminEvent(currentEvent, pendingDataLines.join('\n'));
       }
     } catch (err: unknown) {
       if (err instanceof DOMException && err.name === 'AbortError') {
@@ -1714,9 +1714,10 @@ const TestChatModal: React.FC<TestChatModalProps> = ({ isOpen, onClose, assistan
                   : 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-tl-md'
               }`}>
                 {msg.role === 'assistant' ? (
-                  <div className="prose prose-sm dark:prose-invert max-w-none [&>p]:my-1 [&>ul]:my-1 [&>ol]:my-1 [&>pre]:my-2 [&>blockquote]:my-1">
-                    <Markdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>{msg.content}</Markdown>
-                  </div>
+                  <MarkdownRenderer
+                    content={msg.content}
+                    className="prose prose-sm dark:prose-invert max-w-none [&>p]:my-1 [&>ul]:my-1 [&>ol]:my-1 [&>pre]:my-2 [&>blockquote]:my-1"
+                  />
                 ) : (
                   <span className="whitespace-pre-wrap">{msg.content}</span>
                 )}
@@ -1775,9 +1776,12 @@ const TestChatModal: React.FC<TestChatModalProps> = ({ isOpen, onClose, assistan
                 <Bot size={14} className="text-white animate-pulse" />
               </div>
               <div className="max-w-[75%] rounded-2xl rounded-tl-md px-4 py-2.5 bg-gray-100 dark:bg-gray-800 text-sm text-gray-800 dark:text-gray-200 leading-relaxed">
-                <div className="prose prose-sm dark:prose-invert max-w-none [&>p]:my-1 [&>ul]:my-1 [&>ol]:my-1 [&>pre]:my-2 [&>blockquote]:my-1">
-                  <Markdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>{streamingContent}</Markdown>
-                </div>
+                <MarkdownRenderer
+                  content={streamingContent}
+                  isStreaming
+                  showCursor
+                  className="prose prose-sm dark:prose-invert max-w-none [&>p]:my-1 [&>ul]:my-1 [&>ol]:my-1 [&>pre]:my-2 [&>blockquote]:my-1"
+                />
               </div>
             </div>
           )}
