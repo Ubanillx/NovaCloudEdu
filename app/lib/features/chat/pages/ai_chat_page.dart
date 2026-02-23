@@ -7,18 +7,24 @@ import 'package:markdown_widget/markdown_widget.dart';
 import '../../../config/app_theme.dart';
 import '../../../services/file_upload_service.dart';
 import '../../../widgets/toast/nova_message.dart';
-import '../../../widgets/common/loading_widget.dart';
+import '../../../widgets/common/skeleton_widgets.dart';
 import '../services/ai_chat_service.dart';
 
 /// AI智慧体对话页面 - 支持会话级SSE流式对话
 class AiChatPage extends StatefulWidget {
   final int? sessionId;
   final String title;
+  final int? assistantId;
+  final String? assistantName;
+  final String? assistantAvatar;
 
   const AiChatPage({
     super.key,
     this.sessionId,
     this.title = 'AI 助手',
+    this.assistantId,
+    this.assistantName,
+    this.assistantAvatar,
   });
 
   @override
@@ -64,7 +70,8 @@ class _AiChatPageState extends State<AiChatPage> {
   @override
   void initState() {
     super.initState();
-    _title = widget.title;
+    // 如果有智慧体信息，优先使用智慧体名称
+    _title = widget.assistantName ?? widget.title;
     _currentSessionId = widget.sessionId;
     _initSession();
   }
@@ -77,7 +84,7 @@ class _AiChatPageState extends State<AiChatPage> {
         final session = detail['session'] as AiChatSession;
         setState(() {
           _messages = detail['messages'] as List<AiChatMessage>;
-          _title = session.title ?? widget.title;
+          _title = widget.assistantName ?? session.title ?? widget.title;
           _isInitializing = false;
         });
         _scrollToBottom();
@@ -85,7 +92,15 @@ class _AiChatPageState extends State<AiChatPage> {
       }
     }
 
-    // 创建新会话
+    // 智慧体对话：不预创建session，首次发消息时后端自动创建并通过SSE返回sessionId
+    if (widget.assistantId != null) {
+      if (mounted) {
+        setState(() => _isInitializing = false);
+      }
+      return;
+    }
+
+    // 普通AI对话：预创建session
     final sessionId = await _chatService.createSession();
     if (mounted) {
       setState(() {
@@ -233,7 +248,8 @@ class _AiChatPageState extends State<AiChatPage> {
   Future<void> _sendMessage() async {
     final content = _inputController.text.trim();
     if (content.isEmpty || _isLoading) return;
-    if (_currentSessionId == null) {
+    // 普通对话必须有sessionId，智慧体对话允许null（后端自动创建）
+    if (_currentSessionId == null && widget.assistantId == null) {
       NovaMessage.error(context, '会话创建失败，请重试');
       return;
     }
@@ -314,11 +330,21 @@ class _AiChatPageState extends State<AiChatPage> {
       return;
     }
 
-    await _chatService.sessionStreamChat(
-      sessionId: _currentSessionId!,
-      message: content,
-      imageUrls: imageUrls.isNotEmpty ? imageUrls : null,
-      documentUrls: documentUrls.isNotEmpty ? documentUrls : null,
+    // 根据是否有智慧体ID选择调用不同的API
+    if (widget.assistantId != null) {
+      // 智慧体对话
+      await _chatService.assistantStreamChat(
+        assistantId: widget.assistantId!,
+        message: content,
+        sessionId: _currentSessionId,
+        imageUrls: imageUrls.isNotEmpty ? imageUrls : null,
+        documentUrls: documentUrls.isNotEmpty ? documentUrls : null,
+        onSessionCreated: (sessionId) {
+          // 后端自动创建会话后返回sessionId，保存供后续消息复用
+          if (mounted) {
+            setState(() => _currentSessionId = sessionId);
+          }
+        },
       onData: (data) {
         if (mounted) {
           setState(() {
@@ -466,6 +492,159 @@ class _AiChatPageState extends State<AiChatPage> {
         }
       },
     );
+    } else {
+      // 普通会话对话
+      await _chatService.sessionStreamChat(
+        sessionId: _currentSessionId!,
+        message: content,
+        imageUrls: imageUrls.isNotEmpty ? imageUrls : null,
+        documentUrls: documentUrls.isNotEmpty ? documentUrls : null,
+        onData: (data) {
+          if (mounted) {
+            setState(() {
+              _streamingContent += data;
+            });
+            _scrollToBottom();
+          }
+        },
+        onImageGenerating: (ig) {
+          if (mounted) {
+            setState(() => _imageGenerations.add(ig));
+            _scrollToBottom();
+          }
+        },
+        onImageGenerated: (ig) {
+          if (mounted) {
+            _imageResultsMap[ig.index] = ig;
+            setState(() {
+              final idx = _imageGenerations.indexWhere((e) => e.index == ig.index);
+              if (idx >= 0) {
+                _imageGenerations[idx].status = 'done';
+                _imageGenerations[idx].url = ig.url;
+              }
+            });
+            _scrollToBottom();
+          }
+        },
+        onImageError: (ig) {
+          if (mounted) {
+            _imageResultsMap[ig.index] = ig;
+            setState(() {
+              final idx = _imageGenerations.indexWhere((e) => e.index == ig.index);
+              if (idx >= 0) {
+                _imageGenerations[idx].status = 'error';
+                _imageGenerations[idx].error = ig.error;
+              }
+            });
+          }
+        },
+        onVideoGenerating: (vg) {
+          if (mounted) {
+            setState(() => _videoGenerations.add(vg));
+            _scrollToBottom();
+          }
+        },
+        onVideoGenerated: (vg) {
+          if (mounted) {
+            _videoResultsMap[vg.index] = vg;
+            setState(() {
+              final idx = _videoGenerations.indexWhere((e) => e.index == vg.index);
+              if (idx >= 0) {
+                _videoGenerations[idx].status = 'done';
+                _videoGenerations[idx].url = vg.url;
+              }
+            });
+            _scrollToBottom();
+          }
+        },
+        onVideoError: (vg) {
+          if (mounted) {
+            _videoResultsMap[vg.index] = vg;
+            setState(() {
+              final idx = _videoGenerations.indexWhere((e) => e.index == vg.index);
+              if (idx >= 0) {
+                _videoGenerations[idx].status = 'error';
+                _videoGenerations[idx].error = vg.error;
+              }
+            });
+          }
+        },
+        onDone: () {
+          if (mounted) {
+            setState(() {
+              if (_streamingContent.isNotEmpty) {
+                String finalContent = _streamingContent;
+                if (_imageResultsMap.isNotEmpty) {
+                  int idx = 0;
+                  finalContent = finalContent.replaceAllMapped(
+                    RegExp(r'<<IMAGE_(?:GEN|REF):(.+?)>>'),
+                    (match) {
+                      idx++;
+                      final result = _imageResultsMap[idx];
+                      if (result?.url != null) {
+                        return '\n![AI生成图片](${result!.url})\n';
+                      } else if (result?.error != null) {
+                        return '\n[图片生成失败: ${result!.error}]\n';
+                      }
+                      return '\n[图片生成中: ${match.group(1)?.trim()}]\n';
+                    },
+                  );
+                }
+                if (_videoResultsMap.isNotEmpty) {
+                  int vidIdx = 0;
+                  finalContent = finalContent.replaceAllMapped(
+                    RegExp(r'<<VIDEO_GEN:(.+?)>>'),
+                    (match) {
+                      vidIdx++;
+                      final result = _videoResultsMap[vidIdx];
+                      if (result?.url != null) {
+                        return '\n[点击播放 AI 生成视频](${result!.url})\n';
+                      } else if (result?.error != null) {
+                        return '\n[视频生成失败: ${result!.error}]\n';
+                      }
+                      return '\n[视频生成中: ${match.group(1)?.trim()}]\n';
+                    },
+                  );
+                }
+                _messages.add(AiChatMessage(
+                  role: 'assistant',
+                  content: finalContent,
+                ));
+              }
+              _streamingContent = '';
+              _isLoading = false;
+              _imageGenerations = [];
+              _imageResultsMap.clear();
+              _videoGenerations = [];
+              _videoResultsMap.clear();
+            });
+            _scrollToBottom();
+            if (_messages.length <= 3) {
+              _refreshTitle();
+            }
+          }
+        },
+        onError: (error) {
+          if (mounted) {
+            setState(() {
+              _isLoading = false;
+              if (_streamingContent.isNotEmpty) {
+                _messages.add(AiChatMessage(
+                  role: 'assistant',
+                  content: _streamingContent,
+                ));
+                _streamingContent = '';
+              }
+              _imageGenerations = [];
+              _imageResultsMap.clear();
+              _videoGenerations = [];
+              _videoResultsMap.clear();
+            });
+            NovaMessage.error(context, '请求失败，请重试');
+          }
+        },
+      );
+    }
   }
 
   Future<void> _refreshTitle() async {
@@ -515,27 +694,76 @@ class _AiChatPageState extends State<AiChatPage> {
               color: colors.textPrimary, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        title: Row(
           children: [
-            Text(
-              _title,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: colors.textPrimary,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            if (_currentSessionId != null)
-              Text(
-                '会话 #$_currentSessionId',
-                style: TextStyle(
-                  fontSize: 11,
-                  color: colors.textTertiary,
+            // 智慧体头像
+            if (widget.assistantAvatar != null && widget.assistantAvatar!.isNotEmpty)
+              Container(
+                margin: const EdgeInsets.only(right: 12),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                  child: Image.network(
+                    widget.assistantAvatar!,
+                    width: 40,
+                    height: 40,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: AppTheme.brand.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: const Icon(
+                        Icons.smart_toy_rounded,
+                        color: AppTheme.brand,
+                        size: 24,
+                      ),
+                    ),
+                  ),
+                ),
+              )
+            else if (widget.assistantId != null)
+              Container(
+                margin: const EdgeInsets.only(right: 12),
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: AppTheme.brand.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: const Icon(
+                  Icons.smart_toy_rounded,
+                  color: AppTheme.brand,
+                  size: 24,
                 ),
               ),
+            // 标题和会话信息
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    _title,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: colors.textPrimary,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  if (_currentSessionId != null)
+                    Text(
+                      widget.assistantId != null ? '智慧体对话' : '会话 #$_currentSessionId',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: colors.textTertiary,
+                      ),
+                    ),
+                ],
+              ),
+            ),
           ],
         ),
         actions: [
@@ -549,7 +777,7 @@ class _AiChatPageState extends State<AiChatPage> {
         ],
       ),
       body: _isInitializing
-          ? const LoadingWidget(message: '正在初始化...')
+          ? const ChatMessageSkeleton()
           : Column(
               children: [
                 Expanded(child: _buildMessageList(colors)),
@@ -561,6 +789,21 @@ class _AiChatPageState extends State<AiChatPage> {
 
   void _startNewSession() async {
     if (_isLoading) return;
+
+    // 智慧体对话：直接清空状态，首次发消息时后端自动创建session
+    if (widget.assistantId != null) {
+      if (mounted) {
+        setState(() {
+          _currentSessionId = null;
+          _messages = [];
+          _title = widget.assistantName ?? widget.title;
+          _streamingContent = '';
+        });
+      }
+      return;
+    }
+
+    // 普通对话：预创建session
     final sessionId = await _chatService.createSession();
     if (sessionId != null && mounted) {
       setState(() {
@@ -617,6 +860,78 @@ class _AiChatPageState extends State<AiChatPage> {
   }
 
   Widget _buildEmptyState(AppColors colors) {
+    // 智慧体对话时显示简洁的引导，普通对话显示完整欢迎界面
+    if (widget.assistantId != null) {
+      // 智慧体对话 - 显示智慧体头像和名字
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // 智慧体头像
+              if (widget.assistantAvatar != null && widget.assistantAvatar!.isNotEmpty)
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(40),
+                  child: Image.network(
+                    widget.assistantAvatar!,
+                    width: 80,
+                    height: 80,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => Container(
+                      width: 80,
+                      height: 80,
+                      decoration: BoxDecoration(
+                        color: AppTheme.brand.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(40),
+                      ),
+                      child: const Icon(
+                        Icons.smart_toy_rounded,
+                        color: AppTheme.brand,
+                        size: 40,
+                      ),
+                    ),
+                  ),
+                )
+              else
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: AppTheme.brand.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(40),
+                  ),
+                  child: const Icon(
+                    Icons.smart_toy_rounded,
+                    color: AppTheme.brand,
+                    size: 40,
+                  ),
+                ),
+              const SizedBox(height: 16),
+              // 智慧体名字
+              Text(
+                widget.assistantName ?? '智慧体',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: colors.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                '有什么我可以帮助你的吗？',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: colors.textSecondary,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    // 普通AI对话 - 完整欢迎界面
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -802,7 +1117,7 @@ class _AiChatPageState extends State<AiChatPage> {
                 }).toList(),
               ),
             ),
-          // 文字气泡
+          // 文字气泡（移除头像）
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -812,7 +1127,11 @@ class _AiChatPageState extends State<AiChatPage> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   decoration: BoxDecoration(
-                    color: AppTheme.brand,
+                    gradient: const LinearGradient(
+                      colors: [AppTheme.brand, AppTheme.brand2],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
                     borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(20),
                       topRight: Radius.circular(20),
@@ -821,9 +1140,9 @@ class _AiChatPageState extends State<AiChatPage> {
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: AppTheme.brand.withOpacity(0.2),
-                        blurRadius: 8,
-                        offset: const Offset(0, 3),
+                        color: AppTheme.brand.withOpacity(0.3),
+                        blurRadius: 12,
+                        offset: const Offset(0, 6),
                       ),
                     ],
                   ),
@@ -836,20 +1155,6 @@ class _AiChatPageState extends State<AiChatPage> {
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Container(
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(
-                  color: AppTheme.brand.withOpacity(0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.person_rounded,
-                  color: AppTheme.brand,
-                  size: 18,
                 ),
               ),
             ],
@@ -879,29 +1184,58 @@ class _AiChatPageState extends State<AiChatPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 头像 + 名称
+            // 头像 + 名称（使用真实智慧体头像）
             Row(
               children: [
-                Container(
-                  width: 28,
-                  height: 28,
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [AppTheme.brand, AppTheme.brand2],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
+                // 智慧体头像
+                if (widget.assistantAvatar != null && widget.assistantAvatar!.isNotEmpty)
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(14),
+                    child: Image.network(
+                      widget.assistantAvatar!,
+                      width: 28,
+                      height: 28,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => Container(
+                        width: 28,
+                        height: 28,
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [AppTheme.brand, AppTheme.brand2],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.smart_toy_rounded,
+                          color: Colors.white,
+                          size: 16,
+                        ),
+                      ),
                     ),
-                    shape: BoxShape.circle,
+                  )
+                else
+                  Container(
+                    width: 28,
+                    height: 28,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [AppTheme.brand, AppTheme.brand2],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.smart_toy_rounded,
+                      color: Colors.white,
+                      size: 16,
+                    ),
                   ),
-                  child: const Icon(
-                    Icons.smart_toy_rounded,
-                    color: Colors.white,
-                    size: 16,
-                  ),
-                ),
                 const SizedBox(width: 8),
                 Text(
-                  'AI 助手',
+                  widget.assistantName ?? 'AI 助手',
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
@@ -1518,15 +1852,17 @@ class _AiChatPageState extends State<AiChatPage> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 14),
                   decoration: BoxDecoration(
-                    color: colors.background,
+                    color: colors.surfaceVariant.withOpacity(0.5),
                     borderRadius: BorderRadius.circular(22),
-                    border: Border.all(color: colors.border.withOpacity(0.6)),
+                    border: Border.all(color: Colors.transparent),
                   ),
                   child: TextField(
                     controller: _inputController,
                     focusNode: _focusNode,
                     maxLines: 4,
                     minLines: 1,
+                    cursorColor: const Color(0xFF3B5BFF),
+                    cursorWidth: 1.5,
                     decoration: InputDecoration(
                       hintText: _pendingImages.isNotEmpty
                           ? '描述图片内容或提问...'
@@ -1540,6 +1876,7 @@ class _AiChatPageState extends State<AiChatPage> {
                     style: TextStyle(
                       fontSize: 15,
                       color: colors.textPrimary,
+                      fontWeight: FontWeight.w600,
                     ),
                     textInputAction: TextInputAction.send,
                     onSubmitted: (_) => _sendMessage(),
@@ -1782,25 +2119,29 @@ class _AiChatPageState extends State<AiChatPage> {
 
   Widget _buildSendButton() {
     return GestureDetector(
+      onTapDown: (_) {},
       onTap: _sendMessage,
-      child: Container(
-        width: 40,
-        height: 40,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 160),
+        width: 44,
+        height: 44,
         decoration: BoxDecoration(
-          color: AppTheme.brand,
+          gradient: const LinearGradient(
+            colors: [AppTheme.brand, AppTheme.brand2],
+          ),
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: AppTheme.brand.withOpacity(0.25),
+              color: AppTheme.brand.withOpacity(0.3),
               blurRadius: 8,
-              offset: const Offset(0, 3),
+              offset: const Offset(0, 4),
             ),
           ],
         ),
         child: const Icon(
           Icons.send_rounded,
           color: Colors.white,
-          size: 18,
+          size: 20,
         ),
       ),
     );

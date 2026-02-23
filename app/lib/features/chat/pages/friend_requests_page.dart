@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:nova_api/nova_api.dart';
 import '../../../config/app_theme.dart';
 import '../../../widgets/common/empty_widget.dart';
-import '../../../widgets/common/loading_widget.dart';
+import '../../../widgets/common/skeleton_widgets.dart';
 import '../../../widgets/common/nova_refresh_header.dart';
 import '../../../widgets/toast/nova_message.dart';
 import '../../../widgets/dialogs/app_dialog.dart';
+import '../../../widgets/tabs/nova_tab_bar.dart';
 import '../services/friend_service.dart';
 
 /// 好友申请列表页面
@@ -136,17 +137,15 @@ class _FriendRequestsPageState extends State<FriendRequestsPage>
           ),
         ),
         centerTitle: true,
-        bottom: TabBar(
-          controller: _tabController,
-          labelColor: AppTheme.brand,
-          unselectedLabelColor: colors.textSecondary,
-          indicatorColor: AppTheme.brand,
-          indicatorSize: TabBarIndicatorSize.label,
-          dividerColor: Colors.transparent, // 移除分割线
-          dividerHeight: 0, // 确保分割线高度为0
-          tabs: [
-            Tab(
-              child: Row(
+      ),
+      body: Column(
+        children: [
+          // Tab栏 - 使用自定义 NovaTabBar
+          NovaTabBar(
+            controller: _tabController,
+            tabWidgets: [
+              // 收到的（带徽章）
+              Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const Text('收到的'),
@@ -169,16 +168,20 @@ class _FriendRequestsPageState extends State<FriendRequestsPage>
                   ],
                 ],
               ),
+              // 发送的
+              const Text('发送的'),
+            ],
+          ),
+          // Tab内容
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                _buildReceivedTab(colors),
+                _buildSentTab(colors),
+              ],
             ),
-            const Tab(text: '发送的'),
-          ],
-        ),
-      ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          _buildReceivedTab(colors),
-          _buildSentTab(colors),
+          ),
         ],
       ),
     );
@@ -186,7 +189,7 @@ class _FriendRequestsPageState extends State<FriendRequestsPage>
 
   Widget _buildReceivedTab(AppColors colors) {
     if (_isLoadingReceived) {
-      return const LoadingWidget(message: '加载中...');
+      return const ListItemSkeleton();
     }
 
     if (_receivedRequests.isEmpty) {
@@ -207,7 +210,7 @@ class _FriendRequestsPageState extends State<FriendRequestsPage>
 
   Widget _buildSentTab(AppColors colors) {
     if (_isLoadingSent) {
-      return const LoadingWidget(message: '加载中...');
+      return const ListItemSkeleton();
     }
 
     if (_sentRequests.isEmpty) {

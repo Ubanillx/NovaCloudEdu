@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nova_api/nova_api.dart';
 import '../../../config/app_theme.dart';
 import '../../../widgets/common/empty_widget.dart';
-import '../../../widgets/common/loading_widget.dart';
+import '../../../widgets/common/skeleton_widgets.dart';
 import '../../../widgets/inputs/app_input.dart';
 import '../../../widgets/toast/nova_message.dart';
 import '../../../widgets/dialogs/app_dialog.dart';
@@ -19,7 +19,7 @@ class SearchUserPage extends StatefulWidget {
 class _SearchUserPageState extends State<SearchUserPage> {
   final _searchController = TextEditingController();
   final _friendService = FriendService();
-  
+
   List<SearchUserResponse> _users = [];
   bool _isLoading = false;
   bool _hasSearched = false;
@@ -61,13 +61,13 @@ class _SearchUserPageState extends State<SearchUserPage> {
 
   Future<void> _sendFriendRequest(SearchUserResponse user) async {
     if (user.userId == null) return;
-    
+
     final message = await showInputDialog(
       context,
       title: '发送好友申请',
       hintText: '请输入验证消息（可选）',
     );
-    
+
     if (message == null) return; // 用户取消
 
     setState(() => _sendingRequests.add(user.userId!));
@@ -129,9 +129,7 @@ class _SearchUserPageState extends State<SearchUserPage> {
             ),
           ),
           // 搜索结果
-          Expanded(
-            child: _buildContent(colors),
-          ),
+          Expanded(child: _buildContent(colors)),
         ],
       ),
     );
@@ -139,7 +137,7 @@ class _SearchUserPageState extends State<SearchUserPage> {
 
   Widget _buildContent(AppColors colors) {
     if (_isLoading) {
-      return const LoadingWidget(message: '搜索中...');
+      return const ListItemSkeleton(itemCount: 4);
     }
 
     if (!_hasSearched) {
@@ -147,18 +145,11 @@ class _SearchUserPageState extends State<SearchUserPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.search,
-              size: 64,
-              color: colors.textTertiary,
-            ),
+            Icon(Icons.search, size: 64, color: colors.textTertiary),
             const SizedBox(height: 16),
             Text(
               '输入用户名或账号搜索',
-              style: TextStyle(
-                color: colors.textSecondary,
-                fontSize: 14,
-              ),
+              style: TextStyle(color: colors.textSecondary, fontSize: 14),
             ),
           ],
         ),
@@ -179,7 +170,7 @@ class _SearchUserPageState extends State<SearchUserPage> {
 
   Widget _buildUserItem(SearchUserResponse user, AppColors colors) {
     final isSending = _sendingRequests.contains(user.userId);
-    
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -199,7 +190,8 @@ class _SearchUserPageState extends State<SearchUserPage> {
           CircleAvatar(
             radius: 24,
             backgroundColor: AppTheme.brand.withOpacity(0.1),
-            backgroundImage: user.userAvatar != null && user.userAvatar!.isNotEmpty
+            backgroundImage:
+                user.userAvatar != null && user.userAvatar!.isNotEmpty
                 ? NetworkImage(user.userAvatar!)
                 : null,
             child: user.userAvatar == null || user.userAvatar!.isEmpty
@@ -223,19 +215,14 @@ class _SearchUserPageState extends State<SearchUserPage> {
                 const SizedBox(height: 4),
                 Text(
                   '@${user.userAccount ?? ''}',
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: colors.textSecondary,
-                  ),
+                  style: TextStyle(fontSize: 13, color: colors.textSecondary),
                 ),
-                if (user.userProfile != null && user.userProfile!.isNotEmpty) ...[
+                if (user.userProfile != null &&
+                    user.userProfile!.isNotEmpty) ...[
                   const SizedBox(height: 4),
                   Text(
                     user.userProfile!,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: colors.textTertiary,
-                    ),
+                    style: TextStyle(fontSize: 12, color: colors.textTertiary),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -251,7 +238,11 @@ class _SearchUserPageState extends State<SearchUserPage> {
     );
   }
 
-  Widget _buildActionButton(SearchUserResponse user, AppColors colors, bool isSending) {
+  Widget _buildActionButton(
+    SearchUserResponse user,
+    AppColors colors,
+    bool isSending,
+  ) {
     if (user.isFriend == true) {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),

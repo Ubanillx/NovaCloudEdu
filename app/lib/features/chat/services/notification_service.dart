@@ -150,14 +150,15 @@ class NotificationService {
         break;
 
       case 'UNREAD_COUNT_CHANGED':
-        // 服务器推送的未读数更新
+        // 服务器推送的未读数更新（字段名与后端对齐）
         _unreadCount = UnreadCount(
-          privateMessageCount: event.data['privateMessageCount'] as int? ?? 0,
-          groupMessageCount: event.data['groupMessageCount'] as int? ?? 0,
+          privateMessageCount: event.data['privateUnread'] as int? ?? 0,
+          groupMessageCount: event.data['groupUnread'] as int? ?? 0,
           friendRequestCount: event.data['friendRequestCount'] as int? ?? 0,
           systemNotificationCount: event.data['systemNotificationCount'] as int? ?? 0,
         );
         _unreadCountController.add(_unreadCount);
+        debugPrint('未读数更新: private=${_unreadCount.privateMessageCount}, group=${_unreadCount.groupMessageCount}, friend=${_unreadCount.friendRequestCount}, total=${_unreadCount.totalCount}');
         break;
 
       case 'SYSTEM_NOTIFICATION':

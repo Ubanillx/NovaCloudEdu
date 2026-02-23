@@ -67,13 +67,35 @@ class ChatSyncService {
   /// 更新会话信息
   Future<void> _updateSession(int partnerId, WsChatMessage message) async {
     final existingSession = await _dbService.getSessionByPartner(partnerId);
-    
+
+    // 根据消息类型生成会话摘要
+    String lastMessage;
+    switch ((message.type ?? 'TEXT').toUpperCase()) {
+      case 'IMAGE':
+        lastMessage = '[图片]';
+        break;
+      case 'AUDIO':
+        lastMessage = '[语音]';
+        break;
+      case 'FILE':
+        lastMessage = '[文件]';
+        break;
+      case 'VIDEO':
+        lastMessage = '[视频]';
+        break;
+      case 'CALL':
+        lastMessage = '[通话]';
+        break;
+      default:
+        lastMessage = message.content ?? '';
+    }
+
     final session = LocalChatSession(
       sessionId: existingSession?.sessionId,
       partnerId: partnerId,
-      partnerName: message.senderName,
-      partnerAvatar: message.senderAvatar,
-      lastMessage: message.content,
+      partnerName: existingSession?.partnerName ?? message.senderName,
+      partnerAvatar: existingSession?.partnerAvatar ?? message.senderAvatar,
+      lastMessage: lastMessage,
       lastMessageTime: message.createTime ?? DateTime.now(),
       unreadCount: (existingSession?.unreadCount ?? 0) + 1,
       updatedAt: DateTime.now(),
