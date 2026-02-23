@@ -16,6 +16,7 @@ import 'study_plan_page.dart';
 import 'checkin_ranking_page.dart';
 import '../../circle/pages/my_favourites_page.dart';
 import '../../home/daily_word/pages/word_book_page.dart';
+import '../../membership/widgets/membership_card.dart';
 
 /// 个人中心页面 - 参考smartclass Profile.vue
 class ProfilePage extends StatefulWidget {
@@ -191,6 +192,13 @@ class _ProfilePageState extends State<ProfilePage> {
             SliverToBoxAdapter(child: _buildUserInfoCard()),
             // 学习数据
             SliverToBoxAdapter(child: _buildStudyStats()),
+            // 会员权益卡片
+            const SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                child: MembershipCard(),
+              ),
+            ),
             // 今日学习目标
             SliverToBoxAdapter(child: _buildTodayGoals()),
             // 功能菜单
