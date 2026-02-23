@@ -1,6 +1,8 @@
 package com.novacloudedu.backend.interfaces.websocket;
 
 import com.novacloudedu.backend.application.service.NotificationService;
+import com.novacloudedu.backend.application.service.PrivateChatApplicationService;
+import com.novacloudedu.backend.application.service.FriendApplicationService;
 import com.novacloudedu.backend.interfaces.websocket.dto.NotificationEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +29,8 @@ import java.util.Map;
 public class NotificationWebSocketController {
 
     private final NotificationService notificationService;
+    private final PrivateChatApplicationService privateChatApplicationService;
+    private final FriendApplicationService friendApplicationService;
 
     /**
      * 客户端确认收到通知（可选）
@@ -57,11 +61,22 @@ public class NotificationWebSocketController {
             return;
         }
 
-        // 这里可以注入相关服务获取未读数，然后推送
-        // 示例：通知用户刷新未读数（实际数据由客户端通过 HTTP 获取）
-        notificationService.notifyUser(userId, NotificationEvent.EventType.UNREAD_COUNT_CHANGED, Map.of(
-                "refresh", true
-        ));
+        try {
+            int privateUnread = privateChatApplicationService.getTotalUnreadCount(userId);
+            int friendRequestCount = friendApplicationService.getPendingReceivedCount(userId);
+            // 群未读暂用0，后续可扩展
+            int groupUnread = 0;
+
+            notificationService.notifyUser(userId, NotificationEvent.EventType.UNREAD_COUNT_CHANGED, Map.of(
+                    "privateUnread", privateUnread,
+                    "groupUnread", groupUnread,
+                    "friendRequestCount", friendRequestCount,
+                    "totalUnread", privateUnread + groupUnread + friendRequestCount
+            ));
+            log.debug("未读数已推送: userId={}, private={}, group={}, friend={}", userId, privateUnread, groupUnread, friendRequestCount);
+        } catch (Exception e) {
+            log.error("获取未读数失败: userId={}", userId, e);
+        }
     }
 
     private Long extractUserId(Principal principal) {
