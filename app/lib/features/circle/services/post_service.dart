@@ -50,7 +50,7 @@ class PostService {
     int pageSize = 10,
   }) async {
     try {
-      final response = await _api.searchPosts(
+      final response = await _api.searchPosts1(
         keyword: keyword,
         pageNum: pageNum,
         pageSize: pageSize,

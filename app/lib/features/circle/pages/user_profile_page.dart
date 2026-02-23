@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:nova_api/nova_api.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../../config/app_theme.dart';
-import '../../../widgets/common/loading_widget.dart';
+import '../../../widgets/common/skeleton_widgets.dart';
 import '../../../widgets/toast/nova_message.dart';
 import '../../../widgets/dialogs/app_dialog.dart';
 import '../services/post_service.dart';
@@ -181,12 +182,12 @@ class _UserProfilePageState extends State<UserProfilePage> {
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: colors.textPrimary),
+          icon: Icon(PhosphorIcons.caretLeft(), color: colors.textPrimary),
           onPressed: () => Navigator.pop(context),
         ),
       ),
       body: _isLoading
-          ? const LoadingWidget()
+          ? const ProfileSkeleton()
           : RefreshIndicator(
               onRefresh: _loadData,
               child: CustomScrollView(
@@ -285,7 +286,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Icon(
-                                _isFollowing ? Icons.check_rounded : Icons.add_rounded,
+                                _isFollowing ? PhosphorIcons.check(PhosphorIconsStyle.fill) : PhosphorIcons.plus(PhosphorIconsStyle.fill),
                                 size: 18,
                               ),
                               const SizedBox(width: 4),
@@ -315,10 +316,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
                               borderRadius: BorderRadius.circular(100),
                             ),
                           ),
-                          child: const Row(
+                          child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.chat_bubble_outline, size: 18),
+                              Icon(PhosphorIcons.chatTeardropText(), size: 18),
                               SizedBox(width: 4),
                               Text(
                                 '发消息',
@@ -362,8 +363,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                   children: [
                                     Icon(
                                       _hasPendingRequest
-                                          ? Icons.hourglass_empty
-                                          : Icons.person_add_outlined,
+                                      ? PhosphorIcons.hourglass(PhosphorIconsStyle.fill)
+                                      : PhosphorIcons.userPlus(),
                                       size: 18,
                                     ),
                                     const SizedBox(width: 4),
@@ -392,7 +393,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
       width: 100,
       height: 100,
       color: colors.surfaceVariant,
-      child: Icon(Icons.person_rounded, size: 50, color: colors.iconSecondary),
+      child: Icon(PhosphorIcons.user(), size: 50, color: colors.iconSecondary),
     );
   }
 
@@ -563,8 +564,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
   Widget _buildGenderTag() {
     final gender = _userInfo?.userGender;
     final isMale = gender == 0; // 假设0是男，1是女
-    final color = isMale ? const Color(0xFF3B82F6) : const Color(0xFFEC4899);
-    final icon = isMale ? Icons.male_rounded : Icons.female_rounded;
+    final color = isMale ? context.colors.info : const Color(0xFFEC4899);
+    final icon = isMale ? PhosphorIcons.genderMale(PhosphorIconsStyle.fill) : PhosphorIcons.genderFemale(PhosphorIconsStyle.fill);
     final label = isMale ? '男' : '女';
     
     return Row(
@@ -632,7 +633,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
       return const SliverToBoxAdapter(
         child: Padding(
           padding: EdgeInsets.all(32),
-          child: LoadingWidget(),
+          child: PostListSkeleton(itemCount: 2),
         ),
       );
     }
@@ -648,7 +649,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
           ),
           child: Column(
             children: [
-              Icon(Icons.article_outlined, size: 48, color: colors.iconSecondary.withOpacity(0.5)),
+              Icon(PhosphorIcons.article(), size: 48, color: colors.iconSecondary.withOpacity(0.5)),
               const SizedBox(height: 16),
               Text(
                 '暂无帖子',
@@ -754,14 +755,14 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   style: TextStyle(fontSize: 12, color: colors.textTertiary),
                 ),
                 const Spacer(),
-                Icon(Icons.thumb_up_rounded, size: 16, color: colors.iconSecondary),
+                Icon(PhosphorIcons.thumbsUp(PhosphorIconsStyle.fill), size: 16, color: colors.iconSecondary),
                 const SizedBox(width: 4),
                 Text(
                   '${post.thumbNum ?? 0}',
                   style: TextStyle(fontSize: 12, color: colors.textSecondary),
                 ),
                 const SizedBox(width: 16),
-                Icon(Icons.chat_bubble_rounded, size: 16, color: colors.iconSecondary),
+                Icon(PhosphorIcons.chatTeardropText(PhosphorIconsStyle.fill), size: 16, color: colors.iconSecondary),
                 const SizedBox(width: 4),
                 Text(
                   '${post.commentNum ?? 0}',

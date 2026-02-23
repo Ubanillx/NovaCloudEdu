@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:markdown_widget/markdown_widget.dart';
 import 'package:nova_api/nova_api.dart';
-import 'package:tdesign_flutter/tdesign_flutter.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import '../../../config/app_theme.dart';
 import '../../../services/file_upload_service.dart';
 import '../../../widgets/toast/nova_message.dart';
@@ -33,15 +34,8 @@ class _PostEditPageState extends State<PostEditPage> {
   bool _isUploading = false;
   bool _isPreviewMode = false;
   bool _isFullscreen = false;
+  bool _showEmojiPicker = false;
   bool get _isEdit => widget.postId != null;
-
-  static const Map<String, String> _postTypes = {
-    'discussion': '讨论',
-    'question': '提问',
-    'share': '分享',
-    'announcement': '公告',
-  };
-  String _selectedPostType = 'discussion';
 
   @override
   void initState() {
@@ -51,9 +45,6 @@ class _PostEditPageState extends State<PostEditPage> {
       _contentController.text = widget.post!.content ?? '';
       if (widget.post!.tags != null) {
         _tags.addAll(widget.post!.tags!.toList());
-      }
-      if (widget.post!.postType != null && _postTypes.containsKey(widget.post!.postType)) {
-        _selectedPostType = widget.post!.postType!;
       }
     }
   }
@@ -92,10 +83,22 @@ class _PostEditPageState extends State<PostEditPage> {
     });
   }
 
-  void _toggleFullscreen() {
+  void _toggleEmojiPicker() {
     setState(() {
-      _isFullscreen = !_isFullscreen;
+      _showEmojiPicker = !_showEmojiPicker;
     });
+  }
+
+  void _onEmojiSelected(Emoji emoji) {
+    final currentText = _contentController.text;
+    final selection = _contentController.selection;
+    final newText = currentText.substring(0, selection.baseOffset) +
+        emoji.emoji +
+        currentText.substring(selection.extentOffset);
+    _contentController.text = newText;
+    _contentController.selection = TextSelection.collapsed(
+      offset: selection.baseOffset + emoji.emoji.length,
+    );
   }
 
   Future<void> _pickAndUploadImage() async {
@@ -111,7 +114,7 @@ class _PostEditPageState extends State<PostEditPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              leading: const Icon(Icons.photo_library, color: AppTheme.brand),
+              leading: Icon(PhosphorIcons.images(), color: AppTheme.brand),
               title: Text('从相册选择', style: TextStyle(color: colors.textPrimary)),
               onTap: () {
                 Navigator.pop(context);
@@ -119,7 +122,7 @@ class _PostEditPageState extends State<PostEditPage> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.camera_alt, color: AppTheme.brand),
+              leading: Icon(PhosphorIcons.camera(), color: AppTheme.brand),
               title: Text('拍照', style: TextStyle(color: colors.textPrimary)),
               onTap: () {
                 Navigator.pop(context);
@@ -173,18 +176,18 @@ class _PostEditPageState extends State<PostEditPage> {
   }
 
   Future<void> _submit() async {
-    final title = _titleController.text.trim();
     final content = _contentController.text.trim();
-
-    if (title.isEmpty) {
-      NovaMessage.warning(context, '请输入标题');
-      return;
-    }
 
     if (content.isEmpty) {
       NovaMessage.warning(context, '请输入内容');
       return;
     }
+
+    // 微博风格：内容第一行作为标题，如果没有换行则取前20字
+    final lines = content.split('\n');
+    final title = lines.first.length > 20 
+        ? '${lines.first.substring(0, 20)}...' 
+        : lines.first;
 
     setState(() => _isLoading = true);
 
@@ -195,7 +198,7 @@ class _PostEditPageState extends State<PostEditPage> {
           title: title,
           content: content,
           tags: _tags,
-          postType: _selectedPostType,
+          postType: 'share', // 微博风格统一用分享类型
         );
         if (success && mounted) {
           NovaMessage.success(context, '更新成功');
@@ -206,7 +209,7 @@ class _PostEditPageState extends State<PostEditPage> {
           title: title,
           content: content,
           tags: _tags,
-          postType: _selectedPostType,
+          postType: 'share', // 微博风格统一用分享类型
         );
         if (post != null && mounted) {
           NovaMessage.success(context, '发布成功');
@@ -215,7 +218,7 @@ class _PostEditPageState extends State<PostEditPage> {
       }
     } catch (e) {
       if (mounted) {
-        NovaMessage.error(context, '操作失败: $e');
+        NovaMessage.error(context, '操作失败: \$e');
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -230,32 +233,60 @@ class _PostEditPageState extends State<PostEditPage> {
       appBar: AppBar(
         backgroundColor: colors.surface,
         elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.close, color: colors.textPrimary),
+        leading: TextButton(
           onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(
-          _isEdit ? '编辑帖子' : '发布帖子',
-          style: TextStyle(
-            color: colors.textPrimary,
-            fontSize: 17,
-            fontWeight: FontWeight.w600,
+          child: Text(
+            '取消',
+            style: TextStyle(
+              color: colors.textPrimary,
+              fontSize: 16,
+            ),
           ),
+        ),
+        leadingWidth: 80,
+        title: Column(
+          children: [
+            Text(
+              _isEdit ? '编辑帖子' : '发帖子',
+              style: TextStyle(
+                color: colors.textPrimary,
+                fontSize: 17,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
         ),
         centerTitle: true,
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16),
             child: Center(
-              child: TDButton(
-                text: _isEdit ? '保存' : '发布',
-                size: TDButtonSize.small,
-                type: TDButtonType.fill,
-                theme: TDButtonTheme.primary,
-                width: 64,
-                height: 32,
-                icon: _isLoading ? TDIcons.loading : null,
-                onTap: _submit,
+              child: GestureDetector(
+                onTap: _isLoading ? null : _submit,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: _isLoading ? colors.textTertiary : AppTheme.brand,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: _isLoading
+                      ? SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                        )
+                      : Text(
+                          _isEdit ? '保存' : '发布',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                ),
               ),
             ),
           ),
@@ -266,235 +297,247 @@ class _PostEditPageState extends State<PostEditPage> {
           Expanded(
             child: _isFullscreen
                 ? _buildFullscreenEditor()
-                : _buildNormalEditor(),
+                : _buildWeiboStyleEditor(),
           ),
-          // 工具栏
+          // 微博风格底部工具栏 - 卡片样式
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: EdgeInsets.symmetric(
+              horizontal: 16, 
+              vertical: _showEmojiPicker ? 8 : 12,
+            ),
             decoration: BoxDecoration(
               color: colors.surface,
-              border: Border(
-                top: BorderSide(color: colors.border),
-              ),
+              borderRadius: BorderRadius.circular(24),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(context.isDarkMode ? 0.2 : 0.05),
-                  offset: const Offset(0, -2),
-                  blurRadius: 4,
+                  color: Colors.black.withOpacity(0.03),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
                 ),
               ],
             ),
-            child: SafeArea(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _buildToolbarButton(
-                    icon: Icons.image,
-                    label: '图片',
-                    onTap: _pickAndUploadImage,
-                    isLoading: _isUploading,
-                  ),
-                  _buildToolbarButton(
-                    icon: _isPreviewMode ? Icons.edit : Icons.preview,
-                    label: _isPreviewMode ? '编辑' : '预览',
+            child: Row(
+              children: [
+                _buildIconButton(
+                  icon: PhosphorIcons.image(),
+                  onTap: _isUploading ? null : _pickAndUploadImage,
+                ),
+                _buildIconButton(
+                  icon: PhosphorIcons.smiley(),
+                  onTap: _toggleEmojiPicker,
+                ),
+                const Spacer(),
+                _buildIconButton(
+                  icon: _isFullscreen ? PhosphorIcons.cornersIn() : PhosphorIcons.cornersOut(),
+                  onTap: () {
+                    setState(() {
+                      _isFullscreen = !_isFullscreen;
+                    });
+                  },
+                ),
+                if (_isPreviewMode)
+                  _buildIconButton(
+                    icon: PhosphorIcons.pencilSimple(),
+                    onTap: _togglePreview,
+                  )
+                else
+                  _buildIconButton(
+                    icon: PhosphorIcons.eye(),
                     onTap: _togglePreview,
                   ),
-                  _buildToolbarButton(
-                    icon: _isFullscreen ? Icons.fullscreen_exit : Icons.fullscreen,
-                    label: _isFullscreen ? '退出' : '全屏',
-                    onTap: _toggleFullscreen,
-                  ),
-                ],
-              ),
+              ],
             ),
           ),
+          // 表情选择器
+          if (_showEmojiPicker)
+            SizedBox(
+              height: 250,
+              child: EmojiPicker(
+                onEmojiSelected: (Category? category, Emoji emoji) {
+                  _onEmojiSelected(emoji);
+                },
+                config: Config(
+                  height: 250,
+                  checkPlatformCompatibility: true,
+                  emojiViewConfig: EmojiViewConfig(
+                    emojiSizeMax: 28,
+                    backgroundColor: colors.surface,
+                    columns: 7,
+                  ),
+                  skinToneConfig: const SkinToneConfig(),
+                  categoryViewConfig: CategoryViewConfig(
+                    backgroundColor: colors.surface,
+                    iconColor: colors.textTertiary,
+                    iconColorSelected: AppTheme.brand,
+                    indicatorColor: AppTheme.brand,
+                  ),
+                  bottomActionBarConfig: const BottomActionBarConfig(
+                    enabled: false,
+                  ),
+                  searchViewConfig: SearchViewConfig(
+                    backgroundColor: colors.surface,
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
     );
   }
 
-  Widget _buildNormalEditor() {
+  Widget _buildWeiboStyleEditor() {
     final colors = context.colors;
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 标题输入
-          TextField(
-            controller: _titleController,
-            maxLength: 50,
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              height: 1.3,
-              color: colors.textPrimary,
+          // 内容输入卡片
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: colors.surface,
+              borderRadius: BorderRadius.circular(24),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.03),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
-            decoration: InputDecoration(
-              hintText: '请输入标题',
-              hintStyle: TextStyle(
-                color: colors.textTertiary,
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-              ),
-              border: InputBorder.none,
-              counterText: '',
-              contentPadding: EdgeInsets.zero,
-            ),
+            child: _buildContentArea(minLines: 14),
           ),
           const SizedBox(height: 16),
-
-          // 帖子类型选择
-          Row(
-            children: [
-              Icon(Icons.category, size: 18, color: colors.textTertiary),
-              const SizedBox(width: 6),
-              Text(
-                '类型',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: colors.textSecondary,
-                  fontWeight: FontWeight.w500,
+          // 标签卡片
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: colors.surface,
+              borderRadius: BorderRadius.circular(24),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.03),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
                 ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: _postTypes.entries.map((entry) {
-                      final isSelected = _selectedPostType == entry.key;
-                      return Padding(
-                        padding: const EdgeInsets.only(right: 8),
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(16),
-                          onTap: () {
-                            setState(() => _selectedPostType = entry.key);
-                          },
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 180),
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                            decoration: BoxDecoration(
-                              color: isSelected
-                                  ? AppTheme.brand.withOpacity(context.isDarkMode ? 0.22 : 0.16)
-                                  : colors.surfaceVariant,
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(
-                                color: isSelected ? AppTheme.brand : colors.border,
-                              ),
-                            ),
-                            child: Text(
-                              entry.value,
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: isSelected ? AppTheme.brand : colors.textSecondary,
-                                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                              ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // 标签区域
+                if (_tags.isNotEmpty) ...[
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: _tags.map((tag) => _buildTagChip(tag)).toList(),
+                  ),
+                  const SizedBox(height: 12),
+                ],
+                // 标签输入
+                Row(
+                  children: [
+                    Icon(PhosphorIcons.hash(), size: 18, color: AppTheme.brand),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: TextField(
+                        controller: _tagController,
+                        decoration: InputDecoration(
+                          hintText: '添加标签话题 (${_tags.length}/5)',
+                          hintStyle: TextStyle(fontSize: 14, color: colors.textTertiary),
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                        style: TextStyle(fontSize: 14, color: colors.textPrimary),
+                        onSubmitted: (_) => _addTag(),
+                        textInputAction: TextInputAction.done,
+                      ),
+                    ),
+                    if (_tagController.text.isNotEmpty)
+                      GestureDetector(
+                        onTap: _addTag,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: AppTheme.brand,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Text(
+                            '添加',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                         ),
-                      );
-                    }).toList(),
-                  ),
+                      ),
+                  ],
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          
-          // 内容区域（编辑或预览）
-          _buildContentArea(minLines: 15),
-          
-          const SizedBox(height: 30),
-          Divider(height: 1, color: colors.border),
-          const SizedBox(height: 20),
-
-          // 标签区域
-          Row(
-            children: [
-              const Icon(Icons.tag, size: 20, color: AppTheme.brand),
-              const SizedBox(width: 8),
-              Text(
-                '添加标签',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: colors.textPrimary,
-                ),
-              ),
-              const SizedBox(width: 8),
-              Text(
-                '(${_tags.length}/5)',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: colors.textTertiary,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          
-          // 标签输入
-          Row(
-            children: [
-              Expanded(
-                child: Container(
-                  height: 40,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  decoration: BoxDecoration(
-                    color: colors.surfaceVariant,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: TextField(
-                    controller: _tagController,
-                    decoration: InputDecoration(
-                      hintText: '输入标签话题',
-                      hintStyle: TextStyle(fontSize: 14, color: colors.textTertiary),
-                      border: InputBorder.none,
-                      contentPadding: const EdgeInsets.only(bottom: 10),
-                    ),
-                    style: TextStyle(fontSize: 14, color: colors.textPrimary),
-                    onSubmitted: (_) => _addTag(),
-                    textInputAction: TextInputAction.done,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              TDButton(
-                text: '添加',
-                size: TDButtonSize.small,
-                type: TDButtonType.outline,
-                theme: TDButtonTheme.primary,
-                onTap: _addTag,
-              ),
-            ],
-          ),
-          
-          if (_tags.isNotEmpty) ...[
-            const SizedBox(height: 16),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: _tags.map((tag) => _buildTagChip(tag)).toList(),
+              ],
             ),
-          ],
-          
+          ),
           const SizedBox(height: 40),
         ],
       ),
     );
   }
 
-  Widget _buildFullscreenEditor() {
-    return Column(
-      children: [
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: _buildContentArea(minLines: 20, expanded: true),
+  Widget _buildTagChip(String tag) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: AppTheme.brand.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            '#$tag',
+            style: const TextStyle(
+              fontSize: 12,
+              color: AppTheme.brand,
+              fontWeight: FontWeight.w500,
+            ),
           ),
+          const SizedBox(width: 4),
+          GestureDetector(
+            onTap: () => _removeTag(tag),
+            child: Icon(
+              PhosphorIcons.x(),
+              size: 12,
+              color: AppTheme.brand,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFullscreenEditor() {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: _buildContentArea(minLines: 30, expanded: true),
+    );
+  }
+
+  Widget _buildIconButton({
+    required IconData icon,
+    required VoidCallback? onTap,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 24),
+      child: GestureDetector(
+        onTap: onTap,
+        child: Icon(
+          icon,
+          size: 24,
+          color: Colors.grey[600], // 使用灰色替代蓝色
         ),
-      ],
+      ),
     );
   }
 
@@ -506,11 +549,14 @@ class _PostEditPageState extends State<PostEditPage> {
     if (_isPreviewMode) {
       // Markdown 预览
       final content = _contentController.text.isEmpty
-          ? Text(
-              '暂无内容',
-              style: TextStyle(
-                color: colors.textTertiary,
-                fontSize: 16,
+          ? Container(
+              width: double.infinity,
+              child: Text(
+                '暂无内容',
+                style: TextStyle(
+                  color: colors.textTertiary,
+                  fontSize: 16,
+                ),
               ),
             )
           : MarkdownWidget(
@@ -533,7 +579,7 @@ class _PostEditPageState extends State<PostEditPage> {
                               color: colors.surfaceVariant,
                               borderRadius: BorderRadius.circular(8),
                             ),
-                            child: Icon(Icons.broken_image, color: colors.textTertiary),
+                            child: Icon(PhosphorIcons.imageBroken(), color: colors.textTertiary),
                           );
                         },
                       ),
@@ -571,7 +617,7 @@ class _PostEditPageState extends State<PostEditPage> {
           color: colors.textPrimary,
         ),
         decoration: InputDecoration(
-          hintText: '分享你的想法...',
+          hintText: '分享新鲜事...',
           hintStyle: TextStyle(
             color: colors.textTertiary,
             fontSize: 16,
@@ -582,75 +628,5 @@ class _PostEditPageState extends State<PostEditPage> {
         ),
       );
     }
-  }
-
-  Widget _buildToolbarButton({
-    required IconData icon,
-    required String label,
-    required VoidCallback onTap,
-    bool isLoading = false,
-  }) {
-    final colors = context.colors;
-    return InkWell(
-      onTap: isLoading ? null : onTap,
-      borderRadius: BorderRadius.circular(8),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (isLoading)
-              const SizedBox(
-                width: 18,
-                height: 18,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              )
-            else
-              Icon(icon, size: 20, color: AppTheme.brand),
-            const SizedBox(width: 6),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 14,
-                color: colors.textSecondary,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTagChip(String tag) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: AppTheme.brand.withOpacity(0.08),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            '#$tag',
-            style: const TextStyle(
-              fontSize: 13,
-              color: AppTheme.brand,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(width: 6),
-          GestureDetector(
-            onTap: () => _removeTag(tag),
-            child: const Icon(
-              Icons.close,
-              size: 14,
-              color: AppTheme.brand,
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }

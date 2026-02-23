@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:markdown_widget/markdown_widget.dart';
 import 'package:nova_api/nova_api.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../../config/app_theme.dart';
 import '../../../widgets/dialogs/app_dialog.dart';
 import '../../../widgets/toast/nova_message.dart';
 import '../../../widgets/common/loading_widget.dart';
+import '../../../widgets/common/skeleton_widgets.dart';
 import '../services/post_service.dart';
 import '../../auth/services/auth_service.dart';
 
@@ -249,7 +251,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
         backgroundColor: colors.surface,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: colors.textPrimary),
+          icon: Icon(PhosphorIcons.caretLeft(), color: colors.textPrimary),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -264,13 +266,13 @@ class _PostDetailPageState extends State<PostDetailPage> {
         actions: [
           if (_post != null && _post!.userId == _currentUserId)
             IconButton(
-              icon: Icon(Icons.more_horiz, color: colors.textPrimary),
+              icon: Icon(PhosphorIcons.dotsThree(), color: colors.textPrimary),
               onPressed: () => _showPostMenu(),
             ),
         ],
       ),
       body: _isLoading
-          ? const LoadingWidget()
+          ? const DetailPageSkeleton()
           : _post == null
               ? Center(child: Text('帖子不存在', style: TextStyle(color: colors.textSecondary)))
               : Column(
@@ -316,7 +318,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                     : CircleAvatar(
                         radius: 20,
                         backgroundColor: AppTheme.brand.withOpacity(0.1),
-                        child: const Icon(Icons.person, color: AppTheme.brand),
+                        child: Icon(PhosphorIcons.user(), color: AppTheme.brand),
                       ),
               ),
               const SizedBox(width: 12),
@@ -443,7 +445,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                               ),
                               child: Column(
                                 children: [
-                                  Icon(Icons.broken_image, color: colors.textTertiary, size: 48),
+                                  Icon(PhosphorIcons.imageBroken(), color: colors.textTertiary, size: 48),
                                   const SizedBox(height: 8),
                                   Text('图片加载失败', style: TextStyle(color: colors.textSecondary)),
                                 ],
@@ -471,14 +473,14 @@ class _PostDetailPageState extends State<PostDetailPage> {
           Row(
             children: [
               _buildInteractionButton(
-                icon: _hasThumb ? Icons.thumb_up : Icons.thumb_up_outlined,
+                icon: _hasThumb ? PhosphorIcons.thumbsUp(PhosphorIconsStyle.fill) : PhosphorIcons.thumbsUp(),
                 count: _post?.thumbNum ?? 0,
                 isActive: _hasThumb,
                 onTap: _toggleThumb,
               ),
               const SizedBox(width: 24),
               _buildInteractionButton(
-                icon: _hasFavour ? Icons.star : Icons.star_outline,
+                icon: _hasFavour ? PhosphorIcons.star(PhosphorIconsStyle.fill) : PhosphorIcons.star(),
                 count: _post?.favourNum ?? 0,
                 isActive: _hasFavour,
                 activeColor: Colors.amber,
@@ -577,7 +579,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
           color: colors.surface,
           child: Column(
             children: [
-              Icon(Icons.chat_bubble_outline, size: 48, color: colors.textTertiary),
+              Icon(PhosphorIcons.chatTeardropText(), size: 48, color: colors.textTertiary),
               const SizedBox(height: 16),
               Text(
                 '暂无评论，快来抢沙发吧',
@@ -596,7 +598,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
             return _hasMoreComments
                 ? const Padding(
                     padding: EdgeInsets.all(16),
-                    child: Center(child: CircularProgressIndicator()),
+                    child: Center(child: LoadingWidget(size: 24)),
                   )
                 : null;
           }
@@ -643,7 +645,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                 : CircleAvatar(
                     radius: 16,
                     backgroundColor: colors.surfaceVariant,
-                    child: Icon(Icons.person, size: 16, color: colors.textTertiary),
+                    child: Icon(PhosphorIcons.user(), size: 16, color: colors.textTertiary),
                   ),
           ),
           const SizedBox(width: 12),
@@ -822,7 +824,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                     color: AppTheme.brand.withOpacity(0.1),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.edit_outlined, color: AppTheme.brand, size: 22),
+                  child: Icon(PhosphorIcons.pencilSimple(), color: AppTheme.brand, size: 22),
                 ),
                 title: Text('编辑帖子', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: colors.textPrimary)),
                 onTap: () {
@@ -839,7 +841,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                     color: Colors.red.withOpacity(0.1),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.delete_outline, color: Colors.red, size: 22),
+                  child: Icon(PhosphorIcons.trash(), color: Colors.red, size: 22),
                 ),
                 title: const Text('删除帖子', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.red)),
                 onTap: () {
@@ -1000,7 +1002,7 @@ class _UserInfoCardContentState extends State<_UserInfoCardContent> {
                       : CircleAvatar(
                           radius: 40,
                           backgroundColor: AppTheme.brand.withOpacity(0.1),
-                          child: const Icon(Icons.person, size: 40, color: AppTheme.brand),
+                          child: Icon(PhosphorIcons.user(), size: 40, color: AppTheme.brand),
                         ),
                 ),
                 const SizedBox(height: 12),

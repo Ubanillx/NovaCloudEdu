@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:nova_api/nova_api.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../../config/app_theme.dart';
+import '../../../widgets/common/skeleton_widgets.dart';
 import '../services/post_service.dart';
 import 'post_detail_page.dart';
 
@@ -57,7 +59,7 @@ class _UserPostsPageState extends State<UserPostsPage> {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.black87),
+          icon: Icon(PhosphorIcons.caretLeft(), color: Colors.black87),
           onPressed: () => Navigator.pop(context),
         ),
         title: Column(
@@ -82,7 +84,7 @@ class _UserPostsPageState extends State<UserPostsPage> {
         centerTitle: true,
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const PostListSkeleton()
           : _posts.isEmpty
               ? _buildEmptyState()
               : RefreshIndicator(
@@ -101,7 +103,7 @@ class _UserPostsPageState extends State<UserPostsPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.article_outlined, size: 64, color: Colors.grey[300]),
+          Icon(PhosphorIcons.article(), size: 64, color: Colors.grey[300]),
           const SizedBox(height: 16),
           Text(
             '该用户暂无公开帖子',
@@ -133,7 +135,7 @@ class _UserPostsPageState extends State<UserPostsPage> {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(24),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -185,21 +187,21 @@ class _UserPostsPageState extends State<UserPostsPage> {
             const SizedBox(height: 12),
             Row(
               children: [
-                Icon(Icons.thumb_up_outlined, size: 14, color: Colors.grey[400]),
+                Icon(PhosphorIcons.thumbsUp(), size: 14, color: Colors.grey[400]),
                 const SizedBox(width: 4),
                 Text(
                   '${post.thumbNum ?? 0}',
                   style: TextStyle(fontSize: 12, color: Colors.grey[500]),
                 ),
                 const SizedBox(width: 16),
-                Icon(Icons.chat_bubble_outline, size: 14, color: Colors.grey[400]),
+                Icon(PhosphorIcons.chatTeardropText(), size: 14, color: Colors.grey[400]),
                 const SizedBox(width: 4),
                 Text(
                   '${post.commentNum ?? 0}',
                   style: TextStyle(fontSize: 12, color: Colors.grey[500]),
                 ),
                 const SizedBox(width: 16),
-                Icon(Icons.star_outline, size: 14, color: Colors.grey[400]),
+                Icon(PhosphorIcons.star(), size: 14, color: Colors.grey[400]),
                 const SizedBox(width: 4),
                 Text(
                   '${post.favourNum ?? 0}',

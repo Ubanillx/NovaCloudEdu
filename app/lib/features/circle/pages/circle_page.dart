@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:nova_api/nova_api.dart';
 import 'package:tdesign_flutter/tdesign_flutter.dart';
 import '../../../config/app_theme.dart';
@@ -8,6 +10,7 @@ import '../../../widgets/common/empty_widget.dart';
 import '../../../widgets/common/loading_widget.dart';
 import '../../../widgets/common/nova_refresh_header.dart';
 import '../../../widgets/toast/nova_message.dart';
+import '../../../widgets/tabs/nova_tab_bar.dart';
 import '../services/post_service.dart';
 import 'post_detail_page.dart';
 import 'post_edit_page.dart';
@@ -331,8 +334,21 @@ class _CirclePageState extends State<CirclePage>
       body: SafeArea(
         child: Column(
           children: [
+            // 顶部导航栏（Tab栏 + 图标按钮）
             _buildHeader(),
-            _buildTabBar(),
+            // 分隔阴影
+            Container(
+              height: 1,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    colors.border.withValues(alpha: 0),
+                    colors.border.withValues(alpha: 0.5),
+                    colors.border.withValues(alpha: 0),
+                  ],
+                ),
+              ),
+            ),
             Expanded(
               child: TabBarView(
                 controller: _tabController,
@@ -350,75 +366,37 @@ class _CirclePageState extends State<CirclePage>
   }
 
   Widget _buildHeader() {
-    final colors = context.colors;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 16, 8, 8),
+      padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
-            '圈子',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 0.5,
-              color: colors.textPrimary,
-            ),
+          // Tab栏（移除标题文字，放在左侧）
+          NovaTabBar(
+            controller: _tabController,
+            tabs: _tabs,
           ),
-          Row(
-            children: [
-              IconButton(
-                onPressed: _navigateToCreatePost,
-                icon: Icon(Icons.add_box_outlined, size: 24, color: colors.iconPrimary),
-                tooltip: '发布',
-              ),
-              IconButton(
-                onPressed: _navigateToSearch,
-                icon: Icon(Icons.search_rounded, size: 24, color: colors.iconPrimary),
-              ),
-            ],
+          const Spacer(),
+          // 发布按钮 - SVG
+          IconButton(
+            onPressed: _navigateToCreatePost,
+            icon: SvgPicture.asset(
+              'lib/assests/fonts/icons/加号.svg',
+              width: 24,
+              height: 24,
+            ),
+            tooltip: '发布',
+          ),
+          // 搜索按钮 - SVG
+          IconButton(
+            onPressed: _navigateToSearch,
+            icon: SvgPicture.asset(
+              'lib/assests/fonts/icons/搜索.svg',
+              width: 24,
+              height: 24,
+            ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildTabBar() {
-    final colors = context.colors;
-    return Container(
-      height: 40,
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      child: ListView.separated(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        scrollDirection: Axis.horizontal,
-        itemCount: _tabs.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 10),
-        itemBuilder: (context, index) {
-          final isSelected = _tabController.index == index;
-          return GestureDetector(
-            onTap: () => _tabController.animateTo(index),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
-              decoration: BoxDecoration(
-                color: isSelected 
-                    ? AppTheme.brand 
-                    : colors.surfaceVariant,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Center(
-                child: Text(
-                  _tabs[index],
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                    color: isSelected ? Colors.white : colors.textSecondary,
-                  ),
-                ),
-              ),
-            ),
-          );
-        },
       ),
     );
   }
@@ -523,8 +501,8 @@ class _CirclePageState extends State<CirclePage>
         ),
         // 帖子列表
         if (_topPosts.isEmpty)
-          const SliverFillRemaining(
-            child: EmptyWidget(message: '暂无热门帖子'),
+          SliverFillRemaining(
+            child: _buildSimpleEmptyState('暂无热门帖子', PhosphorIcons.trendUp()),
           )
         else
           SliverPadding(
@@ -612,6 +590,7 @@ class _CirclePageState extends State<CirclePage>
       onTap: () => _navigateToPostDetail(post),
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
+      borderRadius: 24,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -622,7 +601,7 @@ class _CirclePageState extends State<CirclePage>
             margin: const EdgeInsets.only(right: 12),
             decoration: BoxDecoration(
               color: rankColor.withOpacity(rank <= 3 ? 1 : 0.1),
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(12),
             ),
             child: Center(
               child: Text(
@@ -654,7 +633,7 @@ class _CirclePageState extends State<CirclePage>
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    Icon(Icons.thumb_up, size: 14, color: AppTheme.brand),
+                    Icon(PhosphorIcons.thumbsUp(PhosphorIconsStyle.fill), size: 14, color: AppTheme.brand),
                     const SizedBox(width: 4),
                     Text(
                       '${post.thumbNum ?? 0}',
@@ -665,7 +644,7 @@ class _CirclePageState extends State<CirclePage>
                       ),
                     ),
                     const SizedBox(width: 16),
-                    Icon(Icons.chat_bubble_outline, size: 14, color: colors.textTertiary),
+                    Icon(PhosphorIcons.chatTeardropText(PhosphorIconsStyle.fill), size: 14, color: colors.textTertiary),
                     const SizedBox(width: 4),
                     Text(
                       '${post.commentNum ?? 0}',
@@ -686,26 +665,67 @@ class _CirclePageState extends State<CirclePage>
     );
   }
 
-  Widget _buildEmptyStateWithAction(String message, String actionText, VoidCallback onAction) {
+  Widget _buildSimpleEmptyState(String message, IconData icon) {
+    final colors = context.colors;
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          TDEmpty(
-            type: TDEmptyType.plain,
-            emptyText: message,
-            image: Icon(
-              Icons.people_outline,
-              size: 96,
-              color: context.colors.textTertiary,
-            ),
+          Icon(
+            icon,
+            size: 96,
+            color: colors.textTertiary,
           ),
           const SizedBox(height: 16),
-          PrimaryButton(
-            text: actionText,
+          Text(
+            message,
+            style: TextStyle(
+              fontSize: 14,
+              color: colors.textSecondary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyStateWithAction(String message, String actionText, VoidCallback onAction) {
+    final colors = context.colors;
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            PhosphorIcons.usersThree(),
+            size: 96,
+            color: colors.textTertiary,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            message,
+            style: TextStyle(
+              fontSize: 14,
+              color: colors.textSecondary,
+            ),
+          ),
+          const SizedBox(height: 24),
+          GestureDetector(
             onTap: onAction,
-            width: 120,
-            size: TDButtonSize.medium,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              decoration: BoxDecoration(
+                color: AppTheme.brand,
+                borderRadius: BorderRadius.circular(24),
+              ),
+              child: Text(
+                actionText,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
+            ),
           ),
         ],
       ),
@@ -730,11 +750,23 @@ class _CirclePageState extends State<CirclePage>
       });
     }
 
-    return AppCard(
+    return GestureDetector(
       onTap: () => _navigateToPostDetail(post),
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
-      child: Column(
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 16),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: colors.surface,
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(isDark ? 0.2 : 0.04),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // 用户信息
@@ -749,7 +781,7 @@ class _CirclePageState extends State<CirclePage>
                   : CircleAvatar(
                       radius: 18,
                       backgroundColor: AppTheme.brand.withOpacity(isDark ? 0.2 : 0.1),
-                      child: const Icon(Icons.person, size: 20, color: AppTheme.brand),
+                      child: Icon(PhosphorIcons.user(), size: 20, color: AppTheme.brand),
                     ),
               const SizedBox(width: 10),
               Expanded(
@@ -832,7 +864,7 @@ class _CirclePageState extends State<CirclePage>
           Row(
             children: [
               _buildActionButton(
-                icon: hasThumb ? Icons.thumb_up : Icons.thumb_up_outlined,
+                icon: hasThumb ? PhosphorIcons.thumbsUp(PhosphorIconsStyle.fill) : PhosphorIcons.thumbsUp(),
                 count: post.thumbNum ?? 0,
                 isActive: hasThumb,
                 activeColor: AppTheme.brand,
@@ -840,13 +872,13 @@ class _CirclePageState extends State<CirclePage>
               ),
               const SizedBox(width: 24),
               _buildActionButton(
-                icon: Icons.chat_bubble_outline,
+                icon: PhosphorIcons.chatTeardropText(),
                 count: post.commentNum ?? 0,
                 onTap: () => _navigateToPostDetail(post),
               ),
               const SizedBox(width: 24),
               _buildActionButton(
-                icon: hasFavour ? Icons.star : Icons.star_outline,
+                icon: hasFavour ? PhosphorIcons.star(PhosphorIconsStyle.fill) : PhosphorIcons.star(),
                 count: post.favourNum ?? 0,
                 isActive: hasFavour,
                 activeColor: colors.warning,
@@ -856,8 +888,9 @@ class _CirclePageState extends State<CirclePage>
           ),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildActionButton({
     required IconData icon,
