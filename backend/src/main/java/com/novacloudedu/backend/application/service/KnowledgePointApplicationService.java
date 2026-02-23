@@ -4,6 +4,7 @@ import com.novacloudedu.backend.domain.book.entity.Chapter;
 import com.novacloudedu.backend.domain.book.entity.KnowledgePoint;
 import com.novacloudedu.backend.domain.book.repository.ChapterRepository;
 import com.novacloudedu.backend.domain.book.repository.KnowledgePointRepository;
+import com.novacloudedu.backend.domain.book.service.ContentSecurityService;
 import com.novacloudedu.backend.domain.book.service.LlmService;
 import com.novacloudedu.backend.domain.book.valueobject.ChapterId;
 import com.novacloudedu.backend.domain.book.valueobject.KnowledgePointType;
@@ -31,7 +32,14 @@ public class KnowledgePointApplicationService {
     private final ChapterRepository chapterRepository;
     private final KnowledgePointRepository knowledgePointRepository;
     private final LlmService llmService;
+    private final ContentSecurityService contentSecurityService;
     private final Gson gson;
+
+    @Value("${book.content.encryption.enabled:false}")
+    private boolean encryptionEnabled;
+
+    @Value("${book.content.encryption.secret-key:NovaCloudEduBookKey1}")
+    private String encryptionSecretKey;
 
     @Value("${ai.knowledge.max-points:20}")
     private int maxPoints;
@@ -136,12 +144,35 @@ public class KnowledgePointApplicationService {
     /**
      * 构建用户消息
      */
+    private String getDecryptedContent(Chapter chapter) {
+        String content = chapter.getContent();
+        if (encryptionEnabled && chapter.isEncrypted()) {
+            try {
+                content = contentSecurityService.decrypt(content, encryptionSecretKey, chapter.getEncryptionIv());
+            } catch (Exception e) {
+                log.error("章节内容解密失败: chapterId={}", chapter.getId(), e);
+                throw new RuntimeException("内容解密失败", e);
+            }
+        }
+        return content;
+    }
+
     private String buildUserMessage(Chapter chapter) {
         return String.format(
                 "章节标题：%s\n\n章节内容：\n%s",
                 chapter.getTitle(),
-                chapter.getContent()
+                truncateForLlm(getDecryptedContent(chapter))
         );
+    }
+
+    private static final int MAX_CONTENT_LENGTH = 28000;
+
+    private String truncateForLlm(String content) {
+        if (content == null || content.isEmpty()) return "";
+        String plain = content.replaceAll("<[^>]*>", " ").replaceAll("\\s+", " ").trim();
+        if (plain.length() <= MAX_CONTENT_LENGTH) return plain;
+        log.warn("章节内容过长({} 字符)，截断至 {} 字符", plain.length(), MAX_CONTENT_LENGTH);
+        return plain.substring(0, MAX_CONTENT_LENGTH) + "\n\n[注意：内容过长，已截断]";
     }
 
     /**

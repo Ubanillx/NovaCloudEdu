@@ -4,6 +4,7 @@ import com.novacloudedu.backend.domain.book.entity.Chapter;
 import com.novacloudedu.backend.domain.book.entity.ChapterSummary;
 import com.novacloudedu.backend.domain.book.repository.ChapterRepository;
 import com.novacloudedu.backend.domain.book.repository.ChapterSummaryRepository;
+import com.novacloudedu.backend.domain.book.service.ContentSecurityService;
 import com.novacloudedu.backend.domain.book.service.LlmService;
 import com.novacloudedu.backend.domain.book.valueobject.ChapterId;
 import com.novacloudedu.backend.domain.book.valueobject.SummaryType;
@@ -29,9 +30,16 @@ public class ChapterSummaryApplicationService {
     private final ChapterRepository chapterRepository;
     private final ChapterSummaryRepository summaryRepository;
     private final LlmService llmService;
+    private final ContentSecurityService contentSecurityService;
 
     @Value("${ai.summary.cache-enabled:true}")
     private boolean cacheEnabled;
+
+    @Value("${book.content.encryption.enabled:false}")
+    private boolean encryptionEnabled;
+
+    @Value("${book.content.encryption.secret-key:NovaCloudEduBookKey1}")
+    private String encryptionSecretKey;
 
     /**
      * 生成章节总结
@@ -130,17 +138,40 @@ public class ChapterSummaryApplicationService {
     /**
      * 构建用户消息
      */
+    private String getDecryptedContent(Chapter chapter) {
+        String content = chapter.getContent();
+        if (encryptionEnabled && chapter.isEncrypted()) {
+            try {
+                content = contentSecurityService.decrypt(content, encryptionSecretKey, chapter.getEncryptionIv());
+            } catch (Exception e) {
+                log.error("章节内容解密失败: chapterId={}", chapter.getId(), e);
+                throw new RuntimeException("内容解密失败", e);
+            }
+        }
+        return content;
+    }
+
     private String buildUserMessage(Chapter chapter, SummaryType type) {
         StringBuilder message = new StringBuilder();
         message.append("请总结以下章节内容：\n\n");
         message.append("章节标题：").append(chapter.getTitle()).append("\n\n");
-        message.append("章节内容：\n").append(chapter.getContent());
+        message.append("章节内容：\n").append(truncateForLlm(getDecryptedContent(chapter)));
         
         if (type == SummaryType.KEYPOINTS) {
             message.append("\n\n请以要点形式输出，每个要点以\"- \"开头。");
         }
         
         return message.toString();
+    }
+
+    private static final int MAX_CONTENT_LENGTH = 28000;
+
+    private String truncateForLlm(String content) {
+        if (content == null || content.isEmpty()) return "";
+        String plain = content.replaceAll("<[^>]*>", " ").replaceAll("\\s+", " ").trim();
+        if (plain.length() <= MAX_CONTENT_LENGTH) return plain;
+        log.warn("章节内容过长({} 字符)，截断至 {} 字符", plain.length(), MAX_CONTENT_LENGTH);
+        return plain.substring(0, MAX_CONTENT_LENGTH) + "\n\n[注意：内容过长，已截断]";
     }
 
     /**
