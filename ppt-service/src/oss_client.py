@@ -31,13 +31,13 @@ if _env_path.exists():
 
 logger = logging.getLogger(__name__)
 
-# ---- 配置 ----
+# ---- 配置（优先读 OSS_*，回退读 ALIYUN_OSS_*，兼容 Docker 和本地运行）----
 
-OSS_ENDPOINT = os.environ.get("OSS_ENDPOINT", "")
-OSS_ACCESS_KEY_ID = os.environ.get("OSS_ACCESS_KEY_ID", "")
-OSS_ACCESS_KEY_SECRET = os.environ.get("OSS_ACCESS_KEY_SECRET", "")
-OSS_BUCKET_NAME = os.environ.get("OSS_BUCKET_NAME", "")
-OSS_DOMAIN = os.environ.get("OSS_DOMAIN", "")
+OSS_ENDPOINT = os.environ.get("OSS_ENDPOINT") or os.environ.get("ALIYUN_OSS_ENDPOINT", "")
+OSS_ACCESS_KEY_ID = os.environ.get("OSS_ACCESS_KEY_ID") or os.environ.get("ALIYUN_OSS_ACCESS_KEY_ID", "")
+OSS_ACCESS_KEY_SECRET = os.environ.get("OSS_ACCESS_KEY_SECRET") or os.environ.get("ALIYUN_OSS_ACCESS_KEY_SECRET", "")
+OSS_BUCKET_NAME = os.environ.get("OSS_BUCKET_NAME") or os.environ.get("ALIYUN_OSS_BUCKET_NAME", "")
+OSS_DOMAIN = os.environ.get("OSS_DOMAIN") or os.environ.get("ALIYUN_OSS_DOMAIN", "")
 
 
 def _is_configured() -> bool:
