@@ -129,6 +129,7 @@ export function usePptGeneration() {
         const decoder = new TextDecoder();
         let buffer = '';
         let currentEventType = 'message';
+        let pendingDataLines: string[] = [];
 
         while (true) {
           const { done, value } = await reader.read();
@@ -139,20 +140,36 @@ export function usePptGeneration() {
           buffer = lines.pop() || '';
 
           for (const line of lines) {
+            if (line.trim() === '') {
+              if (pendingDataLines.length > 0) {
+                const data = pendingDataLines.join('\n');
+                if (currentEventType === 'done') {
+                  if (onEvent) onEvent('done', data);
+                } else if (data !== '[DONE]') {
+                  if (onEvent) onEvent(currentEventType, data);
+                }
+                pendingDataLines = [];
+              }
+              currentEventType = 'message';
+              continue;
+            }
             if (line.startsWith('event:')) {
               currentEventType = line.slice(6).trim();
               continue;
             }
             if (line.startsWith('data:')) {
-              const data = line.slice(5).trim();
-              if (currentEventType === 'done') {
-                if (onEvent) onEvent('done', data);
-                currentEventType = 'message';
-                continue;
-              }
-              if (data === '[DONE]' || !data) continue;
-              if (onEvent) onEvent(currentEventType, data);
+              const dc = line.charAt(5) === ' ' ? line.slice(6) : line.slice(5);
+              pendingDataLines.push(dc);
+              continue;
             }
+          }
+        }
+        if (pendingDataLines.length > 0) {
+          const data = pendingDataLines.join('\n');
+          if (currentEventType === 'done') {
+            if (onEvent) onEvent('done', data);
+          } else if (data !== '[DONE]') {
+            if (onEvent) onEvent(currentEventType, data);
           }
         }
       } catch (err: unknown) {

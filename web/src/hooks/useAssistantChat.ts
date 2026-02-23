@@ -209,21 +209,22 @@ export function useAssistantChat(assistantId: string | undefined) {
     abortControllerRef.current = controller;
     let accumulated = '';
     let currentEvent = '';
-    // RAF 节流：避免每个 token 都触发 React 重渲染 + ReactMarkdown 全量解析
-    let rafId: number | null = null;
+    // 时间节流（~80ms）：避免每个 token 都触发 React 重渲染 + ReactMarkdown 全量解析
+    let throttleTimer: ReturnType<typeof setTimeout> | null = null;
+    const THROTTLE_MS = 80;
     const flushStreaming = () => {
-      if (rafId !== null) {
-        cancelAnimationFrame(rafId);
-        rafId = null;
+      if (throttleTimer !== null) {
+        clearTimeout(throttleTimer);
+        throttleTimer = null;
       }
       setStreamingContent(accumulated);
     };
     const scheduleStreamingUpdate = () => {
-      if (rafId === null) {
-        rafId = requestAnimationFrame(() => {
+      if (throttleTimer === null) {
+        throttleTimer = setTimeout(() => {
           setStreamingContent(accumulated);
-          rafId = null;
-        });
+          throttleTimer = null;
+        }, THROTTLE_MS);
       }
     };
 
@@ -247,6 +248,106 @@ export function useAssistantChat(assistantId: string | undefined) {
 
       const decoder = new TextDecoder();
       let buffer = '';
+      // SSE 事件缓冲：按 SSE 规范，同一事件内的多个 data: 行用 \n 拼接
+      let pendingDataLines: string[] = [];
+
+      // 处理一个完整的 SSE 事件
+      const dispatchEvent = (eventType: string, data: string) => {
+        if (data === '[DONE]') return;
+
+        // session 事件：接收后端自动创建的会话 ID
+        if (eventType === 'session') {
+          try {
+            const sessionData = JSON.parse(data);
+            if (sessionData.sessionId) {
+              const sid = String(sessionData.sessionId);
+              setCurrentSessionId(sid);
+              currentSessionIdRef.current = sid;
+              storeSessionId(String(assistantId), sid);
+            }
+          } catch { /* ignore */ }
+          return;
+        }
+
+        if (eventType === 'rag_searching') {
+          setRagStatus('searching');
+          return;
+        }
+
+        if (eventType === 'rag_completed') {
+          try {
+            const ragData = JSON.parse(data);
+            setRagStatus(ragData.found ? 'found' : 'not_found');
+          } catch {
+            setRagStatus('not_found');
+          }
+          return;
+        }
+
+        if (eventType === 'error') {
+          accumulated += `\n\n⚠️ ${data}`;
+          flushStreaming();
+          return;
+        }
+
+        if (eventType === 'done') return;
+
+        // 工作流事件处理
+        if (eventType === 'workflow_calling') {
+          accumulated = accumulated.replace(/\[CALL_WORKFLOW:\s*\{[\s\S]*?\}\s*\]/, '');
+          flushStreaming();
+          setWorkflowStatus('calling');
+          return;
+        }
+
+        if (eventType === 'workflow_completed') {
+          setWorkflowStatus('completed');
+          return;
+        }
+
+        if (eventType === 'workflow_error') {
+          try {
+            const wfData = JSON.parse(data);
+            accumulated += `\n\n> 工作流执行失败: ${wfData.error}`;
+            flushStreaming();
+          } catch { /* ignore */ }
+          setWorkflowStatus('error');
+          return;
+        }
+
+        if (eventType === 'image_generating' || eventType === 'video_generating') {
+          try {
+            const genData = JSON.parse(data);
+            accumulated += `\n\n🎨 *正在生成${eventType === 'video_generating' ? '视频' : '图片'}：${genData.prompt}...*`;
+            flushStreaming();
+          } catch { /* ignore */ }
+          return;
+        }
+
+        if (eventType === 'image_generated' || eventType === 'video_generated') {
+          try {
+            const genData = JSON.parse(data);
+            const mediaUrl = genData.url || genData.imageUrl;
+            if (mediaUrl) {
+              accumulated += eventType === 'video_generated'
+                ? `\n\n<video controls src="${mediaUrl}" style="max-width:100%;border-radius:12px"></video>`
+                : `\n\n![生成图片](${mediaUrl})`;
+              flushStreaming();
+            }
+          } catch { /* ignore */ }
+          return;
+        }
+
+        // 普通 message token：data 是 LLM token（可能含换行）
+        try {
+          const json = JSON.parse(data);
+          const chunk = json.content ?? json.text ?? data;
+          accumulated += String(chunk);
+        } catch {
+          accumulated += data;
+        }
+        scheduleStreamingUpdate();
+      };
 
       while (true) {
         const { done, value } = await reader.read();
@@ -257,124 +358,35 @@ export function useAssistantChat(assistantId: string | undefined) {
         buffer = lines.pop() || '';
 
         for (const line of lines) {
+          // 空行 = SSE 事件分隔符 → 派发已缓冲的事件
+          if (line.trim() === '') {
+            if (pendingDataLines.length > 0) {
+              const eventData = pendingDataLines.join('\n');
+              dispatchEvent(currentEvent, eventData);
+              pendingDataLines = [];
+            }
+            currentEvent = '';
+            continue;
+          }
+
           if (line.startsWith('event:')) {
             currentEvent = line.slice(6).trim();
             continue;
           }
+
           if (line.startsWith('data:')) {
-            const data = line.slice(5).trim();
-            if (data === '[DONE]' || !data) continue;
-
-            // session 事件：接收后端自动创建的会话 ID
-            if (currentEvent === 'session') {
-              try {
-                const sessionData = JSON.parse(data);
-                if (sessionData.sessionId) {
-                  const sid = String(sessionData.sessionId);
-                  setCurrentSessionId(sid);
-                  currentSessionIdRef.current = sid;
-                  storeSessionId(String(assistantId), sid);
-                }
-              } catch { /* ignore */ }
-              currentEvent = '';
-              continue;
-            }
-
-            if (currentEvent === 'rag_searching') {
-              setRagStatus('searching');
-              currentEvent = '';
-              continue;
-            }
-
-            if (currentEvent === 'rag_completed') {
-              try {
-                const ragData = JSON.parse(data);
-                setRagStatus(ragData.found ? 'found' : 'not_found');
-              } catch {
-                setRagStatus('not_found');
-              }
-              currentEvent = '';
-              continue;
-            }
-
-            if (currentEvent === 'error') {
-              accumulated += `\n\n⚠️ ${data}`;
-              flushStreaming();
-              currentEvent = '';
-              continue;
-            }
-
-            if (currentEvent === 'done') {
-              currentEvent = '';
-              continue;
-            }
-
-            // 工作流事件处理
-            if (currentEvent === 'workflow_calling') {
-              // 从已累积文本中剥离 [CALL_WORKFLOW:...] 标记
-              accumulated = accumulated.replace(/\[CALL_WORKFLOW:\s*\{[\s\S]*?\}\s*\]/, '');
-              flushStreaming();
-              setWorkflowStatus('calling');
-              currentEvent = '';
-              continue;
-            }
-
-            if (currentEvent === 'workflow_completed') {
-              // 后端会二次调用LLM，后续 message tokens 会自然流入
-              // 这里只更新状态，不拼接JSON结果
-              setWorkflowStatus('completed');
-              currentEvent = '';
-              continue;
-            }
-
-            if (currentEvent === 'workflow_error') {
-              try {
-                const wfData = JSON.parse(data);
-                accumulated += `\n\n> 工作流执行失败: ${wfData.error}`;
-                flushStreaming();
-              } catch { /* ignore */ }
-              setWorkflowStatus('error');
-              currentEvent = '';
-              continue;
-            }
-
-            if (currentEvent === 'image_generating' || currentEvent === 'video_generating') {
-              try {
-                const genData = JSON.parse(data);
-                accumulated += `\n\n🎨 *正在生成${currentEvent === 'video_generating' ? '视频' : '图片'}：${genData.prompt}...*`;
-                flushStreaming();
-              } catch { /* ignore */ }
-              currentEvent = '';
-              continue;
-            }
-
-            if (currentEvent === 'image_generated' || currentEvent === 'video_generated') {
-              try {
-                const genData = JSON.parse(data);
-                const mediaUrl = genData.url || genData.imageUrl;
-                if (mediaUrl) {
-                  accumulated += currentEvent === 'video_generated'
-                    ? `\n\n<video controls src="${mediaUrl}" style="max-width:100%;border-radius:12px"></video>`
-                    : `\n\n![生成图片](${mediaUrl})`;
-                  flushStreaming();
-                }
-              } catch { /* ignore */ }
-              currentEvent = '';
-              continue;
-            }
-
-            // 普通 message token
-            try {
-              const json = JSON.parse(data);
-              const chunk = json.content ?? json.text ?? data;
-              accumulated += String(chunk);
-            } catch {
-              accumulated += data;
-            }
-            scheduleStreamingUpdate();
-            currentEvent = '';
+            // SSE 规范：data: 后面如果有一个空格则去掉该空格
+            const dataContent = line.charAt(5) === ' ' ? line.slice(6) : line.slice(5);
+            pendingDataLines.push(dataContent);
+            continue;
           }
         }
+      }
+
+      // 流结束后处理剩余的未派发事件
+      if (pendingDataLines.length > 0) {
+        const eventData = pendingDataLines.join('\n');
+        dispatchEvent(currentEvent, eventData);
       }
     } catch (err: unknown) {
       flushStreaming();
