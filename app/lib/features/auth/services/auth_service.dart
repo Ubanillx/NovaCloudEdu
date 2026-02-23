@@ -5,6 +5,8 @@ import 'package:nova_api/nova_api.dart';
 import '../../../core/network/api_client.dart';
 import '../../chat/services/chat_websocket_service.dart';
 import '../../chat/services/chat_sync_service.dart';
+import '../../chat/services/rtc_signaling_service.dart';
+import '../../chat/services/call_service.dart';
 
 class AuthService {
   static final AuthService _instance = AuthService._internal();
@@ -29,6 +31,9 @@ class AuthService {
       ApiClient.instance.setOnTokenExpired(_handleTokenExpired);
       // 连接 WebSocket
       ChatWebSocketService.instance.connect(token);
+      // 连接 RTC 信令
+      RtcSignalingService.instance.connect(token);
+      CallService().init();
       // 初始化同步服务
       final userInfo = await getUserInfo();
       if (userInfo != null && userInfo['id'] != null) {
@@ -51,6 +56,8 @@ class AuthService {
     _cachedUserInfo = null;
     // 断开WebSocket
     ChatWebSocketService.instance.disconnect();
+    // 断开RTC信令
+    RtcSignalingService.instance.disconnect();
     // TODO: 可以在这里发送事件通知UI跳转到登录页
   }
 
@@ -123,6 +130,9 @@ class AuthService {
       ApiClient.instance.setOnTokenExpired(_handleTokenExpired);
       // 连接 WebSocket
       ChatWebSocketService.instance.connect(token);
+      // 连接 RTC 信令
+      RtcSignalingService.instance.connect(token);
+      CallService().init();
 
       // 初始化同步服务
       if (responseData.data!.id != null) {
@@ -177,6 +187,8 @@ class AuthService {
   Future<void> logout() async {
     // 断开 WebSocket 连接
     ChatWebSocketService.instance.disconnect();
+    // 断开 RTC 信令
+    RtcSignalingService.instance.disconnect();
     await _storage.delete(key: _tokenKey);
     await _storage.delete(key: _refreshTokenKey);
     await _storage.delete(key: _userInfoKey);
