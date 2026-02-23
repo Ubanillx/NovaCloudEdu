@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:nova_api/nova_api.dart';
 import '../../../config/app_theme.dart';
 import '../../../widgets/common/empty_widget.dart';
-import '../../../widgets/common/loading_widget.dart';
+import '../../../widgets/common/skeleton_widgets.dart';
 import '../../../widgets/common/nova_refresh_header.dart';
 import '../../../widgets/toast/nova_message.dart';
 import '../../../widgets/dialogs/app_dialog.dart';
 import '../services/friend_service.dart';
+import '../services/call_service.dart';
+import '../services/rtc_models.dart';
 
 /// 好友列表页面
 class FriendsListPage extends StatefulWidget {
@@ -122,7 +124,7 @@ class _FriendsListPageState extends State<FriendsListPage> {
 
   Widget _buildContent(AppColors colors) {
     if (_isLoading) {
-      return const LoadingWidget(message: '加载中...');
+      return const ListItemSkeleton();
     }
 
     if (_friends.isEmpty) {
@@ -211,11 +213,17 @@ class _FriendsListPageState extends State<FriendsListPage> {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // 发消息按钮
+              // 语音通话按钮
               GestureDetector(
                 onTap: () {
-                  // TODO: 跳转到聊天页面
-                  NovaMessage.show(context, '聊天功能开发中');
+                  if (friend.userId != null) {
+                    CallService().startCall(
+                      friend.userId.toString(),
+                      friend.userName ?? '未知用户',
+                      friend.userAvatar,
+                      MediaType.audio,
+                    );
+                  }
                 },
                 child: Container(
                   width: 36,
@@ -225,7 +233,34 @@ class _FriendsListPageState extends State<FriendsListPage> {
                     borderRadius: BorderRadius.circular(18),
                   ),
                   child: Icon(
-                    Icons.chat_bubble_outline,
+                    Icons.phone,
+                    color: AppTheme.brand,
+                    size: 18,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              // 视频通话按钮
+              GestureDetector(
+                onTap: () {
+                  if (friend.userId != null) {
+                    CallService().startCall(
+                      friend.userId.toString(),
+                      friend.userName ?? '未知用户',
+                      friend.userAvatar,
+                      MediaType.video,
+                    );
+                  }
+                },
+                child: Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: AppTheme.brand.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                  child: Icon(
+                    Icons.videocam,
                     color: AppTheme.brand,
                     size: 18,
                   ),

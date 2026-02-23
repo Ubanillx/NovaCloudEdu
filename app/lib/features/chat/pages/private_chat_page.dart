@@ -1,7 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../../config/app_theme.dart';
-import '../../../widgets/common/loading_widget.dart';
+import '../../../widgets/common/skeleton_widgets.dart';
 import '../../../widgets/toast/nova_message.dart';
 import '../services/chat_sync_service.dart';
 import '../services/chat_database_service.dart';
@@ -9,8 +10,11 @@ import '../services/chat_websocket_service.dart';
 import '../widgets/message_content_widget.dart';
 import '../widgets/chat_input_bar.dart';
 import '../services/friend_service.dart';
+import '../services/call_service.dart';
+import '../services/rtc_models.dart';
 import '../../circle/pages/user_profile_page.dart';
 import '../../../widgets/dialogs/app_dialog.dart';
+import '../widgets/message/chat_bubble.dart';
 
 /// 私聊会话页面
 class PrivateChatPage extends StatefulWidget {
@@ -61,8 +65,13 @@ class _PrivateChatPageState extends State<PrivateChatPage> {
   void _subscribeToMessages() {
     // 监听新消息
     _messageSubscription = _wsService.chatMessages.listen((message) {
-      // 只处理来自当前聊天对象的消息
-      if (message.senderId == widget.partnerId) {
+      // 处理来自当前聊天对象的消息
+      final isFromPartner = message.senderId == widget.partnerId;
+      // 也处理自己发出的 CALL 消息（通话记录由后端生成，senderId 是主叫方即自己）
+      final isSelfCallMsg = message.type?.toUpperCase() == 'CALL' &&
+          message.receiverId == widget.partnerId;
+
+      if (isFromPartner || isSelfCallMsg) {
         setState(() {
           // 防重：如果该 messageId 已存在则不插入
           final exists = message.messageId != null &&
@@ -82,8 +91,10 @@ class _PrivateChatPageState extends State<PrivateChatPage> {
             ));
           }
         });
-        // 标记已读
-        _syncService.markAsRead(widget.partnerId);
+        if (isFromPartner) {
+          // 标记已读
+          _syncService.markAsRead(widget.partnerId);
+        }
         // 滚动到底部
         _scrollToBottom();
       }
@@ -221,7 +232,7 @@ class _PrivateChatPageState extends State<PrivateChatPage> {
         backgroundColor: colors.surface,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: colors.textPrimary),
+          icon: Icon(PhosphorIcons.caretLeft(), color: colors.textPrimary),
           onPressed: () => Navigator.pop(context),
         ),
         title: Row(
@@ -234,7 +245,7 @@ class _PrivateChatPageState extends State<PrivateChatPage> {
                   ? NetworkImage(widget.partnerAvatar!)
                   : null,
               child: widget.partnerAvatar == null || widget.partnerAvatar!.isEmpty
-                  ? Icon(Icons.person, color: AppTheme.brand, size: 16)
+                  ? Icon(PhosphorIcons.user(), color: AppTheme.brand, size: 16)
                   : null,
             ),
             const SizedBox(width: 8),
@@ -253,7 +264,27 @@ class _PrivateChatPageState extends State<PrivateChatPage> {
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.more_vert, color: colors.textPrimary),
+            icon: Icon(PhosphorIcons.phone(), color: colors.textPrimary, size: 20),
+            onPressed: () => CallService().startCall(
+              widget.partnerId.toString(),
+              widget.partnerName,
+              widget.partnerAvatar,
+              MediaType.audio,
+            ),
+            tooltip: '语音通话',
+          ),
+          IconButton(
+            icon: Icon(PhosphorIcons.videoCamera(), color: colors.textPrimary, size: 22),
+            onPressed: () => CallService().startCall(
+              widget.partnerId.toString(),
+              widget.partnerName,
+              widget.partnerAvatar,
+              MediaType.video,
+            ),
+            tooltip: '视频通话',
+          ),
+          IconButton(
+            icon: Icon(PhosphorIcons.dotsThreeVertical(), color: colors.textPrimary),
             onPressed: () => _showMoreMenu(context, colors),
           ),
         ],
@@ -263,7 +294,7 @@ class _PrivateChatPageState extends State<PrivateChatPage> {
           // 消息列表
           Expanded(
             child: _isLoading
-                ? const LoadingWidget(message: '加载中...')
+                ? const ChatMessageSkeleton()
                 : _buildMessageList(colors),
           ),
           // 输入框
@@ -282,7 +313,7 @@ class _PrivateChatPageState extends State<PrivateChatPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              Icons.chat_bubble_outline,
+              PhosphorIcons.chatTeardropText(),
               size: 64,
               color: colors.textTertiary,
             ),
@@ -336,52 +367,25 @@ class _PrivateChatPageState extends State<PrivateChatPage> {
     bool showTime,
     AppColors colors,
   ) {
-    return Column(
-      children: [
-        if (showTime)
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12),
-            child: Text(
-              _formatTime(message.createTime),
-              style: TextStyle(
-                fontSize: 12,
-                color: colors.textTertiary,
-              ),
+    return ChatBubble(
+      isMe: isMe,
+      colors: colors,
+      isDarkMode: context.isDarkMode,
+      time: showTime ? _formatTime(message.createTime) : null,
+      statusIcon: isMe ? _buildMessageStatus(message, colors) : null,
+      senderAvatarUrl: isMe ? null : widget.partnerAvatar,
+      onAvatarTap: () {
+        if (!isMe) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => UserProfilePage(userId: widget.partnerId),
             ),
-          ),
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4),
-          child: Row(
-            mainAxisAlignment:
-                isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              if (!isMe) ...[
-                CircleAvatar(
-                  radius: 16,
-                  backgroundColor: AppTheme.brand.withOpacity(0.1),
-                  backgroundImage: widget.partnerAvatar != null &&
-                          widget.partnerAvatar!.isNotEmpty
-                      ? NetworkImage(widget.partnerAvatar!)
-                      : null,
-                  child: widget.partnerAvatar == null ||
-                          widget.partnerAvatar!.isEmpty
-                      ? Icon(Icons.person, color: AppTheme.brand, size: 16)
-                      : null,
-                ),
-                const SizedBox(width: 8),
-              ],
-              Flexible(
-                child: _buildMessageContent(message, isMe, colors),
-              ),
-              if (isMe) ...[
-                const SizedBox(width: 4),
-                _buildMessageStatus(message, colors),
-              ],
-            ],
-          ),
-        ),
-      ],
+          );
+        }
+      },
+      hasBubbleArea: message.type.toUpperCase() != 'IMAGE',
+      child: _buildMessageContent(message, isMe, colors),
     );
   }
 
@@ -390,47 +394,13 @@ class _PrivateChatPageState extends State<PrivateChatPage> {
     final type = message.type.toUpperCase();
     final content = message.content ?? '';
     
-    // 图片消息不显示消息框
-    if (type == 'IMAGE') {
-      return MessageContentWidget(
-        content: content,
-        type: message.type,
-        isMe: isMe,
-        colors: colors,
-      );
-    }
-    
-    // 其他消息显示消息框
-    return Container(
-      constraints: BoxConstraints(
-        maxWidth: MediaQuery.of(context).size.width * 0.7,
-      ),
-      padding: EdgeInsets.symmetric(
-        horizontal: type == 'AUDIO' ? 8 : 14,
-        vertical: type == 'AUDIO' ? 4 : 10,
-      ),
-      decoration: BoxDecoration(
-        color: isMe ? AppTheme.brand : colors.surface,
-        borderRadius: BorderRadius.only(
-          topLeft: const Radius.circular(16),
-          topRight: const Radius.circular(16),
-          bottomLeft: Radius.circular(isMe ? 16 : 4),
-          bottomRight: Radius.circular(isMe ? 4 : 16),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: MessageContentWidget(
-        content: content,
-        type: message.type,
-        isMe: isMe,
-        colors: colors,
-      ),
+    // 图片消息或普通消息一视同仁传递给 MessageContentWidget
+    // 对于 IMAGE, hasBubbleArea 被设置为 false 会去除外框
+    return MessageContentWidget(
+      content: content,
+      type: message.type,
+      isMe: isMe,
+      colors: colors,
     );
   }
 
@@ -440,8 +410,8 @@ class _PrivateChatPageState extends State<PrivateChatPage> {
     if (message.syncStatus == 2) {
       return GestureDetector(
         onTap: () => _retrySendMessage(message),
-        child: const Icon(
-          Icons.error_outline,
+        child: Icon(
+          PhosphorIcons.warningCircle(),
           size: 16,
           color: Colors.red,
         ),
@@ -462,7 +432,7 @@ class _PrivateChatPageState extends State<PrivateChatPage> {
     
     // 已读/已发送
     return Icon(
-      message.isRead ? Icons.done_all : Icons.done,
+      message.isRead ? PhosphorIcons.checks() : PhosphorIcons.check(),
       size: 14,
       color: message.isRead ? AppTheme.brand : colors.textTertiary,
     );
@@ -678,7 +648,7 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
         backgroundColor: colors.surface,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: colors.textPrimary),
+          icon: Icon(PhosphorIcons.caretLeft(), color: colors.textPrimary),
           onPressed: () => Navigator.pop(context),
         ),
         title: TextField(
@@ -695,7 +665,7 @@ class _ChatSearchPageState extends State<ChatSearchPage> {
         actions: [
           if (_searchController.text.isNotEmpty)
             IconButton(
-              icon: Icon(Icons.clear, color: colors.textSecondary),
+              icon: Icon(PhosphorIcons.x(), color: colors.textSecondary),
               onPressed: () {
                 _searchController.clear();
                 setState(() => _searchResults = []);

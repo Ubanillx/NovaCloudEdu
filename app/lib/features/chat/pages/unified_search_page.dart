@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:nova_api/nova_api.dart';
 import '../../../config/app_theme.dart';
+import '../../../widgets/tabs/nova_tab_bar.dart';
 import '../services/friend_service.dart';
 import '../services/group_service.dart';
 import 'private_chat_page.dart';
@@ -103,7 +105,9 @@ class _UnifiedSearchPageState extends State<UnifiedSearchPage>
       // 转换ChatGroup到GroupResponse
       final responses = <GroupResponse>[];
       for (final chatGroup in groups) {
-        final groupInfo = await _groupService.getGroupInfo(chatGroup.id?.value ?? 0);
+        final groupInfo = await _groupService.getGroupInfo(
+          chatGroup.id?.value ?? 0,
+        );
         if (groupInfo != null) {
           responses.add(groupInfo);
         }
@@ -129,29 +133,16 @@ class _UnifiedSearchPageState extends State<UnifiedSearchPage>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(
-              '取消',
-              style: TextStyle(color: colors.textSecondary),
-            ),
+            child: Text('取消', style: TextStyle(color: colors.textSecondary)),
           ),
         ],
       ),
       body: Column(
         children: [
-          // Tab栏
-          Material(
-            color: colors.surface,
-            elevation: 0, // 移除阴影
-            child: TabBar(
-              controller: _tabController,
-              labelColor: AppTheme.brand,
-              unselectedLabelColor: colors.textSecondary,
-              indicatorColor: AppTheme.brand,
-              indicatorSize: TabBarIndicatorSize.label,
-              dividerColor: Colors.transparent, // 去除分割线
-              dividerHeight: 0, // 确保分割线高度为0
-              tabs: _tabs.map((t) => Tab(text: t)).toList(),
-            ),
+          // Tab栏 - 使用自定义 NovaTabBar
+          NovaTabBar(
+            controller: _tabController,
+            tabs: _tabs,
           ),
           // 搜索结果
           Expanded(
@@ -171,42 +162,68 @@ class _UnifiedSearchPageState extends State<UnifiedSearchPage>
 
   Widget _buildSearchBar(AppColors colors) {
     return Container(
-      height: 36,
+      height: 40,
       margin: const EdgeInsets.only(left: 16),
       decoration: BoxDecoration(
         color: colors.surfaceVariant,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: colors.border.withOpacity(0.3), width: 0.5),
       ),
-      child: TextField(
-        controller: _searchController,
-        autofocus: true,
-        textAlignVertical: TextAlignVertical.center, // 垂直居中
-        style: TextStyle(color: colors.textPrimary, fontSize: 14), // 明确设置文字样式
-        decoration: InputDecoration(
-          hintText: '搜索用户或群聊',
-          hintStyle: TextStyle(color: colors.textTertiary, fontSize: 14),
-          prefixIcon: Icon(Icons.search, color: colors.textTertiary, size: 20),
-          border: InputBorder.none,
-          isDense: true, // 紧凑模式
-          contentPadding: const EdgeInsets.only(right: 16), // 移除垂直padding，只保留右侧
-          suffixIcon: _searchController.text.isNotEmpty
-              ? IconButton(
-                  icon: Icon(Icons.clear, color: colors.textTertiary, size: 18),
-                  padding: EdgeInsets.zero, // 移除IconButton的padding
-                  constraints: const BoxConstraints(), // 移除最小尺寸限制
-                  onPressed: () {
-                    _searchController.clear();
-                    _search('');
-                  },
-                )
-              : null,
-        ),
-        onChanged: (value) {
-          _search(value);
-        },
-        onSubmitted: (value) {
-          _search(value);
-        },
+      child: Row(
+        children: [
+          // 搜索图标
+          Padding(
+            padding: const EdgeInsets.only(left: 12),
+            child: SvgPicture.asset(
+              'lib/assests/fonts/icons/搜索.svg',
+              width: 18,
+              height: 18,
+              // 不使用ColorFilter，保持SVG原始线框样式
+            ),
+          ),
+          // 输入框
+          Expanded(
+            child: TextField(
+              controller: _searchController,
+              autofocus: true,
+              textAlignVertical: TextAlignVertical.center,
+              style: TextStyle(color: colors.textPrimary, fontSize: 14),
+              decoration: InputDecoration(
+                hintText: '搜索用户或群聊',
+                hintStyle: TextStyle(color: colors.textTertiary, fontSize: 14),
+                border: InputBorder.none,
+                isDense: true,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+              ),
+              onChanged: (value) {
+                setState(() {});
+                _search(value);
+              },
+              onSubmitted: (value) {
+                _search(value);
+              },
+            ),
+          ),
+          // 清除按钮
+          if (_searchController.text.isNotEmpty)
+            GestureDetector(
+              onTap: () {
+                _searchController.clear();
+                _search('');
+                setState(() {});
+              },
+              child: Container(
+                width: 24,
+                height: 24,
+                margin: const EdgeInsets.only(right: 8),
+                decoration: BoxDecoration(
+                  color: colors.textTertiary.withOpacity(0.2),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(Icons.close, color: colors.textTertiary, size: 14),
+              ),
+            ),
+        ],
       ),
     );
   }
@@ -240,7 +257,9 @@ class _UnifiedSearchPageState extends State<UnifiedSearchPage>
         // 群聊结果
         if (_groupResults.isNotEmpty) ...[
           _buildSectionHeader(colors, '群聊', _groupResults.length),
-          ..._groupResults.take(3).map((group) => _buildGroupItem(group, colors)),
+          ..._groupResults
+              .take(3)
+              .map((group) => _buildGroupItem(group, colors)),
           if (_groupResults.length > 3)
             _buildShowMoreButton(colors, '查看更多群聊', () {
               _tabController.animateTo(2);
@@ -299,7 +318,13 @@ class _UnifiedSearchPageState extends State<UnifiedSearchPage>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.search, size: 64, color: colors.iconSecondary),
+          // 使用搜索SVG图标替代原生图标，保持线框样式
+          SvgPicture.asset(
+            'lib/assests/fonts/icons/搜索.svg',
+            width: 48,
+            height: 48,
+            // 不使用ColorFilter，保持SVG原始线框样式
+          ),
           const SizedBox(height: 16),
           Text(
             hint,
@@ -324,18 +349,35 @@ class _UnifiedSearchPageState extends State<UnifiedSearchPage>
     );
   }
 
-  Widget _buildShowMoreButton(AppColors colors, String text, VoidCallback onTap) {
+  Widget _buildShowMoreButton(
+    AppColors colors,
+    String text,
+    VoidCallback onTap,
+  ) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12),
         alignment: Alignment.center,
-        child: Text(
-          text,
-          style: TextStyle(
-            fontSize: 14,
-            color: AppTheme.brand,
-          ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              text,
+              style: TextStyle(fontSize: 14, color: AppTheme.brand),
+            ),
+            const SizedBox(width: 4),
+            // 使用自定义箭头替代原生图标
+            Container(
+              width: 16,
+              height: 16,
+              decoration: BoxDecoration(
+                color: AppTheme.brand.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.arrow_forward_ios, color: AppTheme.brand, size: 10),
+            ),
+          ],
         ),
       ),
     );
@@ -350,18 +392,25 @@ class _UnifiedSearchPageState extends State<UnifiedSearchPage>
         decoration: BoxDecoration(
           color: colors.surface,
           borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: colors.border.withOpacity(0.3), width: 0.5),
+          boxShadow: [
+            BoxShadow(
+              color: colors.border.withOpacity(0.3),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: Row(
           children: [
-            CircleAvatar(
-              radius: 24,
-              backgroundColor: colors.surfaceVariant,
-              backgroundImage: user.userAvatar != null && user.userAvatar!.isNotEmpty
-                  ? NetworkImage(user.userAvatar!)
-                  : null,
-              child: user.userAvatar == null || user.userAvatar!.isEmpty
-                  ? Icon(Icons.person, color: colors.iconSecondary)
-                  : null,
+            // 用户头像
+            _buildAvatar(
+              imageUrl: user.userAvatar,
+              fallbackText: (user.userName?.isNotEmpty == true)
+                  ? user.userName!.substring(0, 1).toUpperCase()
+                  : '?',
+              backgroundColor: AppTheme.brand.withOpacity(0.1),
+              textColor: AppTheme.brand,
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -389,7 +438,7 @@ class _UnifiedSearchPageState extends State<UnifiedSearchPage>
                 ],
               ),
             ),
-            // 显示好友状态
+            // 显示好友状态或箭头
             if (user.isFriend == true)
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
@@ -403,10 +452,66 @@ class _UnifiedSearchPageState extends State<UnifiedSearchPage>
                 ),
               )
             else
-              Icon(Icons.chevron_right, color: colors.iconSecondary),
+              Container(
+                width: 28,
+                height: 28,
+                decoration: BoxDecoration(
+                  color: colors.surfaceVariant,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(Icons.arrow_forward_ios, color: colors.iconSecondary, size: 12),
+              ),
           ],
         ),
       ),
+    );
+  }
+
+  /// 构建头像组件
+  Widget _buildAvatar({
+    String? imageUrl,
+    required String fallbackText,
+    required Color backgroundColor,
+    required Color textColor,
+  }) {
+    final colors = context.colors;
+    return Container(
+      width: 48,
+      height: 48,
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        shape: BoxShape.circle,
+        border: Border.all(color: colors.border.withOpacity(0.2), width: 1),
+      ),
+      child: imageUrl != null && imageUrl.isNotEmpty
+          ? ClipOval(
+              child: Image.network(
+                imageUrl,
+                width: 48,
+                height: 48,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) => Center(
+                  child: Text(
+                    fallbackText,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: textColor,
+                    ),
+                  ),
+                ),
+              ),
+            )
+          : Center(
+              child: Text(
+                fallbackText,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: textColor,
+                ),
+              ),
+            ),
     );
   }
 
@@ -419,18 +524,25 @@ class _UnifiedSearchPageState extends State<UnifiedSearchPage>
         decoration: BoxDecoration(
           color: colors.surface,
           borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: colors.border.withOpacity(0.3), width: 0.5),
+          boxShadow: [
+            BoxShadow(
+              color: colors.border.withOpacity(0.3),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: Row(
           children: [
-            CircleAvatar(
-              radius: 24,
+            // 群聊头像
+            _buildAvatar(
+              imageUrl: group.avatar,
+              fallbackText: (group.groupName?.isNotEmpty == true)
+                  ? group.groupName!.substring(0, 1).toUpperCase()
+                  : '群',
               backgroundColor: AppTheme.brand.withOpacity(0.1),
-              backgroundImage: group.avatar != null && group.avatar!.isNotEmpty
-                  ? NetworkImage(group.avatar!)
-                  : null,
-              child: group.avatar == null || group.avatar!.isEmpty
-                  ? Icon(Icons.group, color: AppTheme.brand)
-                  : null,
+              textColor: AppTheme.brand,
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -447,15 +559,20 @@ class _UnifiedSearchPageState extends State<UnifiedSearchPage>
                   ),
                   Text(
                     '${group.memberCount ?? 0}人',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: colors.textSecondary,
-                    ),
+                    style: TextStyle(fontSize: 13, color: colors.textSecondary),
                   ),
                 ],
               ),
             ),
-            Icon(Icons.chevron_right, color: colors.iconSecondary),
+            Container(
+              width: 28,
+              height: 28,
+              decoration: BoxDecoration(
+                color: colors.surfaceVariant,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.arrow_forward_ios, color: colors.iconSecondary, size: 12),
+            ),
           ],
         ),
       ),

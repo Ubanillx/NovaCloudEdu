@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../config/app_theme.dart';
-import '../../../widgets/common/loading_widget.dart';
+import '../../../widgets/common/skeleton_widgets.dart';
 import '../../../widgets/common/nova_refresh_header.dart';
 import '../../../widgets/common/empty_widget.dart';
 import '../../../widgets/dialogs/app_dialog.dart';
@@ -49,6 +49,9 @@ class _AiSessionListPageState extends State<AiSessionListPage> {
         builder: (_) => AiChatPage(
           sessionId: session.sessionId,
           title: session.title ?? 'AI 助手',
+          assistantId: session.assistantId,
+          assistantName: session.assistantName,
+          assistantAvatar: session.assistantAvatar,
         ),
       ),
     );
@@ -118,7 +121,7 @@ class _AiSessionListPageState extends State<AiSessionListPage> {
         ],
       ),
       body: _isLoading
-          ? const LoadingWidget(message: '加载中...')
+          ? const ChatListSkeleton()
           : _sessions.isEmpty
               ? _buildEmpty(colors)
               : _buildSessionList(colors),
@@ -215,30 +218,64 @@ class _AiSessionListPageState extends State<AiSessionListPage> {
           ),
           child: Row(
             children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      AppTheme.brand.withOpacity(0.15),
-                      AppTheme.brand2.withOpacity(0.1),
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
+              // 显示智慧体头像或默认图标
+              if (session.assistantAvatar != null && session.assistantAvatar!.isNotEmpty)
+                ClipRRect(
                   borderRadius: BorderRadius.circular(12),
+                  child: Image.network(
+                    session.assistantAvatar!,
+                    width: 44,
+                    height: 44,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            AppTheme.brand.withOpacity(0.15),
+                            AppTheme.brand2.withOpacity(0.1),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(Icons.smart_toy_rounded,
+                          color: AppTheme.brand, size: 22),
+                    ),
+                  ),
+                )
+              else
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        AppTheme.brand.withOpacity(0.15),
+                        AppTheme.brand2.withOpacity(0.1),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    session.assistantId != null
+                        ? Icons.smart_toy_rounded
+                        : Icons.chat_bubble_outline_rounded,
+                    color: AppTheme.brand,
+                    size: 22,
+                  ),
                 ),
-                child: Icon(Icons.chat_bubble_outline_rounded,
-                    color: AppTheme.brand, size: 22),
-              ),
               const SizedBox(width: 14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      session.title ?? '未命名会话',
+                      session.assistantName ?? session.title ?? '未命名会话',
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,

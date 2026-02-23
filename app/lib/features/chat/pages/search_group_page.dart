@@ -104,7 +104,6 @@ class _SearchGroupPageState extends State<SearchGroupPage> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
@@ -144,7 +143,10 @@ class _SearchGroupPageState extends State<SearchGroupPage> {
                     prefixIcon: Icon(Icons.search, color: colors.iconSecondary),
                     suffixIcon: _searchController.text.isNotEmpty
                         ? IconButton(
-                            icon: Icon(Icons.clear, color: colors.iconSecondary),
+                            icon: Icon(
+                              Icons.clear,
+                              color: colors.iconSecondary,
+                            ),
                             onPressed: () {
                               _searchController.clear();
                               setState(() => _searchResults = []);
@@ -190,8 +192,9 @@ class _SearchGroupPageState extends State<SearchGroupPage> {
                             height: 20,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              valueColor:
-                                  AlwaysStoppedAnimation<Color>(Colors.white),
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Colors.white,
+                              ),
                             ),
                           )
                         : const Text('搜索'),
@@ -201,9 +204,7 @@ class _SearchGroupPageState extends State<SearchGroupPage> {
             ),
           ),
           // 搜索结果
-          Expanded(
-            child: _buildSearchResults(colors),
-          ),
+          Expanded(child: _buildSearchResults(colors)),
         ],
       ),
     );
@@ -283,10 +284,9 @@ class _SearchGroupPageState extends State<SearchGroupPage> {
           CircleAvatar(
             radius: 28,
             backgroundColor: AppTheme.brand.withOpacity(0.1),
-            backgroundImage:
-                group.avatar != null && group.avatar!.isNotEmpty
-                    ? NetworkImage(group.avatar!)
-                    : null,
+            backgroundImage: group.avatar != null && group.avatar!.isNotEmpty
+                ? NetworkImage(group.avatar!)
+                : null,
             child: group.avatar == null || group.avatar!.isEmpty
                 ? Icon(Icons.group, color: AppTheme.brand, size: 28)
                 : null,

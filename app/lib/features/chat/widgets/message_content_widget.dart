@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:open_filex/open_filex.dart';
@@ -12,6 +13,7 @@ enum MessageType {
   file,
   audio,
   video,
+  call,
 }
 
 /// 消息内容组件 - 根据消息类型显示不同内容
@@ -39,6 +41,8 @@ class MessageContentWidget extends StatelessWidget {
         return MessageType.audio;
       case 'VIDEO':
         return MessageType.video;
+      case 'CALL':
+        return MessageType.call;
       default:
         return MessageType.text;
     }
@@ -57,6 +61,8 @@ class MessageContentWidget extends StatelessWidget {
         return _buildVideoMessage(context);
       case MessageType.text:
         return _buildTextMessage();
+      case MessageType.call:
+        return _buildCallMessage();
     }
   }
 
@@ -187,7 +193,7 @@ class MessageContentWidget extends StatelessWidget {
       case 'wav':
       case 'aac':
       case 'm4a':
-        return _FileInfo(Icons.audio_file, const Color(0xFF1989FA));
+        return _FileInfo(Icons.audio_file, colors.info);
       case 'mp4':
       case 'avi':
       case 'mov':
@@ -216,6 +222,126 @@ class MessageContentWidget extends StatelessWidget {
       isMe: isMe,
       colors: colors,
     );
+  }
+
+  Widget _buildCallMessage() {
+    String mediaType = 'audio';
+    String status = 'completed';
+    int duration = 0;
+
+    try {
+      final data = Map<String, dynamic>.from(
+        (content.isNotEmpty) ? _parseJson(content) : {},
+      );
+      mediaType = data['mediaType'] as String? ?? 'audio';
+      status = data['status'] as String? ?? 'completed';
+      duration = (data['duration'] as num?)?.toInt() ?? 0;
+    } catch (_) {}
+
+    final isVideo = mediaType == 'video';
+    final statusLabel = _callStatusLabel(status);
+    final durationStr = status == 'completed' && duration > 0
+        ? _formatCallDuration(duration)
+        : '';
+    final statusColor = _callStatusColor(status);
+    final statusIcon = _callStatusIcon(status, isVideo);
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: isMe
+                  ? Colors.white.withOpacity(0.2)
+                  : statusColor.withOpacity(0.12),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              statusIcon,
+              size: 18,
+              color: isMe ? Colors.white : statusColor,
+            ),
+          ),
+          const SizedBox(width: 10),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                isVideo ? '\u89c6\u9891\u901a\u8bdd' : '\u8bed\u97f3\u901a\u8bdd',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: isMe ? Colors.white : colors.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                '$statusLabel${durationStr.isNotEmpty ? ' \u00b7 $durationStr' : ''}',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: isMe ? Colors.white70 : colors.textTertiary,
+                ),
+              ),
+            ],
+          ),
+        ],
+    );
+  }
+
+  static Map<String, dynamic> _parseJson(String s) {
+    try {
+      if (s.startsWith('{')) {
+        return Map<String, dynamic>.from(jsonDecode(s) as Map);
+      }
+      return {};
+    } catch (_) {
+      return {};
+    }
+  }
+
+  static String _callStatusLabel(String status) {
+    switch (status) {
+      case 'completed': return '\u901a\u8bdd\u7ed3\u675f';
+      case 'rejected':  return '\u5df2\u62d2\u63a5';
+      case 'missed':    return '\u672a\u63a5\u542c';
+      case 'busy':      return '\u5bf9\u65b9\u5fd9';
+      case 'cancelled': return '\u5df2\u53d6\u6d88';
+      default:          return '\u901a\u8bdd\u7ed3\u675f';
+    }
+  }
+
+  static Color _callStatusColor(String status) {
+    switch (status) {
+      case 'completed': return const Color(0xFF4CAF50);
+      case 'rejected':  return const Color(0xFFEF5350);
+      case 'missed':    return const Color(0xFFFB8C00);
+      case 'busy':      return const Color(0xFF9E9E9E);
+      case 'cancelled': return const Color(0xFF9E9E9E);
+      default:          return const Color(0xFF4CAF50);
+    }
+  }
+
+  static IconData _callStatusIcon(String status, bool isVideo) {
+    if (isVideo) return Icons.videocam;
+    switch (status) {
+      case 'completed': return Icons.phone;
+      case 'rejected':  return Icons.phone_disabled;
+      case 'missed':    return Icons.phone_missed;
+      case 'busy':      return Icons.phone_disabled;
+      case 'cancelled': return Icons.phone_disabled;
+      default:          return Icons.phone;
+    }
+  }
+
+  static String _formatCallDuration(int seconds) {
+    if (seconds <= 0) return '';
+    final m = seconds ~/ 60;
+    final s = seconds % 60;
+    if (m > 0) return '$m\u5206${s.toString().padLeft(2, '0')}\u79d2';
+    return '$s\u79d2';
   }
 
   Widget _buildVideoMessage(BuildContext context) {

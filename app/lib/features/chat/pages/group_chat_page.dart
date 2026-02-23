@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:nova_api/nova_api.dart';
 import '../../../config/app_theme.dart';
-import '../../../widgets/common/loading_widget.dart';
+import '../../../widgets/common/skeleton_widgets.dart';
 import '../../../widgets/toast/nova_message.dart';
 import '../../../widgets/dialogs/app_dialog.dart';
 import '../../auth/services/auth_service.dart';
@@ -14,6 +14,7 @@ import '../services/chat_websocket_service.dart';
 import '../services/user_info_service.dart';
 import '../widgets/message_content_widget.dart';
 import '../widgets/chat_input_bar.dart';
+import '../widgets/message/chat_bubble.dart';
 import 'invite_members_page.dart';
 
 /// 群聊会话页面
@@ -393,7 +394,7 @@ class _GroupChatPageState extends State<GroupChatPage> {
         children: [
           Expanded(
             child: _isLoading
-                ? const LoadingWidget(message: '加载中...')
+                ? const ChatMessageSkeleton()
                 : _buildMessageList(colors),
           ),
           ChatInputBar(
@@ -477,99 +478,43 @@ class _GroupChatPageState extends State<GroupChatPage> {
     // 判断是否是自己发送的消息
     final isMe = _currentUserId != null && message.senderId == _currentUserId;
 
-    return Column(
-      children: [
-        if (showTime)
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            child: Text(
-              _formatTime(message.createTime),
-              style: TextStyle(
-                color: colors.textTertiary,
-                fontSize: 12,
-              ),
-            ),
-          ),
-        Padding(
-          padding: const EdgeInsets.only(bottom: 12),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment:
-                isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
-            children: [
-              if (!isMe) ...[
-                GestureDetector(
-                  onTap: () {
-                    // TODO: 查看用户资料
-                  },
-                  child: CircleAvatar(
-                    radius: 18,
-                    backgroundColor: colors.surfaceVariant,
-                    backgroundImage: message.senderAvatar != null &&
-                            message.senderAvatar!.isNotEmpty
-                        ? NetworkImage(message.senderAvatar!)
-                        : null,
-                    child: message.senderAvatar == null ||
-                            message.senderAvatar!.isEmpty
-                        ? Icon(Icons.person,
-                            color: colors.iconSecondary, size: 18)
-                        : null,
+    return ChatBubble(
+      isMe: isMe,
+      colors: colors,
+      isDarkMode: context.isDarkMode,
+      time: showTime ? _formatTime(message.createTime) : null,
+      senderName: isMe ? null : (message.senderName ?? '未知用户'),
+      senderAvatarUrl: isMe ? null : message.senderAvatar,
+      statusIcon: isMe
+          ? GestureDetector(
+              onTap: message.messageId != null
+                  ? () => _showReadUsers(context, message.messageId!)
+                  : null,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    message.messageId != null ? Icons.done_all : Icons.access_time,
+                    size: 14,
+                    color: AppTheme.brand.withOpacity(0.6),
                   ),
-                ),
-                const SizedBox(width: 8),
-              ],
-              Flexible(
-                child: Column(
-                  crossAxisAlignment:
-                      isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-                  children: [
-                    if (!isMe)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 4, left: 4),
-                        child: Text(
-                          message.senderName ?? '未知用户',
-                          style: TextStyle(
-                            color: colors.textTertiary,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ),
-                    _buildMessageContent(message, isMe, colors),
-                    if (isMe)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 4, right: 4),
-                        child: GestureDetector(
-                          onTap: message.messageId != null
-                              ? () => _showReadUsers(context, message.messageId!)
-                              : null,
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                message.messageId != null ? Icons.done_all : Icons.access_time,
-                                size: 14,
-                                color: AppTheme.brand.withOpacity(0.6),
-                              ),
-                              const SizedBox(width: 2),
-                              Text(
-                                message.messageId != null ? '查看已读' : '发送中',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  color: AppTheme.brand.withOpacity(0.6),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
+                  const SizedBox(width: 2),
+                  Text(
+                    message.messageId != null ? '已发' : '发送中',
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: AppTheme.brand.withOpacity(0.6),
+                    ),
+                  ),
+                ],
               ),
-              if (isMe) const SizedBox(width: 8),
-            ],
-          ),
-        ),
-      ],
+            )
+          : null,
+      onAvatarTap: () {
+        // TODO: 查看用户资料
+      },
+      hasBubbleArea: message.type.toUpperCase() != 'IMAGE',
+      child: _buildMessageContent(message, isMe, colors),
     );
   }
 
@@ -578,45 +523,12 @@ class _GroupChatPageState extends State<GroupChatPage> {
     final type = message.type.toUpperCase();
     final content = message.content ?? '';
 
-    if (type == 'IMAGE') {
-      return MessageContentWidget(
-        content: content,
-        type: message.type,
-        isMe: isMe,
-        colors: colors,
-      );
-    }
-
-    return Container(
-      constraints: BoxConstraints(
-        maxWidth: MediaQuery.of(context).size.width * 0.7,
-      ),
-      padding: EdgeInsets.symmetric(
-        horizontal: type == 'AUDIO' ? 8 : 14,
-        vertical: type == 'AUDIO' ? 4 : 10,
-      ),
-      decoration: BoxDecoration(
-        color: isMe ? AppTheme.brand : colors.surface,
-        borderRadius: BorderRadius.only(
-          topLeft: const Radius.circular(16),
-          topRight: const Radius.circular(16),
-          bottomLeft: Radius.circular(isMe ? 16 : 4),
-          bottomRight: Radius.circular(isMe ? 4 : 16),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: MessageContentWidget(
-        content: content,
-        type: message.type,
-        isMe: isMe,
-        colors: colors,
-      ),
+    // 直接返回对应的内容，由 ChatBubble 负责外框绘制
+    return MessageContentWidget(
+      content: content,
+      type: message.type,
+      isMe: isMe,
+      colors: colors,
     );
   }
 

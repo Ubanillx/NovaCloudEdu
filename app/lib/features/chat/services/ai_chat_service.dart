@@ -46,22 +46,29 @@ class AiChatMessage {
 /// AI聊天会话
 class AiChatSession {
   final int sessionId;
+  final int? assistantId;
   final String? title;
   final int messageCount;
   final DateTime? createTime;
   final DateTime? updateTime;
+  final String? assistantName;
+  final String? assistantAvatar;
 
   AiChatSession({
     required this.sessionId,
+    this.assistantId,
     this.title,
     this.messageCount = 0,
     this.createTime,
     this.updateTime,
+    this.assistantName,
+    this.assistantAvatar,
   });
 
   factory AiChatSession.fromJson(Map<String, dynamic> json) {
     return AiChatSession(
       sessionId: json['sessionId'] as int,
+      assistantId: json['assistantId'] as int?,
       title: json['title'] as String?,
       messageCount: (json['messageCount'] as num?)?.toInt() ?? 0,
       createTime: json['createTime'] != null
@@ -70,6 +77,8 @@ class AiChatSession {
       updateTime: json['updateTime'] != null
           ? DateTime.tryParse(json['updateTime'].toString())
           : null,
+      assistantName: json['assistantName'] as String?,
+      assistantAvatar: json['assistantAvatar'] as String?,
     );
   }
 }
@@ -400,6 +409,212 @@ class AiChatApiService {
       debugPrint('获取模型列表失败: $e');
     }
     return [];
+  }
+
+  /// 智慧体流式对话
+  Future<void> assistantStreamChat({
+    required int assistantId,
+    required String message,
+    int? sessionId,
+    List<String>? imageUrls,
+    List<String>? documentUrls,
+    required Function(String) onData,
+    required VoidCallback onDone,
+    required Function(dynamic) onError,
+    Function(int sessionId)? onSessionCreated,
+    Function(ImageGeneration)? onImageGenerating,
+    Function(ImageGeneration)? onImageGenerated,
+    Function(ImageGeneration)? onImageError,
+    Function(VideoGeneration)? onVideoGenerating,
+    Function(VideoGeneration)? onVideoGenerated,
+    Function(VideoGeneration)? onVideoError,
+  }) async {
+    if (_isStreaming) {
+      onError('正在等待上一条消息的回复');
+      return;
+    }
+
+    _isStreaming = true;
+
+    try {
+      final token = _dio.options.headers['Authorization'];
+
+      final body = <String, dynamic>{
+        'message': message,
+        if (sessionId != null) 'sessionId': sessionId,
+        if (imageUrls != null && imageUrls.isNotEmpty) 'imageUrls': imageUrls,
+        if (documentUrls != null && documentUrls.isNotEmpty) 'documentUrls': documentUrls,
+      };
+
+      final url = '${EnvConfig.apiBaseUrl}/api/ai/assistants/$assistantId/chat/stream';
+      debugPrint('智慧体SSE POST URL: $url');
+
+      _sseSubscription = SSEClient.subscribeToSSE(
+        method: SSERequestType.POST,
+        url: url,
+        header: {
+          'Authorization': token ?? '',
+          'Accept': 'text/event-stream',
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache',
+        },
+        body: body,
+      ).listen(
+        (event) {
+          if (event.event == 'done' || event.data == '[DONE]') {
+            _isStreaming = false;
+            onDone();
+            return;
+          }
+
+          if (event.event == 'error') {
+            _isStreaming = false;
+            onError(event.data ?? '对话失败');
+            return;
+          }
+
+          // 后端自动创建会话后返回sessionId
+          if (event.event == 'session' && event.data != null) {
+            try {
+              final payload = jsonDecode(event.data!) as Map<String, dynamic>;
+              final newSessionId = payload['sessionId'];
+              if (newSessionId != null && onSessionCreated != null) {
+                onSessionCreated(newSessionId is int ? newSessionId : int.parse(newSessionId.toString()));
+              }
+            } catch (e) {
+              debugPrint('解析 session 事件失败: $e');
+            }
+            return;
+          }
+
+          // RAG检索事件（忽略）
+          if (event.event == 'rag_searching' || event.event == 'rag_completed') {
+            return;
+          }
+
+          // 文生图事件
+          if (event.event == 'image_generating' && event.data != null) {
+            try {
+              final payload = jsonDecode(event.data!) as Map<String, dynamic>;
+              onImageGenerating?.call(ImageGeneration(
+                index: payload['index'] as int,
+                prompt: payload['prompt'] as String,
+              ));
+            } catch (e) {
+              debugPrint('解析 image_generating 事件失败: $e');
+            }
+            return;
+          }
+
+          if (event.event == 'image_generated' && event.data != null) {
+            try {
+              final payload = jsonDecode(event.data!) as Map<String, dynamic>;
+              onImageGenerated?.call(ImageGeneration(
+                index: payload['index'] as int,
+                prompt: payload['prompt'] as String,
+                status: 'done',
+                url: payload['url'] as String?,
+              ));
+            } catch (e) {
+              debugPrint('解析 image_generated 事件失败: $e');
+            }
+            return;
+          }
+
+          if (event.event == 'image_error' && event.data != null) {
+            try {
+              final payload = jsonDecode(event.data!) as Map<String, dynamic>;
+              onImageError?.call(ImageGeneration(
+                index: payload['index'] as int,
+                prompt: payload['prompt'] as String,
+                status: 'error',
+                error: payload['error'] as String?,
+              ));
+            } catch (e) {
+              debugPrint('解析 image_error 事件失败: $e');
+            }
+            return;
+          }
+
+          // 文生视频事件
+          if (event.event == 'video_generating' && event.data != null) {
+            try {
+              final payload = jsonDecode(event.data!) as Map<String, dynamic>;
+              onVideoGenerating?.call(VideoGeneration(
+                index: payload['index'] as int,
+                prompt: payload['prompt'] as String,
+              ));
+            } catch (e) {
+              debugPrint('解析 video_generating 事件失败: $e');
+            }
+            return;
+          }
+
+          if (event.event == 'video_generated' && event.data != null) {
+            try {
+              final payload = jsonDecode(event.data!) as Map<String, dynamic>;
+              onVideoGenerated?.call(VideoGeneration(
+                index: payload['index'] as int,
+                prompt: payload['prompt'] as String,
+                status: 'done',
+                url: payload['url'] as String?,
+              ));
+            } catch (e) {
+              debugPrint('解析 video_generated 事件失败: $e');
+            }
+            return;
+          }
+
+          if (event.event == 'video_error' && event.data != null) {
+            try {
+              final payload = jsonDecode(event.data!) as Map<String, dynamic>;
+              onVideoError?.call(VideoGeneration(
+                index: payload['index'] as int,
+                prompt: payload['prompt'] as String,
+                status: 'error',
+                error: payload['error'] as String?,
+              ));
+            } catch (e) {
+              debugPrint('解析 video_error 事件失败: $e');
+            }
+            return;
+          }
+
+          if (event.data != null && event.data!.isNotEmpty) {
+            final data = event.data!;
+            try {
+              final jsonData = jsonDecode(data);
+              if (jsonData is Map) {
+                final content = jsonData['content'] ?? jsonData['text'] ?? data;
+                onData(content.toString());
+              } else {
+                final cleaned = jsonData.toString().replaceAll(RegExp(r'\n$'), '');
+                if (cleaned.isNotEmpty) onData(cleaned);
+              }
+            } catch (e) {
+              final cleaned = data.replaceAll(RegExp(r'\n$'), '');
+              if (cleaned.isNotEmpty) onData(cleaned);
+            }
+          }
+        },
+        onError: (error) {
+          debugPrint('智慧体SSE Error: $error');
+          _isStreaming = false;
+          onError(error);
+        },
+        onDone: () {
+          debugPrint('智慧体SSE Connection Done');
+          if (_isStreaming) {
+            _isStreaming = false;
+            onDone();
+          }
+        },
+      );
+    } catch (e) {
+      debugPrint('智慧体SSE Connection Error: $e');
+      _isStreaming = false;
+      onError(e);
+    }
   }
 
   /// 取消当前的SSE连接

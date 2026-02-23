@@ -3,10 +3,13 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import '../../../config/app_theme.dart';
 import '../../../services/file_upload_service.dart';
 import '../../../widgets/toast/nova_message.dart';
 import '../services/audio_service.dart';
+import 'input/animated_input_bar.dart';
 
 /// 聊天输入栏
 class ChatInputBar extends StatefulWidget {
@@ -31,6 +34,7 @@ class _ChatInputBarState extends State<ChatInputBar> {
   bool _isSending = false;
   bool _isRecording = false;
   bool _showMorePanel = false;
+  bool _showEmojiPicker = false;
   int _recordingDuration = 0;
   
   StreamSubscription<int>? _durationSubscription;
@@ -213,13 +217,37 @@ class _ChatInputBarState extends State<ChatInputBar> {
   }
 
   void _toggleMorePanel() {
-    setState(() => _showMorePanel = !_showMorePanel);
+    setState(() {
+      _showMorePanel = !_showMorePanel;
+      _showEmojiPicker = false;
+    });
   }
 
   void _hideMorePanel() {
     if (_showMorePanel) {
-      setState(() => _showMorePanel = false);
+      setState(() {
+        _showMorePanel = false;
+      });
     }
+  }
+
+  void _toggleEmojiPicker() {
+    setState(() {
+      _showEmojiPicker = !_showEmojiPicker;
+      _showMorePanel = false;
+    });
+  }
+
+  void _onEmojiSelected(Emoji emoji) {
+    final currentText = _messageController.text;
+    final selection = _messageController.selection;
+    final newText = currentText.substring(0, selection.baseOffset) +
+        emoji.emoji +
+        currentText.substring(selection.extentOffset);
+    _messageController.text = newText;
+    _messageController.selection = TextSelection.collapsed(
+      offset: selection.baseOffset + emoji.emoji.length,
+    );
   }
 
   @override
@@ -231,95 +259,46 @@ class _ChatInputBarState extends State<ChatInputBar> {
       mainAxisSize: MainAxisSize.min,
       children: [
         // 主输入栏
-        Container(
-          padding: EdgeInsets.only(
-            left: 8,
-            right: 8,
-            top: 8,
-            bottom: _showMorePanel ? 8 : bottomPadding + 8,
-          ),
-          decoration: BoxDecoration(
-            color: colors.surface,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 8,
-                offset: const Offset(0, -2),
-              ),
-            ],
-          ),
-          child: _isRecording ? _buildRecordingBar(colors) : _buildInputBar(colors),
-        ),
+        _isRecording
+            ? Container(
+                padding: EdgeInsets.only(
+                  left: 8,
+                  right: 8,
+                  top: 8,
+                  bottom: _showMorePanel ? 8 : bottomPadding + 8,
+                ),
+                decoration: BoxDecoration(
+                  color: colors.surface,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 8,
+                      offset: const Offset(0, -2),
+                    ),
+                  ],
+                ),
+                child: _buildRecordingBar(colors),
+              )
+            : _buildInputBar(colors),
         // 更多功能面板
         if (_showMorePanel) _buildMorePanel(colors, bottomPadding),
+        // 表情选择器
+        if (_showEmojiPicker) _buildEmojiPicker(colors, bottomPadding),
       ],
     );
   }
 
   Widget _buildInputBar(AppColors colors) {
-    return Row(
-      children: [
-        // 语音按钮
-        IconButton(
-          icon: Icon(Icons.mic_none, color: colors.textSecondary),
-          onPressed: _startRecording,
-        ),
-        // 输入框
-        Expanded(
-          child: Container(
-            constraints: const BoxConstraints(maxHeight: 100),
-            decoration: BoxDecoration(
-              color: colors.background,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: TextField(
-              controller: _messageController,
-              maxLines: null,
-              textInputAction: TextInputAction.send,
-              onSubmitted: (_) => _sendTextMessage(),
-              onChanged: (_) => widget.onTyping?.call(),
-              decoration: InputDecoration(
-                hintText: '输入消息...',
-                hintStyle: TextStyle(color: colors.textTertiary),
-                border: InputBorder.none,
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 10,
-                ),
-              ),
-            ),
-          ),
-        ),
-        // 更多功能按钮
-        IconButton(
-          icon: Icon(
-            _showMorePanel ? Icons.keyboard : Icons.add_circle_outline,
-            color: colors.textSecondary,
-          ),
-          onPressed: _toggleMorePanel,
-        ),
-        // 发送按钮
-        GestureDetector(
-          onTap: _sendTextMessage,
-          child: Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: AppTheme.brand,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: _isSending
-                ? const Padding(
-                    padding: EdgeInsets.all(10),
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                    ),
-                  )
-                : const Icon(Icons.send, color: Colors.white, size: 20),
-          ),
-        ),
-      ],
+    return AnimatedInputBar(
+      controller: _messageController,
+      onSend: _sendTextMessage,
+      onAttachmentTap: _toggleMorePanel,
+      onEmojiTap: _toggleEmojiPicker,
+      onVoiceTap: _startRecording,
+      onChanged: (_) => widget.onTyping?.call(),
+      isSending: _isSending,
+      showMorePanel: _showMorePanel,
+      showEmojiPicker: _showEmojiPicker,
     );
   }
 
@@ -330,7 +309,7 @@ class _ChatInputBarState extends State<ChatInputBar> {
         children: [
           // 取消按钮
           IconButton(
-            icon: const Icon(Icons.close, color: Colors.red),
+            icon: Icon(PhosphorIcons.x(), color: Colors.red),
             onPressed: _cancelRecording,
           ),
           // 录音动画和时长
@@ -376,7 +355,7 @@ class _ChatInputBarState extends State<ChatInputBar> {
                 color: AppTheme.brand,
                 borderRadius: BorderRadius.circular(24),
               ),
-              child: const Icon(Icons.send, color: Colors.white),
+              child: Icon(PhosphorIcons.paperPlaneRight(), color: Colors.white, size: 22),
             ),
           ),
         ],
@@ -405,19 +384,19 @@ class _ChatInputBarState extends State<ChatInputBar> {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           _buildMoreItem(
-            icon: Icons.photo_library,
+            icon: PhosphorIcons.images(),
             label: '相册',
             onTap: () => _pickImage(ImageSource.gallery),
             colors: colors,
           ),
           _buildMoreItem(
-            icon: Icons.camera_alt,
+            icon: PhosphorIcons.camera(),
             label: '拍照',
             onTap: () => _pickImage(ImageSource.camera),
             colors: colors,
           ),
           _buildMoreItem(
-            icon: Icons.insert_drive_file,
+            icon: PhosphorIcons.file(),
             label: '文件',
             onTap: _pickFile,
             colors: colors,
@@ -427,8 +406,41 @@ class _ChatInputBarState extends State<ChatInputBar> {
     );
   }
 
+  Widget _buildEmojiPicker(AppColors colors, double bottomPadding) {
+    return SizedBox(
+      height: 250,
+      child: EmojiPicker(
+        onEmojiSelected: (Category? category, Emoji emoji) {
+          _onEmojiSelected(emoji);
+        },
+        config: Config(
+          height: 250,
+          checkPlatformCompatibility: true,
+          emojiViewConfig: EmojiViewConfig(
+            emojiSizeMax: 28,
+            backgroundColor: colors.surface,
+            columns: 7,
+          ),
+          skinToneConfig: const SkinToneConfig(),
+          categoryViewConfig: CategoryViewConfig(
+            backgroundColor: colors.surface,
+            iconColor: colors.textTertiary,
+            iconColorSelected: AppTheme.brand,
+            indicatorColor: AppTheme.brand,
+          ),
+          bottomActionBarConfig: const BottomActionBarConfig(
+            enabled: false,
+          ),
+          searchViewConfig: SearchViewConfig(
+            backgroundColor: colors.surface,
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildMoreItem({
-    required IconData icon,
+    required IconData? icon,
     required String label,
     required VoidCallback onTap,
     required AppColors colors,
