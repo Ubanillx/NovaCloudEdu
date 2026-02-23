@@ -1,0 +1,191 @@
+package com.novacloudedu.backend.application.service;
+
+import com.novacloudedu.backend.domain.course.entity.CourseSection;
+import com.novacloudedu.backend.domain.course.repository.CourseSectionRepository;
+import com.novacloudedu.backend.domain.course.valueobject.SectionId;
+import com.novacloudedu.backend.domain.file.service.OssService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.util.stream.Collectors;
+
+/**
+ * HLS m3u8 代理服务
+ * 动态修改 m3u8 内容，将 key URI 替换为带 token 的验证地址
+ */
+@Service
+@Slf4j
+@RequiredArgsConstructor
+public class HlsProxyService {
+
+    private final CourseSectionRepository sectionRepository;
+    private final OssService ossService;
+    private final VideoPlayTokenService tokenService;
+
+    @Value("${server.base-url:http://localhost:8080}")
+    private String serverBaseUrl;
+
+    /**
+     * 获取带 token 的 HLS m3u8 流（供播放器直接使用）
+     * 内部自动生成并附加 token
+     * @param sectionId 小节ID
+     * @param userId 用户ID
+     * @return 修改后的 m3u8 内容，null 表示获取失败
+     */
+    public String getM3u8Stream(Long sectionId, Long userId) {
+        // 1. 获取小节信息
+        CourseSection section = sectionRepository.findById(SectionId.of(sectionId)).orElse(null);
+        if (section == null || section.getHlsUrl() == null) {
+            log.warn("m3u8流获取失败: 小节不存在或无HLS地址, sectionId={}", sectionId);
+            return null;
+        }
+
+        String hlsUrl = section.getHlsUrl();
+        String keyId = section.getEncryptionKeyId();
+
+        // 2. 如果视频未加密或无 keyId，直接返回原始 m3u8 URL（使用预签名）
+        if (keyId == null || keyId.isBlank()) {
+            log.debug("视频未加密, 直接返回预签名m3u8, sectionId={}", sectionId);
+            return generatePresignedM3u8(hlsUrl);
+        }
+
+        // 3. 生成播放令牌（使用真实的 keyId）
+        String token = tokenService.generateToken(userId, keyId);
+
+        // 4. 下载原始 m3u8 内容
+        String originalM3u8 = downloadM3u8(hlsUrl);
+        if (originalM3u8 == null) {
+            log.error("下载m3u8失败, sectionId={}, hlsUrl={}", sectionId, hlsUrl);
+            return null;
+        }
+
+        // 5. 替换 key URI：附加 token 参数
+        // 原始格式: #EXT-X-KEY:METHOD=AES-128,URI="https://host/api/video/key?keyId=xxx"
+        // 修改为:   #EXT-X-KEY:METHOD=AES-128,URI="https://host/api/video/key?keyId=xxx&token=yyy"
+        String modifiedM3u8 = modifyKeyUri(originalM3u8, keyId, token);
+
+        // 6. 替换相对路径为预签名绝对路径
+        modifiedM3u8 = makeAbsoluteUrlsWithPresign(modifiedM3u8, hlsUrl);
+
+        log.debug("m3u8流生成成功, sectionId={}, userId={}, keyId={}", sectionId, userId, keyId);
+        return modifiedM3u8;
+    }
+
+    /**
+     * 获取带 token 的 HLS m3u8 内容（兼容旧方法，使用外部传入的 token）
+     * @param sectionId 小节ID
+     * @param token 播放令牌
+     * @return 修改后的 m3u8 内容
+     */
+    public String getM3u8WithToken(Long sectionId, String token) {
+        // 1. 获取小节信息
+        CourseSection section = sectionRepository.findById(SectionId.of(sectionId)).orElse(null);
+        if (section == null || section.getHlsUrl() == null) {
+            log.warn("m3u8代理失败: 小节不存在或无HLS地址, sectionId={}", sectionId);
+            return null;
+        }
+
+        String hlsUrl = section.getHlsUrl();
+        String keyId = section.getEncryptionKeyId();
+
+        // 2. 如果视频未加密或无 keyId，直接返回原始 m3u8 URL（使用预签名）
+        if (keyId == null || keyId.isBlank()) {
+            log.debug("视频未加密, 直接返回预签名URL, sectionId={}", sectionId);
+            return generatePresignedM3u8(hlsUrl);
+        }
+
+        // 3. 下载原始 m3u8 内容
+        String originalM3u8 = downloadM3u8(hlsUrl);
+        if (originalM3u8 == null) {
+            log.error("下载m3u8失败, sectionId={}, hlsUrl={}", sectionId, hlsUrl);
+            return null;
+        }
+
+        // 4. 替换 key URI：将 keyId 参数附加到 key 请求 URL
+        String modifiedM3u8 = modifyKeyUri(originalM3u8, keyId, token);
+
+        // 5. 替换相对路径为绝对路径（如果有）
+        modifiedM3u8 = makeAbsoluteUrlsWithPresign(modifiedM3u8, hlsUrl);
+
+        log.debug("m3u8代理成功, sectionId={}, token={}", sectionId, token);
+        return modifiedM3u8;
+    }
+
+    /**
+     * 生成预签名的 m3u8 内容
+     * 将 m3u8 中的所有相对 ts 路径替换为预签名绝对路径
+     */
+    private String generatePresignedM3u8(String hlsUrl) {
+        try {
+            // downloadM3u8 内部已经处理预签名，直接传原始 OSS URL
+            String m3u8Content = downloadM3u8(hlsUrl);
+            if (m3u8Content == null) {
+                return null;
+            }
+            // 替换 ts 相对路径为预签名绝对路径
+            return makeAbsoluteUrlsWithPresign(m3u8Content, hlsUrl);
+        } catch (Exception e) {
+            log.warn("生成预签名m3u8失败: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 下载 m3u8 文件内容
+     */
+    private String downloadM3u8(String hlsUrl) {
+        try {
+            // 获取预签名 URL
+            String presignedUrl = ossService.generatePresignedUrl(hlsUrl, 3600);
+            URI uri = URI.create(presignedUrl);
+            try (BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(uri.toURL().openStream(), StandardCharsets.UTF_8))) {
+                return reader.lines().collect(Collectors.joining("\n"));
+            }
+        } catch (Exception e) {
+            log.error("下载m3u8失败: url={}, error={}", hlsUrl, e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 修改 m3u8 中的 key URI，附加 token 参数
+     */
+    private String modifyKeyUri(String m3u8Content, String keyId, String token) {
+        // 原始: ...URI="http://host/api/video/key?keyId=xxx"
+        // 目标: ...URI="http://host/api/video/key?keyId=xxx&token=yyy"
+        // 简单字符串替换，找到 keyId=xxx" 替换为 keyId=xxx&token=yyy"
+        String search = "keyId=" + keyId + "\"";
+        String replace = "keyId=" + keyId + "&token=" + token + "\"";
+        return m3u8Content.replace(search, replace);
+    }
+
+    /**
+     * 将 m3u8 中的相对 URL 转换为预签名的绝对 URL
+     */
+    private String makeAbsoluteUrlsWithPresign(String m3u8Content, String baseHlsUrl) {
+        // 提取基础 URL 路径（去掉文件名）
+        String basePath = baseHlsUrl.substring(0, baseHlsUrl.lastIndexOf('/') + 1);
+
+        // 处理相对路径行（以 seg_ 开头的 ts 切片）
+        String[] lines = m3u8Content.split("\n");
+        StringBuilder result = new StringBuilder();
+        for (String line : lines) {
+            String trimmed = line.trim();
+            if (trimmed.startsWith("seg_") && trimmed.endsWith(".ts")) {
+                // ts 切片在 OSS 上已设为公开读，直接拼接绝对路径
+                result.append(basePath).append(trimmed);
+            } else {
+                result.append(line);
+            }
+            result.append("\n");
+        }
+        return result.toString();
+    }
+}
