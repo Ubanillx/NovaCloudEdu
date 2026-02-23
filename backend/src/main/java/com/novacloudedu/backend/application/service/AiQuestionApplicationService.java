@@ -4,9 +4,8 @@ import com.novacloudedu.backend.domain.book.entity.AiConversation;
 import com.novacloudedu.backend.domain.book.entity.Chapter;
 import com.novacloudedu.backend.domain.book.repository.AiConversationRepository;
 import com.novacloudedu.backend.domain.book.repository.ChapterRepository;
+import com.novacloudedu.backend.domain.book.service.ContentSecurityService;
 import com.novacloudedu.backend.domain.book.service.LlmService;
-import com.novacloudedu.backend.domain.book.service.RagService;
-import com.novacloudedu.backend.domain.book.service.VectorEmbeddingService;
 import com.novacloudedu.backend.domain.book.valueobject.*;
 import com.novacloudedu.backend.domain.user.valueobject.UserId;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * AI问答应用服务
@@ -29,6 +27,13 @@ public class AiQuestionApplicationService {
     private final AiConversationRepository conversationRepository;
     private final ChapterRepository chapterRepository;
     private final LlmService llmService;
+    private final ContentSecurityService contentSecurityService;
+
+    @Value("${book.content.encryption.enabled:false}")
+    private boolean encryptionEnabled;
+
+    @Value("${book.content.encryption.secret-key:NovaCloudEduBookKey1}")
+    private String encryptionSecretKey;
 
     @Value("${ai.conversation.max-history:10}")
     private int maxHistory;
@@ -148,26 +153,53 @@ public class AiQuestionApplicationService {
         String systemPrompt = "你是一个专业的阅读助手。请根据提供的章节内容回答用户的问题。" +
                 "如果问题的答案不在章节内容中，请明确告知用户。";
 
+        String decryptedContent = getDecryptedContent(chapter);
         String userMessage = String.format(
                 "章节内容：\n%s\n\n用户问题：%s",
-                chapter.getContent(),
+                truncateForLlm(decryptedContent),
                 question
         );
 
         String answer = llmService.chatWithSystemPrompt(systemPrompt, userMessage);
 
         // 构建来源信息
+        String plainContent = decryptedContent != null
+                ? decryptedContent.replaceAll("<[^>]*>", " ").replaceAll("\\s+", " ").trim()
+                : "";
         List<Map<String, Object>> sources = new ArrayList<>();
         Map<String, Object> source = new HashMap<>();
         source.put("chapterId", chapter.getId().value());
         source.put("chapterTitle", chapter.getTitle());
-        source.put("excerpt", chapter.getContent().substring(0, Math.min(200, chapter.getContent().length())) + "...");
+        source.put("excerpt", plainContent.substring(0, Math.min(200, plainContent.length())) + "...");
         sources.add(source);
 
         Map<String, Object> result = new HashMap<>();
         result.put("answer", answer);
         result.put("sources", sources);
         return result;
+    }
+
+    private String getDecryptedContent(Chapter chapter) {
+        String content = chapter.getContent();
+        if (encryptionEnabled && chapter.isEncrypted()) {
+            try {
+                content = contentSecurityService.decrypt(content, encryptionSecretKey, chapter.getEncryptionIv());
+            } catch (Exception e) {
+                log.error("章节内容解密失败: chapterId={}", chapter.getId(), e);
+                throw new RuntimeException("内容解密失败", e);
+            }
+        }
+        return content;
+    }
+
+    private static final int MAX_CONTENT_LENGTH = 28000;
+
+    private String truncateForLlm(String content) {
+        if (content == null || content.isEmpty()) return "";
+        String plain = content.replaceAll("<[^>]*>", " ").replaceAll("\\s+", " ").trim();
+        if (plain.length() <= MAX_CONTENT_LENGTH) return plain;
+        log.warn("章节内容过长({} 字符)，截断至 {} 字符", plain.length(), MAX_CONTENT_LENGTH);
+        return plain.substring(0, MAX_CONTENT_LENGTH) + "\n\n[注意：内容过长，已截断]";
     }
 
     /**
