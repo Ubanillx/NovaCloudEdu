@@ -14,7 +14,7 @@ const ReaderSettingsPanel: React.FC<ReaderSettingsPanelProps> = ({ themeVars, on
 
   return (
     <div
-      className="absolute top-20 right-8 bottom-8 w-80 z-30 shadow-2xl animate-in slide-in-from-right-4 fade-in duration-300 rounded-2xl border flex flex-col overflow-hidden ring-1 ring-black/5 dark:ring-white/10"
+      className="absolute top-20 right-8 bottom-8 w-80 z-30 shadow-2xl animate-in fade-in duration-200 rounded-2xl border flex flex-col overflow-hidden ring-1 ring-black/5 dark:ring-white/10"
       style={floatingPanelStyle(themeVars.bg, themeVars.border)}
     >
       <div className="flex flex-col h-full">
@@ -100,7 +100,7 @@ const ReaderSettingsPanel: React.FC<ReaderSettingsPanelProps> = ({ themeVars, on
                 <button
                   key={t}
                   onClick={() => settings.setTheme(t)}
-                  className="flex flex-col gap-2 p-3 rounded-xl border transition-all active:scale-[0.98] group relative overflow-hidden"
+                  className="flex flex-col gap-2 p-3 rounded-xl border transition-all hover:scale-[1.02] group relative overflow-hidden"
                   style={{
                     borderColor: settings.theme === t ? themeVars.accent : themeVars.border,
                     background: THEMES[t].bg,
@@ -150,7 +150,7 @@ const SettingSlider: React.FC<SettingSliderProps> = ({ icon, label, value, progr
     <div className="flex items-center gap-2 group">
       <button 
         onClick={onDecrease} 
-        className="w-8 h-8 flex items-center justify-center rounded-lg border border-black/5 dark:border-white/10 hover:bg-black/5 dark:hover:bg-white/5 transition-all active:scale-90"
+        className="w-8 h-8 flex items-center justify-center rounded-lg border border-black/5 dark:border-white/10 hover:bg-black/5 dark:hover:bg-white/5 transition-all hover:scale-[1.02]"
       >
         <Minus size={14} />
       </button>
@@ -162,7 +162,7 @@ const SettingSlider: React.FC<SettingSliderProps> = ({ icon, label, value, progr
       </div>
       <button 
         onClick={onIncrease} 
-        className="w-8 h-8 flex items-center justify-center rounded-lg border border-black/5 dark:border-white/10 hover:bg-black/5 dark:hover:bg-white/5 transition-all active:scale-90"
+        className="w-8 h-8 flex items-center justify-center rounded-lg border border-black/5 dark:border-white/10 hover:bg-black/5 dark:hover:bg-white/5 transition-all hover:scale-[1.02]"
       >
         <Plus size={14} />
       </button>
