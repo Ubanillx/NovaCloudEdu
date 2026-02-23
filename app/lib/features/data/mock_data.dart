@@ -414,7 +414,7 @@ class MockData {
 
   // 成就徽章
   static const List<AchievementBadge> badges = [
-    AchievementBadge(id: 1, name: '单词达人', icon: 'star', color: 0xFF1989FA),
+    AchievementBadge(id: 1, name: '单词达人', icon: 'star', color: 0xFF007BFF),
     AchievementBadge(id: 2, name: '坚持不懈', icon: 'fire', color: 0xFFFF976A),
     AchievementBadge(
       id: 3,
