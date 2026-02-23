@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:nova_api/nova_api.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../../config/app_theme.dart';
+import '../../../widgets/common/skeleton_widgets.dart';
+import '../../../widgets/common/loading_widget.dart';
 import '../../../widgets/common/nova_refresh_header.dart';
-import '../../data/mock_data.dart';
+import '../../../widgets/toast/nova_message.dart';
+import '../services/course_service.dart';
+import 'course_detail_page.dart';
+import 'course_search_page.dart';
 import 'schedule_page.dart';
 import 'task_list_page.dart';
+import 'bookshelf_page.dart';
 
 /// 课程页面 - 参考smartclass Courses.vue
 class CoursePage extends StatefulWidget {
@@ -14,18 +22,23 @@ class CoursePage extends StatefulWidget {
 }
 
 class _CoursePageState extends State<CoursePage> {
-  int _selectedCategory = 0;
-  int _selectedGrade = 0;
+  final CourseService _courseService = CourseService();
+  
+  List<CourseResponse> _courses = [];
+  bool _isLoading = true;
+  int _currentPage = 1;
+  bool _hasMore = true;
+  
+  @override
+  void initState() {
+    super.initState();
+    _loadCourses();
+  }
 
-  final List<String> _gradeOptions = [
-    '全部年级',
-    '一年级',
-    '二年级',
-    '三年级',
-    '四年级',
-    '五年级',
-    '六年级',
-  ];
+  @override
+  void dispose() {
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,10 +50,23 @@ class _CoursePageState extends State<CoursePage> {
           children: [
             // 头部
             _buildHeader(),
-            // 分类标签
-            _buildCategories(),
+            // 分隔阴影
+            Container(
+              height: 1,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    colors.border.withValues(alpha: 0),
+                    colors.border.withValues(alpha: 0.5),
+                    colors.border.withValues(alpha: 0),
+                  ],
+                ),
+              ),
+            ),
             // 课程列表
-            Expanded(child: _buildCourseList()),
+            Expanded(
+              child: _buildCourseList(),
+            ),
           ],
         ),
       ),
@@ -68,10 +94,23 @@ class _CoursePageState extends State<CoursePage> {
             children: [
               IconButton(
                 onPressed: () {
-                  // TODO: 跳转到电子书页面
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const BookshelfPage()),
+                  );
                 },
-                icon: const Icon(Icons.menu_book_rounded, color: AppTheme.brand, size: 24),
-                tooltip: '电子书',
+                icon: Icon(PhosphorIcons.bookOpenText(), size: 22, color: colors.iconPrimary),
+                tooltip: '电子书库',
+              ),
+              IconButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const CourseSearchPage()),
+                  );
+                },
+                icon: Icon(PhosphorIcons.magnifyingGlass(), size: 22, color: colors.iconPrimary),
+                tooltip: '搜索课程',
               ),
               IconButton(
                 onPressed: () {
@@ -80,7 +119,7 @@ class _CoursePageState extends State<CoursePage> {
                     MaterialPageRoute(builder: (_) => const SchedulePage()),
                   );
                 },
-                icon: Icon(Icons.calendar_today_outlined, size: 20, color: colors.iconPrimary),
+                icon: Icon(PhosphorIcons.calendarBlank(), size: 20, color: colors.iconPrimary),
                 tooltip: '课程表',
               ),
               IconButton(
@@ -90,7 +129,7 @@ class _CoursePageState extends State<CoursePage> {
                     MaterialPageRoute(builder: (_) => const TaskListPage()),
                   );
                 },
-                icon: Icon(Icons.checklist_rounded, size: 22, color: colors.iconPrimary),
+                icon: Icon(PhosphorIcons.listChecks(), size: 22, color: colors.iconPrimary),
                 tooltip: '任务清单',
               ),
             ],
@@ -100,149 +139,108 @@ class _CoursePageState extends State<CoursePage> {
     );
   }
 
-  // 分类标签
-  Widget _buildCategories() {
-    final colors = context.colors;
-    return Container(
-      height: 40,
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      child: ListView.separated(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        scrollDirection: Axis.horizontal,
-        itemCount: MockData.categories.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 10),
-        itemBuilder: (context, index) {
-          final category = MockData.categories[index];
-          final isSelected = _selectedCategory == index;
-          return GestureDetector(
-            onTap: () => setState(() => _selectedCategory = index),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
-              decoration: BoxDecoration(
-                color: isSelected ? AppTheme.brand : colors.surfaceVariant,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Center(
-                child: Text(
-                  category.name,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                    color: isSelected ? Colors.white : colors.textSecondary,
-                  ),
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
   // 课程列表
   Widget _buildCourseList() {
+    if (_isLoading && _courses.isEmpty) {
+      return const CourseListSkeleton();
+    }
+    
+    if (_courses.isEmpty) {
+      return const Center(child: Text('暂无课程'));
+    }
+
     return NovaRefreshableList(
-      onRefresh: () async {
-        await Future.delayed(const Duration(seconds: 1));
-      },
+      onRefresh: _loadCourses,
       slivers: [
-        // 年级筛选（非推荐分类时显示）
-        if (_selectedCategory != 0)
-          SliverToBoxAdapter(child: _buildGradeFilter()),
-        // 课程列表
         SliverPadding(
           padding: const EdgeInsets.all(16),
           sliver: SliverList(
             delegate: SliverChildBuilderDelegate((context, index) {
-              if (index >= MockData.courses.length) return null;
-              return _buildCourseCard(MockData.courses[index]);
-            }, childCount: MockData.courses.length),
+              if (index >= _courses.length) {
+                if (_hasMore) {
+                  _loadMoreCourses();
+                  return const Padding(
+                    padding: EdgeInsets.all(16),
+                    child: Center(child: LoadingWidget(size: 24)),
+                  );
+                }
+                return null;
+              }
+              return _buildCourseCard(_courses[index]);
+            }, childCount: _courses.length + (_hasMore ? 1 : 0)),
           ),
         ),
       ],
     );
   }
 
-  // 年级筛选
-  Widget _buildGradeFilter() {
-    final colors = context.colors;
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          GestureDetector(
-            onTap: () => _showGradeSelector(),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: colors.surface,
-                borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: colors.border),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    _gradeOptions[_selectedGrade],
-                    style: TextStyle(fontSize: 13, color: colors.textPrimary),
-                  ),
-                  const SizedBox(width: 4),
-                  Icon(Icons.arrow_drop_down, size: 18, color: colors.iconSecondary),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
+  // 加载课程列表
+  Future<void> _loadCourses() async {
+    setState(() {
+      _isLoading = true;
+      _currentPage = 1;
+    });
+    
+    try {
+      final courses = await _courseService.getCourses(
+        page: 1,
+        size: 20,
+      );
+      if (mounted) {
+        setState(() {
+          _courses = courses.toList();
+          _hasMore = courses.length >= 20;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        NovaMessage.error(context, '加载课程失败');
+      }
+    }
   }
 
-  void _showGradeSelector() {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text(
-              '选择年级',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 16),
-            ...List.generate(_gradeOptions.length, (index) {
-              return ListTile(
-                title: Text(_gradeOptions[index]),
-                trailing: _selectedGrade == index
-                    ? const Icon(Icons.check, color: AppTheme.brand)
-                    : null,
-                onTap: () {
-                  setState(() => _selectedGrade = index);
-                  Navigator.pop(context);
-                },
-              );
-            }),
-          ],
-        ),
-      ),
-    );
+  // 加载更多课程
+  Future<void> _loadMoreCourses() async {
+    if (_isLoading || !_hasMore) return;
+    
+    try {
+      final courses = await _courseService.getCourses(
+        page: _currentPage + 1,
+        size: 20,
+      );
+      if (mounted) {
+        setState(() {
+          _courses.addAll(courses.toList());
+          _currentPage++;
+          _hasMore = courses.length >= 20;
+        });
+      }
+    } catch (e) {
+      // 静默处理
+    }
   }
 
   // 课程卡片
-  Widget _buildCourseCard(Course course) {
+  Widget _buildCourseCard(CourseResponse course) {
     final colors = context.colors;
     return GestureDetector(
-      onTap: () => _showCourseDetail(course),
+      onTap: () {
+        if (course.id != null) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => CourseDetailPage(courseId: course.id!),
+            ),
+          );
+        }
+      },
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
         decoration: BoxDecoration(
           color: colors.surface,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(context.isDarkMode ? 0.2 : 0.04),
@@ -259,10 +257,10 @@ class _CoursePageState extends State<CoursePage> {
               children: [
                 ClipRRect(
                   borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(16),
+                    top: Radius.circular(24),
                   ),
                   child: Image.network(
-                    course.cover,
+                    course.coverImage ?? '',
                     width: double.infinity,
                     height: 160,
                     fit: BoxFit.cover,
@@ -270,30 +268,10 @@ class _CoursePageState extends State<CoursePage> {
                       width: double.infinity,
                       height: 160,
                       color: Colors.grey[100],
-                      child: Icon(Icons.image_outlined, size: 40, color: Colors.grey[300]),
+                      child: Icon(PhosphorIcons.image(), size: 40, color: Colors.grey[300]),
                     ),
                   ),
                 ),
-                if (course.grade != null)
-                  Positioned(
-                    top: 12,
-                    left: 12,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.6),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        course.grade!,
-                        style: const TextStyle(
-                          fontSize: 11,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ),
               ],
             ),
             // 课程信息
@@ -303,7 +281,7 @@ class _CoursePageState extends State<CoursePage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    course.title,
+                    course.title ?? '未知课程',
                     style: TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.bold,
@@ -314,7 +292,7 @@ class _CoursePageState extends State<CoursePage> {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    course.brief,
+                    course.subtitle ?? '',
                     style: TextStyle(
                       fontSize: 13,
                       color: colors.textSecondary,
@@ -326,35 +304,26 @@ class _CoursePageState extends State<CoursePage> {
                   const SizedBox(height: 12),
                   Row(
                     children: [
-                      _buildCourseTag(course.tag, AppTheme.brand),
+                      _buildCourseTag(course.courseTypeDesc ?? '课程', AppTheme.brand),
                       const Spacer(),
-                      Icon(
-                        Icons.access_time_rounded,
-                        size: 14,
-                        color: colors.textTertiary,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        '${course.duration}min',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: colors.textTertiary,
+                      if (course.price != null && course.price! > 0)
+                        Text(
+                          '¥${course.price}',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: colors.warning,
+                          ),
+                        )
+                      else
+                        Text(
+                          '免费',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: colors.success,
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 12),
-                      Icon(
-                        Icons.person_outline_rounded,
-                        size: 14,
-                        color: colors.textTertiary,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        '${course.studentsCount}',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: colors.textTertiary,
-                        ),
-                      ),
                     ],
                   ),
                 ],
@@ -384,98 +353,4 @@ class _CoursePageState extends State<CoursePage> {
     );
   }
 
-  // 课程详情弹窗
-  void _showCourseDetail(Course course) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (context) => DraggableScrollableSheet(
-        initialChildSize: 0.7,
-        minChildSize: 0.5,
-        maxChildSize: 0.9,
-        expand: false,
-        builder: (context, scrollController) => Container(
-          padding: const EdgeInsets.all(16),
-          child: ListView(
-            controller: scrollController,
-            children: [
-              // 封面
-              ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Image.network(
-                  course.cover,
-                  width: double.infinity,
-                  height: 180,
-                  fit: BoxFit.cover,
-                ),
-              ),
-              const SizedBox(height: 16),
-              // 标题
-              Text(
-                course.title,
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 8),
-              // 简介
-              Text(
-                course.brief,
-                style: const TextStyle(fontSize: 14, color: Colors.grey),
-              ),
-              const SizedBox(height: 16),
-              // 标签
-              Row(
-                children: [
-                  _buildDetailTag(course.tag, AppTheme.brand),
-                  if (course.grade != null) ...[
-                    const SizedBox(width: 8),
-                    _buildDetailTag(course.grade!, const Color(0xFF07C160)),
-                  ],
-                  const SizedBox(width: 8),
-                  _buildDetailTag('${course.duration}分钟', Colors.orange),
-                ],
-              ),
-              const SizedBox(height: 24),
-              // 开始学习按钮
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.brand,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(24),
-                    ),
-                  ),
-                  child: const Text(
-                    '开始学习',
-                    style: TextStyle(fontSize: 16, color: Colors.white),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDetailTag(String text, Color color) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Text(text, style: TextStyle(fontSize: 12, color: color)),
-    );
-  }
 }

@@ -1,5 +1,6 @@
 import 'package:built_collection/built_collection.dart';
 import 'package:flutter/material.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:nova_api/nova_api.dart';
 
 import '../../../config/app_theme.dart';
@@ -91,12 +92,12 @@ class _SchedulePageState extends State<SchedulePage> {
           ),
         ),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_rounded, color: colors.textPrimary, size: 20),
+          icon: Icon(PhosphorIcons.caretLeft(), color: colors.textPrimary, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.add_rounded, color: colors.textPrimary, size: 24),
+            icon: Icon(PhosphorIcons.plus(), color: colors.textPrimary, size: 24),
             onPressed: _navigateToAddCourse,
             tooltip: '添加课程',
           ),
@@ -125,7 +126,7 @@ class _SchedulePageState extends State<SchedulePage> {
         children: [
           IconButton(
             icon: Icon(
-              Icons.chevron_left_rounded,
+              PhosphorIcons.caretLeft(),
               color: _currentWeek > 1 ? colors.textPrimary : colors.textTertiary,
             ),
             onPressed: _currentWeek > 1
@@ -152,14 +153,14 @@ class _SchedulePageState extends State<SchedulePage> {
                     ),
                   ),
                   const SizedBox(width: 4),
-                  const Icon(Icons.arrow_drop_down, color: AppTheme.brand, size: 20),
+                  Icon(PhosphorIcons.caretDown(), color: AppTheme.brand, size: 20),
                 ],
               ),
             ),
           ),
           IconButton(
             icon: Icon(
-              Icons.chevron_right_rounded,
+              PhosphorIcons.caretRight(),
               color: _currentWeek < _totalWeeks ? colors.textPrimary : colors.textTertiary,
             ),
             onPressed: _currentWeek < _totalWeeks
@@ -594,29 +595,29 @@ class _SchedulePageState extends State<SchedulePage> {
                     ),
                   ),
                   IconButton(
-                    icon: Icon(Icons.close, color: colors.textSecondary),
+                    icon: Icon(PhosphorIcons.x(), color: colors.textSecondary),
                     onPressed: () => Navigator.pop(context),
                   ),
                 ],
               ),
               const SizedBox(height: 16),
-              _buildDetailRow(Icons.access_time_rounded, '时间',
+              _buildDetailRow(PhosphorIcons.clock(), '时间',
                   '周${_weekDays[(item.dayOfWeek ?? 1) - 1]} 第${item.startSection}-${item.endSection}节', colors),
               if (item.location != null && item.location!.isNotEmpty)
-                _buildDetailRow(Icons.location_on_outlined, '地点', item.location!, colors),
+                _buildDetailRow(PhosphorIcons.mapPin(), '地点', item.location!, colors),
               if (item.teacherName != null && item.teacherName!.isNotEmpty)
-                _buildDetailRow(Icons.person_outline_rounded, '教师', item.teacherName!, colors),
-              _buildDetailRow(Icons.date_range_rounded, '周次',
+                _buildDetailRow(PhosphorIcons.user(), '教师', item.teacherName!, colors),
+              _buildDetailRow(PhosphorIcons.calendarDots(), '周次',
                   '第${item.startWeek ?? 1}-${item.endWeek ?? _totalWeeks}周${_getWeekTypeText(item.weekType)}', colors),
               if (item.remark != null && item.remark!.isNotEmpty)
-                _buildDetailRow(Icons.notes_rounded, '备注', item.remark!, colors),
+                _buildDetailRow(PhosphorIcons.notepad(), '备注', item.remark!, colors),
               const SizedBox(height: 20),
               Row(
                 children: [
                   Expanded(
                     child: OutlinedButton.icon(
                       onPressed: () => _editCourse(item),
-                      icon: const Icon(Icons.edit_outlined),
+                      icon: Icon(PhosphorIcons.pencilSimple()),
                       label: const Text('编辑'),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: AppTheme.brand,
@@ -632,7 +633,7 @@ class _SchedulePageState extends State<SchedulePage> {
                   Expanded(
                     child: OutlinedButton.icon(
                       onPressed: () => _deleteCourse(item),
-                      icon: const Icon(Icons.delete_outline_rounded),
+                      icon: Icon(PhosphorIcons.trash()),
                       label: const Text('删除'),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: colors.error,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nova_api/nova_api.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../config/app_theme.dart';
 import '../../../widgets/buttons/primary_button.dart';
@@ -135,7 +136,7 @@ class _ScheduleEditPageState extends State<ScheduleEditPage> {
           ),
         ),
         leading: IconButton(
-          icon: Icon(Icons.close, color: colors.textPrimary),
+          icon: Icon(PhosphorIcons.x(), color: colors.textPrimary),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -490,7 +491,7 @@ class _ScheduleEditPageState extends State<ScheduleEditPage> {
                   ],
                 ),
                 child: isSelected
-                    ? const Icon(Icons.check, color: Colors.white, size: 20)
+                    ? Icon(PhosphorIcons.check(), color: Colors.white, size: 20)
                     : null,
               ),
             );
@@ -517,7 +518,7 @@ class _ScheduleEditPageState extends State<ScheduleEditPage> {
         child: DropdownButton<T>(
           value: value,
           isExpanded: true,
-          icon: Icon(Icons.arrow_drop_down, color: colors.textSecondary),
+          icon: Icon(PhosphorIcons.caretDown(), color: colors.textSecondary),
           dropdownColor: colors.surface,
           items: items.map((item) {
             return DropdownMenuItem<T>(
