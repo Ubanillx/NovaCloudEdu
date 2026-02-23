@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import Markdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import rehypeRaw from 'rehype-raw';
+import MarkdownRenderer from '../components/chat/MarkdownRenderer';
 import { ArrowLeft, Calendar, Clock, Eye, Heart, Bookmark, User, Link2, FileText, MessageSquareText, X } from 'lucide-react';
 import { apiClient, DefaultApi, Configuration } from '../api';
 import type { DailyArticleResponse } from '../api/generated/models';
@@ -350,7 +348,7 @@ const DailyArticleDetailPage: React.FC = () => {
 
             {/* 正文 */}
             <div className="prose prose-gray dark:prose-invert max-w-none text-gray-700 dark:text-gray-300 leading-relaxed">
-              <Markdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>{article.content || ''}</Markdown>
+              <MarkdownRenderer content={article.content || ''} />
             </div>
 
             {/* 原文链接 */}

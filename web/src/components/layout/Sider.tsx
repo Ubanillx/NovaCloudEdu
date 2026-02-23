@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useSider } from '../../context/SiderContext';
 import { AIApi, Configuration, apiClient } from '../../api';
 import type { AiAssistantVO } from '../../api/generated/models';
-import { LayoutGrid, MessageCircle, Bot, ChevronsLeft, ChevronsRight, Home, BookOpen, GraduationCap, PenTool } from 'lucide-react';
+import { LayoutGrid, MessageCircle, Bot, ChevronsLeft, ChevronsRight, Home, BookMarked, GraduationCap, PenTool } from 'lucide-react';
 
 interface SiderProps {
   collapsed?: boolean;
@@ -22,7 +22,7 @@ export const Sider: React.FC<SiderProps> = ({ collapsed: propCollapsed = false }
   const isCircleActive = location.pathname.startsWith('/circle');
   const isChatActive = location.pathname.startsWith('/chat');
   const isAiChatActive = location.pathname.startsWith('/ai-chat');
-  const isEbookActive = location.pathname.startsWith('/ebooks');
+  const isBookshelfActive = location.pathname.startsWith('/bookshelf');
   const isCoursesActive = location.pathname === '/courses';
   const isGradingActive = location.pathname.startsWith('/grading');
   const activeAssistantId = isAiChatActive ? location.pathname.split('/ai-chat/')[1]?.split('/')[0] : undefined;
@@ -127,23 +127,23 @@ export const Sider: React.FC<SiderProps> = ({ collapsed: propCollapsed = false }
               </SiderTooltip>
             </li>
             <li>
-              <SiderTooltip label="电子书" show={isCollapsed}>
+              <SiderTooltip label="书架" show={isCollapsed}>
                 <button
-                  onClick={() => navigate('/ebooks')}
+                  onClick={() => navigate('/bookshelf')}
                   className={`w-full flex items-center ${isCollapsed ? 'justify-center px-0 gap-0' : 'gap-3 px-3'} py-2 text-sm rounded-lg transition-all duration-200 ${
-                    isEbookActive
+                    isBookshelfActive
                       ? 'bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 font-medium'
                       : 'text-gray-700 dark:text-gray-300 hover:bg-brand-50 dark:hover:bg-brand-900/30 hover:text-brand-600 dark:hover:text-brand-400'
                   }`}
                 >
                   <div className={`w-7 h-7 rounded-lg flex-shrink-0 flex items-center justify-center transition-colors ${
-                    isEbookActive
+                    isBookshelfActive
                       ? 'bg-brand-500 text-white shadow-sm'
                       : 'bg-brand-100 dark:bg-brand-900/50 text-brand-600 dark:text-brand-400'
                   }`}>
-                    <BookOpen size={15} />
+                    <BookMarked size={15} />
                   </div>
-                  <span className={textFadeClass}>电子书</span>
+                  <span className={textFadeClass}>书架</span>
                 </button>
               </SiderTooltip>
             </li>

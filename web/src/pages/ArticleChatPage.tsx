@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import Markdown from 'react-markdown';
+import MarkdownRenderer from '../components/chat/MarkdownRenderer';
 import { Send, Square, Trash2, Bot, User, Info } from 'lucide-react';
 import { getToken } from '../api';
 import { useTextToSpeech } from '../hooks/useTextToSpeech';
@@ -121,6 +121,21 @@ export const ArticleChatPanel: React.FC<ArticleChatPanelProps> = ({
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let buffer = '';
+      let pendingDataLines: string[] = [];
+      let pendingEventType = 'message';
+
+      const dispatchArticleEvent = (eventType: string, data: string) => {
+        if (data === '[DONE]' || eventType === 'done') return;
+        if (eventType !== 'message' && eventType !== '') return;
+        try {
+          const json = JSON.parse(data);
+          const chunk = json.content || json.text || data;
+          accumulated += chunk;
+        } catch {
+          accumulated += data;
+        }
+        setStreamingContent(accumulated);
+      };
 
       while (true) {
         const { done, value } = await reader.read();
@@ -131,20 +146,27 @@ export const ArticleChatPanel: React.FC<ArticleChatPanelProps> = ({
         buffer = lines.pop() || '';
 
         for (const line of lines) {
-          if (line.startsWith('data:')) {
-            const data = line.slice(5).trim();
-            if (data === '[DONE]' || !data) continue;
-
-            try {
-              const json = JSON.parse(data);
-              const chunk = json.content || json.text || data;
-              accumulated += chunk;
-            } catch {
-              accumulated += data;
+          if (line.trim() === '') {
+            if (pendingDataLines.length > 0) {
+              dispatchArticleEvent(pendingEventType, pendingDataLines.join('\n'));
+              pendingDataLines = [];
             }
-            setStreamingContent(accumulated);
+            pendingEventType = 'message';
+            continue;
+          }
+          if (line.startsWith('event:')) {
+            pendingEventType = line.slice(6).trim();
+            continue;
+          }
+          if (line.startsWith('data:')) {
+            const dataContent = line.charAt(5) === ' ' ? line.slice(6) : line.slice(5);
+            pendingDataLines.push(dataContent);
+            continue;
           }
         }
+      }
+      if (pendingDataLines.length > 0) {
+        dispatchArticleEvent(pendingEventType, pendingDataLines.join('\n'));
       }
     } catch (err: unknown) {
       if (err instanceof DOMException && err.name === 'AbortError') {
@@ -222,6 +244,21 @@ export const ArticleChatPanel: React.FC<ArticleChatPanelProps> = ({
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
         let buffer = '';
+        let pendingDataLines: string[] = [];
+        let pendingEvt = 'message';
+
+        const dispatchRetryEvent = (evtType: string, data: string) => {
+          if (data === '[DONE]' || evtType === 'done') return;
+          if (evtType !== 'message' && evtType !== '') return;
+          try {
+            const json = JSON.parse(data);
+            accumulated += json.content || json.text || data;
+          } catch {
+            accumulated += data;
+          }
+          setStreamingContent(accumulated);
+        };
+
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
@@ -229,18 +266,27 @@ export const ArticleChatPanel: React.FC<ArticleChatPanelProps> = ({
           const lines = buffer.split('\n');
           buffer = lines.pop() || '';
           for (const line of lines) {
-            if (line.startsWith('data:')) {
-              const data = line.slice(5).trim();
-              if (data === '[DONE]' || !data) continue;
-              try {
-                const json = JSON.parse(data);
-                accumulated += json.content || json.text || data;
-              } catch {
-                accumulated += data;
+            if (line.trim() === '') {
+              if (pendingDataLines.length > 0) {
+                dispatchRetryEvent(pendingEvt, pendingDataLines.join('\n'));
+                pendingDataLines = [];
               }
-              setStreamingContent(accumulated);
+              pendingEvt = 'message';
+              continue;
+            }
+            if (line.startsWith('event:')) {
+              pendingEvt = line.slice(6).trim();
+              continue;
+            }
+            if (line.startsWith('data:')) {
+              const dc = line.charAt(5) === ' ' ? line.slice(6) : line.slice(5);
+              pendingDataLines.push(dc);
+              continue;
             }
           }
+        }
+        if (pendingDataLines.length > 0) {
+          dispatchRetryEvent(pendingEvt, pendingDataLines.join('\n'));
         }
       }).catch((err: unknown) => {
         if (err instanceof DOMException && err.name === 'AbortError') {
@@ -387,15 +433,12 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, messageIndex, tt
           {isUser ? (
             <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
           ) : (
-            <div className="prose prose-sm prose-gray dark:prose-invert max-w-none [&_p]:my-1 [&_ul]:my-1 [&_ol]:my-1 [&_li]:my-0.5">
-              <Markdown>{message.content}</Markdown>
-              {message.isStreaming && (
-                <div className="flex items-center gap-2 mt-2 pt-2 border-t border-gray-100 dark:border-gray-800">
-                  <div className="w-3 h-3 border-2 border-brand-500 border-t-transparent rounded-full animate-spin" />
-                  <span className="text-xs text-gray-400">AI 正在思考...</span>
-                </div>
-              )}
-            </div>
+            <MarkdownRenderer
+              content={message.content}
+              isStreaming={!!message.isStreaming}
+              showCursor={!!message.isStreaming}
+              className="prose prose-sm prose-gray dark:prose-invert max-w-none [&_p]:my-1 [&_ul]:my-1 [&_ol]:my-1 [&_li]:my-0.5"
+            />
           )}
         </div>
         {!isUser && !message.isStreaming && (

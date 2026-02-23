@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   Bot, Download, Check, Edit3, Loader2, FileText,
   AlertCircle, ChevronRight, ExternalLink,
 } from 'lucide-react';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
+import MarkdownRenderer from '../chat/MarkdownRenderer';
 import type { PptChatMessage as PptChatMessageData } from '../../hooks/usePptChat';
 import type { useTextToSpeech } from '../../hooks/useTextToSpeech';
 import AiMessageActions from '../chat/AiMessageActions';
@@ -34,11 +32,10 @@ const OutlineCard: React.FC<OutlineCardProps> = ({ markdown, actionDone, onConfi
     <div className="space-y-3">
       <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-5 transition-all">
         <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">AI 生成的大纲</h4>
-        <div className="prose prose-sm dark:prose-invert max-w-none prose-p:my-1 prose-headings:my-2 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5">
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>
-            {markdown}
-          </ReactMarkdown>
-        </div>
+        <MarkdownRenderer
+          content={markdown}
+          className="prose prose-sm dark:prose-invert max-w-none prose-p:my-1 prose-headings:my-2 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5"
+        />
       </div>
 
       {!actionDone && (
@@ -136,14 +133,12 @@ const ProgressCard: React.FC<{ current: number; total: number }> = ({ current, t
 // ============ 下载卡片 ============
 
 const DownloadCard: React.FC<{ url: string; fileName?: string }> = ({ url, fileName }) => {
-  const navigate = useNavigate();
-
   const handleEdit = () => {
     const params = new URLSearchParams({
       fileUrl: url,
       fileName: fileName || '演示文稿.pptx',
     });
-    navigate(`/admin/ppt-editor?${params.toString()}`);
+    window.open(`/admin/ppt-editor?${params.toString()}`, '_blank');
   };
 
   return (
@@ -222,14 +217,12 @@ const PptChatMessageComponent: React.FC<PptChatMessageProps> = ({
         <div className="max-w-[75%]">
           <div className="rounded-2xl px-4 py-3 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-tl-sm border border-gray-100 dark:border-gray-700 shadow-sm">
             {content ? (
-              <div className="prose prose-sm dark:prose-invert max-w-none prose-p:my-1 prose-headings:my-2 prose-code:text-brand-600 dark:prose-code:text-brand-400 prose-code:bg-brand-50 dark:prose-code:bg-brand-900/30 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:before:content-none prose-code:after:content-none">
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                  {content}
-                </ReactMarkdown>
-                {isStreaming && (
-                  <span className="inline-block w-2 h-4 bg-brand-500 animate-pulse rounded-sm ml-0.5 align-middle" />
-                )}
-              </div>
+              <MarkdownRenderer
+                content={content}
+                isStreaming={!!isStreaming}
+                showCursor={!!isStreaming}
+                className="prose prose-sm dark:prose-invert max-w-none prose-p:my-1 prose-headings:my-2 prose-code:text-brand-600 dark:prose-code:text-brand-400 prose-code:bg-brand-50 dark:prose-code:bg-brand-900/30 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:before:content-none prose-code:after:content-none"
+              />
             ) : isStreaming ? (
               <div className="flex items-center gap-2 text-gray-400">
                 <Loader2 size={14} className="animate-spin" />
