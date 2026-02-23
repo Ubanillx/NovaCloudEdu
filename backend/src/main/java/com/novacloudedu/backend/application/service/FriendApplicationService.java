@@ -224,8 +224,15 @@ public class FriendApplicationService {
     }
 
     /**
-     * 获取当前登录用户ID
+     * 获取用户收到的待处理好友申请数量（供通知服务使用）
      */
+    @Transactional(readOnly = true)
+    public int getPendingReceivedCount(Long userId) {
+        return friendRequestRepository
+                .findByReceiverId(UserId.of(userId), FriendRequestStatus.PENDING)
+                .size();
+    }
+
     private UserId getCurrentUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
