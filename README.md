@@ -16,6 +16,8 @@
 
   [功能文档](docs/wiki/Home.md) · [快速开始](#快速开始) · [架构设计](#架构设计)
 
+  ![主页预览](assets/web/user/web端首页-主体预览.png)
+
 </div>
 
 ---
