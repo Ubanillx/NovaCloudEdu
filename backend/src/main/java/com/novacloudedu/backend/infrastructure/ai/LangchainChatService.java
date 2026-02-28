@@ -1,9 +1,9 @@
 package com.novacloudedu.backend.infrastructure.ai;
 
 import dev.langchain4j.data.message.*;
-import dev.langchain4j.model.StreamingResponseHandler;
-import dev.langchain4j.model.chat.StreamingChatLanguageModel;
-import dev.langchain4j.model.output.Response;
+import dev.langchain4j.model.chat.StreamingChatModel;
+import dev.langchain4j.model.chat.response.ChatResponse;
+import dev.langchain4j.model.chat.response.StreamingChatResponseHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -39,7 +39,7 @@ public class LangchainChatService {
      * @param callback  流式回调
      */
     public void streamChat(String modelId, List<Map<String, String>> messages, StreamCallback callback) {
-        StreamingChatLanguageModel model = resolveModel(modelId, false);
+        StreamingChatModel model = resolveModel(modelId, false);
         List<ChatMessage> chatMessages = convertMessages(messages, null);
 
         log.info("Langchain4j 流式对话: modelId={}, 消息数={}", modelId, chatMessages.size());
@@ -64,7 +64,7 @@ public class LangchainChatService {
     public void streamChatWithParams(String modelId, List<Map<String, String>> messages,
                                       Double temperature, Double topP, Integer maxTokens,
                                       boolean enableSearch, StreamCallback callback) {
-        StreamingChatLanguageModel model = chatModelFactory.createStreamingModelWithParams(
+        StreamingChatModel model = chatModelFactory.createStreamingModelWithParams(
                 modelId, temperature, topP, maxTokens, enableSearch);
         List<ChatMessage> chatMessages = convertMessages(messages, null);
 
@@ -80,7 +80,7 @@ public class LangchainChatService {
                                                List<String> imageUrls,
                                                Double temperature, Double topP, Integer maxTokens,
                                                StreamCallback callback) {
-        StreamingChatLanguageModel model = chatModelFactory.createStreamingModelWithParams(
+        StreamingChatModel model = chatModelFactory.createStreamingModelWithParams(
                 modelId, temperature, topP, maxTokens);
         List<ChatMessage> chatMessages = convertMessages(messages, imageUrls);
 
@@ -99,7 +99,7 @@ public class LangchainChatService {
      */
     public void streamChatWithImages(String modelId, List<Map<String, String>> messages,
                                       List<String> imageUrls, StreamCallback callback) {
-        StreamingChatLanguageModel model = resolveModel(modelId, true);
+        StreamingChatModel model = resolveModel(modelId, true);
         List<ChatMessage> chatMessages = convertMessages(messages, imageUrls);
 
         log.info("Langchain4j 多模态流式对话: modelId={}, 消息数={}, 图片数={}",
@@ -111,7 +111,7 @@ public class LangchainChatService {
      * 同步对话（用于内部摘要/标题生成等场景）
      */
     public String chat(String modelId, String systemPrompt, String userMessage) {
-        StreamingChatLanguageModel model = resolveModel(modelId, false);
+        StreamingChatModel model = resolveModel(modelId, false);
 
         List<ChatMessage> messages = new ArrayList<>();
         if (systemPrompt != null && !systemPrompt.trim().isEmpty()) {
@@ -124,14 +124,14 @@ public class LangchainChatService {
         final boolean[] done = {false};
         final Throwable[] error = {null};
 
-        model.generate(messages, new StreamingResponseHandler<AiMessage>() {
+        model.chat(messages, new StreamingChatResponseHandler() {
             @Override
-            public void onNext(String token) {
+            public void onPartialResponse(String token) {
                 result.append(token);
             }
 
             @Override
-            public void onComplete(Response<AiMessage> response) {
+            public void onCompleteResponse(ChatResponse response) {
                 synchronized (lock) {
                     done[0] = true;
                     lock.notifyAll();
@@ -176,7 +176,7 @@ public class LangchainChatService {
      */
     public String chatWithImage(String modelId, String systemPrompt,
                                  String userMessage, String imageUrl) {
-        StreamingChatLanguageModel model = resolveModel(modelId, true);
+        StreamingChatModel model = resolveModel(modelId, true);
 
         List<ChatMessage> messages = new ArrayList<>();
         if (systemPrompt != null && !systemPrompt.trim().isEmpty()) {
@@ -196,14 +196,14 @@ public class LangchainChatService {
         final boolean[] done = {false};
         final Throwable[] error = {null};
 
-        model.generate(messages, new StreamingResponseHandler<AiMessage>() {
+        model.chat(messages, new StreamingChatResponseHandler() {
             @Override
-            public void onNext(String token) {
+            public void onPartialResponse(String token) {
                 result.append(token);
             }
 
             @Override
-            public void onComplete(Response<AiMessage> response) {
+            public void onCompleteResponse(ChatResponse response) {
                 synchronized (lock) {
                     done[0] = true;
                     lock.notifyAll();
@@ -254,29 +254,29 @@ public class LangchainChatService {
 
     // ==================== 私有方法 ====================
 
-    private StreamingChatLanguageModel resolveModel(String modelId, boolean isVision) {
+    private StreamingChatModel resolveModel(String modelId, boolean isVision) {
         if (modelId != null && !modelId.trim().isEmpty()) {
             return chatModelFactory.getStreamingModel(modelId);
         }
         return isVision ? chatModelFactory.getDefaultVisionModel() : chatModelFactory.getDefaultModel();
     }
 
-    private void doStreamChat(StreamingChatLanguageModel model, List<ChatMessage> messages,
+    private void doStreamChat(StreamingChatModel model, List<ChatMessage> messages,
                                StreamCallback callback) {
         final Object lock = new Object();
         final boolean[] done = {false};
         final Throwable[] error = {null};
 
-        model.generate(messages, new StreamingResponseHandler<AiMessage>() {
+        model.chat(messages, new StreamingChatResponseHandler() {
             @Override
-            public void onNext(String token) {
+            public void onPartialResponse(String token) {
                 if (token != null && !token.isEmpty()) {
                     callback.onToken(token);
                 }
             }
 
             @Override
-            public void onComplete(Response<AiMessage> response) {
+            public void onCompleteResponse(ChatResponse response) {
                 synchronized (lock) {
                     done[0] = true;
                     lock.notifyAll();

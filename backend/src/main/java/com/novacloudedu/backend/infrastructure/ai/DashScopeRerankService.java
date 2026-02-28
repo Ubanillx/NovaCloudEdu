@@ -33,7 +33,7 @@ public class DashScopeRerankService implements RerankService {
     @Value("${ai.dashscope.api-key}")
     private String apiKey;
 
-    @Value("${ai.dashscope.rerank.model-name:gte-rerank}")
+    @Value("${ai.dashscope.rerank.model-name:qwen3-rerank}")
     private String modelName;
 
     @Value("${ai.dashscope.rerank.enabled:true}")
@@ -49,6 +49,11 @@ public class DashScopeRerankService implements RerankService {
 
     @Override
     public List<RerankResult> rerank(String query, List<String> documents, int topN) {
+        return rerank(query, documents, topN, null);
+    }
+
+    @Override
+    public List<RerankResult> rerank(String query, List<String> documents, int topN, String rerankModel) {
         if (!enabled) {
             log.debug("Rerank 未启用，跳过重排序");
             return buildPassthroughResults(documents, topN);
@@ -59,13 +64,15 @@ public class DashScopeRerankService implements RerankService {
             return buildPassthroughResults(documents, topN);
         }
 
+        String effectiveModel = (rerankModel != null && !rerankModel.isBlank()) ? rerankModel : modelName;
+
         log.info("执行 Rerank: model={}, query长度={}, documents数={}, topN={}",
-                modelName, query.length(), documents.size(), topN);
+                effectiveModel, query.length(), documents.size(), topN);
 
         try {
             // 构建请求体
             JsonObject requestBody = new JsonObject();
-            requestBody.addProperty("model", modelName);
+            requestBody.addProperty("model", effectiveModel);
             requestBody.addProperty("query", query);
             requestBody.addProperty("top_n", Math.min(topN, documents.size()));
             requestBody.addProperty("return_documents", true);
@@ -87,7 +94,7 @@ public class DashScopeRerankService implements RerankService {
             try (Response response = httpClient.newCall(request).execute()) {
                 if (!response.isSuccessful()) {
                     String errorBody = response.body() != null ? response.body().string() : "无响应体";
-                    log.error("Rerank API 调用失败: status={}, body={}", response.code(), errorBody);
+                    log.error("Rerank API 调用失败: status={}, model={}, body={}", response.code(), effectiveModel, errorBody);
                     return buildPassthroughResults(documents, topN);
                 }
 
@@ -96,10 +103,10 @@ public class DashScopeRerankService implements RerankService {
             }
 
         } catch (IOException e) {
-            log.error("Rerank API 网络异常", e);
+            log.error("Rerank API 网络异常: model={}", effectiveModel, e);
             return buildPassthroughResults(documents, topN);
         } catch (Exception e) {
-            log.error("Rerank 处理异常", e);
+            log.error("Rerank 处理异常: model={}", effectiveModel, e);
             return buildPassthroughResults(documents, topN);
         }
     }
@@ -112,7 +119,19 @@ public class DashScopeRerankService implements RerankService {
 
         try {
             JsonObject json = gson.fromJson(responseBody, JsonObject.class);
-            JsonArray resultsArray = json.getAsJsonObject("output").getAsJsonArray("results");
+
+            // 兼容两种响应格式：
+            // 1. OpenAI-compatible: { "results": [...] }
+            // 2. DashScope native:  { "output": { "results": [...] } }
+            JsonArray resultsArray;
+            if (json.has("results") && json.get("results").isJsonArray()) {
+                resultsArray = json.getAsJsonArray("results");
+            } else if (json.has("output") && json.getAsJsonObject("output").has("results")) {
+                resultsArray = json.getAsJsonObject("output").getAsJsonArray("results");
+            } else {
+                log.error("Rerank 响应格式未知: {}", responseBody.substring(0, Math.min(200, responseBody.length())));
+                return buildPassthroughResults(originalDocuments, originalDocuments.size());
+            }
 
             for (JsonElement element : resultsArray) {
                 JsonObject result = element.getAsJsonObject();
