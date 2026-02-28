@@ -31,9 +31,60 @@ export interface TemplateSlide {
   image_slots: { shape_id: number }[];
 }
 
+export type SlideStatus = 'pending' | 'generating' | 'designing' | 'rendering' | 'done' | 'evaluating' | 'repairing' | 'failed';
+
 export interface GeneratedSlide {
   previewImageUrl: string;
   isNew: boolean;
+  status?: SlideStatus;
+  statusLabel?: string;
+}
+
+// ==================== Agent Task Types ====================
+
+export type AgentTaskStatus = 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'FAILED' | 'SKIPPED';
+export type AgentRole = 'PLANNER' | 'RESEARCHER' | 'CONTENT' | 'DESIGN' | 'EVALUATOR' | 'REPAIRER' | 'ASSEMBLER';
+
+export interface AgentTask {
+  id: string;
+  agent: string;
+  agentRole: AgentRole;
+  description: string;
+  status: AgentTaskStatus;
+  statusLabel: string;
+  detail?: string;
+  slideIndex?: number;
+  startedAt?: number;
+  completedAt?: number;
+  durationMs?: number;
+}
+
+export interface AgentTaskSummary {
+  total: number;
+  completed: number;
+  inProgress: number;
+  failed: number;
+  pending: number;
+  progress: number;
+}
+
+export interface EvaluationResult {
+  overallScore: number;
+  contentScore: number;
+  designScore: number;
+  coherenceScore: number;
+  strengths: string[];
+  weaknesses: string[];
+  suggestions: string[];
+  slideFeedbacks: { slideIndex: number; score: number; feedback: string }[];
+  repairRounds: number;
+}
+
+export interface RepairProgress {
+  phase: 'evaluating' | 'repairing';
+  round: number;
+  slideIndex?: number;
+  message: string;
 }
 
 export interface PptGenerationState {
@@ -54,6 +105,10 @@ export interface PptGenerationState {
   resultUrl: string;
   resultFileName: string;
   errorMessage: string;
+  agentTasks: AgentTask[];
+  agentTaskSummary: AgentTaskSummary | null;
+  evaluationResult: EvaluationResult | null;
+  repairProgress: RepairProgress | null;
 }
 
 const initialState: PptGenerationState = {
@@ -74,6 +129,10 @@ const initialState: PptGenerationState = {
   resultUrl: '',
   resultFileName: '',
   errorMessage: '',
+  agentTasks: [],
+  agentTaskSummary: null,
+  evaluationResult: null,
+  repairProgress: null,
 };
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
@@ -216,7 +275,7 @@ export function usePptGeneration() {
       update({ phase: 'generating_outline', outlineMarkdown: '', aiMessage: '', errorMessage: '' });
       const extra: Record<string, unknown> = { topic };
       if (requirements) extra.requirements = requirements;
-      sendAction('generate_outline', extra, (evt, data) => {
+      sendAction('agent_generate_outline', extra, (evt, data) => {
         if (evt === 'message') {
           setState(prev => ({ ...prev, aiMessage: prev.aiMessage + data }));
         } else if (evt === 'outline') {
@@ -323,7 +382,7 @@ export function usePptGeneration() {
       statusMessage: '正在生成幻灯片内容...',
     });
 
-    sendAction('generate_ppt', {}, (evt, data) => {
+    sendAction('agent_generate_ppt', {}, (evt, data) => {
       if (evt === 'status') {
         try {
           const payload = JSONBigString.parse(data);
@@ -332,31 +391,76 @@ export function usePptGeneration() {
             update({ phase: 'assembling' });
           }
         } catch { /* ignore */ }
+      } else if (evt === 'slide_placeholders') {
+        try {
+          const payload = JSONBigString.parse(data);
+          const total = payload.total as number || 0;
+          const slidesData = payload.slides as { index: number; status: string; statusLabel: string }[];
+          const placeholders: GeneratedSlide[] = (slidesData || []).map(() => ({
+            previewImageUrl: '',
+            isNew: false,
+            status: 'pending' as const,
+            statusLabel: '等待生成',
+          }));
+          setState(prev => ({
+            ...prev,
+            generatedSlides: placeholders,
+            totalSlides: total,
+            currentSlide: 0,
+          }));
+        } catch { /* ignore */ }
+      } else if (evt === 'slide_status') {
+        try {
+          const payload = JSONBigString.parse(data);
+          const idx = payload.index as number;
+          const status = payload.status as string;
+          const statusLabel = payload.statusLabel as string;
+          setState(prev => {
+            const slides = [...prev.generatedSlides];
+            if (idx >= 0 && idx < slides.length) {
+              slides[idx] = { ...slides[idx], status: status as GeneratedSlide['status'], statusLabel };
+            }
+            return { ...prev, generatedSlides: slides };
+          });
+        } catch { /* ignore */ }
       } else if (evt === 'slide_progress') {
         try {
           const payload = JSONBigString.parse(data);
-          const newSlide: GeneratedSlide = {
-            previewImageUrl: payload.previewImageUrl || '',
-            isNew: true,
-          };
+          const slideIndex = (payload.current as number || 1) - 1;
+          const previewUrl = payload.previewImageUrl as string || '';
 
           setState(prev => {
-            const slides = [...prev.generatedSlides, newSlide];
+            const slides = [...prev.generatedSlides];
+            if (slideIndex >= 0 && slideIndex < slides.length) {
+              slides[slideIndex] = {
+                ...slides[slideIndex],
+                previewImageUrl: previewUrl,
+                isNew: true,
+                status: 'done',
+                statusLabel: '完成',
+              };
+            } else {
+              slides.push({
+                previewImageUrl: previewUrl,
+                isNew: true,
+                status: 'done',
+                statusLabel: '完成',
+              });
+            }
+            const doneCount = slides.filter(s => s.previewImageUrl).length;
             return {
               ...prev,
               generatedSlides: slides,
-              currentSlide: payload.current || slides.length,
+              currentSlide: doneCount,
               totalSlides: payload.total || prev.totalSlides,
-              selectedSlideIndex: slides.length - 1,
             };
           });
 
-          // 清除 isNew 标记（动画后）
           setTimeout(() => {
             setState(prev => ({
               ...prev,
               generatedSlides: prev.generatedSlides.map((s, i) =>
-                i === prev.generatedSlides.length - 1 ? { ...s, isNew: false } : s
+                i === slideIndex ? { ...s, isNew: false } : s
               ),
             }));
           }, 600);
@@ -364,17 +468,40 @@ export function usePptGeneration() {
       } else if (evt === 'result') {
         try {
           const payload = JSONBigString.parse(data);
-          update({
-            phase: 'completed',
-            resultUrl: payload.fileUrl || payload.file_url || '',
-            resultFileName: payload.fileName || payload.file_name || '',
-            statusMessage: 'PPT 生成完毕！',
+          // Finalize all slides to 'done' and update progress to 100%
+          setState(prev => {
+            const finalSlides = prev.generatedSlides.map(s => ({
+              ...s,
+              status: 'done' as const,
+              statusLabel: '完成',
+              isNew: false,
+            }));
+            const total = prev.totalSlides || finalSlides.length;
+            return {
+              ...prev,
+              phase: 'completed',
+              resultUrl: payload.fileUrl || payload.file_url || '',
+              resultFileName: payload.fileName || payload.file_name || '',
+              statusMessage: 'PPT 生成完毕！',
+              generatedSlides: finalSlides,
+              currentSlide: total,
+              totalSlides: total,
+            };
           });
         } catch { /* ignore */ }
       } else if (evt === 'done') {
         setState(prev => {
           if (prev.resultUrl) {
-            return { ...prev, phase: 'completed', statusMessage: 'PPT 生成完毕！' };
+            const finalSlides = prev.generatedSlides.map(s =>
+              s.status !== 'done' ? { ...s, status: 'done' as const, statusLabel: '完成' } : s
+            );
+            return {
+              ...prev,
+              phase: 'completed',
+              statusMessage: 'PPT 生成完毕！',
+              generatedSlides: finalSlides,
+              currentSlide: prev.totalSlides,
+            };
           }
           return prev;
         });

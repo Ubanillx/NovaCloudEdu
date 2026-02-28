@@ -3,7 +3,7 @@ import JSONBig from 'json-bigint';
 import { apiClient, getToken } from '../api';
 import type {
   PptPhase, PptGenerationState, GeneratedSlide, SlideImage,
-  TemplateSlide,
+  TemplateSlide, AgentTask, AgentTaskSummary,
 } from './usePptGeneration';
 
 const JSONBigString = JSONBig({ storeAsString: true });
@@ -103,6 +103,10 @@ export function usePptChat() {
     resultUrl: '',
     resultFileName: '',
     errorMessage: '',
+    agentTasks: [],
+    agentTaskSummary: null,
+    evaluationResult: null,
+    repairProgress: null,
   });
 
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -295,6 +299,10 @@ export function usePptChat() {
       resultUrl: detail.resultUrl || '',
       resultFileName: detail.resultUrl ? `${detail.topic}.pptx` : '',
       errorMessage: '',
+      agentTasks: [],
+      agentTaskSummary: null,
+      evaluationResult: null,
+      repairProgress: null,
     });
 
   }, [loadSessionDetail, reconstructMessages]);
@@ -480,7 +488,7 @@ export function usePptChat() {
     const extra: Record<string, unknown> = { topic };
     if (requirements) extra.requirements = requirements;
 
-    sendAction('generate_outline', extra, (evt, data) => {
+    sendAction('agent_generate_outline', extra, (evt, data) => {
       if (evt === 'message') {
         setMessages(prev => prev.map(m =>
           m.id === streamMsgId ? { ...m, content: m.content + data } : m
@@ -490,6 +498,28 @@ export function usePptChat() {
         try {
           const payload = JSONBigString.parse(data);
           updatePpt({ statusMessage: payload.message || '', phase: payload.phase || 'generating_outline' });
+        } catch { /* ignore */ }
+      } else if (evt === 'agent_todo') {
+        try {
+          const payload = JSONBigString.parse(data);
+          const eventType = payload.type as string;
+          if (eventType === 'full_list' && Array.isArray(payload.tasks)) {
+            updatePpt({
+              agentTasks: payload.tasks as AgentTask[],
+              agentTaskSummary: payload.summary as AgentTaskSummary || null,
+            });
+          } else if (eventType === 'task_added' || eventType === 'task_status_changed' || eventType === 'task_updated') {
+            const updatedTask = payload.task as AgentTask;
+            if (updatedTask) {
+              setPptState(prev => {
+                const tasks = [...prev.agentTasks];
+                const idx = tasks.findIndex(t => t.id === updatedTask.id);
+                if (idx >= 0) tasks[idx] = updatedTask;
+                else tasks.push(updatedTask);
+                return { ...prev, agentTasks: tasks, agentTaskSummary: payload.summary as AgentTaskSummary || prev.agentTaskSummary };
+              });
+            }
+          }
         } catch { /* ignore */ }
       } else if (evt === 'outline') {
         try {
@@ -670,7 +700,7 @@ export function usePptChat() {
       progress: { current: 0, total: 0 },
     });
 
-    sendAction('generate_ppt', {}, (evt, data) => {
+    sendAction('agent_generate_ppt', {}, (evt, data) => {
       if (evt === 'status') {
         try {
           const payload = JSONBigString.parse(data);
@@ -679,22 +709,74 @@ export function usePptChat() {
             updatePpt({ phase: 'assembling' });
           }
         } catch { /* ignore */ }
-      } else if (evt === 'slide_progress') {
+      } else if (evt === 'slide_placeholders') {
+        // 后端推送所有幻灯片占位符（并行生成开始前）
         try {
           const payload = JSONBigString.parse(data);
-          const newSlide: GeneratedSlide = {
-            previewImageUrl: payload.previewImageUrl || '',
-            isNew: true,
-          };
+          const total = payload.total as number || 0;
+          const slidesData = payload.slides as { index: number; status: string; statusLabel: string }[];
+          const placeholders: GeneratedSlide[] = (slidesData || []).map(() => ({
+            previewImageUrl: '',
+            isNew: false,
+            status: 'pending' as const,
+            statusLabel: '等待生成',
+          }));
+          setPptState(prev => ({
+            ...prev,
+            generatedSlides: placeholders,
+            totalSlides: total,
+            currentSlide: 0,
+          }));
+          updateMessage(progressMsgId, { progress: { current: 0, total } });
+        } catch { /* ignore */ }
+      } else if (evt === 'slide_status') {
+        // 后端推送单页状态变化（generating/designing/rendering/done/evaluating/repairing/failed）
+        try {
+          const payload = JSONBigString.parse(data);
+          const idx = payload.index as number;
+          const status = payload.status as string;
+          const statusLabel = payload.statusLabel as string;
+          setPptState(prev => {
+            const slides = [...prev.generatedSlides];
+            if (idx >= 0 && idx < slides.length) {
+              slides[idx] = { ...slides[idx], status: status as GeneratedSlide['status'], statusLabel };
+            }
+            return { ...prev, generatedSlides: slides };
+          });
+        } catch { /* ignore */ }
+      } else if (evt === 'slide_progress') {
+        // 后端推送单页预览图就绪（更新已有占位符而非追加）
+        try {
+          const payload = JSONBigString.parse(data);
+          const slideIndex = (payload.current as number || 1) - 1; // current is 1-based
+          const previewUrl = payload.previewImageUrl as string || '';
 
           setPptState(prev => {
-            const slides = [...prev.generatedSlides, newSlide];
+            const slides = [...prev.generatedSlides];
+            if (slideIndex >= 0 && slideIndex < slides.length) {
+              // 更新已有占位符
+              slides[slideIndex] = {
+                ...slides[slideIndex],
+                previewImageUrl: previewUrl,
+                isNew: true,
+                status: 'done',
+                statusLabel: '完成',
+              };
+            } else {
+              // 兜底：追加新幻灯片（无占位符时）
+              slides.push({
+                previewImageUrl: previewUrl,
+                isNew: true,
+                status: 'done',
+                statusLabel: '完成',
+              });
+            }
+            const doneCount = slides.filter(s => s.previewImageUrl).length;
             return {
               ...prev,
               generatedSlides: slides,
-              currentSlide: payload.current || slides.length,
+              currentSlide: doneCount,
               totalSlides: payload.total || prev.totalSlides,
-              selectedSlideIndex: slides.length - 1,
             };
           });
 
@@ -711,22 +793,102 @@ export function usePptChat() {
             setPptState(prev => ({
               ...prev,
               generatedSlides: prev.generatedSlides.map((s, i) =>
-                i === prev.generatedSlides.length - 1 ? { ...s, isNew: false } : s
+                i === slideIndex ? { ...s, isNew: false } : s
               ),
             }));
           }, 600);
+        } catch { /* ignore */ }
+      } else if (evt === 'agent_todo') {
+        try {
+          const payload = JSONBigString.parse(data);
+          const eventType = payload.type as string;
+
+          if (eventType === 'full_list' && Array.isArray(payload.tasks)) {
+            updatePpt({
+              agentTasks: payload.tasks as AgentTask[],
+              agentTaskSummary: payload.summary as AgentTaskSummary || null,
+            });
+          } else if (eventType === 'task_added' || eventType === 'task_status_changed' || eventType === 'task_updated') {
+            const updatedTask = payload.task as AgentTask;
+            if (updatedTask) {
+              setPptState(prev => {
+                const tasks = [...prev.agentTasks];
+                const idx = tasks.findIndex(t => t.id === updatedTask.id);
+                if (idx >= 0) {
+                  tasks[idx] = updatedTask;
+                } else {
+                  tasks.push(updatedTask);
+                }
+                return {
+                  ...prev,
+                  agentTasks: tasks,
+                  agentTaskSummary: payload.summary as AgentTaskSummary || prev.agentTaskSummary,
+                };
+              });
+            }
+          }
+        } catch { /* ignore */ }
+      } else if (evt === 'evaluation_result') {
+        try {
+          const payload = JSONBigString.parse(data);
+          updatePpt({
+            evaluationResult: {
+              overallScore: payload.overallScore || 0,
+              contentScore: payload.contentScore || 0,
+              designScore: payload.designScore || 0,
+              coherenceScore: payload.coherenceScore || 0,
+              strengths: payload.strengths || [],
+              weaknesses: payload.weaknesses || [],
+              suggestions: payload.suggestions || [],
+              slideFeedbacks: payload.slideFeedbacks || [],
+              repairRounds: payload.repairRounds || 0,
+            },
+          });
+        } catch { /* ignore */ }
+      } else if (evt === 'repair_progress') {
+        try {
+          const payload = JSONBigString.parse(data);
+          updatePpt({
+            repairProgress: {
+              phase: payload.phase || 'evaluating',
+              round: payload.round || 0,
+              slideIndex: payload.slideIndex,
+              message: payload.message || '',
+            },
+          });
         } catch { /* ignore */ }
       } else if (evt === 'result') {
         try {
           const payload = JSONBigString.parse(data);
           const url = payload.fileUrl || payload.file_url || '';
           const name = payload.fileName || payload.file_name || '';
-          updatePpt({
-            phase: 'completed',
-            resultUrl: url,
-            resultFileName: name,
-            statusMessage: 'PPT 生成完毕！',
+
+          // Finalize all slides to 'done' and update progress to 100%
+          setPptState(prev => {
+            const finalSlides = prev.generatedSlides.map(s => ({
+              ...s,
+              status: 'done' as const,
+              statusLabel: '完成',
+              isNew: false,
+            }));
+            const total = prev.totalSlides || finalSlides.length;
+            return {
+              ...prev,
+              phase: 'completed',
+              resultUrl: url,
+              resultFileName: name,
+              statusMessage: 'PPT 生成完毕！',
+              generatedSlides: finalSlides,
+              currentSlide: total,
+              totalSlides: total,
+            };
           });
+
+          // Update progress card to 100%
+          updateMessage(progressMsgId, {
+            progress: { current: payload.slideCount || 0, total: payload.slideCount || 0 },
+          });
+
           appendMessage({
             type: 'download-card',
             content: '',
@@ -738,7 +900,17 @@ export function usePptChat() {
       } else if (evt === 'done') {
         setPptState(prev => {
           if (prev.resultUrl) {
-            return { ...prev, phase: 'completed', statusMessage: 'PPT 生成完毕！' };
+            // Also finalize any remaining slides
+            const finalSlides = prev.generatedSlides.map(s =>
+              s.status !== 'done' ? { ...s, status: 'done' as const, statusLabel: '完成' } : s
+            );
+            return {
+              ...prev,
+              phase: 'completed',
+              statusMessage: 'PPT 生成完毕！',
+              generatedSlides: finalSlides,
+              currentSlide: prev.totalSlides,
+            };
           }
           return prev;
         });
@@ -777,6 +949,10 @@ export function usePptChat() {
       resultUrl: '',
       resultFileName: '',
       errorMessage: '',
+      agentTasks: [],
+      agentTaskSummary: null,
+      evaluationResult: null,
+      repairProgress: null,
     });
   }, []);
 
