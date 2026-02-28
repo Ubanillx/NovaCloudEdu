@@ -4,16 +4,16 @@ import com.novacloudedu.backend.config.ChatModelProperties;
 import com.novacloudedu.backend.config.ChatModelProperties.ModelConfig;
 import com.novacloudedu.backend.config.ChatModelProperties.ProviderAndModel;
 import com.novacloudedu.backend.config.ChatModelProperties.ProviderConfig;
-import dev.langchain4j.model.chat.ChatLanguageModel;
-import dev.langchain4j.model.chat.StreamingChatLanguageModel;
-import dev.langchain4j.model.dashscope.QwenChatModel;
-import dev.langchain4j.model.dashscope.QwenStreamingChatModel;
+import dev.langchain4j.model.chat.ChatModel;
+import dev.langchain4j.model.chat.StreamingChatModel;
+import dev.langchain4j.community.model.dashscope.QwenChatModel;
+import dev.langchain4j.community.model.dashscope.QwenStreamingChatModel;
 import dev.langchain4j.model.ollama.OllamaChatModel;
 import dev.langchain4j.model.ollama.OllamaStreamingChatModel;
 import dev.langchain4j.model.openai.OpenAiChatModel;
 import dev.langchain4j.model.openai.OpenAiStreamingChatModel;
-import dev.langchain4j.model.zhipu.ZhipuAiChatModel;
-import dev.langchain4j.model.zhipu.ZhipuAiStreamingChatModel;
+import dev.langchain4j.community.model.zhipu.ZhipuAiChatModel;
+import dev.langchain4j.community.model.zhipu.ZhipuAiStreamingChatModel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 /**
  * 聊天模型工厂
  * 
- * 根据 modelId（格式: "provider/model"）创建和缓存 Langchain4j StreamingChatLanguageModel 实例。
+ * 根据 modelId（格式: "provider/model"）创建和缓存 Langchain4j StreamingChatModel 实例。
  * 支持的供应商：
  * - dashscope: 阿里云通义千问（qwen-max, qwen-vl-max 等）
  * - openai: OpenAI 兼容协议（GPT-4o, DeepSeek, Moonshot, SiliconFlow 等）
@@ -42,30 +42,30 @@ public class ChatModelFactory {
     private final ChatModelProperties properties;
 
     /** 流式模型实例缓存 */
-    private final Map<String, StreamingChatLanguageModel> modelCache = new ConcurrentHashMap<>();
+    private final Map<String, StreamingChatModel> modelCache = new ConcurrentHashMap<>();
     /** 非流式模型实例缓存（用于 tool calling） */
-    private final Map<String, ChatLanguageModel> chatModelCache = new ConcurrentHashMap<>();
+    private final Map<String, ChatModel> chatModelCache = new ConcurrentHashMap<>();
 
     /**
      * 获取流式聊天模型（带缓存）
      * 
      * @param modelId 格式: "provider/model"，如 "dashscope/qwen-max"
      */
-    public StreamingChatLanguageModel getStreamingModel(String modelId) {
+    public StreamingChatModel getStreamingModel(String modelId) {
         return modelCache.computeIfAbsent(modelId, this::createStreamingModel);
     }
 
     /**
      * 获取默认文本模型
      */
-    public StreamingChatLanguageModel getDefaultModel() {
+    public StreamingChatModel getDefaultModel() {
         return getStreamingModel(properties.getDefaultModel());
     }
 
     /**
      * 获取默认视觉模型
      */
-    public StreamingChatLanguageModel getDefaultVisionModel() {
+    public StreamingChatModel getDefaultVisionModel() {
         return getStreamingModel(properties.getDefaultVisionModel());
     }
 
@@ -105,7 +105,7 @@ public class ChatModelFactory {
      * 创建带自定义参数的流式聊天模型（不缓存，每次新建）
      * 用于 AI 助手等需要自定义 temperature/topP/maxTokens 的场景
      */
-    public StreamingChatLanguageModel createStreamingModelWithParams(
+    public StreamingChatModel createStreamingModelWithParams(
             String modelId, Double temperature, Double topP, Integer maxTokens) {
         return createStreamingModelWithParams(modelId, temperature, topP, maxTokens, false);
     }
@@ -115,7 +115,7 @@ public class ChatModelFactory {
      *
      * @param enableSearch 是否启用联网搜索（仅 DashScope 供应商支持）
      */
-    public StreamingChatLanguageModel createStreamingModelWithParams(
+    public StreamingChatModel createStreamingModelWithParams(
             String modelId, Double temperature, Double topP, Integer maxTokens,
             boolean enableSearch) {
         ProviderAndModel pm = properties.parseModelId(modelId);
@@ -170,14 +170,14 @@ public class ChatModelFactory {
     /**
      * 获取非流式聊天模型（带缓存），用于 tool calling 等需要同步响应的场景
      */
-    public ChatLanguageModel getChatModel(String modelId) {
+    public ChatModel getChatModel(String modelId) {
         return chatModelCache.computeIfAbsent(modelId, this::createChatModel);
     }
 
     /**
      * 创建带自定义参数的非流式聊天模型（不缓存），用于 tool calling
      */
-    public ChatLanguageModel createChatModelWithParams(
+    public ChatModel createChatModelWithParams(
             String modelId, Double temperature, Double topP, Integer maxTokens) {
         ProviderAndModel pm = properties.parseModelId(modelId);
         ProviderConfig providerConfig = properties.getProviderConfig(pm.provider());
@@ -232,7 +232,7 @@ public class ChatModelFactory {
 
     // ==================== 私有方法：创建各供应商模型实例 ====================
 
-    private StreamingChatLanguageModel createStreamingModel(String modelId) {
+    private StreamingChatModel createStreamingModel(String modelId) {
         ProviderAndModel pm = properties.parseModelId(modelId);
         ProviderConfig providerConfig = properties.getProviderConfig(pm.provider());
         ModelConfig modelConfig = properties.getModelConfig(pm.provider(), pm.model());
@@ -249,7 +249,7 @@ public class ChatModelFactory {
         };
     }
 
-    private StreamingChatLanguageModel createDashScopeModel(ProviderConfig provider, ModelConfig model, String modelName) {
+    private StreamingChatModel createDashScopeModel(ProviderConfig provider, ModelConfig model, String modelName) {
         return QwenStreamingChatModel.builder()
                 .apiKey(provider.getApiKey())
                 .modelName(modelName)
@@ -259,7 +259,7 @@ public class ChatModelFactory {
                 .build();
     }
 
-    private StreamingChatLanguageModel createOpenAiModel(ProviderConfig provider, ModelConfig model, String modelName) {
+    private StreamingChatModel createOpenAiModel(ProviderConfig provider, ModelConfig model, String modelName) {
         var builder = OpenAiStreamingChatModel.builder()
                 .apiKey(provider.getApiKey())
                 .modelName(modelName)
@@ -274,7 +274,7 @@ public class ChatModelFactory {
         return builder.build();
     }
 
-    private StreamingChatLanguageModel createZhipuModel(ProviderConfig provider, ModelConfig model, String modelName) {
+    private StreamingChatModel createZhipuModel(ProviderConfig provider, ModelConfig model, String modelName) {
         return ZhipuAiStreamingChatModel.builder()
                 .apiKey(provider.getApiKey())
                 .model(modelName)
@@ -284,7 +284,7 @@ public class ChatModelFactory {
                 .build();
     }
 
-    private StreamingChatLanguageModel createOllamaModel(ProviderConfig provider, ModelConfig model, String modelName) {
+    private StreamingChatModel createOllamaModel(ProviderConfig provider, ModelConfig model, String modelName) {
         return OllamaStreamingChatModel.builder()
                 .baseUrl(provider.getBaseUrl())
                 .modelName(modelName)
@@ -294,7 +294,7 @@ public class ChatModelFactory {
 
     // ==================== 非流式模型创建 ====================
 
-    private ChatLanguageModel createChatModel(String modelId) {
+    private ChatModel createChatModel(String modelId) {
         ProviderAndModel pm = properties.parseModelId(modelId);
         ProviderConfig providerConfig = properties.getProviderConfig(pm.provider());
         ModelConfig modelConfig = properties.getModelConfig(pm.provider(), pm.model());
