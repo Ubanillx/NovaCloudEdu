@@ -22,6 +22,16 @@ export interface KnowledgeBaseVO {
     'embeddingDimension'?: number;
     'chunkSize'?: number;
     'chunkOverlap'?: number;
+    'chunkStrategy'?: string;
+    'parentChildMode'?: boolean;
+    'parentChunkSize'?: number;
+    'preserveMetadata'?: boolean;
+    'semanticThreshold'?: number;
+    'retrievalMode'?: string;
+    'enableQueryRewrite'?: boolean;
+    'useDynamicTopK'?: boolean;
+    'defaultTopK'?: number;
+    'queryRewriteModelId'?: string;
     'documentCount'?: number;
     'chunkCount'?: number;
     'status'?: string;

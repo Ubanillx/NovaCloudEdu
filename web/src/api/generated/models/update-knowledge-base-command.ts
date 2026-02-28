@@ -17,7 +17,19 @@
 export interface UpdateKnowledgeBaseCommand {
     'name'?: string;
     'description'?: string;
+    'embeddingModel'?: string;
+    'embeddingDimension'?: number;
     'chunkSize'?: number;
     'chunkOverlap'?: number;
+    'chunkStrategy'?: string;
+    'parentChildMode'?: boolean;
+    'parentChunkSize'?: number;
+    'preserveMetadata'?: boolean;
+    'semanticThreshold'?: number;
+    'retrievalMode'?: string;
+    'enableQueryRewrite'?: boolean;
+    'useDynamicTopK'?: boolean;
+    'defaultTopK'?: number;
+    'queryRewriteModelId'?: string;
 }
 
