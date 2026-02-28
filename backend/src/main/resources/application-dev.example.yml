@@ -363,6 +363,23 @@ book:
 ppt-service:
   url: ${PPT_SERVICE_URL:http://localhost:8100}
 
+# PPT Agent 多智能体配置
+ppt:
+  agent:
+    planner-model: ${PPT_AGENT_PLANNER_MODEL:dashscope/qwen-max}
+    content-model: ${PPT_AGENT_CONTENT_MODEL:dashscope/qwen-max}
+    design-model: ${PPT_AGENT_DESIGN_MODEL:dashscope/qwen-vl-max}
+    evaluator-model: ${PPT_AGENT_EVALUATOR_MODEL:dashscope/qwen-max}
+    concurrency: ${PPT_AGENT_CONCURRENCY:3}
+    quality-threshold: ${PPT_AGENT_QUALITY_THRESHOLD:65}
+    max-repair-rounds: ${PPT_AGENT_MAX_REPAIR_ROUNDS:2}
+    slide-score-threshold: ${PPT_AGENT_SLIDE_SCORE_THRESHOLD:60}
+    # 联网图片搜索（Bing Image Search / Google Custom Search）
+    image-search:
+      enabled: ${PPT_AGENT_IMAGE_SEARCH_ENABLED:false}
+      provider: ${PPT_AGENT_IMAGE_SEARCH_PROVIDER:bing}
+      api-key: "${PPT_AGENT_IMAGE_SEARCH_API_KEY:}"
+
 # OnlyOffice 文档服务器配置
 onlyoffice:
   document-server-url: ${ONLYOFFICE_URL:http://localhost:9980}
