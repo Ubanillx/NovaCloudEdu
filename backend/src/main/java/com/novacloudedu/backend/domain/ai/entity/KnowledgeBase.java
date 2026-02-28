@@ -1,5 +1,6 @@
 package com.novacloudedu.backend.domain.ai.entity;
 
+import com.novacloudedu.backend.domain.ai.valueobject.ChunkStrategy;
 import com.novacloudedu.backend.domain.ai.valueobject.KnowledgeBaseId;
 import com.novacloudedu.backend.domain.user.valueobject.UserId;
 import lombok.AccessLevel;
@@ -24,6 +25,19 @@ public class KnowledgeBase {
     private Integer embeddingDimension;
     private Integer chunkSize;
     private Integer chunkOverlap;
+    private ChunkStrategy chunkStrategy;
+    private Boolean parentChildMode;
+    private Integer parentChunkSize;
+    private Boolean preserveMetadata;
+    private Double semanticThreshold;
+    
+    // RAG 检索配置
+    private String retrievalMode;
+    private Boolean enableQueryRewrite;
+    private Boolean useDynamicTopK;
+    private Integer defaultTopK;
+    private String queryRewriteModelId;
+    private String rerankModel;
     
     // 统计
     private Integer documentCount;
@@ -52,10 +66,21 @@ public class KnowledgeBase {
         kb.name = name.trim();
         kb.description = description;
         kb.creatorId = creatorId;
-        kb.embeddingModel = "text-embedding-v2";
-        kb.embeddingDimension = 1536;
+        kb.embeddingModel = "text-embedding-v4";
+        kb.embeddingDimension = 1024;
         kb.chunkSize = 500;
         kb.chunkOverlap = 50;
+        kb.chunkStrategy = ChunkStrategy.SEMANTIC;
+        kb.parentChildMode = false;
+        kb.parentChunkSize = 1500;
+        kb.preserveMetadata = true;
+        kb.semanticThreshold = 0.5;
+        kb.retrievalMode = "HYBRID_RERANK";
+        kb.enableQueryRewrite = false;
+        kb.useDynamicTopK = true;
+        kb.defaultTopK = 5;
+        kb.queryRewriteModelId = "dashscope/qwen-turbo";
+        kb.rerankModel = "qwen3-rerank";
         kb.documentCount = 0;
         kb.chunkCount = 0;
         kb.status = "ACTIVE";
@@ -75,6 +100,17 @@ public class KnowledgeBase {
             Integer embeddingDimension,
             Integer chunkSize,
             Integer chunkOverlap,
+            ChunkStrategy chunkStrategy,
+            Boolean parentChildMode,
+            Integer parentChunkSize,
+            Boolean preserveMetadata,
+            Double semanticThreshold,
+            String retrievalMode,
+            Boolean enableQueryRewrite,
+            Boolean useDynamicTopK,
+            Integer defaultTopK,
+            String queryRewriteModelId,
+            String rerankModel,
             Integer documentCount,
             Integer chunkCount,
             String status,
@@ -90,6 +126,17 @@ public class KnowledgeBase {
         kb.embeddingDimension = embeddingDimension;
         kb.chunkSize = chunkSize;
         kb.chunkOverlap = chunkOverlap;
+        kb.chunkStrategy = chunkStrategy != null ? chunkStrategy : ChunkStrategy.SEMANTIC;
+        kb.parentChildMode = parentChildMode != null ? parentChildMode : false;
+        kb.parentChunkSize = parentChunkSize != null ? parentChunkSize : 1500;
+        kb.preserveMetadata = preserveMetadata != null ? preserveMetadata : true;
+        kb.semanticThreshold = semanticThreshold != null ? semanticThreshold : 0.5;
+        kb.retrievalMode = retrievalMode != null ? retrievalMode : "HYBRID_RERANK";
+        kb.enableQueryRewrite = enableQueryRewrite != null ? enableQueryRewrite : false;
+        kb.useDynamicTopK = useDynamicTopK != null ? useDynamicTopK : true;
+        kb.defaultTopK = defaultTopK != null ? defaultTopK : 5;
+        kb.queryRewriteModelId = queryRewriteModelId != null ? queryRewriteModelId : "dashscope/qwen-turbo";
+        kb.rerankModel = rerankModel != null ? rerankModel : "qwen3-rerank";
         kb.documentCount = documentCount;
         kb.chunkCount = chunkCount;
         kb.status = status;
@@ -113,12 +160,67 @@ public class KnowledgeBase {
     /**
      * 更新向量化配置
      */
-    public void updateEmbeddingConfig(Integer chunkSize, Integer chunkOverlap) {
+    public void updateEmbeddingConfig(String embeddingModel, Integer embeddingDimension, Integer chunkSize, Integer chunkOverlap) {
+        if (embeddingModel != null && !embeddingModel.isBlank()) {
+            this.embeddingModel = embeddingModel;
+        }
+        if (embeddingDimension != null && embeddingDimension > 0) {
+            this.embeddingDimension = embeddingDimension;
+        }
         if (chunkSize != null && chunkSize > 0) {
             this.chunkSize = chunkSize;
         }
         if (chunkOverlap != null && chunkOverlap >= 0) {
             this.chunkOverlap = chunkOverlap;
+        }
+        this.updateTime = LocalDateTime.now();
+    }
+
+    /**
+     * 更新切分配置
+     */
+    public void updateChunkConfig(ChunkStrategy chunkStrategy, Boolean parentChildMode,
+                                   Integer parentChunkSize, Boolean preserveMetadata,
+                                   Double semanticThreshold) {
+        if (chunkStrategy != null) {
+            this.chunkStrategy = chunkStrategy;
+        }
+        if (parentChildMode != null) {
+            this.parentChildMode = parentChildMode;
+        }
+        if (parentChunkSize != null && parentChunkSize > 0) {
+            this.parentChunkSize = parentChunkSize;
+        }
+        if (preserveMetadata != null) {
+            this.preserveMetadata = preserveMetadata;
+        }
+        if (semanticThreshold != null && semanticThreshold >= 0 && semanticThreshold <= 1) {
+            this.semanticThreshold = semanticThreshold;
+        }
+        this.updateTime = LocalDateTime.now();
+    }
+
+    /**
+     * 更新RAG检索配置
+     */
+    public void updateRetrievalConfig(String retrievalMode, Boolean enableQueryRewrite, Boolean useDynamicTopK, Integer defaultTopK, String queryRewriteModelId, String rerankModel) {
+        if (retrievalMode != null) {
+            this.retrievalMode = retrievalMode;
+        }
+        if (enableQueryRewrite != null) {
+            this.enableQueryRewrite = enableQueryRewrite;
+        }
+        if (useDynamicTopK != null) {
+            this.useDynamicTopK = useDynamicTopK;
+        }
+        if (defaultTopK != null && defaultTopK > 0 && defaultTopK <= 20) {
+            this.defaultTopK = defaultTopK;
+        }
+        if (queryRewriteModelId != null && !queryRewriteModelId.isBlank()) {
+            this.queryRewriteModelId = queryRewriteModelId;
+        }
+        if (rerankModel != null && !rerankModel.isBlank()) {
+            this.rerankModel = rerankModel;
         }
         this.updateTime = LocalDateTime.now();
     }

@@ -33,6 +33,11 @@ public interface KnowledgeChunkRepository {
     List<ChunkSearchResult> searchSimilarInMultiple(List<Long> knowledgeBaseIds, float[] queryEmbedding, int topK);
 
     /**
+     * 全文检索（BM25）在多个知识库中搜索
+     */
+    List<ChunkSearchResult> fullTextSearchInMultiple(List<Long> knowledgeBaseIds, String query, int topK);
+
+    /**
      * 根据文档ID删除分块
      */
     void deleteByDocumentId(KnowledgeDocumentId documentId);
@@ -78,6 +83,9 @@ public interface KnowledgeChunkRepository {
             Long documentId,
             String content,
             Integer chunkIndex,
+            Long parentChunkId,
+            Boolean isParentChunk,
+            String sectionTitle,
             String metadata,
             java.time.LocalDateTime createTime
     ) {}

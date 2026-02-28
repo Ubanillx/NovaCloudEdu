@@ -19,6 +19,13 @@ public interface RerankService {
     List<RerankResult> rerank(String query, List<String> documents, int topN);
 
     /**
+     * 对文档列表按与查询的相关性重新排序（指定模型）
+     */
+    default List<RerankResult> rerank(String query, List<String> documents, int topN, String modelName) {
+        return rerank(query, documents, topN);
+    }
+
+    /**
      * 重排序结果
      */
     record RerankResult(
