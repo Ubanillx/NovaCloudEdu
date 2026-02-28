@@ -1358,20 +1358,20 @@ public class PptAgentOrchestrator {
 
     private String buildEvaluationInput(List<Map<String, Object>> slides, String outline) {
         StringBuilder sb = new StringBuilder();
-        sb.append("## 原始大纲\n").append(outline).append("\n\n");
-        sb.append("## 生成的幻灯片内容（共").append(slides.size()).append("页）\n\n");
+        sb.append("## Original Outline\n").append(outline).append("\n\n");
+        sb.append("## Generated Slide Content (").append(slides.size()).append(" slides)\n\n");
 
         for (int i = 0; i < slides.size(); i++) {
             try {
-                sb.append("### 第").append(i + 1).append("页\n");
+                sb.append("### Slide ").append(i + 1).append("\n");
                 sb.append(objectMapper.writeValueAsString(slides.get(i)));
                 sb.append("\n\n");
             } catch (Exception e) {
-                sb.append("（解析失败）\n\n");
+                sb.append("(parse failed)\n\n");
             }
         }
 
-        sb.append("请对这份PPT进行全面的质量评估，输出纯JSON。");
+        sb.append("Please perform a comprehensive quality evaluation of this presentation. Output pure JSON.");
         return sb.toString();
     }
 
@@ -1382,16 +1382,24 @@ public class PptAgentOrchestrator {
         String researchSummary = "";
         String outlineMarkdown = rawResult;
 
-        int outlineIdx = rawResult.indexOf("## PPT大纲");
+        // Try English markers first (matching PlannerAgent output format)
+        int outlineIdx = rawResult.indexOf("## Presentation Outline");
+        if (outlineIdx == -1) {
+            outlineIdx = rawResult.indexOf("## PPT大纲");
+        }
         if (outlineIdx == -1) {
             outlineIdx = rawResult.indexOf("## PPT 大纲");
         }
 
         if (outlineIdx > 0) {
             researchSummary = rawResult.substring(0, outlineIdx).trim();
-            outlineMarkdown = rawResult.substring(outlineIdx + "## PPT大纲".length()).trim();
-            // 移除 "## 研究摘要" 前缀
-            if (researchSummary.startsWith("## 研究摘要")) {
+            // Remove the heading line itself
+            String headingLine = rawResult.substring(outlineIdx).split("\n", 2)[0];
+            outlineMarkdown = rawResult.substring(outlineIdx + headingLine.length()).trim();
+            // Remove research summary heading prefix
+            if (researchSummary.startsWith("## Research Summary")) {
+                researchSummary = researchSummary.substring("## Research Summary".length()).trim();
+            } else if (researchSummary.startsWith("## 研究摘要")) {
                 researchSummary = researchSummary.substring("## 研究摘要".length()).trim();
             }
         }

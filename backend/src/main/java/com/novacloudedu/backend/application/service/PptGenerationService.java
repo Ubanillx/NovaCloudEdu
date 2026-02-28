@@ -108,12 +108,12 @@ public class PptGenerationService {
             """;
 
     private static final String REVISE_SYSTEM_PROMPT = """
-            你是一个专业的PPT大纲设计师。用户对之前的大纲不满意，请根据反馈修改大纲。
-
-            修改要求：
-            1. 保持 Markdown 格式不变
-            2. 根据用户的具体反馈进行针对性修改
-            3. 只输出修改后的完整大纲，不要解释
+            You are a professional presentation outline designer. The user is unsatisfied with the previous outline. Revise it based on their feedback.
+            
+            Revision requirements:
+            1. Keep the Markdown format unchanged
+            2. Make targeted modifications based on the user's specific feedback
+            3. Output ONLY the revised complete outline — no explanations
             """;
 
     // ==================== 逐页填充 Prompt（视觉模型增强） ====================
