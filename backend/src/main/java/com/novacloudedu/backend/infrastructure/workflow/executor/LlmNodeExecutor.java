@@ -15,7 +15,7 @@ import com.novacloudedu.backend.infrastructure.ai.McpClientService;
 import com.novacloudedu.backend.infrastructure.ai.McpClientService.McpTool;
 import dev.langchain4j.agent.tool.ToolSpecification;
 import dev.langchain4j.data.message.*;
-import dev.langchain4j.model.chat.ChatLanguageModel;
+import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.chat.request.ChatRequest;
 import dev.langchain4j.model.chat.request.json.JsonObjectSchema;
 import dev.langchain4j.model.chat.response.ChatResponse;
@@ -312,7 +312,7 @@ public class LlmNodeExecutor implements NodeExecutor {
      * 流程：
      * 1. 连接所有配置的 MCP 服务器，发现工具列表
      * 2. 将 MCP 工具转换为 langchain4j ToolSpecification
-     * 3. 使用非流式 ChatLanguageModel 发送消息 + 工具规格
+     * 3. 使用非流式 ChatModel 发送消息 + 工具规格
      * 4. 如果 LLM 返回工具调用请求，通过 MCP 执行工具
      * 5. 将工具结果反馈给 LLM，循环直到得到最终文本回复
      */
@@ -355,7 +355,7 @@ public class LlmNodeExecutor implements NodeExecutor {
                 allToolSpecs.stream().map(ToolSpecification::name).toList());
 
         // 2. 创建非流式模型（tool calling 需要同步响应）
-        ChatLanguageModel chatModel;
+        ChatModel chatModel;
         if (temperature != null || topP != null || maxTokens != null) {
             chatModel = chatModelFactory.createChatModelWithParams(modelId, temperature, topP, maxTokens);
         } else {
