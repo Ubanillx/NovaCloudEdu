@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -78,25 +77,8 @@ public class AiUsageRecordRepositoryImpl implements AiUsageRecordRepository {
 
     @Override
     public void incrementUsage(UserId userId, AiFeatureType featureType, LocalDate date) {
-        LambdaQueryWrapper<AiUsageRecordPO> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(AiUsageRecordPO::getUserId, userId.value())
-                .eq(AiUsageRecordPO::getFeatureType, featureType.getValue())
-                .eq(AiUsageRecordPO::getUsageDate, date);
-        AiUsageRecordPO existing = aiUsageRecordMapper.selectOne(wrapper);
-
-        if (existing != null) {
-            existing.setUsageCount(existing.getUsageCount() + 1);
-            existing.setUpdateTime(LocalDateTime.now());
-            aiUsageRecordMapper.updateById(existing);
-        } else {
-            AiUsageRecordPO po = new AiUsageRecordPO();
-            po.setUserId(userId.value());
-            po.setFeatureType(featureType.getValue());
-            po.setUsageDate(date);
-            po.setUsageCount(1);
-            po.setCreateTime(LocalDateTime.now());
-            po.setUpdateTime(LocalDateTime.now());
-            aiUsageRecordMapper.insert(po);
-        }
+        // 使用 PostgreSQL INSERT ON CONFLICT DO UPDATE 原子性 upsert，避免并发竞态
+        long id = com.baomidou.mybatisplus.core.toolkit.IdWorker.getId();
+        aiUsageRecordMapper.upsertUsage(id, userId.value(), featureType.getValue(), date);
     }
 }

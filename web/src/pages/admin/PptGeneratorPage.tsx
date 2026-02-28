@@ -15,6 +15,7 @@ import { usePptChat } from '../../hooks/usePptChat';
 import type { PptSessionSummary } from '../../hooks/usePptChat';
 import PptChatMessageComponent from '../../components/ppt/PptChatMessage';
 import PptPreviewPanel from '../../components/ppt/PptPreviewPanel';
+import AgentTaskPanel from '../../components/ppt/AgentTaskPanel';
 import PptChatInput from '../../components/ppt/PptChatInput';
 import { useTextToSpeech } from '../../hooks/useTextToSpeech';
 import { TemplateSelector } from '../../components/ppt/TemplateSelector';
@@ -327,16 +328,32 @@ const PptGeneratorPage: React.FC = () => {
           />
         </div>
 
-        {/* 右侧 PPT 缩略图面板 */}
-        {chat.showPreview && (
-          <div className="w-52 flex-shrink-0 border-l border-gray-100 dark:border-gray-800 bg-gray-50/30 dark:bg-gray-800/20 transition-all duration-500 animate-in slide-in-from-right duration-500">
-            <PptPreviewPanel
-              slides={chat.pptState.generatedSlides}
-              selectedIndex={chat.pptState.selectedSlideIndex}
-              onSelectSlide={chat.setSelectedSlide}
-              totalSlides={chat.pptState.totalSlides}
-              isGenerating={chat.pptState.phase === 'generating_slides'}
-            />
+        {/* 右侧面板区：Agent任务 + PPT缩略图 */}
+        {(chat.showPreview || chat.pptState.agentTasks.length > 0) && (
+          <div className="w-60 flex-shrink-0 border-l border-gray-100 dark:border-gray-800 bg-gray-50/30 dark:bg-gray-800/20 transition-all duration-500 animate-in slide-in-from-right duration-500 flex flex-col">
+            {/* Agent 任务面板 */}
+            {chat.pptState.agentTasks.length > 0 && (
+              <div className={`${chat.showPreview ? 'max-h-[50%]' : 'flex-1'} overflow-hidden flex flex-col`}>
+                <AgentTaskPanel
+                  tasks={chat.pptState.agentTasks}
+                  summary={chat.pptState.agentTaskSummary}
+                  evaluationResult={chat.pptState.evaluationResult}
+                  repairProgress={chat.pptState.repairProgress}
+                />
+              </div>
+            )}
+            {/* PPT 缩略图面板 */}
+            {chat.showPreview && (
+              <div className={`${chat.pptState.agentTasks.length > 0 ? 'border-t border-gray-100 dark:border-gray-800' : ''} flex-1 overflow-hidden`}>
+                <PptPreviewPanel
+                  slides={chat.pptState.generatedSlides}
+                  selectedIndex={chat.pptState.selectedSlideIndex}
+                  onSelectSlide={chat.setSelectedSlide}
+                  totalSlides={chat.pptState.totalSlides}
+                  isGenerating={chat.pptState.phase === 'generating_slides'}
+                />
+              </div>
+            )}
           </div>
         )}
       </div>
