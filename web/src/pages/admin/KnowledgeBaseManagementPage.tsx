@@ -29,6 +29,12 @@ import {
   SearchCheck,
   ChevronDown,
   ChevronUp,
+  Sparkles,
+  ToggleLeft,
+  ToggleRight,
+  SlidersHorizontal,
+  Scissors,
+  GitBranch,
 } from 'lucide-react';
 import { apiClient, DefaultApi, Configuration } from '../../api';
 import type {
@@ -72,6 +78,37 @@ const FILE_TYPE_ICONS: Record<string, { icon: LucideIcon; color: string }> = {
   EPUB: { icon: BookOpen, color: 'text-teal-500' },
 };
 
+// 切分策略配置
+const CHUNK_STRATEGY_MAP: Record<string, { label: string; description: string; icon: LucideIcon }> = {
+  SEMANTIC: { label: '语义切分', description: '综合标题+段落+embedding相似度+句法边界（推荐）', icon: Sparkles },
+  PARAGRAPH: { label: '段落切分', description: '按段落边界切分，保持段落完整性', icon: FileText },
+  TITLE: { label: '标题切分', description: '按Markdown标题层级切分', icon: Hash },
+  SENTENCE: { label: '句法切分', description: '按句号/问号/感叹号等句法边界切分', icon: Scissors },
+  FIXED: { label: '固定大小', description: '按固定字符数切分', icon: Layers },
+};
+
+// 检索模式配置
+const RETRIEVAL_MODE_MAP: Record<string, { label: string; description: string; icon: LucideIcon }> = {
+  VECTOR_ONLY: { label: '纯向量召回', description: '仅使用向量相似度检索', icon: Database },
+  HYBRID: { label: '混合召回', description: '向量 + BM25 全文检索，RRF 融合', icon: Layers },
+  HYBRID_RERANK: { label: '混合召回+Rerank', description: '混合召回 + Rerank 精排（推荐）', icon: Sparkles },
+};
+
+// Embedding 模型配置（前端静态，与后端 /embedding-models API 一致）
+const EMBEDDING_MODELS = [
+  { model: 'text-embedding-v4', label: 'text-embedding-v4 (Qwen3)', dimensions: [2048, 1536, 1024, 768, 512, 256, 128, 64], defaultDimension: 1024, recommended: true },
+  { model: 'text-embedding-v3', label: 'text-embedding-v3', dimensions: [1024, 768, 512, 256, 128, 64], defaultDimension: 1024, recommended: false },
+  { model: 'text-embedding-v2', label: 'text-embedding-v2', dimensions: [1536], defaultDimension: 1536, recommended: false },
+  { model: 'text-embedding-v1', label: 'text-embedding-v1 (Legacy)', dimensions: [1536], defaultDimension: 1536, recommended: false },
+];
+
+// Rerank 模型配置
+const RERANK_MODELS = [
+  { model: 'qwen3-rerank', label: 'Qwen3 Rerank', desc: '500并发·4K上下文·100+语种', recommended: true },
+  { model: 'gte-rerank-v2', label: 'GTE Rerank v2', desc: '30K并发·50+语种', recommended: false },
+  { model: 'qwen3-vl-rerank', label: 'Qwen3 VL Rerank', desc: '100并发·8K上下文·多模态', recommended: false },
+];
+
 const FileTypeIcon: React.FC<{ fileType?: string; size?: number }> = ({ fileType, size = 18 }) => {
   const config = FILE_TYPE_ICONS[fileType || ''] || { icon: File, color: 'text-gray-400' };
   const Icon = config.icon;
@@ -107,14 +144,30 @@ interface KBFormModalProps {
   knowledgeBase?: KnowledgeBaseVO | null;
 }
 
+type KBFormData = CreateKnowledgeBaseCommand & { rerankModel?: string };
+
 const KBFormModal: React.FC<KBFormModalProps> = ({ isOpen, onClose, onSuccess, knowledgeBase }) => {
   const isEdit = !!knowledgeBase;
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState<CreateKnowledgeBaseCommand>({
+  const [showAdvancedChunk, setShowAdvancedChunk] = useState(false);
+  const [formData, setFormData] = useState<KBFormData>({
     name: '',
     description: '',
+    embeddingModel: 'text-embedding-v4',
+    embeddingDimension: 1024,
     chunkSize: 500,
     chunkOverlap: 50,
+    chunkStrategy: 'SEMANTIC',
+    parentChildMode: false,
+    parentChunkSize: 1500,
+    preserveMetadata: true,
+    semanticThreshold: 0.5,
+    retrievalMode: 'HYBRID_RERANK',
+    enableQueryRewrite: false,
+    useDynamicTopK: true,
+    defaultTopK: 5,
+    queryRewriteModelId: 'dashscope/qwen-turbo',
+    rerankModel: 'qwen3-rerank',
   });
 
   useEffect(() => {
@@ -122,12 +175,26 @@ const KBFormModal: React.FC<KBFormModalProps> = ({ isOpen, onClose, onSuccess, k
       setFormData({
         name: knowledgeBase.name || '',
         description: knowledgeBase.description || '',
+        embeddingModel: knowledgeBase.embeddingModel || 'text-embedding-v4',
+        embeddingDimension: knowledgeBase.embeddingDimension || 1024,
         chunkSize: knowledgeBase.chunkSize || 500,
         chunkOverlap: knowledgeBase.chunkOverlap || 50,
+        chunkStrategy: knowledgeBase.chunkStrategy || 'SEMANTIC',
+        parentChildMode: knowledgeBase.parentChildMode ?? false,
+        parentChunkSize: knowledgeBase.parentChunkSize || 1500,
+        preserveMetadata: knowledgeBase.preserveMetadata ?? true,
+        semanticThreshold: knowledgeBase.semanticThreshold ?? 0.5,
+        retrievalMode: knowledgeBase.retrievalMode || 'HYBRID_RERANK',
+        enableQueryRewrite: knowledgeBase.enableQueryRewrite ?? false,
+        useDynamicTopK: knowledgeBase.useDynamicTopK ?? true,
+        defaultTopK: knowledgeBase.defaultTopK ?? 5,
+        queryRewriteModelId: knowledgeBase.queryRewriteModelId || 'dashscope/qwen-turbo',
+        rerankModel: (knowledgeBase as any).rerankModel || 'qwen3-rerank',
       });
     } else {
-      setFormData({ name: '', description: '', chunkSize: 500, chunkOverlap: 50 });
+      setFormData({ name: '', description: '', embeddingModel: 'text-embedding-v4', embeddingDimension: 1024, chunkSize: 500, chunkOverlap: 50, chunkStrategy: 'SEMANTIC', parentChildMode: false, parentChunkSize: 1500, preserveMetadata: true, semanticThreshold: 0.5, retrievalMode: 'HYBRID_RERANK', enableQueryRewrite: false, useDynamicTopK: true, defaultTopK: 5, queryRewriteModelId: 'dashscope/qwen-turbo', rerankModel: 'qwen3-rerank' });
     }
+    setShowAdvancedChunk(false);
   }, [knowledgeBase, isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -143,8 +210,20 @@ const KBFormModal: React.FC<KBFormModalProps> = ({ isOpen, onClose, onSuccess, k
         const updateData: UpdateKnowledgeBaseCommand = {
           name: formData.name,
           description: formData.description,
+          embeddingModel: formData.embeddingModel,
+          embeddingDimension: formData.embeddingDimension,
           chunkSize: formData.chunkSize,
           chunkOverlap: formData.chunkOverlap,
+          chunkStrategy: formData.chunkStrategy,
+          parentChildMode: formData.parentChildMode,
+          parentChunkSize: formData.parentChunkSize,
+          preserveMetadata: formData.preserveMetadata,
+          semanticThreshold: formData.semanticThreshold,
+          retrievalMode: formData.retrievalMode,
+          enableQueryRewrite: formData.enableQueryRewrite,
+          useDynamicTopK: formData.useDynamicTopK,
+          defaultTopK: formData.defaultTopK,
+          queryRewriteModelId: formData.queryRewriteModelId,
         };
         const response = await api.kbUpdate({
           id: knowledgeBase.id,
@@ -183,7 +262,7 @@ const KBFormModal: React.FC<KBFormModalProps> = ({ isOpen, onClose, onSuccess, k
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-lg mx-4 max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-200">
+      <div className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-200">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800">
           <h3 className="text-lg font-bold text-gray-900 dark:text-white">
@@ -195,7 +274,7 @@ const KBFormModal: React.FC<KBFormModalProps> = ({ isOpen, onClose, onSuccess, k
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto max-h-[calc(90vh-140px)]">
+        <form onSubmit={handleSubmit} className="p-6 space-y-5 overflow-y-auto max-h-[calc(90vh-140px)]">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">名称 *</label>
             <input
@@ -220,10 +299,111 @@ const KBFormModal: React.FC<KBFormModalProps> = ({ isOpen, onClose, onSuccess, k
             />
           </div>
 
+          {/* Embedding 模型选择 */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <span className="flex items-center gap-1.5"><Database size={14} className="text-brand-500" /> Embedding 模型</span>
+            </label>
+            <div className="space-y-2">
+              <select
+                value={formData.embeddingModel || 'text-embedding-v4'}
+                onChange={(e) => {
+                  const model = EMBEDDING_MODELS.find(m => m.model === e.target.value);
+                  if (isEdit && knowledgeBase?.chunkCount && knowledgeBase.chunkCount > 0 && e.target.value !== knowledgeBase.embeddingModel) {
+                    if (!window.confirm('当前知识库已有向量化数据，切换 Embedding 模型后需要重新向量化所有文档。确定要更改吗？')) {
+                      return;
+                    }
+                  }
+                  setFormData(prev => ({
+                    ...prev,
+                    embeddingModel: e.target.value,
+                    embeddingDimension: model?.defaultDimension ?? 1024,
+                  }));
+                }}
+                className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-white outline-none focus:border-brand-500/50 focus:ring-2 focus:ring-brand-500/20 transition-all"
+              >
+                {EMBEDDING_MODELS.map(m => (
+                  <option key={m.model} value={m.model}>
+                    {m.label}{m.recommended ? ' ★ 推荐' : ''}
+                  </option>
+                ))}
+              </select>
+              <div className="flex items-center gap-3">
+                <label className="text-xs font-medium text-gray-500 dark:text-gray-400 whitespace-nowrap">向量维度</label>
+                <select
+                  value={formData.embeddingDimension || 1024}
+                  onChange={(e) => setFormData(prev => ({ ...prev, embeddingDimension: Number(e.target.value) }))}
+                  className="flex-1 px-3 py-1.5 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg text-sm text-gray-900 dark:text-white outline-none focus:border-brand-500/50 transition-all"
+                >
+                  {(EMBEDDING_MODELS.find(m => m.model === formData.embeddingModel)?.dimensions || [1024]).map(d => (
+                    <option key={d} value={d}>{d}</option>
+                  ))}
+                </select>
+                <span className="text-[10px] text-gray-400 whitespace-nowrap">维度越高精度越高，速度越慢</span>
+              </div>
+            </div>
+          </div>
+
+          {/* 切分策略选择 */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">切分策略</label>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {Object.entries(CHUNK_STRATEGY_MAP).map(([key, cfg]) => {
+                const StratIcon = cfg.icon;
+                const selected = formData.chunkStrategy === key;
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, chunkStrategy: key }))}
+                    className={`flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-medium border transition-all text-left ${
+                      selected
+                        ? 'bg-brand-50 dark:bg-brand-900/20 border-brand-500 text-brand-700 dark:text-brand-400 ring-1 ring-brand-500/20'
+                        : 'bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
+                    }`}
+                  >
+                    <StratIcon size={16} className={selected ? 'text-brand-500' : 'text-gray-400'} />
+                    <div className="min-w-0">
+                      <div className="font-bold text-xs">{cfg.label}</div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+            {formData.chunkStrategy && CHUNK_STRATEGY_MAP[formData.chunkStrategy] && (
+              <p className="text-xs text-gray-400 mt-1.5 pl-1">
+                {CHUNK_STRATEGY_MAP[formData.chunkStrategy].description}
+              </p>
+            )}
+          </div>
+
+          {/* 语义切分：显示语义阈值 */}
+          {formData.chunkStrategy === 'SEMANTIC' && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                语义相似度阈值 <span className="text-brand-500 font-bold">{formData.semanticThreshold}</span>
+              </label>
+              <input
+                type="range"
+                value={formData.semanticThreshold}
+                onChange={(e) => setFormData(prev => ({ ...prev, semanticThreshold: parseFloat(e.target.value) }))}
+                min={0.1}
+                max={0.9}
+                step={0.05}
+                className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-brand-500"
+              />
+              <div className="flex justify-between text-[10px] text-gray-400 mt-0.5">
+                <span>更粗粒度 (0.1)</span>
+                <span>更细粒度 (0.9)</span>
+              </div>
+            </div>
+          )}
+
+          {/* 分块大小和重叠（所有策略均可配置，SEMANTIC策略作为最大分块大小） */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                分块大小
+                {formData.chunkStrategy === 'SEMANTIC' ? '最大分块大小' : '分块大小'}
                 <span className="text-xs text-gray-400 ml-1">(字符)</span>
               </label>
               <input
@@ -249,6 +429,209 @@ const KBFormModal: React.FC<KBFormModalProps> = ({ isOpen, onClose, onSuccess, k
                 max={1000}
               />
             </div>
+          </div>
+
+          {/* 高级配置 */}
+          <div>
+            <button
+              type="button"
+              onClick={() => setShowAdvancedChunk(!showAdvancedChunk)}
+              className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-brand-600 dark:hover:text-brand-400 transition-colors"
+            >
+              <SlidersHorizontal size={14} />
+              <span>高级切分配置</span>
+              {showAdvancedChunk ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+            </button>
+            {showAdvancedChunk && (
+              <div className="mt-3 space-y-4 pl-1">
+                {/* 父子Chunk模式 */}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                      <GitBranch size={14} className="text-gray-400" />
+                      父子Chunk模式
+                    </div>
+                    <p className="text-xs text-gray-400 mt-0.5">生成大块作为父chunk，小块作为子chunk，提升召回上下文</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, parentChildMode: !prev.parentChildMode }))}
+                    className="flex-shrink-0"
+                  >
+                    {formData.parentChildMode
+                      ? <ToggleRight size={32} className="text-brand-500" />
+                      : <ToggleLeft size={32} className="text-gray-300 dark:text-gray-600" />
+                    }
+                  </button>
+                </div>
+
+                {formData.parentChildMode && (
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">父Chunk大小 (字符)</label>
+                    <input
+                      type="number"
+                      value={formData.parentChunkSize}
+                      onChange={(e) => setFormData(prev => ({ ...prev, parentChunkSize: Number(e.target.value) || 1500 }))}
+                      className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg text-sm text-gray-900 dark:text-white outline-none focus:border-brand-500/50 transition-all"
+                      min={500}
+                      max={10000}
+                    />
+                  </div>
+                )}
+
+                {/* 保留元数据 */}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                      <Settings2 size={14} className="text-gray-400" />
+                      保留元数据
+                    </div>
+                    <p className="text-xs text-gray-400 mt-0.5">保存文档名、章节标题等信息到分块元数据</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, preserveMetadata: !prev.preserveMetadata }))}
+                    className="flex-shrink-0"
+                  >
+                    {formData.preserveMetadata
+                      ? <ToggleRight size={32} className="text-brand-500" />
+                      : <ToggleLeft size={32} className="text-gray-300 dark:text-gray-600" />
+                    }
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* RAG 检索配置 */}
+          <div className="space-y-3">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <span className="flex items-center gap-2"><SearchCheck size={16} className="text-accent-500" /> 检索模式</span>
+            </label>
+            <div className="grid grid-cols-3 gap-2">
+              {Object.entries(RETRIEVAL_MODE_MAP).map(([key, config]) => {
+                const Icon = config.icon;
+                const selected = formData.retrievalMode === key;
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, retrievalMode: key }))}
+                    className={`relative p-3 rounded-xl border-2 transition-all text-left ${
+                      selected
+                        ? 'border-accent-500 bg-accent-50 dark:bg-accent-900/20 shadow-md shadow-accent-500/10'
+                        : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                    }`}
+                  >
+                    <Icon size={18} className={selected ? 'text-accent-500' : 'text-gray-400'} />
+                    <div className={`text-xs font-bold mt-1.5 ${selected ? 'text-accent-600 dark:text-accent-400' : 'text-gray-600 dark:text-gray-400'}`}>{config.label}</div>
+                    <div className="text-[10px] text-gray-400 mt-0.5 leading-tight">{config.description}</div>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Rerank 模型选择（仅 HYBRID_RERANK 模式显示） */}
+            {formData.retrievalMode === 'HYBRID_RERANK' && (
+              <div className="mt-2 p-3 rounded-xl bg-accent-50/50 dark:bg-accent-900/10 border border-accent-200/50 dark:border-accent-800/30">
+                <label className="block text-xs font-medium text-accent-700 dark:text-accent-400 mb-1.5">Rerank 精排模型</label>
+                <select
+                  value={formData.rerankModel || 'qwen3-rerank'}
+                  onChange={(e) => setFormData(prev => ({ ...prev, rerankModel: e.target.value }))}
+                  className="w-full px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm text-gray-900 dark:text-white outline-none focus:border-brand-500/50 transition-all"
+                >
+                  {RERANK_MODELS.map(m => (
+                    <option key={m.model} value={m.model}>
+                      {m.label}{m.recommended ? ' (推荐)' : ''} — {m.desc}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {/* Query 改写 & 动态 topK */}
+            <div className="flex gap-4 mt-2">
+              <div className="flex-1 flex items-center justify-between p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
+                <div>
+                  <div className="flex items-center gap-1.5 text-xs font-medium text-gray-700 dark:text-gray-300">
+                    <Sparkles size={12} className="text-amber-500" />
+                    Query 改写
+                  </div>
+                  <p className="text-[10px] text-gray-400 mt-0.5">LLM 辅助改写查询</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setFormData(prev => ({ ...prev, enableQueryRewrite: !prev.enableQueryRewrite }))}
+                  className="flex-shrink-0"
+                >
+                  {formData.enableQueryRewrite
+                    ? <ToggleRight size={28} className="text-brand-500" />
+                    : <ToggleLeft size={28} className="text-gray-300 dark:text-gray-600" />
+                  }
+                </button>
+              </div>
+              <div className="flex-1 p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="flex items-center gap-1.5 text-xs font-medium text-gray-700 dark:text-gray-300">
+                      <SlidersHorizontal size={12} className="text-blue-500" />
+                      动态 TopK
+                    </div>
+                    <p className="text-[10px] text-gray-400 mt-0.5">根据查询自动调节</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, useDynamicTopK: !prev.useDynamicTopK }))}
+                    className="flex-shrink-0"
+                  >
+                    {formData.useDynamicTopK
+                      ? <ToggleRight size={28} className="text-brand-500" />
+                      : <ToggleLeft size={28} className="text-gray-300 dark:text-gray-600" />
+                    }
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* 手动 topK 输入（关闭动态 topK 时显示） */}
+            {!formData.useDynamicTopK && (
+              <div className="mt-2">
+                <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                  固定 TopK 召回数量
+                </label>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="number"
+                    value={formData.defaultTopK ?? 5}
+                    onChange={(e) => {
+                      const val = Math.max(1, Math.min(20, Number(e.target.value) || 5));
+                      setFormData(prev => ({ ...prev, defaultTopK: val }));
+                    }}
+                    className="w-20 px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm text-gray-900 dark:text-white outline-none focus:border-brand-500/50 transition-all text-center"
+                    min={1}
+                    max={20}
+                  />
+                  <span className="text-xs text-gray-400">范围 1~20，推荐 3~10</span>
+                </div>
+              </div>
+            )}
+
+            {/* Query 改写 LLM 模型选择（启用 Query 改写时显示） */}
+            {formData.enableQueryRewrite && (
+              <div className="mt-2 p-3 rounded-xl bg-amber-50/50 dark:bg-amber-900/10 border border-amber-200/50 dark:border-amber-800/30">
+                <label className="block text-xs font-medium text-amber-700 dark:text-amber-400 mb-1.5">Query 改写模型</label>
+                <select
+                  value={formData.queryRewriteModelId || 'dashscope/qwen-turbo'}
+                  onChange={(e) => setFormData(prev => ({ ...prev, queryRewriteModelId: e.target.value }))}
+                  className="w-full px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm text-gray-900 dark:text-white outline-none focus:border-brand-500/50 transition-all"
+                >
+                  <option value="dashscope/qwen-turbo">qwen-turbo (Flash · 快速低成本)</option>
+                  <option value="dashscope/qwen-plus">qwen-plus (Plus · 均衡)</option>
+                  <option value="dashscope/qwen-max">qwen-max (Max · 深度思考)</option>
+                </select>
+                <p className="text-[10px] text-amber-600/60 dark:text-amber-400/50 mt-1">小任务推荐 turbo，复杂查询可选 plus/max</p>
+              </div>
+            )}
           </div>
         </form>
 
@@ -726,6 +1109,9 @@ interface ChunkItem {
   chunkIndex: number;
   metadata: string;
   createTime: string;
+  parentChunkId: number | null;
+  isParentChunk: boolean;
+  sectionTitle: string | null;
 }
 
 const ChunkViewerModal: React.FC<ChunkViewerModalProps> = ({ isOpen, onClose, knowledgeBaseId, document: doc }) => {
@@ -802,11 +1188,24 @@ const ChunkViewerModal: React.FC<ChunkViewerModalProps> = ({ isOpen, onClose, kn
             ))
           ) : chunks.length > 0 ? (
             chunks.map((chunk) => (
-              <div key={String(chunk.id)} className="bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-100 dark:border-gray-700 overflow-hidden">
+              <div key={String(chunk.id)} className={`rounded-xl border overflow-hidden ${
+                chunk.isParentChunk
+                  ? 'border-brand-200 dark:border-brand-800 bg-brand-50/30 dark:bg-brand-900/10'
+                  : 'bg-gray-50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-700'
+              }`}>
                 <div className="flex items-center justify-between px-4 py-2 bg-gray-100/50 dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
                   <div className="flex items-center gap-2">
                     <Hash size={14} className="text-accent-500" />
                     <span className="text-xs font-bold text-gray-600 dark:text-gray-300">分块 {chunk.chunkIndex + 1}</span>
+                    {chunk.isParentChunk && (
+                      <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-brand-100 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 border border-brand-200 dark:border-brand-800">父块</span>
+                    )}
+                    {chunk.parentChunkId && !chunk.isParentChunk && (
+                      <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-accent-100 dark:bg-accent-900/30 text-accent-600 dark:text-accent-400 border border-accent-200 dark:border-accent-800">子块</span>
+                    )}
+                    {chunk.sectionTitle && (
+                      <span className="text-xs text-gray-500 dark:text-gray-400 truncate max-w-[200px]">{chunk.sectionTitle}</span>
+                    )}
                   </div>
                   <span className="text-xs text-gray-400">{chunk.content.length} 字符</span>
                 </div>
@@ -986,6 +1385,18 @@ const DocumentPanel: React.FC<DocumentPanelProps> = ({ knowledgeBase, onBack }) 
   const [batchProcessing, setBatchProcessing] = useState(false);
   const [chunkViewDoc, setChunkViewDoc] = useState<KnowledgeDocumentVO | null>(null);
   const [editDoc, setEditDoc] = useState<KnowledgeDocumentVO | null>(null);
+  const [chunkPreviewDoc, setChunkPreviewDoc] = useState<KnowledgeDocumentVO | null>(null);
+  const [docStats, setDocStats] = useState<Record<string, number>>({ PENDING: 0, PROCESSING: 0, COMPLETED: 0, FAILED: 0 });
+
+  const fetchDocStats = useCallback(async () => {
+    if (!knowledgeBase.id) return;
+    try {
+      const response = await apiClient.get(`/api/ai/knowledge-bases/${knowledgeBase.id}/document-stats`);
+      if (response.data.code === 0 && response.data.data) {
+        setDocStats(response.data.data);
+      }
+    } catch { /* silent */ }
+  }, [knowledgeBase.id]);
 
   const fetchDocuments = useCallback(async () => {
     if (!knowledgeBase.id) return;
@@ -1006,7 +1417,8 @@ const DocumentPanel: React.FC<DocumentPanelProps> = ({ knowledgeBase, onBack }) 
 
   useEffect(() => {
     fetchDocuments();
-  }, [fetchDocuments]);
+    fetchDocStats();
+  }, [fetchDocuments, fetchDocStats]);
 
   const handleDeleteDocument = async (doc: KnowledgeDocumentVO) => {
     if (!doc.id || !knowledgeBase.id) return;
@@ -1017,6 +1429,7 @@ const DocumentPanel: React.FC<DocumentPanelProps> = ({ knowledgeBase, onBack }) 
       if (response.data.code === 0) {
         toast.success('删除成功');
         fetchDocuments();
+        fetchDocStats();
       } else {
         toast.error(response.data.message || '删除失败');
       }
@@ -1034,6 +1447,7 @@ const DocumentPanel: React.FC<DocumentPanelProps> = ({ knowledgeBase, onBack }) 
       if (response.data.code === 0) {
         toast.success('向量化成功');
         fetchDocuments();
+        fetchDocStats();
       } else {
         toast.error(response.data.message || '向量化失败');
       }
@@ -1057,6 +1471,7 @@ const DocumentPanel: React.FC<DocumentPanelProps> = ({ knowledgeBase, onBack }) 
         const result = response.data.data;
         toast.success(`批量向量化完成: 成功 ${result?.successCount || 0} / 共 ${result?.total || 0}`);
         fetchDocuments();
+        fetchDocStats();
       } else {
         toast.error(response.data.message || '批量向量化失败');
       }
@@ -1078,7 +1493,7 @@ const DocumentPanel: React.FC<DocumentPanelProps> = ({ knowledgeBase, onBack }) 
     );
   };
 
-  const pendingCount = documents.filter(d => d.status === 'PENDING').length;
+  const pendingCount = (docStats.PENDING || 0) + (docStats.PROCESSING || 0);
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
@@ -1096,7 +1511,9 @@ const DocumentPanel: React.FC<DocumentPanelProps> = ({ knowledgeBase, onBack }) 
             <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm">
               {knowledgeBase.description || '暂无描述'} · 
               <span className="ml-1">{knowledgeBase.embeddingModel}</span> · 
+              <span className="ml-1">{CHUNK_STRATEGY_MAP[knowledgeBase.chunkStrategy || 'SEMANTIC']?.label || '语义切分'}</span> · 
               <span className="ml-1">分块 {knowledgeBase.chunkSize}/{knowledgeBase.chunkOverlap}</span>
+              {knowledgeBase.parentChildMode && <span className="ml-1 text-brand-500">· 父子模式</span>}
             </p>
           </div>
         </div>
@@ -1152,7 +1569,7 @@ const DocumentPanel: React.FC<DocumentPanelProps> = ({ knowledgeBase, onBack }) 
             </div>
             <div>
               <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                {documents.filter(d => d.status === 'COMPLETED').length}
+                {docStats.COMPLETED || 0}
               </p>
               <p className="text-xs text-gray-500 dark:text-gray-400">已向量化</p>
             </div>
@@ -1164,7 +1581,7 @@ const DocumentPanel: React.FC<DocumentPanelProps> = ({ knowledgeBase, onBack }) 
               <Clock size={20} className="text-amber-600 dark:text-amber-400" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">{pendingCount}</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{docStats.PENDING || 0}</p>
               <p className="text-xs text-gray-500 dark:text-gray-400">待处理</p>
             </div>
           </div>
@@ -1245,6 +1662,13 @@ const DocumentPanel: React.FC<DocumentPanelProps> = ({ knowledgeBase, onBack }) 
                             </button>
                           )}
                           <button
+                            onClick={() => setChunkPreviewDoc(doc)}
+                            className="p-2 text-gray-400 hover:text-accent-600 hover:bg-accent-50 dark:hover:bg-accent-900/20 rounded-lg transition-all"
+                            title="预览切分"
+                          >
+                            <Scissors size={18} />
+                          </button>
+                          <button
                             onClick={() => setEditDoc(doc)}
                             className="p-2 text-gray-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded-lg transition-all"
                             title="编辑"
@@ -1319,7 +1743,7 @@ const DocumentPanel: React.FC<DocumentPanelProps> = ({ knowledgeBase, onBack }) 
       <AddDocumentModal
         isOpen={addModalOpen}
         onClose={() => setAddModalOpen(false)}
-        onSuccess={fetchDocuments}
+        onSuccess={() => { fetchDocuments(); fetchDocStats(); }}
         knowledgeBaseId={knowledgeBase.id!}
       />
 
@@ -1343,6 +1767,260 @@ const DocumentPanel: React.FC<DocumentPanelProps> = ({ knowledgeBase, onBack }) 
           document={editDoc}
         />
       )}
+
+      {/* Chunk Preview Modal */}
+      {chunkPreviewDoc && (
+        <ChunkPreviewModal
+          isOpen={!!chunkPreviewDoc}
+          onClose={() => setChunkPreviewDoc(null)}
+          knowledgeBaseId={knowledgeBase.id!}
+          document={chunkPreviewDoc}
+        />
+      )}
+    </div>
+  );
+};
+
+// ==================== 切分预览弹窗 ====================
+interface PreviewChunkItem {
+  index: number;
+  content: string;
+  charCount: number;
+  isParent: boolean;
+  parentIndex: number | null;
+  sectionTitle: string | null;
+}
+
+interface ChunkPreviewResult {
+  strategy: string;
+  totalChunks: number;
+  parentChunks: number;
+  childChunks: number;
+  avgChunkSize: number;
+  chunks: PreviewChunkItem[];
+}
+
+interface ChunkPreviewModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  knowledgeBaseId: number;
+  document: KnowledgeDocumentVO;
+}
+
+const ChunkPreviewModal: React.FC<ChunkPreviewModalProps> = ({ isOpen, onClose, knowledgeBaseId, document: doc }) => {
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<ChunkPreviewResult | null>(null);
+  const [strategy, setStrategy] = useState('SEMANTIC');
+  const [chunkSize, setChunkSize] = useState(500);
+  const [chunkOverlap, setChunkOverlap] = useState(50);
+  const [parentChildMode, setParentChildMode] = useState(false);
+  const [expandedChunks, setExpandedChunks] = useState<Set<number>>(new Set());
+
+  useEffect(() => {
+    if (!isOpen) {
+      setResult(null);
+      setExpandedChunks(new Set());
+    }
+  }, [isOpen]);
+
+  const handlePreview = async () => {
+    if (!doc.id) return;
+    setLoading(true);
+    setResult(null);
+    try {
+      const response = await api.kbPreviewDocumentChunking({
+        id: knowledgeBaseId as unknown as number,
+        docId: doc.id as unknown as number,
+        requestBody: {
+          strategy: strategy as unknown as object,
+          chunkSize: chunkSize as unknown as object,
+          chunkOverlap: chunkOverlap as unknown as object,
+          parentChildMode: parentChildMode as unknown as object,
+        },
+      });
+      if (response.data.code === 0) {
+        setResult((response.data as any).data);
+      } else {
+        toast.error(response.data.message || '预览失败');
+      }
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || '预览请求失败');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const toggleChunk = (index: number) => {
+    setExpandedChunks(prev => {
+      const next = new Set(prev);
+      if (next.has(index)) next.delete(index);
+      else next.add(index);
+      return next;
+    });
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-4xl mx-4 overflow-hidden animate-in zoom-in-95 duration-200 max-h-[90vh] flex flex-col">
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent-50 to-brand-50 dark:from-accent-900/20 dark:to-brand-900/20 flex items-center justify-center border border-accent-100 dark:border-accent-800">
+              <Scissors size={20} className="text-accent-600 dark:text-accent-400" />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-gray-900 dark:text-white">切分预览</h2>
+              <p className="text-sm text-gray-500 dark:text-gray-400 truncate max-w-[400px]">{doc.name}</p>
+            </div>
+          </div>
+          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-all">
+            <X size={20} />
+          </button>
+        </div>
+
+        {/* Config Bar */}
+        <div className="p-4 border-b border-gray-100 dark:border-gray-800 space-y-3">
+          <div className="flex flex-wrap items-end gap-3">
+            <div className="flex-1 min-w-[140px]">
+              <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">切分策略</label>
+              <select
+                value={strategy}
+                onChange={(e) => setStrategy(e.target.value)}
+                className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg text-sm text-gray-900 dark:text-white outline-none focus:border-brand-500/50 transition-all cursor-pointer"
+              >
+                {Object.entries(CHUNK_STRATEGY_MAP).map(([key, cfg]) => (
+                  <option key={key} value={key}>{cfg.label}</option>
+                ))}
+              </select>
+            </div>
+            <div className="w-24">
+              <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">块大小</label>
+              <input
+                type="number"
+                value={chunkSize}
+                onChange={(e) => setChunkSize(Math.max(100, Number(e.target.value)))}
+                className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg text-sm text-gray-900 dark:text-white outline-none focus:border-brand-500/50 transition-all"
+                min={100}
+                max={5000}
+              />
+            </div>
+            <div className="w-24">
+              <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">重叠</label>
+              <input
+                type="number"
+                value={chunkOverlap}
+                onChange={(e) => setChunkOverlap(Math.max(0, Number(e.target.value)))}
+                className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg text-sm text-gray-900 dark:text-white outline-none focus:border-brand-500/50 transition-all"
+                min={0}
+                max={1000}
+              />
+            </div>
+            <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 cursor-pointer select-none">
+              <button type="button" onClick={() => setParentChildMode(!parentChildMode)} className="flex-shrink-0">
+                {parentChildMode
+                  ? <ToggleRight size={28} className="text-brand-500" />
+                  : <ToggleLeft size={28} className="text-gray-300 dark:text-gray-600" />
+                }
+              </button>
+              <span className="text-xs">父子模式</span>
+            </label>
+            <button
+              onClick={handlePreview}
+              disabled={loading}
+              className="px-5 py-2 bg-brand-600 text-white rounded-lg text-sm font-bold hover:bg-brand-700 disabled:opacity-50 shadow-lg shadow-brand-600/20 transition-all active:scale-95 flex items-center gap-2"
+            >
+              {loading ? <Loader2 size={14} className="animate-spin" /> : <Eye size={14} />}
+              {loading ? '预览中...' : '预览'}
+            </button>
+          </div>
+        </div>
+
+        {/* Results */}
+        <div className="flex-1 overflow-y-auto p-6">
+          {result ? (
+            <div className="space-y-4">
+              {/* Stats */}
+              <div className="flex items-center gap-4 px-4 py-3 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-100 dark:border-gray-800 text-sm">
+                <span className="text-gray-500">策略 <b className="text-gray-900 dark:text-white">{CHUNK_STRATEGY_MAP[result.strategy]?.label || result.strategy}</b></span>
+                <span className="text-gray-500">总计 <b className="text-gray-900 dark:text-white">{result.totalChunks}</b> 块</span>
+                {result.parentChunks > 0 && (
+                  <>
+                    <span className="text-gray-500">父块 <b className="text-brand-600 dark:text-brand-400">{result.parentChunks}</b></span>
+                    <span className="text-gray-500">子块 <b className="text-accent-600 dark:text-accent-400">{result.childChunks}</b></span>
+                  </>
+                )}
+                <span className="text-gray-500">平均 <b className="text-gray-900 dark:text-white">{result.avgChunkSize}</b> 字符</span>
+              </div>
+
+              {/* Chunk List */}
+              <div className="space-y-2">
+                {result.chunks.map((chunk) => {
+                  const expanded = expandedChunks.has(chunk.index);
+                  const isParent = chunk.isParent;
+                  return (
+                    <div
+                      key={chunk.index}
+                      className={`rounded-xl border overflow-hidden transition-colors ${
+                        isParent
+                          ? 'border-brand-200 dark:border-brand-800 bg-brand-50/30 dark:bg-brand-900/10'
+                          : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900'
+                      }`}
+                    >
+                      <div
+                        className="flex items-center justify-between px-4 py-2.5 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+                        onClick={() => toggleChunk(chunk.index)}
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <span className={`w-7 h-7 flex items-center justify-center rounded-lg text-xs font-bold ${
+                            isParent
+                              ? 'bg-brand-100 dark:bg-brand-900/30 text-brand-600'
+                              : 'bg-gray-100 dark:bg-gray-800 text-gray-500'
+                          }`}>
+                            {chunk.index + 1}
+                          </span>
+                          {isParent && (
+                            <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-brand-100 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 border border-brand-200 dark:border-brand-800">
+                              父块
+                            </span>
+                          )}
+                          {chunk.parentIndex !== null && !isParent && (
+                            <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-accent-100 dark:bg-accent-900/30 text-accent-600 dark:text-accent-400 border border-accent-200 dark:border-accent-800">
+                              子块 → #{chunk.parentIndex + 1}
+                            </span>
+                          )}
+                          {chunk.sectionTitle && (
+                            <span className="text-xs text-gray-500 dark:text-gray-400 truncate max-w-[200px]">{chunk.sectionTitle}</span>
+                          )}
+                          <span className="text-xs text-gray-400">{chunk.charCount} 字符</span>
+                        </div>
+                        {expanded ? <ChevronUp size={14} className="text-gray-400" /> : <ChevronDown size={14} className="text-gray-400" />}
+                      </div>
+                      {expanded && (
+                        <div className="px-4 pb-3 border-t border-gray-100 dark:border-gray-800">
+                          <pre className="mt-2 text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap font-sans leading-relaxed bg-gray-50 dark:bg-gray-800/30 rounded-lg p-3 max-h-48 overflow-y-auto">
+                            {chunk.content}
+                          </pre>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ) : !loading ? (
+            <div className="text-center py-12">
+              <div className="w-16 h-16 bg-gray-50 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Scissors size={28} className="text-gray-300" />
+              </div>
+              <p className="text-gray-500 font-medium">选择切分参数后点击预览</p>
+              <p className="text-gray-400 text-sm mt-1">预览不同切分策略对文档的切分效果</p>
+            </div>
+          ) : null}
+        </div>
+      </div>
     </div>
   );
 };
@@ -1360,7 +2038,11 @@ interface RecallChunk {
 
 interface RecallTestResult {
   query: string;
+  retrievalMode: string;
+  enableQueryRewrite: boolean;
+  useDynamicTopK: boolean;
   topK: number;
+  defaultTopK: number;
   similarityThreshold: number;
   totalResults: number;
   searchTimeMs: number;
@@ -1377,17 +2059,26 @@ const RecallTestModal: React.FC<RecallTestModalProps> = ({ isOpen, onClose, know
   const [query, setQuery] = useState('');
   const [topK, setTopK] = useState(5);
   const [threshold, setThreshold] = useState(0.3);
+  const [retrievalMode, setRetrievalMode] = useState('HYBRID_RERANK');
+  const [enableQueryRewrite, setEnableQueryRewrite] = useState(false);
+  const [useDynamicTopK, setUseDynamicTopK] = useState(true);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<RecallTestResult | null>(null);
   const [expandedChunks, setExpandedChunks] = useState<Set<number>>(new Set());
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   useEffect(() => {
+    if (isOpen && knowledgeBase) {
+      setRetrievalMode(knowledgeBase.retrievalMode || 'HYBRID_RERANK');
+      setEnableQueryRewrite(knowledgeBase.enableQueryRewrite ?? false);
+      setUseDynamicTopK(knowledgeBase.useDynamicTopK ?? true);
+      setTopK(knowledgeBase.defaultTopK ?? 5);
+    }
     if (!isOpen) {
       setResult(null);
       setExpandedChunks(new Set());
     }
-  }, [isOpen]);
+  }, [isOpen, knowledgeBase]);
 
   const handleTest = async () => {
     if (!knowledgeBase?.id || !query.trim()) return;
@@ -1396,7 +2087,15 @@ const RecallTestModal: React.FC<RecallTestModalProps> = ({ isOpen, onClose, know
     try {
       const response = await api.kbRecallTest({
         id: knowledgeBase.id as unknown as number,
-        requestBody: { query: query.trim(), topK, similarityThreshold: threshold } as any,
+        requestBody: {
+          query: query.trim(),
+          topK: useDynamicTopK ? undefined : topK,
+          similarityThreshold: threshold,
+          retrievalMode,
+          enableQueryRewrite,
+          useDynamicTopK,
+          defaultTopK: topK,
+        } as any,
       });
       if (response.data.code === 0) {
         setResult((response.data as any).data);
@@ -1467,43 +2166,99 @@ const RecallTestModal: React.FC<RecallTestModalProps> = ({ isOpen, onClose, know
             />
           </div>
 
-          {/* Advanced Settings */}
-          <div>
-            <button
-              onClick={() => setShowAdvanced(!showAdvanced)}
-              className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-brand-600 dark:hover:text-brand-400 transition-colors"
-            >
-              <Settings2 size={14} />
-              <span>高级设置</span>
-              {showAdvanced ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-            </button>
-            {showAdvanced && (
-              <div className="mt-3 grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">返回条数 (TopK)</label>
-                  <input
-                    type="number"
-                    value={topK}
-                    onChange={(e) => setTopK(Math.max(1, Math.min(20, Number(e.target.value))))}
-                    min={1}
-                    max={20}
-                    className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg text-sm text-gray-900 dark:text-white outline-none focus:border-brand-500/50 transition-all"
-                  />
+          {/* RAG Config */}
+          <div className="space-y-3">
+            {/* Retrieval Mode */}
+            <div className="flex items-center gap-2">
+              {Object.entries(RETRIEVAL_MODE_MAP).map(([key, cfg]) => {
+                const Icon = cfg.icon;
+                const sel = retrievalMode === key;
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => setRetrievalMode(key)}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
+                      sel
+                        ? 'border-accent-500 bg-accent-50 dark:bg-accent-900/20 text-accent-700 dark:text-accent-400'
+                        : 'border-gray-200 dark:border-gray-700 text-gray-500 hover:border-gray-300'
+                    }`}
+                  >
+                    <Icon size={13} className={sel ? 'text-accent-500' : 'text-gray-400'} />
+                    {cfg.label}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Toggles row */}
+            <div className="flex items-center gap-4">
+              <button
+                type="button"
+                onClick={() => setEnableQueryRewrite(!enableQueryRewrite)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
+                  enableQueryRewrite
+                    ? 'border-amber-400 bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400'
+                    : 'border-gray-200 dark:border-gray-700 text-gray-500 hover:border-gray-300'
+                }`}
+              >
+                <Sparkles size={12} />
+                Query 改写 {enableQueryRewrite ? '开' : '关'}
+              </button>
+              <button
+                type="button"
+                onClick={() => setUseDynamicTopK(!useDynamicTopK)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
+                  useDynamicTopK
+                    ? 'border-blue-400 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400'
+                    : 'border-gray-200 dark:border-gray-700 text-gray-500 hover:border-gray-300'
+                }`}
+              >
+                <SlidersHorizontal size={12} />
+                动态 TopK {useDynamicTopK ? '开' : '关'}
+              </button>
+            </div>
+
+            {/* Advanced: topK + threshold */}
+            <div>
+              <button
+                onClick={() => setShowAdvanced(!showAdvanced)}
+                className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-brand-600 dark:hover:text-brand-400 transition-colors"
+              >
+                <Settings2 size={14} />
+                <span>更多参数</span>
+                {showAdvanced ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+              </button>
+              {showAdvanced && (
+                <div className="mt-3 grid grid-cols-2 gap-4">
+                  {!useDynamicTopK && (
+                    <div>
+                      <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">固定 TopK</label>
+                      <input
+                        type="number"
+                        value={topK}
+                        onChange={(e) => setTopK(Math.max(1, Math.min(20, Number(e.target.value))))}
+                        min={1}
+                        max={20}
+                        className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg text-sm text-gray-900 dark:text-white outline-none focus:border-brand-500/50 transition-all"
+                      />
+                    </div>
+                  )}
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">相似度阈值</label>
+                    <input
+                      type="number"
+                      value={threshold}
+                      onChange={(e) => setThreshold(Math.max(0, Math.min(1, Number(e.target.value))))}
+                      min={0}
+                      max={1}
+                      step={0.05}
+                      className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg text-sm text-gray-900 dark:text-white outline-none focus:border-brand-500/50 transition-all"
+                    />
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">相似度阈值</label>
-                  <input
-                    type="number"
-                    value={threshold}
-                    onChange={(e) => setThreshold(Math.max(0, Math.min(1, Number(e.target.value))))}
-                    min={0}
-                    max={1}
-                    step={0.05}
-                    className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg text-sm text-gray-900 dark:text-white outline-none focus:border-brand-500/50 transition-all"
-                  />
-                </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
 
           <button
@@ -1521,12 +2276,27 @@ const RecallTestModal: React.FC<RecallTestModalProps> = ({ isOpen, onClose, know
           {result ? (
             <div className="space-y-4">
               {/* Stats Bar */}
-              <div className="flex items-center justify-between px-4 py-3 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-100 dark:border-gray-800">
-                <div className="flex items-center gap-4 text-sm">
-                  <span className="text-gray-500">召回 <b className="text-gray-900 dark:text-white">{result.totalResults}</b> 条</span>
-                  <span className="text-gray-500">耗时 <b className="text-gray-900 dark:text-white">{result.searchTimeMs}</b>ms</span>
+              <div className="px-4 py-3 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-100 dark:border-gray-800 space-y-1">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4 text-sm">
+                    <span className="text-gray-500">召回 <b className="text-gray-900 dark:text-white">{result.totalResults}</b> 条</span>
+                    <span className="text-gray-500">耗时 <b className="text-gray-900 dark:text-white">{result.searchTimeMs}</b>ms</span>
+                  </div>
+                  <span className="text-xs text-gray-400">TopK={result.topK} · 阈值={result.similarityThreshold}</span>
                 </div>
-                <span className="text-xs text-gray-400">TopK={result.topK} · 阈值={result.similarityThreshold}</span>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-accent-50 text-accent-600 dark:bg-accent-900/20 dark:text-accent-400 border border-accent-200 dark:border-accent-800">
+                    {RETRIEVAL_MODE_MAP[result.retrievalMode]?.label || result.retrievalMode}
+                  </span>
+                  {result.enableQueryRewrite && (
+                    <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-amber-50 text-amber-600 dark:bg-amber-900/20 dark:text-amber-400 border border-amber-200 dark:border-amber-800">
+                      Query 改写
+                    </span>
+                  )}
+                  <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400 border border-blue-200 dark:border-blue-800">
+                    {result.useDynamicTopK ? '动态TopK' : `固定TopK=${result.defaultTopK}`}
+                  </span>
+                </div>
               </div>
 
               {/* Chunks */}
@@ -1592,7 +2362,7 @@ const RecallTestModal: React.FC<RecallTestModalProps> = ({ isOpen, onClose, know
                 <SearchCheck size={28} className="text-gray-300" />
               </div>
               <p className="text-gray-500 font-medium">输入查询文本开始测试</p>
-              <p className="text-gray-400 text-sm mt-1">测试知识库的向量检索 + Rerank 召回效果</p>
+              <p className="text-gray-400 text-sm mt-1">测试多路召回 + RRF融合 + Rerank精排效果</p>
             </div>
           ) : null}
         </div>
@@ -1804,9 +2574,14 @@ export const KnowledgeBaseManagementPage: React.FC = () => {
                     {kb.chunkCount || 0} 分块
                   </span>
                 </div>
-                <div className="flex items-center gap-1">
-                  <Settings2 size={14} />
-                  {kb.chunkSize}/{kb.chunkOverlap}
+                <div className="flex items-center gap-2">
+                  {kb.chunkStrategy && CHUNK_STRATEGY_MAP[kb.chunkStrategy] && (
+                    <span className="flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-brand-50 dark:bg-brand-900/20 text-brand-600 dark:text-brand-400 border border-brand-100 dark:border-brand-800">
+                      {React.createElement(CHUNK_STRATEGY_MAP[kb.chunkStrategy].icon, { size: 12 })}
+                      {CHUNK_STRATEGY_MAP[kb.chunkStrategy].label}
+                    </span>
+                  )}
+                  <span>{kb.chunkSize}/{kb.chunkOverlap}</span>
                 </div>
               </div>
 
