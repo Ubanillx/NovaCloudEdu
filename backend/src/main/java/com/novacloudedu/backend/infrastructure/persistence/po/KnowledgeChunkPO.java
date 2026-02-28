@@ -20,6 +20,9 @@ public class KnowledgeChunkPO {
 
     private String content;
     private Integer chunkIndex;
+    private Long parentChunkId;
+    private Boolean isParentChunk;
+    private String sectionTitle;
 
     @TableField(exist = false)
     private float[] embedding;
