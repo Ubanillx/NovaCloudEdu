@@ -226,6 +226,131 @@ public class PptServiceClient {
     }
 
     /**
+     * 校验单页填充内容是否匹配模板 shape 尺寸。
+     * 借鉴 PPTAgent V1 的 _validate_content() 设计，在渲染前进行内容长度校验。
+     *
+     * @param templateUrl          模板 URL
+     * @param slideIndex           幻灯片索引
+     * @param templateSlideIndex   要克隆的模板页索引
+     * @param fills                填充内容列表
+     * @return 校验结果，包含问题列表和修改建议
+     */
+    public ContentValidationResult validateSlide(
+            String templateUrl, int slideIndex, int templateSlideIndex,
+            java.util.List<Map<String, Object>> fills) {
+        try {
+            Map<String, Object> requestBody = new java.util.HashMap<>();
+            requestBody.put("template_url", templateUrl);
+            requestBody.put("slide_index", slideIndex);
+            requestBody.put("template_slide_index", templateSlideIndex);
+            requestBody.put("fills", fills);
+
+            String body = objectMapper.writeValueAsString(requestBody);
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(baseUrl + "/api/validate-slide"))
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(body))
+                    .timeout(Duration.ofSeconds(30))
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(
+                    request, HttpResponse.BodyHandlers.ofString());
+
+            JsonNode json = objectMapper.readTree(response.body());
+            if (!json.path("success").asBoolean(false)) {
+                log.warn("内容校验调用失败: {}", json.path("message").asText());
+                return ContentValidationResult.valid();
+            }
+
+            boolean isValid = json.path("is_valid").asBoolean(true);
+            String feedbackText = json.path("feedback_text").asText("");
+
+            java.util.List<String> suggestions = new java.util.ArrayList<>();
+            JsonNode suggestionsNode = json.path("suggestions");
+            if (suggestionsNode.isArray()) {
+                for (JsonNode s : suggestionsNode) {
+                    suggestions.add(s.asText());
+                }
+            }
+
+            return new ContentValidationResult(isValid, feedbackText, suggestions);
+
+        } catch (Exception e) {
+            log.warn("内容校验异常，跳过校验: {}", e.getMessage());
+            return ContentValidationResult.valid();
+        }
+    }
+
+    /**
+     * 模板视觉分析：借鉴 PPTAgent V1 SlideInducter，
+     * 对模板每页进行语义分析，输出版式分类、适合内容类型、空间分布等。
+     *
+     * @param templateUrl 模板 URL
+     * @return 视觉分析结果，包含 agent 可读的文本描述
+     */
+    public TemplateVisionAnalysisResult analyzeTemplate(String templateUrl) {
+        try {
+            String body = objectMapper.writeValueAsString(
+                    Map.of("template_url", templateUrl));
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(baseUrl + "/api/analyze-template"))
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(body))
+                    .timeout(Duration.ofSeconds(60))
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(
+                    request, HttpResponse.BodyHandlers.ofString());
+
+            JsonNode json = objectMapper.readTree(response.body());
+            if (!json.path("success").asBoolean(false)) {
+                log.warn("模板视觉分析调用失败: {}", json.path("message").asText());
+                return TemplateVisionAnalysisResult.empty();
+            }
+
+            String agentDescription = json.path("agent_description").asText("");
+            String profileJson = json.path("profile").toString();
+
+            return new TemplateVisionAnalysisResult(agentDescription, profileJson);
+
+        } catch (Exception e) {
+            log.warn("模板视觉分析异常: {}", e.getMessage());
+            return TemplateVisionAnalysisResult.empty();
+        }
+    }
+
+    /**
+     * 模板视觉分析结果
+     */
+    public record TemplateVisionAnalysisResult(
+            String agentDescription,
+            String profileJson
+    ) {
+        public static TemplateVisionAnalysisResult empty() {
+            return new TemplateVisionAnalysisResult("", "{}");
+        }
+
+        public boolean hasContent() {
+            return agentDescription != null && !agentDescription.isBlank();
+        }
+    }
+
+    /**
+     * 内容校验结果
+     */
+    public record ContentValidationResult(
+            boolean isValid,
+            String feedbackText,
+            java.util.List<String> suggestions
+    ) {
+        public static ContentValidationResult valid() {
+            return new ContentValidationResult(true, "", java.util.List.of());
+        }
+    }
+
+    /**
      * 单页预览渲染结果
      */
     public record SlidePreviewResult(

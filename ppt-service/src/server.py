@@ -22,12 +22,14 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from typing import Optional
 
-from .schemas import TemplateGenerationSpec, FilledSlide
+from .schemas import TemplateGenerationSpec, FilledSlide, SlotFill
 from .template_registry import registry
 from .template_renderer import TemplateRenderer, fill_slide_standalone
 from .oss_client import upload_bytes as oss_upload
 from .slide_renderer import render_pptx_cover, render_pptx_to_images, render_single_slide, render_pptx_first_page
 from .thumbnail import generate_cover as _pillow_cover, render_all_slides as _pillow_render
+from .content_validator import validate_slide_fills, format_validation_feedback
+from .template_vision_analyzer import build_template_vision_profile, format_vision_profile_for_agent
 
 logging.basicConfig(
     level=logging.INFO,
@@ -487,6 +489,117 @@ async def api_generate_slide_preview(req: SlidePreviewRequest):
         return JSONResponse(
             status_code=500,
             content={"success": False, "message": str(e)},
+        )
+
+
+class ValidateSlideRequest(BaseModel):
+    """POST /api/validate-slide 请求体"""
+    template_url: str
+    slide_index: int = 0
+    template_slide_index: int
+    fills: list[SlotFillRequest] = []
+
+
+@app.post("/api/validate-slide")
+async def api_validate_slide(req: ValidateSlideRequest):
+    """HTTP 接口：校验单页填充内容是否匹配模板 shape 尺寸。
+
+    借鉴 PPTAgent V1 的 _validate_content() 设计思路，
+    在 AI 生成内容后、渲染 PPTX 之前进行长度校验，
+    避免文字溢出或区域空洞。
+    """
+    try:
+        cfg = registry.register_from_url(req.template_url)
+
+        slide_info = None
+        for s in cfg.slides:
+            if s.index == req.template_slide_index:
+                slide_info = s
+                break
+
+        if slide_info is None:
+            return JSONResponse(
+                status_code=400,
+                content={
+                    "success": False,
+                    "message": (
+                        f"模板页索引 {req.template_slide_index}"
+                        f" 不存在"
+                    ),
+                },
+            )
+
+        fills = [
+            SlotFill(
+                shape_id=f.shape_id,
+                text=f.text,
+                items=f.items,
+                image_url=f.image_url,
+            )
+            for f in req.fills
+        ]
+
+        result = validate_slide_fills(
+            fills, slide_info, req.slide_index)
+        feedback = format_validation_feedback(result)
+
+        return {
+            "success": True,
+            "is_valid": result.is_valid,
+            "issues": [
+                i.model_dump() for i in result.issues
+            ],
+            "suggestions": result.suggestions,
+            "feedback_text": feedback,
+        }
+    except Exception as e:
+        logger.error(
+            "API validate-slide 失败: %s",
+            e, exc_info=True,
+        )
+        return JSONResponse(
+            status_code=500,
+            content={
+                "success": False,
+                "message": str(e),
+            },
+        )
+
+
+class AnalyzeTemplateRequest(BaseModel):
+    """POST /api/analyze-template 请求体"""
+    template_url: str
+
+
+@app.post("/api/analyze-template")
+async def api_analyze_template(req: AnalyzeTemplateRequest):
+    """HTTP 接口：Vision-based 模板智能分析。
+    借鉴 PPTAgent V1 SlideInducter 设计，对模板每页进行
+    语义分析，输出版式分类、适合内容类型、空间分布等。
+    """
+    try:
+        cfg = registry.register_from_url(req.template_url)
+        profile = build_template_vision_profile(
+            cfg.template_id, cfg.slides,
+            cfg.slide_width, cfg.slide_height,
+        )
+        agent_text = format_vision_profile_for_agent(profile)
+        return {
+            "success": True,
+            "profile": profile.to_dict(),
+            "agent_description": agent_text,
+        }
+    except Exception as e:
+        logger.error(
+            "API analyze-template 失败: %s",
+            e, exc_info=True,
+        )
+        return JSONResponse(
+            status_code=500,
+            content={
+                "success": False,
+                "message": str(e),
+            },
         )
 
 

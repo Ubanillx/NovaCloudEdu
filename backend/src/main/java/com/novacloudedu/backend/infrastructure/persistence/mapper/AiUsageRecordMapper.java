@@ -2,10 +2,8 @@ package com.novacloudedu.backend.infrastructure.persistence.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.novacloudedu.backend.infrastructure.persistence.po.AiUsageRecordPO;
-import org.apache.ibatis.annotations.MapKey;
-import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
 
 import java.util.Map;
 
@@ -31,4 +29,13 @@ public interface AiUsageRecordMapper extends BaseMapper<AiUsageRecordPO> {
     Map<String, Map<String, Object>> sumAllMonthlyUsageRaw(@Param("userId") Long userId,
                                                            @Param("year") int year,
                                                            @Param("month") int month);
+
+    @Insert("INSERT INTO ai_usage_record (id, user_id, feature_type, usage_date, usage_count, create_time, update_time) " +
+            "VALUES (#{id}, #{userId}, #{featureType}, #{usageDate}, 1, NOW(), NOW()) " +
+            "ON CONFLICT (user_id, feature_type, usage_date) " +
+            "DO UPDATE SET usage_count = ai_usage_record.usage_count + 1, update_time = NOW()")
+    int upsertUsage(@Param("id") Long id,
+                    @Param("userId") Long userId,
+                    @Param("featureType") String featureType,
+                    @Param("usageDate") java.time.LocalDate usageDate);
 }

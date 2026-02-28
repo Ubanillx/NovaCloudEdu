@@ -239,6 +239,81 @@ public class LangchainChatService {
     }
 
     /**
+     * 同步多图视觉对话（多张图片+文本，用于PPT多页视觉评估等场景）
+     *
+     * @param modelId      模型ID（如 "dashscope/qwen-vl-max"），null 则用默认视觉模型
+     * @param systemPrompt 系统提示词
+     * @param userMessage  用户消息文本
+     * @param imageUrls    图片URL列表
+     */
+    public String chatWithImages(String modelId, String systemPrompt,
+                                  String userMessage, List<String> imageUrls) {
+        StreamingChatModel model = resolveModel(modelId, true);
+
+        List<ChatMessage> messages = new ArrayList<>();
+        if (systemPrompt != null && !systemPrompt.trim().isEmpty()) {
+            messages.add(SystemMessage.from(systemPrompt));
+        }
+
+        List<Content> contents = new ArrayList<>();
+        if (imageUrls != null) {
+            for (String url : imageUrls) {
+                if (url != null && !url.isBlank()) {
+                    contents.add(ImageContent.from(URI.create(url)));
+                }
+            }
+        }
+        contents.add(TextContent.from(userMessage));
+        messages.add(UserMessage.from(contents));
+
+        StringBuilder result = new StringBuilder();
+        final Object lock = new Object();
+        final boolean[] done = {false};
+        final Throwable[] error = {null};
+
+        model.chat(messages, new StreamingChatResponseHandler() {
+            @Override
+            public void onPartialResponse(String token) {
+                result.append(token);
+            }
+
+            @Override
+            public void onCompleteResponse(ChatResponse response) {
+                synchronized (lock) {
+                    done[0] = true;
+                    lock.notifyAll();
+                }
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                synchronized (lock) {
+                    error[0] = throwable;
+                    done[0] = true;
+                    lock.notifyAll();
+                }
+            }
+        });
+
+        synchronized (lock) {
+            while (!done[0]) {
+                try {
+                    lock.wait(180000);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    throw new RuntimeException("多图视觉对话被中断", e);
+                }
+            }
+        }
+
+        if (error[0] != null) {
+            throw new RuntimeException("多图视觉对话失败: " + error[0].getMessage(), error[0]);
+        }
+
+        return result.toString();
+    }
+
+    /**
      * 获取可用模型列表（仅启用的）
      */
     public List<Map<String, Object>> listAvailableModels() {
