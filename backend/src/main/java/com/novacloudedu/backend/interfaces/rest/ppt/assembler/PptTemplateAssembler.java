@@ -22,6 +22,8 @@ public class PptTemplateAssembler {
                 .templateUrl(template.getTemplateUrl())
                 .slideCount(template.getSlideCount())
                 .enabled(template.isEnabled())
+                .parseStatus(template.getParseStatus() != null
+                        ? template.getParseStatus().getCode() : "pending")
                 .build();
     }
 

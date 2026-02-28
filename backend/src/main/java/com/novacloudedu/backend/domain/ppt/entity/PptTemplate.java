@@ -1,6 +1,7 @@
 package com.novacloudedu.backend.domain.ppt.entity;
 
 import com.novacloudedu.backend.domain.ppt.valueobject.PptTemplateId;
+import com.novacloudedu.backend.domain.ppt.valueobject.TemplateParseStatus;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,6 +22,7 @@ public class PptTemplate {
     private String templateUrl;
     private int slideCount;
     private String structureJson;
+    private TemplateParseStatus parseStatus;
     private Long uploaderId;
     private boolean enabled;
     private LocalDateTime createTime;
@@ -41,6 +43,7 @@ public class PptTemplate {
         t.templateUrl = templateUrl;
         t.slideCount = 0;
         t.structureJson = "";
+        t.parseStatus = TemplateParseStatus.PENDING;
         t.uploaderId = uploaderId;
         t.enabled = true;
         t.createTime = LocalDateTime.now();
@@ -53,7 +56,8 @@ public class PptTemplate {
      */
     public static PptTemplate reconstruct(PptTemplateId id, String name, String description,
                                            String coverUrl, String templateUrl, int slideCount,
-                                           String structureJson, Long uploaderId, boolean enabled,
+                                           String structureJson, TemplateParseStatus parseStatus,
+                                           Long uploaderId, boolean enabled,
                                            LocalDateTime createTime, LocalDateTime updateTime) {
         PptTemplate t = new PptTemplate();
         t.id = id;
@@ -63,6 +67,7 @@ public class PptTemplate {
         t.templateUrl = templateUrl;
         t.slideCount = slideCount;
         t.structureJson = structureJson;
+        t.parseStatus = parseStatus != null ? parseStatus : TemplateParseStatus.PENDING;
         t.uploaderId = uploaderId;
         t.enabled = enabled;
         t.createTime = createTime;
@@ -84,7 +89,22 @@ public class PptTemplate {
         this.structureJson = structureJson;
         this.coverUrl = coverUrl != null ? coverUrl : this.coverUrl;
         this.slideCount = slideCount;
+        this.parseStatus = TemplateParseStatus.READY;
         this.updateTime = LocalDateTime.now();
+    }
+
+    public void markParsing() {
+        this.parseStatus = TemplateParseStatus.PARSING;
+        this.updateTime = LocalDateTime.now();
+    }
+
+    public void markParseFailed() {
+        this.parseStatus = TemplateParseStatus.FAILED;
+        this.updateTime = LocalDateTime.now();
+    }
+
+    public boolean isParsed() {
+        return this.parseStatus == TemplateParseStatus.READY;
     }
 
     public void enable() {

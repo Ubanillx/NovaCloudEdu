@@ -83,6 +83,7 @@ public final class PptAgentInterfaces {
                 - template_slide_index: the template page index to clone
                 - Each shape's shape_id, role (title/subtitle/body/label/section_number), fillable status (YES/no), and dimensions
                 - Image slot shape_id and dimensions
+                - Semantic metadata: text_density, emphasis_area, font_style, suggested_content_format, design_complexity
                 
                 You MUST:
                 1. Only use shape_ids listed in the template page for filling
@@ -92,11 +93,16 @@ public final class PptAgentInterfaces {
                    - role=body + fillable=YES → primary content area; use "text" for paragraphs or "items" for bullet lists
                    - If you do not need a fillable=YES shape, still output {"shape_id": N, "text": ""} in fills
                 3. **Shapes with fillable=NO (role=label/section_number) do NOT need filling** — the system handles them
-                4. Determine text volume based on shape dimensions:
+                4. Determine text volume based on shape dimensions AND semantic hints:
+                   - text_density=low → minimal text, keywords only
+                   - text_density=medium → title + 2-4 concise points
+                   - text_density=high → detailed content, 5+ points or paragraphs
                    - Small area (<5cm tall) → single-line short text
                    - Medium area (5-10cm tall) → 2-4 bullet points
                    - Large area (>10cm tall) → multiple paragraphs or 5+ bullet points
-                5. If image slots exist, describe desired images in image_suggestions
+                5. Use emphasis_area to place the most impactful content at the visual focal point
+                6. Use suggested_content_format to choose between bullet_points, paragraphs, short_phrases, or numbers_stats
+                7. If image slots exist, describe desired images in image_suggestions
                 
                 ## Output Format — Strictly output pure JSON:
                 {

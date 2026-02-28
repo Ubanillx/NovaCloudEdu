@@ -29,6 +29,8 @@ public class PptTemplatePO implements Serializable {
 
     private String structureJson;
 
+    private String parseStatus;
+
     private Long uploaderId;
 
     private Boolean enabled;

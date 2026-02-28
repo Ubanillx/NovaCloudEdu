@@ -86,18 +86,25 @@ public class PptGenerationService {
     // ==================== 大纲 Prompt ====================
 
     private static final String OUTLINE_SYSTEM_PROMPT = """
-            你是一个专业的PPT大纲设计师。你需要根据用户的主题、要求以及PPT模板的页面结构来生成一个结构化的Markdown大纲。
-
-            模板页面结构会在用户消息中以JSON描述的形式提供。你需要根据模板拥有的页面类型（封面cover、章节section、正文content、结束ending）来合理规划大纲结构。
-
-            要求：
-            1. 使用 Markdown 格式：# 为PPT标题（封面），## 为章节/分节标题，### 为该节的要点
-            2. 每个章节包含 2-4 个要点，要点内容简洁有力
-            3. 必须包含封面页（# 标题）和结束页（## 感谢/结语）
-            4. 大纲的章节数量应适配模板页面数量，不要生成过多或过少的章节
-            5. 参考模板中每页的文本槽位数量来调整每页的内容量
-            6. 内容专业、有逻辑性，适合PPT展示
-            7. 不要输出任何非大纲的内容（不要解释说明）
+            You are a professional presentation outline designer. Generate a structured Markdown outline based on the user's topic, requirements, and template page structure.
+            
+            The template structure is described in the user message. Plan the outline according to the template's page types (cover, section, content, ending) and semantic attributes.
+            
+            Requirements:
+            1. Use Markdown format: # for the PPT title (cover), ## for chapter/section titles, ### for content page headings
+            2. Each chapter should contain 2-4 bullet points — concise and impactful
+            3. Must include a cover page (# title) and an ending page (## Thank You / Summary)
+            4. The number of chapters must match the template's page count — no more, no fewer
+            5. Adapt content volume per page based on the template's text_density and suggested_content_format:
+               - text_density=low → short phrases only
+               - text_density=medium → title + 2-3 concise points
+               - text_density=high → title + 4-6 detailed points
+               - suggested_content_format=bullet_points → use dash-list format
+               - suggested_content_format=short_phrases → single-line keywords/phrases
+               - suggested_content_format=numbers_stats → emphasize data and statistics
+            6. If audience_level and tone are specified, match the language register accordingly
+            7. Content should be professional, logical, and presentation-ready
+            8. Output ONLY the outline — no explanations, no meta-commentary
             """;
 
     private static final String REVISE_SYSTEM_PROMPT = """
@@ -112,21 +119,31 @@ public class PptGenerationService {
     // ==================== 逐页填充 Prompt（视觉模型增强） ====================
 
     private static final String SLIDE_FILL_SYSTEM_PROMPT = """
-            你是一个PPT内容填充助手。你会收到一张模板页的高清截图和该页的槽位结构信息。
-            请仔细观察截图中的布局、样式、文字位置，结合大纲内容，生成合理的填充配置 JSON。
-
-            视觉理解要求：
-            1. 观察截图了解页面的视觉布局和设计风格
-            2. 根据截图中文字的位置和大小，判断每个槽位适合放多少文字
-            3. 标题类槽位文字简短有力，内容类槽位可以适当详细
-
-            严格要求：
-            1. 只输出纯JSON，不要输出markdown代码块标记，不要解释
-            2. template_slide_index 必须是模板中实际存在的页索引
-            3. shape_id 必须使用模板页中列出的 shape_id
-            4. 根据页面角色选择合适的模板页：cover→封面页, content→正文页, section→章节页, ending→结束页
-            5. 文本长度要简洁，适合PPT展示
-            6. 如果是要点列表，用 items 数组而非 text
+            You are a PPT content filling assistant. You will receive a high-resolution screenshot of a template slide \
+            along with its slot structure information and semantic metadata.
+            
+            ## Visual Understanding
+            1. Observe the screenshot to understand the page's visual layout and design style
+            2. Use emphasis_area to identify where the visual focal point is — place the most important content there
+            3. Use font_style hints to match text length to the observed typography
+            4. Match text volume to text_density: low → minimal text, medium → moderate, high → detailed
+            
+            ## Content Format
+            Adapt content structure based on suggested_content_format:
+            - bullet_points → use "items" array with concise bullet points
+            - paragraphs → use "text" with flowing prose
+            - short_phrases → use "text" with brief keywords/phrases
+            - numbers_stats → emphasize quantitative data and statistics
+            - mixed → combine formats as appropriate
+            
+            ## Strict Requirements
+            1. Output pure JSON only — no markdown code blocks, no explanations
+            2. template_slide_index MUST be an actually existing page index in the template
+            3. shape_id MUST use only the shape_ids listed for the template page
+            4. Match page role to content: cover → title slide, content → body, section → chapter divider, ending → closing
+            5. Text must be concise and presentation-ready
+            6. For bullet lists, use "items" array instead of "text"
+            7. Fill ALL shapes where fillable=YES — omissions leave ugly placeholder text visible
             """;
 
     // ==================== 公共方法 ====================
@@ -407,60 +424,66 @@ public class PptGenerationService {
 
         executor.execute(() -> {
             try {
-                // 确定 templateUrl
-                String resolvedUrl = templateUrl;
-                if (templateId != null && (resolvedUrl == null || resolvedUrl.isBlank())) {
+                // === 通过 templateId 选择已上传的模板 ===
+                if (templateId != null) {
                     PptTemplate template = templateRepository.findById(PptTemplateId.of(templateId))
                             .orElseThrow(() -> new BusinessException(40400, "模板不存在"));
 
-                    // 如果已有解析结果，直接使用
-                    if (template.getStructureJson() != null && !template.getStructureJson().isBlank()) {
-                        session.startParsingTemplate(templateId, template.getTemplateUrl());
-                        session.templateReady(template.getStructureJson());
-                        sessionRepository.save(session);
-
-                        sendEvent(emitter, alive, "status",
-                                Map.of("phase", "template_ready", "message", "模板已就绪，正在渲染预览..."));
-
-                        // 渲染幻灯片图片
-                        PptServiceClient.RenderSlidesResult renderResult =
-                                pptServiceClient.renderSlideImages(template.getTemplateUrl());
-
-                        sendEvent(emitter, alive, "template_parsed",
-                                parseTemplateJsonForFrontend(template.getStructureJson(),
-                                        template.getTemplateUrl(), renderResult));
-                        sendDone(emitter, alive);
-                        return;
+                    // 检查解析状态 — 只有 READY 才能使用
+                    if (!template.isParsed()) {
+                        String statusMsg = switch (template.getParseStatus()) {
+                            case PENDING, PARSING -> "模板正在解析中，请稍后再试";
+                            case FAILED -> "模板解析失败，请联系管理员重新解析";
+                            default -> "模板尚未就绪";
+                        };
+                        throw new BusinessException(40000, statusMsg);
                     }
-                    resolvedUrl = template.getTemplateUrl();
+
+                    // 已解析完成，直接使用缓存的 enriched structureJson
+                    session.startParsingTemplate(templateId, template.getTemplateUrl());
+                    session.templateReady(template.getStructureJson());
+                    sessionRepository.save(session);
+
+                    sendEvent(emitter, alive, "status",
+                            Map.of("phase", "template_ready", "message", "模板已就绪，正在渲染预览..."));
+
+                    PptServiceClient.RenderSlidesResult renderResult =
+                            pptServiceClient.renderSlideImages(template.getTemplateUrl());
+
+                    sendEvent(emitter, alive, "template_parsed",
+                            parseTemplateJsonForFrontend(template.getStructureJson(),
+                                    template.getTemplateUrl(), renderResult));
+                    sendDone(emitter, alive);
+                    return;
                 }
 
-                if (resolvedUrl == null || resolvedUrl.isBlank()) {
+                // === 通过 templateUrl 直接传入（未入库的临时模板）===
+                if (templateUrl == null || templateUrl.isBlank()) {
                     throw new BusinessException(40000, "请提供模板ID或模板URL");
                 }
 
-                session.startParsingTemplate(templateId, resolvedUrl);
-                sessionRepository.save(session);
-                sendEvent(emitter, alive, "status",
-                        Map.of("phase", "parsing_template", "message", "正在解析模板..."));
-
-                // 调 Python 解析模板
-                PptServiceClient.ParseTemplateResult parseResult =
-                        pptServiceClient.parseTemplate(resolvedUrl);
-
-                session.templateReady(parseResult.fullResponseJson());
+                session.startParsingTemplate(null, templateUrl);
                 sessionRepository.save(session);
 
                 sendEvent(emitter, alive, "status",
-                        Map.of("phase", "template_ready", "message", "模板解析完成，正在渲染预览..."));
+                        Map.of("phase", "parsing_template",
+                                "message", "正在语义增强解析模板（多模态分析）..."));
 
-                // 渲染幻灯片图片
-                PptServiceClient.RenderSlidesResult renderResult =
-                        pptServiceClient.renderSlideImages(resolvedUrl);
+                PptServiceClient.ParseEnrichedResult enrichedResult =
+                        pptServiceClient.parseTemplateEnriched(templateUrl);
+
+                session.templateReady(enrichedResult.fullResponseJson());
+                sessionRepository.save(session);
+
+                sendEvent(emitter, alive, "status",
+                        Map.of("phase", "template_ready",
+                                "message", "模板语义增强解析完成"));
 
                 sendEvent(emitter, alive, "template_parsed",
-                        parseTemplateJsonForFrontend(parseResult.fullResponseJson(),
-                                resolvedUrl, renderResult));
+                        parseTemplateJsonForFrontend(
+                                enrichedResult.fullResponseJson(),
+                                templateUrl,
+                                enrichedResult.renderResult()));
                 sendDone(emitter, alive);
 
             } catch (Exception e) {
@@ -1204,7 +1227,7 @@ public class PptGenerationService {
         if (slides.isArray()) {
             for (JsonNode slide : slides) {
                 int index = slide.path("index").asInt();
-                String role = slide.path("role").asText("content");
+                String role = slide.path("data").path("role").asText("content");
                 roleToIndexes.computeIfAbsent(role, k -> new ArrayList<>()).add(index);
                 switch (role) {
                     case "cover" -> cover++;
@@ -1279,8 +1302,9 @@ public class PptGenerationService {
     }
 
     /**
-     * 构建模板页结构描述（详细版，供 ContentAgent 按 shape 精准填充用）
-     * 包含每页的角色、布局名称、所有文本槽位（shape_id/role/是否可填充/示例文本/尺寸）和图片槽位
+     * 构建模板页结构描述（语义概览版，供 Agent 总览模板用）。
+     * 只输出语义信息（purpose/description/layout_type/content_capacity 等）和槽位数量摘要，
+     * 不暴露 shape_id 等细节。具体 shape 信息在 Agent 选定某页后通过 buildPerPageDescriptions 提供。
      */
     private String buildTemplateSlidesDescription(JsonNode templateRoot) {
         JsonNode slides = templateRoot.path("slides");
@@ -1288,74 +1312,93 @@ public class PptGenerationService {
 
         StringBuilder sb = new StringBuilder();
         sb.append("=== Template Structure Overview ===\n");
-        sb.append(String.format("Total pages: %d, Slide dimensions: %dx%d EMU\n\n",
+        sb.append(String.format("Total pages: %d, Slide dimensions: %dx%d EMU\n",
                 templateRoot.path("slide_count").asInt(),
                 templateRoot.path("slide_width").asInt(),
                 templateRoot.path("slide_height").asInt()));
 
+        // 模板级语义信息
+        String overallStyle = templateRoot.path("overall_style").asText("");
+        String templateDesc = templateRoot.path("template_description").asText("");
+        if (!overallStyle.isBlank()) {
+            sb.append(String.format("Overall style: %s\n", overallStyle));
+        }
+        if (!templateDesc.isBlank()) {
+            sb.append(String.format("Description: %s\n", templateDesc));
+        }
+        JsonNode topics = templateRoot.path("suitable_topics");
+        if (topics.isArray() && !topics.isEmpty()) {
+            sb.append("Suitable topics: ");
+            for (int i = 0; i < topics.size(); i++) {
+                if (i > 0) sb.append(", ");
+                sb.append(topics.get(i).asText());
+            }
+            sb.append("\n");
+        }
+        String audienceLevel = templateRoot.path("audience_level").asText("");
+        String tone = templateRoot.path("tone").asText("");
+        if (!audienceLevel.isBlank()) sb.append(String.format("Audience: %s\n", audienceLevel));
+        if (!tone.isBlank()) sb.append(String.format("Tone: %s\n", tone));
+        sb.append("\n");
+
         for (JsonNode slide : slides) {
             int index = slide.path("index").asInt();
-            String role = slide.path("role").asText("content");
-            String layoutName = slide.path("layout_name").asText("");
-            int fillableCount = slide.path("fillable_count").asInt(0);
+            JsonNode dataNode = slide.path("data");
+            String role = dataNode.path("role").asText("content");
+            int fillableCount = dataNode.path("fillable_count").asInt(0);
 
-            sb.append(String.format("┌── Template Page %d [role=%s, layout=\"%s\", fillable_slots=%d] ──┐\n",
-                    index, role, layoutName, fillableCount));
+            sb.append(String.format("┌── Page %d [role=%s] ──┐\n", index, role));
 
-            // 文本槽位详情
-            JsonNode textSlots = slide.path("text_slots");
-            if (textSlots.isArray() && !textSlots.isEmpty()) {
-                sb.append("│ Text slots:\n");
-                for (JsonNode slot : textSlots) {
-                    int shapeId = slot.path("shape_id").asInt();
-                    String slotRole = slot.path("role").asText("body");
-                    boolean fillable = slot.path("is_fillable").asBoolean(false);
-                    String sampleText = slot.path("sample_text").asText("");
-                    int width = slot.path("width").asInt(0);
-                    int height = slot.path("height").asInt(0);
+            String purpose = slide.path("purpose").asText("");
+            String description = slide.path("description").asText("");
+            String layoutType = slide.path("layout_type").asText("");
+            String contentCapacity = slide.path("content_capacity").asText("");
+            String visualStyle = slide.path("visual_style").asText("");
+            String recommendedUsage = slide.path("recommended_usage").asText("");
 
-                    // EMU → cm (1cm = 914400 EMU)
-                    String sizeCm = String.format("%.1fcm x %.1fcm",
-                            width / 914400.0, height / 914400.0);
+            if (!purpose.isBlank()) sb.append(String.format("│ Purpose: %s\n", purpose));
+            if (!description.isBlank()) sb.append(String.format("│ Description: %s\n", description));
+            if (!layoutType.isBlank()) sb.append(String.format("│ Layout type: %s\n", layoutType));
+            if (!contentCapacity.isBlank()) sb.append(String.format("│ Content capacity: %s\n", contentCapacity));
+            if (!visualStyle.isBlank()) sb.append(String.format("│ Visual style: %s\n", visualStyle));
+            if (!recommendedUsage.isBlank()) sb.append(String.format("│ Recommended usage: %s\n", recommendedUsage));
 
-                    sb.append(String.format("│   shape_id=%d, role=%s, fillable=%s, size=%s\n",
-                            shapeId, slotRole, fillable ? "YES" : "no", sizeCm));
-                    sb.append(String.format("│     sample: \"%s\"\n",
-                            truncate(sampleText, 50)));
+            // 新增语义字段
+            String textDensity = slide.path("text_density").asText("");
+            String designComplexity = slide.path("design_complexity").asText("");
+            String contentFormat = slide.path("suggested_content_format").asText("");
+            if (!textDensity.isBlank()) sb.append(String.format("│ Text density: %s\n", textDensity));
+            if (!designComplexity.isBlank()) sb.append(String.format("│ Design complexity: %s\n", designComplexity));
+            if (!contentFormat.isBlank()) sb.append(String.format("│ Content format: %s\n", contentFormat));
 
-                    // Provide fill guidance per role
-                    String hint = switch (slotRole) {
-                        case "title" -> "→ Fill with the page title (concise, ≤15 chars)";
-                        case "subtitle" -> "→ Fill with subtitle or supplementary text";
-                        case "body" -> fillable
-                                ? "→ Fillable area: use text for paragraph or items for bullet list"
-                                : "→ Body area";
-                        case "label" -> "→ Short label/number, usually keep original or use brief text";
-                        case "section_number" -> "→ Chapter number (e.g. PART 01), usually keep as-is";
-                        default -> "→ Fill as needed";
-                    };
-                    sb.append(String.format("│     %s\n", hint));
-                }
+            // 配色方案
+            JsonNode colorScheme = slide.path("color_scheme");
+            String primary = colorScheme.path("primary").asText("");
+            String bgColor = colorScheme.path("background").asText("");
+            if (!primary.isBlank() || !bgColor.isBlank()) {
+                sb.append(String.format("│ Colors: primary=%s, background=%s\n", primary, bgColor));
             }
 
-            // 图片槽位详情
-            JsonNode imageSlots = slide.path("image_slots");
-            if (imageSlots.isArray() && !imageSlots.isEmpty()) {
-                sb.append("│ Image slots:\n");
-                for (JsonNode imgSlot : imageSlots) {
-                    int shapeId = imgSlot.path("shape_id").asInt();
-                    String name = imgSlot.path("name").asText("");
-                    int width = imgSlot.path("width").asInt(0);
-                    int height = imgSlot.path("height").asInt(0);
-                    String sizeCm = String.format("%.1fcm x %.1fcm",
-                            width / 914400.0, height / 914400.0);
-                    sb.append(String.format("│   shape_id=%d, name=\"%s\", size=%s\n",
-                            shapeId, truncate(name, 20), sizeCm));
-                    sb.append("│     → Can be replaced with AI-generated image via image_url\n");
+            // 关键词
+            JsonNode keywords = slide.path("keywords");
+            if (keywords.isArray() && !keywords.isEmpty()) {
+                sb.append("│ Keywords: ");
+                for (int ki = 0; ki < keywords.size(); ki++) {
+                    if (ki > 0) sb.append(", ");
+                    sb.append(keywords.get(ki).asText());
                 }
+                sb.append("\n");
             }
 
-            sb.append(String.format("└── End of Template Page %d ──┘\n\n", index));
+            // 仅展示槽位摘要（数量），不暴露 shape_id 等细节
+            JsonNode textSlots = dataNode.path("text_slots");
+            JsonNode imageSlots = dataNode.path("image_slots");
+            int textCount = textSlots.isArray() ? textSlots.size() : 0;
+            int imgCount = imageSlots.isArray() ? imageSlots.size() : 0;
+            sb.append(String.format("│ Slots: %d text (fillable=%d), %d image\n",
+                    textCount, fillableCount, imgCount));
+
+            sb.append(String.format("└── End Page %d ──┘\n\n", index));
         }
 
         // Usage rules summary
@@ -1366,13 +1409,14 @@ public class PptGenerationService {
         sb.append("Content → fill title+bullet points; Ending → fill thank-you text\n");
         sb.append("4. Slots with is_fillable=YES are the primary fill targets\n");
         sb.append("5. Slots with role=label/section_number usually keep original text or minor tweaks\n");
+        sb.append("6. Detailed shape info (shape_ids, sizes, samples) will be provided per-page when generating each slide\n");
 
         return sb.toString();
     }
 
     /**
-     * 构建每页的模板描述 Map（pageIndex → 单页描述字符串）
-     * 供 ContentAgent 按 shape 精准填充用，只包含指定页的详细信息
+     * 构建每页的模板描述 Map（pageIndex → 单页描述字符串）。
+     * Agent 选中某页后获得：语义上下文 + 完整 shape 详情（shape_id/size/role/sample/fill hints）。
      */
     private Map<Integer, String> buildPerPageDescriptions(JsonNode templateRoot) {
         Map<Integer, String> result = new LinkedHashMap<>();
@@ -1381,15 +1425,53 @@ public class PptGenerationService {
 
         for (JsonNode slide : slides) {
             int index = slide.path("index").asInt();
-            String role = slide.path("role").asText("content");
-            String layoutName = slide.path("layout_name").asText("");
-            int fillableCount = slide.path("fillable_count").asInt(0);
+            JsonNode dataNode = slide.path("data");
+            String role = dataNode.path("role").asText("content");
+            String layoutName = dataNode.path("layout_name").asText("");
+            int fillableCount = dataNode.path("fillable_count").asInt(0);
 
             StringBuilder sb = new StringBuilder();
             sb.append(String.format("Template Page %d [role=%s, layout=\"%s\", fillable_slots=%d]\n",
                     index, role, layoutName, fillableCount));
 
-            JsonNode textSlots = slide.path("text_slots");
+            // 语义上下文
+            String purpose = slide.path("purpose").asText("");
+            String description = slide.path("description").asText("");
+            String contentCapacity = slide.path("content_capacity").asText("");
+            String visualStyle = slide.path("visual_style").asText("");
+            String recommendedUsage = slide.path("recommended_usage").asText("");
+            if (!purpose.isBlank()) sb.append(String.format("Purpose: %s\n", purpose));
+            if (!description.isBlank()) sb.append(String.format("Description: %s\n", description));
+            if (!contentCapacity.isBlank()) sb.append(String.format("Content capacity: %s\n", contentCapacity));
+            if (!visualStyle.isBlank()) sb.append(String.format("Visual style: %s\n", visualStyle));
+            if (!recommendedUsage.isBlank()) sb.append(String.format("Recommended usage: %s\n", recommendedUsage));
+
+            // 新增语义字段
+            String textDensity = slide.path("text_density").asText("");
+            String designComplexity = slide.path("design_complexity").asText("");
+            String emphasisArea = slide.path("emphasis_area").asText("");
+            String fontStyle = slide.path("font_style").asText("");
+            String contentFormat = slide.path("suggested_content_format").asText("");
+            if (!textDensity.isBlank()) sb.append(String.format("Text density: %s\n", textDensity));
+            if (!designComplexity.isBlank()) sb.append(String.format("Design complexity: %s\n", designComplexity));
+            if (!emphasisArea.isBlank()) sb.append(String.format("Emphasis area: %s\n", emphasisArea));
+            if (!fontStyle.isBlank()) sb.append(String.format("Font style: %s\n", fontStyle));
+            if (!contentFormat.isBlank()) sb.append(String.format("Content format: %s\n", contentFormat));
+
+            // 配色方案
+            JsonNode colorScheme = slide.path("color_scheme");
+            String primary = colorScheme.path("primary").asText("");
+            String bgColor = colorScheme.path("background").asText("");
+            String textColor = colorScheme.path("text").asText("");
+            if (!primary.isBlank() || !bgColor.isBlank()) {
+                sb.append(String.format("Colors: primary=%s, background=%s, text=%s\n",
+                        primary, bgColor, textColor));
+            }
+
+            sb.append("--- Shape details (data) ---\n");
+
+            // 完整的 text_slots 详情（含 shape_id / role / fillable / size / sample / fill hints）
+            JsonNode textSlots = dataNode.path("text_slots");
             if (textSlots.isArray() && !textSlots.isEmpty()) {
                 sb.append("Text slots:\n");
                 for (JsonNode slot : textSlots) {
@@ -1397,19 +1479,42 @@ public class PptGenerationService {
                     String slotRole = slot.path("role").asText("body");
                     boolean fillable = slot.path("is_fillable").asBoolean(false);
                     String sampleText = slot.path("sample_text").asText("");
-                    sb.append(String.format("  shape_id=%d, role=%s, fillable=%s, sample=\"%s\"\n",
-                            shapeId, slotRole, fillable ? "YES" : "no", truncate(sampleText, 40)));
+                    int width = slot.path("width").asInt(0);
+                    int height = slot.path("height").asInt(0);
+                    String sizeCm = String.format("%.1fcm x %.1fcm",
+                            width / 914400.0, height / 914400.0);
+
+                    sb.append(String.format("  shape_id=%d, role=%s, fillable=%s, size=%s, sample=\"%s\"\n",
+                            shapeId, slotRole, fillable ? "YES" : "no", sizeCm, truncate(sampleText, 50)));
+
+                    String hint = switch (slotRole) {
+                        case "title" -> "    → Fill with the page title (concise, ≤15 chars)";
+                        case "subtitle" -> "    → Fill with subtitle or supplementary text";
+                        case "body" -> fillable
+                                ? "    → Fillable: use text for paragraph or items for bullet list"
+                                : "    → Body area";
+                        case "label" -> "    → Short label/number, keep original or use brief text";
+                        case "section_number" -> "    → Chapter number (e.g. PART 01), keep as-is";
+                        default -> "    → Fill as needed";
+                    };
+                    sb.append(hint).append("\n");
                 }
             }
 
-            JsonNode imageSlots = slide.path("image_slots");
+            // 完整的 image_slots 详情
+            JsonNode imageSlots = dataNode.path("image_slots");
             if (imageSlots.isArray() && !imageSlots.isEmpty()) {
                 sb.append("Image slots:\n");
                 for (JsonNode imgSlot : imageSlots) {
                     int shapeId = imgSlot.path("shape_id").asInt();
                     String name = imgSlot.path("name").asText("");
-                    sb.append(String.format("  shape_id=%d, name=\"%s\"\n",
-                            shapeId, truncate(name, 20)));
+                    int width = imgSlot.path("width").asInt(0);
+                    int height = imgSlot.path("height").asInt(0);
+                    String sizeCm = String.format("%.1fcm x %.1fcm",
+                            width / 914400.0, height / 914400.0);
+                    sb.append(String.format("  shape_id=%d, name=\"%s\", size=%s\n",
+                            shapeId, truncate(name, 20), sizeCm));
+                    sb.append("    → Can be replaced with AI-generated image via image_url\n");
                 }
             }
 

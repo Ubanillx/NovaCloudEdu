@@ -73,6 +73,14 @@ public class PptTemplateController {
         return ResultUtils.success(null);
     }
 
+    @PostMapping("/templates/{id}/retry-parse")
+    @Operation(summary = "重新触发模板解析（用于解析失败的模板）")
+    public BaseResponse<Void> retryParsing(
+            @PathVariable @Parameter(description = "模板ID") Long id) {
+        pptTemplateService.retryParsing(id);
+        return ResultUtils.success(null);
+    }
+
     @PostMapping("/generate")
     @Operation(summary = "基于模板生成PPT")
     public BaseResponse<PptGenerateResponse> generatePpt(

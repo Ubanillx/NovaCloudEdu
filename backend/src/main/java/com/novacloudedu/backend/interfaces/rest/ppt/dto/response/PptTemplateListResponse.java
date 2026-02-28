@@ -29,4 +29,7 @@ public class PptTemplateListResponse {
 
     @Schema(description = "是否启用")
     private boolean enabled;
+
+    @Schema(description = "解析状态: pending/parsing/ready/failed")
+    private String parseStatus;
 }
