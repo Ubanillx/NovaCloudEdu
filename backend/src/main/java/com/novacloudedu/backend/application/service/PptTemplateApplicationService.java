@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -49,8 +51,13 @@ public class PptTemplateApplicationService {
         Long templateId = template.getId().value();
         log.info("PPT模板上传成功: id={}, name={}, 异步解析已触发", templateId, name);
 
-        // 3. 异步触发语义增强解析（通过独立 Bean 调用，确保 @Async 代理生效）
-        pptTemplateParseService.triggerEnrichedParsing(templateId, templateUrl);
+        // 3. 事务提交后异步触发语义增强解析（避免异步线程在 commit 前查不到模板）
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                pptTemplateParseService.triggerEnrichedParsing(templateId, templateUrl);
+            }
+        });
 
         return templateId;
     }
