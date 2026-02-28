@@ -31,6 +31,9 @@ public interface KnowledgeDocumentMapper extends BaseMapper<KnowledgeDocumentPO>
     @Select("SELECT COUNT(*) FROM knowledge_document WHERE knowledge_base_id = #{knowledgeBaseId} AND is_delete = 0")
     long countByKnowledgeBaseId(@Param("knowledgeBaseId") Long knowledgeBaseId);
 
+    @Select("SELECT status, COUNT(*) AS cnt FROM knowledge_document WHERE knowledge_base_id = #{knowledgeBaseId} AND is_delete = 0 GROUP BY status")
+    List<java.util.Map<String, Object>> countByKnowledgeBaseIdGroupByStatus(@Param("knowledgeBaseId") Long knowledgeBaseId);
+
     @Update("UPDATE knowledge_document SET is_delete = 1, update_time = NOW() WHERE knowledge_base_id = #{knowledgeBaseId}")
     void deleteByKnowledgeBaseId(@Param("knowledgeBaseId") Long knowledgeBaseId);
 }

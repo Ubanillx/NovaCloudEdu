@@ -27,7 +27,7 @@ public class KnowledgeChunkRepositoryImpl implements KnowledgeChunkRepository {
     public void saveChunk(KnowledgeBaseId knowledgeBaseId, KnowledgeDocumentId documentId,
                           String content, int chunkIndex, float[] embedding, String metadata) {
         String embeddingStr = floatArrayToString(embedding);
-        mapper.insertChunk(knowledgeBaseId.value(), documentId.value(), content, chunkIndex, embeddingStr, metadata);
+        mapper.insertChunk(knowledgeBaseId.value(), documentId.value(), content, chunkIndex, null, null, null, embeddingStr, metadata);
     }
 
     private static final int DB_BATCH_SIZE = 1000;
@@ -42,6 +42,9 @@ public class KnowledgeChunkRepositoryImpl implements KnowledgeChunkRepository {
             row.put("documentId", documentId.value());
             row.put("content", contents.get(i));
             row.put("chunkIndex", i);
+            row.put("parentChunkId", null);
+            row.put("isParentChunk", null);
+            row.put("sectionTitle", null);
             row.put("embedding", floatArrayToString(embeddings.get(i)));
             row.put("metadata", metadata);
             allRows.add(row);
@@ -74,6 +77,28 @@ public class KnowledgeChunkRepositoryImpl implements KnowledgeChunkRepository {
         return results.stream()
                 .map(this::mapToResult)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ChunkSearchResult> fullTextSearchInMultiple(List<Long> knowledgeBaseIds, String query, int topK) {
+        if (knowledgeBaseIds == null || knowledgeBaseIds.isEmpty() || query == null || query.trim().isEmpty()) {
+            return new ArrayList<>();
+        }
+        try {
+            List<Map<String, Object>> results = mapper.fullTextSearchInMultiple(knowledgeBaseIds, query, topK);
+            if (results != null && !results.isEmpty()) {
+                return results.stream().map(this::mapToResult).collect(Collectors.toList());
+            }
+            // 全文检索无结果时，尝试 trigram 模糊匹配作为降级
+            List<Map<String, Object>> trigramResults = mapper.trigramSearchInMultiple(knowledgeBaseIds, query, topK);
+            if (trigramResults != null) {
+                return trigramResults.stream().map(this::mapToResult).collect(Collectors.toList());
+            }
+            return new ArrayList<>();
+        } catch (Exception e) {
+            log.warn("全文检索异常，降级返回空: {}", e.getMessage());
+            return new ArrayList<>();
+        }
     }
 
     @Override
@@ -127,6 +152,9 @@ public class KnowledgeChunkRepositoryImpl implements KnowledgeChunkRepository {
                 ((Number) map.get("document_id")).longValue(),
                 (String) map.get("content"),
                 map.get("chunk_index") != null ? ((Number) map.get("chunk_index")).intValue() : 0,
+                map.get("parent_chunk_id") != null ? ((Number) map.get("parent_chunk_id")).longValue() : null,
+                map.get("is_parent_chunk") != null ? (Boolean) map.get("is_parent_chunk") : false,
+                (String) map.get("section_title"),
                 convertMetadataToString(map.get("metadata")),
                 map.get("create_time") != null ? ((java.sql.Timestamp) map.get("create_time")).toLocalDateTime() : null
         );

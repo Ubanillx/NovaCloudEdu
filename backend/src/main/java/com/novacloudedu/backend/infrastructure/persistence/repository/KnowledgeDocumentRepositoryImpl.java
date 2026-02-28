@@ -83,6 +83,26 @@ public class KnowledgeDocumentRepositoryImpl implements KnowledgeDocumentReposit
     }
 
     @Override
+    public java.util.Map<String, Long> countByKnowledgeBaseIdGroupByStatus(KnowledgeBaseId knowledgeBaseId) {
+        List<java.util.Map<String, Object>> rows = mapper.countByKnowledgeBaseIdGroupByStatus(knowledgeBaseId.value());
+        java.util.Map<String, Long> result = new java.util.LinkedHashMap<>();
+        result.put("PENDING", 0L);
+        result.put("PROCESSING", 0L);
+        result.put("COMPLETED", 0L);
+        result.put("FAILED", 0L);
+        if (rows != null) {
+            for (java.util.Map<String, Object> row : rows) {
+                String status = (String) row.get("status");
+                Long cnt = ((Number) row.get("cnt")).longValue();
+                if (status != null) {
+                    result.put(status, cnt);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
     public void delete(KnowledgeDocumentId id) {
         mapper.deleteById(id.value());
     }
