@@ -21,6 +21,7 @@ Name | Type | Description | Notes
 **transcodeStatus** | **number** | 转码状态: 0-未转码, 1-转码中, 2-已完成, 3-失败 | [optional] [default to undefined]
 **thumbnailUrl** | **string** | 缩略图雪碧图URL | [optional] [default to undefined]
 **thumbnailCount** | **number** | 缩略图数量 | [optional] [default to undefined]
+**encryptionKeyId** | **string** | 加密密钥ID（用于HLS解密） | [optional] [default to undefined]
 **createTime** | **string** | 创建时间 | [optional] [default to undefined]
 **updateTime** | **string** | 更新时间 | [optional] [default to undefined]
 
@@ -45,6 +46,7 @@ const instance: SectionResponse = {
     transcodeStatus,
     thumbnailUrl,
     thumbnailCount,
+    encryptionKeyId,
     createTime,
     updateTime,
 };

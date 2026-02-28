@@ -76,6 +76,8 @@ import type { BaseResponseCheckinResult } from '../models';
 // @ts-ignore
 import type { BaseResponseCheckinStatusResult } from '../models';
 // @ts-ignore
+import type { BaseResponseChunkPreviewResult } from '../models';
+// @ts-ignore
 import type { BaseResponseClassAnalyticsResponse } from '../models';
 // @ts-ignore
 import type { BaseResponseClassResponse } from '../models';
@@ -199,6 +201,8 @@ import type { BaseResponseListKnowledgeProfileResponse } from '../models';
 import type { BaseResponseListLong } from '../models';
 // @ts-ignore
 import type { BaseResponseListMapStringObject } from '../models';
+// @ts-ignore
+import type { BaseResponseListMapStringString } from '../models';
 // @ts-ignore
 import type { BaseResponseListMembershipPlan } from '../models';
 // @ts-ignore
@@ -7711,6 +7715,51 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 通过 URL 中的一次性 token 验证身份，返回修改后的 m3u8 内容。 原生视频播放器无法携带 HTTP Header，因此使用 token-in-URL 方式认证。 客户端需先调用 /api/video/stream-token 获取 token。 
+         * @summary 获取HLS播放流（Token-in-URL认证）
+         * @param {number} sectionId 小节ID
+         * @param {string} token 一次性流访问令牌
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getHlsStream: async (sectionId: number, token: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'sectionId' is not null or undefined
+            assertParamExists('getHlsStream', 'sectionId', sectionId)
+            // verify required parameter 'token' is not null or undefined
+            assertParamExists('getHlsStream', 'token', token)
+            const localVarPath = `/api/video/hls/{sectionId}`
+                .replace(`{${"sectionId"}}`, encodeURIComponent(String(sectionId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (token !== undefined) {
+                localVarQueryParameter['token'] = token;
+            }
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 
          * @summary 获取视频解密密钥（HLS播放器自动调用）
          * @param {string} keyId 密钥ID
@@ -8996,6 +9045,54 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 获取一次性播放令牌，用于请求HLS解密密钥。令牌5分钟有效且只能使用一次。
+         * @summary 获取视频播放令牌
+         * @param {number} sectionId 小节ID
+         * @param {string} keyId 加密密钥ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getPlayToken: async (sectionId: number, keyId: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'sectionId' is not null or undefined
+            assertParamExists('getPlayToken', 'sectionId', sectionId)
+            // verify required parameter 'keyId' is not null or undefined
+            assertParamExists('getPlayToken', 'keyId', keyId)
+            const localVarPath = `/api/video/play-token`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (sectionId !== undefined) {
+                localVarQueryParameter['sectionId'] = sectionId;
+            }
+
+            if (keyId !== undefined) {
+                localVarQueryParameter['keyId'] = keyId;
+            }
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 
          * @summary 获取帖子评论列表
          * @param {number} postId 
@@ -10040,6 +10137,47 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             // authentication Bearer Token required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 获取一次性流访问令牌，用于 HLS m3u8 请求的 URL 认证。令牌5分钟有效且只能使用一次。
+         * @summary 获取视频流访问令牌
+         * @param {number} sectionId 小节ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getStreamToken: async (sectionId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'sectionId' is not null or undefined
+            assertParamExists('getStreamToken', 'sectionId', sectionId)
+            const localVarPath = `/api/video/stream-token`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (sectionId !== undefined) {
+                localVarQueryParameter['sectionId'] = sectionId;
+            }
 
             localVarHeaderParameter['Accept'] = 'application/json';
 
@@ -12131,6 +12269,44 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 返回知识库中各状态文档的数量统计（全量，不受分页影响）
+         * @summary 获取文档状态统计
+         * @param {number} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        kbDocumentStats: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('kbDocumentStats', 'id', id)
+            const localVarPath = `/api/ai/knowledge-bases/{id}/document-stats`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 
          * @summary 获取知识库详情
          * @param {number} id 
@@ -12207,6 +12383,40 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             if (size !== undefined) {
                 localVarQueryParameter['size'] = size;
             }
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 获取可用的切分策略列表
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        kbListChunkStrategies: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/ai/knowledge-bases/chunk-strategies`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
             localVarHeaderParameter['Accept'] = 'application/json';
 
@@ -12320,6 +12530,160 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 返回DashScope平台可用的文本向量化模型及其支持的维度列表
+         * @summary 获取可用的Embedding模型列表
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        kbListEmbeddingModels: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/ai/knowledge-bases/embedding-models`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 返回可用的RAG检索模式列表
+         * @summary 获取检索模式列表
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        kbListRetrievalModes: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/ai/knowledge-bases/retrieval-modes`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 输入文本内容和切分参数，返回切分预览结果（不执行向量化）
+         * @summary 预览文档切分效果
+         * @param {{ [key: string]: object; }} requestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        kbPreviewChunking: async (requestBody: { [key: string]: object; }, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'requestBody' is not null or undefined
+            assertParamExists('kbPreviewChunking', 'requestBody', requestBody)
+            const localVarPath = `/api/ai/knowledge-bases/chunk-preview`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(requestBody, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 基于已上传的文档，预览不同切分策略的效果
+         * @summary 预览文档切分效果（基于已有文档）
+         * @param {number} id 
+         * @param {number} docId 
+         * @param {{ [key: string]: object; }} requestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        kbPreviewDocumentChunking: async (id: number, docId: number, requestBody: { [key: string]: object; }, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('kbPreviewDocumentChunking', 'id', id)
+            // verify required parameter 'docId' is not null or undefined
+            assertParamExists('kbPreviewDocumentChunking', 'docId', docId)
+            // verify required parameter 'requestBody' is not null or undefined
+            assertParamExists('kbPreviewDocumentChunking', 'requestBody', requestBody)
+            const localVarPath = `/api/ai/knowledge-bases/{id}/documents/{docId}/chunk-preview`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)))
+                .replace(`{${"docId"}}`, encodeURIComponent(String(docId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(requestBody, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 
          * @summary 触发文档向量化
          * @param {number} id 
@@ -12362,7 +12726,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * 输入查询文本，返回向量检索+Rerank后的召回结果，用于调试知识库检索效果
+         * 输入查询文本，返回多路召回+RRF融合+Rerank后的召回结果，用于调试知识库检索效果。所有RAG参数可选，缺省时使用知识库默认配置。
          * @summary 知识库召回测试
          * @param {number} id 
          * @param {{ [key: string]: object; }} requestBody 
@@ -22182,6 +22546,20 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 通过 URL 中的一次性 token 验证身份，返回修改后的 m3u8 内容。 原生视频播放器无法携带 HTTP Header，因此使用 token-in-URL 方式认证。 客户端需先调用 /api/video/stream-token 获取 token。 
+         * @summary 获取HLS播放流（Token-in-URL认证）
+         * @param {number} sectionId 小节ID
+         * @param {string} token 一次性流访问令牌
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getHlsStream(sectionId: number, token: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getHlsStream(sectionId, token, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getHlsStream']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 
          * @summary 获取视频解密密钥（HLS播放器自动调用）
          * @param {string} keyId 密钥ID
@@ -22607,6 +22985,20 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 获取一次性播放令牌，用于请求HLS解密密钥。令牌5分钟有效且只能使用一次。
+         * @summary 获取视频播放令牌
+         * @param {number} sectionId 小节ID
+         * @param {string} keyId 加密密钥ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getPlayToken(sectionId: number, keyId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseString>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getPlayToken(sectionId, keyId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getPlayToken']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 
          * @summary 获取帖子评论列表
          * @param {number} postId 
@@ -22959,6 +23351,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getStatus(submissionId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.getStatus']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 获取一次性流访问令牌，用于 HLS m3u8 请求的 URL 认证。令牌5分钟有效且只能使用一次。
+         * @summary 获取视频流访问令牌
+         * @param {number} sectionId 小节ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getStreamToken(sectionId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseString>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getStreamToken(sectionId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getStreamToken']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -23646,6 +24051,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 返回知识库中各状态文档的数量统计（全量，不受分页影响）
+         * @summary 获取文档状态统计
+         * @param {number} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async kbDocumentStats(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseMapStringLong>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.kbDocumentStats(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.kbDocumentStats']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 
          * @summary 获取知识库详情
          * @param {number} id 
@@ -23671,6 +24089,18 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.kbListByCreator(userId, page, size, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.kbListByCreator']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 获取可用的切分策略列表
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async kbListChunkStrategies(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseListMapStringString>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.kbListChunkStrategies(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.kbListChunkStrategies']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -23705,6 +24135,58 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 返回DashScope平台可用的文本向量化模型及其支持的维度列表
+         * @summary 获取可用的Embedding模型列表
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async kbListEmbeddingModels(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseListMapStringObject>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.kbListEmbeddingModels(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.kbListEmbeddingModels']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 返回可用的RAG检索模式列表
+         * @summary 获取检索模式列表
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async kbListRetrievalModes(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseListMapStringString>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.kbListRetrievalModes(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.kbListRetrievalModes']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 输入文本内容和切分参数，返回切分预览结果（不执行向量化）
+         * @summary 预览文档切分效果
+         * @param {{ [key: string]: object; }} requestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async kbPreviewChunking(requestBody: { [key: string]: object; }, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseChunkPreviewResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.kbPreviewChunking(requestBody, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.kbPreviewChunking']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 基于已上传的文档，预览不同切分策略的效果
+         * @summary 预览文档切分效果（基于已有文档）
+         * @param {number} id 
+         * @param {number} docId 
+         * @param {{ [key: string]: object; }} requestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async kbPreviewDocumentChunking(id: number, docId: number, requestBody: { [key: string]: object; }, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseChunkPreviewResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.kbPreviewDocumentChunking(id, docId, requestBody, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.kbPreviewDocumentChunking']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 
          * @summary 触发文档向量化
          * @param {number} id 
@@ -23719,7 +24201,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * 输入查询文本，返回向量检索+Rerank后的召回结果，用于调试知识库检索效果
+         * 输入查询文本，返回多路召回+RRF融合+Rerank后的召回结果，用于调试知识库检索效果。所有RAG参数可选，缺省时使用知识库默认配置。
          * @summary 知识库召回测试
          * @param {number} id 
          * @param {{ [key: string]: object; }} requestBody 
@@ -27885,6 +28367,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.getHistory(requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
         },
         /**
+         * 通过 URL 中的一次性 token 验证身份，返回修改后的 m3u8 内容。 原生视频播放器无法携带 HTTP Header，因此使用 token-in-URL 方式认证。 客户端需先调用 /api/video/stream-token 获取 token。 
+         * @summary 获取HLS播放流（Token-in-URL认证）
+         * @param {DefaultApiGetHlsStreamRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getHlsStream(requestParameters: DefaultApiGetHlsStreamRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.getHlsStream(requestParameters.sectionId, requestParameters.token, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 
          * @summary 获取视频解密密钥（HLS播放器自动调用）
          * @param {DefaultApiGetKeyRequest} requestParameters Request parameters.
@@ -28195,6 +28687,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.getPlan(requestParameters.planId, options).then((request) => request(axios, basePath));
         },
         /**
+         * 获取一次性播放令牌，用于请求HLS解密密钥。令牌5分钟有效且只能使用一次。
+         * @summary 获取视频播放令牌
+         * @param {DefaultApiGetPlayTokenRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getPlayToken(requestParameters: DefaultApiGetPlayTokenRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseString> {
+            return localVarFp.getPlayToken(requestParameters.sectionId, requestParameters.keyId, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 
          * @summary 获取帖子评论列表
          * @param {DefaultApiGetPostCommentsRequest} requestParameters Request parameters.
@@ -28456,6 +28958,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         getStatus(requestParameters: DefaultApiGetStatusRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseSubmissionStatusResponse> {
             return localVarFp.getStatus(requestParameters.submissionId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 获取一次性流访问令牌，用于 HLS m3u8 请求的 URL 认证。令牌5分钟有效且只能使用一次。
+         * @summary 获取视频流访问令牌
+         * @param {DefaultApiGetStreamTokenRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getStreamToken(requestParameters: DefaultApiGetStreamTokenRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseString> {
+            return localVarFp.getStreamToken(requestParameters.sectionId, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -28961,6 +29473,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.kbDeleteDocument(requestParameters.id, requestParameters.docId, options).then((request) => request(axios, basePath));
         },
         /**
+         * 返回知识库中各状态文档的数量统计（全量，不受分页影响）
+         * @summary 获取文档状态统计
+         * @param {DefaultApiKbDocumentStatsRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        kbDocumentStats(requestParameters: DefaultApiKbDocumentStatsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringLong> {
+            return localVarFp.kbDocumentStats(requestParameters.id, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 
          * @summary 获取知识库详情
          * @param {DefaultApiKbGetByIdRequest} requestParameters Request parameters.
@@ -28979,6 +29501,15 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         kbListByCreator(requestParameters: DefaultApiKbListByCreatorRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListKnowledgeBaseVO> {
             return localVarFp.kbListByCreator(requestParameters.userId, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 获取可用的切分策略列表
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        kbListChunkStrategies(options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListMapStringString> {
+            return localVarFp.kbListChunkStrategies(options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -29001,6 +29532,44 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.kbListDocuments(requestParameters.id, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
         },
         /**
+         * 返回DashScope平台可用的文本向量化模型及其支持的维度列表
+         * @summary 获取可用的Embedding模型列表
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        kbListEmbeddingModels(options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListMapStringObject> {
+            return localVarFp.kbListEmbeddingModels(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 返回可用的RAG检索模式列表
+         * @summary 获取检索模式列表
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        kbListRetrievalModes(options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListMapStringString> {
+            return localVarFp.kbListRetrievalModes(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 输入文本内容和切分参数，返回切分预览结果（不执行向量化）
+         * @summary 预览文档切分效果
+         * @param {DefaultApiKbPreviewChunkingRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        kbPreviewChunking(requestParameters: DefaultApiKbPreviewChunkingRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseChunkPreviewResult> {
+            return localVarFp.kbPreviewChunking(requestParameters.requestBody, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 基于已上传的文档，预览不同切分策略的效果
+         * @summary 预览文档切分效果（基于已有文档）
+         * @param {DefaultApiKbPreviewDocumentChunkingRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        kbPreviewDocumentChunking(requestParameters: DefaultApiKbPreviewDocumentChunkingRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseChunkPreviewResult> {
+            return localVarFp.kbPreviewDocumentChunking(requestParameters.id, requestParameters.docId, requestParameters.requestBody, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 
          * @summary 触发文档向量化
          * @param {DefaultApiKbProcessDocumentRequest} requestParameters Request parameters.
@@ -29011,7 +29580,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.kbProcessDocument(requestParameters.id, requestParameters.docId, options).then((request) => request(axios, basePath));
         },
         /**
-         * 输入查询文本，返回向量检索+Rerank后的召回结果，用于调试知识库检索效果
+         * 输入查询文本，返回多路召回+RRF融合+Rerank后的召回结果，用于调试知识库检索效果。所有RAG参数可选，缺省时使用知识库默认配置。
          * @summary 知识库召回测试
          * @param {DefaultApiKbRecallTestRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
@@ -32335,6 +32904,15 @@ export interface DefaultApiInterface {
     getHistory(requestParameters?: DefaultApiGetHistoryRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListSubmissionStatusResponse>;
 
     /**
+     * 通过 URL 中的一次性 token 验证身份，返回修改后的 m3u8 内容。 原生视频播放器无法携带 HTTP Header，因此使用 token-in-URL 方式认证。 客户端需先调用 /api/video/stream-token 获取 token。 
+     * @summary 获取HLS播放流（Token-in-URL认证）
+     * @param {DefaultApiGetHlsStreamRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getHlsStream(requestParameters: DefaultApiGetHlsStreamRequest, options?: RawAxiosRequestConfig): AxiosPromise<void>;
+
+    /**
      * 
      * @summary 获取视频解密密钥（HLS播放器自动调用）
      * @param {DefaultApiGetKeyRequest} requestParameters Request parameters.
@@ -32613,6 +33191,15 @@ export interface DefaultApiInterface {
     getPlan(requestParameters: DefaultApiGetPlanRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMembershipPlan>;
 
     /**
+     * 获取一次性播放令牌，用于请求HLS解密密钥。令牌5分钟有效且只能使用一次。
+     * @summary 获取视频播放令牌
+     * @param {DefaultApiGetPlayTokenRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getPlayToken(requestParameters: DefaultApiGetPlayTokenRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseString>;
+
+    /**
      * 
      * @summary 获取帖子评论列表
      * @param {DefaultApiGetPostCommentsRequest} requestParameters Request parameters.
@@ -32847,6 +33434,15 @@ export interface DefaultApiInterface {
      * @throws {RequiredError}
      */
     getStatus(requestParameters: DefaultApiGetStatusRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseSubmissionStatusResponse>;
+
+    /**
+     * 获取一次性流访问令牌，用于 HLS m3u8 请求的 URL 认证。令牌5分钟有效且只能使用一次。
+     * @summary 获取视频流访问令牌
+     * @param {DefaultApiGetStreamTokenRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getStreamToken(requestParameters: DefaultApiGetStreamTokenRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseString>;
 
     /**
      * 
@@ -33301,6 +33897,15 @@ export interface DefaultApiInterface {
     kbDeleteDocument(requestParameters: DefaultApiKbDeleteDocumentRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid>;
 
     /**
+     * 返回知识库中各状态文档的数量统计（全量，不受分页影响）
+     * @summary 获取文档状态统计
+     * @param {DefaultApiKbDocumentStatsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    kbDocumentStats(requestParameters: DefaultApiKbDocumentStatsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringLong>;
+
+    /**
      * 
      * @summary 获取知识库详情
      * @param {DefaultApiKbGetByIdRequest} requestParameters Request parameters.
@@ -33317,6 +33922,14 @@ export interface DefaultApiInterface {
      * @throws {RequiredError}
      */
     kbListByCreator(requestParameters: DefaultApiKbListByCreatorRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListKnowledgeBaseVO>;
+
+    /**
+     * 
+     * @summary 获取可用的切分策略列表
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    kbListChunkStrategies(options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListMapStringString>;
 
     /**
      * 
@@ -33337,6 +33950,40 @@ export interface DefaultApiInterface {
     kbListDocuments(requestParameters: DefaultApiKbListDocumentsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListKnowledgeDocumentVO>;
 
     /**
+     * 返回DashScope平台可用的文本向量化模型及其支持的维度列表
+     * @summary 获取可用的Embedding模型列表
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    kbListEmbeddingModels(options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListMapStringObject>;
+
+    /**
+     * 返回可用的RAG检索模式列表
+     * @summary 获取检索模式列表
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    kbListRetrievalModes(options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListMapStringString>;
+
+    /**
+     * 输入文本内容和切分参数，返回切分预览结果（不执行向量化）
+     * @summary 预览文档切分效果
+     * @param {DefaultApiKbPreviewChunkingRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    kbPreviewChunking(requestParameters: DefaultApiKbPreviewChunkingRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseChunkPreviewResult>;
+
+    /**
+     * 基于已上传的文档，预览不同切分策略的效果
+     * @summary 预览文档切分效果（基于已有文档）
+     * @param {DefaultApiKbPreviewDocumentChunkingRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    kbPreviewDocumentChunking(requestParameters: DefaultApiKbPreviewDocumentChunkingRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseChunkPreviewResult>;
+
+    /**
      * 
      * @summary 触发文档向量化
      * @param {DefaultApiKbProcessDocumentRequest} requestParameters Request parameters.
@@ -33346,7 +33993,7 @@ export interface DefaultApiInterface {
     kbProcessDocument(requestParameters: DefaultApiKbProcessDocumentRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid>;
 
     /**
-     * 输入查询文本，返回向量检索+Rerank后的召回结果，用于调试知识库检索效果
+     * 输入查询文本，返回多路召回+RRF融合+Rerank后的召回结果，用于调试知识库检索效果。所有RAG参数可选，缺省时使用知识库默认配置。
      * @summary 知识库召回测试
      * @param {DefaultApiKbRecallTestRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -36480,6 +37127,21 @@ export interface DefaultApiGetHistoryRequest {
 }
 
 /**
+ * Request parameters for getHlsStream operation in DefaultApi.
+ */
+export interface DefaultApiGetHlsStreamRequest {
+    /**
+     * 小节ID
+     */
+    readonly sectionId: number
+
+    /**
+     * 一次性流访问令牌
+     */
+    readonly token: string
+}
+
+/**
  * Request parameters for getKey operation in DefaultApi.
  */
 export interface DefaultApiGetKeyRequest {
@@ -36717,6 +37379,21 @@ export interface DefaultApiGetPlanRequest {
 }
 
 /**
+ * Request parameters for getPlayToken operation in DefaultApi.
+ */
+export interface DefaultApiGetPlayTokenRequest {
+    /**
+     * 小节ID
+     */
+    readonly sectionId: number
+
+    /**
+     * 加密密钥ID
+     */
+    readonly keyId: string
+}
+
+/**
  * Request parameters for getPostComments operation in DefaultApi.
  */
 export interface DefaultApiGetPostCommentsRequest {
@@ -36894,6 +37571,16 @@ export interface DefaultApiGetSentRequestsRequest {
  */
 export interface DefaultApiGetStatusRequest {
     readonly submissionId: number
+}
+
+/**
+ * Request parameters for getStreamToken operation in DefaultApi.
+ */
+export interface DefaultApiGetStreamTokenRequest {
+    /**
+     * 小节ID
+     */
+    readonly sectionId: number
 }
 
 /**
@@ -37315,6 +38002,13 @@ export interface DefaultApiKbDeleteDocumentRequest {
 }
 
 /**
+ * Request parameters for kbDocumentStats operation in DefaultApi.
+ */
+export interface DefaultApiKbDocumentStatsRequest {
+    readonly id: number
+}
+
+/**
  * Request parameters for kbGetById operation in DefaultApi.
  */
 export interface DefaultApiKbGetByIdRequest {
@@ -37354,6 +38048,24 @@ export interface DefaultApiKbListDocumentsRequest {
     readonly page?: number
 
     readonly size?: number
+}
+
+/**
+ * Request parameters for kbPreviewChunking operation in DefaultApi.
+ */
+export interface DefaultApiKbPreviewChunkingRequest {
+    readonly requestBody: { [key: string]: object; }
+}
+
+/**
+ * Request parameters for kbPreviewDocumentChunking operation in DefaultApi.
+ */
+export interface DefaultApiKbPreviewDocumentChunkingRequest {
+    readonly id: number
+
+    readonly docId: number
+
+    readonly requestBody: { [key: string]: object; }
 }
 
 /**
@@ -41086,6 +41798,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * 通过 URL 中的一次性 token 验证身份，返回修改后的 m3u8 内容。 原生视频播放器无法携带 HTTP Header，因此使用 token-in-URL 方式认证。 客户端需先调用 /api/video/stream-token 获取 token。 
+     * @summary 获取HLS播放流（Token-in-URL认证）
+     * @param {DefaultApiGetHlsStreamRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getHlsStream(requestParameters: DefaultApiGetHlsStreamRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getHlsStream(requestParameters.sectionId, requestParameters.token, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 
      * @summary 获取视频解密密钥（HLS播放器自动调用）
      * @param {DefaultApiGetKeyRequest} requestParameters Request parameters.
@@ -41428,6 +42151,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * 获取一次性播放令牌，用于请求HLS解密密钥。令牌5分钟有效且只能使用一次。
+     * @summary 获取视频播放令牌
+     * @param {DefaultApiGetPlayTokenRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getPlayToken(requestParameters: DefaultApiGetPlayTokenRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getPlayToken(requestParameters.sectionId, requestParameters.keyId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 
      * @summary 获取帖子评论列表
      * @param {DefaultApiGetPostCommentsRequest} requestParameters Request parameters.
@@ -41715,6 +42449,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public getStatus(requestParameters: DefaultApiGetStatusRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).getStatus(requestParameters.submissionId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 获取一次性流访问令牌，用于 HLS m3u8 请求的 URL 认证。令牌5分钟有效且只能使用一次。
+     * @summary 获取视频流访问令牌
+     * @param {DefaultApiGetStreamTokenRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getStreamToken(requestParameters: DefaultApiGetStreamTokenRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getStreamToken(requestParameters.sectionId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -42272,6 +43017,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * 返回知识库中各状态文档的数量统计（全量，不受分页影响）
+     * @summary 获取文档状态统计
+     * @param {DefaultApiKbDocumentStatsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public kbDocumentStats(requestParameters: DefaultApiKbDocumentStatsRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).kbDocumentStats(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 
      * @summary 获取知识库详情
      * @param {DefaultApiKbGetByIdRequest} requestParameters Request parameters.
@@ -42291,6 +43047,16 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public kbListByCreator(requestParameters: DefaultApiKbListByCreatorRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).kbListByCreator(requestParameters.userId, requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 获取可用的切分策略列表
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public kbListChunkStrategies(options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).kbListChunkStrategies(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -42316,6 +43082,48 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * 返回DashScope平台可用的文本向量化模型及其支持的维度列表
+     * @summary 获取可用的Embedding模型列表
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public kbListEmbeddingModels(options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).kbListEmbeddingModels(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 返回可用的RAG检索模式列表
+     * @summary 获取检索模式列表
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public kbListRetrievalModes(options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).kbListRetrievalModes(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 输入文本内容和切分参数，返回切分预览结果（不执行向量化）
+     * @summary 预览文档切分效果
+     * @param {DefaultApiKbPreviewChunkingRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public kbPreviewChunking(requestParameters: DefaultApiKbPreviewChunkingRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).kbPreviewChunking(requestParameters.requestBody, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 基于已上传的文档，预览不同切分策略的效果
+     * @summary 预览文档切分效果（基于已有文档）
+     * @param {DefaultApiKbPreviewDocumentChunkingRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public kbPreviewDocumentChunking(requestParameters: DefaultApiKbPreviewDocumentChunkingRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).kbPreviewDocumentChunking(requestParameters.id, requestParameters.docId, requestParameters.requestBody, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 
      * @summary 触发文档向量化
      * @param {DefaultApiKbProcessDocumentRequest} requestParameters Request parameters.
@@ -42327,7 +43135,7 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
-     * 输入查询文本，返回向量检索+Rerank后的召回结果，用于调试知识库检索效果
+     * 输入查询文本，返回多路召回+RRF融合+Rerank后的召回结果，用于调试知识库检索效果。所有RAG参数可选，缺省时使用知识库默认配置。
      * @summary 知识库召回测试
      * @param {DefaultApiKbRecallTestRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.

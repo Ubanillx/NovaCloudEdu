@@ -79,6 +79,10 @@ export interface SectionResponse {
      */
     'thumbnailCount'?: number;
     /**
+     * 加密密钥ID（用于HLS解密）
+     */
+    'encryptionKeyId'?: string;
+    /**
      * 创建时间
      */
     'createTime'?: string;

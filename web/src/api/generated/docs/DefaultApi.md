@@ -180,6 +180,7 @@ All URIs are relative to *http://localhost:8080*
 |[**getGroupMembers1**](#getgroupmembers1) | **GET** /api/admin/groups/{groupId}/members | 分页获取群成员|
 |[**getGroupMembersPage**](#getgroupmemberspage) | **GET** /api/groups/{groupId}/members/page | 分页获取群成员|
 |[**getHistory**](#gethistory) | **GET** /api/grading/history | 查询批改历史|
+|[**getHlsStream**](#gethlsstream) | **GET** /api/video/hls/{sectionId} | 获取HLS播放流（Token-in-URL认证）|
 |[**getKey**](#getkey) | **GET** /api/video/key | 获取视频解密密钥（HLS播放器自动调用）|
 |[**getLatestMessages**](#getlatestmessages) | **GET** /api/group-chat/{groupId}/messages/latest | 获取群最新消息|
 |[**getLikedArticles**](#getlikedarticles) | **GET** /api/user/daily-article/liked | 获取点赞文章列表|
@@ -212,6 +213,7 @@ All URIs are relative to *http://localhost:8080*
 |[**getPendingCount**](#getpendingcount) | **GET** /api/teacher/application/pending/count | 获取待审核申请数量（管理员）|
 |[**getPendingRequests**](#getpendingrequests) | **GET** /api/groups/{groupId}/requests | 获取群待审批申请列表|
 |[**getPlan**](#getplan) | **GET** /api/membership/plans/{planId} | 获取计划详情|
+|[**getPlayToken**](#getplaytoken) | **GET** /api/video/play-token | 获取视频播放令牌|
 |[**getPostComments**](#getpostcomments) | **GET** /api/posts/{postId}/comments | 获取帖子评论列表|
 |[**getPostDetail**](#getpostdetail) | **GET** /api/posts/{postId} | 获取帖子详情|
 |[**getPostList**](#getpostlist) | **GET** /api/posts | 分页获取帖子列表|
@@ -239,6 +241,7 @@ All URIs are relative to *http://localhost:8080*
 |[**getStats2**](#getstats2) | **GET** /api/user/daily-article/stats | 获取阅读统计|
 |[**getStats3**](#getstats3) | **GET** /api/grading/stats | 查询批改历史统计|
 |[**getStatus**](#getstatus) | **GET** /api/grading/{submissionId}/status | 查询批改状态|
+|[**getStreamToken**](#getstreamtoken) | **GET** /api/video/stream-token | 获取视频流访问令牌|
 |[**getStudentAiReport**](#getstudentaireport) | **GET** /api/analytics/student/ai-report | AI个人学情分析报告（SSE流式）|
 |[**getStudentOverview**](#getstudentoverview) | **GET** /api/analytics/student/overview | 个人学情概览|
 |[**getStudentSubjects**](#getstudentsubjects) | **GET** /api/analytics/student/subjects | 个人各学科学情|
@@ -290,10 +293,16 @@ All URIs are relative to *http://localhost:8080*
 |[**kbCreate**](#kbcreate) | **POST** /api/ai/knowledge-bases | 创建知识库|
 |[**kbDelete**](#kbdelete) | **DELETE** /api/ai/knowledge-bases/{id} | 删除知识库|
 |[**kbDeleteDocument**](#kbdeletedocument) | **DELETE** /api/ai/knowledge-bases/{id}/documents/{docId} | 删除文档|
+|[**kbDocumentStats**](#kbdocumentstats) | **GET** /api/ai/knowledge-bases/{id}/document-stats | 获取文档状态统计|
 |[**kbGetById**](#kbgetbyid) | **GET** /api/ai/knowledge-bases/{id} | 获取知识库详情|
 |[**kbListByCreator**](#kblistbycreator) | **GET** /api/ai/knowledge-bases | 获取用户的知识库列表|
+|[**kbListChunkStrategies**](#kblistchunkstrategies) | **GET** /api/ai/knowledge-bases/chunk-strategies | 获取可用的切分策略列表|
 |[**kbListChunks**](#kblistchunks) | **GET** /api/ai/knowledge-bases/{id}/documents/{docId}/chunks | 获取文档分块列表|
 |[**kbListDocuments**](#kblistdocuments) | **GET** /api/ai/knowledge-bases/{id}/documents | 获取文档列表|
+|[**kbListEmbeddingModels**](#kblistembeddingmodels) | **GET** /api/ai/knowledge-bases/embedding-models | 获取可用的Embedding模型列表|
+|[**kbListRetrievalModes**](#kblistretrievalmodes) | **GET** /api/ai/knowledge-bases/retrieval-modes | 获取检索模式列表|
+|[**kbPreviewChunking**](#kbpreviewchunking) | **POST** /api/ai/knowledge-bases/chunk-preview | 预览文档切分效果|
+|[**kbPreviewDocumentChunking**](#kbpreviewdocumentchunking) | **POST** /api/ai/knowledge-bases/{id}/documents/{docId}/chunk-preview | 预览文档切分效果（基于已有文档）|
 |[**kbProcessDocument**](#kbprocessdocument) | **POST** /api/ai/knowledge-bases/{id}/documents/{docId}/embed | 触发文档向量化|
 |[**kbRecallTest**](#kbrecalltest) | **POST** /api/ai/knowledge-bases/{id}/recall-test | 知识库召回测试|
 |[**kbSearch**](#kbsearch) | **GET** /api/ai/knowledge-bases/search | 搜索知识库|
@@ -9715,6 +9724,61 @@ const { status, data } = await apiInstance.getHistory(
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **getHlsStream**
+> getHlsStream()
+
+通过 URL 中的一次性 token 验证身份，返回修改后的 m3u8 内容。 原生视频播放器无法携带 HTTP Header，因此使用 token-in-URL 方式认证。 客户端需先调用 /api/video/stream-token 获取 token。 
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let sectionId: number; //小节ID (default to undefined)
+let token: string; //一次性流访问令牌 (default to undefined)
+
+const { status, data } = await apiInstance.getHlsStream(
+    sectionId,
+    token
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **sectionId** | [**number**] | 小节ID | defaults to undefined|
+| **token** | [**string**] | 一次性流访问令牌 | defaults to undefined|
+
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **getKey**
 > getKey()
 
@@ -11337,6 +11401,61 @@ const { status, data } = await apiInstance.getPlan(
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **getPlayToken**
+> BaseResponseString getPlayToken()
+
+获取一次性播放令牌，用于请求HLS解密密钥。令牌5分钟有效且只能使用一次。
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let sectionId: number; //小节ID (default to undefined)
+let keyId: string; //加密密钥ID (default to undefined)
+
+const { status, data } = await apiInstance.getPlayToken(
+    sectionId,
+    keyId
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **sectionId** | [**number**] | 小节ID | defaults to undefined|
+| **keyId** | [**string**] | 加密密钥ID | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseString**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **getPostComments**
 > BaseResponseCommentPageResponse getPostComments()
 
@@ -12686,6 +12805,58 @@ const { status, data } = await apiInstance.getStatus(
 ### Return type
 
 **BaseResponseSubmissionStatusResponse**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getStreamToken**
+> BaseResponseString getStreamToken()
+
+获取一次性流访问令牌，用于 HLS m3u8 请求的 URL 认证。令牌5分钟有效且只能使用一次。
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let sectionId: number; //小节ID (default to undefined)
+
+const { status, data } = await apiInstance.getStreamToken(
+    sectionId
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **sectionId** | [**number**] | 小节ID | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseString**
 
 ### Authorization
 
@@ -15357,6 +15528,58 @@ const { status, data } = await apiInstance.kbDeleteDocument(
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **kbDocumentStats**
+> BaseResponseMapStringLong kbDocumentStats()
+
+返回知识库中各状态文档的数量统计（全量，不受分页影响）
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let id: number; // (default to undefined)
+
+const { status, data } = await apiInstance.kbDocumentStats(
+    id
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **id** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseMapStringLong**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **kbGetById**
 > BaseResponseKnowledgeBaseVO kbGetById()
 
@@ -15446,6 +15669,50 @@ const { status, data } = await apiInstance.kbListByCreator(
 ### Return type
 
 **BaseResponseListKnowledgeBaseVO**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **kbListChunkStrategies**
+> BaseResponseListMapStringString kbListChunkStrategies()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+const { status, data } = await apiInstance.kbListChunkStrategies();
+```
+
+### Parameters
+This endpoint does not have any parameters.
+
+
+### Return type
+
+**BaseResponseListMapStringString**
 
 ### Authorization
 
@@ -15582,6 +15849,206 @@ const { status, data } = await apiInstance.kbListDocuments(
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **kbListEmbeddingModels**
+> BaseResponseListMapStringObject kbListEmbeddingModels()
+
+返回DashScope平台可用的文本向量化模型及其支持的维度列表
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+const { status, data } = await apiInstance.kbListEmbeddingModels();
+```
+
+### Parameters
+This endpoint does not have any parameters.
+
+
+### Return type
+
+**BaseResponseListMapStringObject**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **kbListRetrievalModes**
+> BaseResponseListMapStringString kbListRetrievalModes()
+
+返回可用的RAG检索模式列表
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+const { status, data } = await apiInstance.kbListRetrievalModes();
+```
+
+### Parameters
+This endpoint does not have any parameters.
+
+
+### Return type
+
+**BaseResponseListMapStringString**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **kbPreviewChunking**
+> BaseResponseChunkPreviewResult kbPreviewChunking(requestBody)
+
+输入文本内容和切分参数，返回切分预览结果（不执行向量化）
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let requestBody: { [key: string]: object; }; //
+
+const { status, data } = await apiInstance.kbPreviewChunking(
+    requestBody
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **requestBody** | **{ [key: string]: object; }**|  | |
+
+
+### Return type
+
+**BaseResponseChunkPreviewResult**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **kbPreviewDocumentChunking**
+> BaseResponseChunkPreviewResult kbPreviewDocumentChunking(requestBody)
+
+基于已上传的文档，预览不同切分策略的效果
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let id: number; // (default to undefined)
+let docId: number; // (default to undefined)
+let requestBody: { [key: string]: object; }; //
+
+const { status, data } = await apiInstance.kbPreviewDocumentChunking(
+    id,
+    docId,
+    requestBody
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **requestBody** | **{ [key: string]: object; }**|  | |
+| **id** | [**number**] |  | defaults to undefined|
+| **docId** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseChunkPreviewResult**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **kbProcessDocument**
 > BaseResponseVoid kbProcessDocument()
 
@@ -15639,7 +16106,7 @@ const { status, data } = await apiInstance.kbProcessDocument(
 # **kbRecallTest**
 > BaseResponseMapStringObject kbRecallTest(requestBody)
 
-输入查询文本，返回向量检索+Rerank后的召回结果，用于调试知识库检索效果
+输入查询文本，返回多路召回+RRF融合+Rerank后的召回结果，用于调试知识库检索效果。所有RAG参数可选，缺省时使用知识库默认配置。
 
 ### Example
 
