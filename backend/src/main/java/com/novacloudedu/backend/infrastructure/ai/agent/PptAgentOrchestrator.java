@@ -1337,21 +1337,22 @@ public class PptAgentOrchestrator {
 
     private String buildPlannerInput(String topic, String requirements, String templateInfo) {
         StringBuilder sb = new StringBuilder();
-        sb.append("PPT主题：").append(topic).append("\n\n");
+        sb.append("Presentation topic: ").append(topic).append("\n\n");
 
         if (requirements != null && !requirements.isBlank()) {
-            sb.append("额外要求：").append(requirements).append("\n\n");
+            sb.append("Additional requirements: ").append(requirements).append("\n\n");
         }
         if (templateInfo != null && !templateInfo.isBlank()) {
-            sb.append("## 模板结构（你必须严格按照其中的「大纲结构要求」来规划）\n\n");
+            sb.append("## Template Structure (you MUST strictly follow the \"Outline Structure Requirements\" within)\n\n");
             sb.append(templateInfo).append("\n\n");
-            sb.append("重要提示：\n");
-            sb.append("- 请严格按照上面的「大纲结构要求」控制 ##（章节）和 ###（内容页）的数量\n");
-            sb.append("- 每个 ### 对应一页PPT，总数必须匹配模板的 content 页数量\n");
-            sb.append("- 不需要标注 template_slide_index，系统会自动分配模板页\n\n");
+            sb.append("IMPORTANT:\n");
+            sb.append("- Strictly follow the Outline Structure Requirements to control ## (chapter) and ### (content page) counts\n");
+            sb.append("- Each ### corresponds to one PPT slide; total must match the template's content page count\n");
+            sb.append("- Do NOT annotate template_slide_index; the system assigns it automatically\n");
+            sb.append("- If Audience and Tone are specified above, match the language register and formality accordingly\n\n");
         }
 
-        sb.append("请先使用联网搜索工具收集该主题的最新信息，然后制定大纲。");
+        sb.append("First use web search tools to gather the latest information on this topic, then create the outline.");
         return sb.toString();
     }
 

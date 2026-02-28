@@ -77,6 +77,147 @@ class TemplateConfig(BaseModel):
         description="各幻灯片的描述")
 
 
+# ==================== 语义增强模型 ====================
+
+
+class ColorScheme(BaseModel):
+    """配色方案"""
+    primary: str = Field(
+        default="", description="主色调(HEX)")
+    secondary: str = Field(
+        default="", description="辅助色(HEX)")
+    accent: str = Field(
+        default="", description="强调色(HEX)")
+    background: str = Field(
+        default="", description="背景色(HEX)")
+    text: str = Field(
+        default="", description="主要文字颜色(HEX)")
+
+
+class SlideRawData(BaseModel):
+    """单页幻灯片的原始解析数据"""
+    role: str = Field(
+        default="content",
+        description="页面角色: cover/toc/section/"
+                    "content/ending/credits")
+    layout_name: str = Field(default="")
+    text_slots: list[TextSlot] = Field(
+        default_factory=list,
+        description="该页包含的文本槽位")
+    image_slots: list[ImageSlot] = Field(
+        default_factory=list,
+        description="该页包含的图片区域")
+    fillable_count: int = Field(
+        default=0,
+        description="可填充文本区域数量")
+
+
+class EnrichedSlideInfo(BaseModel):
+    """语义增强的幻灯片描述：
+    顶层为多模态模型分析出的语义字段，
+    data 中保存原始解析数据。
+    """
+    index: int = Field(
+        description="在模板中的索引")
+    # -- 语义字段 --
+    purpose: str = Field(
+        default="",
+        description="页面用途: 封面展示/目录导航/"
+                    "章节过渡/内容讲解/数据图表/"
+                    "图文混排/总结致谢/版权声明")
+    description: str = Field(
+        default="",
+        description="页面自然语言描述")
+    color_scheme: ColorScheme = Field(
+        default_factory=ColorScheme,
+        description="配色方案")
+    layout_type: str = Field(
+        default="",
+        description="版式类型: title_centered/"
+                    "two_column/image_text/bullets_list"
+                    "/comparison/timeline/grid/blank")
+    content_capacity: str = Field(
+        default="",
+        description="内容容量描述")
+    visual_style: str = Field(
+        default="",
+        description="视觉风格描述")
+    recommended_usage: str = Field(
+        default="",
+        description="推荐使用场景")
+    keywords: list[str] = Field(
+        default_factory=list,
+        description="适合的内容关键词")
+    text_density: str = Field(
+        default="",
+        description="文本密度: low/medium/high")
+    design_complexity: str = Field(
+        default="",
+        description="设计复杂度: simple/moderate/complex")
+    emphasis_area: str = Field(
+        default="",
+        description="视觉重心区域描述")
+    font_style: str = Field(
+        default="",
+        description="字体风格描述")
+    suggested_content_format: str = Field(
+        default="",
+        description="推荐内容格式: bullet_points/"
+                    "paragraphs/short_phrases/"
+                    "numbers_stats/mixed")
+    # -- 预览图 --
+    preview_image_url: str = Field(
+        default="",
+        description="渲染后的预览图 URL")
+    # -- 原始数据 --
+    data: SlideRawData = Field(
+        default_factory=SlideRawData,
+        description="原始解析数据")
+
+
+class EnrichedTemplateConfig(BaseModel):
+    """语义增强的模板完整配置"""
+    template_id: str = Field(
+        description="模板唯一标识")
+    name: str = Field(
+        description="模板显示名称")
+    slide_width: int = Field(
+        description="幻灯片宽度(EMU)")
+    slide_height: int = Field(
+        description="幻灯片高度(EMU)")
+    slide_count: int = Field(
+        default=0, description="模板总页数")
+    # -- 模板级语义 --
+    overall_style: str = Field(
+        default="",
+        description="模板整体风格")
+    color_palette: list[str] = Field(
+        default_factory=list,
+        description="模板主色调列表(HEX)")
+    template_description: str = Field(
+        default="",
+        description="模板整体描述")
+    suitable_topics: list[str] = Field(
+        default_factory=list,
+        description="适合的演示主题")
+    audience_level: str = Field(
+        default="",
+        description="适合受众层级: "
+                    "student/professional/executive/general")
+    tone: str = Field(
+        default="",
+        description="演示基调: formal/casual/"
+                    "academic/creative/corporate")
+    # -- 幻灯片列表 --
+    slides: list[EnrichedSlideInfo] = Field(
+        default_factory=list,
+        description="语义增强的幻灯片列表")
+    # -- 封面 --
+    cover_url: str = Field(
+        default="",
+        description="封面缩略图 URL")
+
+
 class SlotFill(BaseModel):
     """AI 为一个槽位生成的填充内容（文本或图片）"""
     shape_id: int = Field(

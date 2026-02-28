@@ -10,6 +10,7 @@ import com.novacloudedu.backend.exception.BusinessException;
 import com.novacloudedu.backend.infrastructure.ppt.PptServiceClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,7 +31,7 @@ public class PptTemplateApplicationService {
     private final PptServiceClient pptServiceClient;
 
     /**
-     * 上传模板：PPTX → OSS → 调 Python 解析 → 存 DB
+     * 上传模板：PPTX → OSS → 存 DB（状态 PENDING）→ 异步触发语义增强解析
      */
     @Transactional
     public Long uploadTemplate(MultipartFile file, String name, String description, Long uploaderId) {
@@ -41,28 +42,61 @@ public class PptTemplateApplicationService {
         // 1. 上传 PPTX 到 OSS
         String templateUrl = ossService.uploadFile(file, FileBusinessType.PPT_TEMPLATE);
 
-        // 2. 创建模板实体
+        // 2. 创建模板实体（状态为 PENDING，前端可见但不可选用）
         PptTemplate template = PptTemplate.create(name, description, templateUrl, uploaderId);
         pptTemplateRepository.save(template);
 
-        // 3. 调 Python 解析模板结构 + 截封面
-        try {
-            PptServiceClient.ParseTemplateResult parseResult =
-                    pptServiceClient.parseTemplate(templateUrl);
+        Long templateId = template.getId().value();
+        log.info("PPT模板上传成功: id={}, name={}, 异步解析已触发", templateId, name);
 
-            template.updateStructure(
-                    parseResult.fullResponseJson(),
-                    parseResult.coverUrl(),
-                    parseResult.slideCount()
-            );
-            pptTemplateRepository.save(template);
+        // 3. 异步触发语义增强解析
+        triggerEnrichedParsing(templateId, templateUrl);
 
-        } catch (Exception e) {
-            log.error("模板解析失败，模板已保存但结构未解析", e);
+        return templateId;
+    }
+
+    /**
+     * 异步执行语义增强解析：调用 ppt-service 的 enriched 端点
+     */
+    @Async
+    public void triggerEnrichedParsing(Long templateId, String templateUrl) {
+        PptTemplate template = pptTemplateRepository.findById(PptTemplateId.of(templateId))
+                .orElse(null);
+        if (template == null) {
+            log.warn("异步解析模板时找不到模板: id={}", templateId);
+            return;
         }
 
-        log.info("PPT模板上传成功: id={}, name={}", template.getId().value(), name);
-        return template.getId().value();
+        template.markParsing();
+        pptTemplateRepository.save(template);
+
+        try {
+            PptServiceClient.ParseEnrichedResult enrichedResult =
+                    pptServiceClient.parseTemplateEnriched(templateUrl);
+
+            template.updateStructure(
+                    enrichedResult.fullResponseJson(),
+                    enrichedResult.coverUrl(),
+                    enrichedResult.slideCount()
+            );
+            pptTemplateRepository.save(template);
+            log.info("模板语义增强解析完成: id={}", templateId);
+
+        } catch (Exception e) {
+            log.error("模板语义增强解析失败: id={}", templateId, e);
+            template.markParseFailed();
+            pptTemplateRepository.save(template);
+        }
+    }
+
+    /**
+     * 手动重新触发模板解析（用于 FAILED 状态的模板）
+     */
+    @Transactional
+    public void retryParsing(Long templateId) {
+        PptTemplate template = pptTemplateRepository.findById(PptTemplateId.of(templateId))
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_ERROR, "模板不存在"));
+        triggerEnrichedParsing(templateId, template.getTemplateUrl());
     }
 
     /**

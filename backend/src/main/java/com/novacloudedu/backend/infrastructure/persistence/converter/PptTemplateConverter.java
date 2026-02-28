@@ -2,6 +2,7 @@ package com.novacloudedu.backend.infrastructure.persistence.converter;
 
 import com.novacloudedu.backend.domain.ppt.entity.PptTemplate;
 import com.novacloudedu.backend.domain.ppt.valueobject.PptTemplateId;
+import com.novacloudedu.backend.domain.ppt.valueobject.TemplateParseStatus;
 import com.novacloudedu.backend.infrastructure.persistence.po.PptTemplatePO;
 import org.springframework.stereotype.Component;
 
@@ -23,6 +24,7 @@ public class PptTemplateConverter {
                 po.getTemplateUrl(),
                 po.getSlideCount() != null ? po.getSlideCount() : 0,
                 po.getStructureJson(),
+                TemplateParseStatus.fromCode(po.getParseStatus()),
                 po.getUploaderId(),
                 po.getEnabled() != null && po.getEnabled(),
                 po.getCreateTime(),
@@ -44,6 +46,8 @@ public class PptTemplateConverter {
         po.setTemplateUrl(template.getTemplateUrl());
         po.setSlideCount(template.getSlideCount());
         po.setStructureJson(template.getStructureJson());
+        po.setParseStatus(template.getParseStatus() != null
+                ? template.getParseStatus().getCode() : "pending");
         po.setUploaderId(template.getUploaderId());
         po.setEnabled(template.isEnabled());
         po.setCreateTime(template.getCreateTime());
