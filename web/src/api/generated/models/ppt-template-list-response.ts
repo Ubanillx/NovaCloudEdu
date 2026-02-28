@@ -46,5 +46,9 @@ export interface PptTemplateListResponse {
      * 是否启用
      */
     'enabled'?: boolean;
+    /**
+     * 解析状态: pending/parsing/ready/failed
+     */
+    'parseStatus'?: string;
 }
 

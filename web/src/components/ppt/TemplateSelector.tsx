@@ -1,10 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { X, Upload, Check, Loader2 } from 'lucide-react';
+import { X, Upload, Check, Loader2, AlertTriangle, Clock, RefreshCw } from 'lucide-react';
 import { PPTApi } from '../../api/generated/api/pptapi';
 import { apiClient, Configuration } from '../../api';
 import type { PptTemplateListResponse } from '../../api/generated/models';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
+
+const parseStatusConfig: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
+  ready:   { label: '可用',   color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400', icon: <Check className="w-3 h-3" /> },
+  parsing: { label: '解析中', color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',   icon: <Loader2 className="w-3 h-3 animate-spin" /> },
+  pending: { label: '等待中', color: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400', icon: <Clock className="w-3 h-3" /> },
+  failed:  { label: '解析失败', color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',     icon: <AlertTriangle className="w-3 h-3" /> },
+};
 
 interface TemplateSelectorProps {
   onSelect: (templateId?: string, templateUrl?: string) => void;
@@ -15,23 +22,37 @@ export const TemplateSelector: React.FC<TemplateSelectorProps> = ({ onSelect, on
   const [templates, setTemplates] = useState<PptTemplateListResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [retrying, setRetrying] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchTemplates = async () => {
-      try {
-        const config = new Configuration({ basePath: API_BASE });
-        const api = new PPTApi(config, API_BASE, apiClient);
-        const res = await api.listTemplates();
-        const data = (res.data as any)?.data || [];
-        setTemplates(data);
-      } catch (err) {
-        console.error('加载模板失败', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchTemplates();
-  }, []);
+  const fetchTemplates = async () => {
+    try {
+      const config = new Configuration({ basePath: API_BASE });
+      const api = new PPTApi(config, API_BASE, apiClient);
+      const res = await api.listTemplates();
+      const data = (res.data as any)?.data || [];
+      setTemplates(data);
+    } catch (err) {
+      console.error('加载模板失败', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { fetchTemplates(); }, []);
+
+  const handleRetryParse = async (e: React.MouseEvent, templateId: string) => {
+    e.stopPropagation();
+    setRetrying(templateId);
+    try {
+      await apiClient.post(`${API_BASE}/api/ppt/templates/${templateId}/retry-parse`);
+      // Refresh list after triggering retry
+      setTimeout(() => fetchTemplates(), 1000);
+    } catch (err) {
+      console.error('重试解析失败', err);
+    } finally {
+      setRetrying(null);
+    }
+  };
 
   const handleConfirm = () => {
     if (selectedId) {
@@ -70,43 +91,72 @@ export const TemplateSelector: React.FC<TemplateSelectorProps> = ({ onSelect, on
               {templates.map(t => {
                 const tid = String(t.id);
                 const isSelected = tid === selectedId;
+                const status = t.parseStatus || 'pending';
+                const isReady = status === 'ready';
+                const isFailed = status === 'failed';
+                const statusCfg = parseStatusConfig[status] || parseStatusConfig.pending;
+
                 return (
                   <button
                     key={tid}
-                    onClick={() => setSelectedId(isSelected ? null : tid)}
+                    onClick={() => isReady ? setSelectedId(isSelected ? null : tid) : undefined}
+                    disabled={!isReady}
                     className={`
-                      group relative rounded-2xl overflow-hidden border-2 transition-all duration-300
-                      ${isSelected
-                        ? 'border-brand-500 shadow-lg shadow-brand-500/20'
-                        : 'border-gray-100 dark:border-gray-800 hover:border-brand-300 dark:hover:border-brand-600 hover:shadow-md'
+                      group relative rounded-2xl overflow-hidden border-2 transition-all duration-300 text-left
+                      ${!isReady
+                        ? 'opacity-60 cursor-not-allowed border-gray-200 dark:border-gray-700'
+                        : isSelected
+                          ? 'border-brand-500 shadow-lg shadow-brand-500/20'
+                          : 'border-gray-100 dark:border-gray-800 hover:border-brand-300 dark:hover:border-brand-600 hover:shadow-md'
                       }
                     `}
                   >
-                    <div className="aspect-video bg-gray-50 dark:bg-gray-800 overflow-hidden">
+                    <div className="aspect-video bg-gray-50 dark:bg-gray-800 overflow-hidden relative">
                       {t.coverUrl ? (
                         <img
                           src={t.coverUrl}
                           alt={t.name || '模板'}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          className={`w-full h-full object-cover transition-transform duration-300 ${isReady ? 'group-hover:scale-105' : 'grayscale'}`}
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-gray-300 dark:text-gray-600">
                           <Upload className="w-8 h-8" />
                         </div>
                       )}
-                      {isSelected && (
+                      {isSelected && isReady && (
                         <div className="absolute inset-0 bg-brand-500/20 flex items-center justify-center">
                           <div className="w-8 h-8 rounded-full bg-brand-500 flex items-center justify-center animate-bounceIn">
                             <Check className="w-5 h-5 text-white" />
                           </div>
                         </div>
                       )}
+                      {/* Parse status badge */}
+                      {!isReady && (
+                        <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                          <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${statusCfg.color}`}>
+                            {statusCfg.icon}
+                            {statusCfg.label}
+                          </span>
+                        </div>
+                      )}
                     </div>
-                    <div className="px-3 py-2">
-                      <p className="text-sm font-bold text-gray-900 dark:text-white group-hover:text-brand-600 transition-colors truncate">
-                        {t.name || '未命名模板'}
-                      </p>
-                      <p className="text-xs text-gray-400">{t.slideCount || 0} 页</p>
+                    <div className="px-3 py-2 flex items-center justify-between">
+                      <div className="min-w-0">
+                        <p className={`text-sm font-bold truncate transition-colors ${isReady ? 'text-gray-900 dark:text-white group-hover:text-brand-600' : 'text-gray-400 dark:text-gray-500'}`}>
+                          {t.name || '未命名模板'}
+                        </p>
+                        <p className="text-xs text-gray-400">{t.slideCount || 0} 页</p>
+                      </div>
+                      {isFailed && (
+                        <button
+                          onClick={(e) => handleRetryParse(e, tid)}
+                          disabled={retrying === tid}
+                          className="flex-shrink-0 p-1.5 rounded-lg text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                          title="重新解析"
+                        >
+                          <RefreshCw className={`w-4 h-4 ${retrying === tid ? 'animate-spin' : ''}`} />
+                        </button>
+                      )}
                     </div>
                   </button>
                 );
