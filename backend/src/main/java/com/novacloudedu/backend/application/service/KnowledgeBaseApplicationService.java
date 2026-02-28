@@ -21,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
@@ -47,6 +48,8 @@ public class KnowledgeBaseApplicationService {
     private final KnowledgeChunkRepository chunkRepository;
     private final VectorEmbeddingService embeddingService;
     private final DocumentContentExtractor contentExtractor;
+    private final DocumentChunkingService chunkingService;
+    private final TransactionTemplate transactionTemplate;
 
     private ExecutorService documentProcessExecutor;
 
@@ -93,8 +96,23 @@ public class KnowledgeBaseApplicationService {
                 UserId.of(userId)
         );
 
-        if (dto.getChunkSize() != null || dto.getChunkOverlap() != null) {
-            kb.updateEmbeddingConfig(dto.getChunkSize(), dto.getChunkOverlap());
+        if (dto.getEmbeddingModel() != null || dto.getEmbeddingDimension() != null
+                || dto.getChunkSize() != null || dto.getChunkOverlap() != null) {
+            kb.updateEmbeddingConfig(dto.getEmbeddingModel(), dto.getEmbeddingDimension(),
+                    dto.getChunkSize(), dto.getChunkOverlap());
+        }
+
+        // 切分配置
+        ChunkStrategy strategy = parseChunkStrategy(dto.getChunkStrategy());
+        if (strategy != null || dto.getParentChildMode() != null || dto.getParentChunkSize() != null
+                || dto.getPreserveMetadata() != null || dto.getSemanticThreshold() != null) {
+            kb.updateChunkConfig(strategy, dto.getParentChildMode(), dto.getParentChunkSize(),
+                    dto.getPreserveMetadata(), dto.getSemanticThreshold());
+        }
+
+        // RAG 检索配置
+        if (dto.getRetrievalMode() != null || dto.getEnableQueryRewrite() != null || dto.getUseDynamicTopK() != null) {
+            kb.updateRetrievalConfig(dto.getRetrievalMode(), dto.getEnableQueryRewrite(), dto.getUseDynamicTopK(), dto.getDefaultTopK(), dto.getQueryRewriteModelId(), dto.getRerankModel());
         }
 
         KnowledgeBase saved = knowledgeBaseRepository.save(kb);
@@ -115,8 +133,22 @@ public class KnowledgeBaseApplicationService {
             kb.updateBasicInfo(dto.getName(), dto.getDescription());
         }
 
-        if (dto.getChunkSize() != null || dto.getChunkOverlap() != null) {
-            kb.updateEmbeddingConfig(dto.getChunkSize(), dto.getChunkOverlap());
+        if (dto.getEmbeddingModel() != null || dto.getEmbeddingDimension() != null
+                || dto.getChunkSize() != null || dto.getChunkOverlap() != null) {
+            kb.updateEmbeddingConfig(dto.getEmbeddingModel(), dto.getEmbeddingDimension(),
+                    dto.getChunkSize(), dto.getChunkOverlap());
+        }
+
+        ChunkStrategy strategy = parseChunkStrategy(dto.getChunkStrategy());
+        if (strategy != null || dto.getParentChildMode() != null || dto.getParentChunkSize() != null
+                || dto.getPreserveMetadata() != null || dto.getSemanticThreshold() != null) {
+            kb.updateChunkConfig(strategy, dto.getParentChildMode(), dto.getParentChunkSize(),
+                    dto.getPreserveMetadata(), dto.getSemanticThreshold());
+        }
+
+        // RAG 检索配置
+        if (dto.getRetrievalMode() != null || dto.getEnableQueryRewrite() != null || dto.getUseDynamicTopK() != null) {
+            kb.updateRetrievalConfig(dto.getRetrievalMode(), dto.getEnableQueryRewrite(), dto.getUseDynamicTopK(), dto.getDefaultTopK(), dto.getQueryRewriteModelId(), dto.getRerankModel());
         }
 
         KnowledgeBase saved = knowledgeBaseRepository.save(kb);
@@ -212,6 +244,13 @@ public class KnowledgeBaseApplicationService {
     }
 
     /**
+     * 获取知识库文档状态统计（全量，不分页）
+     */
+    public java.util.Map<String, Long> getDocumentStatusCounts(Long knowledgeBaseId) {
+        return documentRepository.countByKnowledgeBaseIdGroupByStatus(KnowledgeBaseId.of(knowledgeBaseId));
+    }
+
+    /**
      * 删除文档
      */
     @Transactional
@@ -237,7 +276,7 @@ public class KnowledgeBaseApplicationService {
     }
 
     /**
-     * 处理文档向量化
+     * 处理文档向量化（单文档，带事务）
      */
     @Transactional
     public void processDocument(Long documentId) {
@@ -252,63 +291,7 @@ public class KnowledgeBaseApplicationService {
         try {
             doc.startProcessing();
             documentRepository.save(doc);
-
-            String content = doc.getContent();
-            if ((content == null || content.isEmpty()) && doc.getFileUrl() != null && !doc.getFileUrl().isEmpty()) {
-                log.info("文档内容为空，从文件URL提取: fileType={}, url={}", doc.getFileType(), doc.getFileUrl());
-                content = contentExtractor.extractContent(doc.getFileUrl(), doc.getFileType().name());
-                String hash = computeHash(content);
-                doc.setContent(content, hash);
-                documentRepository.save(doc);
-            }
-            if (content == null || content.isEmpty()) {
-                throw new IllegalStateException("文档内容为空，且无法从文件URL提取");
-            }
-
-            // 分块
-            List<String> chunks = splitContent(content, kb.getChunkSize(), kb.getChunkOverlap());
-            
-            String metadata = String.format("{\"documentId\": %d, \"documentName\": \"%s\"}", 
-                    doc.getId().value(), doc.getName());
-
-            // 分批向量化（每200条一轮）并保存
-            int embeddingBatchSize = 200;
-            List<String> allChunkContents = new ArrayList<>();
-            List<float[]> allEmbeddings = new ArrayList<>();
-
-            for (int batchStart = 0; batchStart < chunks.size(); batchStart += embeddingBatchSize) {
-                int batchEnd = Math.min(batchStart + embeddingBatchSize, chunks.size());
-                List<String> batchChunks = chunks.subList(batchStart, batchEnd);
-                log.info("向量化批次 {}-{}/{}", batchStart + 1, batchEnd, chunks.size());
-
-                String[] batchArray = batchChunks.toArray(new String[0]);
-                ChapterVector[] vectors = embeddingService.embedTexts(batchArray);
-
-                for (ChapterVector v : vectors) {
-                    allEmbeddings.add(v.getEmbedding());
-                }
-                allChunkContents.addAll(batchChunks);
-            }
-
-            // 批量保存分块（Repository内部按1000条一轮插入数据库）
-            chunkRepository.saveChunks(
-                    doc.getKnowledgeBaseId(),
-                    doc.getId(),
-                    allChunkContents,
-                    allEmbeddings,
-                    metadata
-            );
-
-            // 更新文档状态
-            doc.completeProcessing(chunks.size());
-            documentRepository.save(doc);
-
-            // 更新知识库分块数量
-            long totalChunks = chunkRepository.countByKnowledgeBaseId(doc.getKnowledgeBaseId());
-            knowledgeBaseRepository.updateChunkCount(doc.getKnowledgeBaseId(), (int) totalChunks);
-
-            log.info("文档向量化完成: documentId={}, chunkCount={}", documentId, chunks.size());
-
+            vectorizeDocumentCore(doc, kb);
         } catch (Exception e) {
             log.error("文档向量化失败: documentId={}", documentId, e);
             doc.failProcessing(e.getMessage());
@@ -318,9 +301,8 @@ public class KnowledgeBaseApplicationService {
     }
 
     /**
-     * 批量处理文档向量化
+     * 批量处理文档向量化（每个文档独立事务，互不影响）
      */
-    @Transactional
     public BatchProcessResult batchProcessDocuments(List<Long> documentIds) {
         log.info("批量处理文档向量化: count={}", documentIds.size());
 
@@ -329,7 +311,9 @@ public class KnowledgeBaseApplicationService {
 
         for (Long documentId : documentIds) {
             try {
-                processDocument(documentId);
+                transactionTemplate.executeWithoutResult(status -> {
+                    processDocumentInTransaction(documentId);
+                });
                 result.addSuccess(documentId);
             } catch (Exception e) {
                 log.error("批量向量化失败: documentId={}", documentId, e);
@@ -345,11 +329,9 @@ public class KnowledgeBaseApplicationService {
     /**
      * 批量处理知识库下所有待处理文档
      */
-    @Transactional
     public BatchProcessResult batchProcessByKnowledgeBase(Long knowledgeBaseId) {
         log.info("批量处理知识库文档: knowledgeBaseId={}", knowledgeBaseId);
 
-        // 查询所有待处理的文档
         List<KnowledgeDocument> pendingDocs = documentRepository.findPendingByKnowledgeBaseId(
                 KnowledgeBaseId.of(knowledgeBaseId));
 
@@ -368,7 +350,6 @@ public class KnowledgeBaseApplicationService {
 
         for (Long documentId : documentIds) {
             try {
-                // 先标记为处理中
                 KnowledgeDocument doc = documentRepository.findById(KnowledgeDocumentId.of(documentId))
                         .orElse(null);
                 if (doc != null && doc.getStatus() == DocumentStatus.PENDING) {
@@ -380,11 +361,12 @@ public class KnowledgeBaseApplicationService {
             }
         }
 
-        // 使用线程池异步处理
         for (Long documentId : documentIds) {
             documentProcessExecutor.submit(() -> {
                 try {
-                    processDocumentInternal(documentId);
+                    transactionTemplate.executeWithoutResult(status -> {
+                        processDocumentInTransaction(documentId);
+                    });
                 } catch (Exception e) {
                     log.error("异步向量化失败: documentId={}", documentId, e);
                 }
@@ -393,85 +375,91 @@ public class KnowledgeBaseApplicationService {
     }
 
     /**
-     * 内部处理文档向量化（不含事务）
+     * 在事务内处理单个文档向量化（供 TransactionTemplate 回调使用）
      */
-    private void processDocumentInternal(Long documentId) {
+    private void processDocumentInTransaction(Long documentId) {
         KnowledgeDocument doc = documentRepository.findById(KnowledgeDocumentId.of(documentId))
-                .orElse(null);
-        if (doc == null) {
-            return;
-        }
+                .orElseThrow(() -> new IllegalArgumentException("文档不存在: " + documentId));
 
         KnowledgeBase kb = knowledgeBaseRepository.findById(doc.getKnowledgeBaseId())
-                .orElse(null);
-        if (kb == null) {
-            return;
-        }
+                .orElseThrow(() -> new IllegalArgumentException("知识库不存在"));
 
         try {
-            String content = doc.getContent();
-            if ((content == null || content.isEmpty()) && doc.getFileUrl() != null && !doc.getFileUrl().isEmpty()) {
-                log.info("异步处理: 文档内容为空，从文件URL提取: fileType={}, url={}", doc.getFileType(), doc.getFileUrl());
-                content = contentExtractor.extractContent(doc.getFileUrl(), doc.getFileType().name());
-                String hash = computeHash(content);
-                doc.setContent(content, hash);
-                documentRepository.save(doc);
-            }
-            if (content == null || content.isEmpty()) {
-                doc.failProcessing("文档内容为空，且无法从文件URL提取");
-                documentRepository.save(doc);
-                return;
-            }
-
-            // 分块
-            List<String> chunks = splitContent(content, kb.getChunkSize(), kb.getChunkOverlap());
-            
-            String metadata = String.format("{\"documentId\": %d, \"documentName\": \"%s\"}", 
-                    doc.getId().value(), doc.getName());
-
-            // 分批向量化（每200条一轮）并保存
-            int embeddingBatchSize = 200;
-            List<String> allChunkContents = new ArrayList<>();
-            List<float[]> allEmbeddings = new ArrayList<>();
-
-            for (int batchStart = 0; batchStart < chunks.size(); batchStart += embeddingBatchSize) {
-                int batchEnd = Math.min(batchStart + embeddingBatchSize, chunks.size());
-                List<String> batchChunks = chunks.subList(batchStart, batchEnd);
-                log.info("异步向量化批次 {}-{}/{}", batchStart + 1, batchEnd, chunks.size());
-
-                String[] batchArray = batchChunks.toArray(new String[0]);
-                ChapterVector[] vectors = embeddingService.embedTexts(batchArray);
-
-                for (ChapterVector v : vectors) {
-                    allEmbeddings.add(v.getEmbedding());
-                }
-                allChunkContents.addAll(batchChunks);
-            }
-
-            // 批量保存分块（Repository内部按1000条一轮插入数据库）
-            chunkRepository.saveChunks(
-                    doc.getKnowledgeBaseId(),
-                    doc.getId(),
-                    allChunkContents,
-                    allEmbeddings,
-                    metadata
-            );
-
-            // 更新文档状态
-            doc.completeProcessing(chunks.size());
+            doc.startProcessing();
             documentRepository.save(doc);
-
-            // 更新知识库分块数量
-            long totalChunks = chunkRepository.countByKnowledgeBaseId(doc.getKnowledgeBaseId());
-            knowledgeBaseRepository.updateChunkCount(doc.getKnowledgeBaseId(), (int) totalChunks);
-
-            log.info("异步文档向量化完成: documentId={}, chunkCount={}", documentId, chunks.size());
-
+            vectorizeDocumentCore(doc, kb);
         } catch (Exception e) {
-            log.error("异步文档向量化失败: documentId={}", documentId, e);
+            log.error("文档向量化失败: documentId={}", documentId, e);
             doc.failProcessing(e.getMessage());
             documentRepository.save(doc);
+            throw new RuntimeException("文档向量化失败: " + e.getMessage(), e);
         }
+    }
+
+    /**
+     * 文档向量化核心逻辑（无事务注解，由调用方管理事务）
+     * 
+     * 流程：清理旧分块 → 提取内容 → 切分 → 分批向量化 → 保存分块 → 更新状态
+     */
+    private void vectorizeDocumentCore(KnowledgeDocument doc, KnowledgeBase kb) {
+        // 清理旧分块（重试时避免重复）
+        chunkRepository.deleteByDocumentId(doc.getId());
+
+        // 提取文档内容
+        String content = doc.getContent();
+        if ((content == null || content.isEmpty()) && doc.getFileUrl() != null && !doc.getFileUrl().isEmpty()) {
+            log.info("文档内容为空，从文件URL提取: fileType={}, url={}", doc.getFileType(), doc.getFileUrl());
+            content = contentExtractor.extractContent(doc.getFileUrl(), doc.getFileType().name());
+            doc.setContent(content, computeHash(content));
+            documentRepository.save(doc);
+        }
+        if (content == null || content.isEmpty()) {
+            throw new IllegalStateException("文档内容为空，且无法从文件URL提取");
+        }
+
+        // 切分
+        DocumentChunkingService.ChunkConfig chunkConfig = buildChunkConfig(kb);
+        DocumentChunkingService.ChunkResult chunkResult = chunkingService.split(content, chunkConfig);
+        List<String> chunkContents = chunkResult.getChunks().stream()
+                .map(DocumentChunkingService.ChunkItem::getContent)
+                .collect(Collectors.toList());
+
+        // 构建 metadata（使用 Gson 避免 JSON 注入）
+        com.google.gson.JsonObject metadataJson = new com.google.gson.JsonObject();
+        metadataJson.addProperty("documentId", doc.getId().value());
+        metadataJson.addProperty("documentName", doc.getName());
+        String metadata = metadataJson.toString();
+
+        // 分批向量化（每200条一轮）
+        int embeddingBatchSize = 200;
+        List<String> allChunkContents = new ArrayList<>();
+        List<float[]> allEmbeddings = new ArrayList<>();
+
+        for (int batchStart = 0; batchStart < chunkContents.size(); batchStart += embeddingBatchSize) {
+            int batchEnd = Math.min(batchStart + embeddingBatchSize, chunkContents.size());
+            List<String> batchChunks = chunkContents.subList(batchStart, batchEnd);
+            log.info("向量化批次 {}-{}/{}", batchStart + 1, batchEnd, chunkContents.size());
+
+            ChapterVector[] vectors = embeddingService.embedTexts(batchChunks.toArray(new String[0]));
+            for (ChapterVector v : vectors) {
+                allEmbeddings.add(v.getEmbedding());
+            }
+            allChunkContents.addAll(batchChunks);
+        }
+
+        // 批量保存分块
+        chunkRepository.saveChunks(doc.getKnowledgeBaseId(), doc.getId(), allChunkContents, allEmbeddings, metadata);
+
+        // 更新文档状态
+        doc.completeProcessing(chunkContents.size());
+        documentRepository.save(doc);
+
+        // 更新知识库分块数量
+        long totalChunks = chunkRepository.countByKnowledgeBaseId(doc.getKnowledgeBaseId());
+        knowledgeBaseRepository.updateChunkCount(doc.getKnowledgeBaseId(), (int) totalChunks);
+
+        log.info("文档向量化完成: documentId={}, chunkCount={}, strategy={}",
+                doc.getId().value(), chunkContents.size(), chunkResult.getStrategyUsed());
     }
 
     /**
@@ -508,70 +496,124 @@ public class KnowledgeBaseApplicationService {
     }
 
     /**
-     * 段落感知分块
-     *
-     * 策略：
-     * 1. 从 start 开始取 chunkSize 个字符作为基准切割点
-     * 2. 从基准切割点向后搜索最近的 \n，延伸到该段落结尾（最多额外延伸 chunkSize * 0.2）
-     * 3. 如果向后找不到 \n，则向前搜索最近的 \n，在段落边界处切割
-     * 4. overlap 起始位置也对齐到最近的 \n 边界，保证重叠部分从段落开头开始
+     * 预览文档切分效果（不执行向量化，仅返回切分结果）
      */
-    private List<String> splitContent(String content, int chunkSize, int overlap) {
-        List<String> chunks = new ArrayList<>();
+    public ChunkPreviewResult previewChunking(String content, String strategyStr,
+                                               Integer chunkSize, Integer chunkOverlap,
+                                               Boolean parentChildMode, Integer parentChunkSize,
+                                               Boolean preserveMetadata, Double semanticThreshold) {
+        if (content == null || content.trim().isEmpty()) {
+            throw new IllegalArgumentException("预览内容不能为空");
+        }
+
+        ChunkStrategy strategy = parseChunkStrategy(strategyStr);
+        DocumentChunkingService.ChunkConfig config = DocumentChunkingService.ChunkConfig.builder()
+                .strategy(strategy != null ? strategy : ChunkStrategy.SEMANTIC)
+                .chunkSize(chunkSize != null ? chunkSize : 500)
+                .chunkOverlap(chunkOverlap != null ? chunkOverlap : 50)
+                .parentChildMode(parentChildMode != null ? parentChildMode : false)
+                .parentChunkSize(parentChunkSize != null ? parentChunkSize : 1500)
+                .preserveMetadata(preserveMetadata != null ? preserveMetadata : true)
+                .semanticThreshold(semanticThreshold != null ? semanticThreshold : 0.5)
+                .build();
+
+        DocumentChunkingService.ChunkResult result = chunkingService.split(content, config);
+
+        List<ChunkPreviewItem> items = new ArrayList<>();
+        for (DocumentChunkingService.ChunkItem item : result.getChunks()) {
+            ChunkPreviewItem preview = new ChunkPreviewItem();
+            preview.setIndex(item.getIndex());
+            preview.setContent(item.getContent());
+            preview.setCharCount(item.getContent().length());
+            preview.setCharStart(item.getCharStart());
+            preview.setCharEnd(item.getCharEnd());
+            preview.setParentIndex(item.getParentIndex());
+            preview.setIsParent(item.isParent());
+            preview.setSectionTitle(item.getSectionTitle());
+            items.add(preview);
+        }
+
+        ChunkPreviewResult previewResult = new ChunkPreviewResult();
+        previewResult.setStrategy(result.getStrategyUsed().name());
+        previewResult.setTotalChunks(result.getTotalChunks());
+        previewResult.setTotalCharacters(content.length());
+        previewResult.setAvgChunkSize(items.isEmpty() ? 0 :
+                items.stream().mapToInt(ChunkPreviewItem::getCharCount).sum() / items.size());
+        previewResult.setChunks(items);
+        return previewResult;
+    }
+
+    /**
+     * 预览文档切分效果（基于已有文档ID）
+     */
+    public ChunkPreviewResult previewDocumentChunking(Long documentId, String strategyStr,
+                                                       Integer chunkSize, Integer chunkOverlap,
+                                                       Boolean parentChildMode, Integer parentChunkSize,
+                                                       Boolean preserveMetadata, Double semanticThreshold) {
+        KnowledgeDocument doc = documentRepository.findById(KnowledgeDocumentId.of(documentId))
+                .orElseThrow(() -> new IllegalArgumentException("文档不存在: " + documentId));
+
+        String content = doc.getContent();
+        if ((content == null || content.isEmpty()) && doc.getFileUrl() != null && !doc.getFileUrl().isEmpty()) {
+            content = contentExtractor.extractContent(doc.getFileUrl(), doc.getFileType().name());
+        }
         if (content == null || content.isEmpty()) {
-            return chunks;
+            throw new IllegalStateException("文档内容为空");
         }
 
-        int maxExtend = Math.max(chunkSize / 5, 100);
-        int len = content.length();
-        int start = 0;
+        return previewChunking(content, strategyStr, chunkSize, chunkOverlap,
+                parentChildMode, parentChunkSize, preserveMetadata, semanticThreshold);
+    }
 
-        while (start < len) {
-            int baseEnd = Math.min(start + chunkSize, len);
+    /**
+     * 切分预览结果
+     */
+    @Data
+    public static class ChunkPreviewResult {
+        private String strategy;
+        private int totalChunks;
+        private int totalCharacters;
+        private int avgChunkSize;
+        private List<ChunkPreviewItem> chunks;
+    }
 
-            // 已经到达末尾，直接收尾
-            if (baseEnd >= len) {
-                chunks.add(content.substring(start).trim());
-                break;
-            }
+    @Data
+    public static class ChunkPreviewItem {
+        private int index;
+        private String content;
+        private int charCount;
+        private int charStart;
+        private int charEnd;
+        private Integer parentIndex;
+        private Boolean isParent;
+        private String sectionTitle;
+    }
 
-            // 向后找最近的 \n（最多延伸 maxExtend 个字符）
-            int end = baseEnd;
-            int forwardNewline = content.indexOf('\n', baseEnd);
-            if (forwardNewline != -1 && forwardNewline <= baseEnd + maxExtend) {
-                end = forwardNewline + 1;
-            } else {
-                // 向前找最近的 \n
-                int backwardNewline = content.lastIndexOf('\n', baseEnd);
-                if (backwardNewline > start) {
-                    end = backwardNewline + 1;
-                }
-                // 都找不到则保持 baseEnd
-            }
+    /**
+     * 从知识库配置构建切分配置
+     */
+    private DocumentChunkingService.ChunkConfig buildChunkConfig(KnowledgeBase kb) {
+        return DocumentChunkingService.ChunkConfig.builder()
+                .strategy(kb.getChunkStrategy() != null ? kb.getChunkStrategy() : ChunkStrategy.SEMANTIC)
+                .chunkSize(kb.getChunkSize() != null ? kb.getChunkSize() : 500)
+                .chunkOverlap(kb.getChunkOverlap() != null ? kb.getChunkOverlap() : 50)
+                .parentChildMode(kb.getParentChildMode() != null ? kb.getParentChildMode() : false)
+                .parentChunkSize(kb.getParentChunkSize() != null ? kb.getParentChunkSize() : 1500)
+                .preserveMetadata(kb.getPreserveMetadata() != null ? kb.getPreserveMetadata() : true)
+                .semanticThreshold(kb.getSemanticThreshold() != null ? kb.getSemanticThreshold() : 0.5)
+                .build();
+    }
 
-            String chunk = content.substring(start, end).trim();
-            if (!chunk.isEmpty()) {
-                chunks.add(chunk);
-            }
-
-            // 计算下一个 start：end - overlap，然后对齐到最近的 \n 边界
-            int nextStart = end - overlap;
-            if (nextStart <= start) {
-                nextStart = end;
-            }
-            // 从 nextStart 向前找 \n 对齐到段落开头
-            int alignNewline = content.lastIndexOf('\n', nextStart);
-            if (alignNewline > start && alignNewline >= nextStart - overlap) {
-                nextStart = alignNewline + 1;
-            }
-
-            if (nextStart >= len) {
-                break;
-            }
-            start = nextStart;
+    private ChunkStrategy parseChunkStrategy(String strategyStr) {
+        if (strategyStr == null || strategyStr.trim().isEmpty()) {
+            return null;
         }
-
-        return chunks;
+        try {
+            return ChunkStrategy.valueOf(strategyStr.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            log.warn("无效的切分策略: {}", strategyStr);
+            return null;
+        }
     }
 
     /**
@@ -635,6 +677,9 @@ public class KnowledgeBaseApplicationService {
         vo.setDocumentId(chunk.documentId());
         vo.setContent(chunk.content());
         vo.setChunkIndex(chunk.chunkIndex());
+        vo.setParentChunkId(chunk.parentChunkId());
+        vo.setIsParentChunk(chunk.isParentChunk());
+        vo.setSectionTitle(chunk.sectionTitle());
         vo.setMetadata(chunk.metadata());
         vo.setCreateTime(chunk.createTime());
         return vo;
@@ -649,6 +694,17 @@ public class KnowledgeBaseApplicationService {
         vo.setEmbeddingDimension(kb.getEmbeddingDimension());
         vo.setChunkSize(kb.getChunkSize());
         vo.setChunkOverlap(kb.getChunkOverlap());
+        vo.setChunkStrategy(kb.getChunkStrategy() != null ? kb.getChunkStrategy().name() : "SEMANTIC");
+        vo.setParentChildMode(kb.getParentChildMode());
+        vo.setParentChunkSize(kb.getParentChunkSize());
+        vo.setPreserveMetadata(kb.getPreserveMetadata());
+        vo.setSemanticThreshold(kb.getSemanticThreshold());
+        vo.setRetrievalMode(kb.getRetrievalMode());
+        vo.setEnableQueryRewrite(kb.getEnableQueryRewrite());
+        vo.setUseDynamicTopK(kb.getUseDynamicTopK());
+        vo.setDefaultTopK(kb.getDefaultTopK());
+        vo.setQueryRewriteModelId(kb.getQueryRewriteModelId());
+        vo.setRerankModel(kb.getRerankModel());
         vo.setDocumentCount(kb.getDocumentCount());
         vo.setChunkCount(kb.getChunkCount());
         vo.setStatus(kb.getStatus());

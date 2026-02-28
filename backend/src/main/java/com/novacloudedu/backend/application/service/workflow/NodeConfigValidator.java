@@ -17,7 +17,7 @@ import java.util.Set;
 public class NodeConfigValidator {
 
     private static final Set<String> SUPPORTED_EMBEDDING_MODELS = Set.of(
-            "text-embedding-v2", "text-embedding-v1"
+            "text-embedding-v4", "text-embedding-v3", "text-embedding-v2", "text-embedding-v1"
     );
 
     /**
