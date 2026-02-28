@@ -64,6 +64,7 @@ docs/BaseResponseChapterSummary.md
 docs/BaseResponseChatMessagePageResponse.md
 docs/BaseResponseCheckinResult.md
 docs/BaseResponseCheckinStatusResult.md
+docs/BaseResponseChunkPreviewResult.md
 docs/BaseResponseClassAnalyticsResponse.md
 docs/BaseResponseClassResponse.md
 docs/BaseResponseCommentPageResponse.md
@@ -138,6 +139,7 @@ docs/BaseResponseListKnowledgePoint.md
 docs/BaseResponseListKnowledgeProfileResponse.md
 docs/BaseResponseListLong.md
 docs/BaseResponseListMapStringObject.md
+docs/BaseResponseListMapStringString.md
 docs/BaseResponseListMembershipPlan.md
 docs/BaseResponseListMessageReadUserResponse.md
 docs/BaseResponseListNodeTypeResponse.md
@@ -266,6 +268,8 @@ docs/CheckinRankingItem.md
 docs/CheckinResult.md
 docs/CheckinStatusResult.md
 docs/ChildrenDefinition.md
+docs/ChunkPreviewItem.md
+docs/ChunkPreviewResult.md
 docs/ClassAnalyticsResponse.md
 docs/ClassMemberResponse.md
 docs/ClassResponse.md
@@ -585,6 +589,7 @@ models/base-response-chapter-summary.ts
 models/base-response-chat-message-page-response.ts
 models/base-response-checkin-result.ts
 models/base-response-checkin-status-result.ts
+models/base-response-chunk-preview-result.ts
 models/base-response-class-analytics-response.ts
 models/base-response-class-response.ts
 models/base-response-comment-page-response.ts
@@ -659,6 +664,7 @@ models/base-response-list-knowledge-point.ts
 models/base-response-list-knowledge-profile-response.ts
 models/base-response-list-long.ts
 models/base-response-list-map-string-object.ts
+models/base-response-list-map-string-string.ts
 models/base-response-list-membership-plan.ts
 models/base-response-list-message-read-user-response.ts
 models/base-response-list-node-type-response.ts
@@ -787,6 +793,8 @@ models/checkin-ranking-item.ts
 models/checkin-result.ts
 models/checkin-status-result.ts
 models/children-definition.ts
+models/chunk-preview-item.ts
+models/chunk-preview-result.ts
 models/class-analytics-response.ts
 models/class-member-response.ts
 models/class-response.ts
