@@ -408,59 +408,59 @@ public class PptAgentOrchestrator {
         }
 
         String systemPrompt = """
-                你是一位专业的PPT质量评审专家，擅长从视觉和内容两个维度评估幻灯片质量。
-                你会收到PPT每页的渲染截图和对应的内容配置。请仔细查看每张图片，评估：
+                You are a professional presentation quality reviewer, expert at evaluating slides from both visual and content perspectives.
+                You will receive rendered screenshots and content configurations for each slide. Examine every image carefully and evaluate:
                 
-                1. **内容质量** (content_score): 信息准确性、专业深度、数据支撑、文字精炼度
-                2. **视觉设计** (design_score): 排版美观度、颜色搭配、图文比例、留白合理性、字体大小可读性
-                3. **结构连贯** (coherence_score): 页面间逻辑衔接、主题一致性、信息递进关系
+                1. **Content Quality** (content_score): information accuracy, professional depth, data support, text conciseness
+                2. **Visual Design** (design_score): layout aesthetics, color harmony, image-text ratio, whitespace balance, font readability
+                3. **Structural Coherence** (coherence_score): logical flow between pages, topic consistency, information progression
                 
-                对每一页都给出单独评分和具体反馈，特别关注：
-                - 是否有模板原始占位文字残留（如"单击此处"、"添加标题"等）或与AI生成内容重叠
-                - 文字是否溢出文本框或被截断
-                - 图片是否模糊、变形或与内容不匹配
-                - 排版是否拥挤或过于空旷
-                - 配色是否和谐
+                For each slide, provide an individual score and specific feedback. Pay special attention to:
+                - Template placeholder text remnants (e.g., "Click to add title", "Type here") or overlap with AI-generated content
+                - Text overflowing or being clipped by text boxes
+                - Images that are blurry, distorted, or mismatched with content
+                - Layout that is too crowded or too sparse
+                - Color scheme harmony
                 
-                如果发现模板原始文字残留或内容重叠，该页评分必须低于50分。
+                If template placeholder text remnants or content overlap are found, that slide's score MUST be below 50.
                 
-                输出纯JSON，格式：
+                Output pure JSON:
                 {
                     "overall_score": 0-100,
                     "content_score": 0-100,
                     "design_score": 0-100,
                     "coherence_score": 0-100,
-                    "strengths": ["优点1", "优点2"],
-                    "weaknesses": ["不足1", "不足2"],
-                    "improvement_suggestions": ["建议1", "建议2"],
+                    "strengths": ["strength 1", "strength 2"],
+                    "weaknesses": ["weakness 1", "weakness 2"],
+                    "improvement_suggestions": ["suggestion 1", "suggestion 2"],
                     "slide_level_feedback": [
-                        {"slide_index": 0, "score": 75, "feedback": "具体问题描述"},
-                        {"slide_index": 1, "score": 60, "feedback": "具体问题描述"}
+                        {"slide_index": 0, "score": 75, "feedback": "specific issue description"},
+                        {"slide_index": 1, "score": 60, "feedback": "specific issue description"}
                     ]
                 }
                 """;
 
-        // 构建用户消息：文本描述 + 所有预览图
+        // Build user message: text description + all preview images
         StringBuilder userMsg = new StringBuilder();
-        userMsg.append("以下是一份PPT的所有页面渲染截图和对应内容。请逐页审查并给出评估。\n\n");
-        userMsg.append("## 原始大纲\n").append(outline).append("\n\n");
-        userMsg.append("## 幻灯片内容（共").append(slides.size()).append("页）\n\n");
+        userMsg.append("Below are all rendered slide screenshots and their content configurations. Review each page and provide evaluation.\n\n");
+        userMsg.append("## Original Outline\n").append(outline).append("\n\n");
+        userMsg.append("## Slide Content (").append(slides.size()).append(" slides)\n\n");
 
         for (int i = 0; i < slides.size(); i++) {
-            userMsg.append("### 第").append(i + 1).append("页");
+            userMsg.append("### Slide ").append(i + 1);
             if (i < validImageUrls.size() && validImageUrls.get(i) != null) {
-                userMsg.append("（见对应图片）");
+                userMsg.append(" (see corresponding image)");
             }
             userMsg.append("\n");
             try {
                 userMsg.append(objectMapper.writeValueAsString(slides.get(i)));
             } catch (Exception e) {
-                userMsg.append("（内容序列化失败）");
+                userMsg.append("(serialization failed)");
             }
             userMsg.append("\n\n");
         }
 
-        userMsg.append("请仔细查看所有幻灯片截图，对每页的视觉效果和内容质量进行评估，输出纯JSON。");
+        userMsg.append("Carefully examine all slide screenshots. Evaluate the visual quality and content of each page. Output pure JSON.");
 
         try {
             String result = langchainChatService.chatWithImages(
@@ -1313,7 +1313,7 @@ public class PptAgentOrchestrator {
         String[] lines = cleaned.split("\n");
         List<Map<String, Object>> fills = new ArrayList<>();
 
-        String title = lines.length > 0 ? lines[0].replaceAll("^#+\\s*", "") : "第" + (slideIndex + 1) + "页";
+        String title = lines.length > 0 ? lines[0].replaceAll("^#+\\s*", "") : "Slide " + (slideIndex + 1);
         fills.add(Map.of("shape_id", 0, "text", title));
 
         if (lines.length > 1) {
