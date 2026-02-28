@@ -8,6 +8,9 @@ import {
   FileText,
   Loader2,
   X,
+  Check,
+  AlertTriangle,
+  Clock,
 } from 'lucide-react';
 import { PPTApi } from '../../api/generated/api/pptapi';
 import { apiClient, Configuration } from '../../api';
@@ -16,6 +19,13 @@ import { toast } from '../../components/ui';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
 const api = new PPTApi(new Configuration(), API_BASE, apiClient);
+
+const parseStatusConfig: Record<string, { label: string; color: string; bgColor: string; icon: React.ReactNode }> = {
+  ready:   { label: '可用',     color: 'text-green-600 dark:text-green-400', bgColor: 'bg-green-100 dark:bg-green-900/30', icon: <Check className="w-3.5 h-3.5" /> },
+  parsing: { label: '解析中',   color: 'text-blue-600 dark:text-blue-400',  bgColor: 'bg-blue-100 dark:bg-blue-900/30',  icon: <Loader2 className="w-3.5 h-3.5 animate-spin" /> },
+  pending: { label: '等待解析', color: 'text-yellow-600 dark:text-yellow-400', bgColor: 'bg-yellow-100 dark:bg-yellow-900/30', icon: <Clock className="w-3.5 h-3.5" /> },
+  failed:  { label: '解析失败', color: 'text-red-600 dark:text-red-400',    bgColor: 'bg-red-100 dark:bg-red-900/30',    icon: <AlertTriangle className="w-3.5 h-3.5" /> },
+};
 
 const PptTemplateManagementPage: React.FC = () => {
   const [templates, setTemplates] = useState<PptTemplateListResponse[]>([]);
@@ -28,6 +38,7 @@ const PptTemplateManagementPage: React.FC = () => {
   const [previewId, setPreviewId] = useState<string | null>(null);
   const [previewData, setPreviewData] = useState<any>(null);
   const [previewLoading, setPreviewLoading] = useState(false);
+  const [retryingId, setRetryingId] = useState<string | null>(null);
 
   const fetchTemplates = useCallback(async () => {
     setLoading(true);
@@ -98,6 +109,19 @@ const PptTemplateManagementPage: React.FC = () => {
     }
   };
 
+  const handleRetryParse = async (id: string) => {
+    setRetryingId(id);
+    try {
+      await apiClient.post(`${API_BASE}/api/ppt/templates/${id}/retry-parse`);
+      toast.success('已触发重新解析');
+      setTimeout(() => fetchTemplates(), 1500);
+    } catch {
+      toast.error('重新解析触发失败');
+    } finally {
+      setRetryingId(null);
+    }
+  };
+
   const filtered = templates.filter(t =>
     !searchQuery || (t.name || '').toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -158,10 +182,19 @@ const PptTemplateManagementPage: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
           {filtered.map(t => {
             const tid = String(t.id);
+            const status = t.parseStatus || 'pending';
+            const isReady = status === 'ready';
+            const isFailed = status === 'failed';
+            const statusCfg = parseStatusConfig[status] || parseStatusConfig.pending;
+
             return (
               <div
                 key={tid}
-                className="group bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden hover:shadow-lg hover:border-brand-300 dark:hover:border-brand-600 transition-all duration-300"
+                className={`group bg-white dark:bg-gray-900 rounded-2xl border shadow-sm overflow-hidden transition-all duration-300 ${
+                  isReady
+                    ? 'border-gray-100 dark:border-gray-800 hover:shadow-lg hover:border-brand-300 dark:hover:border-brand-600'
+                    : 'border-gray-200 dark:border-gray-700'
+                }`}
               >
                 {/* 封面 */}
                 <div className="relative aspect-video bg-gray-50 dark:bg-gray-800 overflow-hidden">
@@ -169,41 +202,72 @@ const PptTemplateManagementPage: React.FC = () => {
                     <img
                       src={t.coverUrl}
                       alt={t.name || '模板'}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      className={`w-full h-full object-cover transition-transform duration-300 ${isReady ? 'group-hover:scale-105' : 'grayscale opacity-70'}`}
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
                       <FileText className="w-12 h-12 text-gray-300 dark:text-gray-600" />
                     </div>
                   )}
+                  {/* Parse status overlay for non-ready */}
+                  {!isReady && (
+                    <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
+                      <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium ${statusCfg.bgColor} ${statusCfg.color}`}>
+                        {statusCfg.icon}
+                        {statusCfg.label}
+                      </span>
+                    </div>
+                  )}
                   {/* 操作按钮浮层 */}
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-200">
-                    <button
-                      onClick={() => handlePreview(tid)}
-                      className="p-2 text-gray-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-900/20 bg-white/90 dark:bg-gray-900/90 rounded-lg transition-all"
-                      title="查看详情"
-                    >
-                      <Eye size={18} />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(tid)}
-                      className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 bg-white/90 dark:bg-gray-900/90 rounded-lg transition-all"
-                      title="删除"
-                    >
-                      <Trash2 size={18} />
-                    </button>
-                  </div>
+                  {isReady && (
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-200">
+                      <button
+                        onClick={() => handlePreview(tid)}
+                        className="p-2 text-gray-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-900/20 bg-white/90 dark:bg-gray-900/90 rounded-lg transition-all"
+                        title="查看详情"
+                      >
+                        <Eye size={18} />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(tid)}
+                        className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 bg-white/90 dark:bg-gray-900/90 rounded-lg transition-all"
+                        title="删除"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
+                  )}
                 </div>
                 {/* 信息 */}
                 <div className="px-4 py-3">
-                  <h3 className="font-bold text-gray-900 dark:text-white group-hover:text-brand-600 transition-colors truncate text-sm">
-                    {t.name || '未命名模板'}
-                  </h3>
+                  <div className="flex items-center justify-between">
+                    <h3 className={`font-bold truncate text-sm transition-colors ${isReady ? 'text-gray-900 dark:text-white group-hover:text-brand-600' : 'text-gray-400 dark:text-gray-500'}`}>
+                      {t.name || '未命名模板'}
+                    </h3>
+                    {isFailed && (
+                      <button
+                        onClick={() => handleRetryParse(tid)}
+                        disabled={retryingId === tid}
+                        className="flex-shrink-0 p-1.5 rounded-lg text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                        title="重新解析"
+                      >
+                        <RefreshCw className={`w-4 h-4 ${retryingId === tid ? 'animate-spin' : ''}`} />
+                      </button>
+                    )}
+                  </div>
                   <div className="flex items-center justify-between mt-1.5">
                     <span className="text-xs text-gray-400">{t.slideCount || 0} 页幻灯片</span>
-                    <span className={`text-xs font-medium ${t.enabled ? 'text-green-500' : 'text-gray-400'}`}>
-                      {t.enabled ? '已启用' : '已禁用'}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      {isReady && (
+                        <span className={`inline-flex items-center gap-1 text-xs font-medium ${statusCfg.color}`}>
+                          {statusCfg.icon}
+                          {statusCfg.label}
+                        </span>
+                      )}
+                      <span className={`text-xs font-medium ${t.enabled ? 'text-green-500' : 'text-gray-400'}`}>
+                        {t.enabled ? '已启用' : '已禁用'}
+                      </span>
+                    </div>
                   </div>
                   {t.description && (
                     <p className="text-xs text-gray-400 mt-1.5 truncate">{t.description}</p>
