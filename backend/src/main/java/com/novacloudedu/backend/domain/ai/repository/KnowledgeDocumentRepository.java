@@ -49,6 +49,11 @@ public interface KnowledgeDocumentRepository {
     long countByKnowledgeBaseId(KnowledgeBaseId knowledgeBaseId);
 
     /**
+     * 按状态统计知识库的文档数量
+     */
+    java.util.Map<String, Long> countByKnowledgeBaseIdGroupByStatus(KnowledgeBaseId knowledgeBaseId);
+
+    /**
      * 删除文档
      */
     void delete(KnowledgeDocumentId id);

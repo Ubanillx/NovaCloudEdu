@@ -25,6 +25,10 @@ public interface KnowledgeSearchService {
         private String retrievalMode;
         private Boolean includeMetadata;
         private Boolean includeScore;
+        private Boolean enableQueryRewrite;
+        private Boolean useDynamicTopK;
+        private String queryRewriteModelId;
+        private String rerankModel;
     }
 
     @Data
