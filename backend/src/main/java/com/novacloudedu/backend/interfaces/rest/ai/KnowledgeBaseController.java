@@ -153,6 +153,19 @@ public class KnowledgeBaseController {
         }
     }
 
+    @GetMapping("/{id}/document-stats")
+    @Operation(summary = "获取文档状态统计", operationId = "kbDocumentStats",
+            description = "返回知识库中各状态文档的数量统计（全量，不受分页影响）")
+    public BaseResponse<java.util.Map<String, Long>> getDocumentStats(@PathVariable Long id) {
+        try {
+            java.util.Map<String, Long> stats = knowledgeBaseService.getDocumentStatusCounts(id);
+            return ResultUtils.success(stats);
+        } catch (Exception e) {
+            log.error("获取文档状态统计失败", e);
+            return (BaseResponse<java.util.Map<String, Long>>) (BaseResponse<?>) ResultUtils.error(50000, e.getMessage());
+        }
+    }
+
     @DeleteMapping("/{id}/documents/{docId}")
     @Operation(summary = "删除文档", operationId = "kbDeleteDocument")
     public BaseResponse<Void> deleteDocument(
@@ -266,28 +279,192 @@ public class KnowledgeBaseController {
         }
     }
 
+    @PostMapping("/chunk-preview")
+    @Operation(summary = "预览文档切分效果", operationId = "kbPreviewChunking",
+            description = "输入文本内容和切分参数，返回切分预览结果（不执行向量化）")
+    public BaseResponse<KnowledgeBaseApplicationService.ChunkPreviewResult> previewChunking(
+            @RequestBody Map<String, Object> request) {
+        try {
+            String content = (String) request.get("content");
+            String strategy = (String) request.get("strategy");
+            Integer chunkSize = request.get("chunkSize") != null ? ((Number) request.get("chunkSize")).intValue() : null;
+            Integer chunkOverlap = request.get("chunkOverlap") != null ? ((Number) request.get("chunkOverlap")).intValue() : null;
+            Boolean parentChildMode = (Boolean) request.get("parentChildMode");
+            Integer parentChunkSize = request.get("parentChunkSize") != null ? ((Number) request.get("parentChunkSize")).intValue() : null;
+            Boolean preserveMetadata = (Boolean) request.get("preserveMetadata");
+            Double semanticThreshold = request.get("semanticThreshold") != null ? ((Number) request.get("semanticThreshold")).doubleValue() : null;
+
+            KnowledgeBaseApplicationService.ChunkPreviewResult result = knowledgeBaseService.previewChunking(
+                    content, strategy, chunkSize, chunkOverlap, parentChildMode, parentChunkSize, preserveMetadata, semanticThreshold);
+            return ResultUtils.success(result);
+        } catch (Exception e) {
+            log.error("预览切分失败", e);
+            return (BaseResponse<KnowledgeBaseApplicationService.ChunkPreviewResult>) (BaseResponse<?>) ResultUtils.error(50000, e.getMessage());
+        }
+    }
+
+    @PostMapping("/{id}/documents/{docId}/chunk-preview")
+    @Operation(summary = "预览文档切分效果（基于已有文档）", operationId = "kbPreviewDocumentChunking",
+            description = "基于已上传的文档，预览不同切分策略的效果")
+    public BaseResponse<KnowledgeBaseApplicationService.ChunkPreviewResult> previewDocumentChunking(
+            @PathVariable Long id,
+            @PathVariable Long docId,
+            @RequestBody Map<String, Object> request) {
+        try {
+            String strategy = (String) request.get("strategy");
+            Integer chunkSize = request.get("chunkSize") != null ? ((Number) request.get("chunkSize")).intValue() : null;
+            Integer chunkOverlap = request.get("chunkOverlap") != null ? ((Number) request.get("chunkOverlap")).intValue() : null;
+            Boolean parentChildMode = (Boolean) request.get("parentChildMode");
+            Integer parentChunkSize = request.get("parentChunkSize") != null ? ((Number) request.get("parentChunkSize")).intValue() : null;
+            Boolean preserveMetadata = (Boolean) request.get("preserveMetadata");
+            Double semanticThreshold = request.get("semanticThreshold") != null ? ((Number) request.get("semanticThreshold")).doubleValue() : null;
+
+            KnowledgeBaseApplicationService.ChunkPreviewResult result = knowledgeBaseService.previewDocumentChunking(
+                    docId, strategy, chunkSize, chunkOverlap, parentChildMode, parentChunkSize, preserveMetadata, semanticThreshold);
+            return ResultUtils.success(result);
+        } catch (Exception e) {
+            log.error("预览文档切分失败: docId={}", docId, e);
+            return (BaseResponse<KnowledgeBaseApplicationService.ChunkPreviewResult>) (BaseResponse<?>) ResultUtils.error(50000, e.getMessage());
+        }
+    }
+
+    @GetMapping("/chunk-strategies")
+    @Operation(summary = "获取可用的切分策略列表", operationId = "kbListChunkStrategies")
+    public BaseResponse<List<Map<String, String>>> listChunkStrategies() {
+        List<Map<String, String>> strategies = new java.util.ArrayList<>();
+        for (com.novacloudedu.backend.domain.ai.valueobject.ChunkStrategy s : 
+                com.novacloudedu.backend.domain.ai.valueobject.ChunkStrategy.values()) {
+            Map<String, String> item = new java.util.LinkedHashMap<>();
+            item.put("value", s.name());
+            item.put("label", s.getDescription());
+            strategies.add(item);
+        }
+        return ResultUtils.success(strategies);
+    }
+
+    @GetMapping("/retrieval-modes")
+    @Operation(summary = "获取检索模式列表", operationId = "kbListRetrievalModes",
+            description = "返回可用的RAG检索模式列表")
+    public BaseResponse<List<Map<String, String>>> listRetrievalModes() {
+        List<Map<String, String>> modes = new java.util.ArrayList<>();
+        for (com.novacloudedu.backend.domain.ai.valueobject.RetrievalMode m :
+                com.novacloudedu.backend.domain.ai.valueobject.RetrievalMode.values()) {
+            Map<String, String> item = new java.util.LinkedHashMap<>();
+            item.put("value", m.name());
+            item.put("label", m.getLabel());
+            modes.add(item);
+        }
+        return ResultUtils.success(modes);
+    }
+
+    @GetMapping("/embedding-models")
+    @Operation(summary = "获取可用的Embedding模型列表", operationId = "kbListEmbeddingModels",
+            description = "返回DashScope平台可用的文本向量化模型及其支持的维度列表")
+    public BaseResponse<List<Map<String, Object>>> listEmbeddingModels() {
+        List<Map<String, Object>> models = new java.util.ArrayList<>();
+
+        // text-embedding-v4 (Qwen3-Embedding)
+        Map<String, Object> v4 = new java.util.LinkedHashMap<>();
+        v4.put("model", "text-embedding-v4");
+        v4.put("label", "text-embedding-v4 (Qwen3-Embedding)");
+        v4.put("dimensions", List.of(2048, 1536, 1024, 768, 512, 256, 128, 64));
+        v4.put("defaultDimension", 1024);
+        v4.put("maxTokens", 8192);
+        v4.put("recommended", true);
+        models.add(v4);
+
+        // text-embedding-v3
+        Map<String, Object> v3 = new java.util.LinkedHashMap<>();
+        v3.put("model", "text-embedding-v3");
+        v3.put("label", "text-embedding-v3");
+        v3.put("dimensions", List.of(1024, 768, 512, 256, 128, 64));
+        v3.put("defaultDimension", 1024);
+        v3.put("maxTokens", 8192);
+        v3.put("recommended", false);
+        models.add(v3);
+
+        // text-embedding-v2
+        Map<String, Object> v2 = new java.util.LinkedHashMap<>();
+        v2.put("model", "text-embedding-v2");
+        v2.put("label", "text-embedding-v2");
+        v2.put("dimensions", List.of(1536));
+        v2.put("defaultDimension", 1536);
+        v2.put("maxTokens", 2048);
+        v2.put("recommended", false);
+        models.add(v2);
+
+        // text-embedding-v1
+        Map<String, Object> v1 = new java.util.LinkedHashMap<>();
+        v1.put("model", "text-embedding-v1");
+        v1.put("label", "text-embedding-v1 (Legacy)");
+        v1.put("dimensions", List.of(1536));
+        v1.put("defaultDimension", 1536);
+        v1.put("maxTokens", 2048);
+        v1.put("recommended", false);
+        models.add(v1);
+
+        return ResultUtils.success(models);
+    }
+
     @PostMapping("/{id}/recall-test")
     @Operation(summary = "知识库召回测试", operationId = "kbRecallTest",
-            description = "输入查询文本，返回向量检索+Rerank后的召回结果，用于调试知识库检索效果")
+            description = "输入查询文本，返回多路召回+RRF融合+Rerank后的召回结果，用于调试知识库检索效果。" +
+                    "所有RAG参数可选，缺省时使用知识库默认配置。")
     public BaseResponse<Map<String, Object>> recallTest(
             @PathVariable Long id,
             @RequestBody Map<String, Object> request) {
         try {
             String query = (String) request.get("query");
-            Integer topK = request.get("topK") != null ? ((Number) request.get("topK")).intValue() : 5;
-            Double threshold = request.get("similarityThreshold") != null
-                    ? ((Number) request.get("similarityThreshold")).doubleValue() : 0.3;
-
             if (query == null || query.trim().isEmpty()) {
                 return (BaseResponse<Map<String, Object>>) (BaseResponse<?>) ResultUtils.error(40000, "查询文本不能为空");
             }
+
+            // 从知识库获取默认RAG配置作为 fallback
+            com.novacloudedu.backend.application.ai.dto.KnowledgeBaseVO kbVO = knowledgeBaseService.getById(id);
+
+            // 请求参数覆盖知识库默认配置
+            String mode = request.get("retrievalMode") != null
+                    ? (String) request.get("retrievalMode")
+                    : (kbVO.getRetrievalMode() != null ? kbVO.getRetrievalMode() : "HYBRID_RERANK");
+
+            boolean queryRewrite = request.get("enableQueryRewrite") != null
+                    ? (Boolean) request.get("enableQueryRewrite")
+                    : (kbVO.getEnableQueryRewrite() != null && kbVO.getEnableQueryRewrite());
+
+            boolean dynamicTopK = request.get("useDynamicTopK") != null
+                    ? (Boolean) request.get("useDynamicTopK")
+                    : (kbVO.getUseDynamicTopK() != null && kbVO.getUseDynamicTopK());
+
+            int defaultTopK = request.get("defaultTopK") != null
+                    ? ((Number) request.get("defaultTopK")).intValue()
+                    : (kbVO.getDefaultTopK() != null ? kbVO.getDefaultTopK() : 5);
+
+            // topK: 如果动态 topK 关闭，使用 defaultTopK；否则由搜索服务动态计算
+            Integer topK = request.get("topK") != null
+                    ? ((Number) request.get("topK")).intValue()
+                    : (!dynamicTopK ? defaultTopK : 5);
+
+            Double threshold = request.get("similarityThreshold") != null
+                    ? ((Number) request.get("similarityThreshold")).doubleValue() : 0.3;
+
+            String queryRewriteModelId = request.get("queryRewriteModelId") != null
+                    ? (String) request.get("queryRewriteModelId")
+                    : (kbVO.getQueryRewriteModelId() != null ? kbVO.getQueryRewriteModelId() : "dashscope/qwen-turbo");
+
+            String rerankModel = request.get("rerankModel") != null
+                    ? (String) request.get("rerankModel")
+                    : (kbVO.getRerankModel() != null ? kbVO.getRerankModel() : "qwen3-rerank");
 
             KnowledgeSearchService.SearchRequest searchRequest = KnowledgeSearchService.SearchRequest.builder()
                     .knowledgeBaseIds(List.of(id))
                     .query(query.trim())
                     .topK(topK)
                     .similarityThreshold(threshold)
-                    .retrievalMode("hybrid")
+                    .retrievalMode(mode)
+                    .enableQueryRewrite(queryRewrite)
+                    .useDynamicTopK(dynamicTopK)
+                    .queryRewriteModelId(queryRewriteModelId)
+                    .rerankModel(rerankModel)
                     .build();
 
             KnowledgeSearchService.SearchResult result = knowledgeSearchService.search(searchRequest);
@@ -308,7 +485,11 @@ public class KnowledgeBaseController {
 
             Map<String, Object> response = new java.util.LinkedHashMap<>();
             response.put("query", query);
+            response.put("retrievalMode", mode);
+            response.put("enableQueryRewrite", queryRewrite);
+            response.put("useDynamicTopK", dynamicTopK);
             response.put("topK", topK);
+            response.put("defaultTopK", defaultTopK);
             response.put("similarityThreshold", threshold);
             response.put("totalResults", result.getTotalCount());
             response.put("searchTimeMs", result.getSearchTimeMs());
