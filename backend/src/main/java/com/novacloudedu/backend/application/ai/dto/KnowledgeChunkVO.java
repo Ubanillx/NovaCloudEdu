@@ -16,6 +16,9 @@ public class KnowledgeChunkVO {
 
     private String content;
     private Integer chunkIndex;
+    private Long parentChunkId;
+    private Boolean isParentChunk;
+    private String sectionTitle;
     private String metadata;
 
     private LocalDateTime createTime;
