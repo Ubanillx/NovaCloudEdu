@@ -1,167 +1,36 @@
+# =================================================================
+# NovaCloudEdu — Docker 容器环境覆盖
+# 仅覆盖容器内服务地址（容器名替代 localhost）
+# 所有密钥/API Key 通过环境变量直接注入 application.yml 的 ${} 占位符
+# =================================================================
+
 spring:
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:postgres}:${DB_PORT:5432}/${DB_NAME:novacloudedu}?stringtype=unspecified
+    username: ${DB_USERNAME:nova}
   data:
     redis:
-      host: redis
-      port: 6379
-      password: ${SPRING_REDIS_PASSWORD}
-      database: 0
-      timeout: 3000ms
-  datasource:
-    url: jdbc:postgresql://postgres:5432/${POSTGRES_DB:novacloudedu}?stringtype=unspecified
-    username: ${POSTGRES_USER:nova}
-    password: ${POSTGRES_PASSWORD}
-    driver-class-name: org.postgresql.Driver
+      host: ${REDIS_HOST:redis}
   neo4j:
-    uri: bolt://neo4j:7687
-    authentication:
-      username: neo4j
-      password: ${NEO4J_PASSWORD}
-  docker:
-    compose:
-      enabled: false
+    uri: bolt://${NEO4J_HOST:neo4j}:${NEO4J_BOLT_PORT:7687}
+  elasticsearch:
+    uris: http://${ES_HOST:elasticsearch}:${ES_PORT:9200}
 
-# AI 配置
-ai:
-  dashscope:
-    api-key: ${AI_DASHSCOPE_APIKEY:}
-    llm:
-      model-name: qwen-max
-      vision-model-name: qwen-vl-max
-      temperature: 0.7
-      max-tokens: 2000
-      top-p: 0.8
-      enable-search: false
-    embedding:
-      model-name: ${AI_DASHSCOPE_EMBEDDING_MODELNAME:text-embedding-v2}
-      dimension: 1536
-      text-type: document
-    rerank:
-      model-name: ${DASHSCOPE_RERANK_MODEL:gte-rerank}
-      enabled: true
-
-  # 对话记忆配置
-  conversation:
-    max-history: 10
-    context-window: 4000
-    window-size: 20
-    summarize-threshold: 30
-
-  # 多模型路由配置
-  chat-models:
-    default-model: dashscope/qwen-max
-    default-vision-model: dashscope/qwen-vl-max
-    providers:
-      dashscope:
-        enabled: true
-        api-key: ${AI_DASHSCOPE_APIKEY:}
-      openai:
-        enabled: false
-        api-key: ${OPENAI_API_KEY:}
-      deepseek:
-        enabled: false
-        api-key: ${DEEPSEEK_API_KEY:}
-      moonshot:
-        enabled: false
-        api-key: ${MOONSHOT_API_KEY:}
-      zhipu:
-        enabled: false
-        api-key: ${ZHIPU_API_KEY:}
-      siliconflow:
-        enabled: false
-        api-key: ${SILICONFLOW_API_KEY:}
-
-  # 文生图模型配置
-  image-models:
-    enabled: true
-    default-model: dashscope/wan2.6-t2i
-    upload-to-oss: true
-    providers:
-      dashscope:
-        enabled: true
-        api-key: ${AI_DASHSCOPE_APIKEY:}
-
-  # 文生视频模型配置
-  video-models:
-    enabled: true
-    default-model: dashscope/wan2.6-t2v
-    upload-to-oss: true
-    providers:
-      dashscope:
-        enabled: true
-        api-key: ${AI_DASHSCOPE_APIKEY:}
-
-  # RAG 配置
-  rag:
-    enabled: true
-    top-k: 5
-    similarity-threshold: 0.7
-    chunk-size: 500
-    chunk-overlap: 50
-    max-context-length: 3000
-
-# SMS 配置
-sms:
-  url: ${SMS_URL:}
-  query-url: https://push.spug.cc/request/query
-  token: ${SMS_TOKEN:}
-  app-name: 智云星课
-  expire-minutes: 5
-
-# 阿里云配置
-aliyun:
-  oss:
-    endpoint: ${ALIYUN_OSS_ENDPOINT:oss-cn-hangzhou.aliyuncs.com}
-    access-key-id: ${ALIYUN_OSS_ACCESSKEYID:}
-    access-key-secret: ${ALIYUN_OSS_ACCESSKEYSECRET:}
-    bucket-name: ${ALIYUN_OSS_BUCKETNAME:}
-    domain: ${ALIYUN_OSS_DOMAIN:}
-  nls:
-    access-key-id: ${ALIYUN_NLS_ACCESSKEYID:}
-    access-key-secret: ${ALIYUN_NLS_ACCESSKEYSECRET:}
-    app-key: ${ALIYUN_NLS_APPKEY:}
-
-# 书籍加密配置
-book:
-  content:
-    encryption:
-      enabled: ${BOOK_CONTENT_ENCRYPTION_ENABLED:false}
-      secret-key: ${BOOK_CONTENT_ENCRYPTION_SECRETKEY:NovaCloudEduBookKey1}
-
-# Tavily Search API（供 PPT Agent 联网搜索）
-tavily:
-  api-key: "${TAVILY_API_KEY:}"
-
-# PPT 服务配置
+# ---- 容器内服务地址 ----
 ppt-service:
   url: ${PPT_SERVICE_URL:http://ppt-service:8100}
 
-# PPT Agent 多智能体配置
-ppt:
-  agent:
-    planner-model: ${PPT_AGENT_PLANNER_MODEL:dashscope/qwen-max}
-    content-model: ${PPT_AGENT_CONTENT_MODEL:dashscope/qwen-max}
-    design-model: ${PPT_AGENT_DESIGN_MODEL:dashscope/qwen-vl-max}
-    evaluator-model: ${PPT_AGENT_EVALUATOR_MODEL:dashscope/qwen-max}
-    concurrency: ${PPT_AGENT_CONCURRENCY:3}
-    quality-threshold: ${PPT_AGENT_QUALITY_THRESHOLD:65}
-    max-repair-rounds: ${PPT_AGENT_MAX_REPAIR_ROUNDS:2}
-    slide-score-threshold: ${PPT_AGENT_SLIDE_SCORE_THRESHOLD:60}
-    # 联网图片搜索（Bing Image Search / Google Custom Search）
-    image-search:
-      enabled: ${PPT_AGENT_IMAGE_SEARCH_ENABLED:false}
-      provider: ${PPT_AGENT_IMAGE_SEARCH_PROVIDER:bing}
-      api-key: "${PPT_AGENT_IMAGE_SEARCH_API_KEY:}"
-
-# Typst 试卷排版服务配置
 typst:
   service:
     url: ${TYPST_SERVICE_URL:http://typst-service:8200}
 
-# OnlyOffice 配置
 onlyoffice:
   document-server-url: ${ONLYOFFICE_URL:http://onlyoffice:80}
-  callback-url: ${ONLYOFFICE_CALLBACK_URL:http://localhost:8080/api/onlyoffice/callback}
-  jwt-secret: "${ONLYOFFICE_JWT_SECRET:changeme_onlyoffice_secret_1234567}"
 
-# Elasticsearch 配置
-spring.elasticsearch.uris: http://elasticsearch:9200
+srs:
+  rtmp-url: ${SRS_RTMP_URL:rtmp://srs:1935/live}
+
+# ---- 日志：容器环境 INFO ----
+logging:
+  level:
+    com.novacloudedu: ${LOG_LEVEL:INFO}
