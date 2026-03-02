@@ -112,6 +112,31 @@ class SlideRawData(BaseModel):
         description="可填充文本区域数量")
 
 
+class ImagePlaceholder(BaseModel):
+    """图片槽位描述：视觉模型识别的图片放置区域"""
+    shape_id: int = Field(
+        default=0,
+        description="对应的 image_slot shape_id")
+    position: str = Field(
+        default="",
+        description="图片在页面中的位置描述"
+                    "（如 'right half', 'bottom-left quarter'）")
+    width_cm: float = Field(
+        default=0.0,
+        description="图片宽度(cm)")
+    height_cm: float = Field(
+        default=0.0,
+        description="图片高度(cm)")
+    aspect_ratio: str = Field(
+        default="",
+        description="宽高比（如 '16:9', '1:1', '4:3'）")
+    suggested_image_type: str = Field(
+        default="",
+        description="推荐图片类型"
+                    "（如 'photo', 'icon', 'chart', "
+                    "'illustration', 'diagram'）")
+
+
 class EnrichedSlideInfo(BaseModel):
     """语义增强的幻灯片描述：
     顶层为多模态模型分析出的语义字段，
@@ -165,6 +190,10 @@ class EnrichedSlideInfo(BaseModel):
         description="推荐内容格式: bullet_points/"
                     "paragraphs/short_phrases/"
                     "numbers_stats/mixed")
+    # -- 图片槽位语义 --
+    image_placeholders: list[ImagePlaceholder] = Field(
+        default_factory=list,
+        description="图片放置区域描述列表")
     # -- 预览图 --
     preview_image_url: str = Field(
         default="",
