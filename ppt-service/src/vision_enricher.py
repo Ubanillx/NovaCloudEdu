@@ -26,6 +26,7 @@ from .schemas import (
     TemplateConfig, SlideInfo,
     ColorScheme, SlideRawData,
     EnrichedSlideInfo, EnrichedTemplateConfig,
+    ImagePlaceholder,
 )
 
 logger = logging.getLogger(__name__)
@@ -102,6 +103,21 @@ or gradients; complex = layered overlays or intricate charts.
 bullet_points / paragraphs / short_phrases / \
 numbers_stats / mixed. \
 Indicates the best text format for this slide's layout.
+14. **image_placeholders** (array of objects): For EACH image slot \
+listed in the structured data below, provide an object with:
+   - shape_id (int): The shape_id from the image_slots data
+   - position (string): Where the image area sits on the page \
+(e.g. "right half", "bottom-left quarter", "center background", \
+"top-right corner")
+   - width_cm (float): Approximate width in centimeters \
+(convert from EMU: 1 cm = 360000 EMU)
+   - height_cm (float): Approximate height in centimeters
+   - aspect_ratio (string): Width-to-height ratio \
+(e.g. "16:9", "4:3", "1:1", "3:2")
+   - suggested_image_type (string): What kind of image fits best. \
+Must be one of: photo / icon / chart / illustration / diagram / \
+logo / decorative / screenshot
+   If there are no image slots, return an empty array [].
 
 ## Structured Data (parsed slot information for this slide)
 ```json
@@ -247,6 +263,98 @@ def _parse_color_scheme(cs_dict: dict) -> ColorScheme:
         background=cs_dict.get("background", ""),
         text=cs_dict.get("text", ""),
     )
+
+
+_EMU_PER_CM = 360000
+
+
+def _parse_image_placeholders(
+    vision_result: list,
+    slide_info: SlideInfo,
+) -> list[ImagePlaceholder]:
+    """解析图片槽位信息。
+
+    优先使用视觉模型返回的结果，如果视觉模型未返回
+    或格式不对，则从原始 image_slots 数据推算。
+    """
+    # 如果视觉模型返回了有效数据
+    if isinstance(vision_result, list) and vision_result:
+        placeholders = []
+        for item in vision_result:
+            if not isinstance(item, dict):
+                continue
+            placeholders.append(ImagePlaceholder(
+                shape_id=item.get("shape_id", 0),
+                position=item.get("position", ""),
+                width_cm=float(item.get("width_cm", 0)),
+                height_cm=float(item.get("height_cm", 0)),
+                aspect_ratio=item.get("aspect_ratio", ""),
+                suggested_image_type=item.get(
+                    "suggested_image_type", "photo"),
+            ))
+        if placeholders:
+            return placeholders
+
+    # 兜底：从原始 image_slots 推算
+    return _fallback_image_placeholders(slide_info)
+
+
+def _fallback_image_placeholders(
+    slide_info: SlideInfo,
+) -> list[ImagePlaceholder]:
+    """从原始 image_slots 推算图片槽位信息"""
+    placeholders = []
+    for slot in slide_info.image_slots:
+        w_cm = round(slot.width / _EMU_PER_CM, 1)
+        h_cm = round(slot.height / _EMU_PER_CM, 1)
+
+        # 计算宽高比
+        if h_cm > 0:
+            ratio = w_cm / h_cm
+            if abs(ratio - 16 / 9) < 0.15:
+                ar = "16:9"
+            elif abs(ratio - 4 / 3) < 0.15:
+                ar = "4:3"
+            elif abs(ratio - 3 / 2) < 0.15:
+                ar = "3:2"
+            elif abs(ratio - 1) < 0.15:
+                ar = "1:1"
+            else:
+                ar = f"{round(ratio, 1)}:1"
+        else:
+            ar = ""
+
+        # 推断位置
+        # 标准幻灯片 ~25.4cm × 19.05cm (16:9)
+        cx = (slot.left + slot.width / 2) / _EMU_PER_CM
+        cy = (slot.top + slot.height / 2) / _EMU_PER_CM
+        pos = _infer_position(cx, cy)
+
+        placeholders.append(ImagePlaceholder(
+            shape_id=slot.shape_id,
+            position=pos,
+            width_cm=w_cm,
+            height_cm=h_cm,
+            aspect_ratio=ar,
+            suggested_image_type="photo",
+        ))
+    return placeholders
+
+
+def _infer_position(cx_cm: float, cy_cm: float) -> str:
+    """根据中心点坐标推断页面位置描述"""
+    # 假设标准 16:9 幻灯片 ~25.4cm × 19.05cm
+    h = "left" if cx_cm < 8.5 else (
+        "right" if cx_cm > 17 else "center")
+    v = "top" if cy_cm < 6.4 else (
+        "bottom" if cy_cm > 12.7 else "middle")
+    if h == "center" and v == "middle":
+        return "center"
+    if v == "middle":
+        return f"{h} half"
+    if h == "center":
+        return f"{v} area"
+    return f"{v}-{h}"
 
 
 # ---- 结构化分析兜底（无视觉模型时使用）----
@@ -401,6 +509,9 @@ async def enrich_template(
                 slide_info, idx, total)
 
         cs = semantic.get("color_scheme", {})
+        img_phs = _parse_image_placeholders(
+            semantic.get("image_placeholders", []),
+            slide_info)
         return EnrichedSlideInfo(
             index=idx,
             purpose=semantic.get("purpose", ""),
@@ -423,6 +534,7 @@ async def enrich_template(
                 "font_style", ""),
             suggested_content_format=semantic.get(
                 "suggested_content_format", ""),
+            image_placeholders=img_phs,
             preview_image_url=image_url,
             data=raw_data,
         )
@@ -485,6 +597,7 @@ def _fallback_enrich(
             if idx < len(slide_image_urls) else ""
         )
 
+        img_phs = _fallback_image_placeholders(slide_info)
         enriched_slides.append(EnrichedSlideInfo(
             index=idx,
             purpose=semantic.get("purpose", ""),
@@ -507,6 +620,7 @@ def _fallback_enrich(
                 "font_style", ""),
             suggested_content_format=semantic.get(
                 "suggested_content_format", ""),
+            image_placeholders=img_phs,
             preview_image_url=image_url,
             data=raw_data,
         ))

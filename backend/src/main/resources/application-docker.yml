@@ -127,6 +127,10 @@ book:
       enabled: ${BOOK_CONTENT_ENCRYPTION_ENABLED:false}
       secret-key: ${BOOK_CONTENT_ENCRYPTION_SECRETKEY:NovaCloudEduBookKey1}
 
+# Tavily Search API（供 PPT Agent 联网搜索）
+tavily:
+  api-key: "${TAVILY_API_KEY:}"
+
 # PPT 服务配置
 ppt-service:
   url: ${PPT_SERVICE_URL:http://ppt-service:8100}
