@@ -10,6 +10,10 @@ import {
   History,
   MessageSquarePlus,
   ArrowDown,
+  FolderOpen,
+  X,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from 'lucide-react';
 import { usePptChat } from '../../hooks/usePptChat';
 import type { PptSessionSummary } from '../../hooks/usePptChat';
@@ -19,6 +23,7 @@ import AgentTaskPanel from '../../components/ppt/AgentTaskPanel';
 import PptChatInput from '../../components/ppt/PptChatInput';
 import { useTextToSpeech } from '../../hooks/useTextToSpeech';
 import { TemplateSelector } from '../../components/ppt/TemplateSelector';
+import PptProjectPanel from '../../components/ppt/PptProjectPanel';
 
 // ============ 会话时间格式化 ============
 
@@ -61,7 +66,7 @@ const SessionSidebar: React.FC<SessionSidebarProps> = ({
   };
 
   return (
-    <div className="w-64 flex-shrink-0 flex flex-col border-r border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/30">
+    <div className="flex-1 flex flex-col bg-gray-50/50 dark:bg-gray-900/30 overflow-hidden">
       {/* 头部 */}
       <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800">
         <div className="flex items-center justify-between">
@@ -146,6 +151,9 @@ const PptGeneratorPage: React.FC = () => {
   const navigate = useNavigate();
   const chat = usePptChat();
   const tts = useTextToSpeech();
+  const [selectedProjectId, setSelectedProjectId] = React.useState<string | null>(null);
+  const [selectedProjectName, setSelectedProjectName] = React.useState<string>('');
+  const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [showScrollBtn, setShowScrollBtn] = React.useState(false);
@@ -241,21 +249,44 @@ const PptGeneratorPage: React.FC = () => {
         className="flex bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden transition-all duration-300"
         style={{ height: 'calc(100vh - 180px)' }}
       >
-        {/* 左侧会话列表 */}
-        <SessionSidebar
-          sessions={chat.sessions}
-          currentSessionId={chat.currentSessionId}
-          isLoading={chat.isLoadingSessions}
-          onSelect={(id) => chat.openSession(id)}
-          onDelete={handleDeleteSession}
-          onNew={chat.startNewSession}
-        />
+        {/* 左侧：会话列表 + 项目文档（可折叠） */}
+        <div className={`flex-shrink-0 flex flex-col border-r border-gray-100 dark:border-gray-800 transition-all duration-300 ${sidebarCollapsed ? 'w-0 overflow-hidden border-r-0' : 'w-64'}`}>
+          {/* 上半：会话列表 */}
+          <div className="flex-1 min-h-0 overflow-hidden">
+            <SessionSidebar
+              sessions={chat.sessions}
+              currentSessionId={chat.currentSessionId}
+              isLoading={chat.isLoadingSessions}
+              onSelect={(id) => chat.openSession(id)}
+              onDelete={handleDeleteSession}
+              onNew={chat.startNewSession}
+            />
+          </div>
+          {/* 下半：项目文档 */}
+          <div className="h-[45%] border-t border-gray-100 dark:border-gray-800 overflow-hidden">
+            <PptProjectPanel
+              selectedProjectId={selectedProjectId}
+              onSelectProject={(id) => {
+                setSelectedProjectId(id);
+                if (!id) setSelectedProjectName('');
+              }}
+              onProjectNameChange={setSelectedProjectName}
+            />
+          </div>
+        </div>
 
         {/* 中间对话区 */}
         <div className="flex-1 flex flex-col min-w-0 transition-all duration-500">
           {/* 对话头部 */}
           <div className="flex items-center justify-between px-5 py-3 border-b border-gray-200/60 dark:border-gray-700/40 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
             <div className="flex items-center gap-2.5 min-w-0">
+              <button
+                onClick={() => setSidebarCollapsed(prev => !prev)}
+                className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                title={sidebarCollapsed ? '展开侧边栏' : '收起侧边栏'}
+              >
+                {sidebarCollapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
+              </button>
               <div className="w-8 h-8 rounded-lg bg-brand-500 flex items-center justify-center shadow-sm">
                 <Bot size={16} className="text-white" />
               </div>
@@ -288,7 +319,13 @@ const PptGeneratorPage: React.FC = () => {
                   <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-2">
                     PPT 生成助手
                   </h2>
-                  <p className="text-gray-400 text-sm mb-4">告诉我你想做什么 PPT，我来帮你完成</p>
+                  <p className="text-gray-400 text-sm mb-2">告诉我你想做什么 PPT，我来帮你完成</p>
+                  <p className="text-gray-400/70 text-xs">
+                    {selectedProjectId
+                      ? <span className="inline-flex items-center gap-1 text-brand-500"><FolderOpen size={12} /> 已关联项目「{selectedProjectName}」，AI 将参考项目文档生成内容</span>
+                      : '可在左侧「项目文档」中选择一个项目，AI 会参考其中的文档内容'
+                    }
+                  </p>
                 </div>
               </div>
             ) : (
@@ -301,6 +338,9 @@ const PptGeneratorPage: React.FC = () => {
                     tts={tts}
                     onConfirmOutline={chat.confirmOutline}
                     onReviseOutline={chat.reviseOutline}
+                    onUpdateOutline={chat.updateOutline}
+                    outlineJson={chat.pptState.outlineJson}
+                    isGenerating={chat.isGenerating}
                   />
                 ))}
                 <div ref={messagesEndRef} />
@@ -318,9 +358,18 @@ const PptGeneratorPage: React.FC = () => {
             )}
           </div>
 
-          {/* 输入区域 */}
+          {/* 项目关联提示 + 输入区域 */}
+          {selectedProjectId && (
+            <div className="px-4 pt-2 flex items-center gap-1.5 text-[11px] text-brand-600 dark:text-brand-400 bg-brand-50/50 dark:bg-brand-900/10 border-t border-brand-100 dark:border-brand-800/30">
+              <FolderOpen size={12} />
+              <span className="truncate">已关联项目: {selectedProjectName || '未命名'}</span>
+              <button onClick={() => { setSelectedProjectId(null); setSelectedProjectName(''); }} className="ml-auto p-0.5 rounded hover:bg-brand-100 dark:hover:bg-brand-800/40">
+                <X size={12} />
+              </button>
+            </div>
+          )}
           <PptChatInput
-            onSend={chat.sendMessage}
+            onSend={(content) => chat.sendMessage(content, selectedProjectId)}
             isGenerating={chat.isGenerating}
             onAbort={chat.abort}
             disabled={false}
@@ -362,6 +411,10 @@ const PptGeneratorPage: React.FC = () => {
       {templateSelectorOpen && (
         <TemplateSelector
           onSelect={handleTemplateSelect}
+          onSkip={(styleHint: string) => {
+            setTemplateSelectorOpen(false);
+            chat.skipTemplate(styleHint);
+          }}
           onClose={() => setTemplateSelectorOpen(false)}
         />
       )}

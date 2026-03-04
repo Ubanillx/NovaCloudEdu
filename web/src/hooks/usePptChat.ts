@@ -50,6 +50,8 @@ export interface PptSessionDetail {
   topic: string;
   state: string;
   outlineMarkdown?: string;
+  outlineJson?: string;
+  projectId?: string;
   templateId?: string;
   templateUrl?: string;
   templateJson?: string;
@@ -93,6 +95,8 @@ export function usePptChat() {
     intentDetected: null,
     intentTopic: '',
     outlineMarkdown: '',
+    outlineJson: '',
+    projectId: null,
     templateUrl: '',
     slideImages: [],
     templateSlides: [],
@@ -289,6 +293,8 @@ export function usePptChat() {
       intentDetected: null,
       intentTopic: detail.topic,
       outlineMarkdown: detail.outlineMarkdown || '',
+      outlineJson: detail.outlineJson || '',
+      projectId: detail.projectId || null,
       templateUrl: detail.templateUrl || '',
       slideImages,
       templateSlides,
@@ -416,17 +422,20 @@ export function usePptChat() {
   // ==================== Chat Actions ====================
 
   /** 发送用户消息（自动意图识别 → 生成大纲） */
-  const sendMessage = useCallback((content: string) => {
+  const sendMessage = useCallback((content: string, projectId?: string | null) => {
     // Append user message
     appendMessage({ type: 'user', content });
 
     // Start intent detection + outline generation
-    updatePpt({ phase: 'detecting', aiMessage: '', intentDetected: null, errorMessage: '' });
+    updatePpt({ phase: 'detecting', aiMessage: '', intentDetected: null, errorMessage: '', ...(projectId ? { projectId } : {}) });
 
     const streamMsgId = appendMessage({ type: 'ai-text', content: '', isStreaming: true });
     streamingMsgIdRef.current = streamMsgId;
 
-    sendAction('detect_intent', { message: content }, (evt, data) => {
+    const extra: Record<string, unknown> = { message: content };
+    if (projectId) extra.projectId = projectId;
+
+    sendAction('detect_intent', extra, (evt, data) => {
       if (evt === 'message') {
         setMessages(prev => prev.map(m =>
           m.id === streamMsgId ? { ...m, content: m.content + data } : m
@@ -525,10 +534,12 @@ export function usePptChat() {
         try {
           const payload = JSONBigString.parse(data);
           const markdown = payload.outline || payload.markdown || data;
+          const outlineJson = payload.outlineJson || '';
           const sessionId = payload.sessionId ? String(payload.sessionId) : undefined;
 
           updatePpt({
             outlineMarkdown: markdown,
+            outlineJson: outlineJson,
             phase: 'outline_ready',
             ...(sessionId ? { sessionId } : {}),
           });
@@ -599,6 +610,21 @@ export function usePptChat() {
       }
     });
   }, [appendMessage, sendAction, updatePpt]);
+
+  /** Save edited outline JSON to backend */
+  const updateOutline = useCallback((outlineJson: string) => {
+    updatePpt({ outlineJson });
+    sendAction('update_outline', { outlineJson }, (evt, data) => {
+      if (evt === 'outline_updated') {
+        try {
+          const payload = JSONBigString.parse(data);
+          updatePpt({ outlineJson: payload.outlineJson || outlineJson });
+        } catch { /* ignore */ }
+      } else if (evt === 'error') {
+        appendMessage({ type: 'error', content: data });
+      }
+    });
+  }, [sendAction, updatePpt, appendMessage]);
 
   /** Confirm outline → trigger slides generation (template already selected) */
   const confirmOutline = useCallback(() => {
@@ -676,6 +702,56 @@ export function usePptChat() {
             });
           }, 500);
         } catch { /* ignore */ }
+      } else if (evt === 'error') {
+        updatePpt({ phase: 'error', errorMessage: data });
+        appendMessage({ type: 'error', content: data });
+      }
+    });
+  }, [appendMessage, sendAction, updatePpt]);
+
+  /** Skip template selection — use HTML mode */
+  const skipTemplate = useCallback((styleHint?: string) => {
+    updatePpt({ phase: 'parsing_template', statusMessage: '跳过模板，使用 HTML 模式...', errorMessage: '' });
+    appendMessage({ type: 'status', content: styleHint
+      ? `跳过模板选择，风格：${styleHint}`
+      : '跳过模板选择，将使用 HTML 模式生成 PPT...' });
+
+    const extra: Record<string, unknown> = {};
+    if (styleHint) extra.styleHint = styleHint;
+
+    sendAction('skip_template', extra, (evt, data) => {
+      if (evt === 'status') {
+        try {
+          const payload = JSONBigString.parse(data);
+          updatePpt({ statusMessage: payload.message || '' });
+        } catch { /* ignore */ }
+      } else if (evt === 'template_skipped') {
+        try {
+          const payload = JSONBigString.parse(data);
+          const sessionId = payload.sessionId ? String(payload.sessionId) : undefined;
+          if (sessionId) {
+            sessionIdRef.current = sessionId;
+            setCurrentSessionId(sessionId);
+          }
+        } catch { /* ignore */ }
+        updatePpt({
+          phase: 'template_ready',
+          templateUrl: '',
+          templateSlides: [],
+          slideImages: [],
+          statusMessage: 'HTML 模式就绪',
+        });
+        appendMessage({ type: 'status', content: 'HTML 模式就绪，开始生成大纲...' });
+
+        // 自动生成大纲
+        setTimeout(() => {
+          setPptState(prev => {
+            generateOutlineInternal(prev.intentTopic || '');
+            return prev;
+          });
+        }, 500);
+      } else if (evt === 'done') {
+        // done handled above in template_skipped
       } else if (evt === 'error') {
         updatePpt({ phase: 'error', errorMessage: data });
         appendMessage({ type: 'error', content: data });
@@ -939,6 +1015,8 @@ export function usePptChat() {
       intentDetected: null,
       intentTopic: '',
       outlineMarkdown: '',
+      outlineJson: '',
+      projectId: null,
       templateUrl: '',
       slideImages: [],
       templateSlides: [],
@@ -989,7 +1067,9 @@ export function usePptChat() {
     sendMessage,
     reviseOutline,
     confirmOutline,
+    updateOutline,
     selectTemplate,
+    skipTemplate,
     setSelectedSlide,
     abort,
   };

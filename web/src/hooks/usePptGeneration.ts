@@ -95,6 +95,8 @@ export interface PptGenerationState {
   intentDetected: boolean | null;
   intentTopic: string;
   outlineMarkdown: string;
+  outlineJson: string;
+  projectId: string | null;
   templateUrl: string;
   slideImages: SlideImage[];
   templateSlides: TemplateSlide[];
@@ -119,6 +121,8 @@ const initialState: PptGenerationState = {
   intentDetected: null,
   intentTopic: '',
   outlineMarkdown: '',
+  outlineJson: '',
+  projectId: null,
   templateUrl: '',
   slideImages: [],
   templateSlides: [],
