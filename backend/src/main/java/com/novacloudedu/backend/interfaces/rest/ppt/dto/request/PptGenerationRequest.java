@@ -32,4 +32,10 @@ public class PptGenerationRequest {
 
     @Schema(description = "自定义模板URL（select_template 时使用，与 templateId 二选一）")
     private String templateUrl;
+
+    @Schema(description = "结构化大纲JSON（update_outline 时使用）")
+    private String outlineJson;
+
+    @Schema(description = "关联的PPT项目ID（detect_intent 时可选）")
+    private Long projectId;
 }

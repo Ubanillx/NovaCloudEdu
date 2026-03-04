@@ -50,16 +50,26 @@ public class PptGenerationService {
     private final PptServiceClient pptServiceClient;
     private final AiUsageLimitService aiUsageLimitService;
     private final PptAgentOrchestrator pptAgentOrchestrator;
+    private final PptProjectService pptProjectService;
+    private final com.novacloudedu.backend.infrastructure.ai.agent.ImageGenerationTool imageGenerationTool;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final ExecutorService executor = Executors.newCachedThreadPool();
 
     // ==================== 意图识别 Prompt ====================
 
     private static final String INTENT_SYSTEM_PROMPT = """
-            你是一个意图识别助手。分析用户的消息，判断用户是否想要生成PPT/演示文稿。
+            你是一个PPT生成助手。分析用户的消息，判断用户是否想要生成PPT/演示文稿。
 
+            ## 项目文档
+            用户可能已经关联了一个「项目」，项目中包含文档和图片。如果用户消息中附带了项目文档内容，
+            你应该充分理解和利用这些文档信息来：
+            - 更精准地理解用户的需求和主题
+            - 从文档中提取关键信息作为PPT主题
+            - 在确认回复中体现你对文档内容的理解
+
+            ## 意图判断规则
             如果用户想要生成PPT，请：
-            1. 用友好的语气确认用户的需求
+            1. 用友好的语气确认用户的需求，如果有项目文档，简要说明你已理解文档内容
             2. 提炼出PPT的核心主题
             3. 在回复的最后一行，输出一个JSON标记：<<PPT_INTENT:{"topic":"提炼的主题"}>>
 
@@ -70,7 +80,12 @@ public class PptGenerationService {
             回复：好的，我来帮你生成一个关于「人工智能在教育领域的应用」的PPT。我会先为你生成一份大纲，你确认后再进行制作。
             <<PPT_INTENT:{"topic":"人工智能在教育领域的应用"}>>
 
-            示例2：
+            示例2（有项目文档）：
+            用户：[项目文档包含智云星课产品介绍] 帮我做个网站介绍PPT
+            回复：我已阅读项目文档，了解到「智云星课」是一个AI驱动的在线教育平台，具有课程体系、师资管理、直播录播等功能。我来为你生成一份关于智云星课网站介绍的PPT。
+            <<PPT_INTENT:{"topic":"智云星课网站介绍"}>>
+
+            示例3：
             用户：今天天气怎么样
             回复：抱歉，我无法查询天气信息。如果你需要制作PPT，可以告诉我主题，我来帮你生成。
             """;
@@ -158,10 +173,12 @@ public class PptGenerationService {
             case "revise_outline" -> doReviseOutline(params, userId);
             case "confirm_outline" -> doConfirmOutline(params, userId);
             case "select_template" -> doSelectTemplate(params, userId);
+            case "skip_template" -> doSkipTemplate(params, userId);
             case "generate_ppt" -> doGeneratePpt(params, userId);
             case "agent_generate_outline" -> doAgentGenerateOutline(params, userId);
             case "agent_generate_ppt" -> doAgentGeneratePpt(params, userId);
             case "assemble_ppt" -> doAssemblePpt(params, userId);
+            case "update_outline" -> doUpdateOutline(params, userId);
             default -> throw new BusinessException(40000, "未知的操作: " + action);
         };
     }
@@ -180,10 +197,21 @@ public class PptGenerationService {
 
         executor.execute(() -> {
             try {
+                // 如果关联了项目，注入项目文档上下文到用户消息中
+                String enrichedMessage = message;
+                Long projectId = params.get("projectId") != null ? toLong(params.get("projectId")) : null;
+                if (projectId != null) {
+                    String projectContext = pptProjectService.getProjectDocumentsContext(projectId);
+                    if (projectContext != null && !projectContext.isBlank()) {
+                        enrichedMessage = projectContext + "\n\n用户消息：" + message;
+                        log.info("意图识别：已注入项目文档上下文，projectId={}", projectId);
+                    }
+                }
+
                 StringBuilder fullResponse = new StringBuilder();
                 List<Map<String, String>> messages = List.of(
                         Map.of("role", "system", "content", INTENT_SYSTEM_PROMPT),
-                        Map.of("role", "user", "content", message)
+                        Map.of("role", "user", "content", enrichedMessage)
                 );
 
                 langchainChatService.streamChat(null, messages, token -> {
@@ -205,7 +233,7 @@ public class PptGenerationService {
                     JsonNode intentJson = objectMapper.readTree(intentMarker);
                     String topic = intentJson.path("topic").asText("");
 
-                    PptGenerationSession session = PptGenerationSession.create(userId, topic);
+                    PptGenerationSession session = PptGenerationSession.create(userId, topic, projectId);
                     sessionRepository.save(session);
 
                     sendEvent(emitter, alive, "intent", Map.of(
@@ -409,6 +437,39 @@ public class PptGenerationService {
         return emitter;
     }
 
+    // ==================== 步骤 3.5：用户手动编辑大纲JSON ====================
+
+    private SseEmitter doUpdateOutline(Map<String, Object> params, Long userId) {
+        Long sessionId = toLong(params.get("sessionId"));
+        String outlineJsonStr = (String) params.get("outlineJson");
+
+        if (outlineJsonStr == null || outlineJsonStr.isBlank()) {
+            throw new BusinessException(40000, "缺少 outlineJson 参数");
+        }
+
+        PptGenerationSession session = getSessionAndVerify(sessionId, userId);
+        session.updateOutlineJson(outlineJsonStr);
+        sessionRepository.save(session);
+
+        EmitterHolder holder = createEmitter(10_000L);
+        SseEmitter emitter = holder.emitter();
+        AtomicBoolean alive = holder.alive();
+
+        executor.execute(() -> {
+            try {
+                sendEvent(emitter, alive, "outline_updated", Map.of(
+                        "sessionId", session.getId(),
+                        "outlineJson", outlineJsonStr
+                ));
+                sendDone(emitter, alive);
+            } catch (Exception e) {
+                handleError(emitter, alive, session, e);
+            }
+        });
+
+        return emitter;
+    }
+
     // ==================== 步骤 4：选择模板 ====================
 
     private SseEmitter doSelectTemplate(Map<String, Object> params, Long userId) {
@@ -492,6 +553,57 @@ public class PptGenerationService {
         });
 
         return emitter;
+    }
+
+    // ==================== 步骤 4b：跳过模板（HTML 模式） ====================
+
+    private SseEmitter doSkipTemplate(Map<String, Object> params, Long userId) {
+        Long sessionId = toLong(params.get("sessionId"));
+        PptGenerationSession session = getSessionAndVerify(sessionId, userId);
+
+        // 用户自定义风格提示词（可选）
+        String styleHint = params.get("styleHint") != null
+                ? params.get("styleHint").toString().trim() : "";
+
+        EmitterHolder holder = createEmitter(30_000L);
+        SseEmitter emitter = holder.emitter();
+        AtomicBoolean alive = holder.alive();
+
+        executor.execute(() -> {
+            try {
+                // 标记为 HTML 模式，携带用户自定义风格提示
+                String templateJson = styleHint.isEmpty()
+                        ? "{\"mode\":\"html\",\"slide_count\":0}"
+                        : String.format("{\"mode\":\"html\",\"slide_count\":0,\"styleHint\":\"%s\"}",
+                                styleHint.replace("\"", "\\\""));
+                session.templateReady(templateJson);
+                sessionRepository.save(session);
+
+                sendEvent(emitter, alive, "status",
+                        Map.of("phase", "template_skipped",
+                                "message", styleHint.isEmpty()
+                                        ? "已跳过模板选择，将使用 HTML 模式生成"
+                                        : "已跳过模板选择，风格：" + styleHint));
+                sendEvent(emitter, alive, "template_skipped", Map.of(
+                        "sessionId", session.getId(),
+                        "mode", "html"
+                ));
+                sendDone(emitter, alive);
+            } catch (Exception e) {
+                handleError(emitter, alive, session, e);
+            }
+        });
+
+        return emitter;
+    }
+
+    /**
+     * 判断 session 是否处于 HTML（无模板）模式
+     */
+    private boolean isHtmlMode(PptGenerationSession session) {
+        String templateJson = session.getTemplateJson();
+        if (templateJson == null || templateJson.isBlank()) return false;
+        return templateJson.contains("\"mode\":\"html\"");
     }
 
     // ==================== 步骤 5：生成 PPT（逐页渲染预览 + 自动组装） ====================
@@ -652,15 +764,30 @@ public class PptGenerationService {
 
                 // 获取模板结构摘要（精简版供 PlannerAgent 使用，精准控制页数）
                 String templateSummary = null;
-                if (session.getTemplateJson() != null && !session.getTemplateJson().isBlank()) {
+                boolean htmlMode = isHtmlMode(session);
+
+                if (htmlMode) {
+                    // HTML 模式：无模板约束，PlannerAgent 自行决定页数
+                    templateSummary = """
+                            ## No Template Selected (HTML Mode)
+                            
+                            You are free to decide the number of slides. A typical presentation has 8-15 slides.
+                            Suggested structure:
+                            - 1 cover slide (# Main Title)
+                            - 2-4 chapters (## Chapter Title), each with 2-3 content pages (### Content Page)
+                            - 1 ending slide (## Thank You / Summary)
+                            
+                            Under each ###, write 2-4 bullet points (using - list format).
+                            """;
+                    log.info("HTML 模式大纲生成：PlannerAgent 自由规划页数");
+                } else if (session.getTemplateJson() != null && !session.getTemplateJson().isBlank()) {
                     JsonNode templateRoot = objectMapper.readTree(session.getTemplateJson());
                     TemplateAnalysis ta = analyzeTemplate(templateRoot);
                     templateSummary = buildTemplatePlannerPrompt(ta);
                 }
 
-                // Vision-based 模板智能分析：借鉴 PPTAgent V1 SlideInducter，
-                // 为 PlannerAgent 提供更丰富的模板语义理解（版式分类/适合内容类型/空间分布）
-                if (session.getTemplateUrl() != null && !session.getTemplateUrl().isBlank()) {
+                // Vision-based 模板智能分析（仅模板模式）
+                if (!htmlMode && session.getTemplateUrl() != null && !session.getTemplateUrl().isBlank()) {
                     try {
                         var visionResult = pptServiceClient.analyzeTemplate(session.getTemplateUrl());
                         if (visionResult.hasContent()) {
@@ -673,9 +800,24 @@ public class PptGenerationService {
                     }
                 }
 
+                // 注入项目文档上下文
+                String projectContext = "";
+                if (session.getProjectId() != null) {
+                    projectContext = pptProjectService.getProjectDocumentsContext(session.getProjectId());
+                    if (!projectContext.isBlank()) {
+                        sendEvent(emitter, alive, "status",
+                                Map.of("phase", "agent_researching", "message",
+                                        "已加载项目文档，正在结合文档内容生成大纲..."));
+                    }
+                }
+                String enhancedRequirements = requirements;
+                if (!projectContext.isBlank()) {
+                    enhancedRequirements = (requirements != null ? requirements + "\n\n" : "") + projectContext;
+                }
+
                 // PlannerAgent 联网搜索 + 规划大纲（带任务跟踪）
                 PptAgentOrchestrator.OutlineResult outlineResult =
-                        pptAgentOrchestrator.planOutline(session.getTopic(), requirements, templateSummary, tracker);
+                        pptAgentOrchestrator.planOutline(session.getTopic(), enhancedRequirements, templateSummary, tracker);
 
                 // 推送研究摘要
                 if (outlineResult.researchSummary() != null && !outlineResult.researchSummary().isBlank()) {
@@ -700,13 +842,18 @@ public class PptGenerationService {
                     }
                 }
 
-                // 保存大纲
+                // 将 Markdown 大纲转换为结构化 JSON
+                String outlineJsonStr = convertMarkdownToOutlineJson(outlineMarkdown, session.getTopic());
+
+                // 保存大纲（同时保存 markdown 和 json 两种格式）
                 session.outlineReady(outlineMarkdown);
+                session.updateOutlineJson(outlineJsonStr);
                 sessionRepository.save(session);
 
                 sendEvent(emitter, alive, "outline", Map.of(
                         "sessionId", session.getId(),
                         "markdown", outlineMarkdown,
+                        "outlineJson", outlineJsonStr,
                         "researchSummary", outlineResult.researchSummary() != null
                                 ? outlineResult.researchSummary() : ""
                 ));
@@ -727,10 +874,15 @@ public class PptGenerationService {
         PptGenerationSession session = getSessionAndVerify(sessionId, userId);
 
         if (session.getTemplateJson() == null || session.getTemplateJson().isBlank()) {
-            throw new BusinessException(40000, "请先选择模板");
+            throw new BusinessException(40000, "请先选择模板或跳过模板");
         }
         if (session.getOutlineMarkdown() == null || session.getOutlineMarkdown().isBlank()) {
             throw new BusinessException(40000, "大纲为空");
+        }
+
+        boolean htmlMode = isHtmlMode(session);
+        if (htmlMode) {
+            return doAgentGeneratePptHtml(session, userId);
         }
 
         EmitterHolder holder = createEmitter(900_000L);
@@ -801,6 +953,9 @@ public class PptGenerationService {
                 }
                 sendEvent(emitter, alive, "slide_placeholders",
                         Map.of("total", totalSlides, "slides", placeholders));
+
+                // 2.6 设置项目图片到 DesignAgent 工具上下文
+                setupProjectImages(session);
 
                 // 3. 使用带反思修复循环的 Agent 生成（含任务跟踪）
                 // 生成 → 评估 → 识别低分页 → 修复重生 → 再评估 → 直到达标或达最大轮次
@@ -915,6 +1070,11 @@ public class PptGenerationService {
                 sessionRepository.save(session);
 
                 // 6. 自动组装完整 PPTX
+                String assemblerTaskId = tracker.findTaskIdByRole(AgentTaskTracker.AgentRole.ASSEMBLER);
+                if (assemblerTaskId != null) {
+                    tracker.startTask(assemblerTaskId, "正在组装最终 PPT 文件...");
+                }
+
                 sendEvent(emitter, alive, "status",
                         Map.of("phase", "assembling", "message", "正在组装最终 PPT 文件..."));
                 session.startAssembling(session.getSlidesJson());
@@ -931,6 +1091,10 @@ public class PptGenerationService {
 
                 session.completed(result.fileUrl());
                 sessionRepository.save(session);
+
+                if (assemblerTaskId != null) {
+                    tracker.completeTask(assemblerTaskId, "PPT 文件已生成: " + result.fileName());
+                }
 
                 sendEvent(emitter, alive, "status",
                         Map.of("phase", "completed", "message", "PPT 生成完成！"));
@@ -950,6 +1114,240 @@ public class PptGenerationService {
 
             } catch (Exception e) {
                 handleError(emitter, alive, session, e);
+            } finally {
+                clearProjectImages();
+            }
+        });
+
+        return emitter;
+    }
+
+    // ==================== Agent 模式：HTML 无模板生成 PPT ====================
+
+    private SseEmitter doAgentGeneratePptHtml(PptGenerationSession session, Long userId) {
+        EmitterHolder holder = createEmitter(900_000L);
+        SseEmitter emitter = holder.emitter();
+        AtomicBoolean alive = holder.alive();
+
+        executor.execute(() -> {
+            try {
+                session.startGeneratingSlides();
+                sessionRepository.save(session);
+
+                final Object sseLock = new Object();
+
+                AgentTaskTracker tracker = new AgentTaskTracker(event -> {
+                    if (alive.get()) {
+                        try {
+                            synchronized (sseLock) {
+                                sendEvent(emitter, alive, "agent_todo", event);
+                            }
+                        } catch (IOException ex) {
+                            log.warn("推送 agent_todo 事件失败", ex);
+                            alive.set(false);
+                        }
+                    }
+                });
+
+                sendEvent(emitter, alive, "status",
+                        Map.of("phase", "agent_generating",
+                                "message", "HTML 模式：Multi-Agent 正在生成幻灯片..."));
+
+                // 1. 解析大纲为章节列表
+                List<String> sections = parseOutlineToSections(session.getOutlineMarkdown());
+                int totalSlides = sections.size();
+
+                // 从 templateJson 提取用户自定义风格提示
+                String userStyleHint = "";
+                try {
+                    String tJson = session.getTemplateJson();
+                    if (tJson != null && tJson.contains("styleHint")) {
+                        com.fasterxml.jackson.databind.JsonNode node =
+                                new com.fasterxml.jackson.databind.ObjectMapper().readTree(tJson);
+                        userStyleHint = node.path("styleHint").asText("");
+                    }
+                } catch (Exception ignored) { /* fallback to empty */ }
+
+                log.info("HTML Agent PPT 生成: 大纲 {} 个 section, styleHint='{}'",
+                        totalSlides, userStyleHint.isEmpty() ? "(default)" : userStyleHint);
+
+                sendEvent(emitter, alive, "status",
+                        Map.of("phase", "agent_generating",
+                                "message", String.format("HTML 模式：共 %d 页，Agent 并发生成中...", totalSlides)));
+
+                // 推送占位符
+                List<Map<String, Object>> placeholders = new ArrayList<>();
+                for (int i = 0; i < totalSlides; i++) {
+                    placeholders.add(Map.of(
+                            "index", i, "status", "pending", "statusLabel", "等待生成"));
+                }
+                sendEvent(emitter, alive, "slide_placeholders",
+                        Map.of("total", totalSlides, "slides", placeholders));
+
+                // 设置项目图片到 DesignAgent 工具上下文
+                setupProjectImages(session);
+
+                // 2. 使用 HTML 模式的反思修复循环生成
+                PptAgentOrchestrator.GenerationWithEvalResult genResult =
+                        pptAgentOrchestrator.generateWithReflectionHtml(
+                                sections,
+                                session.getOutlineMarkdown(),
+                                userStyleHint,
+                                // HTML 进度回调：渲染 HTML 预览并推送 SSE
+                                (slideIndex, slideConfig) -> {
+                                    if (!alive.get()) return;
+                                    try {
+                                        String previewImageUrl = slideConfig.containsKey("previewImageUrl")
+                                                ? (String) slideConfig.get("previewImageUrl") : null;
+
+                                        // 如果尚无预览图，调用 Python 渲染 HTML → PNG
+                                        if ((previewImageUrl == null || previewImageUrl.isBlank())
+                                                && slideConfig.containsKey("slide_html")) {
+                                            try {
+                                                String generatedImgUrl = slideConfig.containsKey("generated_image_url")
+                                                        ? (String) slideConfig.get("generated_image_url") : null;
+                                                PptServiceClient.SlidePreviewResult previewResult =
+                                                        pptServiceClient.generateHtmlSlidePreview(
+                                                                (String) slideConfig.get("slide_html"),
+                                                                generatedImgUrl);
+                                                previewImageUrl = previewResult.imageUrl();
+                                            } catch (Exception e) {
+                                                log.warn("HTML 模式：第{}页预览渲染失败: {}",
+                                                        slideIndex + 1, e.getMessage());
+                                            }
+                                        }
+
+                                        if (previewImageUrl != null && !previewImageUrl.isBlank()) {
+                                            slideConfig.put("previewImageUrl", previewImageUrl);
+                                        }
+
+                                        Map<String, Object> progressData = new HashMap<>();
+                                        progressData.put("current", slideIndex + 1);
+                                        progressData.put("total", totalSlides);
+                                        progressData.put("previewImageUrl",
+                                                previewImageUrl != null ? previewImageUrl : "");
+                                        progressData.put("mode", "html");
+                                        synchronized (sseLock) {
+                                            sendEvent(emitter, alive, "slide_progress", progressData);
+                                        }
+                                    } catch (Exception e) {
+                                        log.warn("HTML 模式：推送第{}页进度失败", slideIndex + 1, e);
+                                    }
+                                },
+                                // 反思修复进度回调
+                                (round, slideIndex, message) -> {
+                                    if (!alive.get()) return;
+                                    try {
+                                        String phase = slideIndex == -1 ? "evaluating" : "repairing";
+                                        Map<String, Object> repairData = new HashMap<>();
+                                        repairData.put("phase", phase);
+                                        repairData.put("round", round);
+                                        repairData.put("message", message);
+                                        if (slideIndex >= 0) repairData.put("slideIndex", slideIndex);
+                                        synchronized (sseLock) {
+                                            sendEvent(emitter, alive, "repair_progress", repairData);
+                                        }
+                                    } catch (Exception e) {
+                                        log.warn("推送修复进度失败", e);
+                                    }
+                                },
+                                tracker,
+                                // 单页状态回调
+                                (slideIdx, status, statusLabel) -> {
+                                    if (!alive.get()) return;
+                                    try {
+                                        Map<String, Object> statusData = new HashMap<>();
+                                        statusData.put("index", slideIdx);
+                                        statusData.put("status", status);
+                                        statusData.put("statusLabel", statusLabel);
+                                        synchronized (sseLock) {
+                                            sendEvent(emitter, alive, "slide_status", statusData);
+                                        }
+                                    } catch (Exception e) {
+                                        log.warn("推送第{}页状态失败", slideIdx + 1, e);
+                                    }
+                                });
+
+                List<Map<String, Object>> allSlides = genResult.slides();
+                PptAgentOrchestrator.EvaluationResult evalResult = genResult.evaluation();
+                int repairRounds = genResult.repairRounds();
+
+                if (allSlides.isEmpty()) {
+                    throw new RuntimeException("HTML Agent 未生成任何有效的幻灯片");
+                }
+
+                // 3. 推送评估结果
+                Map<String, Object> evalData = new HashMap<>();
+                evalData.put("overallScore", evalResult.overallScore());
+                evalData.put("contentScore", evalResult.contentScore());
+                evalData.put("designScore", evalResult.designScore());
+                evalData.put("coherenceScore", evalResult.coherenceScore());
+                evalData.put("strengths", evalResult.strengths());
+                evalData.put("weaknesses", evalResult.weaknesses());
+                evalData.put("suggestions", evalResult.suggestions());
+                evalData.put("repairRounds", repairRounds);
+                if (evalResult.slideFeedbacks() != null) {
+                    List<Map<String, Object>> sfList = new ArrayList<>();
+                    for (var sf : evalResult.slideFeedbacks()) {
+                        sfList.add(Map.of("slideIndex", sf.slideIndex(),
+                                "score", sf.score(), "feedback", sf.feedback()));
+                    }
+                    evalData.put("slideFeedbacks", sfList);
+                }
+                sendEvent(emitter, alive, "evaluation_result", evalData);
+
+                // 4. 保存 slidesJson
+                session.saveSlidesJson(objectMapper.writeValueAsString(allSlides));
+                sessionRepository.save(session);
+
+                // 5. 组装 HTML → PPTX
+                String assemblerTaskId = tracker.findTaskIdByRole(AgentTaskTracker.AgentRole.ASSEMBLER);
+                if (assemblerTaskId != null) {
+                    tracker.startTask(assemblerTaskId, "正在将 HTML 幻灯片转换为 PPT 文件...");
+                }
+
+                sendEvent(emitter, alive, "status",
+                        Map.of("phase", "assembling", "message", "正在将 HTML 幻灯片转换为 PPT 文件..."));
+                session.startAssembling(session.getSlidesJson());
+                sessionRepository.save(session);
+
+                String title = extractTitle(session.getOutlineMarkdown());
+                Map<String, Object> generateRequest = new HashMap<>();
+                generateRequest.put("title", title);
+                generateRequest.put("author", "");
+                generateRequest.put("slides", allSlides);
+                generateRequest.put("mode", "html");
+
+                PptServiceClient.GenerateResult result = pptServiceClient.generateFromHtml(generateRequest);
+
+                session.completed(result.fileUrl());
+                sessionRepository.save(session);
+
+                if (assemblerTaskId != null) {
+                    tracker.completeTask(assemblerTaskId, "HTML PPT 文件已生成: " + result.fileName());
+                }
+
+                sendEvent(emitter, alive, "status",
+                        Map.of("phase", "completed", "message", "HTML 模式 PPT 生成完成！"));
+                sendEvent(emitter, alive, "result", Map.of(
+                        "fileUrl", result.fileUrl(),
+                        "fileName", result.fileName(),
+                        "slideCount", result.slideCount(),
+                        "repairRounds", repairRounds,
+                        "mode", "html",
+                        "evaluation", Map.of(
+                                "overallScore", evalResult.overallScore(),
+                                "contentScore", evalResult.contentScore(),
+                                "designScore", evalResult.designScore(),
+                                "coherenceScore", evalResult.coherenceScore()
+                        )
+                ));
+                sendDone(emitter, alive);
+
+            } catch (Exception e) {
+                handleError(emitter, alive, session, e);
+            } finally {
+                clearProjectImages();
             }
         });
 
@@ -1643,6 +2041,7 @@ public class PptGenerationService {
             map.put("topic", s.getTopic());
             map.put("state", s.getState().name());
             map.put("resultUrl", s.getResultUrl());
+            map.put("projectId", s.getProjectId());
             map.put("createTime", s.getCreateTime());
             map.put("updateTime", s.getUpdateTime());
             return map;
@@ -1656,6 +2055,8 @@ public class PptGenerationService {
         map.put("topic", session.getTopic());
         map.put("state", session.getState().name());
         map.put("outlineMarkdown", session.getOutlineMarkdown());
+        map.put("outlineJson", session.getOutlineJson());
+        map.put("projectId", session.getProjectId());
         map.put("templateId", session.getTemplateId());
         map.put("templateUrl", session.getTemplateUrl());
         map.put("templateJson", session.getTemplateJson());
@@ -1669,6 +2070,163 @@ public class PptGenerationService {
     public void deleteSession(Long sessionId, Long userId) {
         PptGenerationSession session = getSessionAndVerify(sessionId, userId);
         sessionRepository.deleteById(session.getId());
+    }
+
+    // ==================== Markdown → OutlineJson 转换 ====================
+
+    /**
+     * 将 Markdown 大纲转换为结构化 JSON 格式
+     * Markdown 格式：# = PPT标题(cover), ## = 章节标题, ### = 内容页, - = 要点
+     */
+    private String convertMarkdownToOutlineJson(String markdown, String topic) {
+        try {
+            Map<String, Object> outline = new LinkedHashMap<>();
+            outline.put("title", topic);
+            outline.put("speaker", "");
+
+            List<Map<String, Object>> sections = new ArrayList<>();
+            String[] lines = markdown.split("\n");
+            Map<String, Object> currentChapter = null;
+            List<Map<String, Object>> currentPages = null;
+            Map<String, Object> currentPage = null;
+            List<String> currentBullets = null;
+            boolean hasCover = false;
+
+            for (String line : lines) {
+                String trimmed = line.trim();
+                if (trimmed.isEmpty()) continue;
+
+                if (trimmed.startsWith("# ")) {
+                    // 封面标题
+                    if (!hasCover) {
+                        String coverTitle = trimmed.substring(2).trim();
+                        outline.put("title", coverTitle);
+                        Map<String, Object> cover = new LinkedHashMap<>();
+                        cover.put("type", "cover");
+                        cover.put("title", coverTitle);
+                        sections.add(cover);
+                        hasCover = true;
+                    }
+                } else if (trimmed.startsWith("## ")) {
+                    // 保存上一个章节
+                    flushChapter(currentChapter, currentPages, currentPage, currentBullets, sections);
+                    currentPage = null;
+                    currentBullets = null;
+
+                    String sectionTitle = trimmed.substring(3).trim();
+                    // 判断是结尾页还是普通章节
+                    String lower = sectionTitle.toLowerCase();
+                    if (lower.contains("thank") || lower.contains("谢谢") || lower.contains("总结")
+                            || lower.contains("summary") || lower.contains("结语") || lower.contains("q&a")) {
+                        currentChapter = null;
+                        currentPages = null;
+                        Map<String, Object> ending = new LinkedHashMap<>();
+                        ending.put("type", "ending");
+                        ending.put("title", sectionTitle);
+                        sections.add(ending);
+                    } else {
+                        currentChapter = new LinkedHashMap<>();
+                        currentChapter.put("type", "chapter");
+                        currentChapter.put("chapterTitle", sectionTitle);
+                        currentPages = new ArrayList<>();
+                    }
+                } else if (trimmed.startsWith("### ")) {
+                    // 内容页标题
+                    if (currentPage != null && currentBullets != null && currentPages != null) {
+                        currentPage.put("bullets", new ArrayList<>(currentBullets));
+                        currentPages.add(currentPage);
+                    }
+                    currentPage = new LinkedHashMap<>();
+                    currentPage.put("title", trimmed.substring(4).trim());
+                    currentBullets = new ArrayList<>();
+                } else if (trimmed.startsWith("- ") || trimmed.startsWith("* ")) {
+                    // 要点
+                    if (currentBullets != null) {
+                        currentBullets.add(trimmed.substring(2).trim());
+                    }
+                }
+            }
+
+            // 保存最后一个章节
+            flushChapter(currentChapter, currentPages, currentPage, currentBullets, sections);
+
+            // 如果没有封面，添加默认封面
+            if (!hasCover) {
+                Map<String, Object> cover = new LinkedHashMap<>();
+                cover.put("type", "cover");
+                cover.put("title", topic);
+                sections.add(0, cover);
+            }
+
+            outline.put("sections", sections);
+
+            // 计算页数
+            int pageCount = 0;
+            for (Map<String, Object> s : sections) {
+                if ("chapter".equals(s.get("type"))) {
+                    @SuppressWarnings("unchecked")
+                    List<?> pages = (List<?>) s.get("pages");
+                    pageCount += pages != null ? pages.size() : 0;
+                } else {
+                    pageCount++;
+                }
+            }
+            outline.put("pageCount", pageCount);
+
+            return objectMapper.writeValueAsString(outline);
+        } catch (Exception e) {
+            log.warn("Markdown→JSON转换失败，返回简化JSON: {}", e.getMessage());
+            try {
+                return objectMapper.writeValueAsString(Map.of(
+                        "title", topic, "speaker", "", "pageCount", 0,
+                        "sections", List.of(Map.of("type", "cover", "title", topic))
+                ));
+            } catch (JsonProcessingException ex) {
+                return "{}";
+            }
+        }
+    }
+
+    private void flushChapter(Map<String, Object> chapter, List<Map<String, Object>> pages,
+                               Map<String, Object> currentPage, List<String> currentBullets,
+                               List<Map<String, Object>> sections) {
+        if (currentPage != null && currentBullets != null && pages != null) {
+            currentPage.put("bullets", new ArrayList<>(currentBullets));
+            pages.add(currentPage);
+        }
+        if (chapter != null && pages != null) {
+            chapter.put("pages", pages);
+            sections.add(chapter);
+        }
+    }
+
+    // ==================== 项目图片注入 ====================
+
+    /**
+     * 将项目图片设置到 ImageGenerationTool 的 ThreadLocal，供 DesignAgent 的 useProjectImage 工具使用
+     */
+    private void setupProjectImages(PptGenerationSession session) {
+        if (session.getProjectId() == null) return;
+        try {
+            List<PptProjectService.ProjectImageInfo> images = pptProjectService.getProjectImageInfos(session.getProjectId());
+            if (!images.isEmpty()) {
+                List<com.novacloudedu.backend.infrastructure.ai.agent.ImageGenerationTool.ProjectImage> toolImages =
+                        images.stream()
+                                .map(i -> new com.novacloudedu.backend.infrastructure.ai.agent.ImageGenerationTool.ProjectImage(
+                                        i.fileName(), i.fileUrl(), i.fileType()))
+                                .toList();
+                imageGenerationTool.setProjectImages(toolImages);
+                log.info("已注入 {} 张项目图片到 DesignAgent 上下文", toolImages.size());
+            }
+        } catch (Exception e) {
+            log.warn("加载项目图片失败: {}", e.getMessage());
+        }
+    }
+
+    private void clearProjectImages() {
+        try {
+            imageGenerationTool.clearProjectImages();
+        } catch (Exception ignored) {}
     }
 
     // ==================== SSE 工具方法 ====================

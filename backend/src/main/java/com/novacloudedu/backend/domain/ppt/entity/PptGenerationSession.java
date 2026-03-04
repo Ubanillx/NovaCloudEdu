@@ -17,9 +17,11 @@ public class PptGenerationSession {
 
     private Long id;
     private Long userId;
+    private Long projectId;
     private PptGenerationState state;
     private String topic;
     private String outlineMarkdown;
+    private String outlineJson;
     private Long templateId;
     private String templateUrl;
     private String templateJson;
@@ -32,11 +34,16 @@ public class PptGenerationSession {
      * 创建新的生成会话
      */
     public static PptGenerationSession create(Long userId, String topic) {
+        return create(userId, topic, null);
+    }
+
+    public static PptGenerationSession create(Long userId, String topic, Long projectId) {
         if (topic == null || topic.isBlank()) {
             throw new IllegalArgumentException("主题不能为空");
         }
         PptGenerationSession s = new PptGenerationSession();
         s.userId = userId;
+        s.projectId = projectId;
         s.state = PptGenerationState.INIT;
         s.topic = topic;
         s.createTime = LocalDateTime.now();
@@ -48,16 +55,18 @@ public class PptGenerationSession {
      * 从持久化数据重建
      */
     public static PptGenerationSession reconstruct(
-            Long id, Long userId, PptGenerationState state, String topic,
-            String outlineMarkdown, Long templateId, String templateUrl,
+            Long id, Long userId, Long projectId, PptGenerationState state, String topic,
+            String outlineMarkdown, String outlineJson, Long templateId, String templateUrl,
             String templateJson, String slidesJson, String resultUrl,
             LocalDateTime createTime, LocalDateTime updateTime) {
         PptGenerationSession s = new PptGenerationSession();
         s.id = id;
         s.userId = userId;
+        s.projectId = projectId;
         s.state = state;
         s.topic = topic;
         s.outlineMarkdown = outlineMarkdown;
+        s.outlineJson = outlineJson;
         s.templateId = templateId;
         s.templateUrl = templateUrl;
         s.templateJson = templateJson;
@@ -85,6 +94,20 @@ public class PptGenerationSession {
     public void outlineReady(String outlineMarkdown) {
         this.state = PptGenerationState.OUTLINE_READY;
         this.outlineMarkdown = outlineMarkdown;
+        this.updateTime = LocalDateTime.now();
+    }
+
+    public void outlineJsonReady(String outlineJson) {
+        this.state = PptGenerationState.OUTLINE_READY;
+        this.outlineJson = outlineJson;
+        this.updateTime = LocalDateTime.now();
+    }
+
+    /**
+     * 用户手动编辑大纲JSON
+     */
+    public void updateOutlineJson(String outlineJson) {
+        this.outlineJson = outlineJson;
         this.updateTime = LocalDateTime.now();
     }
 
