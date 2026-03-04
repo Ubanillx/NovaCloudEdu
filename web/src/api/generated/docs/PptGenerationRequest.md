@@ -14,6 +14,8 @@ Name | Type | Description | Notes
 **feedback** | **string** | 修改反馈（revise_outline 时使用） | [optional] [default to undefined]
 **templateId** | **number** | 系统模板ID（select_template 时使用） | [optional] [default to undefined]
 **templateUrl** | **string** | 自定义模板URL（select_template 时使用，与 templateId 二选一） | [optional] [default to undefined]
+**outlineJson** | **string** | 结构化大纲JSON（update_outline 时使用） | [optional] [default to undefined]
+**projectId** | **number** | 关联的PPT项目ID（detect_intent 时可选） | [optional] [default to undefined]
 
 ## Example
 
@@ -29,6 +31,8 @@ const instance: PptGenerationRequest = {
     feedback,
     templateId,
     templateUrl,
+    outlineJson,
+    projectId,
 };
 ```
 

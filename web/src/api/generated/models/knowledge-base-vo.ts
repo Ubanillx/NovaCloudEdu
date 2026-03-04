@@ -32,6 +32,7 @@ export interface KnowledgeBaseVO {
     'useDynamicTopK'?: boolean;
     'defaultTopK'?: number;
     'queryRewriteModelId'?: string;
+    'rerankModel'?: string;
     'documentCount'?: number;
     'chunkCount'?: number;
     'status'?: string;

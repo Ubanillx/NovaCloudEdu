@@ -52,6 +52,168 @@ export const PPTApiAxiosParamCreator = function (configuration?: Configuration) 
     return {
         /**
          * 
+         * @summary 添加文档到项目
+         * @param {number} projectId 
+         * @param {{ [key: string]: object; }} requestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        addDocument: async (projectId: number, requestBody: { [key: string]: object; }, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'projectId' is not null or undefined
+            assertParamExists('addDocument', 'projectId', projectId)
+            // verify required parameter 'requestBody' is not null or undefined
+            assertParamExists('addDocument', 'requestBody', requestBody)
+            const localVarPath = `/api/ppt/projects/{projectId}/documents`
+                .replace(`{${"projectId"}}`, encodeURIComponent(String(projectId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(requestBody, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 创建PPT项目
+         * @param {{ [key: string]: string; }} requestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createProject: async (requestBody: { [key: string]: string; }, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'requestBody' is not null or undefined
+            assertParamExists('createProject', 'requestBody', requestBody)
+            const localVarPath = `/api/ppt/projects`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(requestBody, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 删除项目文档
+         * @param {number} projectId 
+         * @param {number} documentId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteDocument: async (projectId: number, documentId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'projectId' is not null or undefined
+            assertParamExists('deleteDocument', 'projectId', projectId)
+            // verify required parameter 'documentId' is not null or undefined
+            assertParamExists('deleteDocument', 'documentId', documentId)
+            const localVarPath = `/api/ppt/projects/{projectId}/documents/{documentId}`
+                .replace(`{${"projectId"}}`, encodeURIComponent(String(projectId)))
+                .replace(`{${"documentId"}}`, encodeURIComponent(String(documentId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 删除PPT项目
+         * @param {number} projectId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteProject: async (projectId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'projectId' is not null or undefined
+            assertParamExists('deleteProject', 'projectId', projectId)
+            const localVarPath = `/api/ppt/projects/{projectId}`
+                .replace(`{${"projectId"}}`, encodeURIComponent(String(projectId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary 删除PPT会话
          * @param {number} sessionId 会话ID
          * @param {*} [options] Override http request option.
@@ -167,6 +329,44 @@ export const PPTApiAxiosParamCreator = function (configuration?: Configuration) 
         },
         /**
          * 
+         * @summary 获取PPT项目详情（含文档列表）
+         * @param {number} projectId 项目ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getProjectDetail: async (projectId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'projectId' is not null or undefined
+            assertParamExists('getProjectDetail', 'projectId', projectId)
+            const localVarPath = `/api/ppt/projects/{projectId}`
+                .replace(`{${"projectId"}}`, encodeURIComponent(String(projectId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary 获取PPT会话详情
          * @param {number} sessionId 会话ID
          * @param {*} [options] Override http request option.
@@ -215,6 +415,40 @@ export const PPTApiAxiosParamCreator = function (configuration?: Configuration) 
             assertParamExists('getTemplateDetail', 'id', id)
             const localVarPath = `/api/ppt/templates/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 获取PPT项目列表
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listProjects: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/ppt/projects`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -310,6 +544,44 @@ export const PPTApiAxiosParamCreator = function (configuration?: Configuration) 
             };
         },
         /**
+         * 
+         * @summary 重新触发模板解析（用于解析失败的模板）
+         * @param {number} id 模板ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        retryParsing: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('retryParsing', 'id', id)
+            const localVarPath = `/api/ppt/templates/{id}/retry-parse`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 多步骤PPT生成流程，通过 action 字段控制： 0. detect_intent - AI判断用户是否要生成PPT，提取主题 1. generate_outline - 输入主题，AI生成Markdown大纲 2. revise_outline - 不满意可修改大纲 3. confirm_outline - 确认大纲 4. select_template - 选择模板（系统模板ID 或 自定义URL） 5. generate_ppt - AI逐页生成内容并生成最终PPT文件  SSE事件：status / message / intent / outline / template_parsed / slide_progress / result / error / done 
          * @summary PPT生成助手（SSE流式）
          * @param {PptGenerationRequest} pptGenerationRequest 
@@ -342,6 +614,49 @@ export const PPTApiAxiosParamCreator = function (configuration?: Configuration) 
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(pptGenerationRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary 更新PPT项目
+         * @param {number} projectId 
+         * @param {{ [key: string]: string; }} requestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateProject: async (projectId: number, requestBody: { [key: string]: string; }, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'projectId' is not null or undefined
+            assertParamExists('updateProject', 'projectId', projectId)
+            // verify required parameter 'requestBody' is not null or undefined
+            assertParamExists('updateProject', 'requestBody', requestBody)
+            const localVarPath = `/api/ppt/projects/{projectId}`
+                .replace(`{${"projectId"}}`, encodeURIComponent(String(projectId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(requestBody, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -408,6 +723,60 @@ export const PPTApiFp = function(configuration?: Configuration) {
     return {
         /**
          * 
+         * @summary 添加文档到项目
+         * @param {number} projectId 
+         * @param {{ [key: string]: object; }} requestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async addDocument(projectId: number, requestBody: { [key: string]: object; }, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseMapStringObject>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.addDocument(projectId, requestBody, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['PPTApi.addDocument']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 创建PPT项目
+         * @param {{ [key: string]: string; }} requestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async createProject(requestBody: { [key: string]: string; }, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseMapStringObject>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createProject(requestBody, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['PPTApi.createProject']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 删除项目文档
+         * @param {number} projectId 
+         * @param {number} documentId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deleteDocument(projectId: number, documentId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteDocument(projectId, documentId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['PPTApi.deleteDocument']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 删除PPT项目
+         * @param {number} projectId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deleteProject(projectId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteProject(projectId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['PPTApi.deleteProject']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @summary 删除PPT会话
          * @param {number} sessionId 会话ID
          * @param {*} [options] Override http request option.
@@ -447,6 +816,19 @@ export const PPTApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary 获取PPT项目详情（含文档列表）
+         * @param {number} projectId 项目ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getProjectDetail(projectId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseMapStringObject>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getProjectDetail(projectId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['PPTApi.getProjectDetail']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @summary 获取PPT会话详情
          * @param {number} sessionId 会话ID
          * @param {*} [options] Override http request option.
@@ -469,6 +851,18 @@ export const PPTApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getTemplateDetail(id, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['PPTApi.getTemplateDetail']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 获取PPT项目列表
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async listProjects(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseListMapStringObject>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listProjects(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['PPTApi.listProjects']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -496,6 +890,19 @@ export const PPTApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 
+         * @summary 重新触发模板解析（用于解析失败的模板）
+         * @param {number} id 模板ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async retryParsing(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.retryParsing(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['PPTApi.retryParsing']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 多步骤PPT生成流程，通过 action 字段控制： 0. detect_intent - AI判断用户是否要生成PPT，提取主题 1. generate_outline - 输入主题，AI生成Markdown大纲 2. revise_outline - 不满意可修改大纲 3. confirm_outline - 确认大纲 4. select_template - 选择模板（系统模板ID 或 自定义URL） 5. generate_ppt - AI逐页生成内容并生成最终PPT文件  SSE事件：status / message / intent / outline / template_parsed / slide_progress / result / error / done 
          * @summary PPT生成助手（SSE流式）
          * @param {PptGenerationRequest} pptGenerationRequest 
@@ -506,6 +913,20 @@ export const PPTApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.stream(pptGenerationRequest, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['PPTApi.stream']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary 更新PPT项目
+         * @param {number} projectId 
+         * @param {{ [key: string]: string; }} requestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async updateProject(projectId: number, requestBody: { [key: string]: string; }, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateProject(projectId, requestBody, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['PPTApi.updateProject']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -532,6 +953,46 @@ export const PPTApiFp = function(configuration?: Configuration) {
 export const PPTApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = PPTApiFp(configuration)
     return {
+        /**
+         * 
+         * @summary 添加文档到项目
+         * @param {PPTApiAddDocumentRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        addDocument(requestParameters: PPTApiAddDocumentRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringObject> {
+            return localVarFp.addDocument(requestParameters.projectId, requestParameters.requestBody, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 创建PPT项目
+         * @param {PPTApiCreateProjectRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createProject(requestParameters: PPTApiCreateProjectRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringObject> {
+            return localVarFp.createProject(requestParameters.requestBody, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 删除项目文档
+         * @param {PPTApiDeleteDocumentRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteDocument(requestParameters: PPTApiDeleteDocumentRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid> {
+            return localVarFp.deleteDocument(requestParameters.projectId, requestParameters.documentId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 删除PPT项目
+         * @param {PPTApiDeleteProjectRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteProject(requestParameters: PPTApiDeleteProjectRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid> {
+            return localVarFp.deleteProject(requestParameters.projectId, options).then((request) => request(axios, basePath));
+        },
         /**
          * 
          * @summary 删除PPT会话
@@ -564,6 +1025,16 @@ export const PPTApiFactory = function (configuration?: Configuration, basePath?:
         },
         /**
          * 
+         * @summary 获取PPT项目详情（含文档列表）
+         * @param {PPTApiGetProjectDetailRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getProjectDetail(requestParameters: PPTApiGetProjectDetailRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringObject> {
+            return localVarFp.getProjectDetail(requestParameters.projectId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary 获取PPT会话详情
          * @param {PPTApiGetSessionDetailRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
@@ -584,6 +1055,15 @@ export const PPTApiFactory = function (configuration?: Configuration, basePath?:
         },
         /**
          * 
+         * @summary 获取PPT项目列表
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listProjects(options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListMapStringObject> {
+            return localVarFp.listProjects(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary 获取PPT会话列表
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -601,6 +1081,16 @@ export const PPTApiFactory = function (configuration?: Configuration, basePath?:
             return localVarFp.listTemplates(options).then((request) => request(axios, basePath));
         },
         /**
+         * 
+         * @summary 重新触发模板解析（用于解析失败的模板）
+         * @param {PPTApiRetryParsingRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        retryParsing(requestParameters: PPTApiRetryParsingRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid> {
+            return localVarFp.retryParsing(requestParameters.id, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 多步骤PPT生成流程，通过 action 字段控制： 0. detect_intent - AI判断用户是否要生成PPT，提取主题 1. generate_outline - 输入主题，AI生成Markdown大纲 2. revise_outline - 不满意可修改大纲 3. confirm_outline - 确认大纲 4. select_template - 选择模板（系统模板ID 或 自定义URL） 5. generate_ppt - AI逐页生成内容并生成最终PPT文件  SSE事件：status / message / intent / outline / template_parsed / slide_progress / result / error / done 
          * @summary PPT生成助手（SSE流式）
          * @param {PPTApiStreamRequest} requestParameters Request parameters.
@@ -609,6 +1099,16 @@ export const PPTApiFactory = function (configuration?: Configuration, basePath?:
          */
         stream(requestParameters: PPTApiStreamRequest, options?: RawAxiosRequestConfig): AxiosPromise<SseEmitter> {
             return localVarFp.stream(requestParameters.pptGenerationRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary 更新PPT项目
+         * @param {PPTApiUpdateProjectRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateProject(requestParameters: PPTApiUpdateProjectRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid> {
+            return localVarFp.updateProject(requestParameters.projectId, requestParameters.requestBody, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -627,6 +1127,42 @@ export const PPTApiFactory = function (configuration?: Configuration, basePath?:
  * PPTApi - interface
  */
 export interface PPTApiInterface {
+    /**
+     * 
+     * @summary 添加文档到项目
+     * @param {PPTApiAddDocumentRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    addDocument(requestParameters: PPTApiAddDocumentRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringObject>;
+
+    /**
+     * 
+     * @summary 创建PPT项目
+     * @param {PPTApiCreateProjectRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    createProject(requestParameters: PPTApiCreateProjectRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringObject>;
+
+    /**
+     * 
+     * @summary 删除项目文档
+     * @param {PPTApiDeleteDocumentRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    deleteDocument(requestParameters: PPTApiDeleteDocumentRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid>;
+
+    /**
+     * 
+     * @summary 删除PPT项目
+     * @param {PPTApiDeleteProjectRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    deleteProject(requestParameters: PPTApiDeleteProjectRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid>;
+
     /**
      * 
      * @summary 删除PPT会话
@@ -656,6 +1192,15 @@ export interface PPTApiInterface {
 
     /**
      * 
+     * @summary 获取PPT项目详情（含文档列表）
+     * @param {PPTApiGetProjectDetailRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getProjectDetail(requestParameters: PPTApiGetProjectDetailRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringObject>;
+
+    /**
+     * 
      * @summary 获取PPT会话详情
      * @param {PPTApiGetSessionDetailRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -674,6 +1219,14 @@ export interface PPTApiInterface {
 
     /**
      * 
+     * @summary 获取PPT项目列表
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    listProjects(options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListMapStringObject>;
+
+    /**
+     * 
      * @summary 获取PPT会话列表
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -689,6 +1242,15 @@ export interface PPTApiInterface {
     listTemplates(options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListPptTemplateListResponse>;
 
     /**
+     * 
+     * @summary 重新触发模板解析（用于解析失败的模板）
+     * @param {PPTApiRetryParsingRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    retryParsing(requestParameters: PPTApiRetryParsingRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid>;
+
+    /**
      * 多步骤PPT生成流程，通过 action 字段控制： 0. detect_intent - AI判断用户是否要生成PPT，提取主题 1. generate_outline - 输入主题，AI生成Markdown大纲 2. revise_outline - 不满意可修改大纲 3. confirm_outline - 确认大纲 4. select_template - 选择模板（系统模板ID 或 自定义URL） 5. generate_ppt - AI逐页生成内容并生成最终PPT文件  SSE事件：status / message / intent / outline / template_parsed / slide_progress / result / error / done 
      * @summary PPT生成助手（SSE流式）
      * @param {PPTApiStreamRequest} requestParameters Request parameters.
@@ -699,6 +1261,15 @@ export interface PPTApiInterface {
 
     /**
      * 
+     * @summary 更新PPT项目
+     * @param {PPTApiUpdateProjectRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    updateProject(requestParameters: PPTApiUpdateProjectRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid>;
+
+    /**
+     * 
      * @summary 上传PPT模板
      * @param {PPTApiUploadTemplateRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -706,6 +1277,38 @@ export interface PPTApiInterface {
      */
     uploadTemplate(requestParameters: PPTApiUploadTemplateRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseLong>;
 
+}
+
+/**
+ * Request parameters for addDocument operation in PPTApi.
+ */
+export interface PPTApiAddDocumentRequest {
+    readonly projectId: number
+
+    readonly requestBody: { [key: string]: object; }
+}
+
+/**
+ * Request parameters for createProject operation in PPTApi.
+ */
+export interface PPTApiCreateProjectRequest {
+    readonly requestBody: { [key: string]: string; }
+}
+
+/**
+ * Request parameters for deleteDocument operation in PPTApi.
+ */
+export interface PPTApiDeleteDocumentRequest {
+    readonly projectId: number
+
+    readonly documentId: number
+}
+
+/**
+ * Request parameters for deleteProject operation in PPTApi.
+ */
+export interface PPTApiDeleteProjectRequest {
+    readonly projectId: number
 }
 
 /**
@@ -736,6 +1339,16 @@ export interface PPTApiGeneratePptRequest {
 }
 
 /**
+ * Request parameters for getProjectDetail operation in PPTApi.
+ */
+export interface PPTApiGetProjectDetailRequest {
+    /**
+     * 项目ID
+     */
+    readonly projectId: number
+}
+
+/**
  * Request parameters for getSessionDetail operation in PPTApi.
  */
 export interface PPTApiGetSessionDetailRequest {
@@ -756,10 +1369,29 @@ export interface PPTApiGetTemplateDetailRequest {
 }
 
 /**
+ * Request parameters for retryParsing operation in PPTApi.
+ */
+export interface PPTApiRetryParsingRequest {
+    /**
+     * 模板ID
+     */
+    readonly id: number
+}
+
+/**
  * Request parameters for stream operation in PPTApi.
  */
 export interface PPTApiStreamRequest {
     readonly pptGenerationRequest: PptGenerationRequest
+}
+
+/**
+ * Request parameters for updateProject operation in PPTApi.
+ */
+export interface PPTApiUpdateProjectRequest {
+    readonly projectId: number
+
+    readonly requestBody: { [key: string]: string; }
 }
 
 /**
@@ -783,6 +1415,50 @@ export interface PPTApiUploadTemplateRequest {
  * PPTApi - object-oriented interface
  */
 export class PPTApi extends BaseAPI implements PPTApiInterface {
+    /**
+     * 
+     * @summary 添加文档到项目
+     * @param {PPTApiAddDocumentRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public addDocument(requestParameters: PPTApiAddDocumentRequest, options?: RawAxiosRequestConfig) {
+        return PPTApiFp(this.configuration).addDocument(requestParameters.projectId, requestParameters.requestBody, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 创建PPT项目
+     * @param {PPTApiCreateProjectRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public createProject(requestParameters: PPTApiCreateProjectRequest, options?: RawAxiosRequestConfig) {
+        return PPTApiFp(this.configuration).createProject(requestParameters.requestBody, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 删除项目文档
+     * @param {PPTApiDeleteDocumentRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public deleteDocument(requestParameters: PPTApiDeleteDocumentRequest, options?: RawAxiosRequestConfig) {
+        return PPTApiFp(this.configuration).deleteDocument(requestParameters.projectId, requestParameters.documentId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 删除PPT项目
+     * @param {PPTApiDeleteProjectRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public deleteProject(requestParameters: PPTApiDeleteProjectRequest, options?: RawAxiosRequestConfig) {
+        return PPTApiFp(this.configuration).deleteProject(requestParameters.projectId, options).then((request) => request(this.axios, this.basePath));
+    }
+
     /**
      * 
      * @summary 删除PPT会话
@@ -818,6 +1494,17 @@ export class PPTApi extends BaseAPI implements PPTApiInterface {
 
     /**
      * 
+     * @summary 获取PPT项目详情（含文档列表）
+     * @param {PPTApiGetProjectDetailRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getProjectDetail(requestParameters: PPTApiGetProjectDetailRequest, options?: RawAxiosRequestConfig) {
+        return PPTApiFp(this.configuration).getProjectDetail(requestParameters.projectId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @summary 获取PPT会话详情
      * @param {PPTApiGetSessionDetailRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -836,6 +1523,16 @@ export class PPTApi extends BaseAPI implements PPTApiInterface {
      */
     public getTemplateDetail(requestParameters: PPTApiGetTemplateDetailRequest, options?: RawAxiosRequestConfig) {
         return PPTApiFp(this.configuration).getTemplateDetail(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 获取PPT项目列表
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public listProjects(options?: RawAxiosRequestConfig) {
+        return PPTApiFp(this.configuration).listProjects(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -859,6 +1556,17 @@ export class PPTApi extends BaseAPI implements PPTApiInterface {
     }
 
     /**
+     * 
+     * @summary 重新触发模板解析（用于解析失败的模板）
+     * @param {PPTApiRetryParsingRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public retryParsing(requestParameters: PPTApiRetryParsingRequest, options?: RawAxiosRequestConfig) {
+        return PPTApiFp(this.configuration).retryParsing(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 多步骤PPT生成流程，通过 action 字段控制： 0. detect_intent - AI判断用户是否要生成PPT，提取主题 1. generate_outline - 输入主题，AI生成Markdown大纲 2. revise_outline - 不满意可修改大纲 3. confirm_outline - 确认大纲 4. select_template - 选择模板（系统模板ID 或 自定义URL） 5. generate_ppt - AI逐页生成内容并生成最终PPT文件  SSE事件：status / message / intent / outline / template_parsed / slide_progress / result / error / done 
      * @summary PPT生成助手（SSE流式）
      * @param {PPTApiStreamRequest} requestParameters Request parameters.
@@ -867,6 +1575,17 @@ export class PPTApi extends BaseAPI implements PPTApiInterface {
      */
     public stream(requestParameters: PPTApiStreamRequest, options?: RawAxiosRequestConfig) {
         return PPTApiFp(this.configuration).stream(requestParameters.pptGenerationRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 更新PPT项目
+     * @param {PPTApiUpdateProjectRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public updateProject(requestParameters: PPTApiUpdateProjectRequest, options?: RawAxiosRequestConfig) {
+        return PPTApiFp(this.configuration).updateProject(requestParameters.projectId, requestParameters.requestBody, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

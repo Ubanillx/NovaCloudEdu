@@ -31,5 +31,6 @@ export interface UpdateKnowledgeBaseCommand {
     'useDynamicTopK'?: boolean;
     'defaultTopK'?: number;
     'queryRewriteModelId'?: string;
+    'rerankModel'?: string;
 }
 

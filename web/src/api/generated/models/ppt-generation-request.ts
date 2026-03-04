@@ -50,5 +50,13 @@ export interface PptGenerationRequest {
      * 自定义模板URL（select_template 时使用，与 templateId 二选一）
      */
     'templateUrl'?: string;
+    /**
+     * 结构化大纲JSON（update_outline 时使用）
+     */
+    'outlineJson'?: string;
+    /**
+     * 关联的PPT项目ID（detect_intent 时可选）
+     */
+    'projectId'?: number;
 }
 

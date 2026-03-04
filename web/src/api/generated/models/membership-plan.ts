@@ -35,8 +35,8 @@ export interface MembershipPlan {
     'sortOrder'?: number;
     'createTime'?: string;
     'updateTime'?: string;
-    'delete'?: boolean;
     'default'?: boolean;
+    'delete'?: boolean;
 }
 
 export const MembershipPlanCodeEnum = {
