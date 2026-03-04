@@ -23,9 +23,9 @@ FROM eclipse-temurin:21-jre-alpine
 # 安装必要工具（健康检查等）
 RUN apk add --no-cache curl
 
-# 创建非 root 用户，并添加到 docker 组以支持 Docker-in-Docker
-RUN addgroup -S spring && addgroup -g 1 docker && \
-    adduser -S spring -G spring,docker -h /home/spring
+# 创建非 root 用户（docker-compose 中以 root 运行以访问 Docker socket）
+RUN addgroup -S spring && \
+    adduser -S spring -G spring -h /home/spring
 
 WORKDIR /app
 
@@ -37,7 +37,7 @@ EXPOSE 8080
 
 # 健康检查
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=5 \
-    CMD curl -f http://localhost:8080/actuator/health || exit 1
+    CMD curl -f http://localhost:8080/api/health || exit 1
 
 # JVM 优化参数
 ENV JAVA_OPTS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -Djava.security.egd=file:/dev/./urandom"
