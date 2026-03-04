@@ -16,6 +16,8 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 图片工具 — 供 DesignAgent 自主调用
@@ -44,9 +46,66 @@ public class ImageGenerationTool {
     @Value("${ppt.agent.image-search.enabled:false}")
     private boolean imageSearchEnabled;
 
+    /**
+     * ThreadLocal 存储当前请求的项目图片列表，供 useProjectImage 工具使用。
+     * 在 PPT 生成开始前通过 setProjectImages() 设置，结束后通过 clearProjectImages() 清除。
+     */
+    private static final ThreadLocal<List<ProjectImage>> PROJECT_IMAGES = new ThreadLocal<>();
+
+    public record ProjectImage(String fileName, String fileUrl, String fileType) {}
+
+    public void setProjectImages(List<ProjectImage> images) {
+        PROJECT_IMAGES.set(images != null ? new ArrayList<>(images) : null);
+        if (images != null && !images.isEmpty()) {
+            log.info("已设置项目图片: {} 张", images.size());
+        }
+    }
+
+    public void clearProjectImages() {
+        PROJECT_IMAGES.remove();
+    }
+
+    public boolean hasProjectImages() {
+        List<ProjectImage> images = PROJECT_IMAGES.get();
+        return images != null && !images.isEmpty();
+    }
+
     public ImageGenerationTool(ImageGenerationService imageGenerationService, OssService ossService) {
         this.imageGenerationService = imageGenerationService;
         this.ossService = ossService;
+    }
+
+    // ==================== Project Image Selection ====================
+
+    @Tool("Select an image from the user's project library. " +
+          "HIGHEST PRIORITY: always check project images first before searching or generating. " +
+          "Returns the image URL if a matching image is found, or a message if no project images are available.")
+    public String useProjectImage(
+            @P("Keywords describing the desired image, e.g. 'company logo' or 'product photo'") String keywords) {
+
+        log.info("Agent useProjectImage: keywords={}", keywords);
+
+        List<ProjectImage> images = PROJECT_IMAGES.get();
+        if (images == null || images.isEmpty()) {
+            return "No project images available. Use searchWebImage or generateSlideImage instead.";
+        }
+
+        // Simple keyword matching against file names
+        String lowerKeywords = keywords.toLowerCase();
+        for (ProjectImage img : images) {
+            String lowerName = img.fileName().toLowerCase();
+            if (lowerName.contains(lowerKeywords) || lowerKeywords.contains(lowerName.replaceAll("\\.[^.]+$", ""))) {
+                log.info("项目图片匹配成功: keywords={}, file={}, url={}", keywords, img.fileName(), img.fileUrl());
+                return img.fileUrl();
+            }
+        }
+
+        // If no keyword match, return the list for AI to choose
+        StringBuilder sb = new StringBuilder("Available project images (pick the most relevant or return 'none'):\n");
+        for (int i = 0; i < images.size(); i++) {
+            sb.append(String.format("%d. %s → %s\n", i + 1, images.get(i).fileName(), images.get(i).fileUrl()));
+        }
+        return sb.toString();
     }
 
     // ==================== Web Image Search ====================

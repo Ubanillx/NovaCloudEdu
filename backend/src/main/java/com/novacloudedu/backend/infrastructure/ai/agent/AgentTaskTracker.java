@@ -162,6 +162,18 @@ public class AgentTaskTracker {
         }
     }
 
+    /**
+     * 按角色查找第一个匹配的任务ID
+     */
+    public String findTaskIdByRole(AgentRole role) {
+        for (AgentTask task : tasks) {
+            if (task.agent() == role) {
+                return task.id();
+            }
+        }
+        return null;
+    }
+
     // ==================== 快捷方法（一步创建+开始） ====================
 
     /**
