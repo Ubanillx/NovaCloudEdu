@@ -23,6 +23,12 @@ COPY --chown=appuser:appuser requirements.txt .
 # 安装到系统目录，避免 PATH 问题
 RUN pip install --no-cache-dir -r requirements.txt
 
+# 安装 Playwright Chromium 浏览器（用于 HTML→PNG 渲染）
+# 使用共享路径，确保 appuser 运行时也能找到浏览器
+ENV PLAYWRIGHT_BROWSERS_PATH=/app/.playwright-browsers
+RUN playwright install --with-deps chromium && \
+    chown -R appuser:appuser /app/.playwright-browsers
+
 # 复制源代码
 COPY --chown=appuser:appuser src/ ./src/
 

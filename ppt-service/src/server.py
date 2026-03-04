@@ -30,6 +30,7 @@ from .slide_renderer import render_pptx_cover, render_pptx_to_images, render_sin
 from .thumbnail import generate_cover as _pillow_cover, render_all_slides as _pillow_render
 from .content_validator import validate_slide_fills, format_validation_feedback
 from .template_vision_analyzer import build_template_vision_profile, format_vision_profile_for_agent
+from .vision_enricher import enrich_template
 
 logging.basicConfig(
     level=logging.INFO,
@@ -603,6 +604,73 @@ async def api_analyze_template(req: AnalyzeTemplateRequest):
         )
 
 
+class ParseEnrichedRequest(BaseModel):
+    """POST /api/templates/parse-enriched 请求体"""
+    template_url: str
+
+
+@app.post("/api/templates/parse-enriched")
+async def api_parse_enriched(req: ParseEnrichedRequest):
+    """HTTP 接口：解析模板 + 渲染每页 + 多模态语义增强。
+
+    流程：
+    1. 下载并解析 PPTX 模板（复用 parse_template）
+    2. 渲染每页为 PNG 图片并上传 OSS
+    3. 对每页截图 + 结构化 JSON 调用视觉模型分析
+    4. 返回 EnrichedTemplateConfig（语义字段 + data 原始数据）
+    """
+    try:
+        if not req.template_url:
+            raise ValueError("缺少 template_url 参数")
+
+        # 1. 解析模板
+        cfg = registry.register_from_url(req.template_url)
+        tpath = registry.get_path(cfg.template_id)
+        if not tpath:
+            raise ValueError("模板文件未找到")
+
+        # 2. 渲染每页为 PNG
+        try:
+            png_list = render_pptx_to_images(tpath)
+        except Exception as ge:
+            logger.warning(
+                "Gotenberg 渲染失败，退化 Pillow: %s", ge)
+            png_list = _pillow_render(tpath)
+
+        # 3. 上传 PNG 到 OSS
+        slide_image_urls: list[str] = []
+        for idx, png_bytes in enumerate(png_list):
+            url = oss_upload(png_bytes, ".png", "ppt/slides")
+            slide_image_urls.append(url)
+
+        # 4. 封面 URL（取第一页）
+        cover_url = (
+            slide_image_urls[0] if slide_image_urls else ""
+        )
+
+        # 5. 多模态语义增强（并发调用视觉模型）
+        enriched = await enrich_template(
+            cfg, slide_image_urls)
+        enriched.cover_url = cover_url
+
+        result = enriched.model_dump()
+        result["success"] = True
+        return result
+
+    except Exception as e:
+        logger.error(
+            "API parse-enriched 失败: %s",
+            e, exc_info=True,
+        )
+        return JSONResponse(
+            status_code=500,
+            content={
+                "success": False,
+                "message": str(e),
+            },
+        )
+
+
 @app.post("/api/generate")
 async def api_generate(req: GenerateRequest):
     """HTTP 接口：基于模板生成 PPTX"""
@@ -611,6 +679,86 @@ async def api_generate(req: GenerateRequest):
         return {"success": True, **data}
     except Exception as e:
         logger.error("API generate 失败: %s", e, exc_info=True)
+        return JSONResponse(
+            status_code=500,
+            content={"success": False, "message": str(e)},
+        )
+
+
+# ==================== HTML 模式端点 ====================
+
+
+class HtmlSlideItem(BaseModel):
+    """HTML 幻灯片项"""
+    slide_html: str
+    slide_type: Optional[str] = "content"
+    speaker_notes: Optional[str] = ""
+    image_suggestions: Optional[list[str]] = []
+    generated_image_url: Optional[str] = None
+    mode: Optional[str] = "html"
+
+
+class HtmlGenerateRequest(BaseModel):
+    """POST /api/generate-html 请求体"""
+    title: str
+    slides: list[HtmlSlideItem]
+    author: Optional[str] = None
+    mode: Optional[str] = "html"
+
+
+class HtmlSlidePreviewRequest(BaseModel):
+    """POST /api/generate-html-slide-preview 请求体"""
+    slide_html: str
+    generated_image_url: Optional[str] = None
+
+
+@app.post("/api/generate-html")
+async def api_generate_html(req: HtmlGenerateRequest):
+    """HTTP 接口：HTML 幻灯片列表 → PPTX 文件"""
+    try:
+        from .html_renderer import html_slides_to_pptx
+
+        slides_data = [s.model_dump() for s in req.slides]
+        pptx_bytes = await html_slides_to_pptx(slides_data, title=req.title)
+
+        file_url = oss_upload(pptx_bytes, ".pptx", "ppt/generated")
+        title = req.title or "presentation"
+
+        return {
+            "success": True,
+            "file_name": f"{title}.pptx",
+            "file_url": file_url,
+            "slide_count": len(req.slides),
+        }
+    except Exception as e:
+        logger.error(
+            "API generate-html 失败: %s", e, exc_info=True)
+        return JSONResponse(
+            status_code=500,
+            content={"success": False, "message": str(e)},
+        )
+
+
+@app.post("/api/generate-html-slide-preview")
+async def api_generate_html_slide_preview(
+    req: HtmlSlidePreviewRequest,
+):
+    """HTTP 接口：单页 HTML → PNG 预览图"""
+    try:
+        from .html_renderer import render_html_to_png
+
+        png_bytes = await render_html_to_png(
+            req.slide_html,
+            image_url=req.generated_image_url,
+        )
+        image_url = oss_upload(png_bytes, ".png", "ppt/preview")
+
+        return {"success": True, "image_url": image_url}
+    except Exception as e:
+        logger.error(
+            "API generate-html-slide-preview 失败: %s",
+            e, exc_info=True,
+        )
         return JSONResponse(
             status_code=500,
             content={"success": False, "message": str(e)},
