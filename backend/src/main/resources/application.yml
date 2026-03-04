@@ -185,8 +185,8 @@ ai:
 
   # ---- 多模型路由（Langchain4j） ----
   chat-models:
-    default-model: ${AI_DEFAULT_MODEL:dashscope/qwen-max}
-    default-vision-model: ${AI_DEFAULT_VISION_MODEL:dashscope/qwen-vl-max}
+    default-model: ${AI_DEFAULT_MODEL:openrouter/openai/gpt-5.2}
+    default-vision-model: ${AI_DEFAULT_VISION_MODEL:openrouter/google/gemini-3-flash-preview}
     providers:
       dashscope:
         enabled: true
@@ -297,6 +297,47 @@ ai:
           llava:
             type: vision
             temperature: 0.7
+      openrouter:
+        enabled: ${OPENROUTER_ENABLED:false}
+        api-key: ${OPENROUTER_API_KEY:}
+        base-url: ${OPENROUTER_BASE_URL:https://openrouter.ai/api/v1}
+        models:
+          openai/gpt-5.2:
+            type: text
+            temperature: 0.7
+            max-tokens: 8000
+          openai/gpt-5-nano:
+            type: text
+            temperature: 0.7
+            max-tokens: 4000
+          google/gemini-3-flash-preview:
+            type: vision
+            temperature: 0.7
+            max-tokens: 8000
+          google/gemini-2.5-flash-preview:
+            type: vision
+            temperature: 0.7
+            max-tokens: 8000
+          anthropic/claude-sonnet-4:
+            type: text
+            temperature: 0.7
+            max-tokens: 8000
+          openai/gpt-4o:
+            type: vision
+            temperature: 0.7
+            max-tokens: 4000
+          openai/gpt-4.1-mini:
+            type: text
+            temperature: 0.7
+            max-tokens: 4000
+          deepseek/deepseek-r1:
+            type: text
+            temperature: 0.6
+            max-tokens: 8000
+          qwen/qwen3-235b-a22b:
+            type: text
+            temperature: 0.7
+            max-tokens: 8000
 
   # ---- 文生图 ----
   image-models:
@@ -411,13 +452,13 @@ ppt-service:
 # =================================================================
 ppt:
   agent:
-    planner-model: ${PPT_AGENT_PLANNER_MODEL:dashscope/qwen-max}
-    content-model: ${PPT_AGENT_CONTENT_MODEL:dashscope/qwen-max}
-    design-model: ${PPT_AGENT_DESIGN_MODEL:dashscope/qwen-vl-max}
-    design-tool-model: ${PPT_AGENT_DESIGN_TOOL_MODEL:dashscope/qwen-max}
-    evaluator-model: ${PPT_AGENT_EVALUATOR_MODEL:dashscope/qwen-max}
-    layout-selector-model: ${PPT_AGENT_LAYOUT_SELECTOR_MODEL:dashscope/qwen-max}
-    html-slide-model: ${PPT_AGENT_HTML_SLIDE_MODEL:dashscope/qwen3-235b-a22b}
+    planner-model: ${PPT_AGENT_PLANNER_MODEL:openrouter/openai/gpt-5.2}
+    content-model: ${PPT_AGENT_CONTENT_MODEL:openrouter/openai/gpt-5.2}
+    design-model: ${PPT_AGENT_DESIGN_MODEL:openrouter/google/gemini-3-flash-preview}
+    design-tool-model: ${PPT_AGENT_DESIGN_TOOL_MODEL:openrouter/openai/gpt-5-nano}
+    evaluator-model: ${PPT_AGENT_EVALUATOR_MODEL:openrouter/openai/gpt-5-nano}
+    layout-selector-model: ${PPT_AGENT_LAYOUT_SELECTOR_MODEL:openrouter/openai/gpt-5-nano}
+    html-slide-model: ${PPT_AGENT_HTML_SLIDE_MODEL:openrouter/google/gemini-3-flash-preview}
     enable-content-validation: ${PPT_AGENT_CONTENT_VALIDATION:true}
     enable-layout-selection: ${PPT_AGENT_LAYOUT_SELECTION:true}
     enable-per-slide-inspection: ${PPT_AGENT_PER_SLIDE_INSPECTION:true}

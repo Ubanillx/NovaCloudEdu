@@ -12,6 +12,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -70,6 +71,62 @@ public class PptServiceClient {
             throw e;
         } catch (Exception e) {
             log.error("调用 ppt-service 解析模板失败", e);
+            throw new BusinessException(50000, "调用PPT服务失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 语义增强解析模板：下载 PPTX → 解析 → 渲染每页 PNG → 多模态视觉分析
+     * 返回 EnrichedTemplateConfig JSON（语义字段 + data 原始数据）
+     */
+    public ParseEnrichedResult parseTemplateEnriched(String templateUrl) {
+        try {
+            String body = objectMapper.writeValueAsString(
+                    Map.of("template_url", templateUrl));
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(baseUrl + "/api/templates/parse-enriched"))
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(body))
+                    .timeout(Duration.ofSeconds(300))
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(
+                    request, HttpResponse.BodyHandlers.ofString());
+
+            log.info("ppt-service 语义增强解析响应: status={}, bodyLen={}",
+                    response.statusCode(), response.body().length());
+
+            JsonNode json = objectMapper.readTree(response.body());
+            if (!json.path("success").asBoolean(false)) {
+                String msg = json.path("message").asText("语义增强解析失败");
+                throw new BusinessException(50000, "模板语义增强解析失败: " + msg);
+            }
+
+            // 提取 slide_images（每页的 preview_image_url）
+            java.util.List<SlideImage> slideImages = new java.util.ArrayList<>();
+            JsonNode slides = json.path("slides");
+            if (slides.isArray()) {
+                for (JsonNode slide : slides) {
+                    int index = slide.path("index").asInt();
+                    String imageUrl = slide.path("preview_image_url").asText("");
+                    if (!imageUrl.isBlank()) {
+                        slideImages.add(new SlideImage(index, imageUrl));
+                    }
+                }
+            }
+
+            return new ParseEnrichedResult(
+                    json.path("cover_url").asText(""),
+                    json.path("slide_count").asInt(0),
+                    response.body(),
+                    new RenderSlidesResult(slideImages)
+            );
+
+        } catch (BusinessException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("调用 ppt-service 语义增强解析模板失败", e);
             throw new BusinessException(50000, "调用PPT服务失败: " + e.getMessage());
         }
     }
@@ -283,6 +340,89 @@ public class PptServiceClient {
     }
 
     /**
+     * HTML 模式：将 HTML 幻灯片列表转换为 PPTX 文件
+     * Python 服务使用 Playwright 渲染 HTML → PNG，然后组装为 PPTX
+     */
+    public GenerateResult generateFromHtml(Map<String, Object> generateRequest) {
+        try {
+            String body = objectMapper.writeValueAsString(generateRequest);
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(baseUrl + "/api/generate-html"))
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(body))
+                    .timeout(Duration.ofSeconds(300))
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(
+                    request, HttpResponse.BodyHandlers.ofString());
+
+            JsonNode json = objectMapper.readTree(response.body());
+            if (!json.path("success").asBoolean(false)) {
+                String msg = json.path("message").asText("HTML PPT生成失败");
+                throw new BusinessException(50000, "HTML PPT生成失败: " + msg);
+            }
+
+            return new GenerateResult(
+                    json.path("file_url").asText(""),
+                    json.path("file_name").asText(""),
+                    json.path("slide_count").asInt(0)
+            );
+
+        } catch (BusinessException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("调用 ppt-service HTML 生成失败", e);
+            throw new BusinessException(50000, "调用PPT服务(HTML模式)失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * HTML 模式：渲染单页 HTML 幻灯片为 PNG 预览图
+     */
+    public SlidePreviewResult generateHtmlSlidePreview(String slideHtml) {
+        return generateHtmlSlidePreview(slideHtml, null);
+    }
+
+    /**
+     * HTML 模式：渲染单页 HTML 幻灯片为 PNG 预览图（支持配图 URL 兜底注入）
+     */
+    public SlidePreviewResult generateHtmlSlidePreview(String slideHtml, String generatedImageUrl) {
+        try {
+            Map<String, Object> requestBody = new HashMap<>();
+            requestBody.put("slide_html", slideHtml);
+            if (generatedImageUrl != null && !generatedImageUrl.isBlank()) {
+                requestBody.put("generated_image_url", generatedImageUrl);
+            }
+            String body = objectMapper.writeValueAsString(requestBody);
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(baseUrl + "/api/generate-html-slide-preview"))
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(body))
+                    .timeout(Duration.ofSeconds(60))
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(
+                    request, HttpResponse.BodyHandlers.ofString());
+
+            JsonNode json = objectMapper.readTree(response.body());
+            if (!json.path("success").asBoolean(false)) {
+                String msg = json.path("message").asText("HTML预览渲染失败");
+                throw new BusinessException(50000, "HTML预览渲染失败: " + msg);
+            }
+
+            return new SlidePreviewResult(json.path("image_url").asText(""));
+
+        } catch (BusinessException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("调用 ppt-service HTML 预览渲染失败", e);
+            throw new BusinessException(50000, "调用PPT服务(HTML预览)失败: " + e.getMessage());
+        }
+    }
+
+    /**
      * 模板视觉分析：借鉴 PPTAgent V1 SlideInducter，
      * 对模板每页进行语义分析，输出版式分类、适合内容类型、空间分布等。
      *
@@ -371,6 +511,16 @@ public class PptServiceClient {
             String coverUrl,
             int slideCount,
             String fullResponseJson
+    ) {}
+
+    /**
+     * 语义增强模板解析结果
+     */
+    public record ParseEnrichedResult(
+            String coverUrl,
+            int slideCount,
+            String fullResponseJson,
+            RenderSlidesResult renderResult
     ) {}
 
     /**

@@ -18,9 +18,11 @@ public class PptGenerationSessionConverter {
         return PptGenerationSession.reconstruct(
                 po.getId(),
                 po.getUserId(),
+                po.getProjectId(),
                 PptGenerationState.fromCode(po.getState()),
                 po.getTopic(),
                 po.getOutlineMarkdown(),
+                po.getOutlineJson(),
                 po.getTemplateId(),
                 po.getTemplateUrl(),
                 po.getTemplateJson(),
@@ -38,9 +40,11 @@ public class PptGenerationSessionConverter {
         PptGenerationSessionPO po = new PptGenerationSessionPO();
         po.setId(session.getId());
         po.setUserId(session.getUserId());
+        po.setProjectId(session.getProjectId());
         po.setState(session.getState().getCode());
         po.setTopic(session.getTopic());
         po.setOutlineMarkdown(session.getOutlineMarkdown());
+        po.setOutlineJson(session.getOutlineJson());
         po.setTemplateId(session.getTemplateId());
         po.setTemplateUrl(session.getTemplateUrl());
         po.setTemplateJson(session.getTemplateJson());

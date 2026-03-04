@@ -19,11 +19,15 @@ public class PptGenerationSessionPO implements Serializable {
 
     private Long userId;
 
+    private Long projectId;
+
     private String state;
 
     private String topic;
 
     private String outlineMarkdown;
+
+    private String outlineJson;
 
     private Long templateId;
 

@@ -91,6 +91,8 @@ public class PptGenerationController {
         params.put("feedback", request.getFeedback());
         params.put("templateId", request.getTemplateId());
         params.put("templateUrl", request.getTemplateUrl());
+        params.put("outlineJson", request.getOutlineJson());
+        params.put("projectId", request.getProjectId());
 
         return pptGenerationService.handleAction(request.getAction(), params, userId);
     }
