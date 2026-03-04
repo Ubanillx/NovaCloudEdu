@@ -7,6 +7,7 @@ WORKDIR /build
 COPY pom.xml .
 COPY mvnw .
 COPY .mvn .mvn
+RUN chmod +x mvnw
 
 # 下载依赖（利用缓存层）
 RUN ./mvnw dependency:go-offline -B
