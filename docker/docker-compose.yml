@@ -110,11 +110,11 @@ services:
       - neo4j_data:/data
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:7474 || exit 1"]
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:7474 || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5
-      start_period: 40s
+      start_period: 60s
     networks:
       - nova-network
 
@@ -226,6 +226,8 @@ services:
       - ZHIPU_API_KEY=${ZHIPU_API_KEY:-}
       - SILICONFLOW_ENABLED=${SILICONFLOW_ENABLED:-false}
       - SILICONFLOW_API_KEY=${SILICONFLOW_API_KEY:-}
+      - OPENROUTER_ENABLED=${OPENROUTER_ENABLED:-false}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
       # ---- 百度 OCR ----
       - BAIDU_OCR_APP_ID=${BAIDU_OCR_APP_ID:-}
       - BAIDU_OCR_API_KEY=${BAIDU_OCR_API_KEY:-}
@@ -237,19 +239,20 @@ services:
       - TAVILY_API_KEY=${TAVILY_API_KEY:-}
       - PPT_AGENT_CONCURRENCY=${PPT_AGENT_CONCURRENCY:-3}
       - PPT_AGENT_QUALITY_THRESHOLD=${PPT_AGENT_QUALITY_THRESHOLD:-65}
+      - PPT_AGENT_MAX_REPAIR_ROUNDS=${PPT_AGENT_MAX_REPAIR_ROUNDS:-2}
+      - PPT_AGENT_SLIDE_SCORE_THRESHOLD=${PPT_AGENT_SLIDE_SCORE_THRESHOLD:-60}
       - PPT_AGENT_IMAGE_SEARCH_ENABLED=${PPT_AGENT_IMAGE_SEARCH_ENABLED:-false}
       # ---- OnlyOffice ----
       - ONLYOFFICE_JWT_SECRET=${ONLYOFFICE_JWT_SECRET:-changeme_onlyoffice_secret_1234567}
       # ---- 代码沙箱 ----
       - CODE_SANDBOX_DOCKER_ENABLED=true
-      # ---- SRS ----
-      - SRS_HTTP_BASE=http://localhost:${SRS_HTTP_PORT:-8085}
+      # ---- SRS（容器内通过容器名访问，SRS 内部端口 8080） ----
+      - SRS_HTTP_BASE=http://srs:8080
       # ---- 服务器 ----
       - SERVER_BASE_URL=${SERVER_BASE_URL:-http://localhost:8080}
     volumes:
       # Docker socket - 允许容器内创建其他容器
-      # macOS Docker Desktop 使用特殊路径，需要读写权限
-      - /Users/longxinliu/.docker/run/docker.sock:/var/run/docker.sock:rw
+      - ${DOCKER_SOCK_PATH:-/var/run/docker.sock}:/var/run/docker.sock:rw
       # Python 代码沙箱缓存和临时目录
       - python-sandbox-venvs:/opt/novacloudedu/venvs
       - python-sandbox-tmp:/tmp/novacloudedu-sandbox
@@ -340,7 +343,7 @@ services:
       - JWT_SECRET=${JWT_SECRET:-NovaCloudEduSecretKey123456789012345678901234567890}
       - REDIS_ADDR=redis:6379
       - REDIS_PASSWORD=${REDIS_PASSWORD:-}
-      - JAVA_BACKEND_URL=http://host.docker.internal:8080
+      - JAVA_BACKEND_URL=http://backend:8080
       - LIVEKIT_URL=${LIVEKIT_URL:-ws://livekit:7880}
       - LIVEKIT_API_KEY=${LIVEKIT_API_KEY:-devkey}
       - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET:-devsecret}
