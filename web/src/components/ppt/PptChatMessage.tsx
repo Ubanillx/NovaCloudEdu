@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import {
-  Bot, Download, Check, Edit3, Loader2, FileText,
+  Download, Check, Edit3, Loader2, FileText,
   AlertCircle, ChevronRight, ExternalLink,
 } from 'lucide-react';
 import MarkdownRenderer from '../chat/MarkdownRenderer';
+import OutlineJsonEditor from './OutlineJsonEditor';
 import type { PptChatMessage as PptChatMessageData } from '../../hooks/usePptChat';
 import type { useTextToSpeech } from '../../hooks/useTextToSpeech';
 import AiMessageActions from '../chat/AiMessageActions';
@@ -180,6 +181,9 @@ interface PptChatMessageProps {
   tts: ReturnType<typeof useTextToSpeech>;
   onConfirmOutline?: () => void;
   onReviseOutline?: (feedback: string) => void;
+  onUpdateOutline?: (json: string) => void;
+  outlineJson?: string;
+  isGenerating?: boolean;
 }
 
 const PptChatMessageComponent: React.FC<PptChatMessageProps> = ({
@@ -188,20 +192,20 @@ const PptChatMessageComponent: React.FC<PptChatMessageProps> = ({
   tts,
   onConfirmOutline,
   onReviseOutline,
+  onUpdateOutline,
+  outlineJson,
+  isGenerating,
 }) => {
   const { type, content, isStreaming } = message;
 
   // ---- User message ----
   if (type === 'user') {
     return (
-      <div className="flex gap-3 justify-end">
+      <div className="flex justify-end">
         <div className="max-w-[75%]">
           <div className="rounded-2xl px-4 py-3 bg-brand-500 text-white rounded-tr-sm">
             <p className="text-sm leading-relaxed whitespace-pre-wrap">{content}</p>
           </div>
-        </div>
-        <div className="w-8 h-8 rounded-lg bg-gray-200 dark:bg-gray-700 flex items-center justify-center flex-shrink-0 shadow-sm mt-0.5">
-          <span className="text-xs font-bold text-gray-600 dark:text-gray-300">我</span>
         </div>
       </div>
     );
@@ -210,11 +214,8 @@ const PptChatMessageComponent: React.FC<PptChatMessageProps> = ({
   // ---- AI text message ----
   if (type === 'ai-text') {
     return (
-      <div className="flex gap-3 justify-start">
-        <div className="w-8 h-8 rounded-lg bg-brand-500 flex items-center justify-center flex-shrink-0 shadow-sm mt-0.5">
-          <Bot size={16} className="text-white" />
-        </div>
-        <div className="max-w-[75%]">
+      <div className="flex justify-start">
+        <div className="max-w-[80%]">
           <div className="rounded-2xl px-4 py-3 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-tl-sm border border-gray-100 dark:border-gray-700 shadow-sm">
             {content ? (
               <MarkdownRenderer
@@ -243,15 +244,28 @@ const PptChatMessageComponent: React.FC<PptChatMessageProps> = ({
   }
 
   // ---- Outline card ----
-  if (type === 'outline-card' && message.outlineMarkdown) {
-    return (
-      <div className="flex gap-3 justify-start">
-        <div className="w-8 h-8 rounded-lg bg-brand-500 flex items-center justify-center flex-shrink-0 shadow-sm mt-0.5">
-          <Bot size={16} className="text-white" />
+  if (type === 'outline-card' && (message.outlineMarkdown || outlineJson)) {
+    // Use JSON editor if outlineJson is available and not yet confirmed
+    if (outlineJson && !message.actionDone) {
+      return (
+        <div className="flex justify-start">
+          <div className="flex-1 max-w-[90%]">
+            <OutlineJsonEditor
+              outlineJson={outlineJson}
+              onSave={onUpdateOutline || (() => {})}
+              onConfirm={onConfirmOutline || (() => {})}
+              isLoading={isGenerating}
+            />
+          </div>
         </div>
+      );
+    }
+    // Fallback: markdown outline card
+    return (
+      <div className="flex justify-start">
         <div className="max-w-[85%]">
           <OutlineCard
-            markdown={message.outlineMarkdown}
+            markdown={message.outlineMarkdown || ''}
             actionDone={message.actionDone}
             onConfirm={onConfirmOutline}
             onRevise={onReviseOutline}
@@ -264,10 +278,7 @@ const PptChatMessageComponent: React.FC<PptChatMessageProps> = ({
   // ---- Progress card ----
   if (type === 'progress-card' && message.progress) {
     return (
-      <div className="flex gap-3 justify-start">
-        <div className="w-8 h-8 rounded-lg bg-brand-500 flex items-center justify-center flex-shrink-0 shadow-sm mt-0.5">
-          <Bot size={16} className="text-white" />
-        </div>
+      <div className="flex justify-start">
         <ProgressCard current={message.progress.current} total={message.progress.total} />
       </div>
     );
@@ -276,10 +287,7 @@ const PptChatMessageComponent: React.FC<PptChatMessageProps> = ({
   // ---- Download card ----
   if (type === 'download-card' && message.downloadUrl) {
     return (
-      <div className="flex gap-3 justify-start">
-        <div className="w-8 h-8 rounded-lg bg-brand-500 flex items-center justify-center flex-shrink-0 shadow-sm mt-0.5">
-          <Bot size={16} className="text-white" />
-        </div>
+      <div className="flex justify-start">
         <DownloadCard url={message.downloadUrl} fileName={message.downloadFileName} />
       </div>
     );
@@ -288,7 +296,7 @@ const PptChatMessageComponent: React.FC<PptChatMessageProps> = ({
   // ---- Status message ----
   if (type === 'status') {
     return (
-      <div className="flex justify-start pl-11">
+      <div className="flex justify-start">
         <div className="flex items-center gap-2 px-4 py-1.5 bg-gray-100 dark:bg-gray-800 rounded-full">
           <ChevronRight size={12} className="text-gray-400" />
           <span className="text-xs text-gray-500 dark:text-gray-400">{content}</span>
@@ -300,11 +308,9 @@ const PptChatMessageComponent: React.FC<PptChatMessageProps> = ({
   // ---- Error message ----
   if (type === 'error') {
     return (
-      <div className="flex gap-3 justify-start">
-        <div className="w-8 h-8 rounded-lg bg-red-500 flex items-center justify-center flex-shrink-0 shadow-sm mt-0.5">
-          <AlertCircle size={16} className="text-white" />
-        </div>
-        <div className="rounded-2xl px-4 py-3 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800/40 max-w-[75%]">
+      <div className="flex justify-start">
+        <div className="flex items-center gap-2 rounded-2xl px-4 py-3 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800/40 max-w-[75%]">
+          <AlertCircle size={14} className="text-red-500 flex-shrink-0" />
           <p className="text-sm text-red-700 dark:text-red-300">{content}</p>
         </div>
       </div>
