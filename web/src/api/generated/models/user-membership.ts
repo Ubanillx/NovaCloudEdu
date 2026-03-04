@@ -27,9 +27,9 @@ export interface UserMembership {
     'status'?: UserMembershipStatusEnum;
     'createTime'?: string;
     'updateTime'?: string;
+    'active'?: boolean;
     'delete'?: boolean;
     'expired'?: boolean;
-    'active'?: boolean;
 }
 
 export const UserMembershipStatusEnum = {

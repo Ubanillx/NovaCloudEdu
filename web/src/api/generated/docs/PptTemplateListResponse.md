@@ -13,6 +13,7 @@ Name | Type | Description | Notes
 **templateUrl** | **string** | 模板文件URL | [optional] [default to undefined]
 **slideCount** | **number** | 页数 | [optional] [default to undefined]
 **enabled** | **boolean** | 是否启用 | [optional] [default to undefined]
+**parseStatus** | **string** | 解析状态: pending/parsing/ready/failed | [optional] [default to undefined]
 
 ## Example
 
@@ -27,6 +28,7 @@ const instance: PptTemplateListResponse = {
     templateUrl,
     slideCount,
     enabled,
+    parseStatus,
 };
 ```
 

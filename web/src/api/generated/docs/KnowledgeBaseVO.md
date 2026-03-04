@@ -22,6 +22,7 @@ Name | Type | Description | Notes
 **useDynamicTopK** | **boolean** |  | [optional] [default to undefined]
 **defaultTopK** | **number** |  | [optional] [default to undefined]
 **queryRewriteModelId** | **string** |  | [optional] [default to undefined]
+**rerankModel** | **string** |  | [optional] [default to undefined]
 **documentCount** | **number** |  | [optional] [default to undefined]
 **chunkCount** | **number** |  | [optional] [default to undefined]
 **status** | **string** |  | [optional] [default to undefined]
@@ -52,6 +53,7 @@ const instance: KnowledgeBaseVO = {
     useDynamicTopK,
     defaultTopK,
     queryRewriteModelId,
+    rerankModel,
     documentCount,
     chunkCount,
     status,

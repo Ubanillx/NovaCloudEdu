@@ -14,9 +14,9 @@ Name | Type | Description | Notes
 **status** | **string** |  | [optional] [default to undefined]
 **createTime** | **string** |  | [optional] [default to undefined]
 **updateTime** | **string** |  | [optional] [default to undefined]
+**active** | **boolean** |  | [optional] [default to undefined]
 **_delete** | **boolean** |  | [optional] [default to undefined]
 **expired** | **boolean** |  | [optional] [default to undefined]
-**active** | **boolean** |  | [optional] [default to undefined]
 
 ## Example
 
@@ -33,9 +33,9 @@ const instance: UserMembership = {
     status,
     createTime,
     updateTime,
+    active,
     _delete,
     expired,
-    active,
 };
 ```
 
