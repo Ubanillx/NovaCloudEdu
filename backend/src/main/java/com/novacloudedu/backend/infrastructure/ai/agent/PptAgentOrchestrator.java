@@ -60,6 +60,9 @@ public class PptAgentOrchestrator {
     @Value("${ppt.agent.layout-selector-model:dashscope/qwen-max}")
     private String layoutSelectorModelId;
 
+    @Value("${ppt.agent.html-slide-model:dashscope/qwen-max}")
+    private String htmlSlideModelId;
+
     @Value("${ppt.agent.enable-content-validation:true}")
     private boolean enableContentValidation;
 
@@ -949,6 +952,15 @@ public class PptAgentOrchestrator {
                 .build();
     }
 
+    private HtmlSlideAgent buildHtmlSlideAgent() {
+        ChatModel model = chatModelFactory.createChatModelWithParams(
+                htmlSlideModelId, 0.7, 0.9, 8192);
+        return AiServices.builder(HtmlSlideAgent.class)
+                .chatModel(model)
+                .tools(webSearchTool, contentResearchTool)
+                .build();
+    }
+
     private Map<String, Object> generateSlideWithAgent(
             String section, String templateInfo, int slideIndex, int totalSlides,
             ContentAgent contentAgent) {
@@ -1408,6 +1420,10 @@ public class PptAgentOrchestrator {
     }
 
     private Map<String, Object> parseSlideConfigSafe(String jsonStr) {
+        if (jsonStr == null || jsonStr.isBlank()) {
+            log.warn("parseSlideConfigSafe: jsonStr is null or blank");
+            return new HashMap<>();
+        }
         try {
             // 清理可能的 markdown code fence
             String cleaned = jsonStr.trim();
@@ -1440,6 +1456,10 @@ public class PptAgentOrchestrator {
     }
 
     private JsonNode parseJsonSafe(String jsonStr) {
+        if (jsonStr == null || jsonStr.isBlank()) {
+            log.warn("parseJsonSafe: jsonStr is null or blank");
+            return null;
+        }
         try {
             String cleaned = jsonStr.trim();
             if (cleaned.startsWith("```")) {
@@ -1635,6 +1655,757 @@ public class PptAgentOrchestrator {
         // 兼容旧格式
         cleaned = cleaned.replaceAll("<!--\\s*template_slide_index\\s*=\\s*\\d+\\s*-->", "");
         return cleaned.trim();
+    }
+
+    // ==================== HTML 模式：无模板幻灯片生成 ====================
+
+    /**
+     * HTML 模式：内容扩写 — 将简短大纲扩展为详细内容
+     * cover/ending 页不扩写（保持简洁），内容页扩展要点为 4-6 条详细描述
+     */
+    private String expandSectionForHtml(String section, int slideIndex, int totalSlides) {
+        String slideType = inferHtmlSlideType(slideIndex, totalSlides, section);
+
+        // cover / ending 保持简洁，不需要扩写
+        if ("cover".equals(slideType) || "ending".equals(slideType) || "section".equals(slideType)) {
+            return section;
+        }
+
+        try {
+            String prompt = String.format("""
+                    你是一位专业的演示文稿内容编辑。请将以下简短大纲扩写为适合演示文稿展示的详细内容。
+                    
+                    ## 原始大纲
+                    %s
+                    
+                    ## 扩写要求
+                    1. 保留原标题不变
+                    2. 将每个要点扩展为 1-2 句话的详细描述（包含具体数据、案例或解释）
+                    3. 如果要点少于 4 个，补充相关要点到 4-6 个
+                    4. 每个要点应独立成段，适合放在单独的卡片中展示
+                    5. 如果涉及数据或统计，添加具体数字（可以合理估算）
+                    6. 保持专业但易懂的语言风格
+                    7. 使用与原文相同的语言（中文大纲 → 中文扩写）
+                    
+                    ## 输出格式
+                    直接输出扩写后的 Markdown 内容（保留标题层级），不要输出其他解释文字。
+                    """, section);
+
+            String expanded = langchainChatService.chat(contentModelId,
+                    "你是专业的演示文稿内容编辑，擅长将简短大纲扩写为详细、有深度的演示内容。",
+                    prompt);
+
+            if (expanded != null && !expanded.isBlank() && expanded.length() > section.length()) {
+                log.info("第{}页内容扩写完成: {}字 → {}字", slideIndex + 1, section.length(), expanded.length());
+                return expanded.trim();
+            }
+        } catch (Exception e) {
+            log.warn("第{}页内容扩写失败，使用原始大纲: {}", slideIndex + 1, e.getMessage());
+        }
+
+        return section;
+    }
+
+    /**
+     * HTML 模式：单页 HTML 幻灯片生成
+     */
+    private Map<String, Object> generateHtmlSlideWithAgent(
+            String section, int slideIndex, int totalSlides,
+            String globalColorScheme, HtmlSlideAgent htmlAgent) {
+
+        String slideType = inferHtmlSlideType(slideIndex, totalSlides, section);
+
+        String designDirective = globalColorScheme != null ? globalColorScheme :
+                "Use a harmonious modern color palette with gradients. " +
+                "Keep the same visual language across all slides.";
+
+        // 根据幻灯片类型给出具体的布局指令
+        String layoutHint = switch (slideType) {
+            case "cover" -> "LAYOUT: Full-bleed gradient background. Large title (72-80px) centered. " +
+                    "Add 2-3 decorative geometric shapes (large semi-transparent circles, diagonal bars). " +
+                    "Subtitle below title. Author/date at bottom.";
+            case "section" -> "LAYOUT: Bold gradient or dark background. Large chapter number (120px+, semi-transparent). " +
+                    "Chapter title (56-64px, light text). Accent line. Corner decorative elements.";
+            case "ending" -> "LAYOUT: Gradient background matching cover style. Large centered closing text. " +
+                    "Decorative shapes echoing cover design. Key takeaway or contact info below.";
+            default -> "LAYOUT: Colored title bar at top (full-width, 80px height). " +
+                    "Content area: arrange points as CARD GRID (2×2 or 3×1), each card with: " +
+                    "rounded corners (16px), box-shadow, left color accent border (4-6px), " +
+                    "emoji icon circle on left, text on right. " +
+                    "Add decorative footer bar or page indicator at bottom. " +
+                    "NEVER use plain bullet text lists — always use card-based layouts!";
+        };
+
+        String input = String.format("""
+                Create a visually STUNNING HTML slide. It must look like a premium keynote design, NOT a plain document.
+
+                ## Slide Position
+                Slide %d of %d — Type: **%s**
+
+                ## %s
+
+                ## Global Design Directive
+                %s
+
+                ## Content for This Slide
+                %s
+
+                ## CRITICAL VISUAL REQUIREMENTS
+                ⚠ Plain white backgrounds with simple text are UNACCEPTABLE. You MUST include:
+                - Gradient background (linear-gradient or radial-gradient)
+                - At least 2-3 decorative div elements (colored circles, bars, accent shapes)
+                - Card-based layouts with box-shadow (0 8px 32px rgba(0,0,0,0.12)) and border-radius (16px)
+                - Unicode emoji symbols (📊💡🎯⚡🔬📈🏆✅🌐🚀) as visual icon anchors in colored circles
+                - Multi-column flexbox or grid layout (NOT single-column plain text)
+                - Colored accent bars, header strips, or sidebar panels
+                - Strong visual hierarchy: title (≥48px bold), subtitle, card content (≥24px)
+
+                ## Technical Rules
+                - Single root `<div>`: width:1920px; height:1080px; overflow:hidden
+                - ALL styles inline (style="..."). NO <style> tags, NO external CSS/JS
+                - Font: Arial, 'Helvetica Neue', sans-serif. NO external fonts
+                - Text language MUST match the content above (Chinese → Chinese)
+
+                ## Output — ONLY pure JSON:
+                {"slide_html": "...", "slide_type": "...", "speaker_notes": "...", "image_suggestions": [...]}
+                """,
+                slideIndex + 1, totalSlides, slideType,
+                layoutHint,
+                designDirective,
+                cleanSectionText(section));
+
+        String result = htmlAgent.generateHtmlSlide(input);
+        Map<String, Object> slideConfig = parseSlideConfigSafe(result);
+
+        // 确保必要字段存在
+        if (!slideConfig.containsKey("slide_html")) {
+            log.warn("第{}页 HTML 生成缺少 slide_html 字段，使用 fallback", slideIndex + 1);
+            return createFallbackHtmlSlideConfig(section, slideIndex, totalSlides);
+        }
+
+        slideConfig.put("mode", "html");
+        return slideConfig;
+    }
+
+    /**
+     * HTML 模式：并发生成所有 HTML 幻灯片
+     */
+    public List<Map<String, Object>> generateHtmlSlidesParallel(
+            List<String> sections,
+            String userStyleHint,
+            BiConsumer<Integer, Map<String, Object>> progressCallback,
+            AgentTaskTracker tracker,
+            SlideStatusCallback slideStatusCallback) {
+
+        log.info("HTML 模式 Stage 2 - 并发生成 {} 页 HTML 幻灯片, concurrency={}",
+                sections.size(), concurrency);
+
+        HtmlSlideAgent sharedHtmlAgent = buildHtmlSlideAgent();
+        DesignAgent sharedDesignAgent = buildDesignAgent();
+
+        int totalSlides = sections.size();
+        Map<Integer, Map<String, Object>> resultsMap = new ConcurrentHashMap<>();
+        List<CompletableFuture<Void>> futures = new ArrayList<>();
+
+        // 全局设计指令：用户提示 > 默认配色方案
+        String globalColorScheme;
+        if (userStyleHint != null && !userStyleHint.isBlank()) {
+            globalColorScheme = "USER STYLE DIRECTIVE (highest priority):\n" +
+                    userStyleHint + "\n\n" +
+                    "ADDITIONAL RULES:\n" +
+                    "- Maintain visual consistency across ALL slides.\n" +
+                    "- EVERY slide must use gradient backgrounds, card layouts with shadows, decorative shapes.\n" +
+                    "- Use the user's described style as the primary design language.\n" +
+                    "- Include emoji icon circles, colored accent bars, multi-column grids.\n" +
+                    "- NEVER produce a plain white slide with simple text — that is a FAILURE.";
+        } else {
+            globalColorScheme = "DEFAULT DESIGN RULES — apply to EVERY slide:\n" +
+                    "- Use a deep blue-to-purple gradient palette (cover/ending: dark gradient, content: light gradient).\n" +
+                    "- Primary accent: vibrant blue (#2563EB). Secondary: purple (#7C3AED).\n" +
+                    "- ALL slides must have gradient backgrounds (linear-gradient), NOT plain solid white.\n" +
+                    "- Content slides: light gradient (e.g. linear-gradient(135deg, #F8FAFC, #EEF2FF)).\n" +
+                    "- Cover/ending: dark gradient (e.g. linear-gradient(135deg, #1E293B, #312E81)).\n" +
+                    "- Use card-based layouts with box-shadow and border-radius for all content.\n" +
+                    "- Include decorative elements: colored circles, accent bars, geometric shapes.\n" +
+                    "- Emoji icons in colored circles as visual anchors on each card.\n" +
+                    "- NEVER produce a plain white slide with simple text — that is a FAILURE.";
+        }
+
+        Map<Integer, String> contentTaskIds = new ConcurrentHashMap<>();
+        Map<Integer, String> designTaskIds = new ConcurrentHashMap<>();
+
+        if (tracker != null) {
+            for (int i = 0; i < totalSlides; i++) {
+                contentTaskIds.put(i, tracker.addTask(AgentTaskTracker.AgentRole.CONTENT,
+                        String.format("生成第 %d/%d 页 HTML 内容", i + 1, totalSlides), i));
+                designTaskIds.put(i, tracker.addTask(AgentTaskTracker.AgentRole.DESIGN,
+                        String.format("第 %d/%d 页视觉优化", i + 1, totalSlides), i));
+            }
+            tracker.pushFullList();
+        }
+
+        for (int i = 0; i < totalSlides; i++) {
+            final int slideIndex = i;
+            final String section = sections.get(i);
+
+            CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
+                try {
+                    log.info("HTML 模式：开始生成第 {}/{} 页", slideIndex + 1, totalSlides);
+
+                    if (slideStatusCallback != null) {
+                        slideStatusCallback.onStatusChange(slideIndex, "expanding", "扩写内容...");
+                    }
+                    if (tracker != null) {
+                        tracker.startTask(contentTaskIds.get(slideIndex), "内容扩写中...");
+                    }
+
+                    // 内容扩写：将简短大纲扩展为详细内容
+                    String expandedSection = expandSectionForHtml(section, slideIndex, totalSlides);
+
+                    if (slideStatusCallback != null) {
+                        slideStatusCallback.onStatusChange(slideIndex, "generating", "AI 生成 HTML 内容...");
+                    }
+                    if (tracker != null) {
+                        tracker.updateDetail(contentTaskIds.get(slideIndex), "HtmlSlideAgent 正在生成...");
+                    }
+
+                    Map<String, Object> slideConfig = generateHtmlSlideWithAgent(
+                            expandedSection, slideIndex, totalSlides, globalColorScheme, sharedHtmlAgent);
+
+                    if (tracker != null) {
+                        tracker.completeTask(contentTaskIds.get(slideIndex), "HTML 内容生成完成");
+                    }
+
+                    // DesignAgent 为 HTML 幻灯片生成配图
+                    if (slideStatusCallback != null) {
+                        slideStatusCallback.onStatusChange(slideIndex, "designing", "视觉优化...");
+                    }
+                    if (tracker != null) {
+                        tracker.startTask(designTaskIds.get(slideIndex), "DesignAgent 检查配图需求...");
+                    }
+
+                    enrichHtmlSlideWithDesign(slideConfig, section, slideIndex, sharedDesignAgent);
+
+                    if (tracker != null) {
+                        boolean hasImage = slideConfig.containsKey("generated_image_url");
+                        tracker.completeTask(designTaskIds.get(slideIndex),
+                                hasImage ? "已生成配图" : "无需配图，跳过");
+                    }
+
+                    if (slideStatusCallback != null) {
+                        slideStatusCallback.onStatusChange(slideIndex, "rendering", "渲染预览...");
+                    }
+
+                    resultsMap.put(slideIndex, slideConfig);
+
+                    if (progressCallback != null) {
+                        progressCallback.accept(slideIndex, slideConfig);
+                    }
+
+                    if (slideStatusCallback != null) {
+                        slideStatusCallback.onStatusChange(slideIndex, "done", "完成");
+                    }
+
+                    log.info("HTML 模式：第 {}/{} 页生成完成", slideIndex + 1, totalSlides);
+
+                } catch (Exception e) {
+                    log.error("HTML 模式：第 {}/{} 页生成失败", slideIndex + 1, totalSlides, e);
+                    if (slideStatusCallback != null) {
+                        slideStatusCallback.onStatusChange(slideIndex, "failed", "生成失败");
+                    }
+                    if (tracker != null) {
+                        tracker.failTask(contentTaskIds.get(slideIndex), "生成失败: " + e.getMessage());
+                        tracker.skipTask(designTaskIds.get(slideIndex), "内容生成失败，跳过视觉优化");
+                    }
+                    Map<String, Object> fallback = createFallbackHtmlSlideConfig(section, slideIndex, totalSlides);
+                    resultsMap.put(slideIndex, fallback);
+                    if (progressCallback != null) {
+                        progressCallback.accept(slideIndex, fallback);
+                    }
+                }
+            }, slideExecutor)
+            .orTimeout(120, TimeUnit.SECONDS)
+            .exceptionally(ex -> {
+                if (ex instanceof java.util.concurrent.TimeoutException
+                        || (ex.getCause() instanceof java.util.concurrent.TimeoutException)) {
+                    log.error("HTML 模式：第 {}/{} 页生成超时（120s）", slideIndex + 1, totalSlides);
+                    if (slideStatusCallback != null) {
+                        slideStatusCallback.onStatusChange(slideIndex, "failed", "生成超时");
+                    }
+                    Map<String, Object> fallback = createFallbackHtmlSlideConfig(section, slideIndex, totalSlides);
+                    resultsMap.put(slideIndex, fallback);
+                    if (progressCallback != null) {
+                        progressCallback.accept(slideIndex, fallback);
+                    }
+                }
+                return null;
+            });
+
+            futures.add(future);
+        }
+
+        try {
+            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
+                    .get(300, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            log.error("HTML 模式：并发生成超时或异常", e);
+        }
+
+        List<Map<String, Object>> orderedResults = new ArrayList<>();
+        for (int i = 0; i < totalSlides; i++) {
+            Map<String, Object> config = resultsMap.get(i);
+            if (config != null) {
+                orderedResults.add(config);
+            }
+        }
+
+        log.info("HTML 模式 Stage 2 完成: 成功生成 {}/{} 页", orderedResults.size(), totalSlides);
+        return orderedResults;
+    }
+
+    /**
+     * HTML 模式：带反思修复循环的完整生成
+     */
+    public GenerationWithEvalResult generateWithReflectionHtml(
+            List<String> sections,
+            String outline,
+            String userStyleHint,
+            BiConsumer<Integer, Map<String, Object>> progressCallback,
+            RepairProgressCallback repairCallback,
+            AgentTaskTracker tracker,
+            SlideStatusCallback slideStatusCallback) {
+
+        log.info("HTML 模式：开始带反思修复的幻灯片生成: {} 页, threshold={}, maxRounds={}, styleHint='{}'",
+                sections.size(), qualityThreshold, maxRepairRounds,
+                (userStyleHint == null || userStyleHint.isEmpty()) ? "(default)" : userStyleHint);
+
+        // Stage 2: 初次并发生成 HTML 幻灯片
+        List<Map<String, Object>> allSlides = generateHtmlSlidesParallel(
+                sections, userStyleHint, progressCallback, tracker, slideStatusCallback);
+
+        if (allSlides.isEmpty()) {
+            return new GenerationWithEvalResult(allSlides, EvaluationResult.defaultResult(), 0);
+        }
+
+        // Stage 3: 评估 → 修复循环
+        int repairRound = 0;
+        EvaluationResult evalResult = null;
+
+        for (int round = 0; round <= maxRepairRounds; round++) {
+            String evalTaskId = null;
+            if (tracker != null) {
+                evalTaskId = tracker.startNewTask(AgentTaskTracker.AgentRole.EVALUATOR,
+                        round == 0 ? "HTML 幻灯片质量评估" : String.format("第 %d 轮修复后重新评估", round),
+                        round == 0 ? "正在审查 HTML 幻灯片质量..." : "重新审查修复后的页面...");
+            }
+
+            if (repairCallback != null) {
+                repairCallback.onProgress(round, -1,
+                        round == 0 ? "EvaluatorAgent 正在审查 HTML 幻灯片质量..."
+                                   : String.format("第 %d 轮修复后重新审查...", round));
+            }
+
+            if (slideStatusCallback != null) {
+                for (int si = 0; si < allSlides.size(); si++) {
+                    slideStatusCallback.onStatusChange(si, "evaluating",
+                            round == 0 ? "质量审查中..." : "重新审查中...");
+                }
+            }
+
+            // HTML 模式使用预览图进行视觉评估
+            List<String> previewUrls = extractPreviewImageUrls(allSlides);
+            evalResult = evaluatePresentationWithVision(allSlides, outline, previewUrls);
+
+            log.info("HTML 模式评估结果 (round={}): overall={}, content={}, design={}, coherence={}",
+                    round, evalResult.overallScore(), evalResult.contentScore(),
+                    evalResult.designScore(), evalResult.coherenceScore());
+
+            if (tracker != null) {
+                tracker.completeTask(evalTaskId, String.format(
+                        "评估完成: 总分%d (内容%d/设计%d/连贯%d)",
+                        evalResult.overallScore(), evalResult.contentScore(),
+                        evalResult.designScore(), evalResult.coherenceScore()));
+            }
+
+            if (slideStatusCallback != null) {
+                for (int si = 0; si < allSlides.size(); si++) {
+                    slideStatusCallback.onStatusChange(si, "done", "完成");
+                }
+            }
+
+            if (evalResult.overallScore() >= qualityThreshold) {
+                log.info("HTML 模式质量达标 (score={} >= threshold={})", evalResult.overallScore(), qualityThreshold);
+                break;
+            }
+
+            if (round == maxRepairRounds) {
+                log.info("HTML 模式：已达到最大修复轮次 {}", maxRepairRounds);
+                break;
+            }
+
+            // 识别低分页面
+            List<SlideFeedback> slideFeedbacks = evalResult.slideFeedbacks();
+            List<Integer> weakSlideIndexes = new ArrayList<>();
+            if (slideFeedbacks != null) {
+                for (SlideFeedback fb : slideFeedbacks) {
+                    if (fb.score() < slideScoreThreshold && fb.slideIndex() < allSlides.size()) {
+                        weakSlideIndexes.add(fb.slideIndex());
+                    }
+                }
+            }
+
+            if (weakSlideIndexes.isEmpty()) {
+                for (int i = 1; i < allSlides.size() - 1 && weakSlideIndexes.size() < 3; i++) {
+                    weakSlideIndexes.add(i);
+                }
+            }
+            if (weakSlideIndexes.isEmpty()) break;
+
+            repairRound = round + 1;
+            log.info("HTML 模式第 {} 轮修复: 需修复 {} 页 (indexes={})",
+                    repairRound, weakSlideIndexes.size(), weakSlideIndexes);
+
+            if (tracker != null) {
+                for (int idx : weakSlideIndexes) {
+                    tracker.addTask(AgentTaskTracker.AgentRole.REPAIRER,
+                            String.format("修复第 %d 页 HTML (round %d)", idx + 1, repairRound), idx);
+                }
+                tracker.pushFullList();
+            }
+
+            if (slideStatusCallback != null) {
+                for (int idx : weakSlideIndexes) {
+                    slideStatusCallback.onStatusChange(idx, "repairing",
+                            String.format("第%d轮修复中...", repairRound));
+                }
+            }
+
+            repairHtmlWeakSlides(allSlides, sections, weakSlideIndexes,
+                    evalResult, repairRound, progressCallback, repairCallback, tracker, slideStatusCallback);
+        }
+
+        if (tracker != null) {
+            tracker.addTask(AgentTaskTracker.AgentRole.ASSEMBLER, "组装最终 PPT 文件（HTML→PPTX）");
+            tracker.pushFullList();
+        }
+
+        return new GenerationWithEvalResult(allSlides, evalResult, repairRound);
+    }
+
+    /**
+     * HTML 模式：并发修复低分 HTML 幻灯片
+     */
+    private void repairHtmlWeakSlides(
+            List<Map<String, Object>> allSlides,
+            List<String> sections,
+            List<Integer> weakIndexes,
+            EvaluationResult prevEval,
+            int repairRound,
+            BiConsumer<Integer, Map<String, Object>> progressCallback,
+            RepairProgressCallback repairCallback,
+            AgentTaskTracker tracker,
+            SlideStatusCallback slideStatusCallback) {
+
+        int totalSlides = sections.size();
+        Map<Integer, Map<String, Object>> repairedMap = new ConcurrentHashMap<>();
+        List<CompletableFuture<Void>> futures = new ArrayList<>();
+
+        String feedbackSummary = buildRepairFeedback(prevEval, weakIndexes);
+        HtmlSlideAgent repairHtmlAgent = buildHtmlSlideAgent();
+        DesignAgent repairDesignAgent = buildDesignAgent();
+
+        Map<Integer, String> repairTaskIds = new ConcurrentHashMap<>();
+        if (tracker != null) {
+            List<Map<String, Object>> snapshot = tracker.getTaskListSnapshot();
+            for (Map<String, Object> t : snapshot) {
+                if ("REPAIRER".equals(t.get("agentRole"))
+                        && "PENDING".equals(t.get("status"))
+                        && t.containsKey("slideIndex")) {
+                    int si = (int) t.get("slideIndex");
+                    if (weakIndexes.contains(si)) {
+                        repairTaskIds.put(si, (String) t.get("id"));
+                    }
+                }
+            }
+        }
+
+        for (int idx : weakIndexes) {
+            if (idx >= sections.size()) continue;
+            final int slideIndex = idx;
+            final String section = sections.get(slideIndex);
+
+            if (repairCallback != null) {
+                repairCallback.onProgress(repairRound, slideIndex,
+                        String.format("正在修复第 %d 页 HTML...", slideIndex + 1));
+            }
+
+            CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
+                String taskId = repairTaskIds.get(slideIndex);
+                try {
+                    if (tracker != null && taskId != null) {
+                        tracker.startTask(taskId, "带评估反馈重新生成 HTML 内容...");
+                    }
+
+                    Map<String, Object> repairedConfig = regenerateHtmlSlideWithFeedback(
+                            section, slideIndex, totalSlides, feedbackSummary, repairHtmlAgent);
+
+                    enrichHtmlSlideWithDesign(repairedConfig, section, slideIndex, repairDesignAgent);
+                    repairedMap.put(slideIndex, repairedConfig);
+
+                    if (progressCallback != null) {
+                        progressCallback.accept(slideIndex, repairedConfig);
+                    }
+                    if (tracker != null && taskId != null) {
+                        tracker.completeTask(taskId, "HTML 修复完成");
+                    }
+                    if (slideStatusCallback != null) {
+                        slideStatusCallback.onStatusChange(slideIndex, "done", "修复完成");
+                    }
+                } catch (Exception e) {
+                    log.error("HTML 模式：第 {}/{} 页修复失败", slideIndex + 1, totalSlides, e);
+                    if (slideStatusCallback != null) {
+                        slideStatusCallback.onStatusChange(slideIndex, "failed", "修复失败");
+                    }
+                    if (tracker != null && taskId != null) {
+                        tracker.failTask(taskId, "修复失败: " + e.getMessage());
+                    }
+                }
+            }, slideExecutor);
+
+            futures.add(future);
+        }
+
+        try {
+            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
+                    .get(180, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            log.error("HTML 模式修复超时或异常", e);
+        }
+
+        for (Map.Entry<Integer, Map<String, Object>> entry : repairedMap.entrySet()) {
+            allSlides.set(entry.getKey(), entry.getValue());
+        }
+    }
+
+    /**
+     * HTML 模式：带评估反馈的 HTML 幻灯片重新生成
+     */
+    private Map<String, Object> regenerateHtmlSlideWithFeedback(
+            String section, int slideIndex, int totalSlides,
+            String feedbackSummary, HtmlSlideAgent htmlAgent) {
+
+        String slideType = inferHtmlSlideType(slideIndex, totalSlides, section);
+
+        String input = String.format("""
+                REPAIR this HTML slide — it scored poorly. Create a VISUALLY STUNNING replacement.
+
+                ## Slide Position
+                Slide %d of %d — Type: **%s**
+
+                ## Content for This Slide
+                %s
+
+                ## Evaluation Feedback (MUST FIX ALL ISSUES)
+                %s
+
+                ## MANDATORY VISUAL COMPLEXITY (the previous version was too plain!)
+                ⚠ You MUST include ALL of these:
+                - Gradient background (linear-gradient or radial-gradient), NOT plain white
+                - Card-based layout with box-shadow and border-radius (16px)
+                - 2-3 decorative div elements (colored circles, accent bars, geometric shapes)
+                - Unicode emoji icons (📊💡🎯⚡🔬📈) in colored circles as visual anchors
+                - Multi-column flexbox/grid layout, NOT single-column plain text
+                - Colored title bar or header strip at top
+                - Strong visual hierarchy: title ≥48px bold, body ≥24px
+
+                ## Technical Rules
+                - Single root `<div>`: width:1920px; height:1080px; overflow:hidden
+                - ALL styles inline. NO <style> tags, NO external resources, NO JavaScript
+                - Font: Arial, 'Helvetica Neue', sans-serif
+                - Text language must match the content above
+
+                ## Output — ONLY pure JSON:
+                {"slide_html": "...", "slide_type": "...", "speaker_notes": "...", "image_suggestions": [...]}
+                """,
+                slideIndex + 1, totalSlides, slideType,
+                cleanSectionText(section),
+                feedbackSummary);
+
+        String result = htmlAgent.generateHtmlSlide(input);
+        Map<String, Object> slideConfig = parseSlideConfigSafe(result);
+
+        if (!slideConfig.containsKey("slide_html")) {
+            return createFallbackHtmlSlideConfig(section, slideIndex, totalSlides);
+        }
+
+        slideConfig.put("mode", "html");
+        return slideConfig;
+    }
+
+    /**
+     * HTML 模式：为 HTML 幻灯片补充 DesignAgent 生成的配图
+     * 如果 slide_html 中包含 image-placeholder，DesignAgent 会生成图片 URL，
+     * 由 Python 服务在渲染时替换 placeholder。
+     */
+    private void enrichHtmlSlideWithDesign(Map<String, Object> slideConfig, String section,
+                                           int slideIndex, DesignAgent designAgent) {
+        try {
+            Object suggestions = slideConfig.get("image_suggestions");
+            if (suggestions instanceof List<?> list && !list.isEmpty()) {
+                String input = String.format("""
+                        Provide a visual optimization plan for the following HTML slide.
+                        
+                        Slide content: %s
+                        Image suggestions: %s
+                        
+                        Image sourcing strategy:
+                        - If the topic is a REAL-WORLD entity, use searchWebImage first.
+                        - If the topic is ABSTRACT or CONCEPTUAL, use generateSlideImage directly.
+                        - Not every slide needs an image.
+                        
+                        Output pure JSON with "image_url" field.
+                        """, section, list);
+
+                String designResult = designAgent.designSlide(input);
+                JsonNode designJson = parseJsonSafe(designResult);
+
+                if (designJson != null && designJson.has("image_url")) {
+                    String imageUrl = designJson.path("image_url").asText(null);
+                    if (imageUrl != null && !imageUrl.isBlank() && !imageUrl.equals("null")) {
+                        slideConfig.put("generated_image_url", imageUrl);
+                        log.info("HTML 模式第{}页配图生成成功: {}", slideIndex + 1, imageUrl);
+
+                        // 将图片注入 HTML：替换 image-placeholder div 为 <img> 标签
+                        injectImageIntoHtml(slideConfig, imageUrl);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.warn("HTML 模式第{}页视觉优化跳过: {}", slideIndex + 1, e.getMessage());
+        }
+    }
+
+    /**
+     * 将生成的图片 URL 注入到 slide_html 中，替换 image-placeholder div
+     * 支持两种 placeholder 格式：
+     * 1. <div class="image-placeholder" data-image-suggestion="...">...</div>
+     * 2. 任何包含 class="image-placeholder" 的 div
+     */
+    private void injectImageIntoHtml(Map<String, Object> slideConfig, String imageUrl) {
+        String html = (String) slideConfig.get("slide_html");
+        if (html == null) {
+            return;
+        }
+
+        try {
+            String replaced = html;
+
+            if (html.contains("image-placeholder")) {
+                // 方式1：替换 image-placeholder div 为包含实际图片的 div
+                // 匹配: <div class="image-placeholder" ... >...</div>
+                replaced = html.replaceFirst(
+                        "(?s)<div[^>]*class=\"image-placeholder\"[^>]*>.*?</div>",
+                        String.format(
+                                "<div style=\"width:100%%;height:100%%;overflow:hidden;border-radius:16px;"
+                                + "box-shadow:0 4px 20px rgba(0,0,0,0.1);\">"
+                                + "<img src=\"%s\" style=\"width:100%%;height:100%%;object-fit:cover;\" />"
+                                + "</div>",
+                                imageUrl));
+            }
+
+            if (replaced.equals(html)) {
+                // 方式2（fallback）：在根 div 的最后一个子元素前插入图片层
+                // 作为半透明背景覆盖在幻灯片上
+                String imgOverlay = String.format(
+                        "<div style=\"position:absolute;top:0;right:0;width:45%%;height:100%%;"
+                        + "overflow:hidden;opacity:0.15;z-index:0;\">"
+                        + "<img src=\"%s\" style=\"width:100%%;height:100%%;object-fit:cover;\" />"
+                        + "</div>",
+                        imageUrl);
+
+                // 在根 div 的第一个 > 之后插入（作为第一个子元素）
+                int firstClose = replaced.indexOf('>');
+                if (firstClose > 0) {
+                    // 确保根 div 有 position:relative
+                    if (!replaced.substring(0, firstClose).contains("position:")) {
+                        replaced = replaced.substring(0, firstClose).replace("style=\"",
+                                "style=\"position:relative;") + replaced.substring(firstClose);
+                        firstClose = replaced.indexOf('>');
+                    }
+                    replaced = replaced.substring(0, firstClose + 1) + imgOverlay
+                            + replaced.substring(firstClose + 1);
+                    log.info("图片已作为背景层注入 HTML: {}", imageUrl);
+                }
+            } else {
+                log.info("图片已替换 placeholder 注入 HTML: {}", imageUrl);
+            }
+
+            slideConfig.put("slide_html", replaced);
+        } catch (Exception e) {
+            log.warn("图片注入 HTML 失败: {}", e.getMessage());
+        }
+    }
+
+    /**
+     * HTML 模式 fallback：生成简单的 HTML 幻灯片
+     */
+    private Map<String, Object> createFallbackHtmlSlideConfig(String section, int slideIndex, int totalSlides) {
+        String cleaned = cleanSectionText(section);
+        String[] lines = cleaned.split("\n");
+        String title = lines.length > 0 ? lines[0].replaceAll("^#+\\s*", "") : "Slide " + (slideIndex + 1);
+
+        StringBuilder bodyHtml = new StringBuilder();
+        for (int i = 1; i < lines.length; i++) {
+            String line = lines[i].replaceAll("^[-*#\\s]+", "").trim();
+            if (!line.isEmpty()) {
+                bodyHtml.append(String.format(
+                        "<div style=\"font-size:28px;color:#334155;margin:16px 0;"
+                        + "padding:12px 20px;background:#F1F5F9;border-radius:8px;"
+                        + "border-left:4px solid #2563EB;\">%s</div>", line));
+            }
+        }
+
+        boolean isDarkSlide = slideIndex == 0 || slideIndex == totalSlides - 1;
+        String bg = isDarkSlide
+                ? "linear-gradient(135deg, #1E293B, #0F172A)"
+                : "#FFFFFF";
+        String titleColor = isDarkSlide ? "#F1F5F9" : "#1E293B";
+        String titleSize = slideIndex == 0 ? "64px" : "48px";
+        String layout = isDarkSlide
+                ? "display:flex;align-items:center;justify-content:center;flex-direction:column;"
+                : "padding:80px 100px;";
+        String accentBar = isDarkSlide
+                ? String.format("<div style=\"width:120px;height:4px;background:#2563EB;"
+                        + "margin:%s;border-radius:2px;\"></div>",
+                        slideIndex == 0 ? "32px auto 0" : "32px auto 0")
+                : "";
+
+        String html = String.format(
+                "<div style=\"width:1920px;height:1080px;background:%s;%s"
+                + "overflow:hidden;font-family:Arial,'Helvetica Neue',sans-serif;\">"
+                + "<div style=\"font-size:%s;font-weight:700;color:%s;"
+                + "letter-spacing:-0.5px;line-height:1.2;\">%s</div>"
+                + "%s%s</div>",
+                bg, layout, titleSize, titleColor, title, accentBar, bodyHtml);
+
+        Map<String, Object> config = new HashMap<>();
+        config.put("slide_html", html);
+        config.put("slide_type", inferHtmlSlideType(slideIndex, totalSlides, section));
+        config.put("speaker_notes", "");
+        config.put("image_suggestions", List.of());
+        config.put("mode", "html");
+        return config;
+    }
+
+    /**
+     * HTML 模式下的页面类型推断
+     */
+    private String inferHtmlSlideType(int slideIndex, int totalSlides, String section) {
+        if (slideIndex == 0) return "cover";
+        if (slideIndex == totalSlides - 1) return "ending";
+        String cleaned = section != null ? cleanSectionText(section).trim() : "";
+        if (cleaned.startsWith("## ") && !cleaned.contains("### ")) return "section";
+        return "content";
     }
 
     // ==================== 数据类 ====================

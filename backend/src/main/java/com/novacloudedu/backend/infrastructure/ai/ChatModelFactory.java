@@ -137,7 +137,7 @@ public class ChatModelFactory {
                 }
                 yield builder.build();
             }
-            case "openai", "deepseek", "moonshot", "siliconflow" -> {
+            case "openai", "deepseek", "moonshot", "siliconflow", "openrouter" -> {
                 var builder = OpenAiStreamingChatModel.builder()
                         .apiKey(providerConfig.getApiKey())
                         .modelName(pm.model())
@@ -193,7 +193,7 @@ public class ChatModelFactory {
                     .maxTokens(maxTokens != null ? maxTokens : 4096)
                     .topP(topP)
                     .build();
-            case "openai", "deepseek", "moonshot", "siliconflow" -> {
+            case "openai", "deepseek", "moonshot", "siliconflow", "openrouter" -> {
                 var builder = OpenAiChatModel.builder()
                         .apiKey(providerConfig.getApiKey())
                         .modelName(pm.model())
@@ -241,7 +241,7 @@ public class ChatModelFactory {
 
         return switch (pm.provider()) {
             case "dashscope" -> createDashScopeModel(providerConfig, modelConfig, pm.model());
-            case "openai", "deepseek", "moonshot", "siliconflow" ->
+            case "openai", "deepseek", "moonshot", "siliconflow", "openrouter" ->
                     createOpenAiModel(providerConfig, modelConfig, pm.model());
             case "zhipu" -> createZhipuModel(providerConfig, modelConfig, pm.model());
             case "ollama" -> createOllamaModel(providerConfig, modelConfig, pm.model());
@@ -309,7 +309,7 @@ public class ChatModelFactory {
                     .maxTokens(modelConfig.getMaxTokens())
                     .topP(modelConfig.getTopP())
                     .build();
-            case "openai", "deepseek", "moonshot", "siliconflow" -> {
+            case "openai", "deepseek", "moonshot", "siliconflow", "openrouter" -> {
                 var builder = OpenAiChatModel.builder()
                         .apiKey(providerConfig.getApiKey())
                         .modelName(pm.model())
