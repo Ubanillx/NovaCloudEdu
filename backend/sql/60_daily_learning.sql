@@ -25,6 +25,7 @@ CREATE INDEX IF NOT EXISTS idx_dw_publish_date ON daily_word(publish_date);
 CREATE INDEX IF NOT EXISTS idx_dw_word ON daily_word(word);
 CREATE INDEX IF NOT EXISTS idx_dw_category ON daily_word(category);
 CREATE INDEX IF NOT EXISTS idx_dw_difficulty ON daily_word(difficulty);
+CREATE UNIQUE INDEX IF NOT EXISTS uq_word_category ON daily_word(word, category);
 COMMENT ON TABLE daily_word IS '每日单词';
 COMMENT ON COLUMN daily_word.id IS 'ID';
 COMMENT ON COLUMN daily_word.word IS '单词';

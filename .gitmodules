@@ -1,0 +1,3 @@
+[submodule "english-vocabulary"]
+	path = english-vocabulary
+	url = https://github.com/KyleBing/english-vocabulary.git
