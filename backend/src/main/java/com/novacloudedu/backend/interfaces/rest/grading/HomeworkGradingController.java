@@ -15,6 +15,7 @@ import com.novacloudedu.backend.domain.grading.entity.QuestionGrading;
 import com.novacloudedu.backend.domain.grading.entity.StudentKnowledgeProfile;
 import com.novacloudedu.backend.domain.grading.valueobject.ErrorCategory;
 import com.novacloudedu.backend.exception.BusinessException;
+import com.novacloudedu.backend.infrastructure.ocr.BaiduOcrClient;
 import com.novacloudedu.backend.interfaces.rest.grading.dto.request.SubmitHomeworkRequest;
 import com.novacloudedu.backend.interfaces.rest.grading.dto.response.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -44,6 +45,7 @@ public class HomeworkGradingController {
     private final GradingStatsApplicationService statsService;
     private final SimilarQuestionService similarQuestionService;
     private final UserApplicationService userApplicationService;
+    private final BaiduOcrClient baiduOcrClient;
 
     @PostMapping(value = "/submit", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     @Operation(summary = "提交作业并开始批改（SSE流式返回进度）")
@@ -101,6 +103,40 @@ public class HomeworkGradingController {
                     return resp;
                 }).toList();
         return ResultUtils.success(responses);
+    }
+
+    // ==================== OCR 文字检测 API ====================
+
+    @PostMapping("/ocr/detect")
+    @Operation(summary = "OCR文字检测（返回文字块+坐标框）")
+    public BaseResponse<Map<String, Object>> detectText(@RequestBody Map<String, String> request) {
+        String imageUrl = request.get("imageUrl");
+        if (imageUrl == null || imageUrl.isBlank()) {
+            throw new BusinessException(40000, "imageUrl 不能为空");
+        }
+
+        log.info("OCR文字检测请求: {}", imageUrl);
+        List<BaiduOcrClient.TextBlock> textBlocks = baiduOcrClient.recognizeFromUrl(imageUrl);
+
+        List<Map<String, Object>> blocks = textBlocks.stream().map(block -> {
+            Map<String, Object> map = new LinkedHashMap<>();
+            map.put("text", block.text());
+            map.put("confidence", block.confidence());
+            if (block.box() != null && block.box().length == 4) {
+                Map<String, Integer> box = new LinkedHashMap<>();
+                box.put("left", block.box()[0]);
+                box.put("top", block.box()[1]);
+                box.put("right", block.box()[2]);
+                box.put("bottom", block.box()[3]);
+                map.put("boundingBox", box);
+            }
+            return map;
+        }).toList();
+
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("blocks", blocks);
+        result.put("blockCount", blocks.size());
+        return ResultUtils.success(result);
     }
 
     // ==================== 试卷选择 API ====================

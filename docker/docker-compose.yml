@@ -61,7 +61,7 @@ services:
       - redis_data:/data
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD-SHELL", "redis-cli -a \"$REDIS_PASSWORD\" --no-auth-warning ping | grep PONG"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -260,6 +260,10 @@ services:
       postgres:
         condition: service_healthy
       redis:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+      neo4j:
         condition: service_healthy
       gotenberg:
         condition: service_healthy
