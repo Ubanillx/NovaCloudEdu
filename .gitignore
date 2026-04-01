@@ -12,3 +12,9 @@ docker/data/
 
 # Java compiled classes in backend
 backend/com/
+
+# 论文文档目录
+paper/
+
+# Presenton 第三方子项目
+presenton/
