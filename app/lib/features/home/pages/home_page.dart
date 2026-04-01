@@ -1099,7 +1099,7 @@ class _HomePageState extends State<HomePage> {
                       // 章节数
                       _buildCourseStat(
                         PhosphorIcons.bookBookmark(),
-                        '${chaptersCount}章${sectionsCount > 0 ? ' $sectionsCount节' : ''}',
+                        '$chaptersCount章${sectionsCount > 0 ? ' $sectionsCount节' : ''}',
                         colors,
                       ),
                       const SizedBox(width: 12),

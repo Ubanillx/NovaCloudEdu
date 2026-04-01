@@ -911,7 +911,7 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
     if (seconds >= 3600) {
       final h = seconds ~/ 3600;
       final m = (seconds % 3600) ~/ 60;
-      return '$h小时${m > 0 ? '${m}分钟' : ''}';
+      return '$h小时${m > 0 ? '$m分钟' : ''}';
     }
     final m = seconds ~/ 60;
     return m > 0 ? '$m分钟' : '$seconds秒';

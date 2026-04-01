@@ -66,8 +66,8 @@ dependencies:
   # 图片裁切
   image_cropper: ^11.0.0
   
-  # ML Kit 文字识别（端侧OCR）
-  google_mlkit_text_recognition: ^0.15.1
+  # ML Kit 文字识别（端侧OCR）— 暂时注释，不支持 iOS 26 arm64 simulator
+  # google_mlkit_text_recognition: ^0.15.1
   
   # SQLite 本地数据库
   sqflite: ^2.3.0

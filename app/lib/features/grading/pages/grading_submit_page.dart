@@ -1204,13 +1204,11 @@ class _UploadedImage {
   final String localPath;
   final String name;
   String? remoteUrl;
-  _UploadStatus status;
+  _UploadStatus status = _UploadStatus.uploading;
 
   _UploadedImage({
     required this.localPath,
     required this.name,
-    this.remoteUrl,
-    this.status = _UploadStatus.uploading,
   });
 }
 

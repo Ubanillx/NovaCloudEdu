@@ -750,8 +750,9 @@ class _ReaderAiPanelState extends State<ReaderAiPanel> with SingleTickerProvider
                 final selected = _userAnswers.length > qi && _userAnswers[qi] == v;
                 final isCorrect = q.correctAnswer == v;
                 Color bgColor = Colors.transparent;
-                if (showResult && isCorrect) bgColor = Colors.green.withValues(alpha: 0.08);
-                else if (showResult && selected && !isCorrect) bgColor = Colors.red.withValues(alpha: 0.08);
+                if (showResult && isCorrect) {
+                  bgColor = Colors.green.withValues(alpha: 0.08);
+                } else if (showResult && selected && !isCorrect) bgColor = Colors.red.withValues(alpha: 0.08);
                 else if (selected) bgColor = tc.accent.withValues(alpha: 0.08);
                 return Expanded(
                   child: GestureDetector(
