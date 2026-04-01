@@ -4,7 +4,6 @@
 
 import 'dart:async';
 
-import 'package:built_value/json_object.dart';
 import 'package:built_value/serializer.dart';
 import 'package:dio/dio.dart';
 
@@ -16,7 +15,6 @@ import 'package:nova_api/src/model/base_response_dashboard_full_response.dart';
 import 'package:nova_api/src/model/base_response_dashboard_learning_response.dart';
 import 'package:nova_api/src/model/base_response_dashboard_overview_response.dart';
 import 'package:nova_api/src/model/base_response_dashboard_trends_response.dart';
-import 'package:nova_api/src/model/base_response_object.dart';
 import 'package:nova_api/src/model/date.dart';
 
 class AdminDashboardControllerApi {

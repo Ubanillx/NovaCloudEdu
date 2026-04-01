@@ -2,12 +2,10 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../services/camera_ocr_service.dart';
 import '../widgets/camera_guide_overlay.dart';
-import '../widgets/text_detection_overlay.dart';
 import '../widgets/capture_thumbnail_bar.dart';
 import 'image_crop_page.dart';
 
@@ -36,10 +34,8 @@ class _GradingCameraPageState extends State<GradingCameraPage>
   bool _isRearCamera = true;
   FlashMode _flashMode = FlashMode.auto;
 
-  // ML Kit 文字检测
+  // 服务端 OCR（拍照后识别）
   final _ocrService = CameraOcrService();
-  List<TextBlock> _detectedBlocks = [];
-  bool _enableTextDetection = true;
 
   // 已拍图片
   final List<File> _capturedImages = [];
@@ -130,47 +126,11 @@ class _GradingCameraPageState extends State<GradingCameraPage>
       await _cameraController!.initialize();
       await _cameraController!.setFlashMode(_flashMode);
 
-      // 启动帧流用于文字检测
-      if (_enableTextDetection) {
-        _startImageStream();
-      }
-
       if (mounted) {
         setState(() => _isInitialized = true);
       }
     } catch (e) {
       debugPrint('相机初始化失败: $e');
-    }
-  }
-
-  void _startImageStream() {
-    if (_cameraController == null || !_cameraController!.value.isInitialized) return;
-
-    try {
-      _cameraController!.startImageStream((CameraImage image) async {
-        if (!_enableTextDetection || !mounted) return;
-
-        final blocks = await _ocrService.processFrame(
-          image,
-          _cameraController!.description,
-        );
-
-        if (blocks != null && mounted) {
-          setState(() => _detectedBlocks = blocks);
-        }
-      });
-    } catch (e) {
-      debugPrint('启动帧流失败: $e');
-    }
-  }
-
-  Future<void> _stopImageStream() async {
-    try {
-      if (_cameraController != null && _cameraController!.value.isStreamingImages) {
-        await _cameraController!.stopImageStream();
-      }
-    } catch (e) {
-      debugPrint('停止帧流失败: $e');
     }
   }
 
@@ -183,9 +143,6 @@ class _GradingCameraPageState extends State<GradingCameraPage>
     setState(() => _isCapturing = true);
 
     try {
-      // 停止帧流后再拍照（避免冲突）
-      await _stopImageStream();
-
       // 快门白色闪烁动画
       _triggerShutterFlash();
 
@@ -194,8 +151,13 @@ class _GradingCameraPageState extends State<GradingCameraPage>
       // 压缩图片
       final file = await _compressImage(File(photo.path));
 
-      // 保存最后检测到的文字块用于裁切建议
-      final lastBlocks = List<TextBlock>.from(_detectedBlocks);
+      // 服务端 OCR 识别文字块（用于裁切建议）
+      List<TextBlock> ocrBlocks = [];
+      try {
+        ocrBlocks = await _ocrService.processImageFile(file);
+      } catch (e) {
+        debugPrint('拍照后OCR失败（不影响裁切）: $e');
+      }
 
       if (mounted) {
         // 自动进入裁切
@@ -203,7 +165,7 @@ class _GradingCameraPageState extends State<GradingCameraPage>
           MaterialPageRoute(
             builder: (_) => ImageCropPage(
               imageFile: file,
-              detectedBlocks: lastBlocks,
+              detectedBlocks: ocrBlocks,
             ),
           ),
         );
@@ -217,10 +179,6 @@ class _GradingCameraPageState extends State<GradingCameraPage>
     } finally {
       if (mounted) {
         setState(() => _isCapturing = false);
-        // 重新启动帧流
-        if (_enableTextDetection) {
-          _startImageStream();
-        }
       }
     }
   }
@@ -362,28 +320,14 @@ class _GradingCameraPageState extends State<GradingCameraPage>
   Future<void> _toggleCamera() async {
     if (_cameras.length < 2) return;
 
-    await _stopImageStream();
     await _cameraController?.dispose();
 
     setState(() {
       _isRearCamera = !_isRearCamera;
       _isInitialized = false;
-      _detectedBlocks.clear();
     });
 
     await _initCamera();
-  }
-
-  void _toggleTextDetection() {
-    setState(() {
-      _enableTextDetection = !_enableTextDetection;
-      if (!_enableTextDetection) {
-        _stopImageStream();
-        _detectedBlocks.clear();
-      } else {
-        _startImageStream();
-      }
-    });
   }
 
   // ==================== UI ====================
@@ -473,27 +417,6 @@ class _GradingCameraPageState extends State<GradingCameraPage>
           child: CameraPreview(controller),
         ),
 
-        // 文字检测叠加层
-        if (_enableTextDetection && _detectedBlocks.isNotEmpty)
-          Positioned.fill(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                return TextDetectionOverlay(
-                  blocks: _detectedBlocks,
-                  imageSize: Size(
-                    controller.value.previewSize?.height ?? constraints.maxWidth,
-                    controller.value.previewSize?.width ?? constraints.maxHeight,
-                  ),
-                  previewSize: Size(constraints.maxWidth, constraints.maxHeight),
-                  rotation: InputImageRotation.values.firstWhere(
-                    (r) => r.rawValue == controller.description.sensorOrientation,
-                    orElse: () => InputImageRotation.rotation0deg,
-                  ),
-                );
-              },
-            ),
-          ),
-
         // 引导框
         const Positioned.fill(
           child: CameraGuideOverlay(),
@@ -566,14 +489,6 @@ class _GradingCameraPageState extends State<GradingCameraPage>
             onTap: () => Navigator.of(context).pop(null),
           ),
           const Spacer(),
-          // 文字检测开关
-          _buildToolButton(
-            icon: _enableTextDetection ? Icons.text_fields : Icons.text_fields,
-            label: _enableTextDetection ? '检测开' : '检测关',
-            onTap: _toggleTextDetection,
-            isActive: _enableTextDetection,
-          ),
-          const SizedBox(width: 20),
           // 闪光灯
           _buildToolButton(
             icon: flashIcon,

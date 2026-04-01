@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
+import '../services/camera_ocr_service.dart' show TextBlock;
+
+/// Stub: 模拟 ML Kit InputImageRotation
+enum InputImageRotation { rotation0deg, rotation90deg, rotation180deg, rotation270deg }
 
 /// 实时文字检测叠加层
 /// 在相机预览上绘制识别到的文字区域

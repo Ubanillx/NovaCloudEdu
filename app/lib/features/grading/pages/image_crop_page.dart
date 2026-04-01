@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
-import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import '../services/camera_ocr_service.dart';
 
 /// 图片裁切确认页

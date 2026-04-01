@@ -1,139 +1,132 @@
 import 'dart:io';
 import 'dart:math';
 import 'dart:ui';
-import 'package:camera/camera.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
+import 'package:image_picker/image_picker.dart';
+import '../../../core/network/api_client.dart';
+import '../../../services/file_upload_service.dart';
 
-/// 相机 OCR 服务 — 封装 ML Kit 文字识别
+/// OCR 识别的文字块（含坐标）
+class TextBlock {
+  final Rect boundingBox;
+  final String text;
+  final double confidence;
+  TextBlock({required this.boundingBox, this.text = '', this.confidence = 0.0});
+}
+
+/// 相机 OCR 服务 — 服务端百度OCR方案
+/// 拍照后上传图片到 OSS，调用后端 /api/grading/ocr/detect 获取文字块+坐标
 class CameraOcrService {
   static CameraOcrService? _instance;
   factory CameraOcrService() => _instance ??= CameraOcrService._();
   CameraOcrService._();
 
-  final TextRecognizer _textRecognizer =
-      TextRecognizer(script: TextRecognitionScript.chinese);
+  final Dio _dio = ApiClient.instance.dio;
+  final _fileUploadService = FileUploadService();
 
-  bool _isProcessing = false;
-  DateTime _lastProcessTime = DateTime.now();
-
-  /// 节流间隔（毫秒）
-  static const int _throttleMs = 500;
-
-  /// 处理相机帧，返回识别到的文字块
-  /// 内置节流逻辑，避免频繁调用
-  Future<List<TextBlock>?> processFrame(CameraImage image, CameraDescription camera) async {
-    if (_isProcessing) return null;
-
-    final now = DateTime.now();
-    if (now.difference(_lastProcessTime).inMilliseconds < _throttleMs) return null;
-
-    _isProcessing = true;
-    _lastProcessTime = now;
-
+  /// 处理静态图片文件 — 上传到 OSS 后调用后端 OCR
+  /// [file] 可以是 File 或 XFile
+  Future<List<TextBlock>> processImageFile(dynamic file) async {
     try {
-      final inputImage = _convertCameraImage(image, camera);
-      if (inputImage == null) {
-        _isProcessing = false;
-        return null;
+      // 上传图片到 OSS
+      XFile xFile;
+      if (file is XFile) {
+        xFile = file;
+      } else if (file is File) {
+        xFile = XFile(file.path);
+      } else {
+        debugPrint('OCR: 不支持的文件类型 ${file.runtimeType}');
+        return [];
       }
 
-      final recognized = await _textRecognizer.processImage(inputImage);
-      _isProcessing = false;
-      return recognized.blocks;
-    } catch (e) {
-      debugPrint('OCR 帧处理失败: $e');
-      _isProcessing = false;
-      return null;
-    }
-  }
+      final uploadResult = await _fileUploadService.uploadFile(xFile, 'grading/ocr');
+      if (uploadResult?.fileUrl == null) {
+        debugPrint('OCR: 图片上传失败');
+        return [];
+      }
 
-  /// 处理静态图片文件
-  Future<List<TextBlock>> processImageFile(File file) async {
-    try {
-      final inputImage = InputImage.fromFile(file);
-      final recognized = await _textRecognizer.processImage(inputImage);
-      return recognized.blocks;
+      debugPrint('OCR: 图片已上传 ${uploadResult!.fileUrl}');
+
+      // 调用后端 OCR 检测
+      final response = await _dio.post(
+        '/api/grading/ocr/detect',
+        data: {'imageUrl': uploadResult.fileUrl},
+      );
+
+      if (response.statusCode == 200 && response.data != null) {
+        final data = response.data;
+        if ((data['code'] == 0 || data['code'] == 200) && data['data'] != null) {
+          return _parseBlocks(data['data']);
+        }
+      }
+
+      debugPrint('OCR: 后端返回异常 ${response.statusCode}');
+      return [];
     } catch (e) {
-      debugPrint('OCR 图片处理失败: $e');
+      debugPrint('OCR: 识别失败 $e');
       return [];
     }
   }
 
+  /// 解析后端返回的文字块
+  List<TextBlock> _parseBlocks(Map<String, dynamic> data) {
+    final blocksJson = data['blocks'] as List<dynamic>? ?? [];
+    final List<TextBlock> blocks = [];
+
+    for (final item in blocksJson) {
+      final text = item['text'] as String? ?? '';
+      final confidence = (item['confidence'] as num?)?.toDouble() ?? 0.0;
+      final box = item['boundingBox'] as Map<String, dynamic>?;
+
+      if (box != null) {
+        final left = (box['left'] as num?)?.toDouble() ?? 0;
+        final top = (box['top'] as num?)?.toDouble() ?? 0;
+        final right = (box['right'] as num?)?.toDouble() ?? 0;
+        final bottom = (box['bottom'] as num?)?.toDouble() ?? 0;
+        blocks.add(TextBlock(
+          boundingBox: Rect.fromLTRB(left, top, right, bottom),
+          text: text,
+          confidence: confidence,
+        ));
+      }
+    }
+
+    debugPrint('OCR: 识别到 ${blocks.length} 个文字块');
+    return blocks;
+  }
+
   /// 根据文字块计算建议裁切区域
+  /// 合并所有文字块的边界框，加上适当的边距
   static Rect? computeAutoCropRect(List<TextBlock> blocks, Size imageSize) {
     if (blocks.isEmpty) return null;
 
-    double left = double.infinity, top = double.infinity;
-    double right = 0, bottom = 0;
+    double minLeft = double.infinity;
+    double minTop = double.infinity;
+    double maxRight = 0;
+    double maxBottom = 0;
 
     for (final block in blocks) {
-      final rect = block.boundingBox;
-      left = min(left, rect.left);
-      top = min(top, rect.top);
-      right = max(right, rect.right);
-      bottom = max(bottom, rect.bottom);
+      minLeft = min(minLeft, block.boundingBox.left);
+      minTop = min(minTop, block.boundingBox.top);
+      maxRight = max(maxRight, block.boundingBox.right);
+      maxBottom = max(maxBottom, block.boundingBox.bottom);
     }
 
-    // 扩展 5% 边距
-    final padX = (right - left) * 0.05;
-    final padY = (bottom - top) * 0.05;
+    // 加 5% 边距
+    final paddingX = imageSize.width * 0.05;
+    final paddingY = imageSize.height * 0.05;
 
     return Rect.fromLTRB(
-      max(0, left - padX),
-      max(0, top - padY),
-      min(imageSize.width, right + padX),
-      min(imageSize.height, bottom + padY),
+      max(0, minLeft - paddingX),
+      max(0, minTop - paddingY),
+      min(imageSize.width, maxRight + paddingX),
+      min(imageSize.height, maxBottom + paddingY),
     );
-  }
-
-  /// 转换相机帧为 ML Kit InputImage
-  InputImage? _convertCameraImage(CameraImage image, CameraDescription camera) {
-    final sensorOrientation = camera.sensorOrientation;
-
-    InputImageRotation? rotation;
-    if (Platform.isIOS) {
-      rotation = InputImageRotation.values.firstWhere(
-        (r) => r.rawValue == sensorOrientation,
-        orElse: () => InputImageRotation.rotation0deg,
-      );
-    } else if (Platform.isAndroid) {
-      rotation = InputImageRotation.values.firstWhere(
-        (r) => r.rawValue == sensorOrientation,
-        orElse: () => InputImageRotation.rotation0deg,
-      );
-    }
-
-    if (rotation == null) return null;
-
-    final format = Platform.isAndroid
-        ? InputImageFormat.yuv_420_888
-        : InputImageFormat.bgra8888;
-
-    if (image.planes.isEmpty) return null;
-
-    return InputImage.fromBytes(
-      bytes: _concatenatePlanes(image.planes),
-      metadata: InputImageMetadata(
-        size: Size(image.width.toDouble(), image.height.toDouble()),
-        rotation: rotation,
-        format: format,
-        bytesPerRow: image.planes.first.bytesPerRow,
-      ),
-    );
-  }
-
-  Uint8List _concatenatePlanes(List<Plane> planes) {
-    final allBytes = WriteBuffer();
-    for (final plane in planes) {
-      allBytes.putUint8List(plane.bytes);
-    }
-    return allBytes.done().buffer.asUint8List();
   }
 
   /// 释放资源
   Future<void> dispose() async {
-    await _textRecognizer.close();
     _instance = null;
   }
 }

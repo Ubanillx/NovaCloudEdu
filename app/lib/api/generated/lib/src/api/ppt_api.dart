@@ -4,7 +4,6 @@
 
 import 'dart:async';
 
-import 'package:built_value/json_object.dart';
 import 'package:built_value/serializer.dart';
 import 'package:dio/dio.dart';
 
@@ -13,7 +12,6 @@ import 'package:nova_api/src/model/base_response_list_map_string_object.dart';
 import 'package:nova_api/src/model/base_response_list_ppt_template_list_response.dart';
 import 'package:nova_api/src/model/base_response_long.dart';
 import 'package:nova_api/src/model/base_response_map_string_object.dart';
-import 'package:nova_api/src/model/base_response_object.dart';
 import 'package:nova_api/src/model/base_response_ppt_generate_response.dart';
 import 'package:nova_api/src/model/base_response_ppt_template_detail_response.dart';
 import 'package:nova_api/src/model/base_response_void.dart';

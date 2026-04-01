@@ -4,11 +4,9 @@
 
 import 'dart:async';
 
-import 'package:built_value/json_object.dart';
 import 'package:built_value/serializer.dart';
 import 'package:dio/dio.dart';
 
-import 'package:nova_api/src/model/base_response_object.dart';
 import 'package:nova_api/src/model/srs_callback_request.dart';
 
 class SrsCallbackControllerApi {

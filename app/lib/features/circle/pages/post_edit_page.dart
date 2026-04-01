@@ -549,7 +549,7 @@ class _PostEditPageState extends State<PostEditPage> {
     if (_isPreviewMode) {
       // Markdown 预览
       final content = _contentController.text.isEmpty
-          ? Container(
+          ? SizedBox(
               width: double.infinity,
               child: Text(
                 '暂无内容',
