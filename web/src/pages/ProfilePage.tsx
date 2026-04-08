@@ -6,11 +6,13 @@ import {
   X, Hash, UserCheck, Ban, RefreshCw, BookMarked, ChevronRight,
   GraduationCap, Send, CheckCircle2, XCircle, Clock3, Plus, Trash2,
   BookOpen, Star, Users, FileText, Languages, HeartOff,
+  Lock, Eye, EyeOff,
 } from 'lucide-react';
 import { apiClient, DefaultApi, Configuration } from '../api';
 import type {
   UserDetailResponse, UpdateProfileRequest, UserStatsResult, TeacherApplicationResponse,
   CourseResponse, PostResponse, UserDailyArticleResponse, UserDailyWordResponse,
+  ChangePasswordRequest,
 } from '../api/generated/models';
 import toast from '../components/ui/Toast';
 import PhoneEditModal from '../components/ui/PhoneEditModal';
@@ -73,6 +75,11 @@ const ProfilePage: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [phoneModalOpen, setPhoneModalOpen] = useState(false);
+  const [passwordModalOpen, setPasswordModalOpen] = useState(false);
+  const [passwordMode, setPasswordMode] = useState<'old' | 'sms'>('old');
+  const [smsCode, setSmsCode] = useState('');
+  const [smsSending, setSmsSending] = useState(false);
+  const [smsCountdown, setSmsCountdown] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // ====== 我的收藏 ======
@@ -179,6 +186,17 @@ const ProfilePage: React.FC = () => {
     userName: '', userAvatar: '', userProfile: '',
     userGender: 2, userEmail: '', userAddress: '', birthday: '',
   });
+  const [passwordForm, setPasswordForm] = useState<ChangePasswordRequest>({
+    oldPassword: '',
+    newPassword: '',
+    confirmPassword: '',
+  });
+  const [showPassword, setShowPassword] = useState({
+    old: false,
+    next: false,
+    confirm: false,
+  });
+  const [passwordSubmitting, setPasswordSubmitting] = useState(false);
 
   // 上传头像
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -363,6 +381,179 @@ const ProfilePage: React.FC = () => {
       } else { toast.error(res.data?.message || '更新失败'); }
     } catch { toast.error('更新失败，请稍后重试'); }
     finally { setSaving(false); }
+  };
+
+  const handleOpenPasswordModal = () => {
+    setPasswordForm({
+      oldPassword: '',
+      newPassword: '',
+      confirmPassword: '',
+    });
+    setShowPassword({
+      old: false,
+      next: false,
+      confirm: false,
+    });
+    setPasswordMode('old');
+    setSmsCode('');
+    setSmsSending(false);
+    setSmsCountdown(0);
+    setPasswordModalOpen(true);
+  };
+
+  const handleClosePasswordModal = () => {
+    if (passwordSubmitting) return;
+    setPasswordModalOpen(false);
+    setPasswordForm({
+      oldPassword: '',
+      newPassword: '',
+      confirmPassword: '',
+    });
+    setShowPassword({
+      old: false,
+      next: false,
+      confirm: false,
+    });
+    setPasswordMode('old');
+    setSmsCode('');
+    setSmsSending(false);
+    setSmsCountdown(0);
+  };
+
+  const handlePasswordChange = async () => {
+    if (passwordSubmitting) return;
+    const oldPassword = passwordForm.oldPassword?.trim() || '';
+    const newPassword = passwordForm.newPassword?.trim() || '';
+    const confirmPassword = passwordForm.confirmPassword?.trim() || '';
+
+    if (!oldPassword) {
+      toast.warning('请输入旧密码');
+      return;
+    }
+    if (!newPassword) {
+      toast.warning('请输入新密码');
+      return;
+    }
+    if (newPassword.length < 6 || newPassword.length > 20) {
+      toast.warning('新密码长度需为 6-20 位');
+      return;
+    }
+    if (!confirmPassword) {
+      toast.warning('请再次输入新密码');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      toast.warning('两次输入的新密码不一致');
+      return;
+    }
+
+    setPasswordSubmitting(true);
+    try {
+      const res = await api.changePassword({
+        changePasswordRequest: {
+          oldPassword,
+          newPassword,
+          confirmPassword,
+        },
+      });
+      if (res.data?.code === 0) {
+        toast.success('密码修改成功');
+        handleClosePasswordModal();
+      } else {
+        toast.error(res.data?.message || '密码修改失败');
+      }
+    } catch {
+      toast.error('密码修改失败，请稍后重试');
+    } finally {
+      setPasswordSubmitting(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!passwordModalOpen || smsCountdown <= 0) return;
+    const timer = window.setInterval(() => {
+      setSmsCountdown((prev) => {
+        if (prev <= 1) {
+          window.clearInterval(timer);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => window.clearInterval(timer);
+  }, [passwordModalOpen, smsCountdown]);
+
+  const handleSendPasswordSmsCode = async () => {
+    if (smsSending || smsCountdown > 0) return;
+    if (!user?.userPhone) {
+      toast.warning('当前账号未绑定手机号，无法通过短信找回密码');
+      return;
+    }
+    setSmsSending(true);
+    try {
+      const res = await apiClient.post('/api/user/password/sms/send');
+      if (res.data?.code === 0) {
+        toast.success('验证码已发送到当前绑定手机号');
+        setSmsCountdown(60);
+      } else {
+        toast.error(res.data?.message || '验证码发送失败');
+      }
+    } catch {
+      toast.error('验证码发送失败，请稍后重试');
+    } finally {
+      setSmsSending(false);
+    }
+  };
+
+  const handlePasswordChangeBySms = async () => {
+    if (passwordSubmitting) return;
+    if (!user?.userPhone) {
+      toast.warning('当前账号未绑定手机号，无法通过短信找回密码');
+      return;
+    }
+    const newPassword = passwordForm.newPassword?.trim() || '';
+    const confirmPassword = passwordForm.confirmPassword?.trim() || '';
+    const trimmedCode = smsCode.trim();
+
+    if (!trimmedCode) {
+      toast.warning('请输入验证码');
+      return;
+    }
+    if (!newPassword) {
+      toast.warning('请输入新密码');
+      return;
+    }
+    if (newPassword.length < 6 || newPassword.length > 20) {
+      toast.warning('新密码长度需为 6-20 位');
+      return;
+    }
+    if (!confirmPassword) {
+      toast.warning('请再次输入新密码');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      toast.warning('两次输入的新密码不一致');
+      return;
+    }
+
+    setPasswordSubmitting(true);
+    try {
+      const res = await apiClient.post('/api/user/password/sms', {
+        smsCode: trimmedCode,
+        newPassword,
+        confirmPassword,
+      });
+      if (res.data?.code === 0) {
+        toast.success('密码修改成功');
+        handleClosePasswordModal();
+      } else {
+        toast.error(res.data?.message || '密码修改失败');
+      }
+    } catch {
+      toast.error('密码修改失败，请稍后重试');
+    } finally {
+      setPasswordSubmitting(false);
+    }
   };
 
   // ==================== 骨架屏 ====================
@@ -585,6 +776,19 @@ const ProfilePage: React.FC = () => {
           />
           <InfoRow icon={<Calendar size={14} />} label="注册时间" value={formatDateTime(user.createTime)} />
           <InfoRow icon={<RefreshCw size={14} />} label="最后更新" value={formatDateTime(user.updateTime)} />
+        </div>
+
+        <div className="mt-6">
+          <SectionTitle title="账号安全" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <ActionInfoRow
+              icon={<Lock size={14} />}
+              label="登录密码"
+              value="已设置"
+              actionLabel="修改密码"
+              onAction={handleOpenPasswordModal}
+            />
+          </div>
         </div>
       </div>
 
@@ -1120,6 +1324,32 @@ const ProfilePage: React.FC = () => {
         onClose={() => setPhoneModalOpen(false)}
         onSuccess={() => fetchData()}
       />
+      <PasswordEditModal
+        open={passwordModalOpen}
+        mode={passwordMode}
+        form={passwordForm}
+        phone={user.userPhone || ''}
+        smsCode={smsCode}
+        smsSending={smsSending}
+        smsCountdown={smsCountdown}
+        showPassword={showPassword}
+        submitting={passwordSubmitting}
+        onClose={handleClosePasswordModal}
+        onSubmit={passwordMode === 'old' ? handlePasswordChange : handlePasswordChangeBySms}
+        onChange={(field, value) => setPasswordForm(prev => ({ ...prev, [field]: value }))}
+        onSmsCodeChange={setSmsCode}
+        onSendSmsCode={handleSendPasswordSmsCode}
+        onSwitchMode={(mode) => {
+          if (mode === 'sms' && !user.userPhone) {
+            toast.warning('当前账号未绑定手机号，无法通过短信找回密码');
+            return;
+          }
+          setSmsCode('');
+          setPasswordForm(prev => ({ ...prev, oldPassword: '' }));
+          setPasswordMode(mode);
+        }}
+        onToggleVisibility={(field) => setShowPassword(prev => ({ ...prev, [field]: !prev[field] }))}
+      />
     </div>
   );
 };
@@ -1189,6 +1419,30 @@ const PhoneInfoRow: React.FC<{ phone?: string; onEdit: () => void }> = ({ phone,
   </div>
 );
 
+const ActionInfoRow: React.FC<{
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  actionLabel: string;
+  onAction: () => void;
+}> = ({ icon, label, value, actionLabel, onAction }) => (
+  <div className="flex items-center gap-2.5 p-2.5 rounded-lg bg-gray-50 dark:bg-gray-800/50">
+    <div className="w-7 h-7 rounded-md bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex items-center justify-center text-gray-400 dark:text-gray-500 flex-shrink-0">
+      {icon}
+    </div>
+    <div className="flex-1 min-w-0">
+      <p className="text-[10px] font-medium text-gray-400 dark:text-gray-500 leading-none mb-1">{label}</p>
+      <p className="text-sm text-gray-900 dark:text-white truncate">{value}</p>
+    </div>
+    <button
+      onClick={onAction}
+      className="flex-shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold text-brand-600 bg-brand-50 dark:bg-brand-900/20 dark:text-brand-400 hover:bg-brand-100 dark:hover:bg-brand-900/30 transition-colors"
+    >
+      {actionLabel}
+    </button>
+  </div>
+);
+
 interface EditFieldProps {
   label: string;
   value: string;
@@ -1250,5 +1504,181 @@ const StatCard: React.FC<StatCardProps> = ({ icon, label, value, unit, color }) 
     </div>
   );
 };
+
+const PasswordEditModal: React.FC<{
+  open: boolean;
+  mode: 'old' | 'sms';
+  form: ChangePasswordRequest;
+  phone: string;
+  smsCode: string;
+  smsSending: boolean;
+  smsCountdown: number;
+  showPassword: { old: boolean; next: boolean; confirm: boolean };
+  submitting: boolean;
+  onClose: () => void;
+  onSubmit: () => void;
+  onChange: (field: 'oldPassword' | 'newPassword' | 'confirmPassword', value: string) => void;
+  onSmsCodeChange: (value: string) => void;
+  onSendSmsCode: () => void;
+  onSwitchMode: (mode: 'old' | 'sms') => void;
+  onToggleVisibility: (field: 'old' | 'next' | 'confirm') => void;
+}> = ({ open, mode, form, phone, smsCode, smsSending, smsCountdown, showPassword, submitting, onClose, onSubmit, onChange, onSmsCodeChange, onSendSmsCode, onSwitchMode, onToggleVisibility }) => {
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative w-full max-w-md mx-4 bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-800 animate-in fade-in zoom-in-95 duration-200">
+        <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-gray-800">
+          <h2 className="text-base font-bold text-gray-900 dark:text-white">修改密码</h2>
+          <button onClick={onClose} className="p-1 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+            <X size={18} />
+          </button>
+        </div>
+
+        <div className="p-5 space-y-4">
+          <div className="space-y-1">
+            <p className="text-sm font-bold text-gray-900 dark:text-white">账号安全验证</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              {mode === 'old' ? '使用旧密码验证身份后修改当前密码。' : '通过当前绑定手机号接收验证码，验证后修改当前密码。'}
+            </p>
+          </div>
+
+          {mode === 'old' ? (
+            <>
+              <PasswordField
+                label="旧密码"
+                value={form.oldPassword || ''}
+                placeholder="请输入旧密码"
+                visible={showPassword.old}
+                autoComplete="current-password"
+                onChange={(value) => onChange('oldPassword', value)}
+                onToggle={() => onToggleVisibility('old')}
+              />
+              <button
+                type="button"
+                onClick={() => onSwitchMode('sms')}
+                className="-mt-1 text-xs font-medium text-brand-500 hover:text-brand-600 dark:text-brand-400 dark:hover:text-brand-300 transition-colors"
+              >
+                忘记密码？通过手机号验证
+              </button>
+            </>
+          ) : (
+            <>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5">当前绑定手机号</label>
+                <div className={`${inputCls} bg-gray-50 dark:bg-gray-800/80 text-gray-500 dark:text-gray-400 cursor-not-allowed`}>
+                  {phone || '未绑定手机号'}
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5">验证码</label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={smsCode}
+                    onChange={(e) => onSmsCodeChange(e.target.value.replace(/\D/g, ''))}
+                    className={`${inputCls} flex-1`}
+                    placeholder="请输入验证码"
+                    maxLength={6}
+                    autoComplete="one-time-code"
+                  />
+                  <button
+                    type="button"
+                    onClick={onSendSmsCode}
+                    disabled={smsSending || smsCountdown > 0}
+                    className="flex-shrink-0 px-4 py-2 rounded-lg text-xs font-bold bg-brand-600 text-white hover:bg-brand-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed min-w-[100px]"
+                  >
+                    {smsSending ? <Loader2 size={14} className="animate-spin mx-auto" /> : smsCountdown > 0 ? `${smsCountdown}s` : '发送验证码'}
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
+          <PasswordField
+            label="新密码"
+            value={form.newPassword || ''}
+            placeholder="请输入 6-20 位新密码"
+            visible={showPassword.next}
+            autoComplete="new-password"
+            onChange={(value) => onChange('newPassword', value)}
+            onToggle={() => onToggleVisibility('next')}
+          />
+          <PasswordField
+            label="确认密码"
+            value={form.confirmPassword || ''}
+            placeholder="请再次输入新密码"
+            visible={showPassword.confirm}
+            autoComplete="new-password"
+            onChange={(value) => onChange('confirmPassword', value)}
+            onToggle={() => onToggleVisibility('confirm')}
+          />
+          {mode === 'sms' && (
+            <button
+              type="button"
+              onClick={() => onSwitchMode('old')}
+              className="-mt-1 text-xs font-medium text-brand-500 hover:text-brand-600 dark:text-brand-400 dark:hover:text-brand-300 transition-colors"
+            >
+              返回旧密码验证
+            </button>
+          )}
+        </div>
+
+        <div className="flex gap-3 p-5 border-t border-gray-100 dark:border-gray-800">
+          <button
+            onClick={onClose}
+            className="flex-1 py-2.5 rounded-lg text-sm font-bold text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+          >
+            取消
+          </button>
+          <button
+            onClick={onSubmit}
+            disabled={submitting}
+            className="flex-1 py-2.5 rounded-lg text-sm font-bold bg-brand-600 text-white hover:bg-brand-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5"
+          >
+            {submitting ? <Loader2 size={14} className="animate-spin" /> : null}
+            确认修改
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const PasswordField: React.FC<{
+  label: string;
+  value: string;
+  placeholder: string;
+  visible: boolean;
+  autoComplete?: string;
+  onChange: (value: string) => void;
+  onToggle: () => void;
+}> = ({ label, value, placeholder, visible, autoComplete = 'off', onChange, onToggle }) => (
+  <div>
+    <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5">{label}</label>
+    <div className="relative">
+      <input
+        type={visible ? 'text' : 'password'}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className={`${inputCls} pr-10`}
+        placeholder={placeholder}
+        maxLength={20}
+        autoComplete={autoComplete}
+        data-lpignore="true"
+        data-form-type="other"
+        spellCheck={false}
+      />
+      <button
+        type="button"
+        onClick={onToggle}
+        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+      >
+        {visible ? <EyeOff size={16} /> : <Eye size={16} />}
+      </button>
+    </div>
+  </div>
+);
 
 export default ProfilePage;
