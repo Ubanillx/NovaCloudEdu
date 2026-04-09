@@ -2,6 +2,7 @@ package com.novacloudedu.backend.interfaces.rest.user;
 
 import com.novacloudedu.backend.annotation.AuthCheck;
 import com.novacloudedu.backend.application.service.UserApplicationService;
+import com.novacloudedu.backend.application.user.command.ChangePasswordBySmsCommand;
 import com.novacloudedu.backend.common.BaseResponse;
 import com.novacloudedu.backend.common.ResultUtils;
 import com.novacloudedu.backend.domain.user.entity.User;
@@ -168,6 +169,32 @@ public class UserManageController {
     public BaseResponse<Boolean> changePassword(@RequestBody @Valid ChangePasswordRequest request) {
         userApplicationService.changePassword(
                 userManageAssembler.toChangePasswordCommand(request)
+        );
+        return ResultUtils.success(true);
+    }
+
+    /**
+     * 发送修改密码验证码（当前登录用户）
+     */
+    @Operation(summary = "发送修改密码验证码", description = "给当前登录用户已绑定手机号发送修改密码验证码")
+    @PostMapping("/password/sms/send")
+    public BaseResponse<SendResult> sendPasswordChangeCode() {
+        SendResult result = userApplicationService.sendPasswordChangeCode();
+        return ResultUtils.success(result);
+    }
+
+    /**
+     * 通过短信验证码修改密码（当前登录用户）
+     */
+    @Operation(summary = "短信验证码修改密码", description = "用户通过已绑定手机号收到的验证码修改自己的密码")
+    @PostMapping("/password/sms")
+    public BaseResponse<Boolean> changePasswordBySms(@RequestBody @Valid ChangePasswordBySmsRequest request) {
+        userApplicationService.changePasswordBySms(
+                new ChangePasswordBySmsCommand(
+                        request.smsCode(),
+                        request.newPassword(),
+                        request.confirmPassword()
+                )
         );
         return ResultUtils.success(true);
     }

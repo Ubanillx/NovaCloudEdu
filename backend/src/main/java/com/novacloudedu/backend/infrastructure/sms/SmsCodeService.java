@@ -60,6 +60,16 @@ public class SmsCodeService {
     }
 
     /**
+     * 发送修改密码验证码
+     *
+     * @param phone 手机号
+     * @return 发送结果
+     */
+    public SmsService.SendResult sendPasswordChangeCode(String phone) {
+        return sendRegisterCode(phone);
+    }
+
+    /**
      * 验证验证码
      *
      * @param phone 手机号

@@ -37,9 +37,11 @@ const UserFormModal: React.FC<UserFormModalProps> = ({ isOpen, onClose, onSucces
   const isEdit = !!user;
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
     userAccount: '',
     userPassword: '',
+    confirmPassword: '',
     userName: '',
     role: 'user',
     userPhone: '',
@@ -52,6 +54,7 @@ const UserFormModal: React.FC<UserFormModalProps> = ({ isOpen, onClose, onSucces
       setFormData({
         userAccount: user.userAccount || '',
         userPassword: '',
+        confirmPassword: '',
         userName: user.userName || '',
         role: user.role || 'user',
         userPhone: user.userPhone || '',
@@ -62,6 +65,7 @@ const UserFormModal: React.FC<UserFormModalProps> = ({ isOpen, onClose, onSucces
       setFormData({
         userAccount: '',
         userPassword: '',
+        confirmPassword: '',
         userName: '',
         role: 'user',
         userPhone: '',
@@ -71,8 +75,8 @@ const UserFormModal: React.FC<UserFormModalProps> = ({ isOpen, onClose, onSucces
     }
   }, [user, isOpen]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (e?: React.FormEvent) => {
+    e?.preventDefault();
     
     if (!isEdit && !formData.userAccount.trim()) {
       toast.warning('请输入账号');
@@ -81,6 +85,16 @@ const UserFormModal: React.FC<UserFormModalProps> = ({ isOpen, onClose, onSucces
     if (!isEdit && (!formData.userPassword || formData.userPassword.length < 6)) {
       toast.warning('密码至少 6 位');
       return;
+    }
+    if (formData.userPassword) {
+      if (formData.userPassword.length < 6 || formData.userPassword.length > 20) {
+        toast.warning('密码长度需为 6-20 位');
+        return;
+      }
+      if (formData.userPassword !== formData.confirmPassword) {
+        toast.warning('两次输入的密码不一致');
+        return;
+      }
     }
 
     setLoading(true);
@@ -96,7 +110,19 @@ const UserFormModal: React.FC<UserFormModalProps> = ({ isOpen, onClose, onSucces
         };
         const response = await api.updateUser({ updateUserRequest: updateData });
         if (response.data.code === 0) {
-          toast.success('更新成功');
+          if (formData.userPassword) {
+            const resetResponse = await api.resetPassword({
+              resetPasswordRequest: {
+                userId: user.id,
+                newPassword: formData.userPassword,
+              },
+            });
+            if (resetResponse.data.code !== 0) {
+              toast.error(resetResponse.data.message || '密码修改失败');
+              return;
+            }
+          }
+          toast.success(formData.userPassword ? '用户信息和密码已更新' : '更新成功');
           onSuccess();
           onClose();
         } else {
@@ -179,7 +205,7 @@ const UserFormModal: React.FC<UserFormModalProps> = ({ isOpen, onClose, onSucces
               </div>
             </>
           )}
-          
+
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">用户名</label>
@@ -249,6 +275,57 @@ const UserFormModal: React.FC<UserFormModalProps> = ({ isOpen, onClose, onSucces
               ))}
             </div>
           </div>
+
+          {isEdit && (
+            <div className="space-y-4">
+              <div>
+                <p className="text-sm font-semibold text-gray-900 dark:text-white">修改密码</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">留空则保持原密码不变</p>
+              </div>
+              <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-gray-50/60 dark:bg-gray-800/30 p-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">新密码</label>
+                    <div className="relative">
+                      <input
+                        type={showPassword ? 'text' : 'password'}
+                        value={formData.userPassword}
+                        onChange={(e) => setFormData(prev => ({ ...prev, userPassword: e.target.value }))}
+                        className="w-full px-4 py-2.5 pr-12 bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all"
+                        placeholder="6-20 位新密码"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-brand-500 transition-colors"
+                      >
+                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                      </button>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">确认密码</label>
+                    <div className="relative">
+                      <input
+                        type={showConfirmPassword ? 'text' : 'password'}
+                        value={formData.confirmPassword}
+                        onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                        className="w-full px-4 py-2.5 pr-12 bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all"
+                        placeholder="再次输入新密码"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-brand-500 transition-colors"
+                      >
+                        {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </form>
 
         {/* Footer */}

@@ -17,6 +17,7 @@ import com.novacloudedu.backend.infrastructure.email.AdminEmailNotifier;
 import com.novacloudedu.backend.infrastructure.security.PasswordEncoderAdapter;
 import com.novacloudedu.backend.infrastructure.security.JwtTokenProvider;
 import com.novacloudedu.backend.infrastructure.sms.SmsCodeService;
+import com.novacloudedu.backend.infrastructure.sms.SmsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -385,6 +386,43 @@ public class UserApplicationService {
         user.changePassword(newPassword);
         userRepository.save(user);
         log.info("用户修改密码成功: {}", user.getId().value());
+    }
+
+    /**
+     * 发送修改密码验证码（当前登录用户）
+     */
+    @Transactional(readOnly = true)
+    public SmsService.SendResult sendPasswordChangeCode() {
+        User user = getCurrentUser();
+        String phone = user.getUserPhone();
+        if (phone == null || phone.isBlank()) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "当前账号未绑定手机号");
+        }
+        return smsCodeService.sendPasswordChangeCode(phone);
+    }
+
+    /**
+     * 通过短信验证码修改密码（当前登录用户）
+     */
+    @Transactional
+    public void changePasswordBySms(ChangePasswordBySmsCommand command) {
+        Password.validateRaw(command.newPassword());
+        Password.validateConfirm(command.newPassword(), command.confirmPassword());
+
+        User user = getCurrentUser();
+        String phone = user.getUserPhone();
+        if (phone == null || phone.isBlank()) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "当前账号未绑定手机号");
+        }
+
+        if (!smsCodeService.verifyCode(phone, command.smsCode())) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "验证码错误或已过期");
+        }
+
+        Password newPassword = Password.fromRaw(command.newPassword(), passwordEncoder);
+        user.changePassword(newPassword);
+        userRepository.save(user);
+        log.info("用户通过短信验证码修改密码成功: {}", user.getId().value());
     }
 
     /**
