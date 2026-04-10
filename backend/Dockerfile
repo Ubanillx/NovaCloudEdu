@@ -21,8 +21,12 @@ RUN ./mvnw clean package -DskipTests -B
 # 运行阶段：使用更小的 JRE 镜像
 FROM eclipse-temurin:21-jre-alpine
 
-# 安装必要工具（健康检查等）
-RUN apk add --no-cache curl
+# 安装运行时依赖：
+# - curl: 健康检查
+# - ffmpeg: 课程视频 HLS 转码与缩略图生成（同时提供 ffprobe）
+RUN apk add --no-cache curl ffmpeg && \
+    ffmpeg -version && \
+    ffprobe -version
 
 # 创建非 root 用户（docker-compose 中以 root 运行以访问 Docker socket）
 RUN addgroup -S spring && \
