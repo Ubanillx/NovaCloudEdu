@@ -25,8 +25,8 @@ Name | Type | Description | Notes
 **sortOrder** | **number** |  | [optional] [default to undefined]
 **createTime** | **string** |  | [optional] [default to undefined]
 **updateTime** | **string** |  | [optional] [default to undefined]
-**_default** | **boolean** |  | [optional] [default to undefined]
 **_delete** | **boolean** |  | [optional] [default to undefined]
+**_default** | **boolean** |  | [optional] [default to undefined]
 
 ## Example
 
@@ -54,8 +54,8 @@ const instance: MembershipPlan = {
     sortOrder,
     createTime,
     updateTime,
-    _default,
     _delete,
+    _default,
 };
 ```
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import {
   Crown, Edit2, ChevronLeft, ChevronRight, RefreshCw, X,
   Loader2, CheckCircle, XCircle, UserPlus, Settings, Users,
-  Clock, Ban, Info, Search, Filter,
+  Clock, Ban, Info,
 } from 'lucide-react';
 import { apiClient, DefaultApi, Configuration } from '../../api';
 import type { MembershipPlan, UserMembership } from '../../api/generated/models';
