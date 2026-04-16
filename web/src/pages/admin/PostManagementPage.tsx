@@ -218,7 +218,7 @@ export const PostManagementPage: React.FC = () => {
     try {
       let response;
       if (searchKeyword.trim()) {
-        response = await api.searchPosts({ 
+        response = await api.searchPosts1({ 
           keyword: searchKeyword.trim(), 
           pageNum, 
           pageSize 

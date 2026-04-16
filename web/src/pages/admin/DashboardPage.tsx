@@ -3,7 +3,7 @@ import {
   Users, BookOpen, ShoppingCart, DollarSign, Activity, MessageSquare,
   TrendingUp, TrendingDown, Minus, RefreshCw, AlertTriangle, Clock,
   CheckCircle2, Brain, FileText, Presentation, Workflow, Bot,
-  GraduationCap, School, BarChart3, PieChart, Crown, BookA,
+  GraduationCap, School, BarChart3, Crown, BookA,
   ClipboardList, Newspaper, CalendarCheck, Globe, Loader2
 } from 'lucide-react';
 import { AdminDashboardControllerApi, apiClient } from '../../api';

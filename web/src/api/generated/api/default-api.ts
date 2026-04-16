@@ -398,6 +398,8 @@ import type { BatchScrapeRequest } from '../models';
 // @ts-ignore
 import type { BatchUpdateNodesRequest } from '../models';
 // @ts-ignore
+import type { ChangePasswordBySmsRequest } from '../models';
+// @ts-ignore
 import type { ChangePasswordRequest } from '../models';
 // @ts-ignore
 import type { ChatHistoryRequestDTO } from '../models';
@@ -1796,6 +1798,45 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(changePasswordRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 用户通过已绑定手机号收到的验证码修改自己的密码
+         * @summary 短信验证码修改密码
+         * @param {ChangePasswordBySmsRequest} changePasswordBySmsRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        changePasswordBySms: async (changePasswordBySmsRequest: ChangePasswordBySmsRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'changePasswordBySmsRequest' is not null or undefined
+            assertParamExists('changePasswordBySms', 'changePasswordBySmsRequest', changePasswordBySmsRequest)
+            const localVarPath = `/api/user/password/sms`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(changePasswordBySmsRequest, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -4612,6 +4653,45 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary OCR文字检测（返回文字块+坐标框）
+         * @param {{ [key: string]: string; }} requestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        detectText: async (requestBody: { [key: string]: string; }, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'requestBody' is not null or undefined
+            assertParamExists('detectText', 'requestBody', requestBody)
+            const localVarPath = `/api/grading/ocr/detect`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(requestBody, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -17147,6 +17227,40 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 给当前登录用户已绑定手机号发送修改密码验证码
+         * @summary 发送修改密码验证码
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        sendPasswordChangeCode: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/user/password/sms/send`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 发送短信验证码用于注册
          * @summary 发送注册验证码
          * @param {SendCodeRequest} sendCodeRequest 
@@ -20589,6 +20703,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 用户通过已绑定手机号收到的验证码修改自己的密码
+         * @summary 短信验证码修改密码
+         * @param {ChangePasswordBySmsRequest} changePasswordBySmsRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async changePasswordBySms(changePasswordBySmsRequest: ChangePasswordBySmsRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseBoolean>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.changePasswordBySms(changePasswordBySmsRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.changePasswordBySms']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 
          * @summary 检查是否已收藏
          * @param {number} courseId 课程ID
@@ -21515,6 +21642,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.deleteVariable(id, variableName, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.deleteVariable']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary OCR文字检测（返回文字块+坐标框）
+         * @param {{ [key: string]: string; }} requestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async detectText(requestBody: { [key: string]: string; }, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseMapStringObject>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.detectText(requestBody, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.detectText']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -25619,6 +25759,18 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 给当前登录用户已绑定手机号发送修改密码验证码
+         * @summary 发送修改密码验证码
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async sendPasswordChangeCode(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseSendResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.sendPasswordChangeCode(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.sendPasswordChangeCode']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 发送短信验证码用于注册
          * @summary 发送注册验证码
          * @param {SendCodeRequest} sendCodeRequest 
@@ -26916,6 +27068,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.changePassword(requestParameters.changePasswordRequest, options).then((request) => request(axios, basePath));
         },
         /**
+         * 用户通过已绑定手机号收到的验证码修改自己的密码
+         * @summary 短信验证码修改密码
+         * @param {DefaultApiChangePasswordBySmsRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        changePasswordBySms(requestParameters: DefaultApiChangePasswordBySmsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseBoolean> {
+            return localVarFp.changePasswordBySms(requestParameters.changePasswordBySmsRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 
          * @summary 检查是否已收藏
          * @param {DefaultApiCheckFavouriteRequest} requestParameters Request parameters.
@@ -27603,6 +27765,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         deleteVariable(requestParameters: DefaultApiDeleteVariableRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid> {
             return localVarFp.deleteVariable(requestParameters.id, requestParameters.variableName, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary OCR文字检测（返回文字块+坐标框）
+         * @param {DefaultApiDetectTextRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        detectText(requestParameters: DefaultApiDetectTextRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringObject> {
+            return localVarFp.detectText(requestParameters.requestBody, options).then((request) => request(axios, basePath));
         },
         /**
          * 禁用指定的抓取配置
@@ -30603,6 +30775,15 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.sendFriendRequest(requestParameters.sendFriendRequestDTO, options).then((request) => request(axios, basePath));
         },
         /**
+         * 给当前登录用户已绑定手机号发送修改密码验证码
+         * @summary 发送修改密码验证码
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        sendPasswordChangeCode(options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseSendResult> {
+            return localVarFp.sendPasswordChangeCode(options).then((request) => request(axios, basePath));
+        },
+        /**
          * 发送短信验证码用于注册
          * @summary 发送注册验证码
          * @param {DefaultApiSendRegisterCodeRequest} requestParameters Request parameters.
@@ -31599,6 +31780,15 @@ export interface DefaultApiInterface {
     changePassword(requestParameters: DefaultApiChangePasswordRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseBoolean>;
 
     /**
+     * 用户通过已绑定手机号收到的验证码修改自己的密码
+     * @summary 短信验证码修改密码
+     * @param {DefaultApiChangePasswordBySmsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    changePasswordBySms(requestParameters: DefaultApiChangePasswordBySmsRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseBoolean>;
+
+    /**
      * 
      * @summary 检查是否已收藏
      * @param {DefaultApiCheckFavouriteRequest} requestParameters Request parameters.
@@ -32217,6 +32407,15 @@ export interface DefaultApiInterface {
      * @throws {RequiredError}
      */
     deleteVariable(requestParameters: DefaultApiDeleteVariableRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseVoid>;
+
+    /**
+     * 
+     * @summary OCR文字检测（返回文字块+坐标框）
+     * @param {DefaultApiDetectTextRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    detectText(requestParameters: DefaultApiDetectTextRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseMapStringObject>;
 
     /**
      * 禁用指定的抓取配置
@@ -34913,6 +35112,14 @@ export interface DefaultApiInterface {
     sendFriendRequest(requestParameters: DefaultApiSendFriendRequestRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseLong>;
 
     /**
+     * 给当前登录用户已绑定手机号发送修改密码验证码
+     * @summary 发送修改密码验证码
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    sendPasswordChangeCode(options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseSendResult>;
+
+    /**
      * 发送短信验证码用于注册
      * @summary 发送注册验证码
      * @param {DefaultApiSendRegisterCodeRequest} requestParameters Request parameters.
@@ -35834,6 +36041,13 @@ export interface DefaultApiChangePasswordRequest {
 }
 
 /**
+ * Request parameters for changePasswordBySms operation in DefaultApi.
+ */
+export interface DefaultApiChangePasswordBySmsRequest {
+    readonly changePasswordBySmsRequest: ChangePasswordBySmsRequest
+}
+
+/**
  * Request parameters for checkFavourite operation in DefaultApi.
  */
 export interface DefaultApiCheckFavouriteRequest {
@@ -36466,6 +36680,13 @@ export interface DefaultApiDeleteVariableRequest {
      * 变量名称
      */
     readonly variableName: string
+}
+
+/**
+ * Request parameters for detectText operation in DefaultApi.
+ */
+export interface DefaultApiDetectTextRequest {
+    readonly requestBody: { [key: string]: string; }
 }
 
 /**
@@ -40201,6 +40422,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * 用户通过已绑定手机号收到的验证码修改自己的密码
+     * @summary 短信验证码修改密码
+     * @param {DefaultApiChangePasswordBySmsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public changePasswordBySms(requestParameters: DefaultApiChangePasswordBySmsRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).changePasswordBySms(requestParameters.changePasswordBySmsRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 
      * @summary 检查是否已收藏
      * @param {DefaultApiCheckFavouriteRequest} requestParameters Request parameters.
@@ -40956,6 +41188,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public deleteVariable(requestParameters: DefaultApiDeleteVariableRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).deleteVariable(requestParameters.id, requestParameters.variableName, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary OCR文字检测（返回文字块+坐标框）
+     * @param {DefaultApiDetectTextRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public detectText(requestParameters: DefaultApiDetectTextRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).detectText(requestParameters.requestBody, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -44258,6 +44501,16 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public sendFriendRequest(requestParameters: DefaultApiSendFriendRequestRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).sendFriendRequest(requestParameters.sendFriendRequestDTO, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 给当前登录用户已绑定手机号发送修改密码验证码
+     * @summary 发送修改密码验证码
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public sendPasswordChangeCode(options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).sendPasswordChangeCode(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

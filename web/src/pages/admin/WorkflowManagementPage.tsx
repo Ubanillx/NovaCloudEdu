@@ -202,7 +202,7 @@ export const WorkflowManagementPage: React.FC = () => {
   const handlePublish = async (wf: WorkflowResponse) => {
     if (!wf.id) return;
     try {
-      const resp = await api.publish1({ id: wf.id as unknown as number });
+      const resp = await api.publish({ id: wf.id as unknown as number });
       if (resp.data.code === 0) { toast.success('发布成功'); fetchWorkflows(); } else { toast.error(resp.data.message || '发布失败'); }
     } catch (error: any) { toast.error(error?.response?.data?.message || '发布失败'); }
   };
@@ -210,7 +210,7 @@ export const WorkflowManagementPage: React.FC = () => {
   const handleArchive = async (wf: WorkflowResponse) => {
     if (!wf.id) return;
     try {
-      const resp = await api.archive1({ id: wf.id as unknown as number });
+      const resp = await api.archive({ id: wf.id as unknown as number });
       if (resp.data.code === 0) { toast.success('归档成功'); fetchWorkflows(); } else { toast.error(resp.data.message || '归档失败'); }
     } catch (error: any) { toast.error(error?.response?.data?.message || '归档失败'); }
   };

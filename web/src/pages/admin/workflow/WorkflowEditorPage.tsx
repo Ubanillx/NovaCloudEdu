@@ -866,7 +866,7 @@ export const WorkflowEditorPage: React.FC = () => {
                     </div>
 
                     {/* 变量快照 */}
-                    {debugResult.variables && Object.keys(debugResult.variables as Record<string, unknown>).length > 0 && (
+                    {Boolean(debugResult.variables) && Object.keys(debugResult.variables as Record<string, unknown>).length > 0 && (
                       <div className="rounded-lg border border-gray-800 overflow-hidden">
                         <div className="px-3 py-2 bg-gray-800/50">
                           <p className="text-xs font-bold text-cyan-400">运行时变量快照 (variables)</p>
