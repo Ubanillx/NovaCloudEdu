@@ -232,6 +232,7 @@ export * from './batch-scrape-request';
 export * from './batch-update-nodes-request';
 export * from './book-dto';
 export * from './book-id';
+export * from './change-password-by-sms-request';
 export * from './change-password-request';
 export * from './chapter-content-dto';
 export * from './chapter-dto';

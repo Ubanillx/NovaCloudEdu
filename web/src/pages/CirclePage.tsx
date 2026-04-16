@@ -230,7 +230,7 @@ const CirclePage: React.FC = () => {
     if (!keyword) return;
     setIsSearching(true);
     try {
-      const res = await api.searchPosts({ keyword, pageNum: 1, pageSize: 20 });
+      const res = await api.searchPosts1({ keyword, pageNum: 1, pageSize: 20 });
       if (res.data?.code === 0 && res.data.data) {
         setSearchResults(res.data.data.posts || []);
         setSearchTotal(res.data.data.total || 0);

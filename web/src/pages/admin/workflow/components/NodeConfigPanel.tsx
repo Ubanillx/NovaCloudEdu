@@ -474,17 +474,23 @@ const LLMConfig: React.FC<{ config: Record<string, unknown>; onUpdate: (c: Recor
     const userId = userInfoStr ? String(JSON.parse(userInfoStr)?.id ?? '') : '';
     if (!userId) return;
     setLoadingKb(true);
-    api.listByCreator({ userId: userId as unknown as number, page: 0, size: 100 }).then((res) => {
-      if (cancelled) return;
-      if (res.data.code === 0) {
-        const list = (res.data.data || []) as unknown as KbInfo[];
-        setKnowledgeBases(list);
-      } else {
-        console.warn('[LLMConfig] 获取知识库列表失败:', res.data.message);
+    const loadKnowledgeBases = async () => {
+      try {
+        const res = await api.kbListByCreator({ userId: Number(userId), page: 0, size: 100 });
+        if (cancelled) return;
+        if (res.data.code === 0) {
+          const list = (res.data.data || []) as unknown as KbInfo[];
+          setKnowledgeBases(list);
+        } else {
+          console.warn('[LLMConfig] 获取知识库列表失败:', res.data.message);
+        }
+      } catch (err: unknown) {
+        console.error('[LLMConfig] 知识库API调用异常:', err);
+      } finally {
+        if (!cancelled) setLoadingKb(false);
       }
-    }).catch((err) => {
-      console.error('[LLMConfig] 知识库API调用异常:', err);
-    }).finally(() => { if (!cancelled) setLoadingKb(false); });
+    };
+    void loadKnowledgeBases();
     return () => { cancelled = true; };
   }, []);
 

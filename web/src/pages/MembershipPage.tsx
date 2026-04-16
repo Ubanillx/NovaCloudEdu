@@ -5,7 +5,7 @@ import {
   History, ChevronRight, AlertCircle,
 } from 'lucide-react';
 import { apiClient, DefaultApi, Configuration } from '../api';
-import type { MembershipPlan, UserMembership } from '../api/generated/models';
+import type { MembershipPlan, UserMembership, UserMembershipDetailResponse } from '../api/generated/models';
 import toast from '../components/ui/Toast';
 
 const api = new DefaultApi(new Configuration(), '', apiClient);
@@ -31,7 +31,7 @@ const formatLimit = (v?: number) => (v === -1 || v === undefined) ? '无限' : S
 const MembershipPage: React.FC = () => {
   const navigate = useNavigate();
   const [plans, setPlans] = useState<MembershipPlan[]>([]);
-  const [currentMembership, setCurrentMembership] = useState<UserMembership | null>(null);
+  const [currentMembership, setCurrentMembership] = useState<UserMembershipDetailResponse | null>(null);
   const [history, setHistory] = useState<UserMembership[]>([]);
   const [quota, setQuota] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -73,7 +73,7 @@ const MembershipPage: React.FC = () => {
     }
   };
 
-  const currentPlanId = currentMembership?.active ? currentMembership.planId : null;
+  const currentPlanId = currentMembership?.status === 'ACTIVE' ? currentMembership.planId : null;
 
   if (loading) {
     return (

@@ -249,6 +249,7 @@ docs/BatchScrapeRequest.md
 docs/BatchUpdateNodesRequest.md
 docs/BookDTO.md
 docs/BookId.md
+docs/ChangePasswordBySmsRequest.md
 docs/ChangePasswordRequest.md
 docs/ChapterContentDTO.md
 docs/ChapterDTO.md
@@ -774,6 +775,7 @@ models/batch-scrape-request.ts
 models/batch-update-nodes-request.ts
 models/book-dto.ts
 models/book-id.ts
+models/change-password-by-sms-request.ts
 models/change-password-request.ts
 models/chapter-content-dto.ts
 models/chapter-dto.ts

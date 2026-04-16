@@ -34,6 +34,7 @@ All URIs are relative to *http://localhost:8080*
 |[**cancelMembership**](#cancelmembership) | **POST** /api/membership/cancel | 取消会员|
 |[**cancelMembership1**](#cancelmembership1) | **POST** /api/admin/membership/cancel/{userId} | 取消用户会员|
 |[**changePassword**](#changepassword) | **POST** /api/user/password | 修改密码|
+|[**changePasswordBySms**](#changepasswordbysms) | **POST** /api/user/password/sms | 短信验证码修改密码|
 |[**checkFavourite**](#checkfavourite) | **GET** /api/course/favourite/{courseId}/check | 检查是否已收藏|
 |[**checkFriendship**](#checkfriendship) | **GET** /api/friend/check/{userId} | 检查好友关系|
 |[**checkin**](#checkin) | **POST** /api/user/checkin | 用户打卡|
@@ -103,6 +104,7 @@ All URIs are relative to *http://localhost:8080*
 |[**deleteTemplate2**](#deletetemplate2) | **DELETE** /api/exam-templates/{id} | 删除模板|
 |[**deleteTrigger**](#deletetrigger) | **DELETE** /api/workflows/triggers/{triggerId} | 删除触发器|
 |[**deleteVariable**](#deletevariable) | **DELETE** /api/workflows/{id}/variables/{variableName} | 删除变量|
+|[**detectText**](#detecttext) | **POST** /api/grading/ocr/detect | OCR文字检测（返回文字块+坐标框）|
 |[**disableConfig**](#disableconfig) | **POST** /api/admin/scraper/config/{id}/disable | 禁用配置|
 |[**disableTrigger**](#disabletrigger) | **POST** /api/workflows/triggers/{triggerId}/disable | 禁用触发器|
 |[**dissolveGroup**](#dissolvegroup) | **DELETE** /api/groups/{groupId} | 解散群|
@@ -407,6 +409,7 @@ All URIs are relative to *http://localhost:8080*
 |[**searchUsers**](#searchusers) | **POST** /api/friend/search | 搜索用户|
 |[**searchWords**](#searchwords) | **GET** /api/daily-word/search | 搜索单词|
 |[**sendFriendRequest**](#sendfriendrequest) | **POST** /api/friend/request/send | 发送好友申请|
+|[**sendPasswordChangeCode**](#sendpasswordchangecode) | **POST** /api/user/password/sms/send | 发送修改密码验证码|
 |[**sendRegisterCode**](#sendregistercode) | **POST** /api/auth/send-code | 发送注册验证码|
 |[**sendSms**](#sendsms) | **POST** /api/user/admin/send-sms | 发送短信验证码|
 |[**setAdmin**](#setadmin) | **PUT** /api/groups/{groupId}/members/{targetUserId}/admin | 设置/取消管理员|
@@ -2040,6 +2043,59 @@ const { status, data } = await apiInstance.changePassword(
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
 | **changePasswordRequest** | **ChangePasswordRequest**|  | |
+
+
+### Return type
+
+**BaseResponseBoolean**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **changePasswordBySms**
+> BaseResponseBoolean changePasswordBySms(changePasswordBySmsRequest)
+
+用户通过已绑定手机号收到的验证码修改自己的密码
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration,
+    ChangePasswordBySmsRequest
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let changePasswordBySmsRequest: ChangePasswordBySmsRequest; //
+
+const { status, data } = await apiInstance.changePasswordBySms(
+    changePasswordBySmsRequest
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **changePasswordBySmsRequest** | **ChangePasswordBySmsRequest**|  | |
 
 
 ### Return type
@@ -5705,6 +5761,57 @@ const { status, data } = await apiInstance.deleteVariable(
 ### HTTP request headers
 
  - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **detectText**
+> BaseResponseMapStringObject detectText(requestBody)
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let requestBody: { [key: string]: string; }; //
+
+const { status, data } = await apiInstance.detectText(
+    requestBody
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **requestBody** | **{ [key: string]: string; }**|  | |
+
+
+### Return type
+
+**BaseResponseMapStringObject**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
  - **Accept**: application/json
 
 
@@ -21619,6 +21726,51 @@ const { status, data } = await apiInstance.sendFriendRequest(
 ### HTTP request headers
 
  - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **sendPasswordChangeCode**
+> BaseResponseSendResult sendPasswordChangeCode()
+
+给当前登录用户已绑定手机号发送修改密码验证码
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+const { status, data } = await apiInstance.sendPasswordChangeCode();
+```
+
+### Parameters
+This endpoint does not have any parameters.
+
+
+### Return type
+
+**BaseResponseSendResult**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
  - **Accept**: application/json
 
 
