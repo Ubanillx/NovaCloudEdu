@@ -106,7 +106,9 @@ public class AliyunOssService implements OssService {
     public String generatePresignedUrl(String fileUrl, long expireSeconds) {
         OSS ossClient = null;
         try {
-            ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
+            // Ensure https is used for the endpoint to generate https presigned URLs
+            String httpsEndpoint = endpoint.startsWith("http") ? endpoint : "https://" + endpoint;
+            ossClient = new OSSClientBuilder().build(httpsEndpoint, accessKeyId, accessKeySecret);
 
             String objectName = extractObjectName(fileUrl);
             Date expiration = new Date(System.currentTimeMillis() + expireSeconds * 1000);

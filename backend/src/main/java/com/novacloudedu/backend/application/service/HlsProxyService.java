@@ -13,6 +13,8 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -38,7 +40,7 @@ public class HlsProxyService {
      * @param userId 用户ID
      * @return 修改后的 m3u8 内容，null 表示获取失败
      */
-    public String getM3u8Stream(Long sectionId, Long userId) {
+    public String getM3u8Stream(Long sectionId, Long userId, String requestBaseUrl) {
         // 1. 获取小节信息
         CourseSection section = sectionRepository.findById(SectionId.of(sectionId)).orElse(null);
         if (section == null || section.getHlsUrl() == null) {
@@ -68,13 +70,18 @@ public class HlsProxyService {
         // 5. 替换 key URI：附加 token 参数
         // 原始格式: #EXT-X-KEY:METHOD=AES-128,URI="https://host/api/video/key?keyId=xxx"
         // 修改为:   #EXT-X-KEY:METHOD=AES-128,URI="https://host/api/video/key?keyId=xxx&token=yyy"
-        String modifiedM3u8 = modifyKeyUri(originalM3u8, keyId, token);
+        String modifiedM3u8 = modifyKeyUri(originalM3u8, keyId, token, requestBaseUrl);
 
         // 6. 替换相对路径为预签名绝对路径
         modifiedM3u8 = makeAbsoluteUrlsWithPresign(modifiedM3u8, hlsUrl);
 
         log.debug("m3u8流生成成功, sectionId={}, userId={}, keyId={}", sectionId, userId, keyId);
         return modifiedM3u8;
+    }
+
+    // 兼容旧调用方（若存在），默认回退到配置项 server.base-url
+    public String getM3u8Stream(Long sectionId, Long userId) {
+        return getM3u8Stream(sectionId, userId, serverBaseUrl);
     }
 
     /**
@@ -108,7 +115,7 @@ public class HlsProxyService {
         }
 
         // 4. 替换 key URI：将 keyId 参数附加到 key 请求 URL
-        String modifiedM3u8 = modifyKeyUri(originalM3u8, keyId, token);
+        String modifiedM3u8 = modifyKeyUri(originalM3u8, keyId, token, serverBaseUrl);
 
         // 5. 替换相对路径为绝对路径（如果有）
         modifiedM3u8 = makeAbsoluteUrlsWithPresign(modifiedM3u8, hlsUrl);
@@ -157,13 +164,29 @@ public class HlsProxyService {
     /**
      * 修改 m3u8 中的 key URI，附加 token 参数
      */
-    private String modifyKeyUri(String m3u8Content, String keyId, String token) {
-        // 原始: ...URI="http://host/api/video/key?keyId=xxx"
-        // 目标: ...URI="http://host/api/video/key?keyId=xxx&token=yyy"
-        // 简单字符串替换，找到 keyId=xxx" 替换为 keyId=xxx&token=yyy"
-        String search = "keyId=" + keyId + "\"";
-        String replace = "keyId=" + keyId + "&token=" + token + "\"";
-        return m3u8Content.replace(search, replace);
+    private String modifyKeyUri(String m3u8Content, String keyId, String token, String requestBaseUrl) {
+        String baseUrl = normalizeBaseUrl(requestBaseUrl);
+        String finalKeyUri = baseUrl + "/api/video/key?keyId=" + keyId + "&token=" + token;
+
+        // 无论历史 m3u8 里是 localhost/内网/旧域名，统一重写为当前请求域名
+        String keyUriPattern = "URI=\\\"[^\\\"]*keyId=" + Pattern.quote(keyId) + "[^\\\"]*\\\"";
+        String replaced = m3u8Content.replaceAll(keyUriPattern, "URI=\"" + Matcher.quoteReplacement(finalKeyUri) + "\"");
+
+        // 兜底：若历史内容格式异常，至少保证 token 被附加
+        if (replaced.equals(m3u8Content)) {
+            String search = "keyId=" + keyId + "\"";
+            String replace = "keyId=" + keyId + "&token=" + token + "\"";
+            return m3u8Content.replace(search, replace);
+        }
+        return replaced;
+    }
+
+    private String normalizeBaseUrl(String baseUrl) {
+        if (baseUrl == null || baseUrl.isBlank()) {
+            return serverBaseUrl;
+        }
+        String trimmed = baseUrl.trim();
+        return trimmed.endsWith("/") ? trimmed.substring(0, trimmed.length() - 1) : trimmed;
     }
 
     /**

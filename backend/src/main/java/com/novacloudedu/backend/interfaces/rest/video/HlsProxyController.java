@@ -5,6 +5,7 @@ import com.novacloudedu.backend.application.service.VideoPlayTokenService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -53,6 +54,7 @@ public class HlsProxyController {
     public void getHlsStream(
             @PathVariable @Parameter(description = "小节ID") Long sectionId,
             @RequestParam @Parameter(description = "一次性流访问令牌") String token,
+            HttpServletRequest request,
             HttpServletResponse response) throws IOException {
 
         // 1. 验证 stream token（一次性消费），获取 userId
@@ -65,7 +67,8 @@ public class HlsProxyController {
         }
 
         // 2. 获取带 key-token 的 m3u8 内容
-        String m3u8Content = hlsProxyService.getM3u8Stream(sectionId, userId);
+        String requestBaseUrl = resolveRequestBaseUrl(request);
+        String m3u8Content = hlsProxyService.getM3u8Stream(sectionId, userId, requestBaseUrl);
 
         if (m3u8Content == null) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -86,5 +89,24 @@ public class HlsProxyController {
         response.getOutputStream().flush();
 
         log.debug("HLS流已分发, sectionId={}, userId={}", sectionId, userId);
+    }
+
+    private String resolveRequestBaseUrl(HttpServletRequest request) {
+        String forwardedProto = request.getHeader("X-Forwarded-Proto");
+        String forwardedHost = request.getHeader("X-Forwarded-Host");
+
+        String scheme = (forwardedProto != null && !forwardedProto.isBlank())
+                ? forwardedProto.split(",")[0].trim()
+                : request.getScheme();
+
+        if (forwardedHost != null && !forwardedHost.isBlank()) {
+            return scheme + "://" + forwardedHost.split(",")[0].trim();
+        }
+
+        int port = request.getServerPort();
+        boolean defaultPort = ("http".equalsIgnoreCase(scheme) && port == 80)
+                || ("https".equalsIgnoreCase(scheme) && port == 443);
+        String host = request.getServerName();
+        return defaultPort ? (scheme + "://" + host) : (scheme + "://" + host + ":" + port);
     }
 }
