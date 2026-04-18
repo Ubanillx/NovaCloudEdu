@@ -1,0 +1,22 @@
+[Unit]
+Description=NovaCloudEdu Backend
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User=__SERVICE_USER__
+Group=__SERVICE_GROUP__
+WorkingDirectory=__WORKING_DIR__
+EnvironmentFile=-/etc/default/novacloudedu-backend
+ExecStartPre=/bin/mkdir -p __WORKING_DIR__/logs __WORKING_DIR__/run
+ExecStart=__WORKING_DIR__/manage-backend.sh run
+StandardOutput=append:__WORKING_DIR__/logs/backend.service.out.log
+StandardError=append:__WORKING_DIR__/logs/backend.service.err.log
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=60
+SuccessExitStatus=143
+
+[Install]
+WantedBy=multi-user.target

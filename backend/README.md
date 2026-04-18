@@ -749,3 +749,24 @@ java -jar target/backend-0.0.1-SNAPSHOT.jar --spring.profiles.active=dev
 # 生产环境运行
 java -jar target/backend-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod
 ```
+
+### systemd 服务启动
+
+Linux 服务器上建议用 systemd 管理后端，这样可以开机自启动，并通过 `systemctl` 统一控制。
+
+```bash
+cd /home/debian/NovaCloudEdu/backend
+sudo ./manage-backend.sh service-install
+sudo cp systemd/novacloudedu-backend.env.example /etc/default/novacloudedu-backend
+sudo systemctl start novacloudedu-backend
+sudo systemctl enable novacloudedu-backend
+```
+
+常用管理命令：
+
+```bash
+sudo ./manage-backend.sh service-status
+sudo ./manage-backend.sh service-logs
+sudo ./manage-backend.sh service-restart
+sudo ./manage-backend.sh service-stop
+```
