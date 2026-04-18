@@ -238,14 +238,47 @@ WHERE search_vector IS NULL;
 CREATE INDEX IF NOT EXISTS idx_chapter_content_search_vector 
 ON chapter USING gin(content_search_vector);
 
+-- 为超长章节内容构建可安全写入的全文搜索向量
+CREATE OR REPLACE FUNCTION build_safe_chapter_search_vector(
+    chapter_title TEXT,
+    chapter_content TEXT
+)
+RETURNS tsvector AS $$
+DECLARE
+    normalized_content TEXT := trim(regexp_replace(
+        regexp_replace(COALESCE(chapter_content, ''), '<[^>]+>', ' ', 'g'),
+        '\s+',
+        ' ',
+        'g'
+    ));
+    title_vector tsvector := setweight(to_tsvector('simple', COALESCE(chapter_title, '')), 'A');
+    content_length INT := char_length(normalized_content);
+BEGIN
+    IF normalized_content = '' THEN
+        RETURN title_vector;
+    END IF;
+
+    LOOP
+        BEGIN
+            RETURN title_vector ||
+                setweight(strip(to_tsvector('simple', left(normalized_content, content_length))), 'B');
+        EXCEPTION
+            WHEN SQLSTATE '54000' THEN
+                IF content_length <= 1024 THEN
+                    RETURN title_vector;
+                END IF;
+                content_length := GREATEST(content_length / 2, 1024);
+        END;
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+
 -- 创建章节全文搜索触发器函数
 CREATE OR REPLACE FUNCTION update_chapter_search_vector()
 RETURNS TRIGGER AS $$
 BEGIN
     -- 只索引纯文本内容,去除HTML标签
-    NEW.content_search_vector := 
-        setweight(to_tsvector('simple', COALESCE(NEW.title, '')), 'A') ||
-        setweight(to_tsvector('simple', COALESCE(regexp_replace(NEW.content, '<[^>]+>', '', 'g'), '')), 'B');
+    NEW.content_search_vector := build_safe_chapter_search_vector(NEW.title, NEW.content);
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
