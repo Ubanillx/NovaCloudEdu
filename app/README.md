@@ -190,6 +190,29 @@ assets/
 
 ## 关键技术实现
 
+### Android 打包
+
+正式构建默认使用生产环境。生产环境地址不再硬编码，必须通过
+`--dart-define` 传入。
+
+```bash
+flutter build apk --release
+```
+
+正式打包时请显式传入环境变量：
+
+```bash
+flutter build apk --release \
+  --dart-define=APP_ENV=prod \
+  --dart-define=API_BASE_URL=https://novacloudedu.ubanillx.com/api \
+  --dart-define=RTC_WS_URL=ws://novacloudedu.ubanillx.com:8300
+```
+
+如果缺少 `API_BASE_URL` 或 `RTC_WS_URL`，生产环境会在运行时直接报错，
+避免误连到硬编码地址。
+
+构建产物默认位于 `build/app/outputs/flutter-apk/app-release.apk`。
+
 ### Token 安全管理
 
 ```
