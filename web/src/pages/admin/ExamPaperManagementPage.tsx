@@ -32,21 +32,11 @@ import type {
   QuestionResponse,
 } from '../../api/generated/models';
 import { toast } from '../../components/ui';
+import { QUESTION_TYPE_OPTIONS, SUBJECT_OPTIONS, getSubjectName } from '../../constants/exam';
 
 const api = new DefaultApi(new Configuration(), '', apiClient);
 
-const SUBJECTS = [
-  { value: '', label: '全部学科' },
-  { value: 'MATH', label: '数学' },
-  { value: 'CHINESE', label: '语文' },
-  { value: 'ENGLISH', label: '英语' },
-  { value: 'PHYSICS', label: '物理' },
-  { value: 'CHEMISTRY', label: '化学' },
-  { value: 'BIOLOGY', label: '生物' },
-  { value: 'HISTORY', label: '历史' },
-  { value: 'GEOGRAPHY', label: '地理' },
-  { value: 'POLITICS', label: '政治' },
-];
+const SUBJECTS = [{ value: '', label: '全部学科' }, ...SUBJECT_OPTIONS];
 
 const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
   DRAFT: { label: '草稿', color: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400' },
@@ -458,7 +448,7 @@ export const ExamPaperManagementPage: React.FC = () => {
   };
 
   const totalPages = Math.ceil(total / pageSize);
-  const subjectLabel = (code: string) => SUBJECTS.find(s => s.value === code)?.label || code;
+  const subjectLabel = (code: string) => getSubjectName(code);
 
   // 当打开编辑器面板时，加载题目详情
   useEffect(() => {
@@ -871,13 +861,7 @@ export const ExamPaperManagementPage: React.FC = () => {
                 <select value={pickerType} onChange={e => { setPickerType(e.target.value); }}
                   className="px-3 py-1.5 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg text-xs text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 cursor-pointer">
                   <option value="">全部题型</option>
-                  <option value="SINGLE_CHOICE">单选题</option>
-                  <option value="MULTIPLE_CHOICE">多选题</option>
-                  <option value="TRUE_FALSE">判断题</option>
-                  <option value="FILL_BLANK">填空题</option>
-                  <option value="SHORT_ANSWER">简答题</option>
-                  <option value="ESSAY">论述题</option>
-                  <option value="CALCULATION">计算题</option>
+                  {QUESTION_TYPE_OPTIONS.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
                 </select>
                 <select value={pickerDifficulty ?? ''} onChange={e => setPickerDifficulty(e.target.value ? Number(e.target.value) : undefined)}
                   className="px-3 py-1.5 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg text-xs text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 cursor-pointer">

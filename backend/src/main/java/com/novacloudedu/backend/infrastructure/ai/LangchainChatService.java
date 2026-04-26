@@ -31,6 +31,11 @@ public class LangchainChatService {
         void onToken(String token);
     }
 
+    private static final long TEXT_CHAT_TIMEOUT_MS = 60_000L;
+    private static final long VISION_CHAT_TIMEOUT_MS = 120_000L;
+    private static final long MULTI_IMAGE_CHAT_TIMEOUT_MS = 180_000L;
+    private static final long STREAM_CHAT_TIMEOUT_MS = 300_000L;
+
     /**
      * 流式对话（文本）
      *
@@ -148,16 +153,7 @@ public class LangchainChatService {
             }
         });
 
-        synchronized (lock) {
-            while (!done[0]) {
-                try {
-                    lock.wait(60000);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    throw new RuntimeException("对话被中断", e);
-                }
-            }
-        }
+        awaitCompletion(lock, done, TEXT_CHAT_TIMEOUT_MS, "LLM 对话超时（60秒）", "对话被中断");
 
         if (error[0] != null) {
             throw new RuntimeException("LLM 对话失败: " + error[0].getMessage(), error[0]);
@@ -220,16 +216,7 @@ public class LangchainChatService {
             }
         });
 
-        synchronized (lock) {
-            while (!done[0]) {
-                try {
-                    lock.wait(120000);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    throw new RuntimeException("视觉对话被中断", e);
-                }
-            }
-        }
+        awaitCompletion(lock, done, VISION_CHAT_TIMEOUT_MS, "视觉模型对话超时（120秒）", "视觉对话被中断");
 
         if (error[0] != null) {
             throw new RuntimeException("视觉模型对话失败: " + error[0].getMessage(), error[0]);
@@ -295,16 +282,7 @@ public class LangchainChatService {
             }
         });
 
-        synchronized (lock) {
-            while (!done[0]) {
-                try {
-                    lock.wait(180000);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    throw new RuntimeException("多图视觉对话被中断", e);
-                }
-            }
-        }
+        awaitCompletion(lock, done, MULTI_IMAGE_CHAT_TIMEOUT_MS, "多图视觉对话超时（180秒）", "多图视觉对话被中断");
 
         if (error[0] != null) {
             throw new RuntimeException("多图视觉对话失败: " + error[0].getMessage(), error[0]);
@@ -368,19 +346,29 @@ public class LangchainChatService {
             }
         });
 
-        synchronized (lock) {
-            while (!done[0]) {
-                try {
-                    lock.wait(300000);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    throw new RuntimeException("流式对话被中断", e);
-                }
-            }
-        }
+        awaitCompletion(lock, done, STREAM_CHAT_TIMEOUT_MS, "流式对话超时（300秒）", "流式对话被中断");
 
         if (error[0] != null) {
             throw new RuntimeException("流式对话失败: " + error[0].getMessage(), error[0]);
+        }
+    }
+
+    private void awaitCompletion(Object lock, boolean[] done, long timeoutMs,
+                                 String timeoutMessage, String interruptedMessage) {
+        long deadline = System.currentTimeMillis() + timeoutMs;
+        synchronized (lock) {
+            while (!done[0]) {
+                long remaining = deadline - System.currentTimeMillis();
+                if (remaining <= 0) {
+                    throw new RuntimeException(timeoutMessage);
+                }
+                try {
+                    lock.wait(remaining);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    throw new RuntimeException(interruptedMessage, e);
+                }
+            }
         }
     }
 

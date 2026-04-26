@@ -4,14 +4,9 @@ import { ArrowLeft, TrendingUp, Target, AlertTriangle, Award, BookOpen, BarChart
 import { apiClient, DefaultApi, Configuration } from '../api';
 import type { GradingStatsResponse, SubjectProfileSummary, ScoreTrendItem, ErrorCategoryCount } from '../api/generated/models';
 import toast from '../components/ui/Toast';
+import { getSubjectName } from '../constants/exam';
 
 const api = new DefaultApi(new Configuration(), '', apiClient);
-
-const SUBJECT_NAMES: Record<string, string> = {
-  MATH: '数学', CHINESE: '语文', ENGLISH: '英语',
-  PHYSICS: '物理', CHEMISTRY: '化学', BIOLOGY: '生物',
-  HISTORY: '历史', GEOGRAPHY: '地理', POLITICS: '政治',
-};
 
 const ERROR_CATEGORY_NAMES: Record<string, string> = {
   CONCEPT_ERROR: '概念错误', CALCULATION_ERROR: '计算错误',
@@ -202,7 +197,7 @@ const ScoreTrendChart: React.FC<{ data: ScoreTrendItem[] }> = ({ data }) => {
             <div key={i} className="flex-1 flex flex-col items-center gap-2 group relative">
               <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-[10px] px-2.5 py-1.5 rounded-xl opacity-0 group-hover:opacity-100 transition-all scale-90 group-hover:scale-100 pointer-events-none z-10 whitespace-nowrap shadow-xl">
                 <span className="font-black">{score}</span> / {max} ({(rate * 100).toFixed(0)}%)
-                <div className="mt-0.5 opacity-60 font-medium">{SUBJECT_NAMES[item.subject ?? ''] || item.subject || ''}</div>
+                <div className="mt-0.5 opacity-60 font-medium">{getSubjectName(item.subject)}</div>
                 <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900 dark:border-t-white" />
               </div>
               <div
@@ -239,7 +234,7 @@ const SubjectScoreCard: React.FC<{ rates: Record<string, number> }> = ({ rates }
         {sorted.map(([subject, rate]) => (
           <div key={subject} className="group">
             <div className="flex justify-between text-xs mb-2">
-              <span className="text-gray-700 dark:text-gray-300 font-bold">{SUBJECT_NAMES[subject] || subject}</span>
+              <span className="text-gray-700 dark:text-gray-300 font-bold">{getSubjectName(subject)}</span>
               <span className={`font-black tabular-nums ${rate >= 0.8 ? 'text-green-500' : rate >= 0.6 ? 'text-yellow-500' : 'text-red-500'}`}>
                 {(rate * 100).toFixed(0)}%
               </span>
@@ -310,7 +305,7 @@ const SubjectProfileCard: React.FC<{ profile: SubjectProfileSummary }> = ({ prof
 
       <div className="flex items-center justify-between mb-5 relative z-10">
         <h4 className="text-base font-bold text-gray-900 dark:text-white">
-          {profile.subjectName || SUBJECT_NAMES[profile.subject ?? ''] || profile.subject}
+          {profile.subjectName || getSubjectName(profile.subject)}
         </h4>
         <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
           mastery >= 0.8 ? 'bg-green-500/10 text-green-600 dark:text-green-400 border border-green-500/20' :

@@ -1,8 +1,10 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, X, Image, Loader2, CheckCircle, AlertCircle, BookOpen, FileText, Sparkles, ChevronDown, Search, Clock, XCircle, ChevronRight, BarChart3 } from 'lucide-react';
-import { apiClient, DefaultApi, Configuration } from '../api';
+import { apiClient, authFetch, DefaultApi, Configuration } from '../api';
 import toast from '../components/ui/Toast';
+import { SUBJECT_OPTIONS, getSubjectName } from '../constants/exam';
+import GradingMarkdown from '../components/grading/GradingMarkdown';
 
 const api = new DefaultApi(new Configuration(), '', apiClient);
 
@@ -37,19 +39,6 @@ const convertHeicToJpeg = (file: File): Promise<File> => {
   });
 };
 
-const SUBJECTS = [
-  { code: '', label: '自动识别（AI推断）' },
-  { code: 'MATH', label: '数学' },
-  { code: 'CHINESE', label: '语文' },
-  { code: 'ENGLISH', label: '英语' },
-  { code: 'PHYSICS', label: '物理' },
-  { code: 'CHEMISTRY', label: '化学' },
-  { code: 'BIOLOGY', label: '生物' },
-  { code: 'HISTORY', label: '历史' },
-  { code: 'GEOGRAPHY', label: '地理' },
-  { code: 'POLITICS', label: '政治' },
-];
-
 const GRADES = [
   '一年级', '二年级', '三年级', '四年级', '五年级', '六年级',
   '初一', '初二', '初三', '高一', '高二', '高三',
@@ -80,6 +69,9 @@ interface GradingProgress {
 
 interface QuestionResult {
   index: number;
+  questionContent?: string;
+  studentAnswer?: string;
+  standardAnswer?: string;
   score: number;
   maxScore: number;
   comment: string;
@@ -88,12 +80,6 @@ interface QuestionResult {
 }
 
 type GradingMode = 'GENERAL' | 'EXAM_PAPER';
-
-const SUBJECT_NAMES: Record<string, string> = {
-  MATH: '数学', CHINESE: '语文', ENGLISH: '英语',
-  PHYSICS: '物理', CHEMISTRY: '化学', BIOLOGY: '生物',
-  HISTORY: '历史', GEOGRAPHY: '地理', POLITICS: '政治',
-};
 
 const STATUS_NAMES: Record<string, { label: string; color: string }> = {
   PENDING: { label: '等待中', color: 'text-gray-500 bg-gray-100 dark:bg-gray-800' },
@@ -278,6 +264,10 @@ const GradingSubmitPage: React.FC = () => {
       toast.warning('请先上传作业图片');
       return;
     }
+    if (mode === 'EXAM_PAPER' && !selectedPaperId) {
+      toast.warning('请选择试卷');
+      return;
+    }
 
     setSubmitting(true);
     setProgress({
@@ -286,7 +276,6 @@ const GradingSubmitPage: React.FC = () => {
     });
 
     try {
-      const token = localStorage.getItem('auth_token');
       const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
 
       const body = JSON.stringify({
@@ -298,11 +287,10 @@ const GradingSubmitPage: React.FC = () => {
         ...(mode === 'EXAM_PAPER' && selectedPaperId ? { examPaperId: selectedPaperId as unknown as number } : {}),
       });
 
-      const response = await fetch(`${baseUrl}/api/grading/submit`, {
+      const response = await authFetch(`${baseUrl}/api/grading/submit`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body,
       });
@@ -311,6 +299,17 @@ const GradingSubmitPage: React.FC = () => {
         const errText = await response.text();
         let errMsg = '提交失败';
         try { errMsg = JSON.parse(errText)?.message || errMsg; } catch {}
+        throw new Error(errMsg);
+      }
+
+      const contentType = response.headers.get('content-type') || '';
+      if (!contentType.includes('text/event-stream')) {
+        const text = await response.text();
+        let errMsg = '提交失败';
+        try {
+          const parsed = JSON.parse(text);
+          errMsg = parsed?.message || parsed?.data?.message || errMsg;
+        } catch {}
         throw new Error(errMsg);
       }
 
@@ -325,21 +324,16 @@ const GradingSubmitPage: React.FC = () => {
         if (done) break;
 
         buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split('\n');
-        buffer = lines.pop() || '';
+        const blocks = buffer.split(/\r?\n\r?\n/);
+        buffer = blocks.pop() || '';
 
-        for (const line of lines) {
-          if (line.startsWith('data:')) {
-            const dataStr = line.slice(5).trim();
-            if (!dataStr) continue;
-            try {
-              const data = JSON.parse(dataStr);
-              handleSseEvent(data);
-            } catch {}
-          } else if (line.startsWith('event:')) {
-            // event name handled via data content
-          }
+        for (const block of blocks) {
+          handleSseBlock(block);
         }
+      }
+
+      if (buffer.trim()) {
+        handleSseBlock(buffer);
       }
     } catch (err: any) {
       setProgress(prev => prev ? { ...prev, error: err?.message || '批改失败', done: true } : null);
@@ -349,30 +343,49 @@ const GradingSubmitPage: React.FC = () => {
     }
   };
 
-  const handleSseEvent = (data: any) => {
-    // progress events
-    if (data.step === 'ocr') {
+  const handleSseBlock = (block: string) => {
+    let eventName = 'message';
+    const dataLines: string[] = [];
+
+    for (const rawLine of block.split(/\r?\n/)) {
+      const line = rawLine.trimEnd();
+      if (line.startsWith('event:')) {
+        eventName = line.slice(6).trim();
+      } else if (line.startsWith('data:')) {
+        dataLines.push(line.slice(5).trimStart());
+      }
+    }
+
+    if (dataLines.length === 0) return;
+    try {
+      handleSseEvent(eventName, JSON.parse(dataLines.join('\n')));
+    } catch {}
+  };
+
+  const handleSseEvent = (eventName: string, data: any) => {
+    if (eventName === 'progress' && data.step === 'ocr') {
       setProgress(prev => prev ? { ...prev, step: 'ocr', message: data.message || '正在识别...' } : prev);
-    } else if (data.step === 'ocr_done') {
+    } else if (eventName === 'progress' && data.step === 'ocr_done') {
       setProgress(prev => prev ? {
         ...prev, step: 'ocr_done',
         message: data.message || '识别完成',
         questionCount: data.questionCount,
       } : prev);
-    } else if (data.index !== undefined && data.total !== undefined && data.message) {
-      // grading progress
+    } else if (eventName === 'grading') {
       setProgress(prev => prev ? {
         ...prev, step: 'grading',
         message: data.message,
         currentIndex: data.index,
         totalQuestions: data.total,
       } : prev);
-    } else if (data.index !== undefined && data.score !== undefined) {
-      // question_graded
+    } else if (eventName === 'question_graded') {
       setProgress(prev => {
         if (!prev) return prev;
         const qr: QuestionResult = {
           index: data.index,
+          questionContent: data.questionContent || '',
+          studentAnswer: data.studentAnswer || '',
+          standardAnswer: data.standardAnswer || '',
           score: data.score,
           maxScore: data.maxScore || 0,
           comment: data.comment || '',
@@ -381,8 +394,7 @@ const GradingSubmitPage: React.FC = () => {
         };
         return { ...prev, questionResults: [...prev.questionResults, qr] };
       });
-    } else if (data.submissionId && data.totalScore !== undefined) {
-      // done
+    } else if (eventName === 'done') {
       setProgress(prev => prev ? {
         ...prev, done: true, step: 'done',
         message: '批改完成',
@@ -391,15 +403,15 @@ const GradingSubmitPage: React.FC = () => {
         maxScore: data.maxScore,
         overallComment: data.overallComment,
       } : prev);
-    } else if (data.message && !data.step) {
-      // error
+    } else if (eventName === 'error') {
       setProgress(prev => prev ? { ...prev, error: data.message, done: true } : prev);
     }
   };
 
   const uploadedCount = images.filter(i => i.url && !i.uploading).length;
   const hasUploadingImages = images.some(i => i.uploading);
-  const canSubmit = uploadedCount > 0 && !hasUploadingImages && !submitting;
+  const needsPaperSelection = mode === 'EXAM_PAPER' && !selectedPaperId;
+  const canSubmit = uploadedCount > 0 && !hasUploadingImages && !submitting && !needsPaperSelection;
 
   return (
     <div className="max-w-5xl mx-auto space-y-8">
@@ -471,7 +483,7 @@ const GradingSubmitPage: React.FC = () => {
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-bold text-gray-900 dark:text-white truncate">{selectedPaperTitle}</p>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                      {subject ? SUBJECT_NAMES[subject] || subject : ''} {grade || ''}
+                      {getSubjectName(subject)} {grade || ''}
                     </p>
                   </div>
                   <CheckCircle size={18} className="text-brand-500 flex-shrink-0" />
@@ -489,7 +501,7 @@ const GradingSubmitPage: React.FC = () => {
                       <select value={paperSubjectFilter} onChange={e => setPaperSubjectFilter(e.target.value)}
                         className="h-full px-3 py-2.5 bg-gray-50 dark:bg-gray-800/40 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-white appearance-none pr-8 focus:outline-none focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 transition-all cursor-pointer">
                         <option value="" className="dark:bg-gray-900">全部学科</option>
-                        {SUBJECTS.filter(s => s.code).map(s => <option key={s.code} value={s.code} className="dark:bg-gray-900">{s.label}</option>)}
+                        {SUBJECT_OPTIONS.map(s => <option key={s.value} value={s.value} className="dark:bg-gray-900">{s.label}</option>)}
                       </select>
                       <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
                     </div>
@@ -569,7 +581,7 @@ const GradingSubmitPage: React.FC = () => {
                             {item.title || (item.gradingMode === 'EXAM_PAPER' ? '试卷批改' : '通用作业批改')}
                           </p>
                           <div className="flex items-center gap-2 mt-0.5">
-                            {item.subject && <span className="text-[10px] px-1.5 py-0.5 bg-brand-50 dark:bg-brand-900/20 text-brand-600 dark:text-brand-400 rounded font-bold">{SUBJECT_NAMES[item.subject] || item.subject}</span>}
+                            {item.subject && <span className="text-[10px] px-1.5 py-0.5 bg-brand-50 dark:bg-brand-900/20 text-brand-600 dark:text-brand-400 rounded font-bold">{getSubjectName(item.subject)}</span>}
                             <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold ${st.color}`}>{st.label}</span>
                             {item.createTime && <span className="text-[10px] text-gray-400">{new Date(item.createTime).toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>}
                           </div>
@@ -620,7 +632,8 @@ const GradingSubmitPage: React.FC = () => {
                 <div className="relative group">
                   <select value={subject} onChange={e => setSubject(e.target.value)}
                     className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800/40 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-white appearance-none focus:outline-none focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 transition-all cursor-pointer">
-                    {SUBJECTS.map(s => <option key={s.code} value={s.code} className="dark:bg-gray-900">{s.label}</option>)}
+                    <option value="" className="dark:bg-gray-900">自动识别（AI推断）</option>
+                    {SUBJECT_OPTIONS.map(s => <option key={s.value} value={s.value} className="dark:bg-gray-900">{s.label}</option>)}
                   </select>
                   <ChevronDown size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none group-hover:text-brand-500 transition-colors" />
                 </div>
@@ -719,21 +732,26 @@ const GradingSubmitPage: React.FC = () => {
               className="hidden" />
           </div>
 
-          <button onClick={handleSubmit} disabled={!canSubmit}
-            className={`w-full py-4 rounded-2xl font-bold text-base transition-all flex items-center justify-center gap-2 group ${
-              canSubmit
-                ? 'bg-brand-600 hover:bg-brand-700 text-white shadow-xl shadow-brand-600/20 hover:scale-[1.02] active:scale-[0.98]'
-                : 'bg-gray-100 dark:bg-gray-800 text-gray-400 cursor-not-allowed'
-            }`}>
-            {hasUploadingImages ? (
-              <><Loader2 size={18} className="animate-spin" /> 图片上传中...</>
-            ) : (
-              <>
-                <BookOpen size={20} />
-                <span>开始批改 {uploadedCount > 0 && `(${uploadedCount} 张图片)`}</span>
-              </>
+          <div className="space-y-2">
+            {needsPaperSelection && (
+              <p className="text-sm text-red-500 font-medium text-center">请选择试卷后再开始批改</p>
             )}
-          </button>
+            <button onClick={handleSubmit} disabled={!canSubmit}
+              className={`w-full py-4 rounded-2xl font-bold text-base transition-all flex items-center justify-center gap-2 group ${
+                canSubmit
+                  ? 'bg-brand-600 hover:bg-brand-700 text-white shadow-xl shadow-brand-600/20 hover:scale-[1.02] active:scale-[0.98]'
+                  : 'bg-gray-100 dark:bg-gray-800 text-gray-400 cursor-not-allowed'
+              }`}>
+              {hasUploadingImages ? (
+                <><Loader2 size={18} className="animate-spin" /> 图片上传中...</>
+              ) : (
+                <>
+                  <BookOpen size={20} />
+                  <span>开始批改 {uploadedCount > 0 && `(${uploadedCount} 张图片)`}</span>
+                </>
+              )}
+            </button>
+          </div>
         </>
       )}
     </div>
@@ -765,10 +783,11 @@ const GradingProgressPanel: React.FC<{
   const totalQ = progress.totalQuestions || progress.questionCount || 0;
   const gradedQ = progress.questionResults.length;
   const pct = totalQ > 0 ? Math.round((gradedQ / totalQ) * 100) : 0;
+  const isCompleted = (progress.done || progress.step === 'done') && !progress.error;
 
   // 判断当前阶段
   const getStageInfo = () => {
-    if (progress.done && !progress.error) {
+    if (isCompleted) {
       return { stage: 'completed', icon: <CheckCircle size={28} className="text-green-500" />, bgClass: 'bg-green-50 dark:bg-green-900/20', title: '批改已完成' };
     }
     if (progress.error) {
@@ -783,13 +802,20 @@ const GradingProgressPanel: React.FC<{
     if (progress.step === 'ocr_done') {
       return { stage: 'ocr_done', icon: <CheckCircle size={28} className="text-blue-500" />, bgClass: 'bg-blue-50 dark:bg-blue-900/20', title: '图像识别完成' };
     }
-    if (progress.step === 'grading' || progress.step === 'done') {
+    if (progress.step === 'grading') {
       return { stage: 'grading', icon: <Loader2 size={28} className="text-yellow-500 animate-spin" />, bgClass: 'bg-yellow-50 dark:bg-yellow-900/20', title: 'AI 智能批改中' };
     }
     return { stage: 'processing', icon: <Loader2 size={28} className="text-brand-500 animate-spin" />, bgClass: 'bg-brand-50 dark:bg-brand-900/20', title: '处理中' };
   };
 
   const stageInfo = getStageInfo();
+  const getQuestionSummary = (qr: QuestionResult) => {
+    if (qr.comment) return qr.comment;
+    if (isCompleted) {
+      return qr.standardAnswer ? '批改完成，已生成参考答案' : '批改完成';
+    }
+    return '正在生成分析...';
+  };
 
   return (
     <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-6 shadow-sm space-y-6">
@@ -804,7 +830,7 @@ const GradingProgressPanel: React.FC<{
           </h3>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 truncate">{progress.message}</p>
         </div>
-        {progress.done && !progress.error && progress.totalScore !== undefined && (
+        {isCompleted && progress.totalScore !== undefined && (
           <div className="text-right">
             <div className="text-3xl font-black text-brand-600 dark:text-brand-400 tabular-nums">
               {progress.totalScore}<span className="text-sm font-normal text-gray-400 ml-1">/{progress.maxScore}</span>
@@ -815,7 +841,7 @@ const GradingProgressPanel: React.FC<{
       </div>
 
       {/* 处理阶段指示器 */}
-      {!progress.done && (
+      {!isCompleted && (
         <div className="flex items-center gap-3">
           {/* OCR 阶段 */}
           <div className="flex-1 flex items-center gap-2">
@@ -892,7 +918,7 @@ const GradingProgressPanel: React.FC<{
       )}
 
       {/* 进度条 */}
-      {!progress.done && totalQ > 0 && (
+      {!isCompleted && totalQ > 0 && (
         <div className="space-y-2">
           <div className="flex justify-between text-xs font-bold text-gray-400 uppercase tracking-wider">
             <span>Progress</span>
@@ -915,13 +941,22 @@ const GradingProgressPanel: React.FC<{
                 {qr.index}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-200 truncate">{qr.comment || '正在生成分析...'}</p>
+                <GradingMarkdown
+                  content={getQuestionSummary(qr)}
+                  className="text-sm font-medium text-gray-700 dark:text-gray-200 line-clamp-1 [&_p]:truncate"
+                />
+                {qr.standardAnswer && (
+                  <GradingMarkdown
+                    content={`参考答案：${qr.standardAnswer}`}
+                    className="text-xs text-green-600 dark:text-green-400 mt-1 line-clamp-1 [&_p]:truncate"
+                  />
+                )}
                 {qr.knowledgePoints.length > 0 && (
                   <div className="flex gap-1.5 mt-1.5 flex-wrap">
                     {qr.knowledgePoints.slice(0, 3).map(kp => (
-                      <span key={kp} className="text-[10px] px-2 py-0.5 bg-brand-50/80 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 rounded-md font-medium border border-brand-100/50 dark:border-brand-800/30">
-                        {kp}
-                      </span>
+                      <div key={kp} className="text-[10px] px-2 py-0.5 bg-brand-50/80 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 rounded-md font-medium border border-brand-100/50 dark:border-brand-800/30">
+                        <GradingMarkdown content={kp} />
+                      </div>
                     ))}
                   </div>
                 )}
@@ -937,7 +972,7 @@ const GradingProgressPanel: React.FC<{
       )}
 
       {/* 总评 */}
-      {progress.done && !progress.error && progress.overallComment && (
+      {isCompleted && progress.overallComment && (
         <div className="p-4 rounded-xl bg-brand-50/50 dark:bg-brand-900/10 border border-brand-100/50 dark:border-brand-800/30 relative overflow-hidden group">
           <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
             <Sparkles size={48} className="text-brand-500" />
@@ -945,7 +980,10 @@ const GradingProgressPanel: React.FC<{
           <h4 className="text-xs font-bold text-brand-600 dark:text-brand-400 uppercase tracking-widest mb-2 flex items-center gap-1.5">
             <Sparkles size={12} /> AI 核心建议
           </h4>
-          <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed relative z-10">{progress.overallComment}</p>
+          <GradingMarkdown
+            content={progress.overallComment}
+            className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed relative z-10"
+          />
         </div>
       )}
 
@@ -959,13 +997,13 @@ const GradingProgressPanel: React.FC<{
 
       {/* 操作按钮 */}
       <div className="flex gap-4 pt-2">
-        {progress.done && !progress.error && (
+        {isCompleted && (
           <button onClick={onViewResult}
             className="flex-[2] py-3 rounded-2xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm transition-all shadow-lg shadow-brand-600/20 active:scale-[0.98]">
             查看详细批改报告
           </button>
         )}
-        {progress.done && (
+        {(isCompleted || progress.error) && (
           <button onClick={() => window.location.reload()}
             className="flex-1 py-3 rounded-2xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 font-bold text-sm transition-all active:scale-[0.98]">
             {progress.error ? '重试' : '继续批改'}

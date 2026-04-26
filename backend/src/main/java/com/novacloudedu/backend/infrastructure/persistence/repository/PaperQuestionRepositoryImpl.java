@@ -11,7 +11,10 @@ import com.novacloudedu.backend.infrastructure.persistence.po.PaperQuestionPO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -61,7 +64,15 @@ public class PaperQuestionRepositoryImpl implements PaperQuestionRepository {
         LambdaQueryWrapper<PaperQuestionPO> wrapper = new LambdaQueryWrapper<>();
         wrapper.in(PaperQuestionPO::getSectionId, idValues)
                 .orderByAsc(PaperQuestionPO::getSortOrder);
+        Map<Long, Integer> sectionOrder = new HashMap<>();
+        for (int i = 0; i < idValues.size(); i++) {
+            sectionOrder.put(idValues.get(i), i);
+        }
         return paperQuestionMapper.selectList(wrapper).stream()
+                .sorted(Comparator
+                        .comparingInt((PaperQuestionPO po) -> sectionOrder.getOrDefault(po.getSectionId(), Integer.MAX_VALUE))
+                        .thenComparing(po -> po.getSortOrder() != null ? po.getSortOrder() : 0)
+                        .thenComparing(po -> po.getId() != null ? po.getId() : 0L))
                 .map(paperQuestionConverter::toDomain)
                 .toList();
     }

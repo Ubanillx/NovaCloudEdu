@@ -4,6 +4,8 @@ import { ArrowLeft, CheckCircle, XCircle, AlertTriangle, BookOpen, Brain, Loader
 import { apiClient, DefaultApi, Configuration } from '../api';
 import type { GradingResultResponse, QuestionGradingItem } from '../api/generated/models';
 import toast from '../components/ui/Toast';
+import { getQuestionTypeName } from '../constants/exam';
+import GradingMarkdown from '../components/grading/GradingMarkdown';
 
 const api = new DefaultApi(new Configuration(), '', apiClient);
 
@@ -156,9 +158,10 @@ const GradingResultPage: React.FC = () => {
                   <div className="p-1.5 rounded-lg bg-brand-500/10 text-brand-500 flex-shrink-0">
                     <Lightbulb size={18} />
                   </div>
-                  <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed font-medium">
-                    {result.overallComment}
-                  </p>
+                  <GradingMarkdown
+                    content={result.overallComment}
+                    className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed font-medium"
+                  />
                 </div>
               </div>
             )}
@@ -237,12 +240,15 @@ const QuestionCard: React.FC<{ question: QuestionGradingItem }> = ({ question })
             </span>
             {question.questionType && (
               <span className="text-[10px] font-black px-2 py-0.5 bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 rounded-md uppercase tracking-wider">
-                {question.questionType}
+                {getQuestionTypeName(question.questionType)}
               </span>
             )}
           </div>
           {question.comment && !expanded && (
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 truncate max-w-md">{question.comment}</p>
+            <GradingMarkdown
+              content={question.comment}
+              className="text-sm text-gray-500 dark:text-gray-400 mt-1 max-w-md line-clamp-1 [&_p]:truncate"
+            />
           )}
         </div>
 
@@ -270,9 +276,10 @@ const QuestionCard: React.FC<{ question: QuestionGradingItem }> = ({ question })
               <div className="flex items-center gap-1.5 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">
                 <BookOpen size={12} /> 题目内容
               </div>
-              <div className="text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800/50 rounded-2xl px-4 py-3 leading-relaxed border border-gray-100 dark:border-gray-800/50">
-                {question.questionContent}
-              </div>
+              <GradingMarkdown
+                content={question.questionContent}
+                className="text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800/50 rounded-2xl px-4 py-3 leading-relaxed border border-gray-100 dark:border-gray-800/50"
+              />
             </div>
           )}
 
@@ -283,13 +290,11 @@ const QuestionCard: React.FC<{ question: QuestionGradingItem }> = ({ question })
                 <div className="flex items-center gap-1.5 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">
                   你的作答
                 </div>
-                <div className={`text-sm rounded-2xl px-4 py-3 min-h-[60px] leading-relaxed border ${
+                <GradingMarkdown content={question.studentAnswer} className={`text-sm rounded-2xl px-4 py-3 min-h-[60px] leading-relaxed border ${
                   isCorrect ? 'bg-green-50/30 dark:bg-green-900/5 border-green-100/50 dark:border-green-800/20 text-gray-700 dark:text-gray-300' :
                   isPartial ? 'bg-yellow-50/30 dark:bg-yellow-900/5 border-yellow-100/50 dark:border-yellow-800/20 text-gray-700 dark:text-gray-300' :
                   'bg-red-50/30 dark:bg-red-900/5 border-red-100/50 dark:border-red-800/20 text-gray-700 dark:text-gray-300'
-                }`}>
-                  {question.studentAnswer}
-                </div>
+                }`} />
               </div>
             )}
             {question.standardAnswer && (
@@ -297,9 +302,10 @@ const QuestionCard: React.FC<{ question: QuestionGradingItem }> = ({ question })
                 <div className="flex items-center gap-1.5 text-xs font-bold text-green-500 uppercase tracking-widest">
                   参考答案
                 </div>
-                <div className="text-sm text-green-700 dark:text-green-300 bg-green-50/50 dark:bg-green-900/10 border border-green-100 dark:border-green-800/30 rounded-2xl px-4 py-3 min-h-[60px] leading-relaxed font-medium">
-                  {question.standardAnswer}
-                </div>
+                <GradingMarkdown
+                  content={question.standardAnswer}
+                  className="text-sm text-green-700 dark:text-green-300 bg-green-50/50 dark:bg-green-900/10 border border-green-100 dark:border-green-800/30 rounded-2xl px-4 py-3 min-h-[60px] leading-relaxed font-medium"
+                />
               </div>
             )}
           </div>
@@ -323,9 +329,9 @@ const QuestionCard: React.FC<{ question: QuestionGradingItem }> = ({ question })
                 <div className="text-xs font-bold text-brand-400 uppercase tracking-widest">考察知识点</div>
                 <div className="flex gap-2 flex-wrap">
                   {question.knowledgePoints.map(kp => (
-                    <span key={kp} className="text-[11px] px-2.5 py-1 bg-brand-50 dark:bg-brand-900/20 text-brand-600 dark:text-brand-400 rounded-lg font-bold border border-brand-100 dark:border-brand-800/30">
-                      {kp}
-                    </span>
+                    <div key={kp} className="text-[11px] px-2.5 py-1 bg-brand-50 dark:bg-brand-900/20 text-brand-600 dark:text-brand-400 rounded-lg font-bold border border-brand-100 dark:border-brand-800/30">
+                      <GradingMarkdown content={kp} />
+                    </div>
                   ))}
                 </div>
               </div>
@@ -340,11 +346,15 @@ const QuestionCard: React.FC<{ question: QuestionGradingItem }> = ({ question })
               </div>
               <div className="space-y-1">
                 <div className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest">AI 深度解析</div>
-                <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed font-medium">{question.comment}</p>
+                <GradingMarkdown
+                  content={question.comment}
+                  className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed font-medium"
+                />
                 {question.errorDetail && (
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 pl-2 border-l-2 border-blue-200 dark:border-blue-800">
-                    {question.errorDetail}
-                  </p>
+                  <GradingMarkdown
+                    content={question.errorDetail}
+                    className="text-xs text-gray-500 dark:text-gray-400 mt-2 pl-2 border-l-2 border-blue-200 dark:border-blue-800"
+                  />
                 )}
               </div>
             </div>

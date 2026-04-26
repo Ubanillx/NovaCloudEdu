@@ -129,6 +129,29 @@ async function refreshAccessToken(): Promise<string | null> {
   }
 }
 
+export async function authFetch(input: RequestInfo | URL, init: RequestInit = {}): Promise<Response> {
+  const headers = new Headers(init.headers);
+  const token = getToken();
+  if (token && !headers.has('Authorization')) {
+    headers.set('Authorization', `Bearer ${token}`);
+  }
+
+  const response = await fetch(input, { ...init, headers });
+  if (response.status !== 401) {
+    return response;
+  }
+
+  const newToken = await refreshAccessToken();
+  if (!newToken) {
+    await handleRefreshFailed();
+    return response;
+  }
+
+  const retryHeaders = new Headers(init.headers);
+  retryHeaders.set('Authorization', `Bearer ${newToken}`);
+  return fetch(input, { ...init, headers: retryHeaders });
+}
+
 // 创建 axios 实例
 export const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080',

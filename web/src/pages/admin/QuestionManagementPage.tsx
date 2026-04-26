@@ -25,33 +25,12 @@ import type {
   UpdateQuestionRequest,
 } from '../../api/generated/models';
 import { toast } from '../../components/ui';
+import { QUESTION_TYPE_OPTIONS, SUBJECT_OPTIONS, getQuestionTypeName, getSubjectName } from '../../constants/exam';
 
 const api = new DefaultApi(new Configuration(), '', apiClient);
 
-// 题型配置
-const QUESTION_TYPES = [
-  { value: '', label: '全部题型' },
-  { value: 'SINGLE_CHOICE', label: '单选题' },
-  { value: 'MULTI_CHOICE', label: '多选题' },
-  { value: 'FILL_BLANK', label: '填空题' },
-  { value: 'TRUE_FALSE', label: '判断题' },
-  { value: 'SHORT_ANSWER', label: '简答题' },
-  { value: 'CALCULATION', label: '计算题' },
-  { value: 'ESSAY', label: '论述题' },
-];
-
-const SUBJECTS = [
-  { value: '', label: '全部学科' },
-  { value: 'MATH', label: '数学' },
-  { value: 'CHINESE', label: '语文' },
-  { value: 'ENGLISH', label: '英语' },
-  { value: 'PHYSICS', label: '物理' },
-  { value: 'CHEMISTRY', label: '化学' },
-  { value: 'BIOLOGY', label: '生物' },
-  { value: 'HISTORY', label: '历史' },
-  { value: 'GEOGRAPHY', label: '地理' },
-  { value: 'POLITICS', label: '政治' },
-];
+const QUESTION_TYPES = [{ value: '', label: '全部题型' }, ...QUESTION_TYPE_OPTIONS];
+const SUBJECTS = [{ value: '', label: '全部学科' }, ...SUBJECT_OPTIONS];
 
 const DIFFICULTY_OPTIONS = [
   { value: 0, label: '全部难度' },
@@ -408,8 +387,8 @@ export const QuestionManagementPage: React.FC = () => {
   };
 
   const totalPages = Math.ceil(total / pageSize);
-  const typeLabel = (code: string) => QUESTION_TYPES.find(t => t.value === code)?.label || code;
-  const subjectLabel = (code: string) => SUBJECTS.find(s => s.value === code)?.label || code;
+  const typeLabel = (code: string) => getQuestionTypeName(code);
+  const subjectLabel = (code: string) => getSubjectName(code);
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">

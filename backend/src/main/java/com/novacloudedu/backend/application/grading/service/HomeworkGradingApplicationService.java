@@ -3,6 +3,7 @@ package com.novacloudedu.backend.application.grading.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.novacloudedu.backend.application.grading.command.SubmitHomeworkCommand;
+import com.novacloudedu.backend.common.ErrorCode;
 import com.novacloudedu.backend.domain.exam.entity.ExamPaper;
 import com.novacloudedu.backend.domain.exam.entity.PaperQuestion;
 import com.novacloudedu.backend.domain.exam.entity.PaperSection;
@@ -30,6 +31,7 @@ import com.novacloudedu.backend.infrastructure.ocr.OcrService;
 import com.novacloudedu.backend.application.analytics.event.LearningActivityEvent;
 import com.novacloudedu.backend.domain.analytics.valueobject.ActivityType;
 import com.novacloudedu.backend.config.ChatModelProperties;
+import com.novacloudedu.backend.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -74,11 +76,14 @@ public class HomeworkGradingApplicationService {
      * 提交作业并触发异步批改（SSE 流式返回进度）
      */
     public SseEmitter submitAndGrade(SubmitHomeworkCommand command, Long userId) {
-        // 检查 AI 配额
-        aiUsageLimitService.checkAndConsume(userId, AiFeatureType.AI_GRADING);
-
         // 解析批改模式
         GradingMode gradingMode = GradingMode.fromCode(command.gradingMode());
+        if (gradingMode == GradingMode.EXAM_PAPER && command.examPaperId() == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "试卷批改模式必须选择试卷");
+        }
+
+        // 检查 AI 配额
+        aiUsageLimitService.checkAndConsume(userId, AiFeatureType.AI_GRADING);
 
         // 解析学科（可空，通用模式下 AI 推断）
         Subject subject = null;
@@ -236,6 +241,9 @@ public class HomeworkGradingApplicationService {
             // 发送单题批改结果
             Map<String, Object> questionResult = new LinkedHashMap<>();
             questionResult.put("index", questionGrading.getQuestionIndex());
+            questionResult.put("questionContent", questionGrading.getQuestionContent());
+            questionResult.put("studentAnswer", questionGrading.getStudentAnswer());
+            questionResult.put("standardAnswer", questionGrading.getStandardAnswer());
             questionResult.put("score", questionGrading.getScore());
             questionResult.put("maxScore", questionGrading.getMaxScore());
             questionResult.put("comment", questionGrading.getComment());
@@ -356,17 +364,18 @@ public class HomeworkGradingApplicationService {
                             Map.of("role", "system", "content", systemPrompt),
                             Map.of("role", "user", "content", userPrompt)
                     ),
-                    0.3, 0.9, 2000, token -> sb.append(token)
+                    0.3, 0.9, 4000, token -> sb.append(token)
             );
 
-            return parseGradingResponse(sb.toString(), qBlock, stdInfo, maxScore);
+            return parseGradingResponse(sb.toString(), qBlock, stdInfo, maxScore, modelId);
         } catch (Exception e) {
             log.error("LLM 批改第{}题失败: {}", qBlock.index(), e.getMessage());
+            String fallbackAnswer = stdInfo != null ? stdInfo.answer() : generateReferenceAnswerFallback(qBlock, modelId);
             // 返回一个默认的批改结果
             return QuestionGrading.create(
                     qBlock.index(), qBlock.questionContent(), qBlock.questionType(),
                     qBlock.studentAnswer(),
-                    stdInfo != null ? stdInfo.answer() : null,
+                    fallbackAnswer,
                     0, maxScore,
                     List.of(), "LLM批改异常: " + e.getMessage(),
                     stdInfo != null ? stdInfo.knowledgeTags() : List.of(),
@@ -390,6 +399,7 @@ public class HomeworkGradingApplicationService {
         }
 
         sb.append("\n请直接输出纯 JSON，不要添加 markdown 标记或额外文字。\n");
+        sb.append("复杂公式请写在 JSON 字符串中，换行必须使用 \\\\n，不要在字符串内部直接换行。\n");
         sb.append("JSON 格式：\n");
         sb.append("{\n");
         sb.append("  \"score\": 得分(整数),\n");
@@ -410,6 +420,7 @@ public class HomeworkGradingApplicationService {
         sb.append("5. 如果学生未作答，score 为 0\n");
         if (!hasStandardAnswer) {
             sb.append("6. referenceAnswer 必须填写，给出完整的正确答案或参考解答，帮助学生理解正确解法\n");
+            sb.append("7. 如果是选择题，referenceAnswer 必须包含正确选项和关键推导\n");
         }
 
         return sb.toString();
@@ -449,57 +460,146 @@ public class HomeworkGradingApplicationService {
     // ==================== 响应解析 ====================
 
     private QuestionGrading parseGradingResponse(String response, OcrService.QuestionBlock qBlock,
-                                                   StandardAnswerInfo stdInfo, int maxScore) {
+                                                   StandardAnswerInfo stdInfo, int maxScore, String modelId) {
         try {
             String json = extractJson(response);
             Map<String, Object> parsed = objectMapper.readValue(json, new TypeReference<>() {});
-
-            int score = 0;
-            if (parsed.get("score") instanceof Number n) {
-                score = Math.max(0, Math.min(n.intValue(), maxScore));
-            }
-
-            List<String> errorCategories = new ArrayList<>();
-            String errorCat = parsed.get("errorCategory") instanceof String s ? s : "";
-            if (!errorCat.isBlank() && !"NONE".equals(errorCat)) {
-                errorCategories.add(errorCat);
-            }
-
-            List<String> errorPoints = parsed.get("errorPoints") instanceof List<?> list
-                    ? list.stream().map(Object::toString).toList() : List.of();
-            String errorDetail = String.join("; ", errorPoints);
-
-            List<String> knowledgePoints = parsed.get("knowledgePoints") instanceof List<?> list
-                    ? list.stream().map(Object::toString).toList()
-                    : (stdInfo != null && stdInfo.knowledgeTags() != null ? stdInfo.knowledgeTags() : List.of());
-
-            String comment = parsed.get("comment") instanceof String s ? s : "";
-
-            // 通用模式：从 LLM 输出中提取参考答案
-            String standardAnswer = stdInfo != null ? stdInfo.answer() : null;
-            if (standardAnswer == null && parsed.get("referenceAnswer") instanceof String refAns && !refAns.isBlank()) {
-                standardAnswer = refAns;
-            }
-
-            return QuestionGrading.create(
-                    qBlock.index(), qBlock.questionContent(), qBlock.questionType(),
-                    qBlock.studentAnswer(),
-                    standardAnswer,
-                    score, maxScore,
-                    errorCategories, errorDetail, knowledgePoints, comment
-            );
+            return buildQuestionGradingFromParsed(parsed, qBlock, stdInfo, maxScore, modelId);
         } catch (Exception e) {
-            log.warn("解析LLM批改响应失败: {}", e.getMessage());
+            log.warn("解析LLM批改响应失败，尝试修复: {}", e.getMessage());
+            Optional<QuestionGrading> repaired = retryParseGradingResponse(response, qBlock, stdInfo, maxScore, modelId);
+            if (repaired.isPresent()) {
+                return repaired.get();
+            }
+
+            String fallbackAnswer = stdInfo != null ? stdInfo.answer() : generateReferenceAnswerFallback(qBlock, modelId);
             return QuestionGrading.create(
                     qBlock.index(), qBlock.questionContent(), qBlock.questionType(),
                     qBlock.studentAnswer(),
-                    stdInfo != null ? stdInfo.answer() : null,
+                    fallbackAnswer,
                     0, maxScore,
-                    List.of(), "解析失败",
+                    List.of(), "解析失败，原始响应: " + abbreviate(response, 500),
                     stdInfo != null ? stdInfo.knowledgeTags() : List.of(),
                     "AI批改结果解析异常，请人工复核"
             );
         }
+    }
+
+    private QuestionGrading buildQuestionGradingFromParsed(Map<String, Object> parsed,
+                                                           OcrService.QuestionBlock qBlock,
+                                                           StandardAnswerInfo stdInfo,
+                                                           int maxScore,
+                                                           String modelId) {
+        int score = 0;
+        if (parsed.get("score") instanceof Number n) {
+            score = Math.max(0, Math.min(n.intValue(), maxScore));
+        }
+
+        List<String> errorCategories = new ArrayList<>();
+        String errorCat = getFirstText(parsed, "errorCategory");
+        if (!errorCat.isBlank() && !"NONE".equals(errorCat)) {
+            errorCategories.add(errorCat);
+        }
+
+        List<String> errorPoints = parsed.get("errorPoints") instanceof List<?> list
+                ? list.stream().map(Object::toString).toList() : List.of();
+        String errorDetail = normalizeEscapedNewlines(String.join("; ", errorPoints));
+        String stepAnalysis = getFirstText(parsed, "stepAnalysis", "analysis", "solution", "reasoning");
+        if (!stepAnalysis.isBlank()) {
+            errorDetail = errorDetail.isBlank() ? stepAnalysis : errorDetail + "\n" + stepAnalysis;
+        }
+
+        List<String> knowledgePoints = parsed.get("knowledgePoints") instanceof List<?> list
+                ? list.stream().map(Object::toString).map(this::normalizeEscapedNewlines).toList()
+                : (stdInfo != null && stdInfo.knowledgeTags() != null ? stdInfo.knowledgeTags() : List.of());
+
+        String comment = getFirstText(parsed, "comment", "feedback", "summary");
+        if (comment.isBlank()) {
+            comment = score >= maxScore ? "答案正确。" : "已完成批改，请查看参考答案和解析。";
+        }
+
+        // 通用模式：从 LLM 输出中提取参考答案
+        String standardAnswer = stdInfo != null ? stdInfo.answer() : null;
+        if (isBlank(standardAnswer)) {
+            standardAnswer = getFirstText(parsed,
+                    "referenceAnswer", "standardAnswer", "correctAnswer", "answer", "solution");
+        }
+        if (isBlank(standardAnswer)) {
+            standardAnswer = generateReferenceAnswerFallback(qBlock, modelId);
+        }
+
+        return QuestionGrading.create(
+                qBlock.index(), normalizeEscapedNewlines(qBlock.questionContent()), qBlock.questionType(),
+                normalizeEscapedNewlines(qBlock.studentAnswer()),
+                normalizeEscapedNewlines(standardAnswer),
+                score, maxScore,
+                errorCategories, normalizeEscapedNewlines(errorDetail), knowledgePoints, normalizeEscapedNewlines(comment)
+        );
+    }
+
+    private Optional<QuestionGrading> retryParseGradingResponse(String response, OcrService.QuestionBlock qBlock,
+                                                               StandardAnswerInfo stdInfo, int maxScore,
+                                                               String modelId) {
+        try {
+            String prompt = "下面是一次作业批改模型的原始输出，但可能不是严格JSON。"
+                    + "请根据原始输出、题目和学生答案，重新输出严格JSON，不要markdown。"
+                    + "必须包含字段 score, referenceAnswer, errorPoints, errorCategory, knowledgePoints, comment, stepAnalysis。"
+                    + "score 为0到" + maxScore + "之间的整数。复杂公式字符串内部换行用 \\\\n。\n\n"
+                    + "题目: " + qBlock.questionContent() + "\n"
+                    + "学生答案: " + (qBlock.studentAnswer() == null ? "" : qBlock.studentAnswer()) + "\n"
+                    + "原始输出: " + abbreviate(response, 2000);
+            String repaired = langchainChatService.chat(modelId, "你是严格JSON修复器和教师批改助手。", prompt);
+            String json = extractJson(repaired);
+            Map<String, Object> parsed = objectMapper.readValue(json, new TypeReference<>() {});
+            return Optional.of(buildQuestionGradingFromParsed(parsed, qBlock, stdInfo, maxScore, modelId));
+        } catch (Exception e) {
+            log.warn("修复LLM批改响应失败: questionIndex={}, error={}", qBlock.index(), e.getMessage());
+            return Optional.empty();
+        }
+    }
+
+    private String generateReferenceAnswerFallback(OcrService.QuestionBlock qBlock, String modelId) {
+        try {
+            String prompt = "请为下面题目生成参考答案。要求：直接给出正确答案和关键推导，控制在300字以内，不要输出JSON。\n\n"
+                    + "题型: " + (qBlock.questionType() != null ? qBlock.questionType() : "未知") + "\n"
+                    + "题目: " + qBlock.questionContent();
+            String answer = langchainChatService.chat(modelId, "你是一位严谨的数学/学科教师。", prompt);
+            return answer != null && !answer.isBlank() ? answer.trim() : null;
+        } catch (Exception e) {
+            log.warn("兜底生成参考答案失败: questionIndex={}, error={}", qBlock.index(), e.getMessage());
+            return null;
+        }
+    }
+
+    private String getFirstText(Map<String, Object> parsed, String... keys) {
+        for (String key : keys) {
+            Object value = parsed.get(key);
+            if (value instanceof String s && !s.isBlank()) {
+                return normalizeEscapedNewlines(s.trim());
+            }
+            if (value != null && !(value instanceof Collection<?>) && !(value instanceof Map<?, ?>)) {
+                String text = value.toString().trim();
+                if (!text.isBlank()) return normalizeEscapedNewlines(text);
+            }
+        }
+        return "";
+    }
+
+    private String normalizeEscapedNewlines(String text) {
+        if (text == null) return null;
+        return text
+                .replace("\\r\\n", "\n")
+                .replaceAll("\\\\n(?![A-Za-z])", "\n")
+                .replaceAll("\\\\r(?![A-Za-z])", "\n");
+    }
+
+    private boolean isBlank(String text) {
+        return text == null || text.isBlank();
+    }
+
+    private String abbreviate(String text, int maxLength) {
+        if (text == null) return "";
+        return text.length() <= maxLength ? text : text.substring(0, maxLength) + "...";
     }
 
     // ==================== 总评生成 ====================
