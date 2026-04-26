@@ -1,6 +1,7 @@
 package com.novacloudedu.backend.chat;
 
 import com.novacloudedu.backend.application.service.PrivateChatApplicationService;
+import com.novacloudedu.backend.application.service.NotificationService;
 import com.novacloudedu.backend.application.social.command.SendPrivateMessageCommand;
 import com.novacloudedu.backend.application.social.query.ChatHistoryQuery;
 import com.novacloudedu.backend.domain.social.entity.PrivateMessage;
@@ -47,6 +48,9 @@ class PrivateChatServiceTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private NotificationService notificationService;
+
     @InjectMocks
     private PrivateChatApplicationService privateChatService;
 
@@ -59,11 +63,14 @@ class PrivateChatServiceTest {
     void sendMessage_Success() {
         // 准备数据
         SendPrivateMessageCommand command = new SendPrivateMessageCommand(
-                SENDER_ID, RECEIVER_ID, "Hello!", MessageType.TEXT
+                SENDER_ID, RECEIVER_ID, "Hello!", MessageType.TEXT, null
         );
 
         User receiver = mock(User.class);
+        User sender = mock(User.class);
         when(userRepository.findById(UserId.of(RECEIVER_ID))).thenReturn(Optional.of(receiver));
+        when(userRepository.findById(UserId.of(SENDER_ID))).thenReturn(Optional.of(sender));
+        when(sender.getUserName()).thenReturn("发送者");
         when(friendRelationshipRepository.areFriends(UserId.of(SENDER_ID), UserId.of(RECEIVER_ID))).thenReturn(true);
         
         // Mock 保存消息
@@ -87,6 +94,9 @@ class PrivateChatServiceTest {
 
         verify(privateMessageRepository, times(1)).save(any(PrivateMessage.class));
         verify(privateChatSessionRepository, times(1)).update(any());
+        verify(notificationService, times(1)).notifyNewPrivateMessage(
+                RECEIVER_ID, SENDER_ID, "发送者", 100L, "Hello!", MessageType.TEXT.getValue()
+        );
     }
 
     @Test
@@ -95,7 +105,7 @@ class PrivateChatServiceTest {
     void sendMessage_FailNotFriends() {
         // 准备数据
         SendPrivateMessageCommand command = new SendPrivateMessageCommand(
-                SENDER_ID, RECEIVER_ID, "Hello!", MessageType.TEXT
+                SENDER_ID, RECEIVER_ID, "Hello!", MessageType.TEXT, null
         );
 
         User receiver = mock(User.class);
@@ -117,7 +127,7 @@ class PrivateChatServiceTest {
     void sendMessage_FailReceiverNotFound() {
         // 准备数据
         SendPrivateMessageCommand command = new SendPrivateMessageCommand(
-                SENDER_ID, RECEIVER_ID, "Hello!", MessageType.TEXT
+                SENDER_ID, RECEIVER_ID, "Hello!", MessageType.TEXT, null
         );
 
         when(userRepository.findById(UserId.of(RECEIVER_ID))).thenReturn(Optional.empty());
@@ -140,11 +150,11 @@ class PrivateChatServiceTest {
 
         PrivateMessage msg1 = PrivateMessage.reconstruct(
                 MessageId.of(1L), UserId.of(SENDER_ID), UserId.of(RECEIVER_ID),
-                "消息1", MessageType.TEXT, false, LocalDateTime.now(), false
+                "消息1", MessageType.TEXT, null, false, LocalDateTime.now(), false
         );
         PrivateMessage msg2 = PrivateMessage.reconstruct(
                 MessageId.of(2L), UserId.of(RECEIVER_ID), UserId.of(SENDER_ID),
-                "消息2", MessageType.TEXT, true, LocalDateTime.now(), false
+                "消息2", MessageType.TEXT, null, true, LocalDateTime.now(), false
         );
 
         MessagePage mockPage = new MessagePage(List.of(msg1, msg2), 2, 1, 20);

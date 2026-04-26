@@ -160,7 +160,7 @@ class NotificationServiceTest {
         when(webSocketEventListener.isUserOnline(USER_ID)).thenReturn(true);
 
         // 执行
-        notificationService.notifyNewPrivateMessage(USER_ID, SENDER_ID, "张三");
+        notificationService.notifyNewPrivateMessage(USER_ID, SENDER_ID, "张三", 300L, "你好", "TEXT");
 
         // 验证
         ArgumentCaptor<NotificationEvent> captor = ArgumentCaptor.forClass(NotificationEvent.class);
@@ -170,6 +170,9 @@ class NotificationServiceTest {
         assertEquals(EventType.NEW_PRIVATE_MESSAGE, event.getType());
         assertEquals(SENDER_ID, event.getData().get("senderId"));
         assertEquals("张三", event.getData().get("senderName"));
+        assertEquals(300L, event.getData().get("messageId"));
+        assertEquals("TEXT", event.getData().get("messageType"));
+        assertEquals("你好", event.getData().get("preview"));
     }
 
     @Test
@@ -197,18 +200,28 @@ class NotificationServiceTest {
     @DisplayName("群消息通知")
     void notifyNewGroupMessage() {
         Long groupId = 200L;
+        Long receiverId = 3L;
+        when(webSocketEventListener.isUserOnline(receiverId)).thenReturn(true);
 
-        // 执行（群通知直接发到 topic，不检查在线状态）
-        notificationService.notifyNewGroupMessage(groupId, "测试群", SENDER_ID, "王五");
+        // 执行
+        notificationService.notifyNewGroupMessage(
+                List.of(receiverId), groupId, "测试群", SENDER_ID, "王五", 400L, "大家好", "TEXT"
+        );
 
         // 验证
         ArgumentCaptor<NotificationEvent> captor = ArgumentCaptor.forClass(NotificationEvent.class);
-        verify(messagingTemplate).convertAndSend(eq("/topic/group/200/notifications"), captor.capture());
+        verify(messagingTemplate).convertAndSendToUser(
+                eq(receiverId.toString()), eq("/queue/notifications"), captor.capture()
+        );
 
         NotificationEvent event = captor.getValue();
         assertEquals(EventType.NEW_GROUP_MESSAGE, event.getType());
         assertEquals(groupId, event.getData().get("groupId"));
         assertEquals("测试群", event.getData().get("groupName"));
+        assertEquals(SENDER_ID, event.getData().get("senderId"));
+        assertEquals("王五", event.getData().get("senderName"));
+        assertEquals(400L, event.getData().get("messageId"));
+        assertEquals("TEXT", event.getData().get("messageType"));
     }
 
     @Test
