@@ -221,9 +221,12 @@ const EditBookModal: React.FC<EditBookModalProps> = ({ isOpen, onClose, onSucces
     }
     setLoading(true);
     try {
-      const res = await apiClient.put(`/api/books/${String(book.id)}`, {
-        title: title.trim(),
-        author: author.trim(),
+      const res = await api.updateBook({
+        bookId: book.id as unknown as number,
+        requestBody: {
+          title: title.trim(),
+          author: author.trim(),
+        },
       });
       if (res.data?.code !== 0) {
         toast.error(res.data?.message || '修改失败');

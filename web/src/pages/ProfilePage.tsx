@@ -491,7 +491,7 @@ const ProfilePage: React.FC = () => {
     }
     setSmsSending(true);
     try {
-      const res = await apiClient.post('/api/user/password/sms/send');
+      const res = await api.sendPasswordChangeCode();
       if (res.data?.code === 0) {
         toast.success('验证码已发送到当前绑定手机号');
         setSmsCountdown(60);
@@ -538,10 +538,12 @@ const ProfilePage: React.FC = () => {
 
     setPasswordSubmitting(true);
     try {
-      const res = await apiClient.post('/api/user/password/sms', {
-        smsCode: trimmedCode,
-        newPassword,
-        confirmPassword,
+      const res = await api.changePasswordBySms({
+        changePasswordBySmsRequest: {
+          smsCode: trimmedCode,
+          newPassword,
+          confirmPassword,
+        },
       });
       if (res.data?.code === 0) {
         toast.success('密码修改成功');

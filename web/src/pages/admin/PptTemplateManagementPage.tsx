@@ -112,7 +112,7 @@ const PptTemplateManagementPage: React.FC = () => {
   const handleRetryParse = async (id: string) => {
     setRetryingId(id);
     try {
-      await apiClient.post(`${API_BASE}/api/ppt/templates/${id}/retry-parse`);
+      await api.retryParsing({ id: id as unknown as number });
       toast.success('已触发重新解析');
       setTimeout(() => fetchTemplates(), 1500);
     } catch {

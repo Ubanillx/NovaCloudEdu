@@ -1,5 +1,7 @@
 import { useState, useCallback, useRef } from 'react';
-import { apiClient, getToken } from '../../api';
+import { apiClient, AIApi, Configuration, getToken } from '../../api';
+
+const aiApi = new AIApi(new Configuration(), '', apiClient);
 
 // ============ 类型定义 ============
 
@@ -64,10 +66,8 @@ export function useAiChat() {
   const loadSessions = useCallback(async () => {
     setIsLoadingSessions(true);
     try {
-      const res = await apiClient.get('/api/ai/chat/sessions', {
-        params: { page: 0, size: 50 },
-      });
-      const data = res.data;
+      const res = await aiApi.listSessions({ page: 0, size: 50 });
+      const data = res.data as any;
       if (data?.code === 0 && Array.isArray(data?.data)) {
         setSessions(data.data.map((s: Record<string, unknown>) => ({
           sessionId: s.sessionId,
@@ -90,8 +90,8 @@ export function useAiChat() {
   /** 创建新会话 */
   const createSession = useCallback(async (): Promise<number | null> => {
     try {
-      const res = await apiClient.post('/api/ai/chat/sessions');
-      const data = res.data;
+      const res = await aiApi.createSession();
+      const data = res.data as any;
       if (data?.code === 0 && data?.data?.sessionId) {
         const sessionId = data.data.sessionId;
         setCurrentSessionId(sessionId);
@@ -117,8 +117,8 @@ export function useAiChat() {
 
     setIsInitializing(true);
     try {
-      const res = await apiClient.get(`/api/ai/chat/sessions/${sessionId}`);
-      const data = res.data;
+      const res = await aiApi.getSessionDetail1({ sessionId });
+      const data = res.data as any;
       if (data?.code === 0 && data?.data) {
         const detail = data.data;
         const session = detail.session;
@@ -144,7 +144,7 @@ export function useAiChat() {
   /** 删除会话 */
   const deleteSession = useCallback(async (sessionId: number): Promise<boolean> => {
     try {
-      const res = await apiClient.delete(`/api/ai/chat/sessions/${sessionId}`);
+      const res = await aiApi.deleteSession1({ sessionId });
       if (res.data?.code === 0) {
         setSessions(prev => prev.filter(s => String(s.sessionId) !== String(sessionId)));
         if (String(currentSessionId) === String(sessionId)) {
@@ -529,8 +529,8 @@ export function useAiChat() {
   const refreshTitle = useCallback(async () => {
     if (currentSessionId == null) return;
     try {
-      const res = await apiClient.get(`/api/ai/chat/sessions/${currentSessionId}`);
-      const data = res.data;
+      const res = await aiApi.getSessionDetail1({ sessionId: currentSessionId });
+      const data = res.data as any;
       if (data?.code === 0 && data?.data?.session?.title) {
         setSessionTitle(data.data.session.title);
       }

@@ -1,12 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Loader2, AlertCircle } from 'lucide-react';
-import { apiClient } from '../../api';
+import { apiClient, Configuration, OnlyOfficeApi } from '../../api';
 
 interface OnlyOfficeConfig {
   documentServerUrl: string;
   config: Record<string, unknown>;
 }
+
+const onlyOfficeApi = new OnlyOfficeApi(new Configuration(), '', apiClient);
 
 const PptEditorPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -32,9 +34,7 @@ const PptEditorPage: React.FC = () => {
     const initEditor = async () => {
       try {
         // 1. 获取编辑器配置
-        const res = await apiClient.get<OnlyOfficeConfig>('/api/onlyoffice/config', {
-          params: { fileUrl, fileName },
-        });
+        const res = await onlyOfficeApi.getEditorConfig({ fileUrl, fileName });
         const data = res.data as unknown as OnlyOfficeConfig;
         if (cancelled) return;
 

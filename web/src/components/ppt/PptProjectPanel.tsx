@@ -3,7 +3,9 @@ import {
   FolderPlus, FileText, Trash2, Upload, Loader2,
   ChevronRight, Plus, X, FolderOpen,
 } from 'lucide-react';
-import { apiClient } from '../../api';
+import { apiClient, Configuration, PPTApi } from '../../api';
+
+const pptApi = new PPTApi(new Configuration(), '', apiClient);
 
 // ==================== Types ====================
 
@@ -52,9 +54,10 @@ const PptProjectPanel: React.FC<PptProjectPanelProps> = ({
   const loadProjects = useCallback(async () => {
     setIsLoading(true);
     try {
-      const res = await apiClient.get('/api/ppt/projects');
-      if (res.data?.code === 0 && Array.isArray(res.data.data)) {
-        setProjects(res.data.data.map((p: Record<string, unknown>) => ({
+      const res = await pptApi.listProjects();
+      const data = res.data?.data as any;
+      if (res.data?.code === 0 && Array.isArray(data)) {
+        setProjects(data.map((p: Record<string, unknown>) => ({
           id: String(p.id),
           name: p.name as string || '',
           description: p.description as string || '',
@@ -74,9 +77,10 @@ const PptProjectPanel: React.FC<PptProjectPanelProps> = ({
   // Load documents for a project
   const loadDocuments = useCallback(async (projectId: string) => {
     try {
-      const res = await apiClient.get(`/api/ppt/projects/${projectId}`);
-      if (res.data?.code === 0 && res.data.data?.documents) {
-        setDocuments(res.data.data.documents.map((d: Record<string, unknown>) => ({
+      const res = await pptApi.getProjectDetail({ projectId: projectId as unknown as number });
+      const data = res.data?.data as any;
+      if (res.data?.code === 0 && data?.documents) {
+        setDocuments(data.documents.map((d: Record<string, unknown>) => ({
           id: String(d.id),
           fileName: d.fileName as string || '',
           fileUrl: d.fileUrl as string || '',
@@ -96,16 +100,15 @@ const PptProjectPanel: React.FC<PptProjectPanelProps> = ({
     if (!newProjectName.trim()) return;
     setIsCreating(true);
     try {
-      const res = await apiClient.post('/api/ppt/projects', {
-        name: newProjectName.trim(),
-        description: newProjectDesc.trim() || undefined,
-      });
+      const requestBody: { [key: string]: string } = { name: newProjectName.trim() };
+      if (newProjectDesc.trim()) requestBody.description = newProjectDesc.trim();
+      const res = await pptApi.createProject({ requestBody });
       if (res.data?.code === 0) {
         setShowCreateForm(false);
         setNewProjectName('');
         setNewProjectDesc('');
         await loadProjects();
-        const newId = String(res.data.data?.id);
+        const newId = String((res.data.data as any)?.id);
         if (newId) {
           onSelectProject(newId);
           onProjectNameChange?.(newProjectName.trim());
@@ -124,7 +127,7 @@ const PptProjectPanel: React.FC<PptProjectPanelProps> = ({
     e.stopPropagation();
     if (!confirm('确定删除此项目？')) return;
     try {
-      await apiClient.delete(`/api/ppt/projects/${projectId}`);
+      await pptApi.deleteProject({ projectId: projectId as unknown as number });
       if (selectedProjectId === projectId) onSelectProject(null);
       await loadProjects();
     } catch (err) {
@@ -143,11 +146,14 @@ const PptProjectPanel: React.FC<PptProjectPanelProps> = ({
           headers: { 'Content-Type': 'multipart/form-data' },
         });
         if (uploadRes.data?.code === 0 && uploadRes.data.data?.fileUrl) {
-          await apiClient.post(`/api/ppt/projects/${projectId}/documents`, {
-            fileName: file.name,
-            fileUrl: uploadRes.data.data.fileUrl,
-            fileType: file.name.split('.').pop()?.toLowerCase() || '',
-            fileSize: file.size,
+          await pptApi.addDocument({
+            projectId: projectId as unknown as number,
+            requestBody: {
+              fileName: file.name,
+              fileUrl: uploadRes.data.data.fileUrl,
+              fileType: file.name.split('.').pop()?.toLowerCase() || '',
+              fileSize: file.size,
+            } as unknown as { [key: string]: object },
           });
         }
       }
@@ -162,7 +168,10 @@ const PptProjectPanel: React.FC<PptProjectPanelProps> = ({
   // Delete document
   const handleDeleteDocument = async (projectId: string, documentId: string) => {
     try {
-      await apiClient.delete(`/api/ppt/projects/${projectId}/documents/${documentId}`);
+      await pptApi.deleteDocument({
+        projectId: projectId as unknown as number,
+        documentId: documentId as unknown as number,
+      });
       await loadDocuments(projectId);
     } catch (e) {
       console.error('删除文档失败:', e);

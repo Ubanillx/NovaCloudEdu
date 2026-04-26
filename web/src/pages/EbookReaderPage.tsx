@@ -94,8 +94,9 @@ const EbookReaderPage: React.FC = () => {
       // PDF 类型：获取预签名 URL，不加载章节
       if (bookData?.fileType === 'PDF') {
         try {
-          const pdfRes = await apiClient.get(`/api/books/${bookId}/pdf-url`);
-          if (pdfRes.data?.code === 0) setPdfUrl(pdfRes.data.data);
+          const pdfRes = await api.getPdfUrl({ bookId: bookId as unknown as number });
+          const data = pdfRes.data as any;
+          if (data?.code === 0) setPdfUrl(data.data || null);
         } catch { toast.error('获取PDF文件失败'); }
       } else {
         // 非 PDF：加载章节列表

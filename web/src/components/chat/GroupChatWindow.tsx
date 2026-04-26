@@ -342,8 +342,8 @@ const GroupSettingsPanel: React.FC<GroupSettingsPanelProps> = ({
       };
       await api.updateGroupInfo({ groupId, updateGroupRequest });
       await api.setJoinMode({ groupId, mode: joinMode });
-      await apiClient.put(`/api/groups/${groupId}/invite-mode`, null, { params: { mode: inviteMode } });
-      await apiClient.put(`/api/groups/${groupId}/announcement`, announcement.trim(), {
+      await api.setInviteMode({ groupId, mode: inviteMode });
+      await api.publishAnnouncement({ groupId, body: announcement.trim() }, {
         headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
       });
       toast.success('群设置已保存');

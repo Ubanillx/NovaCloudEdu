@@ -1391,7 +1391,7 @@ const DocumentPanel: React.FC<DocumentPanelProps> = ({ knowledgeBase, onBack }) 
   const fetchDocStats = useCallback(async () => {
     if (!knowledgeBase.id) return;
     try {
-      const response = await apiClient.get(`/api/ai/knowledge-bases/${knowledgeBase.id}/document-stats`);
+      const response = await api.kbDocumentStats({ id: knowledgeBase.id as unknown as number });
       if (response.data.code === 0 && response.data.data) {
         setDocStats(response.data.data);
       }
