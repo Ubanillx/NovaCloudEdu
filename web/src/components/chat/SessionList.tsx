@@ -25,6 +25,29 @@ const formatTime = (dateStr?: string) => {
   return `${time.getMonth() + 1}月${time.getDate()}日`;
 };
 
+const getCurrentUserId = (): string => {
+  try {
+    const stored = localStorage.getItem('user_info');
+    if (stored) return String(JSON.parse(stored)?.id ?? '');
+  } catch { /* ignore */ }
+  return '';
+};
+
+const getSessionPreview = (session: ChatSessionResponse, currentUserId = getCurrentUserId()) => {
+  const type = (session.lastMessageType || 'TEXT').toUpperCase();
+  const prefix = currentUserId && String(session.lastMessageSenderId) === currentUserId ? '我：' : '';
+  if (type === 'IMAGE') return `${prefix}[图片]`;
+  if (type === 'FILE') {
+    const content = session.lastMessage || '';
+    return content.includes('|') ? `${prefix}[文件] ${content.split('|')[0] || '文件'}` : `${prefix}[文件]`;
+  }
+  if (type === 'AUDIO') return `${prefix}[语音]`;
+  if (type === 'VIDEO') return `${prefix}[视频]`;
+  if (type === 'CALL') return `${prefix}[通话]`;
+  const text = session.lastMessage?.trim();
+  return text ? `${prefix}${text}` : '暂无消息';
+};
+
 export const SessionList: React.FC<SessionListProps> = ({ sessions, loading, activePartnerId, onSelect }) => {
   if (loading) {
     return (
@@ -73,6 +96,9 @@ export const SessionList: React.FC<SessionListProps> = ({ sessions, loading, act
                 {formatTime(session.lastMessageTime)}
               </span>
             </div>
+            <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+              {getSessionPreview(session)}
+            </p>
           </div>
         </button>
       ))}

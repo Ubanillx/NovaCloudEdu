@@ -9,6 +9,8 @@ import toast from '../ui/Toast';
 import { Avatar } from '../ui/Avatar';
 import AvatarUploadField from '../ui/AvatarUploadField';
 import GroupChatWindow from './GroupChatWindow';
+import { useChat } from '../../context/ChatContext';
+import { QrScanner, type SocialQrPayload } from './SocialQrCode';
 
 const api = new DefaultApi(new Configuration(), '', apiClient);
 
@@ -27,6 +29,36 @@ const getJoinActionLabel = (joinMode?: number) => {
   if (joinMode === 0) return '加入群聊';
   if (joinMode === 2) return '禁止加入';
   return '申请加入';
+};
+
+const formatTime = (dateStr?: string) => {
+  if (!dateStr) return '';
+  const now = new Date();
+  const time = new Date(dateStr);
+  const diff = now.getTime() - time.getTime();
+  const minutes = Math.floor(diff / 60000);
+  if (minutes < 1) return '刚刚';
+  if (minutes < 60) return `${minutes}分钟前`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}小时前`;
+  const days = Math.floor(hours / 24);
+  if (days < 7) return `${days}天前`;
+  return `${time.getMonth() + 1}月${time.getDate()}日`;
+};
+
+const formatGroupPreview = (group: GroupResponse) => {
+  const prefix = group.lastMessageSenderName ? `${group.lastMessageSenderName}：` : '';
+  const type = (group.lastMessageType || 'TEXT').toUpperCase();
+  if (type === 'IMAGE') return `${prefix}[图片]`;
+  if (type === 'FILE') {
+    const content = group.lastMessage || '';
+    return content.includes('|') ? `${prefix}[文件] ${content.split('|')[0] || '文件'}` : `${prefix}[文件]`;
+  }
+  if (type === 'AUDIO') return `${prefix}[语音]`;
+  if (type === 'VIDEO') return `${prefix}[视频]`;
+  if (type === 'CALL') return `${prefix}[通话]`;
+  const text = group.lastMessage?.trim();
+  return text ? `${prefix}${text}` : (group.description || `${group.memberCount || 0} 名成员`);
 };
 
 type SearchGroupPage = {
@@ -63,6 +95,8 @@ const normalizeGroupResponse = (raw: unknown): GroupResponse | null => {
     memberCount: toNumberId(source.memberCount as LongLike),
     inviteMode: toNumberId(source.inviteMode as LongLike),
     joinMode: toNumberId(source.joinMode as LongLike),
+    lastMessageSenderId: toNumberId(source.lastMessageSenderId as LongLike),
+    unreadCount: toNumberId(source.unreadCount as LongLike),
   };
 };
 
@@ -343,6 +377,7 @@ const SearchGroupPanel: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const [results, setResults] = useState<GroupResponse[]>([]);
   const [searching, setSearching] = useState(false);
   const [applyingTo, setApplyingTo] = useState<Set<number>>(new Set());
+  const [showScanner, setShowScanner] = useState(false);
 
   const handleSearch = async () => {
     const trimmed = keyword.trim();
@@ -377,6 +412,14 @@ const SearchGroupPanel: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         return next;
       });
     }
+  };
+
+  const handleQrPayload = async (payload: SocialQrPayload) => {
+    if (payload.type !== 'group') {
+      toast.warning('这是个人二维码，请到好友页添加');
+      return;
+    }
+    await handleApply(payload.groupId);
   };
 
   return (
@@ -434,7 +477,15 @@ const SearchGroupPanel: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           >
             {searching ? <Loader2 size={16} className="animate-spin" /> : '搜索'}
           </button>
+          <button
+            type="button"
+            onClick={() => setShowScanner((value) => !value)}
+            className="px-3 py-2 text-sm font-medium text-brand-700 dark:text-brand-300 bg-brand-50 dark:bg-brand-900/20 hover:bg-brand-100 dark:hover:bg-brand-900/40 rounded-lg transition-colors"
+          >
+            扫码
+          </button>
         </div>
+        {showScanner && <QrScanner onResolved={handleQrPayload} />}
       </div>
 
       {/* 搜索结果 */}
@@ -503,18 +554,29 @@ const EmptyState: React.FC<{ icon: React.ReactNode; message: string }> = ({ icon
 
 // ============ GroupChatPanel (Split View) ============
 
-const GroupChatPanel: React.FC = () => {
+interface GroupChatPanelProps {
+  initialGroupId?: number;
+  onOpenGroupChat?: (group: GroupResponse) => void;
+}
+
+const GroupChatPanel: React.FC<GroupChatPanelProps> = ({ initialGroupId, onOpenGroupChat }) => {
   const [groups, setGroups] = useState<GroupResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
-  const [activeGroupId, setActiveGroupId] = useState<number | null>(null);
+  const [activeGroupId, setActiveGroupId] = useState<number | null>(initialGroupId ?? null);
+  const { groupMessages, groupMessagesSent } = useChat();
 
   const loadGroups = useCallback(async () => {
     setLoading(true);
     try {
       const res = await api.getMyGroups();
-      setGroups(res.data?.data || []);
+      const nextGroups = [...(res.data?.data || [])].sort((a, b) => {
+        const aTime = new Date(a.lastMessageTime || a.createTime || 0).getTime();
+        const bTime = new Date(b.lastMessageTime || b.createTime || 0).getTime();
+        return bTime - aTime;
+      });
+      setGroups(nextGroups);
     } catch {
       toast.error('加载群聊列表失败');
     } finally {
@@ -523,6 +585,27 @@ const GroupChatPanel: React.FC = () => {
   }, []);
 
   useEffect(() => { loadGroups(); }, [loadGroups]);
+
+  useEffect(() => {
+    if (groupMessages.length > 0 || groupMessagesSent.length > 0) {
+      loadGroups();
+    }
+  }, [groupMessages, groupMessagesSent, loadGroups]);
+
+  useEffect(() => {
+    if (initialGroupId) {
+      if (onOpenGroupChat) {
+        const group = groups.find((item) => item.id === initialGroupId);
+        if (group) {
+          onOpenGroupChat(group);
+        }
+      } else {
+        setActiveGroupId(initialGroupId);
+      }
+      setShowCreate(false);
+      setShowSearch(false);
+    }
+  }, [groups, initialGroupId, onOpenGroupChat]);
 
   const activeGroup = groups.find(g => g.id === activeGroupId);
 
@@ -576,29 +659,56 @@ const GroupChatPanel: React.FC = () => {
               {groups.map((group) => (
                 <div
                   key={group.id}
-                  onClick={() => { setActiveGroupId(group.id!); setShowCreate(false); setShowSearch(false); }}
+                  onClick={() => {
+                    if (onOpenGroupChat) {
+                      onOpenGroupChat(group);
+                      return;
+                    }
+                    setActiveGroupId(group.id!);
+                    setShowCreate(false);
+                    setShowSearch(false);
+                    if ((group.unreadCount ?? 0) > 0) {
+                      setGroups((prev) => prev.map((item) => (
+                        item.id === group.id ? { ...item, unreadCount: 0 } : item
+                      )));
+                    }
+                  }}
                   className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors ${
                     activeGroupId === group.id
                       ? 'bg-brand-50 dark:bg-brand-900/20 border-r-2 border-brand-500'
                       : 'hover:bg-gray-50 dark:hover:bg-gray-800/50 border-r-2 border-transparent'
                   }`}
                 >
-                  <Avatar src={group.avatar} name={group.groupName} icon="group" />
+                  <div className="relative">
+                    <Avatar src={group.avatar} name={group.groupName} icon="group" />
+                    {(group.unreadCount ?? 0) > 0 && (
+                      <span className="absolute -top-1 -right-1 inline-flex min-w-5 items-center justify-center h-5 px-1 text-[10px] font-bold text-white bg-rose-500 rounded-full ring-2 ring-white dark:ring-gray-900">
+                        {group.unreadCount! > 99 ? '99+' : group.unreadCount}
+                      </span>
+                    )}
+                  </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center justify-between gap-2">
                       <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
                         {group.groupName || '未知群聊'}
                       </p>
+                      {group.lastMessageTime && (
+                        <span className="shrink-0 text-[10px] text-gray-400">
+                          {formatTime(group.lastMessageTime)}
+                        </span>
+                      )}
+                    </div>
+                    <div className="mt-0.5 flex items-center gap-2">
                       {group.groupNumber && (
-                        <span className="flex items-center gap-0.5 text-[10px] text-gray-400 bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">
+                        <span className="shrink-0 flex items-center gap-0.5 text-[10px] text-gray-400 bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">
                           <Hash size={10} />
                           {group.groupNumber}
                         </span>
                       )}
+                      <p className="min-w-0 flex-1 text-xs text-gray-400 truncate">
+                        {formatGroupPreview(group)}
+                      </p>
                     </div>
-                    <p className="text-xs text-gray-400 truncate">
-                      {group.description || `${group.memberCount || 0} 名成员`}
-                    </p>
                   </div>
                 </div>
               ))}
@@ -621,6 +731,10 @@ const GroupChatPanel: React.FC = () => {
             onBack={() => setActiveGroupId(null)}
             onGroupUpdated={loadGroups}
           />
+        ) : activeGroupId && loading ? (
+          <div className="flex flex-1 items-center justify-center text-gray-400">
+            <Loader2 size={24} className="animate-spin" />
+          </div>
         ) : (
           <div className="flex-1 flex flex-col items-center justify-center text-gray-400">
             <UsersRound size={48} className="mb-4 opacity-30" />

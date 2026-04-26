@@ -8,6 +8,9 @@ Name | Type | Description | Notes
 **groupName** | **string** |  | [default to undefined]
 **description** | **string** |  | [optional] [default to undefined]
 **avatar** | **string** |  | [optional] [default to undefined]
+**joinMode** | **number** |  | [optional] [default to undefined]
+**inviteMode** | **number** |  | [optional] [default to undefined]
+**announcement** | **string** |  | [optional] [default to undefined]
 
 ## Example
 
@@ -18,6 +21,9 @@ const instance: CreateGroupRequest = {
     groupName,
     description,
     avatar,
+    joinMode,
+    inviteMode,
+    announcement,
 };
 ```
 

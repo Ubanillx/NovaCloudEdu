@@ -5,6 +5,7 @@ api/admin-dashboard-controller-api.ts
 api/aiapi.ts
 api/default-api.ts
 api/ipapi.ts
+api/link-preview-controller-api.ts
 api/mcpapi.ts
 api/only-office-api.ts
 api/pptapi.ts
@@ -101,7 +102,7 @@ docs/BaseResponseGenerateBannerImageResponse.md
 docs/BaseResponseGradingResultResponse.md
 docs/BaseResponseGradingStatsResponse.md
 docs/BaseResponseGroupMessagePageResponse.md
-docs/BaseResponseGroupPage.md
+docs/BaseResponseGroupPageResponse.md
 docs/BaseResponseGroupResponse.md
 docs/BaseResponseInteger.md
 docs/BaseResponseIpLocationResponse.md
@@ -110,6 +111,7 @@ docs/BaseResponseKnowledgeBaseVO.md
 docs/BaseResponseKnowledgeDocumentVO.md
 docs/BaseResponseLearningStats.md
 docs/BaseResponseLearningTrendResponse.md
+docs/BaseResponseLinkPreview.md
 docs/BaseResponseListAiAssistantVO.md
 docs/BaseResponseListAiConversation.md
 docs/BaseResponseListArticleSourceResponse.md
@@ -261,7 +263,6 @@ docs/ChapterId.md
 docs/ChapterResponse.md
 docs/ChapterSummary.md
 docs/ChapterSummaryId.md
-docs/ChatGroup.md
 docs/ChatGroupMember.md
 docs/ChatHistoryRequestDTO.md
 docs/ChatMessagePageResponse.md
@@ -364,7 +365,7 @@ docs/GroupId.md
 docs/GroupMemberResponse.md
 docs/GroupMessageItem.md
 docs/GroupMessagePageResponse.md
-docs/GroupPage.md
+docs/GroupPageResponse.md
 docs/GroupResponse.md
 docs/HandleFriendRequestDTO.md
 docs/HandleJoinRequestDTO.md
@@ -379,6 +380,9 @@ docs/KnowledgePointId.md
 docs/KnowledgeProfileResponse.md
 docs/LearningStats.md
 docs/LearningTrendResponse.md
+docs/LinkPreview.md
+docs/LinkPreviewControllerApi.md
+docs/LinkPreviewRequest.md
 docs/LiveRoomResponse.md
 docs/LoginUserResponse.md
 docs/MCPApi.md
@@ -632,7 +636,7 @@ models/base-response-generate-banner-image-response.ts
 models/base-response-grading-result-response.ts
 models/base-response-grading-stats-response.ts
 models/base-response-group-message-page-response.ts
-models/base-response-group-page.ts
+models/base-response-group-page-response.ts
 models/base-response-group-response.ts
 models/base-response-integer.ts
 models/base-response-ip-location-response.ts
@@ -641,6 +645,7 @@ models/base-response-knowledge-base-vo.ts
 models/base-response-knowledge-document-vo.ts
 models/base-response-learning-stats.ts
 models/base-response-learning-trend-response.ts
+models/base-response-link-preview.ts
 models/base-response-list-ai-assistant-vo.ts
 models/base-response-list-ai-conversation.ts
 models/base-response-list-article-source-response.ts
@@ -793,7 +798,6 @@ models/chapter-response.ts
 models/chapter-summary-id.ts
 models/chapter-summary.ts
 models/chat-group-member.ts
-models/chat-group.ts
 models/chat-history-request-dto.ts
 models/chat-message-page-response.ts
 models/chat-message-response.ts
@@ -894,7 +898,7 @@ models/group-id.ts
 models/group-member-response.ts
 models/group-message-item.ts
 models/group-message-page-response.ts
-models/group-page.ts
+models/group-page-response.ts
 models/group-response.ts
 models/handle-friend-request-dto.ts
 models/handle-join-request-dto.ts
@@ -909,6 +913,8 @@ models/knowledge-point.ts
 models/knowledge-profile-response.ts
 models/learning-stats.ts
 models/learning-trend-response.ts
+models/link-preview-request.ts
+models/link-preview.ts
 models/live-room-response.ts
 models/login-user-response.ts
 models/member-page.ts

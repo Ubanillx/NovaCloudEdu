@@ -28,6 +28,12 @@ export interface GroupResponse {
     'joinMode'?: number;
     'announcement'?: string;
     'announcementTime'?: string;
+    'lastMessageSenderId'?: number;
+    'lastMessageSenderName'?: string;
+    'lastMessage'?: string;
+    'lastMessageType'?: string;
+    'lastMessageTime'?: string;
+    'unreadCount'?: number;
     'createTime'?: string;
     'mute'?: boolean;
 }

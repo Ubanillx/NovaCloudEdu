@@ -3,15 +3,20 @@ package com.novacloudedu.backend.interfaces.rest.social;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.novacloudedu.backend.application.service.ChatGroupApplicationService;
+import com.novacloudedu.backend.application.service.GroupChatApplicationService;
 import com.novacloudedu.backend.common.BaseResponse;
 import com.novacloudedu.backend.common.ErrorCode;
 import com.novacloudedu.backend.common.ResultUtils;
 import com.novacloudedu.backend.domain.social.entity.ChatGroup;
 import com.novacloudedu.backend.domain.social.entity.ChatGroupMember;
 import com.novacloudedu.backend.domain.social.entity.GroupJoinRequest;
+import com.novacloudedu.backend.domain.social.entity.GroupMessage;
 import com.novacloudedu.backend.domain.social.repository.ChatGroupMemberRepository;
 import com.novacloudedu.backend.domain.social.valueobject.InviteMode;
 import com.novacloudedu.backend.domain.social.valueobject.JoinMode;
+import com.novacloudedu.backend.domain.user.entity.User;
+import com.novacloudedu.backend.domain.user.repository.UserRepository;
+import com.novacloudedu.backend.domain.user.valueobject.UserId;
 import com.novacloudedu.backend.interfaces.rest.social.dto.request.*;
 import com.novacloudedu.backend.interfaces.rest.social.dto.response.*;
 import com.novacloudedu.backend.exception.BusinessException;
@@ -36,6 +41,8 @@ public class ChatGroupController {
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private final ChatGroupApplicationService groupService;
+    private final GroupChatApplicationService groupChatService;
+    private final UserRepository userRepository;
 
     // ==================== 群管理 ====================
 
@@ -234,9 +241,27 @@ public class ChatGroupController {
     public BaseResponse<List<GroupResponse>> getMyGroups(@AuthenticationPrincipal Long userId) {
         List<ChatGroup> groups = groupService.getUserGroups(userId);
         List<GroupResponse> responses = groups.stream()
-                .map(GroupResponse::from)
+                .map(group -> toMyGroupResponse(group, userId))
                 .toList();
         return ResultUtils.success(responses);
+    }
+
+    private GroupResponse toMyGroupResponse(ChatGroup group, Long userId) {
+        GroupResponse response = GroupResponse.from(group);
+        List<GroupMessage> latestMessages = groupChatService.getLatestMessages(group.getId().value(), userId, 1);
+        if (!latestMessages.isEmpty()) {
+            GroupMessage latest = latestMessages.get(0);
+            response.setLastMessageSenderId(latest.getSenderId() != null ? latest.getSenderId().value() : null);
+            response.setLastMessage(latest.getContent());
+            response.setLastMessageType(latest.getType() != null ? latest.getType().getValue() : null);
+            response.setLastMessageTime(latest.getCreateTime());
+            if (latest.getSenderId() != null) {
+                User sender = userRepository.findById(UserId.of(latest.getSenderId().value())).orElse(null);
+                response.setLastMessageSenderName(sender != null ? sender.getUserName() : "未知用户");
+            }
+        }
+        response.setUnreadCount(groupChatService.getUnreadCount(group.getId().value(), userId));
+        return response;
     }
 
     @GetMapping("/search")

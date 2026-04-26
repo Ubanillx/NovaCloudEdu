@@ -58,6 +58,43 @@ interface ChatContextValue {
 
 const ChatContext = createContext<ChatContextValue | null>(null);
 
+const getNotificationKey = (evt: NotificationEvent): string => {
+  const data = evt.data || {};
+  const value = (...keys: string[]) => {
+    for (const key of keys) {
+      const raw = data[key];
+      if (raw != null && raw !== '') return String(raw);
+    }
+    return '';
+  };
+
+  const notificationId = value('notificationId', 'id');
+  if (notificationId) return `${evt.type}:id:${notificationId}`;
+
+  if (evt.type === 'NEW_PRIVATE_MESSAGE') {
+    const messageId = value('messageId');
+    if (messageId) return `${evt.type}:message:${messageId}`;
+  }
+
+  if (evt.type === 'NEW_GROUP_MESSAGE') {
+    const groupId = value('groupId');
+    const messageId = value('messageId');
+    if (messageId) return `${evt.type}:group:${groupId}:message:${messageId}`;
+  }
+
+  const requestId = value('requestId');
+  if (requestId) return `${evt.type}:request:${requestId}`;
+
+  return [
+    evt.type,
+    value('channel'),
+    value('senderId', 'userId', 'groupId'),
+    value('title', 'senderName', 'groupName'),
+    value('preview', 'content'),
+    evt.timestamp || '',
+  ].join(':');
+};
+
 // ============ Provider ============
 
 export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -72,6 +109,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [unreadCount, setUnreadCount] = useState<UnreadCount>(EMPTY_UNREAD);
 
   const wsRef = useRef(WebSocketService.getInstance());
+  const notificationKeysRef = useRef<Set<string>>(new Set());
 
   // 处理通知事件，更新未读数（与 Flutter NotificationService._handleNotification 对齐）
   const handleNotification = useCallback((evt: NotificationEvent) => {
@@ -114,7 +152,17 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setGroupMessages((prev) => [msg, ...prev]);
       },
       onNotification: (evt: NotificationEvent) => {
-        setNotifications((prev) => [evt, ...prev]);
+        if (evt.type === 'UNREAD_COUNT_CHANGED') {
+          handleNotification(evt);
+          return;
+        }
+
+        const key = getNotificationKey(evt);
+        if (notificationKeysRef.current.has(key)) {
+          return;
+        }
+        notificationKeysRef.current.add(key);
+        setNotifications((prev) => [evt, ...prev].slice(0, 100));
         handleNotification(evt);
       },
       onReadReceipt: (receipt: ReadReceipt) => {
@@ -176,6 +224,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const markGroupMessageAsRead = useCallback((groupId: number, messageId: number) => {
     wsRef.current.markGroupMessageAsRead(groupId, messageId);
+    wsRef.current.refreshUnreadCount();
   }, []);
 
   const refreshUnreadCount = useCallback(() => {
@@ -209,7 +258,10 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const clearChatMessages = useCallback(() => setChatMessages([]), []);
   const clearGroupMessages = useCallback(() => setGroupMessages([]), []);
-  const clearNotifications = useCallback(() => setNotifications([]), []);
+  const clearNotifications = useCallback(() => {
+    notificationKeysRef.current.clear();
+    setNotifications([]);
+  }, []);
   const clearGroupReadReceipts = useCallback(() => setGroupReadReceipts([]), []);
 
   const value: ChatContextValue = {

@@ -12,6 +12,7 @@ Name | Type | Description | Notes
 **receiverId** | **number** |  | [optional] [default to undefined]
 **content** | **string** |  | [optional] [default to undefined]
 **type** | **string** |  | [optional] [default to undefined]
+**replyTo** | **number** |  | [optional] [default to undefined]
 **createTime** | **string** |  | [optional] [default to undefined]
 **read** | **boolean** |  | [optional] [default to undefined]
 
@@ -28,6 +29,7 @@ const instance: ChatMessageResponse = {
     receiverId,
     content,
     type,
+    replyTo,
     createTime,
     read,
 };

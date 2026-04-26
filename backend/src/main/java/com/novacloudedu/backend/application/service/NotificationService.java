@@ -10,6 +10,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -109,11 +110,18 @@ public class NotificationService {
     /**
      * 通知用户有新私聊消息
      */
-    public void notifyNewPrivateMessage(Long receiverId, Long senderId, String senderName) {
-        notifyUser(receiverId, EventType.NEW_PRIVATE_MESSAGE, Map.of(
-                "senderId", senderId,
-                "senderName", senderName
-        ));
+    public void notifyNewPrivateMessage(Long receiverId, Long senderId, String senderName,
+                                        Long messageId, String content, String type) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("channel", "PRIVATE_CHAT");
+        data.put("title", senderName);
+        data.put("preview", buildMessagePreview(type, content));
+        data.put("targetPath", "/chat?tab=messages&partnerId=" + senderId);
+        data.put("senderId", senderId);
+        data.put("senderName", senderName);
+        data.put("messageId", messageId);
+        data.put("messageType", type);
+        notifyUser(receiverId, EventType.NEW_PRIVATE_MESSAGE, data);
     }
 
     /**
@@ -128,13 +136,21 @@ public class NotificationService {
     /**
      * 通知群组有新消息
      */
-    public void notifyNewGroupMessage(Long groupId, String groupName, Long senderId, String senderName) {
-        notifyGroup(groupId, EventType.NEW_GROUP_MESSAGE, Map.of(
-                "groupId", groupId,
-                "groupName", groupName,
-                "senderId", senderId,
-                "senderName", senderName
-        ));
+    public void notifyNewGroupMessage(Collection<Long> userIds, Long groupId, String groupName,
+                                      Long senderId, String senderName, Long messageId,
+                                      String content, String type) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("channel", "GROUP_CHAT");
+        data.put("title", groupName);
+        data.put("preview", senderName + ": " + buildMessagePreview(type, content));
+        data.put("targetPath", "/chat?tab=messages&groupId=" + groupId);
+        data.put("groupId", groupId);
+        data.put("groupName", groupName);
+        data.put("senderId", senderId);
+        data.put("senderName", senderName);
+        data.put("messageId", messageId);
+        data.put("messageType", type);
+        notifyUsers(userIds, EventType.NEW_GROUP_MESSAGE, data);
     }
 
     /**
@@ -142,6 +158,10 @@ public class NotificationService {
      */
     public void notifyFriendRequest(Long receiverId, Long requestId, Long senderId, String senderName) {
         notifyUser(receiverId, EventType.FRIEND_REQUEST_RECEIVED, Map.of(
+                "channel", "FRIEND_REQUEST",
+                "title", "新的好友申请",
+                "preview", senderName + " 请求添加你为好友",
+                "targetPath", "/chat?tab=requests",
                 "requestId", requestId,
                 "senderId", senderId,
                 "senderName", senderName
@@ -161,9 +181,13 @@ public class NotificationService {
     /**
      * 通知群管理员收到入群申请
      */
-    public void notifyGroupJoinRequest(Collection<Long> adminIds, Long groupId, Long requestId, 
+    public void notifyGroupJoinRequest(Collection<Long> adminIds, Long groupId, Long requestId,
                                        Long userId, String userName) {
         notifyUsers(adminIds, EventType.GROUP_JOIN_REQUEST_RECEIVED, Map.of(
+                "channel", "GROUP_REQUEST",
+                "title", "新的入群申请",
+                "preview", userName + " 申请加入群聊",
+                "targetPath", "/chat?tab=groups",
                 "groupId", groupId,
                 "requestId", requestId,
                 "userId", userId,
@@ -187,6 +211,10 @@ public class NotificationService {
      */
     public void notifyGroupInvited(Long userId, Long groupId, String groupName, Long inviterId) {
         notifyUser(userId, EventType.GROUP_INVITED, Map.of(
+                "channel", "GROUP_CHAT",
+                "title", "群聊邀请",
+                "preview", "你被邀请加入 " + groupName,
+                "targetPath", "/chat?tab=messages&groupId=" + groupId,
                 "groupId", groupId,
                 "groupName", groupName,
                 "inviterId", inviterId
@@ -238,8 +266,35 @@ public class NotificationService {
      */
     public void notifySystem(Long userId, String title, String content) {
         notifyUser(userId, EventType.SYSTEM_NOTIFICATION, Map.of(
+                "channel", "SYSTEM",
                 "title", title,
-                "content", content
+                "content", content,
+                "preview", content,
+                "targetPath", "/"
         ));
+    }
+
+    private String buildMessagePreview(String type, String content) {
+        String messageType = type != null ? type.toUpperCase() : "TEXT";
+        return switch (messageType) {
+            case "IMAGE" -> "[图片]";
+            case "FILE" -> {
+                if (content != null && content.contains("|")) {
+                    String fileName = content.split("\\|", 2)[0];
+                    yield "[文件] " + (fileName.isBlank() ? "文件消息" : fileName);
+                }
+                yield "[文件]";
+            }
+            case "AUDIO" -> "[语音]";
+            case "VIDEO" -> "[视频]";
+            case "CALL" -> "[通话]";
+            default -> {
+                String text = content == null ? "" : content.trim();
+                if (text.length() > 80) {
+                    yield text.substring(0, 80) + "...";
+                }
+                yield text.isEmpty() ? "空消息" : text;
+            }
+        };
     }
 }

@@ -20,6 +20,7 @@ import AvatarUploadField from '../ui/AvatarUploadField';
 import { MessageBubble } from './MessageContent';
 import { ReplyComposerBar, ReplyPreview } from './MessageReply';
 import { useChatUpload } from './useChatUpload';
+import { createSocialQrPayload, QrCodeCard } from './SocialQrCode';
 
 const api = new DefaultApi(new Configuration(), '', apiClient);
 
@@ -557,6 +558,24 @@ const GroupSettingsPanel: React.FC<GroupSettingsPanelProps> = ({
                   className="w-full px-3 py-2 text-sm bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg outline-none focus:border-brand-400 disabled:opacity-60 resize-none"
                 />
               </section>
+
+              {groupInfo?.id && (
+                <section className="space-y-3">
+                  <p className="text-xs font-semibold text-gray-500 dark:text-gray-400">群聊二维码</p>
+                  <QrCodeCard
+                    title={groupInfo.groupName || '群聊二维码'}
+                    subtitle={groupInfo.groupNumber ? `群号 ${groupInfo.groupNumber}，扫码或打开链接申请加入` : '扫码或打开链接申请加入群聊'}
+                    copyLabel="复制群聊邀请链接"
+                    payload={createSocialQrPayload({
+                      type: 'group',
+                      groupId: groupInfo.id,
+                      groupNumber: groupInfo.groupNumber,
+                      name: groupInfo.groupName,
+                      avatar: groupInfo.avatar,
+                    })}
+                  />
+                </section>
+              )}
 
               {canManage && (
                 <section className="space-y-3">

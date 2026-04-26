@@ -29,6 +29,12 @@ public class GroupResponse {
     private boolean isMute;
     private String announcement;
     private LocalDateTime announcementTime;
+    private Long lastMessageSenderId;
+    private String lastMessageSenderName;
+    private String lastMessage;
+    private String lastMessageType;
+    private LocalDateTime lastMessageTime;
+    private int unreadCount;
     private LocalDateTime createTime;
 
     public static GroupResponse from(ChatGroup group) {

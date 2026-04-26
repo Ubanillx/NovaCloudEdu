@@ -18,6 +18,7 @@ public interface GroupMessageReadMapper extends BaseMapper<GroupMessageReadPO> {
      */
     @Select("SELECT COUNT(*) FROM group_message gm " +
             "WHERE gm.group_id = #{groupId} AND gm.is_delete = 0 " +
+            "AND (gm.sender_id IS NULL OR gm.sender_id != #{userId}) " +
             "AND NOT EXISTS (SELECT 1 FROM group_message_read gmr WHERE gmr.message_id = gm.id AND gmr.user_id = #{userId})")
     int countUnreadMessages(@Param("groupId") Long groupId, @Param("userId") Long userId);
 

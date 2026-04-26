@@ -414,6 +414,7 @@ All URIs are relative to *http://localhost:8080*
 |[**sendRegisterCode**](#sendregistercode) | **POST** /api/auth/send-code | 发送注册验证码|
 |[**sendSms**](#sendsms) | **POST** /api/user/admin/send-sms | 发送短信验证码|
 |[**setAdmin**](#setadmin) | **PUT** /api/groups/{groupId}/members/{targetUserId}/admin | 设置/取消管理员|
+|[**setInviteMode**](#setinvitemode) | **PUT** /api/groups/{groupId}/invite-mode | 设置群邀请模式|
 |[**setJoinMode**](#setjoinmode) | **PUT** /api/groups/{groupId}/join-mode | 设置群加入模式|
 |[**setMute**](#setmute) | **POST** /api/admin/groups/{groupId}/mute | 设置群全员禁言|
 |[**smartDynamicScrape**](#smartdynamicscrape) | **POST** /api/scraper/dynamic/smart | 智能动态抓取|
@@ -18587,7 +18588,7 @@ const { status, data } = await apiInstance.publish(
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **publishAnnouncement**
-> BaseResponseVoid publishAnnouncement(body)
+> BaseResponseVoid publishAnnouncement()
 
 
 ### Example
@@ -18602,7 +18603,7 @@ const configuration = new Configuration();
 const apiInstance = new DefaultApi(configuration);
 
 let groupId: number; // (default to undefined)
-let body: string; //
+let body: string; // (optional)
 
 const { status, data } = await apiInstance.publishAnnouncement(
     groupId,
@@ -21271,7 +21272,7 @@ const { status, data } = await apiInstance.searchCourses(
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **searchGroups**
-> BaseResponseGroupPage searchGroups()
+> BaseResponseGroupPageResponse searchGroups()
 
 
 ### Example
@@ -21307,7 +21308,7 @@ const { status, data } = await apiInstance.searchGroups(
 
 ### Return type
 
-**BaseResponseGroupPage**
+**BaseResponseGroupPageResponse**
 
 ### Authorization
 
@@ -21966,6 +21967,61 @@ const { status, data } = await apiInstance.setAdmin(
 | **groupId** | [**number**] |  | defaults to undefined|
 | **targetUserId** | [**number**] |  | defaults to undefined|
 | **isAdmin** | [**boolean**] |  | defaults to undefined|
+
+
+### Return type
+
+**BaseResponseVoid**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **setInviteMode**
+> BaseResponseVoid setInviteMode()
+
+0-所有成员可邀请，1-仅管理员可邀请
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let groupId: number; // (default to undefined)
+let mode: number; // (default to undefined)
+
+const { status, data } = await apiInstance.setInviteMode(
+    groupId,
+    mode
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **groupId** | [**number**] |  | defaults to undefined|
+| **mode** | [**number**] |  | defaults to undefined|
 
 
 ### Return type

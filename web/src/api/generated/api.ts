@@ -18,6 +18,7 @@ export * from './api/default-api';
 export * from './api/aiapi';
 export * from './api/admin-dashboard-controller-api';
 export * from './api/ipapi';
+export * from './api/link-preview-controller-api';
 export * from './api/mcpapi';
 export * from './api/only-office-api';
 export * from './api/pptapi';
