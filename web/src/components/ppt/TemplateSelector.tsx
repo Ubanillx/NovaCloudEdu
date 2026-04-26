@@ -5,6 +5,7 @@ import { apiClient, Configuration } from '../../api';
 import type { PptTemplateListResponse } from '../../api/generated/models';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
+const pptApi = new PPTApi(new Configuration({ basePath: API_BASE }), API_BASE, apiClient);
 
 const parseStatusConfig: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
   ready:   { label: '可用',   color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400', icon: <Check className="w-3 h-3" /> },
@@ -38,9 +39,7 @@ export const TemplateSelector: React.FC<TemplateSelectorProps> = ({ onSelect, on
 
   const fetchTemplates = async () => {
     try {
-      const config = new Configuration({ basePath: API_BASE });
-      const api = new PPTApi(config, API_BASE, apiClient);
-      const res = await api.listTemplates();
+      const res = await pptApi.listTemplates();
       const data = (res.data as any)?.data || [];
       setTemplates(data);
     } catch (err) {
@@ -56,7 +55,7 @@ export const TemplateSelector: React.FC<TemplateSelectorProps> = ({ onSelect, on
     e.stopPropagation();
     setRetrying(templateId);
     try {
-      await apiClient.post(`${API_BASE}/api/ppt/templates/${templateId}/retry-parse`);
+      await pptApi.retryParsing({ id: templateId as unknown as number });
       // Refresh list after triggering retry
       setTimeout(() => fetchTemplates(), 1000);
     } catch (err) {

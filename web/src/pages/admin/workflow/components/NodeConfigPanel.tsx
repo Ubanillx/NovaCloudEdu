@@ -2,9 +2,10 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { X, Trash2, Settings2, Plus, GripVertical, Loader2, BookOpen, Sparkles, ChevronDown, ChevronRight, Eye, Image, Globe, Code2, Plug2 } from 'lucide-react';
 import { useWorkflowStore } from '../store/useWorkflowStore';
 import { NodeType, getNodeCategoryInfo } from '../types';
-import { apiClient, DefaultApi, Configuration } from '../../../../api';
+import { apiClient, DefaultApi, MCPApi, Configuration } from '../../../../api';
 
 const api = new DefaultApi(new Configuration(), '', apiClient);
+const mcpApi = new MCPApi(new Configuration(), '', apiClient);
 
 export const NodeConfigPanel: React.FC = () => {
   const selectedNodeId = useWorkflowStore((s) => s.selectedNodeId);
@@ -501,7 +502,7 @@ const LLMConfig: React.FC<{ config: Record<string, unknown>; onUpdate: (c: Recor
     const userId = userInfoStr ? String(JSON.parse(userInfoStr)?.id ?? '') : '';
     if (!userId) return;
     setLoadingMcp(true);
-    apiClient.get(`/api/ai/mcp-servers?userId=${userId}`).then((res) => {
+    mcpApi.mcpServerListByCreator({ userId: userId as unknown as number }).then((res) => {
       if (cancelled) return;
       const data = res.data;
       if (data.code === 0 && Array.isArray(data.data)) {

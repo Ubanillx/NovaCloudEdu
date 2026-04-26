@@ -33,12 +33,13 @@ import {
   Image as ImageIcon,
 } from 'lucide-react';
 import MarkdownRenderer from '../../components/chat/MarkdownRenderer';
-import { apiClient, AIApi, DefaultApi, Configuration, getToken } from '../../api';
+import { apiClient, AIApi, DefaultApi, MCPApi, Configuration, getToken } from '../../api';
 import type { AiAssistantVO, CreateAiAssistantCommand, UpdateAiAssistantCommand, KnowledgeBaseVO, WorkflowResponse, WorkflowSkillVO } from '../../api/generated/models';
 import { toast, TruncateWithTooltip, ImageUploadArea } from '../../components/ui';
 
 const aiApi = new AIApi(new Configuration(), '', apiClient);
 const defaultApi = new DefaultApi(new Configuration(), '', apiClient);
+const mcpApi = new MCPApi(new Configuration(), '', apiClient);
 
 // 获取当前用户ID（雪花ID，运行时为字符串）
 const getCurrentUserId = (): number => {
@@ -1191,9 +1192,10 @@ const McpServerBindModal: React.FC<McpServerBindModalProps> = ({ isOpen, onClose
       setLoading(true);
       try {
         const userId = getCurrentUserId();
-        const res = await apiClient.get(`/api/ai/mcp-servers?userId=${userId}`);
-        if (res.data.code === 0) {
-          setAllServers(res.data.data || []);
+        const res = await mcpApi.mcpServerListByCreator({ userId: userId as unknown as number });
+        const data = res.data as any;
+        if (data.code === 0) {
+          setAllServers(data.data || []);
         }
       } catch (error: any) {
         toast.error(error?.response?.data?.message || '获取 MCP 服务器列表失败');

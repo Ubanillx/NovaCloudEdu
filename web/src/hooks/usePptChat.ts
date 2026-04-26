@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
 import JSONBig from 'json-bigint';
-import { apiClient, getToken } from '../api';
+import { apiClient, Configuration, PPTApi, getToken } from '../api';
 import type {
   PptPhase, PptGenerationState, GeneratedSlide, SlideImage,
   TemplateSlide, AgentTask, AgentTaskSummary,
@@ -64,6 +64,7 @@ export interface PptSessionDetail {
 // ==================== Constants ====================
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
+const pptApi = new PPTApi(new Configuration(), '', apiClient);
 
 let msgIdCounter = 0;
 function nextMsgId(): string {
@@ -139,7 +140,7 @@ export function usePptChat() {
   const loadSessions = useCallback(async () => {
     setIsLoadingSessions(true);
     try {
-      const res = await apiClient.get('/api/ppt/generation/sessions');
+      const res = await pptApi.listSessions1();
       if (res.data?.code === 0 && Array.isArray(res.data.data)) {
         setSessions(res.data.data.map((s: Record<string, unknown>) => ({
           id: String(s.id),
@@ -159,9 +160,9 @@ export function usePptChat() {
 
   const loadSessionDetail = useCallback(async (sessionId: string) => {
     try {
-      const res = await apiClient.get(`/api/ppt/generation/sessions/${sessionId}`);
+      const res = await pptApi.getSessionDetail({ sessionId: sessionId as unknown as number });
       if (res.data?.code === 0 && res.data.data) {
-        return res.data.data as PptSessionDetail;
+        return res.data.data as unknown as PptSessionDetail;
       }
     } catch (e) {
       console.error('加载PPT会话详情失败:', e);
@@ -171,7 +172,7 @@ export function usePptChat() {
 
   const deleteSession = useCallback(async (sessionId: string) => {
     try {
-      await apiClient.delete(`/api/ppt/generation/sessions/${sessionId}`);
+      await pptApi.deleteSession({ sessionId: sessionId as unknown as number });
       setSessions(prev => prev.filter(s => s.id !== sessionId));
       if (currentSessionId === sessionId) {
         setCurrentSessionId(null);
