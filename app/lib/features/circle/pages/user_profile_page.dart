@@ -5,6 +5,7 @@ import '../../../config/app_theme.dart';
 import '../../../widgets/common/skeleton_widgets.dart';
 import '../../../widgets/toast/nova_message.dart';
 import '../../../widgets/dialogs/app_dialog.dart';
+import '../constants/post_types.dart';
 import '../services/post_service.dart';
 import '../../chat/services/friend_service.dart';
 import '../../chat/pages/private_chat_page.dart';
@@ -28,7 +29,7 @@ class UserProfilePage extends StatefulWidget {
 class _UserProfilePageState extends State<UserProfilePage> {
   final PostService _postService = PostService();
   final FriendService _friendService = FriendService();
-  
+
   UserPublicResponse? _userInfo;
   List<PostResponse> _posts = [];
   bool _isLoading = true;
@@ -54,16 +55,16 @@ class _UserProfilePageState extends State<UserProfilePage> {
       if (userInfo != null && mounted) {
         setState(() => _userInfo = userInfo);
       }
-      
+
       // 检查关注状态
       final followStatus = await _postService.isFollowing(widget.userId);
       if (followStatus != null && mounted) {
         setState(() => _isFollowing = followStatus);
       }
-      
+
       // 检查好友状态
       await _checkFriendStatus();
-      
+
       // 加载用户帖子
       await _loadPosts();
     } catch (e) {
@@ -98,9 +99,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('操作失败: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('操作失败: $e')));
       }
     } finally {
       if (mounted) setState(() => _isLoadingFollow = false);
@@ -122,7 +123,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
   /// 发送好友申请
   Future<void> _sendFriendRequest() async {
     if (_isLoadingFriend) return;
-    
+
     // 显示输入验证消息对话框
     final message = await showInputDialog(
       context,
@@ -130,9 +131,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
       hintText: '请输入验证消息（可选）',
       confirmText: '发送申请',
     );
-    
+
     if (message == null) return; // 用户取消
-    
+
     setState(() => _isLoadingFriend = true);
     try {
       final success = await _friendService.sendFriendRequest(
@@ -231,7 +232,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
               ],
             ),
             child: ClipOval(
-              child: _userInfo?.userAvatar != null && _userInfo!.userAvatar!.isNotEmpty
+              child:
+                  _userInfo?.userAvatar != null &&
+                      _userInfo!.userAvatar!.isNotEmpty
                   ? Image.network(
                       _userInfo!.userAvatar!,
                       width: 100,
@@ -264,8 +267,12 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   child: ElevatedButton(
                     onPressed: _isLoadingFollow ? null : _toggleFollow,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: _isFollowing ? colors.surfaceVariant : AppTheme.brand,
-                      foregroundColor: _isFollowing ? colors.textSecondary : Colors.white,
+                      backgroundColor: _isFollowing
+                          ? colors.surfaceVariant
+                          : AppTheme.brand,
+                      foregroundColor: _isFollowing
+                          ? colors.textSecondary
+                          : Colors.white,
                       elevation: _isFollowing ? 0 : 2,
                       shadowColor: AppTheme.brand.withOpacity(0.4),
                       padding: const EdgeInsets.symmetric(vertical: 12),
@@ -279,14 +286,22 @@ class _UserProfilePageState extends State<UserProfilePage> {
                             height: 20,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Colors.white,
+                              ),
                             ),
                           )
                         : Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Icon(
-                                _isFollowing ? PhosphorIcons.check(PhosphorIconsStyle.fill) : PhosphorIcons.plus(PhosphorIconsStyle.fill),
+                                _isFollowing
+                                    ? PhosphorIcons.check(
+                                        PhosphorIconsStyle.fill,
+                                      )
+                                    : PhosphorIcons.plus(
+                                        PhosphorIconsStyle.fill,
+                                      ),
                                 size: 18,
                               ),
                               const SizedBox(width: 4),
@@ -354,8 +369,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                   height: 20,
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
-                                    valueColor:
-                                        AlwaysStoppedAnimation<Color>(Colors.white),
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.white,
+                                    ),
                                   ),
                                 )
                               : Row(
@@ -363,8 +379,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                   children: [
                                     Icon(
                                       _hasPendingRequest
-                                      ? PhosphorIcons.hourglass(PhosphorIconsStyle.fill)
-                                      : PhosphorIcons.userPlus(),
+                                          ? PhosphorIcons.hourglass(
+                                              PhosphorIconsStyle.fill,
+                                            )
+                                          : PhosphorIcons.userPlus(),
                                       size: 18,
                                     ),
                                     const SizedBox(width: 4),
@@ -436,7 +454,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   _buildDivider(),
                   _buildInfoRow('性别', _buildGenderTag()),
                 ],
-                if (_userInfo?.userProfile != null && _userInfo!.userProfile!.isNotEmpty) ...[
+                if (_userInfo?.userProfile != null &&
+                    _userInfo!.userProfile!.isNotEmpty) ...[
                   _buildDivider(),
                   _buildProfileRow(),
                 ],
@@ -465,7 +484,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
               ),
             ),
           ),
-          Expanded(child: Align(alignment: Alignment.centerLeft, child: content)),
+          Expanded(
+            child: Align(alignment: Alignment.centerLeft, child: content),
+          ),
         ],
       ),
     );
@@ -516,7 +537,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
   Widget _buildRoleTag() {
     final role = _userInfo?.role;
-    final label = role == 'admin' ? '管理员' : (role == 'user' ? '普通用户' : (role ?? '未知'));
+    final label = role == 'admin'
+        ? '管理员'
+        : (role == 'user' ? '普通用户' : (role ?? '未知'));
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
@@ -550,11 +573,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
           color: Colors.white,
           fontWeight: FontWeight.bold,
           shadows: [
-            Shadow(
-              offset: Offset(0, 1),
-              blurRadius: 2,
-              color: Colors.black12,
-            ),
+            Shadow(offset: Offset(0, 1), blurRadius: 2, color: Colors.black12),
           ],
         ),
       ),
@@ -565,9 +584,11 @@ class _UserProfilePageState extends State<UserProfilePage> {
     final gender = _userInfo?.userGender;
     final isMale = gender == 0; // 假设0是男，1是女
     final color = isMale ? context.colors.info : const Color(0xFFEC4899);
-    final icon = isMale ? PhosphorIcons.genderMale(PhosphorIconsStyle.fill) : PhosphorIcons.genderFemale(PhosphorIconsStyle.fill);
+    final icon = isMale
+        ? PhosphorIcons.genderMale(PhosphorIconsStyle.fill)
+        : PhosphorIcons.genderFemale(PhosphorIconsStyle.fill);
     final label = isMale ? '男' : '女';
-    
+
     return Row(
       children: [
         Icon(icon, size: 18, color: color),
@@ -605,7 +626,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 ),
                 const SizedBox(width: 8),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: colors.surfaceVariant,
                     borderRadius: BorderRadius.circular(100),
@@ -649,12 +673,13 @@ class _UserProfilePageState extends State<UserProfilePage> {
           ),
           child: Column(
             children: [
-              Icon(PhosphorIcons.article(), size: 48, color: colors.iconSecondary.withOpacity(0.5)),
-              const SizedBox(height: 16),
-              Text(
-                '暂无帖子',
-                style: TextStyle(color: colors.textTertiary),
+              Icon(
+                PhosphorIcons.article(),
+                size: 48,
+                color: colors.iconSecondary.withOpacity(0.5),
               ),
+              const SizedBox(height: 16),
+              Text('暂无帖子', style: TextStyle(color: colors.textTertiary)),
             ],
           ),
         ),
@@ -674,15 +699,14 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
   Widget _buildPostItem(PostResponse post) {
     final colors = context.colors;
+    final postTypeLabel = getPostTypeLabel(post.postType);
     return GestureDetector(
       onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => PostDetailPage(
-              postId: post.id!,
-              initialPost: post,
-            ),
+            builder: (context) =>
+                PostDetailPage(postId: post.id!, initialPost: post),
           ),
         ).then((_) => _loadPosts());
       },
@@ -729,21 +753,26 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 spacing: 8,
                 children: post.tags!
                     .take(3)
-                    .map((tag) => Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: AppTheme.brand.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(8),
+                    .map(
+                      (tag) => Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppTheme.brand.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          '#$tag',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: AppTheme.brand,
+                            fontWeight: FontWeight.w600,
                           ),
-                          child: Text(
-                            '#$tag',
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: AppTheme.brand,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ))
+                        ),
+                      ),
+                    )
                     .toList(),
               ),
             ],
@@ -754,15 +783,44 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   _formatTime(post.createTime),
                   style: TextStyle(fontSize: 12, color: colors.textTertiary),
                 ),
+                if (postTypeLabel.isNotEmpty) ...[
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppTheme.brand.withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      postTypeLabel,
+                      style: const TextStyle(
+                        fontSize: 10,
+                        color: AppTheme.brand,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
                 const Spacer(),
-                Icon(PhosphorIcons.thumbsUp(PhosphorIconsStyle.fill), size: 16, color: colors.iconSecondary),
+                Icon(
+                  PhosphorIcons.thumbsUp(PhosphorIconsStyle.fill),
+                  size: 16,
+                  color: colors.iconSecondary,
+                ),
                 const SizedBox(width: 4),
                 Text(
                   '${post.thumbNum ?? 0}',
                   style: TextStyle(fontSize: 12, color: colors.textSecondary),
                 ),
                 const SizedBox(width: 16),
-                Icon(PhosphorIcons.chatTeardropText(PhosphorIconsStyle.fill), size: 16, color: colors.iconSecondary),
+                Icon(
+                  PhosphorIcons.chatTeardropText(PhosphorIconsStyle.fill),
+                  size: 16,
+                  color: colors.iconSecondary,
+                ),
                 const SizedBox(width: 4),
                 Text(
                   '${post.commentNum ?? 0}',

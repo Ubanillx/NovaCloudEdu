@@ -32,7 +32,7 @@ COMMENT ON COLUMN post.ip_address IS 'ip地址区域';
 COMMENT ON COLUMN post.create_time IS '创建时间';
 COMMENT ON COLUMN post.update_time IS '更新时间';
 COMMENT ON COLUMN post.is_delete IS '是否删除';
-COMMENT ON COLUMN post.post_type IS '帖子类型，如学习/生活/技巧';
+COMMENT ON COLUMN post.post_type IS '帖子类型：discussion-讨论交流，question-提问求助，share-资料分享，experience-学习心得，homework-作业答疑，exam-考试升学，course-课程讨论，announcement-活动公告，life-闲聊生活，tool-工具技巧，other-其他';
 
 -- 帖子点赞表（硬删除）
 CREATE TABLE IF NOT EXISTS post_thumb
