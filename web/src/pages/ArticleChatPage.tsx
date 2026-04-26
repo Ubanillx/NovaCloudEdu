@@ -318,8 +318,8 @@ export const ArticleChatPanel: React.FC<ArticleChatPanelProps> = ({
     <div className="flex flex-col h-full bg-white dark:bg-gray-950 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden">
       {/* Header */}
       <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-200 dark:border-gray-800 flex-shrink-0">
-        <div className="w-8 h-8 bg-gradient-to-br from-brand-500 to-accent-500 rounded-full flex items-center justify-center flex-shrink-0">
-          <Bot size={16} className="text-white" />
+        <div className="w-8 h-8 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm">
+          <Bot size={16} className="text-brand-600 dark:text-brand-400" />
         </div>
         <div className="flex-1 min-w-0">
           <h2 className="text-sm font-bold text-gray-900 dark:text-white">AI 深度讨论</h2>
@@ -358,7 +358,7 @@ export const ArticleChatPanel: React.FC<ArticleChatPanelProps> = ({
 
       {/* Input - 现代整合式设计 */}
       <div className="flex-shrink-0 px-4 py-3 border-t border-gray-200/60 dark:border-gray-800/60 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl">
-        <div className="flex items-end gap-2 bg-gray-50/80 dark:bg-gray-800/60 border border-gray-200/80 dark:border-gray-700/60 rounded-2xl p-2 shadow-sm hover:shadow-md transition-shadow focus-within:ring-2 focus-within:ring-brand-100 dark:focus-within:ring-brand-900/20 focus-within:border-brand-300">
+        <div className="flex items-end gap-2 bg-gray-50/80 dark:bg-gray-800/60 border border-gray-200/80 dark:border-gray-700/60 rounded-2xl p-2 shadow-sm hover:shadow-sm transition-shadow focus-within:ring-2 focus-within:ring-brand-100 dark:focus-within:ring-brand-900/20 focus-within:border-brand-300">
           <VoiceInputButton
             onTextChange={(text) => setInput(voiceBaseInputRef.current + text)}
             onRecordingStart={() => { voiceBaseInputRef.current = input; }}
@@ -380,7 +380,7 @@ export const ArticleChatPanel: React.FC<ArticleChatPanelProps> = ({
           {isLoading ? (
             <button
               onClick={cancelStream}
-              className="p-2.5 rounded-xl bg-red-500 hover:bg-red-600 text-white transition-all shadow-sm hover:shadow flex-shrink-0"
+              className="p-2.5 rounded-xl bg-red-500 hover:bg-red-600 text-white transition-all shadow-sm hover:shadow-sm flex-shrink-0"
               title="停止生成"
             >
               <Square size={16} fill="currentColor" />
@@ -389,7 +389,7 @@ export const ArticleChatPanel: React.FC<ArticleChatPanelProps> = ({
             <button
               onClick={sendMessage}
               disabled={!input.trim()}
-              className="p-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 disabled:opacity-40 disabled:cursor-not-allowed text-white transition-all shadow-sm hover:shadow flex-shrink-0"
+              className="p-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 disabled:opacity-40 disabled:cursor-not-allowed text-white transition-all shadow-sm hover:shadow-sm flex-shrink-0"
             >
               <Send size={16} />
             </button>
@@ -416,7 +416,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, messageIndex, tt
         className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
           isUser
             ? 'bg-brand-100 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400'
-            : 'bg-gradient-to-br from-brand-500 to-accent-500 text-white shadow-sm shadow-brand-500/20'
+            : 'bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-brand-600 dark:text-brand-400 shadow-sm'
         }`}
       >
         {isUser ? <User size={16} /> : <Bot size={16} />}

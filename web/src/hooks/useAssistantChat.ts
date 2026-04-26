@@ -1,5 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { apiClient, getToken } from '../api';
+import { apiClient, AIApi, Configuration, getToken } from '../api';
+
+const aiApi = new AIApi(new Configuration(), '', apiClient);
 
 // ============ 类型定义 ============
 
@@ -89,10 +91,8 @@ export function useAssistantChat(assistantId: string | undefined) {
         return;
       }
       // 获取全部会话，再根据 localStorage 映射过滤
-      const res = await apiClient.get('/api/ai/chat/sessions', {
-        params: { page: 0, size: 100 },
-      });
-      const data = res.data;
+      const res = await aiApi.listSessions({ page: 0, size: 100 });
+      const data = res.data as any;
       if (data?.code === 0 && Array.isArray(data?.data)) {
         const storedSet = new Set(storedIds);
         const filtered = data.data
@@ -133,8 +133,8 @@ export function useAssistantChat(assistantId: string | undefined) {
 
     setIsInitializing(true);
     try {
-      const res = await apiClient.get(`/api/ai/chat/sessions/${sessionId}`);
-      const data = res.data;
+      const res = await aiApi.getSessionDetail1({ sessionId: sessionId as unknown as number });
+      const data = res.data as any;
       if (data?.code === 0 && data?.data) {
         const detail = data.data;
         const session = detail.session;
@@ -159,7 +159,7 @@ export function useAssistantChat(assistantId: string | undefined) {
   /** 删除会话 */
   const deleteSession = useCallback(async (sessionId: string): Promise<boolean> => {
     try {
-      const res = await apiClient.delete(`/api/ai/chat/sessions/${sessionId}`);
+      const res = await aiApi.deleteSession1({ sessionId: sessionId as unknown as number });
       if (res.data?.code === 0) {
         setSessions(prev => prev.filter(s => String(s.sessionId) !== sessionId));
         if (assistantId) removeStoredSessionId(String(assistantId), sessionId);
@@ -477,8 +477,8 @@ export function useAssistantChat(assistantId: string | undefined) {
     const sid = currentSessionIdRef.current;
     if (!sid) return;
     try {
-      const res = await apiClient.get(`/api/ai/chat/sessions/${sid}`);
-      const data = res.data;
+      const res = await aiApi.getSessionDetail1({ sessionId: sid as unknown as number });
+      const data = res.data as any;
       if (data?.code === 0 && data?.data?.session?.title) {
         setSessionTitle(data.data.session.title);
         // 同步更新 sessions 列表中的标题

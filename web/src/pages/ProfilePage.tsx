@@ -491,7 +491,7 @@ const ProfilePage: React.FC = () => {
     }
     setSmsSending(true);
     try {
-      const res = await apiClient.post('/api/user/password/sms/send');
+      const res = await api.sendPasswordChangeCode();
       if (res.data?.code === 0) {
         toast.success('验证码已发送到当前绑定手机号');
         setSmsCountdown(60);
@@ -538,10 +538,12 @@ const ProfilePage: React.FC = () => {
 
     setPasswordSubmitting(true);
     try {
-      const res = await apiClient.post('/api/user/password/sms', {
-        smsCode: trimmedCode,
-        newPassword,
-        confirmPassword,
+      const res = await api.changePasswordBySms({
+        changePasswordBySmsRequest: {
+          smsCode: trimmedCode,
+          newPassword,
+          confirmPassword,
+        },
       });
       if (res.data?.code === 0) {
         toast.success('密码修改成功');
@@ -895,7 +897,7 @@ const ProfilePage: React.FC = () => {
                       </div>
                       <button
                         onClick={e => { e.stopPropagation(); handleUnfavCourse(course.id); }}
-                        className="flex-shrink-0 p-1.5 rounded-lg text-gray-300 dark:text-gray-600 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 opacity-0 group-hover:opacity-100 transition-all"
+                        className="flex-shrink-0 p-1.5 rounded-lg text-gray-300 dark:text-gray-600 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
                         title="取消收藏"
                       >
                         <HeartOff size={14} />
@@ -964,7 +966,7 @@ const ProfilePage: React.FC = () => {
                           {article?.coverImage ? (
                             <img src={article.coverImage} alt={article.title} className="w-full h-full object-cover" />
                           ) : (
-                            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-brand-50 to-accent-50 dark:from-brand-900/20 dark:to-accent-900/20">
+                            <div className="w-full h-full flex items-center justify-center bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700">
                               <BookOpen size={20} className="text-brand-300 dark:text-brand-600" />
                             </div>
                           )}
@@ -988,7 +990,7 @@ const ProfilePage: React.FC = () => {
                         </div>
                         <button
                           onClick={e => { e.stopPropagation(); handleUnfavArticle(item.articleId); }}
-                          className="flex-shrink-0 p-1.5 rounded-lg text-gray-300 dark:text-gray-600 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 opacity-0 group-hover:opacity-100 transition-all"
+                          className="flex-shrink-0 p-1.5 rounded-lg text-gray-300 dark:text-gray-600 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
                           title="取消收藏"
                         >
                           <HeartOff size={14} />
@@ -1050,7 +1052,7 @@ const ProfilePage: React.FC = () => {
                         </div>
                         <button
                           onClick={e => { e.stopPropagation(); handleUnfavWord(item.wordId); }}
-                          className="flex-shrink-0 p-1.5 rounded-lg text-gray-300 dark:text-gray-600 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 opacity-0 group-hover:opacity-100 transition-all"
+                          className="flex-shrink-0 p-1.5 rounded-lg text-gray-300 dark:text-gray-600 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
                           title="取消收藏"
                         >
                           <HeartOff size={14} />

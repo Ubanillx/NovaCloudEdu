@@ -268,7 +268,7 @@ const KBFormModal: React.FC<KBFormModalProps> = ({ isOpen, onClose, onSuccess, k
           <h3 className="text-lg font-bold text-gray-900 dark:text-white">
             {isEdit ? '编辑知识库' : '新建知识库'}
           </h3>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          <button onClick={onClose} aria-label="关闭" className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
             <X size={20} />
           </button>
         </div>
@@ -904,7 +904,7 @@ const AddDocumentModal: React.FC<AddDocumentModalProps> = ({ isOpen, onClose, on
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800">
           <h3 className="text-lg font-bold text-gray-900 dark:text-white">添加文档</h3>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          <button onClick={onClose} aria-label="关闭" className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
             <X size={20} />
           </button>
         </div>
@@ -1171,7 +1171,7 @@ const ChunkViewerModal: React.FC<ChunkViewerModalProps> = ({ isOpen, onClose, kn
               <p className="text-sm text-gray-500">共 {total} 个分块 · {doc.fileType} · {formatFileSize(doc.fileSize)}</p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-all">
+          <button onClick={onClose} aria-label="关闭" className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-all">
             <X size={20} />
           </button>
         </div>
@@ -1317,7 +1317,7 @@ const EditDocumentModal: React.FC<EditDocumentModalProps> = ({ isOpen, onClose, 
             </div>
             <h2 className="text-lg font-bold text-gray-900 dark:text-white">编辑文档信息</h2>
           </div>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-all">
+          <button onClick={onClose} aria-label="关闭" className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-all">
             <X size={20} />
           </button>
         </div>
@@ -1391,7 +1391,7 @@ const DocumentPanel: React.FC<DocumentPanelProps> = ({ knowledgeBase, onBack }) 
   const fetchDocStats = useCallback(async () => {
     if (!knowledgeBase.id) return;
     try {
-      const response = await apiClient.get(`/api/ai/knowledge-bases/${knowledgeBase.id}/document-stats`);
+      const response = await api.kbDocumentStats({ id: knowledgeBase.id as unknown as number });
       if (response.data.code === 0 && response.data.data) {
         setDocStats(response.data.data);
       }
@@ -1502,6 +1502,7 @@ const DocumentPanel: React.FC<DocumentPanelProps> = ({ knowledgeBase, onBack }) 
         <div className="flex items-center gap-4">
           <button
             onClick={onBack}
+            aria-label="返回知识库列表"
             className="p-2 text-gray-500 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded-xl transition-all"
           >
             <ArrowLeft size={22} />
@@ -1651,7 +1652,7 @@ const DocumentPanel: React.FC<DocumentPanelProps> = ({ knowledgeBase, onBack }) 
                         <span className="text-sm text-gray-600 dark:text-gray-300">{doc.chunkCount || 0}</span>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="flex items-center gap-1">
                           {doc.status === 'COMPLETED' && (doc.chunkCount ?? 0) > 0 && (
                             <button
                               onClick={() => setChunkViewDoc(doc)}
@@ -1868,7 +1869,7 @@ const ChunkPreviewModal: React.FC<ChunkPreviewModalProps> = ({ isOpen, onClose, 
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent-50 to-brand-50 dark:from-accent-900/20 dark:to-brand-900/20 flex items-center justify-center border border-accent-100 dark:border-accent-800">
+            <div className="w-10 h-10 rounded-xl bg-white dark:bg-gray-900 flex items-center justify-center border border-gray-200 dark:border-gray-700 shadow-sm">
               <Scissors size={20} className="text-accent-600 dark:text-accent-400" />
             </div>
             <div>
@@ -1876,7 +1877,7 @@ const ChunkPreviewModal: React.FC<ChunkPreviewModalProps> = ({ isOpen, onClose, 
               <p className="text-sm text-gray-500 dark:text-gray-400 truncate max-w-[400px]">{doc.name}</p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-all">
+          <button onClick={onClose} aria-label="关闭" className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-all">
             <X size={20} />
           </button>
         </div>
@@ -2134,7 +2135,7 @@ const RecallTestModal: React.FC<RecallTestModalProps> = ({ isOpen, onClose, know
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-50 to-accent-50 dark:from-brand-900/20 dark:to-accent-900/20 flex items-center justify-center border border-brand-100 dark:border-brand-800">
+            <div className="w-10 h-10 rounded-xl bg-white dark:bg-gray-900 flex items-center justify-center border border-gray-200 dark:border-gray-700 shadow-sm">
               <SearchCheck size={20} className="text-brand-600 dark:text-brand-400" />
             </div>
             <div>
@@ -2142,7 +2143,7 @@ const RecallTestModal: React.FC<RecallTestModalProps> = ({ isOpen, onClose, know
               <p className="text-sm text-gray-500 dark:text-gray-400">{knowledgeBase?.name}</p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-all">
+          <button onClick={onClose} aria-label="关闭" className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-all">
             <X size={20} />
           </button>
         </div>
@@ -2523,7 +2524,7 @@ export const KnowledgeBaseManagementPage: React.FC = () => {
               <div className="p-6 pb-4">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-brand-50 to-accent-50 dark:from-brand-900/20 dark:to-accent-900/20 flex items-center justify-center border border-brand-100 dark:border-brand-800">
+                    <div className="w-12 h-12 rounded-xl bg-white dark:bg-gray-900 flex items-center justify-center border border-gray-200 dark:border-gray-700 shadow-sm">
                       <Database size={22} className="text-brand-600 dark:text-brand-400" />
                     </div>
                     <div>
@@ -2533,7 +2534,7 @@ export const KnowledgeBaseManagementPage: React.FC = () => {
                       {getStatusBadge(kb.status)}
                     </div>
                   </div>
-                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
+                  <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
                     <button
                       onClick={() => setRecallTestKB(kb)}
                       className="p-1.5 text-gray-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded-lg transition-all"

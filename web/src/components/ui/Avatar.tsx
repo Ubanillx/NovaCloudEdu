@@ -46,7 +46,7 @@ export const Avatar: React.FC<AvatarProps> = ({
   const initial = name?.[0];
 
   return (
-    <div className={`${baseClasses} bg-gradient-to-br from-brand-100 to-brand-50 dark:from-brand-900/40 dark:to-brand-800/20 text-brand-600 dark:text-brand-400 flex items-center justify-center`}>
+    <div className={`${baseClasses} bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-brand-600 dark:text-brand-400 flex items-center justify-center`}>
       {initial ? (
         <span className="font-semibold">{initial}</span>
       ) : (

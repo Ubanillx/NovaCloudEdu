@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { 
+import {
   Search, 
   Plus, 
   Edit2, 
@@ -12,7 +12,7 @@ import {
   BookOpen,
   Calendar,
   Volume2,
-  Star,
+  Eye,
   FileText,
   Loader2
 } from 'lucide-react';
@@ -29,51 +29,16 @@ const DIFFICULTY_OPTIONS = [
   { value: 3, label: '困难', color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 border-red-200 dark:border-red-800' },
 ];
 
-// 分类选项
-const CATEGORY_OPTIONS = [
-  { value: '', label: '全部分类' },
-  { value: '小学三年级', label: '小学三年级' },
-  { value: '小学四年级', label: '小学四年级' },
-  { value: '小学五年级', label: '小学五年级' },
-  { value: '小学六年级', label: '小学六年级' },
-  { value: '初中七年级', label: '初中七年级' },
-  { value: '初中八年级', label: '初中八年级' },
-  { value: '初中九年级', label: '初中九年级' },
-  { value: '初中', label: '初中' },
-  { value: '初中(乱序)', label: '初中(乱序)' },
-  { value: '外研社初中', label: '外研社初中' },
-  { value: '高中', label: '高中' },
-  { value: '高中(乱序)', label: '高中(乱序)' },
-  { value: '北师高中', label: '北师高中' },
-  { value: '四级', label: '四级' },
-  { value: '四级(乱序)', label: '四级(乱序)' },
-  { value: '专四', label: '专四' },
-  { value: '专四(乱序)', label: '专四(乱序)' },
-  { value: '六级', label: '六级' },
-  { value: '六级(乱序)', label: '六级(乱序)' },
-  { value: '考研', label: '考研' },
-  { value: '考研(乱序)', label: '考研(乱序)' },
-  { value: '专八', label: '专八' },
-  { value: '专八(乱序)', label: '专八(乱序)' },
-  { value: '托福', label: '托福' },
-  { value: '雅思', label: '雅思' },
-  { value: '雅思(乱序)', label: '雅思(乱序)' },
-  { value: 'GRE', label: 'GRE' },
-  { value: 'GMAT', label: 'GMAT' },
-  { value: 'GMAT(乱序)', label: 'GMAT(乱序)' },
-  { value: 'SAT', label: 'SAT' },
-  { value: 'BEC商务英语', label: 'BEC商务英语' },
-];
-
 // 单词表单弹窗组件
 interface WordFormModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
   word?: DailyWordResponse | null;
+  categories: string[];
 }
 
-const WordFormModal: React.FC<WordFormModalProps> = ({ isOpen, onClose, onSuccess, word }) => {
+const WordFormModal: React.FC<WordFormModalProps> = ({ isOpen, onClose, onSuccess, word, categories }) => {
   const isEdit = !!word;
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<CreateDailyWordRequest>({
@@ -194,7 +159,7 @@ const WordFormModal: React.FC<WordFormModalProps> = ({ isOpen, onClose, onSucces
           <h3 className="text-lg font-bold text-gray-900 dark:text-white">
             {isEdit ? '编辑单词' : '新增单词'}
           </h3>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          <button onClick={onClose} aria-label="关闭" className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
             <X size={20} />
           </button>
         </div>
@@ -312,15 +277,18 @@ const WordFormModal: React.FC<WordFormModalProps> = ({ isOpen, onClose, onSucces
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">分类</label>
-              <select
+              <input
+                list="daily-word-category-options"
                 value={formData.category}
                 onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
                 className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all cursor-pointer"
-              >
-                {CATEGORY_OPTIONS.map(opt => (
-                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                placeholder="输入或选择分类"
+              />
+              <datalist id="daily-word-category-options">
+                {categories.map(category => (
+                  <option key={category} value={category} />
                 ))}
-              </select>
+              </datalist>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">发布日期 *</label>
@@ -388,7 +356,7 @@ const WordDetailModal: React.FC<WordDetailModalProps> = ({ isOpen, onClose, word
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800">
           <h3 className="text-lg font-bold text-gray-900 dark:text-white">单词详情</h3>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          <button onClick={onClose} aria-label="关闭" className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
             <X size={20} />
           </button>
         </div>
@@ -409,7 +377,10 @@ const WordDetailModal: React.FC<WordDetailModalProps> = ({ isOpen, onClose, word
                   <span className="text-xs text-gray-400">美</span>
                   <span className="text-gray-600 dark:text-gray-300">{word.pronunciationUs}</span>
                   {word.audioUrlUs && (
-                    <button className="p-1 text-brand-500 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded">
+                    <button
+                      className="p-1 text-brand-500 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded"
+                      aria-label="播放美式发音"
+                    >
                       <Volume2 size={16} />
                     </button>
                   )}
@@ -420,7 +391,10 @@ const WordDetailModal: React.FC<WordDetailModalProps> = ({ isOpen, onClose, word
                   <span className="text-xs text-gray-400">英</span>
                   <span className="text-gray-600 dark:text-gray-300">{word.pronunciationUk}</span>
                   {word.audioUrlUk && (
-                    <button className="p-1 text-brand-500 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded">
+                    <button
+                      className="p-1 text-brand-500 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded"
+                      aria-label="播放英式发音"
+                    >
                       <Volume2 size={16} />
                     </button>
                   )}
@@ -476,6 +450,7 @@ const WordDetailModal: React.FC<WordDetailModalProps> = ({ isOpen, onClose, word
 
 export const DailyWordManagementPage: React.FC = () => {
   const [words, setWords] = useState<DailyWordResponse[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -533,9 +508,24 @@ export const DailyWordManagementPage: React.FC = () => {
     }
   }, [queryParams]);
 
+  const fetchCategories = useCallback(async () => {
+    try {
+      const response = await api.listCategories();
+      if (response.data.code === 0) {
+        setCategories(response.data.data || []);
+      }
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || '获取单词分类失败');
+    }
+  }, []);
+
   useEffect(() => {
     fetchWords();
   }, [fetchWords]);
+
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -607,13 +597,14 @@ export const DailyWordManagementPage: React.FC = () => {
             />
           </div>
           <div className="flex flex-wrap items-center gap-3">
-            <select 
+            <select
               value={queryParams.category}
               onChange={(e) => setQueryParams(prev => ({ ...prev, category: e.target.value, page: 1 }))}
               className="px-4 py-2.5 bg-gray-50 dark:bg-gray-800/50 border border-transparent focus:border-brand-500/50 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 outline-none cursor-pointer"
             >
-              {CATEGORY_OPTIONS.map(opt => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              <option value="">全部分类</option>
+              {categories.map(category => (
+                <option key={category} value={category}>{category}</option>
               ))}
             </select>
             <select 
@@ -721,13 +712,13 @@ export const DailyWordManagementPage: React.FC = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="flex items-center gap-2">
                         <button 
                           onClick={() => { setViewingWord(word); setDetailModalOpen(true); }}
                           className="p-2 text-gray-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded-lg transition-all" 
                           title="查看详情"
                         >
-                          <Star size={18} />
+                          <Eye size={18} />
                         </button>
                         <button 
                           onClick={() => { setEditingWord(word); setModalOpen(true); }}
@@ -822,8 +813,12 @@ export const DailyWordManagementPage: React.FC = () => {
       <WordFormModal
         isOpen={modalOpen}
         onClose={() => { setModalOpen(false); setEditingWord(null); }}
-        onSuccess={fetchWords}
+        onSuccess={() => {
+          fetchWords();
+          fetchCategories();
+        }}
         word={editingWord}
+        categories={categories}
       />
 
       {/* 单词详情弹窗 */}

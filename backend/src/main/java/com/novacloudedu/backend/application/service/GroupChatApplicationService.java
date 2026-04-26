@@ -7,7 +7,6 @@ import com.novacloudedu.backend.domain.social.entity.GroupMessage;
 import com.novacloudedu.backend.domain.social.entity.GroupMessageRead;
 import com.novacloudedu.backend.domain.social.repository.*;
 import com.novacloudedu.backend.domain.social.valueobject.*;
-import com.novacloudedu.backend.interfaces.websocket.dto.NotificationEvent.EventType;
 import com.novacloudedu.backend.domain.user.entity.User;
 import com.novacloudedu.backend.domain.user.repository.UserRepository;
 import com.novacloudedu.backend.domain.user.valueobject.UserId;
@@ -65,7 +64,15 @@ public class GroupChatApplicationService {
         }
 
         // 创建消息
-        GroupMessageId replyTo = replyToId != null ? GroupMessageId.of(replyToId) : null;
+        GroupMessageId replyTo = null;
+        if (replyToId != null) {
+            GroupMessage quotedMessage = messageRepository.findById(GroupMessageId.of(replyToId))
+                    .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_ERROR, "引用消息不存在"));
+            if (!quotedMessage.getGroupId().equals(groupIdVo)) {
+                throw new BusinessException(ErrorCode.FORBIDDEN_ERROR, "不能引用当前群聊外的消息");
+            }
+            replyTo = quotedMessage.getId();
+        }
         GroupMessage message = GroupMessage.createUserMessage(groupIdVo, senderIdVo, content, type, replyTo);
 
         // 保存消息
@@ -82,12 +89,16 @@ public class GroupChatApplicationService {
                 .map(m -> m.getUserId().value())
                 .filter(uid -> !uid.equals(senderId))
                 .collect(Collectors.toList());
-        notificationService.notifyUsers(recipientIds, EventType.NEW_GROUP_MESSAGE, Map.of(
-                "groupId", groupId,
-                "groupName", group.getGroupName(),
-                "senderId", senderId,
-                "senderName", senderName
-        ));
+        notificationService.notifyNewGroupMessage(
+                recipientIds,
+                groupId,
+                group.getGroupName(),
+                senderId,
+                senderName,
+                savedMessage.getId().value(),
+                savedMessage.getContent(),
+                savedMessage.getType().getValue()
+        );
 
         return savedMessage;
     }
@@ -168,6 +179,17 @@ public class GroupChatApplicationService {
         }
 
         return readRepository.countUnreadMessages(groupIdVo, userIdVo);
+    }
+
+    /**
+     * 获取用户所有群聊未读消息数
+     */
+    public int getTotalUnreadCount(Long userId) {
+        UserId userIdVo = UserId.of(userId);
+        return memberRepository.findByUserId(userIdVo).stream()
+                .filter(m -> m.getMemberType() == MemberType.USER && m.getUserId() != null)
+                .mapToInt(m -> readRepository.countUnreadMessages(m.getGroupId(), userIdVo))
+                .sum();
     }
 
     /**

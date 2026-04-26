@@ -140,7 +140,7 @@ const AnnouncementFormModal: React.FC<AnnouncementFormModalProps> = ({ isOpen, o
           <h3 className="text-lg font-bold text-gray-900 dark:text-white">
             {isEdit ? '编辑公告' : '新增公告'}
           </h3>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          <button onClick={onClose} aria-label="关闭" className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
             <X size={20} />
           </button>
         </div>
@@ -458,11 +458,11 @@ export const AnnouncementManagementPage: React.FC = () => {
                   <tr key={item.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors group">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-4">
-                        <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-brand-50 to-accent-50 dark:from-gray-800 dark:to-gray-800 p-0.5 border border-gray-100 dark:border-gray-700 flex-shrink-0">
+                        <div className="w-16 h-16 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 flex-shrink-0 shadow-sm">
                           {item.coverImage ? (
                             <img src={item.coverImage} alt="" className="w-full h-full rounded-[10px] object-cover" />
                           ) : (
-                            <div className="w-full h-full rounded-[10px] flex items-center justify-center bg-white dark:bg-gray-900">
+                            <div className="w-full h-full rounded-[10px] flex items-center justify-center">
                               <Megaphone size={24} className="text-gray-400" />
                             </div>
                           )}
@@ -508,7 +508,7 @@ export const AnnouncementManagementPage: React.FC = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="flex items-center gap-2">
                         <button 
                           onClick={() => { setEditingAnnouncement(item); setModalOpen(true); }}
                           className="p-2 text-gray-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded-lg transition-all" 

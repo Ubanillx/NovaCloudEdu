@@ -37,6 +37,21 @@ public class ChatSessionResponse {
     private String partnerAvatar;
 
     /**
+     * 最后一条消息发送者ID
+     */
+    private Long lastMessageSenderId;
+
+    /**
+     * 最后一条消息内容
+     */
+    private String lastMessage;
+
+    /**
+     * 最后一条消息类型
+     */
+    private String lastMessageType;
+
+    /**
      * 最后消息时间
      */
     private LocalDateTime lastMessageTime;

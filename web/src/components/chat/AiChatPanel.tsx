@@ -219,7 +219,7 @@ const SessionSidebar: React.FC<SessionSidebarProps> = ({
                     </div>
                     <button
                       onClick={(e) => handleDelete(e, session)}
-                      className={`p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity ${
+                      className={`p-1 rounded ${
                         deletingId === String(session.sessionId)
                           ? 'opacity-100'
                           : 'hover:bg-red-50 dark:hover:bg-red-900/20 text-gray-400 hover:text-red-500'
@@ -286,14 +286,14 @@ const IntelligenceOverview: React.FC<OverviewProps> = ({
         <div className="grid grid-cols-2 gap-3">
           <button
             onClick={onViewHistory}
-            className="flex items-center justify-center gap-2.5 px-4 py-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-brand-300 dark:hover:border-brand-700 hover:shadow-md transition-all group"
+            className="flex items-center justify-center gap-2.5 px-4 py-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-brand-300 dark:hover:border-brand-700 hover:shadow-sm transition-all group"
           >
             <History size={20} className="text-brand-500 group-hover:scale-110 transition-transform" />
             <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">对话历史</span>
           </button>
           <button
             onClick={onStartChat}
-            className="flex items-center justify-center gap-2.5 px-4 py-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-brand-300 dark:hover:border-brand-700 hover:shadow-md transition-all group"
+            className="flex items-center justify-center gap-2.5 px-4 py-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-brand-300 dark:hover:border-brand-700 hover:shadow-sm transition-all group"
           >
             <MessageSquarePlus size={20} className="text-brand-500 group-hover:scale-110 transition-transform" />
             <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">新建对话</span>
@@ -321,7 +321,7 @@ const IntelligenceOverview: React.FC<OverviewProps> = ({
                     <div
                       key={String(a.id)}
                       onClick={() => onSelectAssistant(a)}
-                      className="flex flex-col items-center p-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all cursor-pointer"
+                      className="flex flex-col items-center p-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:shadow-sm transition-all cursor-pointer"
                     >
                       {a.avatarUrl ? (
                         <img src={a.avatarUrl} alt="" className="w-12 h-12 rounded-full object-cover mb-2.5 ring-2 ring-brand-100 dark:ring-brand-800" />
@@ -498,11 +498,11 @@ const PendingImagePreview: React.FC<{ file: File; onRemove: () => void }> = ({ f
     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 rounded-xl transition-colors" />
     <button
       onClick={onRemove}
-      className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
+      className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-red-500 text-white flex items-center justify-center shadow-sm"
     >
       <X size={10} />
     </button>
-    <span className="absolute bottom-1 left-1 right-1 text-[9px] text-white bg-black/50 backdrop-blur-sm rounded px-1 py-0.5 truncate opacity-0 group-hover:opacity-100 transition-opacity">
+    <span className="absolute bottom-1 left-1 right-1 text-[9px] text-white bg-black/50 backdrop-blur-sm rounded px-1 py-0.5 truncate">
       {file.name}
     </span>
   </div>
@@ -565,7 +565,7 @@ const ImageGenerationCard: React.FC<{ generation: ImageGeneration }> = ({ genera
           <img
             src={generation.url}
             alt={`AI生成: ${generation.prompt}`}
-            className="rounded-xl border border-gray-200 dark:border-gray-700 shadow-md hover:shadow-lg transition-shadow max-w-full"
+            className="rounded-xl border border-gray-200 dark:border-gray-700 shadow-md hover:shadow-sm transition-shadow max-w-full"
             loading="lazy"
           />
         </a>
@@ -710,6 +710,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const shouldAutoScrollRef = useRef(true);
   const [showScrollBtn, setShowScrollBtn] = useState(false);
   const [pendingImages, setPendingImages] = useState<File[]>([]);
   const [pendingDocs, setPendingDocs] = useState<File[]>([]);
@@ -718,16 +719,20 @@ const ChatArea: React.FC<ChatAreaProps> = ({
   const docInputRef = useRef<HTMLInputElement>(null);
   const voiceBaseInputRef = useRef('');
 
-  const scrollToBottom = useCallback(() => {
+  const scrollToBottom = useCallback((behavior: ScrollBehavior = 'auto') => {
     const container = messagesContainerRef.current;
     if (container) {
-      container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+      shouldAutoScrollRef.current = true;
+      setShowScrollBtn(false);
+      container.scrollTo({ top: container.scrollHeight, behavior });
     }
   }, []);
 
-  // 自动滚动
+  // 贴近底部时自动跟随流式输出；用户上拉后暂停自动滚动
   useEffect(() => {
-    scrollToBottom();
+    if (shouldAutoScrollRef.current) {
+      scrollToBottom('auto');
+    }
   }, [messages, streamingContent, scrollToBottom]);
 
   // 检测是否需要显示滚动按钮
@@ -736,7 +741,10 @@ const ChatArea: React.FC<ChatAreaProps> = ({
     if (!container) return;
     const handleScroll = () => {
       const { scrollTop, scrollHeight, clientHeight } = container;
-      setShowScrollBtn(scrollHeight - scrollTop - clientHeight > 100);
+      const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
+      const isNearBottom = distanceFromBottom <= 120;
+      shouldAutoScrollRef.current = isNearBottom;
+      setShowScrollBtn(!isNearBottom);
     };
     container.addEventListener('scroll', handleScroll);
     return () => container.removeEventListener('scroll', handleScroll);
@@ -757,6 +765,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
 
     setInput('');
     if (textareaRef.current) textareaRef.current.style.height = 'auto';
+    shouldAutoScrollRef.current = true;
 
     // 上传附件
     let imageUrls: string[] | undefined;
@@ -1035,8 +1044,8 @@ const ChatArea: React.FC<ChatAreaProps> = ({
         {/* 滚动到底部按钮 */}
         {showScrollBtn && (
           <button
-            onClick={scrollToBottom}
-            className="absolute bottom-4 right-4 p-2 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all text-gray-500 hover:text-brand-500"
+            onClick={() => scrollToBottom('smooth')}
+            className="absolute bottom-4 right-4 p-2 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-sm transition-all text-gray-500 hover:text-brand-500"
           >
             <ArrowDown size={18} />
           </button>
@@ -1059,7 +1068,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
 
         {/* 主输入容器 - 整合输入框和按钮 */}
         <div className="p-3">
-          <div className="flex items-end gap-2 bg-gray-50/80 dark:bg-gray-800/60 border border-gray-200/80 dark:border-gray-700/60 rounded-2xl p-2 shadow-sm hover:shadow-md transition-shadow focus-within:ring-2 focus-within:ring-brand-100 dark:focus-within:ring-brand-900/20 focus-within:border-brand-300">
+          <div className="flex items-end gap-2 bg-gray-50/80 dark:bg-gray-800/60 border border-gray-200/80 dark:border-gray-700/60 rounded-2xl p-2 shadow-sm hover:shadow-sm transition-shadow focus-within:ring-2 focus-within:ring-brand-100 dark:focus-within:ring-brand-900/20 focus-within:border-brand-300">
             {/* 左侧功能按钮组 */}
             <div className="flex items-center gap-0.5 shrink-0 pb-1">
               <button
@@ -1103,7 +1112,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
               {isLoading ? (
                 <button
                   onClick={onCancel}
-                  className="p-2.5 rounded-xl bg-red-500 hover:bg-red-600 text-white transition-all shadow-sm hover:shadow"
+                  className="p-2.5 rounded-xl bg-red-500 hover:bg-red-600 text-white transition-all shadow-sm hover:shadow-sm"
                   title="停止生成"
                 >
                   <Square size={16} fill="currentColor" />
@@ -1112,7 +1121,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
                 <button
                   onClick={handleSend}
                   disabled={!input.trim() || isUploading}
-                  className="p-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 disabled:opacity-40 disabled:cursor-not-allowed text-white transition-all shadow-sm hover:shadow"
+                  className="p-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 disabled:opacity-40 disabled:cursor-not-allowed text-white transition-all shadow-sm hover:shadow-sm"
                   title="发送"
                 >
                   {isUploading ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}

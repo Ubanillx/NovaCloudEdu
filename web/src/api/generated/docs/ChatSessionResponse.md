@@ -9,6 +9,9 @@ Name | Type | Description | Notes
 **partnerId** | **number** |  | [optional] [default to undefined]
 **partnerName** | **string** |  | [optional] [default to undefined]
 **partnerAvatar** | **string** |  | [optional] [default to undefined]
+**lastMessageSenderId** | **number** |  | [optional] [default to undefined]
+**lastMessage** | **string** |  | [optional] [default to undefined]
+**lastMessageType** | **string** |  | [optional] [default to undefined]
 **lastMessageTime** | **string** |  | [optional] [default to undefined]
 **unreadCount** | **number** |  | [optional] [default to undefined]
 
@@ -22,6 +25,9 @@ const instance: ChatSessionResponse = {
     partnerId,
     partnerName,
     partnerAvatar,
+    lastMessageSenderId,
+    lastMessage,
+    lastMessageType,
     lastMessageTime,
     unreadCount,
 };

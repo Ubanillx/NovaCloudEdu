@@ -24,6 +24,7 @@ import type {
   CreateQuestionRequest,
   UpdateQuestionRequest,
 } from '../../api/generated/models';
+import MarkdownRenderer from '../../components/chat/MarkdownRenderer';
 import { toast } from '../../components/ui';
 import { QUESTION_TYPE_OPTIONS, SUBJECT_OPTIONS, getQuestionTypeName, getSubjectName } from '../../constants/exam';
 
@@ -47,6 +48,196 @@ const DIFFICULTY_COLORS: Record<number, string> = {
   3: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
   4: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
   5: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+};
+
+type QuestionOption = {
+  label?: string;
+  text?: string;
+};
+
+const FORMULA_RENDER_CLASS = 'prose prose-sm dark:prose-invert max-w-none leading-relaxed prose-p:my-0 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5 prose-table:my-1 prose-pre:my-2 prose-code:before:content-none prose-code:after:content-none [&_.katex]:text-inherit [&_.katex-display]:my-2 [&_.katex-display]:overflow-x-auto';
+
+const parseQuestionOptions = (options?: string | null): QuestionOption[] => {
+  if (!options?.trim()) return [];
+  try {
+    const parsed = JSON.parse(options);
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .map((item, index) => ({
+        label: typeof item?.label === 'string' && item.label.trim()
+          ? item.label
+          : String.fromCharCode(65 + index),
+        text: typeof item?.text === 'string' ? item.text : '',
+      }))
+      .filter(item => item.text.trim());
+  } catch {
+    return [];
+  }
+};
+
+const QuestionFormulaText: React.FC<{
+  content?: string | null;
+  className?: string;
+}> = ({ content, className = '' }) => {
+  if (!content?.trim()) return null;
+  return (
+    <MarkdownRenderer
+      content={content}
+      className={`${FORMULA_RENDER_CLASS} ${className}`}
+    />
+  );
+};
+
+const QuestionOptionsPreview: React.FC<{
+  options: QuestionOption[];
+  compact?: boolean;
+}> = ({ options, compact = false }) => {
+  const visibleOptions = options.filter(opt => opt.text?.trim());
+  if (visibleOptions.length === 0) return null;
+
+  return (
+    <div className={compact ? 'mt-2 space-y-1.5' : 'space-y-2'}>
+      {visibleOptions.map((opt, index) => (
+        <div key={`${opt.label || index}-${index}`} className="flex items-start gap-2 min-w-0">
+          <span className={`${compact ? 'mt-0.5 w-5 h-5 text-[11px]' : 'mt-0.5 w-6 h-6 text-xs'} flex items-center justify-center rounded-md bg-brand-50 dark:bg-brand-900/20 text-brand-600 dark:text-brand-400 font-bold shrink-0`}>
+            {opt.label || String.fromCharCode(65 + index)}
+          </span>
+          <QuestionFormulaText
+            content={opt.text}
+            className={`min-w-0 flex-1 ${compact ? 'text-xs text-gray-600 dark:text-gray-400' : 'text-sm text-gray-700 dark:text-gray-300'}`}
+          />
+        </div>
+      ))}
+    </div>
+  );
+};
+
+const FormulaPreviewBlock: React.FC<{
+  label: string;
+  content?: string | null;
+}> = ({ label, content }) => {
+  if (!content?.trim()) return null;
+  return (
+    <div className="mt-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/70 dark:bg-gray-800/40 px-3 py-2.5">
+      <div className="mb-1.5 text-xs font-semibold text-gray-400 dark:text-gray-500">{label}</div>
+      <QuestionFormulaText content={content} className="text-sm text-gray-800 dark:text-gray-200" />
+    </div>
+  );
+};
+
+const QuestionInfoTooltip: React.FC<{
+  question: QuestionResponse;
+  children: React.ReactNode;
+}> = ({ question, children }) => {
+  const [visible, setVisible] = useState(false);
+  const [position, setPosition] = useState<{
+    left: number;
+    top: number;
+    width: number;
+    placement: 'top' | 'bottom';
+  }>({ left: 0, top: 0, width: 520, placement: 'bottom' });
+
+  const options = parseQuestionOptions(question.options as string | undefined);
+  const tags = question.knowledgeTags || [];
+  const grade = (question as any).grade as string | undefined;
+
+  const showTooltip = (event: React.MouseEvent<HTMLDivElement> | React.FocusEvent<HTMLDivElement>) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    const width = Math.min(520, window.innerWidth - 24);
+    const left = Math.min(Math.max(12, rect.left), window.innerWidth - width - 12);
+    const placement = rect.top > window.innerHeight * 0.48 ? 'top' : 'bottom';
+
+    setPosition({
+      left,
+      width,
+      placement,
+      top: placement === 'top' ? rect.top - 10 : rect.bottom + 10,
+    });
+    setVisible(true);
+  };
+
+  const hideTooltip = () => setVisible(false);
+
+  return (
+    <>
+      <div
+        tabIndex={0}
+        onMouseEnter={showTooltip}
+        onMouseLeave={hideTooltip}
+        onFocus={showTooltip}
+        onBlur={hideTooltip}
+        className="outline-none focus-visible:ring-2 focus-visible:ring-brand-500/30 rounded-lg"
+      >
+        {children}
+      </div>
+      {visible && (
+        <div
+          className="fixed z-[9999] pointer-events-none rounded-xl border border-gray-200 dark:border-gray-700 bg-white/95 dark:bg-gray-900/95 px-4 py-3 text-sm shadow-2xl shadow-gray-900/15 dark:shadow-black/30 animate-in fade-in zoom-in-95 duration-150"
+          style={{
+            left: position.left,
+            top: position.top,
+            width: position.width,
+            transform: position.placement === 'top' ? 'translateY(-100%)' : undefined,
+          }}
+        >
+          <div className="mb-2 flex flex-wrap items-center gap-1.5">
+            <span className="px-2 py-0.5 rounded-md bg-brand-50 text-brand-700 dark:bg-brand-900/30 dark:text-brand-300 text-xs font-bold">
+              {question.typeDesc || getQuestionTypeName(question.type || '')}
+            </span>
+            <span className="px-2 py-0.5 rounded-md bg-purple-50 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 text-xs font-bold">
+              {question.subjectDesc || getSubjectName(question.subject || '')}
+            </span>
+            <span className={`px-2 py-0.5 rounded-md text-xs font-bold ${DIFFICULTY_COLORS[question.difficulty || 3] || ''}`}>
+              {question.difficultyDesc || `难度${question.difficulty || 3}`}
+            </span>
+            {grade && (
+              <span className="px-2 py-0.5 rounded-md bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300 text-xs font-bold">
+                {grade}
+              </span>
+            )}
+          </div>
+
+          <div className="max-h-[60vh] overflow-hidden space-y-3">
+            <div>
+              <div className="mb-1 text-xs font-semibold text-gray-400 dark:text-gray-500">题干</div>
+              <QuestionFormulaText content={question.content} className="text-sm text-gray-900 dark:text-gray-100" />
+            </div>
+
+            {options.length > 0 && (
+              <div>
+                <div className="mb-1 text-xs font-semibold text-gray-400 dark:text-gray-500">选项</div>
+                <QuestionOptionsPreview options={options} />
+              </div>
+            )}
+
+            {question.answer?.trim() && (
+              <div>
+                <div className="mb-1 text-xs font-semibold text-gray-400 dark:text-gray-500">答案</div>
+                <QuestionFormulaText content={question.answer} className="text-sm text-gray-800 dark:text-gray-200" />
+              </div>
+            )}
+
+            {question.explanation?.trim() && (
+              <div>
+                <div className="mb-1 text-xs font-semibold text-gray-400 dark:text-gray-500">解析</div>
+                <QuestionFormulaText content={question.explanation} className="text-sm text-gray-700 dark:text-gray-300" />
+              </div>
+            )}
+
+            {tags.length > 0 && (
+              <div className="flex flex-wrap gap-1">
+                {tags.map((tag, index) => (
+                  <span key={`${tag}-${index}`} className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400">
+                    <Tag size={10} /> {tag}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </>
+  );
 };
 
 export const QuestionManagementPage: React.FC = () => {
@@ -469,49 +660,61 @@ export const QuestionManagementPage: React.FC = () => {
                   </tr>
                 ))
               ) : questions.length > 0 ? (
-                questions.map((q) => (
-                  <tr key={String(q.id)} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors group">
-                    <td className="px-6 py-4">
-                      <p className="font-medium text-gray-900 dark:text-white group-hover:text-brand-600 transition-colors line-clamp-2 text-sm leading-relaxed">
-                        {q.content}
-                      </p>
-                      {(q.knowledgeTags || []).length > 0 && (
-                        <div className="flex flex-wrap gap-1 mt-1.5">
-                          {(q.knowledgeTags || []).slice(0, 3).map((tag, i) => (
-                            <span key={i} className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400">
-                              <Tag size={10} /> {tag}
-                            </span>
-                          ))}
+                questions.map((q) => {
+                  const options = parseQuestionOptions(q.options as string | undefined);
+
+                  return (
+                    <tr key={String(q.id)} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors group">
+                      <td className="px-6 py-4">
+                        <QuestionInfoTooltip question={q}>
+                          <div className="cursor-help">
+                            <div className="max-h-28 overflow-hidden">
+                              <QuestionFormulaText
+                                content={q.content}
+                                className="font-medium text-gray-900 dark:text-white group-hover:text-brand-600 transition-colors text-sm"
+                              />
+                              <QuestionOptionsPreview options={options.slice(0, 4)} compact />
+                            </div>
+                            {(q.knowledgeTags || []).length > 0 && (
+                              <div className="flex flex-wrap gap-1 mt-1.5">
+                                {(q.knowledgeTags || []).slice(0, 3).map((tag, i) => (
+                                  <span key={i} className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400">
+                                    <Tag size={10} /> {tag}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </QuestionInfoTooltip>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="px-2.5 py-1 rounded-lg text-xs font-bold border bg-brand-100 text-brand-700 dark:bg-brand-900/30 dark:text-brand-400 border-brand-200 dark:border-brand-800">
+                          {q.typeDesc || typeLabel(q.type || '')}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="px-2.5 py-1 rounded-lg text-xs font-bold border bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 border-purple-200 dark:border-purple-800">
+                          {q.subjectDesc || subjectLabel(q.subject || '')}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className={`px-2.5 py-1 rounded-lg text-xs font-bold ${DIFFICULTY_COLORS[q.difficulty || 3] || ''}`}>
+                          {q.difficultyDesc || `难度${q.difficulty}`}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-2">
+                          <button onClick={() => handleEdit(q)} className="p-2 text-gray-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded-lg transition-all" title="编辑">
+                            <Edit2 size={18} />
+                          </button>
+                          <button onClick={() => handleDelete(q.id as unknown as number)} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all" title="删除">
+                            <Trash2 size={18} />
+                          </button>
                         </div>
-                      )}
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="px-2.5 py-1 rounded-lg text-xs font-bold border bg-brand-100 text-brand-700 dark:bg-brand-900/30 dark:text-brand-400 border-brand-200 dark:border-brand-800">
-                        {q.typeDesc || typeLabel(q.type || '')}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="px-2.5 py-1 rounded-lg text-xs font-bold border bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 border-purple-200 dark:border-purple-800">
-                        {q.subjectDesc || subjectLabel(q.subject || '')}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className={`px-2.5 py-1 rounded-lg text-xs font-bold ${DIFFICULTY_COLORS[q.difficulty || 3] || ''}`}>
-                        {q.difficultyDesc || `难度${q.difficulty}`}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onClick={() => handleEdit(q)} className="p-2 text-gray-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded-lg transition-all" title="编辑">
-                          <Edit2 size={18} />
-                        </button>
-                        <button onClick={() => handleDelete(q.id as unknown as number)} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all" title="删除">
-                          <Trash2 size={18} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
+                      </td>
+                    </tr>
+                  );
+                })
               ) : (
                 <tr>
                   <td colSpan={5} className="px-6 py-12 text-center">
@@ -558,8 +761,8 @@ export const QuestionManagementPage: React.FC = () => {
           <div className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-3xl mx-4 max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center">
-                  <Sparkles size={20} className="text-white" />
+                <div className="w-10 h-10 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 flex items-center justify-center shadow-sm">
+                  <Sparkles size={20} className="text-brand-600 dark:text-brand-400" />
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-gray-900 dark:text-white">AI 智能出题</h3>
@@ -713,49 +916,72 @@ export const QuestionManagementPage: React.FC = () => {
                     </div>
                   )}
 
-                  {aiResults.map((r, i) => (
-                    <div key={i} className={`p-4 rounded-xl border transition-all duration-300 ${
-                      r.status === 'saved'
-                        ? 'border-green-200 bg-green-50/50 dark:border-green-800 dark:bg-green-900/10 animate-in fade-in slide-in-from-bottom-2 duration-300'
-                        : r.status === 'error'
-                          ? 'border-red-200 bg-red-50/50 dark:border-red-800 dark:bg-red-900/10'
-                          : 'border-brand-200 bg-brand-50/30 dark:border-brand-800 dark:bg-brand-900/10 animate-pulse'
-                    }`}>
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className={`text-xs font-bold ${r.status === 'generating' ? 'text-brand-600' : 'text-gray-500'}`}>#{r.index}</span>
-                            {r.status === 'saved' && <CheckCircle size={14} className="text-green-500" />}
-                            {r.status === 'generating' && <Loader2 size={14} className="text-brand-500 animate-spin" />}
-                            {r.status === 'error' && <AlertCircle size={14} className="text-red-500" />}
-                            {r.status === 'generating' && (
-                              <span className="text-xs text-brand-500 font-medium">保存中...</span>
+                  {aiResults.map((r, i) => {
+                    const resultOptions = parseQuestionOptions(r.options);
+
+                    return (
+                      <div key={i} className={`p-4 rounded-xl border transition-all duration-300 ${
+                        r.status === 'saved'
+                          ? 'border-green-200 bg-green-50/50 dark:border-green-800 dark:bg-green-900/10 animate-in fade-in slide-in-from-bottom-2 duration-300'
+                          : r.status === 'error'
+                            ? 'border-red-200 bg-red-50/50 dark:border-red-800 dark:bg-red-900/10'
+                            : 'border-brand-200 bg-brand-50/30 dark:border-brand-800 dark:bg-brand-900/10 animate-pulse'
+                      }`}>
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-2">
+                              <span className={`text-xs font-bold ${r.status === 'generating' ? 'text-brand-600' : 'text-gray-500'}`}>#{r.index}</span>
+                              {r.status === 'saved' && <CheckCircle size={14} className="text-green-500" />}
+                              {r.status === 'generating' && <Loader2 size={14} className="text-brand-500 animate-spin" />}
+                              {r.status === 'error' && <AlertCircle size={14} className="text-red-500" />}
+                              {r.status === 'generating' && (
+                                <span className="text-xs text-brand-500 font-medium">保存中...</span>
+                              )}
+                            </div>
+                            {r.status === 'error' ? (
+                              <p className="text-sm text-red-600">{r.error}</p>
+                            ) : (
+                              <>
+                                <div className="max-h-40 overflow-y-auto pr-1">
+                                  <QuestionFormulaText
+                                    content={r.content}
+                                    className={`text-sm ${r.status === 'generating' ? 'text-gray-600 dark:text-gray-400' : 'text-gray-900 dark:text-white'}`}
+                                  />
+                                  {resultOptions.length > 0 && (
+                                    <QuestionOptionsPreview options={resultOptions} compact />
+                                  )}
+                                </div>
+                                {r.status === 'saved' && (
+                                  <>
+                                    {r.imageUrl && (
+                                      <img src={r.imageUrl} alt="题目配图" className="mt-2 max-h-32 rounded-lg border border-gray-200 dark:border-gray-700" />
+                                    )}
+                                    <div className="mt-3 space-y-2">
+                                      {r.answer && (
+                                        <div className="flex items-start gap-2 text-xs text-gray-500">
+                                          <span className="shrink-0 font-medium">答案:</span>
+                                          <QuestionFormulaText content={r.answer} className="min-w-0 flex-1 text-xs text-gray-600 dark:text-gray-400" />
+                                        </div>
+                                      )}
+                                      {r.explanation && (
+                                        <div className="flex items-start gap-2 text-xs text-gray-500">
+                                          <span className="shrink-0 font-medium">解析:</span>
+                                          <QuestionFormulaText content={r.explanation} className="min-w-0 flex-1 text-xs text-gray-600 dark:text-gray-400" />
+                                        </div>
+                                      )}
+                                      {r.knowledgeTags && r.knowledgeTags.length > 0 && (
+                                        <div className="text-xs text-gray-500">标签: {r.knowledgeTags.join(', ')}</div>
+                                      )}
+                                    </div>
+                                  </>
+                                )}
+                              </>
                             )}
                           </div>
-                          {r.status === 'error' ? (
-                            <p className="text-sm text-red-600">{r.error}</p>
-                          ) : (
-                            <>
-                              <p className={`text-sm line-clamp-2 ${r.status === 'generating' ? 'text-gray-600 dark:text-gray-400' : 'text-gray-900 dark:text-white'}`}>{r.content}</p>
-                              {r.status === 'saved' && (
-                                <>
-                                  {r.imageUrl && (
-                                    <img src={r.imageUrl} alt="题目配图" className="mt-2 max-h-32 rounded-lg border border-gray-200 dark:border-gray-700" />
-                                  )}
-                                  <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
-                                    {r.answer && <span>答案: {r.answer}</span>}
-                                    {r.knowledgeTags && r.knowledgeTags.length > 0 && (
-                                      <span>标签: {r.knowledgeTags.join(', ')}</span>
-                                    )}
-                                  </div>
-                                </>
-                              )}
-                            </>
-                          )}
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -805,6 +1031,7 @@ export const QuestionManagementPage: React.FC = () => {
                 <textarea rows={4} value={form.content} onChange={e => setForm(f => ({ ...f, content: e.target.value }))}
                   className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all resize-none"
                   placeholder="输入题干内容..." />
+                <FormulaPreviewBlock label="题干预览" content={form.content} />
               </div>
 
               {/* 选项（仅选择题） */}
@@ -840,6 +1067,12 @@ export const QuestionManagementPage: React.FC = () => {
                       </button>
                     )}
                   </div>
+                  {form.options.some(opt => opt.text.trim()) && (
+                    <div className="mt-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/70 dark:bg-gray-800/40 px-3 py-2.5">
+                      <div className="mb-1.5 text-xs font-semibold text-gray-400 dark:text-gray-500">选项预览</div>
+                      <QuestionOptionsPreview options={form.options} />
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -849,6 +1082,7 @@ export const QuestionManagementPage: React.FC = () => {
                 <textarea rows={2} value={form.answer} onChange={e => setForm(f => ({ ...f, answer: e.target.value }))}
                   className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all resize-none"
                   placeholder={isChoiceType ? '如：A 或 ABD' : '输入标准答案...'} />
+                <FormulaPreviewBlock label="答案预览" content={form.answer} />
               </div>
 
               {/* 解析 */}
@@ -857,6 +1091,7 @@ export const QuestionManagementPage: React.FC = () => {
                 <textarea rows={3} value={form.explanation} onChange={e => setForm(f => ({ ...f, explanation: e.target.value }))}
                   className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all resize-none"
                   placeholder="输入解析（可选）..." />
+                <FormulaPreviewBlock label="解析预览" content={form.explanation} />
               </div>
 
               {/* 知识点标签 */}

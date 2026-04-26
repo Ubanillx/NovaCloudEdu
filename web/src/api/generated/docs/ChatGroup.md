@@ -20,9 +20,9 @@ Name | Type | Description | Notes
 **announcementTime** | **string** |  | [optional] [default to undefined]
 **createTime** | **string** |  | [optional] [default to undefined]
 **updateTime** | **string** |  | [optional] [default to undefined]
-**full** | **boolean** |  | [optional] [default to undefined]
 **mute** | **boolean** |  | [optional] [default to undefined]
 **_delete** | **boolean** |  | [optional] [default to undefined]
+**full** | **boolean** |  | [optional] [default to undefined]
 
 ## Example
 
@@ -45,9 +45,9 @@ const instance: ChatGroup = {
     announcementTime,
     createTime,
     updateTime,
-    full,
     mute,
     _delete,
+    full,
 };
 ```
 

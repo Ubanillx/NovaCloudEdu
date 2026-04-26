@@ -2,11 +2,18 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   PenSquare, Search, ThumbsUp, MessageCircle, Star, Clock, TrendingUp,
-  Users, Flame, User, X, ChevronRight,
+  Users, Flame, User, X, ChevronRight, MapPin,
 } from 'lucide-react';
 import { apiClient, DefaultApi, Configuration } from '../api';
 import type { PostResponse, UserPublicResponse } from '../api/generated/models';
 import toast from '../components/ui/Toast';
+import {
+  getLocalIpRegionText,
+  loadStoredIpRegionCache,
+  lookupIpRegions,
+  saveStoredIpRegionCache,
+} from '../utils/ipLocation';
+import { getPostTypeLabel } from '../constants/postTypes';
 
 const api = new DefaultApi(new Configuration(), '', apiClient);
 
@@ -26,6 +33,35 @@ const formatTime = (dateStr?: string) => {
   return `${time.getMonth() + 1}月${time.getDate()}日`;
 };
 
+const decodeHtmlEntities = (text: string) => {
+  if (typeof document === 'undefined') return text;
+  const textarea = document.createElement('textarea');
+  textarea.innerHTML = text;
+  return textarea.value;
+};
+
+const stripPostContent = (content?: string) => {
+  if (!content) return '';
+
+  const hasHtmlTags = /<\/?[a-z][\s\S]*>/i.test(content);
+  const plainText = hasHtmlTags
+    ? decodeHtmlEntities(content.replace(/<style[\s\S]*?<\/style>/gi, ' ')
+      .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+      .replace(/<[^>]+>/g, ' '))
+    : content;
+
+  return plainText
+    .replace(/!\[[^\]]*]\([^)]+\)/g, ' ')
+    .replace(/\[([^\]]+)]\([^)]+\)/g, '$1')
+    .replace(/[#*`>_[\]!()-]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+};
+
+const normalizeTags = (tags?: string[]) => (
+  Array.from(new Set((tags || []).map(tag => tag.trim()).filter(Boolean))).slice(0, 3)
+);
+
 // 用户头像组件
 const UserAvatar: React.FC<{ user?: UserPublicResponse | null; size?: 'sm' | 'md' | 'lg' }> = ({ user, size = 'sm' }) => {
   const sizeMap = {
@@ -40,7 +76,7 @@ const UserAvatar: React.FC<{ user?: UserPublicResponse | null; size?: 'sm' | 'md
     return <img src={user.userAvatar} alt="" className={`${sizeClass} rounded-xl object-cover ring-2 ring-white dark:ring-gray-800 shadow-sm`} />;
   }
   return (
-    <div className={`${sizeClass} rounded-xl bg-gradient-to-br from-brand-100 to-brand-50 dark:from-brand-900/40 dark:to-brand-800/20 text-brand-600 dark:text-brand-400 flex items-center justify-center shadow-inner`}>
+    <div className={`${sizeClass} rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-brand-600 dark:text-brand-400 flex items-center justify-center shadow-sm`}>
       <User size={iconSize} />
     </div>
   );
@@ -112,6 +148,10 @@ const CirclePage: React.FC = () => {
   const [userInfoCache, setUserInfoCache] = useState<Record<number, UserPublicResponse>>({});
   const loadingUsers = useRef<Set<number>>(new Set());
 
+  // IP 归属地缓存
+  const [ipRegionCache, setIpRegionCache] = useState<Record<string, string>>(() => loadStoredIpRegionCache());
+  const loadingIpRegions = useRef<Set<string>>(new Set());
+
   const loadUserInfo = useCallback(async (userId: number) => {
     if (loadingUsers.current.has(userId)) return;
     loadingUsers.current.add(userId);
@@ -122,6 +162,33 @@ const CirclePage: React.FC = () => {
       }
     } catch { /* silent */ }
   }, []);
+
+  const loadIpRegions = useCallback(async (ips: string[]) => {
+    const pendingIps = Array.from(new Set(ips.map(ip => ip.trim()).filter(Boolean)))
+      .filter(ip => !ipRegionCache[ip] && !loadingIpRegions.current.has(ip));
+    if (pendingIps.length === 0) return;
+
+    pendingIps.forEach(ip => loadingIpRegions.current.add(ip));
+    try {
+      const result = await lookupIpRegions(pendingIps);
+      setIpRegionCache(prev => {
+        const next = { ...prev, ...result };
+        saveStoredIpRegionCache(next);
+        return next;
+      });
+    } catch {
+      setIpRegionCache(prev => {
+        const next = { ...prev };
+        pendingIps.forEach(ip => {
+          next[ip] = getLocalIpRegionText(ip) || '未知地区';
+        });
+        saveStoredIpRegionCache(next);
+        return next;
+      });
+    } finally {
+      pendingIps.forEach(ip => loadingIpRegions.current.delete(ip));
+    }
+  }, [ipRegionCache]);
 
   // ==================== 推荐帖子 ====================
   const loadPosts = useCallback(async () => {
@@ -316,6 +383,16 @@ const CirclePage: React.FC = () => {
     }
   }, [showSearch]);
 
+  useEffect(() => {
+    const ipSet = new Set<string>();
+    [...posts, ...followingPosts, ...topPosts, ...searchResults, ...sidebarTopPosts].forEach(post => {
+      const ip = post.ipAddress?.trim();
+      if (ip) ipSet.add(ip);
+    });
+
+    void loadIpRegions(Array.from(ipSet));
+  }, [posts, followingPosts, topPosts, searchResults, sidebarTopPosts, loadIpRegions]);
+
   // 滚动加载
   const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
     const el = e.currentTarget;
@@ -342,11 +419,16 @@ const CirclePage: React.FC = () => {
     }
     const hasThumb = thumbStatus[post.id!] ?? false;
     const hasFavour = favourStatus[post.id!] ?? false;
+    const excerpt = stripPostContent(post.content).slice(0, 200);
+    const tags = normalizeTags(post.tags);
+    const postTypeLabel = getPostTypeLabel(post.postType);
+    const ip = post.ipAddress?.trim();
+    const ipRegionText = ip ? (ipRegionCache[ip] || getLocalIpRegionText(ip) || '查询中') : '';
 
     return (
       <div
         key={post.id}
-        className="bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 p-4 hover:shadow-lg dark:hover:shadow-brand-900/10 transition-all duration-300 cursor-pointer group relative overflow-hidden"
+        className="bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 p-4 hover:shadow-sm dark:hover:shadow-brand-900/10 transition-all duration-300 cursor-pointer group relative overflow-hidden"
         onClick={() => navigate(`/circle/post/${post.id}`)}
       >
         <div className="absolute top-0 right-0 w-20 h-20 bg-brand-500/5 rounded-full -mr-10 -mt-10 group-hover:scale-150 transition-transform duration-700" />
@@ -359,13 +441,22 @@ const CirclePage: React.FC = () => {
               {user?.userName || `用户${post.userId || ''}`}
             </p>
             <div className="flex items-center gap-2 mt-0.5">
+              {postTypeLabel && (
+                <span className="rounded-md bg-emerald-50 px-1.5 py-0.5 text-[10px] font-bold text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-300">
+                  {postTypeLabel}
+                </span>
+              )}
               <span className="text-[11px] font-medium text-gray-400 dark:text-gray-500 flex items-center gap-1">
                 <Clock size={11} />
                 {formatTime(post.createTime)}
               </span>
-              {post.ipAddress && (
-                <span className="text-[10px] text-gray-300 dark:text-gray-600 font-medium">
-                  IP: {post.ipAddress}
+              {ipRegionText && (
+                <span
+                  className="inline-flex items-center gap-0.5 text-[10px] text-gray-400 dark:text-gray-500 font-medium"
+                  title={post.ipAddress ? `IP: ${post.ipAddress}` : undefined}
+                >
+                  <MapPin size={10} />
+                  IP属地：{ipRegionText}
                 </span>
               )}
             </div>
@@ -378,24 +469,28 @@ const CirclePage: React.FC = () => {
         </h3>
 
         {/* 内容摘要 */}
-        <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed line-clamp-3 mb-3 font-medium opacity-80">
-          {post.content?.replace(/[#*`>\-\[\]!()]/g, '').substring(0, 200)}
-        </p>
+        {excerpt && (
+          <p className="text-sm text-gray-500 dark:text-gray-400 leading-6 line-clamp-3 mb-3 font-medium">
+            {excerpt}
+          </p>
+        )}
 
         {/* 标签 */}
-        {post.tags && post.tags.length > 0 && post.tags.some(t => t) && (
-          <div className="flex flex-wrap gap-1.5 mb-4">
-            {post.tags.filter(t => t).slice(0, 3).map(tag => (
+        {tags.length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-4">
+            {tags.map(tag => (
               <span
                 key={tag}
-                className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-bold bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 border border-gray-100 dark:border-gray-700 hover:bg-brand-50 hover:text-brand-600 hover:border-brand-100 transition-all"
+                className="inline-flex h-6 max-w-full items-center gap-0.5 rounded-full border border-brand-100/70 bg-brand-50/70 px-2.5 text-[11px] font-semibold text-brand-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.55)] transition-colors hover:border-brand-200 hover:bg-brand-100/80 dark:border-brand-800/50 dark:bg-brand-950/30 dark:text-brand-300 dark:hover:bg-brand-900/40"
+                title={`#${tag}`}
                 onClick={(e) => {
                   e.stopPropagation();
                   setSearchKeyword(`#${tag}`);
                   setShowSearch(true);
                 }}
               >
-                #{tag}
+                <span className="text-brand-400 dark:text-brand-500">#</span>
+                <span className="truncate">{tag}</span>
               </span>
             ))}
           </div>
@@ -446,15 +541,15 @@ const CirclePage: React.FC = () => {
   // ==================== 渲染热榜卡片 ====================
   const renderTopPostCard = (post: PostResponse, rank: number) => {
     const rankColors = rank <= 3
-      ? ['bg-gradient-to-br from-rose-500 to-rose-600 text-white shadow-lg shadow-rose-500/20', 
-         'bg-gradient-to-br from-orange-400 to-orange-500 text-white shadow-lg shadow-orange-400/20', 
-         'bg-gradient-to-br from-amber-400 to-amber-500 text-white shadow-lg shadow-amber-400/20'][rank - 1]
+      ? ['bg-white dark:bg-gray-900 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800 shadow-sm',
+         'bg-white dark:bg-gray-900 text-orange-600 dark:text-orange-400 border border-orange-200 dark:border-orange-800 shadow-sm',
+         'bg-white dark:bg-gray-900 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800 shadow-sm'][rank - 1]
       : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400';
 
     return (
       <div
         key={post.id}
-        className="flex items-center gap-3 bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 p-3 hover:shadow-md hover:translate-x-0.5 transition-all duration-300 cursor-pointer group"
+        className="flex items-center gap-3 bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 p-3 hover:shadow-sm hover:translate-x-0.5 transition-all duration-300 cursor-pointer group"
         onClick={() => navigate(`/circle/post/${post.id}`)}
       >
         <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-black flex-shrink-0 ${rankColors}`}>

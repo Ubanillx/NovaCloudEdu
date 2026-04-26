@@ -192,7 +192,7 @@ const BannerFormModal: React.FC<BannerFormModalProps> = ({ isOpen, onClose, onSu
           <h3 className="text-lg font-bold text-gray-900 dark:text-white">
             {isEdit ? '编辑轮播图' : '新增轮播图'}
           </h3>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          <button onClick={onClose} aria-label="关闭" className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
             <X size={20} />
           </button>
         </div>
@@ -599,7 +599,7 @@ export const BannerManagementPage: React.FC = () => {
                     {item.sort || 0}
                   </div>
                   {/* 操作按钮 */}
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                  <div className="absolute inset-0 bg-black/0 hover:bg-black/30 transition-colors flex items-center justify-center gap-2">
                     <button 
                       onClick={() => { setEditingBanner(item); setModalOpen(true); }}
                       className="p-2.5 bg-white text-gray-700 rounded-lg hover:bg-brand-600 hover:text-white transition-colors" 

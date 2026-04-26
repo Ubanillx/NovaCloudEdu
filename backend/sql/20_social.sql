@@ -8,12 +8,15 @@ CREATE TABLE IF NOT EXISTS private_message
     receiver_id BIGINT                             NOT NULL,
     content     TEXT                               NOT NULL,
     type        VARCHAR(50)                        NOT NULL,
+    reply_to    BIGINT                             NULL,
     is_read     SMALLINT DEFAULT 0                 NOT NULL,
     create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     is_delete   SMALLINT DEFAULT 0                 NOT NULL
 );
+ALTER TABLE private_message ADD COLUMN IF NOT EXISTS reply_to BIGINT NULL;
 CREATE INDEX IF NOT EXISTS idx_pm_sender_id ON private_message(sender_id);
 CREATE INDEX IF NOT EXISTS idx_pm_receiver_id ON private_message(receiver_id);
+CREATE INDEX IF NOT EXISTS idx_pm_reply_to ON private_message(reply_to);
 CREATE INDEX IF NOT EXISTS idx_pm_create_time ON private_message(create_time);
 COMMENT ON TABLE private_message IS '私聊消息';
 COMMENT ON COLUMN private_message.id IS '消息ID';
@@ -21,6 +24,7 @@ COMMENT ON COLUMN private_message.sender_id IS '发送者ID，关联到user表';
 COMMENT ON COLUMN private_message.receiver_id IS '接收者ID，关联到user表';
 COMMENT ON COLUMN private_message.content IS '消息内容';
 COMMENT ON COLUMN private_message.type IS '消息类型';
+COMMENT ON COLUMN private_message.reply_to IS '回复的消息ID';
 COMMENT ON COLUMN private_message.is_read IS '是否已读：0-否，1-是';
 COMMENT ON COLUMN private_message.create_time IS '发送时间';
 COMMENT ON COLUMN private_message.is_delete IS '是否删除：0-否，1-是';

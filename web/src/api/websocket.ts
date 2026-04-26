@@ -32,6 +32,7 @@ class WebSocketService {
 
   // 群组订阅（每个群有消息+已读回执两个订阅）
   private groupSubscriptions = new Map<number, StompSubscription[]>();
+  private baseSubscriptions: StompSubscription[] = [];
 
   // 事件监听器
   private listeners = new Set<ChatEventHandlers>();
@@ -62,8 +63,8 @@ class WebSocketService {
       return;
     }
 
-    if (this.isConnected) {
-      console.log('[WS] 已连接，跳过');
+    if (this._connectionState === 'connected' || this._connectionState === 'connecting') {
+      console.log('[WS] 已连接或连接中，跳过');
       return;
     }
 
@@ -113,6 +114,8 @@ class WebSocketService {
     this.reconnectAttempts = 0;
 
     // 清理群组订阅
+    this.baseSubscriptions.forEach((sub) => { try { sub.unsubscribe(); } catch { /* ignore */ } });
+    this.baseSubscriptions = [];
     this.groupSubscriptions.forEach((subs) => {
       subs.forEach((sub) => { try { sub.unsubscribe(); } catch { /* ignore */ } });
     });
@@ -174,8 +177,11 @@ class WebSocketService {
   private setupSubscriptions(): void {
     if (!this.client?.connected) return;
 
+    this.baseSubscriptions.forEach((sub) => { try { sub.unsubscribe(); } catch { /* ignore */ } });
+    this.baseSubscriptions = [];
+
     // 订阅私聊消息
-    this.client.subscribe('/user/queue/messages', (message: IMessage) => {
+    const privateMessageSub = this.client.subscribe('/user/queue/messages', (message: IMessage) => {
       try {
         const data: WsChatMessage = JSONBigString.parse(message.body);
         console.log('[WS] 收到私聊消息:', data.content?.substring(0, 30));
@@ -186,7 +192,7 @@ class WebSocketService {
     });
 
     // 订阅通知
-    this.client.subscribe('/user/queue/notifications', (message: IMessage) => {
+    const notificationSub = this.client.subscribe('/user/queue/notifications', (message: IMessage) => {
       try {
         const data: NotificationEvent = JSONBigString.parse(message.body);
         console.log('[WS] 收到通知:', data.type);
@@ -197,7 +203,7 @@ class WebSocketService {
     });
 
     // 订阅群消息（后端逐个推送，排除发送者）
-    this.client.subscribe('/user/queue/group-messages', (message: IMessage) => {
+    const groupMessageSub = this.client.subscribe('/user/queue/group-messages', (message: IMessage) => {
       try {
         const data: WsGroupMessage = JSONBigString.parse(message.body);
         console.log('[WS] 收到群消息(user queue):', data.content?.substring(0, 30));
@@ -208,7 +214,7 @@ class WebSocketService {
     });
 
     // 订阅群消息发送确认（发送者专用，含服务端分配的 messageId）
-    this.client.subscribe('/user/queue/group-message-sent', (message: IMessage) => {
+    const groupSentSub = this.client.subscribe('/user/queue/group-message-sent', (message: IMessage) => {
       try {
         const data: WsGroupMessage = JSONBigString.parse(message.body);
         console.log('[WS] 群消息发送确认: messageId=', data.messageId);
@@ -219,7 +225,7 @@ class WebSocketService {
     });
 
     // 订阅已读回执
-    this.client.subscribe('/user/queue/read-receipt', (message: IMessage) => {
+    const readReceiptSub = this.client.subscribe('/user/queue/read-receipt', (message: IMessage) => {
       try {
         const data: ReadReceipt = JSONBigString.parse(message.body);
         console.log('[WS] 收到已读回执:', data.senderId);
@@ -228,6 +234,13 @@ class WebSocketService {
         console.error('[WS] 解析已读回执失败:', e);
       }
     });
+    this.baseSubscriptions = [
+      privateMessageSub,
+      notificationSub,
+      groupMessageSub,
+      groupSentSub,
+      readReceiptSub,
+    ];
 
     // 重新订阅之前的群组
     const groupIds = [...this.groupSubscriptions.keys()];
@@ -282,14 +295,19 @@ class WebSocketService {
 
   // ============ 发送消息 ============
 
-  sendPrivateMessage(receiverId: number, content: string, type: string = 'TEXT'): void {
+  sendPrivateMessage(receiverId: number, content: string, type: string = 'TEXT', replyTo?: number): void {
     if (!this.client?.connected) {
       console.warn('[WS] 未连接，无法发送私聊消息');
       return;
     }
     this.client.publish({
       destination: '/app/chat.send',
-      body: JSON.stringify({ receiverId, content, type }),
+      body: JSON.stringify({
+        receiverId,
+        content,
+        type,
+        ...(replyTo != null && { replyTo }),
+      }),
     });
   }
 

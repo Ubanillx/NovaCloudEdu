@@ -38,6 +38,15 @@ public class ChatGroupApplicationService {
      */
     @Transactional
     public ChatGroup createGroup(Long ownerId, String groupName, String description, String avatar) {
+        return createGroup(ownerId, groupName, description, avatar, JoinMode.FREE, InviteMode.ALL, null);
+    }
+
+    /**
+     * 创建群聊
+     */
+    @Transactional
+    public ChatGroup createGroup(Long ownerId, String groupName, String description, String avatar,
+                                 JoinMode joinMode, InviteMode inviteMode, String announcement) {
         // 验证用户存在
         userRepository.findById(UserId.of(ownerId))
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_ERROR, "用户不存在"));
@@ -46,6 +55,11 @@ public class ChatGroupApplicationService {
         ChatGroup group = ChatGroup.create(groupName, UserId.of(ownerId));
         if (description != null) {
             group.updateInfo(groupName, avatar, description);
+        }
+        group.setJoinMode(joinMode != null ? joinMode : JoinMode.FREE);
+        group.setInviteMode(inviteMode != null ? inviteMode : InviteMode.ALL);
+        if (announcement != null && !announcement.isBlank()) {
+            group.publishAnnouncement(announcement);
         }
         ChatGroup savedGroup = groupRepository.save(group);
 
@@ -140,6 +154,22 @@ public class ChatGroupApplicationService {
         }
 
         group.setJoinMode(joinMode);
+        groupRepository.update(group);
+    }
+
+    /**
+     * 设置群邀请模式
+     */
+    @Transactional
+    public void setInviteMode(Long groupId, Long operatorId, InviteMode inviteMode) {
+        ChatGroup group = getGroupOrThrow(groupId);
+        ChatGroupMember operator = getMemberOrThrow(groupId, operatorId);
+
+        if (!operator.isAdminOrOwner()) {
+            throw new BusinessException(ErrorCode.FORBIDDEN_ERROR, "没有权限修改群设置");
+        }
+
+        group.setInviteMode(inviteMode);
         groupRepository.update(group);
     }
 
@@ -440,10 +470,28 @@ public class ChatGroupApplicationService {
     }
 
     /**
+     * 获取群成员列表
+     */
+    public List<ChatGroupMember> getGroupMembers(Long groupId, Long userId) {
+        getGroupOrThrow(groupId);
+        getMemberOrThrow(groupId, userId);
+        return memberRepository.findByGroupId(GroupId.of(groupId));
+    }
+
+    /**
      * 分页获取群成员
      */
     public ChatGroupMemberRepository.MemberPage getGroupMembersPage(Long groupId, int pageNum, int pageSize) {
         getGroupOrThrow(groupId);
+        return memberRepository.findByGroupId(GroupId.of(groupId), pageNum, pageSize);
+    }
+
+    /**
+     * 分页获取群成员
+     */
+    public ChatGroupMemberRepository.MemberPage getGroupMembersPage(Long groupId, Long userId, int pageNum, int pageSize) {
+        getGroupOrThrow(groupId);
+        getMemberOrThrow(groupId, userId);
         return memberRepository.findByGroupId(GroupId.of(groupId), pageNum, pageSize);
     }
 

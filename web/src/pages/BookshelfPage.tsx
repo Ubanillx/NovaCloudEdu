@@ -331,7 +331,7 @@ const ShelfTab: React.FC<ShelfTabProps> = ({ books, loading, removingIds, onOpen
         return (
           <div
             key={bookIdStr}
-            className="group bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden cursor-pointer hover:shadow-lg hover:border-brand-200 dark:hover:border-brand-500/30 transition-all duration-300"
+            className="group bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden cursor-pointer hover:shadow-sm hover:border-brand-200 dark:hover:border-brand-500/30 transition-all duration-300"
           >
             {/* 封面 */}
             <div
@@ -345,7 +345,7 @@ const ShelfTab: React.FC<ShelfTabProps> = ({ books, loading, removingIds, onOpen
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
               ) : (
-                <div className="w-full h-full flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-brand-50 to-brand-100 dark:from-brand-900/20 dark:to-brand-800/20">
+                <div className="w-full h-full flex flex-col items-center justify-center gap-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700">
                   <BookOpen size={32} className="text-brand-300 dark:text-brand-600" />
                   <span className="text-[10px] text-brand-400 dark:text-brand-500 font-medium">暂无封面</span>
                 </div>
@@ -365,7 +365,7 @@ const ShelfTab: React.FC<ShelfTabProps> = ({ books, loading, removingIds, onOpen
               <button
                 onClick={e => { e.stopPropagation(); onRemove(item); }}
                 disabled={isRemoving}
-                className="absolute top-2 right-2 w-7 h-7 rounded-lg bg-black/40 hover:bg-red-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all backdrop-blur-sm disabled:opacity-50"
+                className="absolute top-2 right-2 w-7 h-7 rounded-lg bg-black/40 hover:bg-red-500 text-white flex items-center justify-center transition-all backdrop-blur-sm disabled:opacity-50"
                 title="移出书架"
               >
                 <Trash2 size={13} />
@@ -459,7 +459,7 @@ const LibraryTab: React.FC<LibraryTabProps> = ({
           return (
             <div
               key={bookIdStr}
-              className="group bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden cursor-pointer hover:shadow-lg hover:border-brand-200 dark:hover:border-brand-500/30 transition-all duration-300"
+              className="group bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden cursor-pointer hover:shadow-sm hover:border-brand-200 dark:hover:border-brand-500/30 transition-all duration-300"
             >
               {/* 封面 */}
               <div

@@ -251,7 +251,7 @@ const CourseListPage: React.FC = () => {
               <div
                 key={String(course.id)}
                 onClick={() => navigate(`/course/${String(course.id)}`)}
-                className="group bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden cursor-pointer hover:shadow-lg hover:border-brand-200 dark:hover:border-brand-500/30 transition-all duration-300"
+                className="group bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden cursor-pointer hover:shadow-sm hover:border-brand-200 dark:hover:border-brand-500/30 transition-all duration-300"
               >
                 {/* 封面 */}
                 <div className="relative aspect-video overflow-hidden bg-gray-50 dark:bg-gray-800/50">
@@ -262,7 +262,7 @@ const CourseListPage: React.FC = () => {
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                   ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-brand-100 to-accent-100 dark:from-brand-900/30 dark:to-accent-900/30 flex items-center justify-center">
+                    <div className="w-full h-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 flex items-center justify-center">
                       <BookOpen size={36} className="text-brand-300 dark:text-brand-600" />
                     </div>
                   )}
@@ -304,7 +304,7 @@ const CourseListPage: React.FC = () => {
                   )}
                   {/* hover 播放按钮 */}
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center">
-                    <div className="w-12 h-12 rounded-full bg-white/0 group-hover:bg-white/90 dark:group-hover:bg-gray-900/90 flex items-center justify-center opacity-0 group-hover:opacity-100 scale-75 group-hover:scale-100 transition-all duration-300 shadow-lg">
+                    <div className="w-12 h-12 rounded-full bg-white/0 group-hover:bg-white/90 dark:group-hover:bg-gray-900/90 flex items-center justify-center scale-75 group-hover:scale-100 transition-all duration-300 shadow-lg">
                       <Play size={20} className="text-brand-600 dark:text-brand-400 ml-0.5" fill="currentColor" />
                     </div>
                   </div>

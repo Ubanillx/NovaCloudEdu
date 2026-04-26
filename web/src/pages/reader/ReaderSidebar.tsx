@@ -117,7 +117,7 @@ const ReaderSidebar: React.FC<ReaderSidebarProps> = ({ chapters, currentIndex, t
                     {onDeleteBookmark && (
                       <button
                         onClick={() => onDeleteBookmark(bm.id as unknown as number)}
-                        className="flex-shrink-0 opacity-0 group-hover:opacity-60 hover:!opacity-100 transition-opacity p-0.5 rounded hover:bg-red-500/10 text-red-500"
+                        className="flex-shrink-0 opacity-60 transition-opacity p-0.5 rounded hover:bg-red-500/10 text-red-500"
                         title="删除书签"
                       >
                         <Trash2 size={12} />

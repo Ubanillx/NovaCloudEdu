@@ -152,7 +152,7 @@ const SectionFormModal: React.FC<SectionFormModalProps> = ({
           <h3 className="text-lg font-bold text-gray-900 dark:text-white">
             {isEdit ? '编辑小节' : '新增小节'}
           </h3>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          <button onClick={onClose} aria-label="关闭" className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
             <X size={20} />
           </button>
         </div>
@@ -337,7 +337,7 @@ const ChapterFormModal: React.FC<ChapterFormModalProps> = ({
           <h3 className="text-lg font-bold text-gray-900 dark:text-white">
             {isEdit ? '编辑章节' : '新增章节'}
           </h3>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          <button onClick={onClose} aria-label="关闭" className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
             <X size={20} />
           </button>
         </div>
@@ -474,7 +474,7 @@ const SectionCard: React.FC<SectionCardProps> = ({ section, index, courseId, onE
       </div>
 
       {/* 操作按钮 */}
-      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+      <div className="flex items-center gap-1 flex-shrink-0">
         <button onClick={onEdit}
           className="p-1.5 text-gray-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded-lg transition-all" title="编辑">
           <Edit2 size={14} />
@@ -527,17 +527,20 @@ const ChapterCard: React.FC<ChapterCardProps> = ({
   const totalDuration = sections.reduce((sum, s) => sum + (s.duration || 0), 0);
 
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md">
+    <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden transition-all duration-300 hover:shadow-sm">
       {/* 章节头 */}
       <div className="flex items-center gap-3 px-5 py-4 cursor-pointer select-none" onClick={() => setIsExpanded(!isExpanded)}>
         {/* 展开/折叠 */}
-        <button className="text-gray-400 hover:text-brand-600 transition-colors">
+        <button
+          className="text-gray-400 hover:text-brand-600 transition-colors"
+          aria-label={isExpanded ? '收起章节' : '展开章节'}
+        >
           {isExpanded ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
         </button>
 
         {/* 序号徽章 */}
-        <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-brand-500 to-indigo-600 flex items-center justify-center flex-shrink-0 shadow-sm">
-          <span className="text-sm font-bold text-white">{index + 1}</span>
+        <div className="w-8 h-8 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 flex items-center justify-center flex-shrink-0 shadow-sm">
+          <span className="text-sm font-bold text-brand-600 dark:text-brand-400">{index + 1}</span>
         </div>
 
         {/* 章节信息 */}
@@ -675,6 +678,7 @@ export const CourseDetailPage: React.FC = () => {
         </div>
         <div className="flex items-center gap-3">
           <button onClick={fetchStructure}
+            aria-label="刷新课程结构"
             className="p-2.5 bg-gray-50 dark:bg-gray-800/50 hover:bg-brand-50 dark:hover:bg-brand-900/20 text-gray-500 hover:text-brand-600 dark:hover:text-brand-400 rounded-xl transition-all border border-gray-200 dark:border-gray-700">
             <RefreshCw size={20} className={loading ? 'animate-spin' : ''} />
           </button>
@@ -691,7 +695,7 @@ export const CourseDetailPage: React.FC = () => {
         <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm p-6 transition-all duration-300">
           <div className="flex items-start gap-5">
             {/* 封面图 */}
-            <div className="w-28 h-20 rounded-xl bg-gradient-to-br from-brand-50 to-indigo-50 dark:from-gray-800 dark:to-gray-800 border border-gray-100 dark:border-gray-700 overflow-hidden flex-shrink-0">
+            <div className="w-28 h-20 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 overflow-hidden flex-shrink-0 shadow-sm">
               {course.coverImage ? (
                 <img src={course.coverImage} alt="" className="w-full h-full object-cover" />
               ) : (

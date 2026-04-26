@@ -7,6 +7,7 @@ import {
 import { apiClient, DefaultApi, Configuration } from '../api';
 import type { SearchResultDTO, PageResult, SearchSuggestionDTO } from '../api/generated/models';
 import { toast } from '../components/ui';
+import { getPostTypeLabel } from '../constants/postTypes';
 
 const api = new DefaultApi(new Configuration(), '', apiClient);
 const PAGE_SIZE = 20;
@@ -57,7 +58,7 @@ const BookResultCard: React.FC<{ item: SearchResultDTO; onClick: () => void }> =
   return (
     <div
       onClick={onClick}
-      className="group flex gap-4 p-4 bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm cursor-pointer hover:shadow-lg hover:border-brand-200 dark:hover:border-brand-500/30 transition-all duration-300"
+      className="group flex gap-4 p-4 bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm cursor-pointer hover:shadow-sm hover:border-brand-200 dark:hover:border-brand-500/30 transition-all duration-300"
     >
       {/* 封面 */}
       <div className="flex-shrink-0 w-20 h-28 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 overflow-hidden flex items-center justify-center">
@@ -96,7 +97,7 @@ const ChapterResultCard: React.FC<{ item: SearchResultDTO; onClick: () => void }
   return (
     <div
       onClick={onClick}
-      className="group p-4 bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm cursor-pointer hover:shadow-lg hover:border-brand-200 dark:hover:border-brand-500/30 transition-all duration-300"
+      className="group p-4 bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm cursor-pointer hover:shadow-sm hover:border-brand-200 dark:hover:border-brand-500/30 transition-all duration-300"
     >
       <div className="flex items-center gap-2 mb-2">
         <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-amber-50 text-amber-600 dark:bg-amber-900/20 dark:text-amber-400">章节</span>
@@ -128,12 +129,12 @@ const PostResultCard: React.FC<{ item: SearchResultDTO; onClick: () => void }> =
   return (
     <div
       onClick={onClick}
-      className="group p-4 bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm cursor-pointer hover:shadow-lg hover:border-brand-200 dark:hover:border-brand-500/30 transition-all duration-300"
+      className="group p-4 bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm cursor-pointer hover:shadow-sm hover:border-brand-200 dark:hover:border-brand-500/30 transition-all duration-300"
     >
       <div className="flex items-center gap-2 mb-2">
         <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-green-50 text-green-600 dark:bg-green-900/20 dark:text-green-400">帖子</span>
         {item.postType && (
-          <span className="text-xs text-gray-400 dark:text-gray-500">{item.postType}</span>
+          <span className="text-xs text-gray-400 dark:text-gray-500">{getPostTypeLabel(item.postType)}</span>
         )}
       </div>
       <h3 className="font-bold text-base text-gray-900 dark:text-white line-clamp-1 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">

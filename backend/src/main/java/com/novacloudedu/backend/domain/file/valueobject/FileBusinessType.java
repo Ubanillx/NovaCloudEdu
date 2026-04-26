@@ -10,6 +10,7 @@ public enum FileBusinessType {
     COURSE_MATERIAL("course/material", "课程资料", 50 * 1024 * 1024),
     USER_AVATAR("user/avatar", "用户头像", 2 * 1024 * 1024),
     TEACHER_AVATAR("teacher/avatar", "讲师头像", 2 * 1024 * 1024),
+    GROUP_AVATAR("group/avatar", "群头像", 5 * 1024 * 1024),
     TEACHER_CERTIFICATE("teacher/certificate", "讲师证书", 10 * 1024 * 1024),
     SYSTEM_DOCUMENT("system/document", "系统文档", 20 * 1024 * 1024),
     FEEDBACK_ATTACHMENT("feedback/attachment", "反馈附件", 30 * 1024 * 1024),

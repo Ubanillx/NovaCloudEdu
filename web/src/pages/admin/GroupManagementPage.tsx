@@ -110,7 +110,7 @@ const EditGroupModal: React.FC<EditGroupModalProps> = ({ isOpen, onClose, onSucc
       <div className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden animate-in zoom-in-95 duration-200">
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800">
           <h3 className="text-lg font-bold text-gray-900 dark:text-white">编辑群信息</h3>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"><X size={20} /></button>
+          <button onClick={onClose} aria-label="关闭" className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"><X size={20} /></button>
         </div>
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
@@ -241,7 +241,7 @@ const GroupDetailModal: React.FC<GroupDetailModalProps> = ({ isOpen, onClose, gr
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-50 to-indigo-50 dark:from-gray-800 dark:to-gray-800 border border-gray-100 dark:border-gray-700 flex items-center justify-center overflow-hidden">
+            <div className="w-10 h-10 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 flex items-center justify-center overflow-hidden shadow-sm">
               {group.avatar ? (
                 <img src={group.avatar} alt="" className="w-full h-full object-cover" />
               ) : (
@@ -258,7 +258,7 @@ const GroupDetailModal: React.FC<GroupDetailModalProps> = ({ isOpen, onClose, gr
               </div>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"><X size={20} /></button>
+          <button onClick={onClose} aria-label="关闭" className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"><X size={20} /></button>
         </div>
 
         {/* Group Info Summary */}
@@ -537,7 +537,7 @@ export const GroupManagementPage: React.FC = () => {
                     <tr key={String(g.id)} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors group">
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-50 to-indigo-50 dark:from-gray-800 dark:to-gray-800 border border-gray-100 dark:border-gray-700 flex items-center justify-center overflow-hidden flex-shrink-0">
+                          <div className="w-10 h-10 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 flex items-center justify-center overflow-hidden flex-shrink-0 shadow-sm">
                             {g.avatar ? (
                               <img src={g.avatar} alt="" className="w-full h-full object-cover" />
                             ) : (
@@ -594,7 +594,7 @@ export const GroupManagementPage: React.FC = () => {
                         {g.createTime ? new Date(g.createTime).toLocaleDateString() : '-'}
                       </td>
                       <td className="px-6 py-4">
-                        <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="flex items-center gap-2">
                           <button onClick={() => { setDetailGroup(g); setDetailModalOpen(true); }}
                             className="p-2 text-gray-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded-lg transition-all" title="查看成员">
                             <Eye size={18} />

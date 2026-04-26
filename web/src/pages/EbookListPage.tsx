@@ -129,7 +129,7 @@ const EbookListPage: React.FC = () => {
               <div
                 key={String(book.id)}
                 onClick={() => navigate(`/book/${String(book.id)}/read`)}
-                className="group bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden cursor-pointer hover:shadow-lg hover:border-brand-200 dark:hover:border-brand-500/30 transition-all duration-300"
+                className="group bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden cursor-pointer hover:shadow-sm hover:border-brand-200 dark:hover:border-brand-500/30 transition-all duration-300"
               >
                 {/* 封面区域 */}
                 <div className="relative h-48 bg-gray-50 dark:bg-gray-800/50 flex items-center justify-center overflow-hidden border-b border-gray-50 dark:border-gray-800">

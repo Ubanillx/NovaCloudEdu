@@ -375,7 +375,7 @@ const SchedulePage: React.FC = () => {
                           i < displaySections - 1 ? 'border-b border-gray-200 dark:border-gray-800' : ''
                         } ${isToday ? 'bg-brand-50/30 dark:bg-brand-900/5' : ''} hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors`}
                       >
-                        <div className="w-full h-full flex items-center justify-center opacity-0 group-hover/cell:opacity-100 transition-opacity">
+                        <div className="w-full h-full flex items-center justify-center">
                           <Plus size={14} className="text-gray-300 dark:text-gray-600" />
                         </div>
                       </div>
@@ -399,7 +399,7 @@ const SchedulePage: React.FC = () => {
                             setSelectedCourse(isSelected ? null : course);
                           }}
                           style={{ top: top + 3, height: height - 6, left: 3, right: 3 }}
-                          className={`absolute rounded-lg ${color.bg} border ${color.border} p-2 flex flex-col overflow-hidden cursor-pointer hover:shadow-md transition-all text-left ${
+                          className={`absolute rounded-lg ${color.bg} border ${color.border} p-2 flex flex-col overflow-hidden cursor-pointer hover:shadow-sm transition-all text-left ${
                             isSelected ? 'ring-2 ring-brand-500 shadow-lg' : ''
                           }`}
                         >

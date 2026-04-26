@@ -7,6 +7,11 @@ import json
 import os
 import tempfile
 import subprocess
+import copy
+import mimetypes
+import re
+import urllib.request
+from urllib.parse import urlparse
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
@@ -16,12 +21,86 @@ from pydantic import BaseModel
 app = FastAPI(title="Typst Compile Service", version="1.0.0")
 
 TEMPLATES_DIR = Path(__file__).parent / "templates"
+MAX_IMAGE_BYTES = 10 * 1024 * 1024
 
 
 class CompileRequest(BaseModel):
     """编译请求"""
     template: str = "exam_paper"
     data: dict
+
+
+def _image_extension(url: str, content_type: str | None) -> str:
+    """Infer a Typst-friendly image extension from URL or HTTP content type."""
+    if content_type:
+        ext = mimetypes.guess_extension(content_type.split(";")[0].strip())
+        if ext in {".jpg", ".jpeg", ".png", ".webp", ".gif", ".svg"}:
+            return ".jpg" if ext == ".jpeg" else ext
+
+    path = urlparse(url).path
+    ext = Path(path).suffix.lower()
+    if ext in {".jpg", ".jpeg", ".png", ".webp", ".gif", ".svg"}:
+        return ".jpg" if ext == ".jpeg" else ext
+    return ".png"
+
+
+def _download_image(url: str, output_path: Path) -> str | None:
+    """Download one question image with a hard size limit."""
+    try:
+        request = urllib.request.Request(url, headers={"User-Agent": "NovaCloudEdu-Typst/1.0"})
+        with urllib.request.urlopen(request, timeout=10) as response:
+            content_type = response.headers.get("Content-Type")
+            ext = _image_extension(url, content_type)
+            final_path = output_path.with_suffix(ext)
+
+            data = response.read(MAX_IMAGE_BYTES + 1)
+            if len(data) > MAX_IMAGE_BYTES:
+                return None
+            final_path.write_bytes(data)
+            return final_path.name
+    except Exception:
+        return None
+
+
+def prepare_question_images(data: dict, tmpdir: str) -> dict:
+    """
+    Typst reads local files, not remote OSS URLs. Download question images into
+    the compile temp dir and add image_path to each question for templates.
+    """
+    prepared = copy.deepcopy(data)
+    assets_dir = Path(tmpdir) / "assets"
+    assets_dir.mkdir(exist_ok=True)
+
+    for section_index, section in enumerate(prepared.get("sections", []), start=1):
+        for question_index, question in enumerate(section.get("questions", []), start=1):
+            image_url = question.get("imageUrl") or question.get("image_url")
+            if not image_url:
+                continue
+
+            base_path = assets_dir / f"question_{section_index}_{question_index}"
+            filename = _download_image(str(image_url), base_path)
+            if filename:
+                question["image_path"] = f"assets/{filename}"
+
+    return prepared
+
+
+def sanitize_cetz_code(code: str) -> str:
+    """Normalize common LLM mistakes that are invalid in CeTZ."""
+    if not code:
+        return code
+    replacements = (
+        (r"mark\s*:\s*\"\"", "mark: none"),
+        (r"mark\s*:\s*''", "mark: none"),
+        (r"start\s*:\s*\"\"", "start: none"),
+        (r"start\s*:\s*''", "start: none"),
+        (r"end\s*:\s*\"\"", "end: none"),
+        (r"end\s*:\s*''", "end: none"),
+    )
+    normalized = code
+    for pattern, replacement in replacements:
+        normalized = re.sub(pattern, replacement, normalized)
+    return normalized
 
 
 @app.get("/health")
@@ -39,10 +118,11 @@ async def compile_pdf(request: CompileRequest):
         raise HTTPException(status_code=400, detail=f"模板不存在: {request.template}")
 
     with tempfile.TemporaryDirectory() as tmpdir:
+        data = prepare_question_images(request.data, tmpdir)
         # 写入 JSON 数据文件
         data_file = os.path.join(tmpdir, "data.json")
         with open(data_file, "w", encoding="utf-8") as f:
-            json.dump(request.data, f, ensure_ascii=False, indent=2)
+            json.dump(data, f, ensure_ascii=False, indent=2)
 
         # 复制模板文件到临时目录
         main_typ = os.path.join(tmpdir, "main.typ")
@@ -93,10 +173,11 @@ async def compile_with_template(request: CompileWithTemplateRequest):
     用于用户上传的自定义试卷模板
     """
     with tempfile.TemporaryDirectory() as tmpdir:
+        data = prepare_question_images(request.data, tmpdir)
         # 写入 JSON 数据文件
         data_file = os.path.join(tmpdir, "data.json")
         with open(data_file, "w", encoding="utf-8") as f:
-            json.dump(request.data, f, ensure_ascii=False, indent=2)
+            json.dump(data, f, ensure_ascii=False, indent=2)
 
         # 写入用户自定义模板
         main_typ = os.path.join(tmpdir, "main.typ")
@@ -150,7 +231,7 @@ async def render_svg(request: RenderRequest):
         # 写入绘图代码数据
         data_file = os.path.join(tmpdir, "data.json")
         with open(data_file, "w", encoding="utf-8") as f:
-            json.dump({"code": request.code}, f, ensure_ascii=False)
+            json.dump({"code": sanitize_cetz_code(request.code)}, f, ensure_ascii=False)
 
         # 复制模板
         main_typ = os.path.join(tmpdir, "main.typ")
@@ -196,7 +277,7 @@ async def render_png(request: RenderRequest):
     with tempfile.TemporaryDirectory() as tmpdir:
         data_file = os.path.join(tmpdir, "data.json")
         with open(data_file, "w", encoding="utf-8") as f:
-            json.dump({"code": request.code}, f, ensure_ascii=False)
+            json.dump({"code": sanitize_cetz_code(request.code)}, f, ensure_ascii=False)
 
         main_typ = os.path.join(tmpdir, "main.typ")
         with open(template_file, "r", encoding="utf-8") as src:

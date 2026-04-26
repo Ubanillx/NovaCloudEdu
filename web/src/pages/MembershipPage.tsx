@@ -137,7 +137,7 @@ const MembershipPage: React.FC = () => {
           return (
             <div
               key={String(plan.id)}
-              className={`relative bg-white dark:bg-gray-900 rounded-2xl border ${isCurrent ? 'border-brand-500 ring-2 ring-brand-500/20' : 'border-gray-200 dark:border-gray-800'} overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300`}
+              className={`relative bg-white dark:bg-gray-900 rounded-2xl border ${isCurrent ? 'border-brand-500 ring-2 ring-brand-500/20' : 'border-gray-200 dark:border-gray-800'} overflow-hidden shadow-sm hover:shadow-sm transition-all duration-300`}
             >
               {isCurrent && (
                 <div className="absolute top-4 right-4 px-2.5 py-1 bg-brand-500 text-white text-xs font-bold rounded-full">当前</div>
@@ -193,7 +193,7 @@ const MembershipPage: React.FC = () => {
                   <button
                     onClick={() => handlePurchase(plan.id)}
                     disabled={!!purchasing}
-                    className="w-full py-2.5 text-sm font-bold text-white bg-gradient-to-r from-brand-500 to-brand-600 rounded-xl hover:shadow-lg hover:shadow-brand-500/20 transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2"
+                    className="w-full py-2.5 text-sm font-bold text-white bg-gradient-to-r from-brand-500 to-brand-600 rounded-xl hover:shadow-sm hover:shadow-brand-500/20 transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2"
                   >
                     {purchasing === String(plan.id) ? <Loader2 size={16} className="animate-spin" /> : <Zap size={16} />}
                     立即开通

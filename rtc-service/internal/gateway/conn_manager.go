@@ -64,12 +64,19 @@ func (m *ConnManager) Add(conn *Conn) {
 	m.logger.Info("connection added", zap.Int64("userId", conn.UserID))
 }
 
-// Remove 移除连接
-func (m *ConnManager) Remove(userID int64) {
+// Remove 移除连接，仅当待移除连接仍是当前连接时才删除。
+func (m *ConnManager) Remove(conn *Conn) bool {
 	m.mu.Lock()
 	defer m.mu.Unlock()
-	delete(m.conns, userID)
-	m.logger.Info("connection removed", zap.Int64("userId", userID))
+
+	current, ok := m.conns[conn.UserID]
+	if !ok || current != conn {
+		m.logger.Debug("skip removing stale connection", zap.Int64("userId", conn.UserID))
+		return false
+	}
+	delete(m.conns, conn.UserID)
+	m.logger.Info("connection removed", zap.Int64("userId", conn.UserID))
+	return true
 }
 
 // Get 获取连接

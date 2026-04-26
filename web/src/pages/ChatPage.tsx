@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Users, UsersRound, Search, UserPlus,
   Check, X, Clock, Send, ArrowLeft,
   MailPlus, UserCheck, Loader2, RefreshCw, MessageCircle, WifiOff, Bot,
-  Phone, Video,
+  Phone, Video, QrCode, ScanLine,
 } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import { apiClient, DefaultApi, Configuration } from '../api';
@@ -19,6 +19,13 @@ import PrivateChatPanel from '../components/chat/PrivateChatPanel';
 import GroupChatPanel from '../components/chat/GroupChatPanel';
 import AiChatPanel from '../components/chat/AiChatPanel';
 import { useRtc } from '../context/RtcContext';
+import {
+  createSocialQrPayload,
+  parseSocialQrPayload,
+  QrCodeCard,
+  QrScanner,
+  type SocialQrPayload,
+} from '../components/chat/SocialQrCode';
 
 const api = new DefaultApi(new Configuration(), '', apiClient);
 
@@ -71,6 +78,20 @@ const StatusBadge: React.FC<{ status?: string }> = ({ status }) => {
 
 type MainTab = 'messages' | 'friends' | 'requests' | 'groups' | 'intelligence';
 type RequestTab = 'received' | 'sent';
+type AddFriendMode = 'search' | 'scan' | 'mine';
+
+const getCurrentUserInfo = () => {
+  try {
+    return JSON.parse(localStorage.getItem('user_info') || '{}') as {
+      id?: number;
+      userAccount?: string;
+      userName?: string;
+      userAvatar?: string;
+    };
+  } catch {
+    return {};
+  }
+};
 
 // ============ 好友列表 Tab ============
 
@@ -80,6 +101,7 @@ const FriendsTab: React.FC<{ onChatWith?: (userId: number, userName?: string, us
   const [loading, setLoading] = useState(true);
   const [searchKeyword, setSearchKeyword] = useState('');
   const [showAddFriend, setShowAddFriend] = useState(false);
+  const [addFriendMode, setAddFriendMode] = useState<AddFriendMode>('search');
 
   const loadFriends = useCallback(async () => {
     setLoading(true);
@@ -103,7 +125,12 @@ const FriendsTab: React.FC<{ onChatWith?: (userId: number, userName?: string, us
   );
 
   if (showAddFriend) {
-    return <AddFriendPanel onBack={() => { setShowAddFriend(false); loadFriends(); }} />;
+    return (
+      <AddFriendPanel
+        initialMode={addFriendMode}
+        onBack={() => { setShowAddFriend(false); loadFriends(); }}
+      />
+    );
   }
 
   return (
@@ -124,13 +151,22 @@ const FriendsTab: React.FC<{ onChatWith?: (userId: number, userName?: string, us
             className="w-full pl-9 pr-4 py-2 text-sm bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 dark:focus:ring-brand-900/30 transition-all"
           />
         </div>
-        <button
-          onClick={() => setShowAddFriend(true)}
-          className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-white bg-brand-500 hover:bg-brand-600 rounded-lg transition-colors shadow-sm"
-        >
-          <UserPlus size={16} />
-          <span>添加好友</span>
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => { setAddFriendMode('mine'); setShowAddFriend(true); }}
+            className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-brand-700 dark:text-brand-300 bg-brand-50 dark:bg-brand-900/20 hover:bg-brand-100 dark:hover:bg-brand-900/40 rounded-lg transition-colors"
+          >
+            <QrCode size={16} />
+            <span>我的二维码</span>
+          </button>
+          <button
+            onClick={() => { setAddFriendMode('search'); setShowAddFriend(true); }}
+            className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-white bg-brand-500 hover:bg-brand-600 rounded-lg transition-colors shadow-sm"
+          >
+            <UserPlus size={16} />
+            <span>添加好友</span>
+          </button>
+        </div>
       </div>
 
       {/* 好友列表 */}
@@ -188,7 +224,8 @@ const FriendsTab: React.FC<{ onChatWith?: (userId: number, userName?: string, us
 
 // ============ 添加好友面板 ============
 
-const AddFriendPanel: React.FC<{ onBack: () => void }> = ({ onBack }) => {
+const AddFriendPanel: React.FC<{ initialMode?: AddFriendMode; onBack: () => void }> = ({ initialMode = 'search', onBack }) => {
+  const [mode, setMode] = useState<AddFriendMode>(initialMode);
   const [keyword, setKeyword] = useState('');
   const [results, setResults] = useState<SearchUserResponse[]>([]);
   const [searching, setSearching] = useState(false);
@@ -234,6 +271,37 @@ const AddFriendPanel: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     }
   };
 
+  const handleQrPayload = async (payload: SocialQrPayload) => {
+    try {
+      if (payload.type === 'friend') {
+        const currentUser = getCurrentUserInfo();
+        if (String(payload.userId) === String(currentUser.id)) {
+          toast.warning('不能添加自己为好友');
+          return;
+        }
+        await api.sendFriendRequest({
+          sendFriendRequestDTO: {
+            receiverId: payload.userId,
+            message: '通过个人二维码添加',
+          },
+        });
+        toast.success('好友申请已发送');
+        return;
+      }
+
+      const res = await api.applyToJoin({
+        groupId: payload.groupId,
+        joinGroupRequest: { message: '通过群聊二维码加入' },
+      });
+      toast.success(res.data?.data ? '入群申请已发送' : '已加入群聊');
+      onBack();
+    } catch (e: any) {
+      toast.error(e?.response?.data?.message || '二维码处理失败');
+    }
+  };
+
+  const currentUser = getCurrentUserInfo();
+
   return (
     <div className="flex flex-col h-full">
       {/* 头部 */}
@@ -244,8 +312,68 @@ const AddFriendPanel: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         >
           <ArrowLeft size={18} className="text-gray-500" />
         </button>
-        <h3 className="text-sm font-semibold text-gray-900 dark:text-white">添加好友</h3>
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+          {mode === 'mine' ? '我的二维码' : mode === 'scan' ? '扫码添加' : '添加好友'}
+        </h3>
       </div>
+
+      <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800">
+        <div className="grid grid-cols-3 gap-2">
+          {[
+            { key: 'search' as const, label: '搜索', icon: Search },
+            { key: 'scan' as const, label: '扫码', icon: ScanLine },
+            { key: 'mine' as const, label: '我的码', icon: QrCode },
+          ].map((item) => {
+            const Icon = item.icon;
+            const active = mode === item.key;
+            return (
+              <button
+                key={item.key}
+                type="button"
+                onClick={() => setMode(item.key)}
+                className={`flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium rounded-lg transition-colors active:scale-[0.98] ${
+                  active
+                    ? 'bg-brand-500 text-white shadow-sm'
+                    : 'bg-gray-100 dark:bg-gray-800 text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700'
+                }`}
+              >
+                <Icon size={14} />
+                {item.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {mode === 'scan' && (
+        <div className="flex-1 overflow-y-auto p-4">
+          <QrScanner onResolved={handleQrPayload} />
+        </div>
+      )}
+
+      {mode === 'mine' && currentUser.id && (
+        <div className="flex-1 overflow-y-auto p-4">
+          <QrCodeCard
+            title={currentUser.userName || '我的个人二维码'}
+            subtitle={currentUser.userAccount ? `账号 ${currentUser.userAccount}` : '扫码添加好友'}
+            payload={createSocialQrPayload({
+              type: 'friend',
+              userId: currentUser.id,
+              name: currentUser.userName,
+              avatar: currentUser.userAvatar,
+            })}
+          />
+        </div>
+      )}
+
+      {mode === 'mine' && !currentUser.id && (
+        <div className="flex-1 flex items-center justify-center text-sm text-gray-400">
+          无法读取当前用户信息
+        </div>
+      )}
+
+      {mode === 'search' && (
+        <>
 
       {/* 搜索栏 */}
       <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800">
@@ -351,6 +479,8 @@ const AddFriendPanel: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           </div>
         )}
       </div>
+        </>
+      )}
     </div>
   );
 };
@@ -507,7 +637,7 @@ const ReceivedRequestCard: React.FC<{
   const isPending = request.status === 'pending';
 
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 p-4 shadow-sm hover:shadow-md transition-shadow">
+    <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 p-4 shadow-sm hover:shadow-sm transition-shadow">
       <div className="flex items-center gap-3">
         <Avatar src={request.senderAvatar} name={request.senderName} />
         <div className="flex-1 min-w-0">
@@ -597,22 +727,102 @@ const ChatPage: React.FC = () => {
     ['messages', 'friends', 'requests', 'groups', 'intelligence'].includes(initialTab) ? initialTab : 'messages'
   );
 
-  // URL 参数变化时同步 tab
+  const [pendingCount, setPendingCount] = useState(0);
+  const [chatTarget, setChatTarget] = useState<{ partnerId: number; partnerName?: string; partnerAvatar?: string } | null>(null);
+  const [groupChatTarget, setGroupChatTarget] = useState<{ groupId: number; groupName?: string; groupAvatar?: string } | null>(null);
+  const { connectionState, connect, notifications } = useChat();
+  const processedQrRef = useRef<string>('');
+
+  // URL 参数变化时同步 tab，并支持通知入口直达具体私聊/群聊
   useEffect(() => {
     const tab = searchParams.get('tab') as MainTab;
+    const partnerIdParam = searchParams.get('partnerId');
+    const groupIdParam = searchParams.get('groupId');
+    const qrParam = searchParams.get('qr');
+    const partnerId = Number(partnerIdParam);
+    const groupId = Number(groupIdParam);
+
+    if (qrParam && processedQrRef.current !== qrParam) {
+      processedQrRef.current = qrParam;
+      const payload = parseSocialQrPayload(qrParam);
+      if (!payload) {
+        toast.error('二维码链接无效');
+      } else {
+        (async () => {
+          try {
+            if (payload.type === 'friend') {
+              const currentUser = getCurrentUserInfo();
+              if (String(payload.userId) === String(currentUser.id)) {
+                toast.warning('不能添加自己为好友');
+              } else {
+                await api.sendFriendRequest({
+                  sendFriendRequestDTO: {
+                    receiverId: payload.userId,
+                    message: '通过个人二维码添加',
+                  },
+                });
+                toast.success('好友申请已发送');
+                setActiveTab('requests');
+              }
+            } else {
+              const res = await api.applyToJoin({
+                groupId: payload.groupId,
+                joinGroupRequest: { message: '通过群聊二维码加入' },
+              });
+              toast.success(res.data?.data ? '入群申请已发送' : '已加入群聊');
+              setGroupChatTarget({
+                groupId: payload.groupId,
+                groupName: payload.name,
+                groupAvatar: payload.avatar,
+              });
+              setActiveTab('messages');
+            }
+          } catch (e: any) {
+            toast.error(e?.response?.data?.message || '二维码处理失败');
+          } finally {
+            setSearchParams({}, { replace: true });
+          }
+        })();
+      }
+    }
+
     if (tab && ['messages', 'friends', 'requests', 'groups', 'intelligence'].includes(tab)) {
       setActiveTab(tab);
-      // 清除 URL 参数，避免污染
+    }
+    if (Number.isFinite(partnerId) && partnerId > 0) {
+      setChatTarget({
+        partnerId,
+        partnerName: searchParams.get('partnerName') || undefined,
+        partnerAvatar: searchParams.get('partnerAvatar') || undefined,
+      });
+      setGroupChatTarget(null);
+      setActiveTab('messages');
+    }
+    if (Number.isFinite(groupId) && groupId > 0) {
+      setGroupChatTarget({
+        groupId,
+        groupName: searchParams.get('groupName') || undefined,
+      });
+      setChatTarget(null);
+      setActiveTab('messages');
+    }
+    if (tab || partnerIdParam || groupIdParam || qrParam) {
+      // 清除 URL 参数，避免刷新后重复触发定位
       setSearchParams({}, { replace: true });
     }
   }, [searchParams, setSearchParams]);
-  const [pendingCount, setPendingCount] = useState(0);
-  const [chatTarget, setChatTarget] = useState<{ partnerId: number; partnerName?: string; partnerAvatar?: string } | null>(null);
-  const { connectionState, connect, notifications } = useChat();
 
   // 从好友列表点击好友 → 打开私聊
   const handleChatWithFriend = useCallback((userId: number, userName?: string, userAvatar?: string) => {
     setChatTarget({ partnerId: userId, partnerName: userName, partnerAvatar: userAvatar });
+    setGroupChatTarget(null);
+    setActiveTab('messages');
+  }, []);
+
+  const handleOpenGroupChat = useCallback((group: { id?: number; groupName?: string; avatar?: string }) => {
+    if (!group.id) return;
+    setGroupChatTarget({ groupId: group.id, groupName: group.groupName, groupAvatar: group.avatar });
+    setChatTarget(null);
     setActiveTab('messages');
   }, []);
 
@@ -703,15 +913,18 @@ const ChatPage: React.FC = () => {
       <div className="flex-1 min-w-0 h-full overflow-hidden bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm rounded-2xl ring-1 ring-gray-200/40 dark:ring-gray-700/30">
         {activeTab === 'messages' && (
           <PrivateChatPanel
-            key={chatTarget?.partnerId}
+            key={chatTarget?.partnerId ? `private:${chatTarget.partnerId}` : groupChatTarget?.groupId ? `group:${groupChatTarget.groupId}` : 'messages'}
             initialPartnerId={chatTarget?.partnerId}
             initialPartnerName={chatTarget?.partnerName}
             initialPartnerAvatar={chatTarget?.partnerAvatar}
+            initialGroupId={groupChatTarget?.groupId}
+            initialGroupName={groupChatTarget?.groupName}
+            initialGroupAvatar={groupChatTarget?.groupAvatar}
           />
         )}
         {activeTab === 'friends' && <FriendsTab onChatWith={handleChatWithFriend} />}
         {activeTab === 'requests' && <RequestsTab />}
-        {activeTab === 'groups' && <GroupChatPanel />}
+        {activeTab === 'groups' && <GroupChatPanel onOpenGroupChat={handleOpenGroupChat} />}
         {activeTab === 'intelligence' && <AiChatPanel />}
       </div>
     </div>

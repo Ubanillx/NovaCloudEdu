@@ -116,6 +116,9 @@ public class PrivateChatController {
                         .partnerId(s.partnerId())
                         .partnerName(s.partnerName())
                         .partnerAvatar(s.partnerAvatar())
+                        .lastMessageSenderId(s.lastMessageSenderId())
+                        .lastMessage(s.lastMessage())
+                        .lastMessageType(s.lastMessageType())
                         .lastMessageTime(s.lastMessageTime())
                         .unreadCount(s.unreadCount())
                         .build())
@@ -180,6 +183,7 @@ public class PrivateChatController {
                 .receiverId(message.getReceiverId().value())
                 .content(message.getContent())
                 .type(message.getType().getValue())
+                .replyTo(message.getReplyTo() != null ? message.getReplyTo().value() : null)
                 .createTime(message.getCreateTime())
                 .isRead(message.isRead())
                 .build();

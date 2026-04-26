@@ -1,4 +1,5 @@
 import React, { useState, useRef, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 
 interface TooltipProps {
   content: string;
@@ -50,7 +51,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
   const getTooltipStyle = (): React.CSSProperties => {
     const style: React.CSSProperties = {
       position: 'fixed',
-      zIndex: 9999,
+      zIndex: 2147483647,
       maxWidth,
       opacity: visible ? 1 : 0,
       visibility: visible ? 'visible' : 'hidden',
@@ -94,14 +95,15 @@ export const Tooltip: React.FC<TooltipProps> = ({
       >
         {children}
       </div>
-      {visible && (
+      {visible && typeof document !== 'undefined' && createPortal(
         <div
           ref={tooltipRef}
           style={getTooltipStyle()}
           className="px-3 py-2 text-sm text-white bg-gray-900/95 dark:bg-white/95 dark:text-gray-900 rounded-lg shadow-lg whitespace-pre-wrap break-words"
         >
           {content}
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );

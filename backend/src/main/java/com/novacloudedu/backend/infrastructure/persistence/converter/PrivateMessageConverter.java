@@ -25,6 +25,9 @@ public class PrivateMessageConverter {
         po.setReceiverId(message.getReceiverId().value());
         po.setContent(message.getContent());
         po.setType(message.getType().getValue());
+        if (message.getReplyTo() != null) {
+            po.setReplyTo(message.getReplyTo().value());
+        }
         po.setIsRead(message.isRead() ? 1 : 0);
         po.setCreateTime(message.getCreateTime());
         po.setIsDelete(message.isDelete() ? 1 : 0);
@@ -41,6 +44,7 @@ public class PrivateMessageConverter {
                 UserId.of(po.getReceiverId()),
                 po.getContent(),
                 MessageType.fromValue(po.getType()),
+                po.getReplyTo() != null ? MessageId.of(po.getReplyTo()) : null,
                 po.getIsRead() == 1,
                 po.getCreateTime(),
                 po.getIsDelete() == 1

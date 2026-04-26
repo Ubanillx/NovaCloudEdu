@@ -28,6 +28,8 @@ public class PrivateMessagePO implements Serializable {
 
     private String type;
 
+    private Long replyTo;
+
     private Integer isRead;
 
     private LocalDateTime createTime;

@@ -95,7 +95,7 @@ const BulletItem: React.FC<{
       />
       <button
         onClick={onDelete}
-        className="opacity-0 group-hover:opacity-100 p-0.5 text-gray-400 hover:text-red-500 transition-all"
+        className=" p-0.5 text-gray-400 hover:text-red-500 transition-all"
       >
         <Trash2 size={13} />
       </button>
@@ -131,7 +131,7 @@ const PageItem: React.FC<{
             placeholder={`第 ${pageIndex + 1} 页标题`}
             className="text-sm font-medium text-gray-800 dark:text-gray-200"
           />
-          <div className="flex items-center gap-1 opacity-0 group-hover/page:opacity-100 transition-opacity">
+          <div className="flex items-center gap-1">
             <button
               onClick={addBullet}
               className="p-0.5 text-gray-400 hover:text-brand-500 transition-colors"
@@ -206,7 +206,7 @@ const ChapterSection: React.FC<{
             className="text-sm font-semibold text-gray-900 dark:text-white"
           />
         </div>
-        <div className="flex items-center gap-1 opacity-0 group-hover/chapter:opacity-100 transition-opacity">
+        <div className="flex items-center gap-1">
           <button
             onClick={e => { e.stopPropagation(); addPage(); }}
             className="p-1 text-gray-400 hover:text-brand-500 transition-colors"

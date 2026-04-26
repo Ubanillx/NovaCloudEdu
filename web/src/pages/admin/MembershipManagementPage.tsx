@@ -88,7 +88,7 @@ const QuotaModal: React.FC<QuotaModalProps> = ({ isOpen, onClose, onSuccess, pla
           <h3 className="text-lg font-bold text-gray-900 dark:text-white">
             编辑配额 — {PLAN_LABELS[plan?.code || ''] || plan?.name}
           </h3>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          <button onClick={onClose} aria-label="关闭" className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
             <X size={20} />
           </button>
         </div>
@@ -156,7 +156,7 @@ const GrantModal: React.FC<GrantModalProps> = ({ isOpen, onClose, onSuccess, pla
       <div className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden animate-in zoom-in-95 duration-200">
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800">
           <h3 className="text-lg font-bold text-gray-900 dark:text-white">为用户开通会员</h3>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"><X size={20} /></button>
+          <button onClick={onClose} aria-label="关闭" className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"><X size={20} /></button>
         </div>
         <div className="p-6 space-y-4">
           <div>
@@ -280,7 +280,7 @@ export const MembershipManagementPage: React.FC = () => {
           { label: '已过期', key: 'expired', icon: XCircle, color: 'text-gray-400', bg: 'bg-gray-50 dark:bg-gray-800/50' },
           { label: '已取消', key: 'cancelled', icon: Ban, color: 'text-red-500', bg: 'bg-red-50 dark:bg-red-900/10' },
         ].map(({ label, key, icon: Icon, color, bg }) => (
-          <div key={key} className={`${bg} rounded-2xl border border-gray-100 dark:border-gray-800 p-5 shadow-sm transition-all hover:shadow-md`}>
+          <div key={key} className={`${bg} rounded-2xl border border-gray-100 dark:border-gray-800 p-5 shadow-sm transition-all hover:shadow-sm`}>
             <div className="flex items-center justify-between">
               <div className={`p-2 rounded-xl bg-white dark:bg-gray-900 shadow-sm ${color}`}>
                 <Icon size={22} />
@@ -387,7 +387,7 @@ export const MembershipManagementPage: React.FC = () => {
                     <td className="px-6 py-4">
                       <button 
                         onClick={() => setQuotaPlan(p)} 
-                        className="p-2 text-gray-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded-lg transition-all opacity-0 group-hover:opacity-100" 
+                        className="p-2 text-gray-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded-lg transition-all" 
                         title="编辑配额"
                       >
                         <Edit2 size={18} />
@@ -465,7 +465,7 @@ export const MembershipManagementPage: React.FC = () => {
                     <tr key={String(m.id)} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors group">
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-50 to-indigo-50 dark:from-gray-800 dark:to-gray-800 flex items-center justify-center border border-gray-100 dark:border-gray-700">
+                          <div className="w-10 h-10 rounded-xl bg-white dark:bg-gray-900 flex items-center justify-center border border-gray-200 dark:border-gray-700 shadow-sm">
                             <Users size={20} className="text-brand-500" />
                           </div>
                           <div>
@@ -503,7 +503,7 @@ export const MembershipManagementPage: React.FC = () => {
                         </span>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="flex items-center gap-2">
                           {m.status === 'PENDING' && m.orderNo && (
                             <button
                               onClick={() => handleConfirmPayment(m.orderNo!)}

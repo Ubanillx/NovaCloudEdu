@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import {
   FileText, FileSpreadsheet, FileImage, FileArchive, FileAudio, FileVideo,
   File, Download, X, Loader2, Presentation, Eye, ExternalLink,
-  Phone, PhoneMissed, PhoneOff, Video,
+  Phone, PhoneMissed, PhoneOff, Video, Link as LinkIcon,
 } from 'lucide-react';
+import { apiClient, Configuration, LinkPreviewControllerApi, type LinkPreview } from '../../api';
 
 // ============ 工具函数 ============
 
@@ -46,6 +47,174 @@ const formatFileSize = (size: string): string => {
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
   if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   return `${(bytes / (1024 * 1024 * 1024)).toFixed(1)} GB`;
+};
+
+const URL_PATTERN = /(https?:\/\/[^\s<>"']+|www\.[^\s<>"']+)/gi;
+const TRAILING_URL_PUNCTUATION_PATTERN = /[),.;:!?，。！？；：、）】》」』]+$/;
+
+const normalizeUrl = (value: string) => (value.startsWith('www.') ? `https://${value}` : value);
+
+const getLinkTitle = (value: string) => {
+  try {
+    const url = new URL(normalizeUrl(value));
+    return url.hostname.replace(/^www\./, '');
+  } catch {
+    return '链接';
+  }
+};
+
+const getLinkDescription = (value: string) => {
+  try {
+    const url = new URL(normalizeUrl(value));
+    const path = `${url.pathname}${url.search}`;
+    return path && path !== '/' ? path : url.href;
+  } catch {
+    return value;
+  }
+};
+
+const splitTextWithLinks = (content: string) => {
+  const parts: Array<{ type: 'text' | 'link'; value: string }> = [];
+  let lastIndex = 0;
+  for (const match of content.matchAll(URL_PATTERN)) {
+    const rawValue = match[0];
+    const index = match.index ?? 0;
+    const trailingPunctuation = rawValue.match(TRAILING_URL_PUNCTUATION_PATTERN)?.[0] || '';
+    const value = trailingPunctuation ? rawValue.slice(0, -trailingPunctuation.length) : rawValue;
+    if (index > lastIndex) {
+      parts.push({ type: 'text', value: content.slice(lastIndex, index) });
+    }
+    if (value) {
+      parts.push({ type: 'link', value });
+    }
+    if (trailingPunctuation) {
+      parts.push({ type: 'text', value: trailingPunctuation });
+    }
+    lastIndex = index + rawValue.length;
+  }
+  if (lastIndex < content.length) {
+    parts.push({ type: 'text', value: content.slice(lastIndex) });
+  }
+  return parts;
+};
+
+const linkPreviewApi = new LinkPreviewControllerApi(new Configuration(), '', apiClient);
+const linkPreviewCache = new Map<string, LinkPreview | null>();
+
+const LinkCard: React.FC<{ url: string; isSelf: boolean }> = ({ url, isSelf }) => {
+  const href = normalizeUrl(url);
+  const [preview, setPreview] = useState<LinkPreview | null | undefined>(() => linkPreviewCache.get(href));
+
+  React.useEffect(() => {
+    let mounted = true;
+    if (linkPreviewCache.has(href)) {
+      setPreview(linkPreviewCache.get(href));
+      return () => { mounted = false; };
+    }
+
+    setPreview(undefined);
+    linkPreviewApi.preview({ linkPreviewRequest: { url: href } })
+      .then((res) => {
+        const data = res.data?.data;
+        const next = data || null;
+        linkPreviewCache.set(href, next);
+        if (mounted) setPreview(next);
+      })
+      .catch(() => {
+        linkPreviewCache.set(href, null);
+        if (mounted) setPreview(null);
+      });
+
+    return () => { mounted = false; };
+  }, [href]);
+
+  const title = preview?.title || getLinkTitle(url);
+  const description = preview === undefined
+    ? '正在读取页面信息...'
+    : preview?.description || getLinkDescription(url);
+  const siteName = preview?.siteName || getLinkTitle(url);
+  const imageUrl = preview?.imageUrl || preview?.iconUrl;
+
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={`mt-2 flex min-w-0 overflow-hidden rounded-xl border transition-colors active:scale-[0.99] ${
+        isSelf
+          ? 'border-white/20 bg-white/12 hover:bg-white/18 text-white'
+          : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 hover:bg-gray-100 dark:hover:bg-gray-700/70 text-gray-900 dark:text-gray-100'
+      }`}
+    >
+      {imageUrl ? (
+        <span className="h-[88px] w-[96px] shrink-0 bg-white/20 dark:bg-gray-800">
+          <img
+            src={imageUrl}
+            alt=""
+            className="h-full w-full object-cover"
+            loading="lazy"
+            referrerPolicy="no-referrer"
+          />
+        </span>
+      ) : (
+        <span className={`m-3 flex h-14 w-14 shrink-0 items-center justify-center rounded-xl ${
+          isSelf ? 'bg-white/15 text-white' : 'bg-white dark:bg-gray-800 text-brand-500'
+        }`}>
+          <LinkIcon size={22} />
+        </span>
+      )}
+      <span className="flex min-w-0 flex-1 flex-col justify-center p-3 pl-0">
+        <span className={`mb-1 flex items-center gap-1.5 text-[11px] font-medium ${isSelf ? 'text-white/65' : 'text-gray-400'}`}>
+          {preview === undefined && (
+            <span className={`h-1.5 w-1.5 rounded-full ${isSelf ? 'bg-white/50' : 'bg-brand-400'} animate-pulse`} />
+          )}
+          <span className="truncate">{siteName}</span>
+        </span>
+        <span className="line-clamp-2 text-sm font-semibold leading-snug">{title}</span>
+        <span className={`mt-1 line-clamp-2 text-xs leading-snug ${isSelf ? 'text-white/70' : 'text-gray-500 dark:text-gray-400'}`}>
+          {description}
+        </span>
+      </span>
+      <span className="shrink-0 self-start p-3 pl-0">
+        <ExternalLink size={15} className={isSelf ? 'text-white/70' : 'text-gray-400'} />
+      </span>
+    </a>
+  );
+};
+
+const TextMessage: React.FC<{ content: string; isSelf: boolean }> = ({ content, isSelf }) => {
+  const parts = splitTextWithLinks(content);
+  const hasLink = parts.some((part) => part.type === 'link');
+  if (!hasLink) {
+    return <span className="text-sm leading-relaxed break-words whitespace-pre-wrap">{content}</span>;
+  }
+
+  return (
+    <div className="space-y-1">
+      <p className="text-sm leading-relaxed break-words whitespace-pre-wrap">
+        {parts.map((part, index) => (
+          part.type === 'link' ? (
+            <a
+              key={`${part.value}-${index}`}
+              href={normalizeUrl(part.value)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={isSelf ? 'underline decoration-white/50 underline-offset-2' : 'text-brand-600 dark:text-brand-300 underline underline-offset-2'}
+            >
+              {part.value}
+            </a>
+          ) : (
+            <React.Fragment key={`${part.value}-${index}`}>{part.value}</React.Fragment>
+          )
+        ))}
+      </p>
+      {parts
+        .filter((part): part is { type: 'link'; value: string } => part.type === 'link')
+        .map((part, index) => (
+          <LinkCard key={`${part.value}-${index}`} url={part.value} isSelf={isSelf} />
+        ))}
+    </div>
+  );
 };
 
 // ============ 图片预览弹窗 ============
@@ -421,6 +590,7 @@ interface MessageBubbleProps {
   content: string;
   type: string;
   isSelf: boolean;
+  replyPreview?: React.ReactNode;
 }
 
 /**
@@ -429,22 +599,58 @@ interface MessageBubbleProps {
  * - FILE：显示文件卡片，无气泡
  * - TEXT/AUDIO/VIDEO：包裹在聊天气泡中
  */
-export const MessageBubble: React.FC<MessageBubbleProps> = ({ content, type, isSelf }) => {
+export const MessageBubble: React.FC<MessageBubbleProps> = ({ content, type, isSelf, replyPreview }) => {
   const upperType = (type || 'TEXT').toUpperCase();
 
   // 图片消息：不需要气泡
   if (upperType === 'IMAGE') {
-    return <ImageMessage content={content} />;
+    if (!replyPreview) return <ImageMessage content={content} />;
+    return (
+      <div
+        className={`max-w-[260px] overflow-hidden rounded-2xl p-2 shadow-sm ${
+          isSelf
+            ? 'bg-brand-500 text-white rounded-tr-sm'
+            : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-tl-sm border border-gray-100 dark:border-gray-800'
+        }`}
+      >
+        {replyPreview}
+        <ImageMessage content={content} />
+      </div>
+    );
   }
 
   // 文件消息：自带卡片样式，不需要气泡
   if (upperType === 'FILE') {
-    return <FileMessage content={content} isSelf={isSelf} />;
+    if (!replyPreview) return <FileMessage content={content} isSelf={isSelf} />;
+    return (
+      <div
+        className={`max-w-[280px] rounded-2xl p-2 shadow-sm ${
+          isSelf
+            ? 'bg-brand-500 text-white rounded-tr-sm'
+            : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-tl-sm border border-gray-100 dark:border-gray-800'
+        }`}
+      >
+        {replyPreview}
+        <FileMessage content={content} isSelf={isSelf} />
+      </div>
+    );
   }
 
   // 通话消息：自带卡片样式，不需要气泡
   if (upperType === 'CALL') {
-    return <CallMessage content={content} isSelf={isSelf} />;
+    if (!replyPreview) return <CallMessage content={content} isSelf={isSelf} />;
+    return (
+      <div
+        className={`rounded-2xl p-2 shadow-sm ${
+          isSelf
+            ? 'bg-brand-500 text-white rounded-tr-sm'
+            : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-tl-sm border border-gray-100 dark:border-gray-800'
+        }`}
+      >
+        {replyPreview}
+        <CallMessage content={content} isSelf={isSelf} />
+      </div>
+    );
   }
 
   // 其他消息（TEXT/AUDIO/VIDEO）：包裹气泡
@@ -454,17 +660,18 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ content, type, isS
   } else if (upperType === 'VIDEO') {
     inner = <span className="text-sm">🎬 视频消息</span>;
   } else {
-    inner = <span className="text-sm leading-relaxed break-words whitespace-pre-wrap">{content}</span>;
+    inner = <TextMessage content={content} isSelf={isSelf} />;
   }
 
   return (
     <div
-      className={`px-4 py-2.5 shadow-sm ${
+      className={`min-w-0 max-w-full px-4 py-2.5 shadow-sm ${
         isSelf
           ? 'bg-brand-500 text-white rounded-2xl rounded-tr-sm'
           : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-2xl rounded-tl-sm border border-gray-100 dark:border-gray-800'
       }`}
     >
+      {replyPreview}
       {inner}
     </div>
   );

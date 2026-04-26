@@ -100,7 +100,7 @@ export const TemplateGalleryModal: React.FC<TemplateGalleryModalProps> = ({
             <h3 className="text-lg font-bold text-gray-900 dark:text-white">模板库</h3>
             <span className="text-xs text-gray-400">{templates.length} 个模板</span>
           </div>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          <button onClick={onClose} aria-label="关闭" className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
             <X size={20} />
           </button>
         </div>
@@ -150,12 +150,12 @@ export const TemplateGalleryModal: React.FC<TemplateGalleryModalProps> = ({
               {templates.map((tpl) => (
                 <div
                   key={String(tpl.id)}
-                  className="group relative bg-white dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700 p-4 hover:border-brand-300 dark:hover:border-brand-700 hover:shadow-md transition-all cursor-pointer"
+                  className="group relative bg-white dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700 p-4 hover:border-brand-300 dark:hover:border-brand-700 hover:shadow-sm transition-all cursor-pointer"
                   onClick={() => handleUseTemplate(tpl)}
                 >
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-50 to-indigo-50 dark:from-brand-900/30 dark:to-indigo-900/30 flex items-center justify-center">
+                      <div className="w-8 h-8 rounded-lg bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 flex items-center justify-center shadow-sm">
                         <BookTemplate size={16} className="text-brand-500" />
                       </div>
                       <div>

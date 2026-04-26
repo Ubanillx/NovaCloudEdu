@@ -170,6 +170,107 @@ table.admin-table td {
 }
 
 /* ========================================
+   社区富文本编辑器与文章内容
+   ======================================== */
+.community-editor-content {
+  @apply text-base sm:text-lg text-gray-900 dark:text-gray-100 leading-8 font-medium;
+}
+
+.community-editor-content .tiptap {
+  min-height: 480px;
+  outline: none;
+}
+
+.community-editor-content .tiptap > * + *,
+.community-rendered-content > * + * {
+  margin-top: 0.9em;
+}
+
+.community-editor-content p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+  @apply text-gray-300 dark:text-gray-700;
+}
+
+.community-editor-content h1,
+.community-rendered-content h1 {
+  @apply text-2xl font-black text-gray-950 dark:text-white leading-tight mt-7 mb-3;
+}
+
+.community-editor-content h2,
+.community-rendered-content h2 {
+  @apply text-xl font-black text-gray-950 dark:text-white leading-snug mt-6 mb-2;
+}
+
+.community-editor-content h3,
+.community-rendered-content h3 {
+  @apply text-lg font-bold text-gray-950 dark:text-white leading-snug mt-5 mb-2;
+}
+
+.community-editor-content p,
+.community-rendered-content p {
+  @apply leading-8;
+}
+
+.community-editor-content ul,
+.community-rendered-content ul {
+  list-style: disc;
+  padding-left: 1.5rem;
+}
+
+.community-editor-content ol,
+.community-rendered-content ol {
+  list-style: decimal;
+  padding-left: 1.5rem;
+}
+
+.community-editor-content li,
+.community-rendered-content li {
+  display: list-item;
+  padding-left: 0.25rem;
+  margin-top: 0.35rem;
+}
+
+.community-editor-content li p,
+.community-rendered-content li p {
+  margin: 0;
+}
+
+.community-editor-content blockquote,
+.community-rendered-content blockquote {
+  @apply border-l-4 border-brand-200 dark:border-brand-800 pl-4 py-1 text-gray-600 dark:text-gray-400 italic bg-brand-50/40 dark:bg-brand-950/20 rounded-r-lg;
+}
+
+.community-editor-content code,
+.community-rendered-content code {
+  @apply px-1.5 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-sm font-mono text-brand-600 dark:text-brand-400;
+}
+
+.community-editor-content pre,
+.community-rendered-content pre {
+  @apply bg-gray-950 text-gray-100 rounded-xl p-4 overflow-x-auto text-sm leading-7;
+}
+
+.community-editor-content pre code,
+.community-rendered-content pre code {
+  @apply bg-transparent text-inherit p-0;
+}
+
+.community-editor-content a,
+.community-rendered-content a,
+.community-content-link {
+  @apply text-brand-600 dark:text-brand-400 underline underline-offset-4 decoration-brand-300 dark:decoration-brand-700;
+}
+
+.community-editor-content img,
+.community-rendered-content img,
+.community-content-image {
+  @apply rounded-xl max-w-full my-4 border border-gray-100 dark:border-gray-800;
+}
+
+/* ========================================
    PPT 生成助手动画
    ======================================== */
 @keyframes fadeIn {

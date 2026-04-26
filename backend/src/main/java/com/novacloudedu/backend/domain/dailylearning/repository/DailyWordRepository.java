@@ -43,7 +43,11 @@ public interface DailyWordRepository {
 
     DailyWordPage findByDifficultyPaged(Difficulty difficulty, int page, int size);
 
+    DailyWordPage findPaged(String category, Difficulty difficulty, int page, int size);
+
     DailyWordPage searchByWordPaged(String keyword, int page, int size);
+
+    List<String> findCategories();
 
     List<DailyWord> findRandomByCategory(String category, List<Long> excludeIds, int size);
 

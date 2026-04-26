@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useSider } from '../../context/SiderContext';
 import { AIApi, Configuration, apiClient } from '../../api';
 import type { AiAssistantVO } from '../../api/generated/models';
+import { Tooltip } from '../ui';
 import { LayoutGrid, MessageCircle, Bot, ChevronsLeft, ChevronsRight, Home, BookMarked, GraduationCap, PenTool } from 'lucide-react';
 
 interface SiderProps {
@@ -10,9 +11,15 @@ interface SiderProps {
 }
 
 /** 菜单项包装 */
-const SiderTooltip: React.FC<{ label: string; show: boolean; children: React.ReactNode }> = ({ children }) => (
-  <>{children}</>
-);
+const SiderTooltip: React.FC<{ label: string; show: boolean; children: React.ReactNode }> = ({ label, show, children }) => {
+  if (!show) return <>{children}</>;
+
+  return (
+    <Tooltip content={label} position="right" maxWidth={220} className="w-full">
+      {children}
+    </Tooltip>
+  );
+};
 
 export const Sider: React.FC<SiderProps> = ({ collapsed: propCollapsed = false }) => {
   const { siderHidden, siderCollapsed, setSiderCollapsed } = useSider();

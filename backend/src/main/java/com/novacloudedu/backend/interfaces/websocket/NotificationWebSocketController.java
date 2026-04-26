@@ -3,6 +3,7 @@ package com.novacloudedu.backend.interfaces.websocket;
 import com.novacloudedu.backend.application.service.NotificationService;
 import com.novacloudedu.backend.application.service.PrivateChatApplicationService;
 import com.novacloudedu.backend.application.service.FriendApplicationService;
+import com.novacloudedu.backend.application.service.GroupChatApplicationService;
 import com.novacloudedu.backend.interfaces.websocket.dto.NotificationEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +31,7 @@ public class NotificationWebSocketController {
 
     private final NotificationService notificationService;
     private final PrivateChatApplicationService privateChatApplicationService;
+    private final GroupChatApplicationService groupChatApplicationService;
     private final FriendApplicationService friendApplicationService;
 
     /**
@@ -64,8 +66,7 @@ public class NotificationWebSocketController {
         try {
             int privateUnread = privateChatApplicationService.getTotalUnreadCount(userId);
             int friendRequestCount = friendApplicationService.getPendingReceivedCount(userId);
-            // 群未读暂用0，后续可扩展
-            int groupUnread = 0;
+            int groupUnread = groupChatApplicationService.getTotalUnreadCount(userId);
 
             notificationService.notifyUser(userId, NotificationEvent.EventType.UNREAD_COUNT_CHANGED, Map.of(
                     "privateUnread", privateUnread,

@@ -19,6 +19,9 @@ export interface ChatSessionResponse {
     'partnerId'?: number;
     'partnerName'?: string;
     'partnerAvatar'?: string;
+    'lastMessageSenderId'?: number;
+    'lastMessage'?: string;
+    'lastMessageType'?: string;
     'lastMessageTime'?: string;
     'unreadCount'?: number;
 }

@@ -174,7 +174,7 @@ const DailyArticleListPage: React.FC = () => {
               <div
                 key={article.id}
                 onClick={() => navigate(`/daily-article/${article.id}`)}
-                className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden hover:shadow-lg hover:border-brand-300 dark:hover:border-brand-700 transition-all cursor-pointer group"
+                className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden hover:shadow-sm hover:border-brand-300 dark:hover:border-brand-700 transition-all cursor-pointer group"
               >
                 {/* Cover */}
                 <div className="relative aspect-video overflow-hidden bg-gray-100 dark:bg-gray-800">

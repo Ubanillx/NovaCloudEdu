@@ -9,6 +9,7 @@ import '../../../widgets/common/loading_widget.dart';
 import '../../../widgets/common/nova_refresh_header.dart';
 import '../../../widgets/toast/nova_message.dart';
 import '../../../widgets/tabs/nova_tab_bar.dart';
+import '../constants/post_types.dart';
 import '../services/post_service.dart';
 import 'post_detail_page.dart';
 import 'post_edit_page.dart';
@@ -55,7 +56,7 @@ class _CirclePageState extends State<CirclePage>
   // 点赞/收藏状态缓存
   final Map<int, bool> _thumbStatus = {};
   final Map<int, bool> _favourStatus = {};
-  
+
   // 用户公开信息缓存
   final Map<int, UserPublicResponse> _userInfoCache = {};
 
@@ -70,7 +71,9 @@ class _CirclePageState extends State<CirclePage>
   void _onTabChanged() {
     setState(() {});
     // 懒加载：切换到对应 Tab 时才加载数据
-    if (_tabController.index == 1 && !_followingLoaded && !_isLoadingFollowing) {
+    if (_tabController.index == 1 &&
+        !_followingLoaded &&
+        !_isLoadingFollowing) {
       _loadFollowingPosts();
     } else if (_tabController.index == 2 && !_topLoaded && !_isLoadingTop) {
       _loadTopPosts();
@@ -90,10 +93,7 @@ class _CirclePageState extends State<CirclePage>
     });
 
     try {
-      final result = await _postService.getPostList(
-        pageNum: 1,
-        pageSize: 20,
-      );
+      final result = await _postService.getPostList(pageNum: 1, pageSize: 20);
       if (result != null) {
         setState(() {
           _posts = result.posts?.toList() ?? [];
@@ -314,10 +314,8 @@ class _CirclePageState extends State<CirclePage>
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => PostDetailPage(
-          postId: post.id!,
-          initialPost: post,
-        ),
+        builder: (context) =>
+            PostDetailPage(postId: post.id!, initialPost: post),
       ),
     ).then((result) {
       if (result == true) _loadPosts();
@@ -370,10 +368,7 @@ class _CirclePageState extends State<CirclePage>
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           // Tab栏（移除标题文字，放在左侧）
-          NovaTabBar(
-            controller: _tabController,
-            tabs: _tabs,
-          ),
+          NovaTabBar(controller: _tabController, tabs: _tabs),
           const Spacer(),
           // 发布按钮 - SVG
           IconButton(
@@ -414,22 +409,19 @@ class _CirclePageState extends State<CirclePage>
         SliverPadding(
           padding: const EdgeInsets.all(16),
           sliver: SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                if (index >= _posts.length) {
-                  if (_hasMore) {
-                    _loadMorePosts();
-                    return const Padding(
-                      padding: EdgeInsets.all(16),
-                      child: LoadingWidget(size: 24, message: '加载中...'),
-                    );
-                  }
-                  return null;
+            delegate: SliverChildBuilderDelegate((context, index) {
+              if (index >= _posts.length) {
+                if (_hasMore) {
+                  _loadMorePosts();
+                  return const Padding(
+                    padding: EdgeInsets.all(16),
+                    child: LoadingWidget(size: 24, message: '加载中...'),
+                  );
                 }
-                return _buildPostCard(_posts[index]);
-              },
-              childCount: _posts.length + (_hasMore ? 1 : 0),
-            ),
+                return null;
+              }
+              return _buildPostCard(_posts[index]);
+            }, childCount: _posts.length + (_hasMore ? 1 : 0)),
           ),
         ),
       ],
@@ -494,9 +486,7 @@ class _CirclePageState extends State<CirclePage>
       onRefresh: _loadTopPosts,
       slivers: [
         // 时间筛选器
-        SliverToBoxAdapter(
-          child: _buildTopDaysFilter(),
-        ),
+        SliverToBoxAdapter(child: _buildTopDaysFilter()),
         // 帖子列表
         if (_topPosts.isEmpty)
           SliverFillRemaining(
@@ -506,22 +496,19 @@ class _CirclePageState extends State<CirclePage>
           SliverPadding(
             padding: const EdgeInsets.all(16),
             sliver: SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  if (index >= _topPosts.length) {
-                    if (_hasMoreTop) {
-                      _loadMoreTopPosts();
-                      return const Padding(
-                        padding: EdgeInsets.all(16),
-                        child: LoadingWidget(size: 24, message: '加载中...'),
-                      );
-                    }
-                    return null;
+              delegate: SliverChildBuilderDelegate((context, index) {
+                if (index >= _topPosts.length) {
+                  if (_hasMoreTop) {
+                    _loadMoreTopPosts();
+                    return const Padding(
+                      padding: EdgeInsets.all(16),
+                      child: LoadingWidget(size: 24, message: '加载中...'),
+                    );
                   }
-                  return _buildTopPostCard(_topPosts[index], index + 1);
-                },
-                childCount: _topPosts.length + (_hasMoreTop ? 1 : 0),
-              ),
+                  return null;
+                }
+                return _buildTopPostCard(_topPosts[index], index + 1);
+              }, childCount: _topPosts.length + (_hasMoreTop ? 1 : 0)),
             ),
           ),
       ],
@@ -547,18 +534,21 @@ class _CirclePageState extends State<CirclePage>
             child: GestureDetector(
               onTap: () => _changeTopDays(option['days'] as int),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
-                  color: isSelected 
-                      ? AppTheme.brand 
-                      : colors.surfaceVariant,
+                  color: isSelected ? AppTheme.brand : colors.surfaceVariant,
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Text(
                   option['label'] as String,
                   style: TextStyle(
                     fontSize: 13,
-                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                    fontWeight: isSelected
+                        ? FontWeight.w600
+                        : FontWeight.normal,
                     color: isSelected ? Colors.white : colors.textSecondary,
                   ),
                 ),
@@ -631,7 +621,11 @@ class _CirclePageState extends State<CirclePage>
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    Icon(PhosphorIcons.thumbsUp(PhosphorIconsStyle.fill), size: 14, color: AppTheme.brand),
+                    Icon(
+                      PhosphorIcons.thumbsUp(PhosphorIconsStyle.fill),
+                      size: 14,
+                      color: AppTheme.brand,
+                    ),
                     const SizedBox(width: 4),
                     Text(
                       '${post.thumbNum ?? 0}',
@@ -642,16 +636,26 @@ class _CirclePageState extends State<CirclePage>
                       ),
                     ),
                     const SizedBox(width: 16),
-                    Icon(PhosphorIcons.chatTeardropText(PhosphorIconsStyle.fill), size: 14, color: colors.textTertiary),
+                    Icon(
+                      PhosphorIcons.chatTeardropText(PhosphorIconsStyle.fill),
+                      size: 14,
+                      color: colors.textTertiary,
+                    ),
                     const SizedBox(width: 4),
                     Text(
                       '${post.commentNum ?? 0}',
-                      style: TextStyle(fontSize: 12, color: colors.textSecondary),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: colors.textSecondary,
+                      ),
                     ),
                     const Spacer(),
                     Text(
                       _formatTime(post.createTime),
-                      style: TextStyle(fontSize: 11, color: colors.textTertiary),
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: colors.textTertiary,
+                      ),
                     ),
                   ],
                 ),
@@ -669,25 +673,22 @@ class _CirclePageState extends State<CirclePage>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            icon,
-            size: 96,
-            color: colors.textTertiary,
-          ),
+          Icon(icon, size: 96, color: colors.textTertiary),
           const SizedBox(height: 16),
           Text(
             message,
-            style: TextStyle(
-              fontSize: 14,
-              color: colors.textSecondary,
-            ),
+            style: TextStyle(fontSize: 14, color: colors.textSecondary),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildEmptyStateWithAction(String message, String actionText, VoidCallback onAction) {
+  Widget _buildEmptyStateWithAction(
+    String message,
+    String actionText,
+    VoidCallback onAction,
+  ) {
     final colors = context.colors;
     return Center(
       child: Column(
@@ -701,10 +702,7 @@ class _CirclePageState extends State<CirclePage>
           const SizedBox(height: 16),
           Text(
             message,
-            style: TextStyle(
-              fontSize: 14,
-              color: colors.textSecondary,
-            ),
+            style: TextStyle(fontSize: 14, color: colors.textSecondary),
           ),
           const SizedBox(height: 24),
           GestureDetector(
@@ -735,10 +733,11 @@ class _CirclePageState extends State<CirclePage>
     final isDark = context.isDarkMode;
     final hasThumb = _thumbStatus[post.id] ?? false;
     final hasFavour = _favourStatus[post.id] ?? false;
-    
+    final postTypeLabel = getPostTypeLabel(post.postType);
+
     final userId = post.userId;
     final cachedInfo = userId != null ? _userInfoCache[userId] : null;
-    
+
     // 异步加载用户信息
     if (userId != null && !_userInfoCache.containsKey(userId)) {
       _getUserInfo(userId).then((info) {
@@ -765,85 +764,127 @@ class _CirclePageState extends State<CirclePage>
           ],
         ),
         child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // 用户信息
-          Row(
-            children: [
-              cachedInfo?.userAvatar != null && cachedInfo!.userAvatar!.isNotEmpty
-                  ? CircleAvatar(
-                      radius: 18,
-                      backgroundImage: NetworkImage(cachedInfo.userAvatar!),
-                      onBackgroundImageError: (_, __) {},
-                    )
-                  : CircleAvatar(
-                      radius: 18,
-                      backgroundColor: AppTheme.brand.withOpacity(isDark ? 0.2 : 0.1),
-                      child: Icon(PhosphorIcons.user(), size: 20, color: AppTheme.brand),
-                    ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      cachedInfo?.userName ?? '用户${post.userId ?? ""}',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: colors.textPrimary,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 用户信息
+            Row(
+              children: [
+                cachedInfo?.userAvatar != null &&
+                        cachedInfo!.userAvatar!.isNotEmpty
+                    ? CircleAvatar(
+                        radius: 18,
+                        backgroundImage: NetworkImage(cachedInfo.userAvatar!),
+                        onBackgroundImageError: (_, __) {},
+                      )
+                    : CircleAvatar(
+                        radius: 18,
+                        backgroundColor: AppTheme.brand.withOpacity(
+                          isDark ? 0.2 : 0.1,
+                        ),
+                        child: Icon(
+                          PhosphorIcons.user(),
+                          size: 20,
+                          color: AppTheme.brand,
+                        ),
                       ),
-                    ),
-                    Text(
-                      _formatTime(post.createTime),
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: colors.textTertiary,
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        cachedInfo?.userName ?? '用户${post.userId ?? ""}',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: colors.textPrimary,
+                        ),
                       ),
-                    ),
-                  ],
+                      Row(
+                        children: [
+                          if (postTypeLabel.isNotEmpty) ...[
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppTheme.brand.withOpacity(
+                                  isDark ? 0.16 : 0.08,
+                                ),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                postTypeLabel,
+                                style: const TextStyle(
+                                  fontSize: 10,
+                                  color: AppTheme.brand,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                          ],
+                          Text(
+                            _formatTime(post.createTime),
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: colors.textTertiary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          // 标题
-          Text(
-            post.title ?? '',
-            style: TextStyle(
-              fontSize: 17,
-              fontWeight: FontWeight.bold,
-              height: 1.3,
-              color: colors.textPrimary,
+              ],
             ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: 8),
-          // 内容
-          Text(
-            post.content ?? '',
-            style: TextStyle(
-              fontSize: 14,
-              color: colors.textSecondary,
-              height: 1.5,
-            ),
-            maxLines: 3,
-            overflow: TextOverflow.ellipsis,
-          ),
-          // 标签
-          if (post.tags != null && post.tags!.isNotEmpty && post.tags!.any((t) => t.isNotEmpty)) ...[
             const SizedBox(height: 12),
-            Wrap(
-              spacing: 8,
-              runSpacing: 6,
-              children: post.tags!
-                  .where((t) => t.isNotEmpty)
-                  .take(3)
-                  .map((tag) => Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            // 标题
+            Text(
+              post.title ?? '',
+              style: TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.bold,
+                height: 1.3,
+                color: colors.textPrimary,
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 8),
+            // 内容
+            Text(
+              post.content ?? '',
+              style: TextStyle(
+                fontSize: 14,
+                color: colors.textSecondary,
+                height: 1.5,
+              ),
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+            ),
+            // 标签
+            if (post.tags != null &&
+                post.tags!.isNotEmpty &&
+                post.tags!.any((t) => t.isNotEmpty)) ...[
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 8,
+                runSpacing: 6,
+                children: post.tags!
+                    .where((t) => t.isNotEmpty)
+                    .take(3)
+                    .map(
+                      (tag) => Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
-                          color: AppTheme.brand.withOpacity(isDark ? 0.15 : 0.08),
+                          color: AppTheme.brand.withOpacity(
+                            isDark ? 0.15 : 0.08,
+                          ),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
@@ -853,42 +894,47 @@ class _CirclePageState extends State<CirclePage>
                             color: AppTheme.brand,
                           ),
                         ),
-                      ))
-                  .toList(),
-            ),
-          ],
-          const SizedBox(height: 12),
-          // 底部操作栏
-          Row(
-            children: [
-              _buildActionButton(
-                icon: hasThumb ? PhosphorIcons.thumbsUp(PhosphorIconsStyle.fill) : PhosphorIcons.thumbsUp(),
-                count: post.thumbNum ?? 0,
-                isActive: hasThumb,
-                activeColor: AppTheme.brand,
-                onTap: () => _toggleThumb(post),
-              ),
-              const SizedBox(width: 24),
-              _buildActionButton(
-                icon: PhosphorIcons.chatTeardropText(),
-                count: post.commentNum ?? 0,
-                onTap: () => _navigateToPostDetail(post),
-              ),
-              const SizedBox(width: 24),
-              _buildActionButton(
-                icon: hasFavour ? PhosphorIcons.star(PhosphorIconsStyle.fill) : PhosphorIcons.star(),
-                count: post.favourNum ?? 0,
-                isActive: hasFavour,
-                activeColor: colors.warning,
-                onTap: () => _toggleFavour(post),
+                      ),
+                    )
+                    .toList(),
               ),
             ],
-          ),
-        ],
+            const SizedBox(height: 12),
+            // 底部操作栏
+            Row(
+              children: [
+                _buildActionButton(
+                  icon: hasThumb
+                      ? PhosphorIcons.thumbsUp(PhosphorIconsStyle.fill)
+                      : PhosphorIcons.thumbsUp(),
+                  count: post.thumbNum ?? 0,
+                  isActive: hasThumb,
+                  activeColor: AppTheme.brand,
+                  onTap: () => _toggleThumb(post),
+                ),
+                const SizedBox(width: 24),
+                _buildActionButton(
+                  icon: PhosphorIcons.chatTeardropText(),
+                  count: post.commentNum ?? 0,
+                  onTap: () => _navigateToPostDetail(post),
+                ),
+                const SizedBox(width: 24),
+                _buildActionButton(
+                  icon: hasFavour
+                      ? PhosphorIcons.star(PhosphorIconsStyle.fill)
+                      : PhosphorIcons.star(),
+                  count: post.favourNum ?? 0,
+                  isActive: hasFavour,
+                  activeColor: colors.warning,
+                  onTap: () => _toggleFavour(post),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 
   Widget _buildActionButton({
     required IconData icon,

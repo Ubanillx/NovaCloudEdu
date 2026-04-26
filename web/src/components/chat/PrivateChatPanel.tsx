@@ -1,15 +1,17 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   ArrowLeft, Send, User, Loader2, MessageCircle, Check, CheckCheck,
-  Image, Paperclip, Upload, Phone, Video,
+  Image, Paperclip, Upload, Phone, Video, Reply, UsersRound,
 } from 'lucide-react';
 import { apiClient, DefaultApi, Configuration } from '../../api';
-import type { ChatSessionResponse, ChatMessageResponse } from '../../api/generated/models';
+import type { ChatSessionResponse, ChatMessageResponse, GroupResponse } from '../../api/generated/models';
 import { useChat } from '../../context/ChatContext';
 import { useRtc } from '../../context/RtcContext';
 import toast from '../ui/Toast';
 import { MessageBubble } from './MessageContent';
+import { ReplyComposerBar, ReplyPreview } from './MessageReply';
 import { useChatUpload } from './useChatUpload';
+import GroupChatWindow from './GroupChatWindow';
 
 const api = new DefaultApi(new Configuration(), '', apiClient);
 
@@ -38,6 +40,87 @@ const formatMessageTime = (dateStr?: string) => {
   return `${hours}:${mins}`;
 };
 
+const getCurrentUserId = (): string => {
+  try {
+    const stored = localStorage.getItem('user_info');
+    if (stored) return String(JSON.parse(stored)?.id ?? '');
+  } catch { /* ignore */ }
+  return '';
+};
+
+type ConversationItem = {
+  id: string;
+  type: 'private' | 'group';
+  targetId: number;
+  title?: string;
+  avatar?: string;
+  preview?: string;
+  lastMessageType?: string;
+  lastMessageTime?: string;
+  unreadCount?: number;
+  lastMessageSenderId?: number;
+  lastMessageSenderName?: string;
+  memberCount?: number;
+};
+
+const formatPreviewContent = (content?: string, messageType?: string, prefix = '') => {
+  const type = (messageType || 'TEXT').toUpperCase();
+  if (type === 'IMAGE') return `${prefix}[图片]`;
+  if (type === 'FILE') {
+    const value = content || '';
+    return value.includes('|') ? `${prefix}[文件] ${value.split('|')[0] || '文件'}` : `${prefix}[文件]`;
+  }
+  if (type === 'AUDIO') return `${prefix}[语音]`;
+  if (type === 'VIDEO') return `${prefix}[视频]`;
+  if (type === 'CALL') return `${prefix}[通话]`;
+  const text = content?.trim();
+  return text ? `${prefix}${text}` : '暂无消息';
+};
+
+const getSessionPreview = (session: ConversationItem, currentUserId = getCurrentUserId()) => {
+  const senderIsMe = currentUserId && String(session.lastMessageSenderId) === currentUserId;
+  const prefix = senderIsMe
+    ? '我：'
+    : session.type === 'group' && session.lastMessageSenderName
+      ? `${session.lastMessageSenderName}：`
+      : '';
+  return formatPreviewContent(session.preview, session.lastMessageType, prefix);
+};
+
+const toPrivateConversation = (session: ChatSessionResponse): ConversationItem | null => {
+  if (!session.partnerId) return null;
+  return {
+    id: `private:${session.partnerId}`,
+    type: 'private',
+    targetId: session.partnerId,
+    title: session.partnerName,
+    avatar: session.partnerAvatar,
+    preview: session.lastMessage,
+    lastMessageType: session.lastMessageType,
+    lastMessageTime: session.lastMessageTime,
+    unreadCount: session.unreadCount,
+    lastMessageSenderId: session.lastMessageSenderId,
+  };
+};
+
+const toGroupConversation = (group: GroupResponse): ConversationItem | null => {
+  if (!group.id) return null;
+  return {
+    id: `group:${group.id}`,
+    type: 'group',
+    targetId: group.id,
+    title: group.groupName,
+    avatar: group.avatar,
+    preview: group.lastMessage,
+    lastMessageType: group.lastMessageType,
+    lastMessageTime: group.lastMessageTime || group.createTime,
+    unreadCount: group.unreadCount,
+    lastMessageSenderId: group.lastMessageSenderId,
+    lastMessageSenderName: group.lastMessageSenderName,
+    memberCount: group.memberCount,
+  };
+};
+
 // ============ 头像组件 ============
 
 const Avatar: React.FC<{ src?: string; name?: string; size?: 'sm' | 'md' | 'lg' }> = ({
@@ -50,7 +133,7 @@ const Avatar: React.FC<{ src?: string; name?: string; size?: 'sm' | 'md' | 'lg' 
   }
   const initial = name?.[0];
   return (
-    <div className={`${sizeMap[size]} rounded-xl bg-gradient-to-br from-brand-100 to-brand-50 dark:from-brand-900/40 dark:to-brand-800/20 text-brand-600 dark:text-brand-400 flex items-center justify-center shadow-inner`}>
+    <div className={`${sizeMap[size]} rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-brand-600 dark:text-brand-400 flex items-center justify-center shadow-sm`}>
       {initial ? <span className={`font-semibold ${textSize[size]}`}>{initial}</span> : <User size={size === 'sm' ? 16 : 20} />}
     </div>
   );
@@ -59,13 +142,13 @@ const Avatar: React.FC<{ src?: string; name?: string; size?: 'sm' | 'md' | 'lg' 
 // ============ 会话列表 ============
 
 interface SessionListProps {
-  sessions: ChatSessionResponse[];
+  sessions: ConversationItem[];
   loading: boolean;
-  activePartnerId: number | null;
-  onSelect: (session: ChatSessionResponse) => void;
+  activeSessionId: string | null;
+  onSelect: (session: ConversationItem) => void;
 }
 
-const SessionList: React.FC<SessionListProps> = ({ sessions, loading, activePartnerId, onSelect }) => {
+const SessionList: React.FC<SessionListProps> = ({ sessions, loading, activeSessionId, onSelect }) => {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-16 text-gray-400">
@@ -88,31 +171,41 @@ const SessionList: React.FC<SessionListProps> = ({ sessions, loading, activePart
     <div className="divide-y divide-gray-100 dark:divide-gray-800">
       {sessions.map((session) => (
         <button
-          key={session.partnerId}
+          key={session.id}
           onClick={() => onSelect(session)}
           className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors ${
-            String(activePartnerId) === String(session.partnerId)
+            activeSessionId === session.id
               ? 'bg-brand-50 dark:bg-brand-900/20'
               : 'hover:bg-gray-50 dark:hover:bg-gray-800/50'
           }`}
         >
           <div className="relative">
-            <Avatar src={session.partnerAvatar} name={session.partnerName} />
+            <Avatar src={session.avatar} name={session.title} />
             {(session.unreadCount ?? 0) > 0 && (
-              <span className="absolute -top-1 -right-1 inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold text-white bg-rose-500 rounded-full">
+              <span className="absolute -top-1 -right-1 inline-flex min-w-5 items-center justify-center h-5 px-1 text-[10px] font-bold text-white bg-rose-500 rounded-full ring-2 ring-white dark:ring-gray-900">
                 {session.unreadCount! > 99 ? '99+' : session.unreadCount}
               </span>
             )}
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between">
-              <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                {session.partnerName || '未知用户'}
-              </p>
+              <div className="flex items-center gap-1.5 min-w-0">
+                <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                  {session.title || (session.type === 'group' ? '未知群聊' : '未知用户')}
+                </p>
+                {session.type === 'group' && (
+                  <span className="shrink-0 rounded bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 text-[10px] font-medium text-gray-500 dark:text-gray-400">
+                    群聊
+                  </span>
+                )}
+              </div>
               <span className="text-[10px] text-gray-400 whitespace-nowrap ml-2">
                 {formatTime(session.lastMessageTime)}
               </span>
             </div>
+            <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400 truncate">
+              {getSessionPreview(session)}
+            </p>
           </div>
         </button>
       ))}
@@ -129,14 +222,6 @@ interface ChatWindowProps {
   onBack: () => void;
 }
 
-const getCurrentUserId = (): string => {
-  try {
-    const stored = localStorage.getItem('user_info');
-    if (stored) return String(JSON.parse(stored)?.id ?? '');
-  } catch { /* ignore */ }
-  return '';
-};
-
 const ChatWindow: React.FC<ChatWindowProps> = ({
   partnerId, partnerName, partnerAvatar, onBack,
 }) => {
@@ -146,13 +231,18 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   const [loading, setLoading] = useState(true);
   const [inputValue, setInputValue] = useState('');
   const [sending, setSending] = useState(false);
+  const [replyingTo, setReplyingTo] = useState<ChatMessageResponse | null>(null);
+  const [highlightedMessageId, setHighlightedMessageId] = useState<number | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const messageRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const currentUserId = useRef<string>(getCurrentUserId());
 
   // 上传功能
   const handleUploadSend = useCallback((content: string, type: string) => {
     const userInfo = (() => { try { return JSON.parse(localStorage.getItem('user_info') || '{}'); } catch { return {}; } })();
+    const replyTo = replyingTo?.messageId;
+    setReplyingTo(null);
     const optimisticMsg: ChatMessageResponse = {
       messageId: Date.now(),
       senderId: -1,
@@ -161,12 +251,13 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
       receiverId: partnerId,
       content,
       type,
+      replyTo,
       createTime: new Date().toISOString(),
       read: false,
     };
     setMessages((prev) => [...prev, optimisticMsg]);
-    sendPrivateMessage(partnerId, content, type);
-  }, [partnerId, sendPrivateMessage]);
+    sendPrivateMessage(partnerId, content, type, replyTo);
+  }, [partnerId, replyingTo, sendPrivateMessage]);
 
   const {
     uploading, isDragging, imageInputRef, fileInputRef,
@@ -211,6 +302,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
         receiverId: latest.receiverId,
         content: latest.content,
         type: latest.type,
+        replyTo: latest.replyTo,
         createTime: latest.createTime,
         read: latest.isRead,
       };
@@ -267,6 +359,8 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
 
     setSending(true);
     setInputValue('');
+    const replyTo = replyingTo?.messageId;
+    setReplyingTo(null);
 
     // 乐观更新（senderId 用 -1 作为占位标记，后续 WebSocket 回传时替换）
     const userInfo = (() => { try { return JSON.parse(localStorage.getItem('user_info') || '{}'); } catch { return {}; } })();
@@ -278,13 +372,14 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
       receiverId: partnerId,
       content,
       type: 'TEXT',
+      replyTo,
       createTime: new Date().toISOString(),
       read: false,
     };
     setMessages((prev) => [...prev, optimisticMsg]);
 
     try {
-      sendPrivateMessage(partnerId, content, 'TEXT');
+      sendPrivateMessage(partnerId, content, 'TEXT', replyTo);
     } catch {
       toast.error('发送失败');
     } finally {
@@ -295,6 +390,21 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   // 判断是否是自己发送的消息（ID 转字符串比较，避免大整数精度丢失）
   const isSelf = (msg: ChatMessageResponse) =>
     msg.senderId === -1 || (currentUserId.current !== '' && String(msg.senderId) === currentUserId.current);
+
+  const findReplyMessage = (replyTo?: number) =>
+    replyTo ? messages.find((msg) => String(msg.messageId) === String(replyTo)) || null : null;
+
+  const scrollToMessage = (messageId?: number) => {
+    if (!messageId) return;
+    const node = messageRefs.current[String(messageId)];
+    if (!node) {
+      toast.info('引用的消息不在当前记录中');
+      return;
+    }
+    node.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setHighlightedMessageId(messageId);
+    window.setTimeout(() => setHighlightedMessageId((current) => (current === messageId ? null : current)), 1400);
+  };
 
   return (
     <div className="flex flex-col h-full">
@@ -362,7 +472,12 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
             return (
               <div
                 key={msg.messageId}
-                className={`flex gap-2 ${self ? 'flex-row-reverse' : ''}`}
+                ref={(node) => { if (msg.messageId) messageRefs.current[String(msg.messageId)] = node; }}
+                className={`group flex gap-2 rounded-2xl transition-shadow ${self ? 'flex-row-reverse' : ''} ${
+                  highlightedMessageId && String(highlightedMessageId) === String(msg.messageId)
+                    ? 'ring-2 ring-brand-300 ring-offset-2 ring-offset-gray-50 dark:ring-offset-gray-950'
+                    : ''
+                }`}
               >
                 <Avatar
                   src={self ? (msg.senderAvatar || undefined) : (msg.senderAvatar || partnerAvatar)}
@@ -370,7 +485,20 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
                   size="sm"
                 />
                 <div className={`max-w-[70%] ${self ? 'items-end' : 'items-start'} flex flex-col`}>
-                  <MessageBubble content={msg.content || ''} type={msg.type || 'TEXT'} isSelf={self} />
+                  <MessageBubble
+                    content={msg.content || ''}
+                    type={msg.type || 'TEXT'}
+                    isSelf={self}
+                    replyPreview={msg.replyTo ? (
+                      <ReplyPreview
+                        message={findReplyMessage(msg.replyTo)}
+                        fallbackName={partnerName}
+                        isSelf={self}
+                        embedded
+                        onClick={() => scrollToMessage(msg.replyTo)}
+                      />
+                    ) : undefined}
+                  />
                   <div className={`flex items-center gap-1 mt-1 ${self ? 'flex-row-reverse' : ''}`}>
                     <span className="text-[10px] text-gray-400">
                       {formatMessageTime(msg.createTime)}
@@ -384,6 +512,16 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
                     )}
                   </div>
                 </div>
+                {msg.messageId && msg.senderId !== -1 && (
+                  <button
+                    type="button"
+                    onClick={() => setReplyingTo(msg)}
+                    className="self-center p-1.5 rounded-lg text-gray-300 hover:text-brand-500 hover:bg-white dark:hover:bg-gray-800 transition-all"
+                    title="引用回复"
+                  >
+                    <Reply size={14} />
+                  </button>
+                )}
               </div>
             );
           })
@@ -405,6 +543,13 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
 
       {/* 输入栏 */}
       <div className="px-4 py-3 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
+        {replyingTo && (
+          <ReplyComposerBar
+            message={replyingTo}
+            fallbackName={partnerName}
+            onCancel={() => setReplyingTo(null)}
+          />
+        )}
         <div className="flex items-center gap-1.5">
           {/* 图片按钮 */}
           <button
@@ -456,33 +601,55 @@ interface PrivateChatPanelProps {
   initialPartnerId?: number;
   initialPartnerName?: string;
   initialPartnerAvatar?: string;
+  initialGroupId?: number;
+  initialGroupName?: string;
+  initialGroupAvatar?: string;
 }
 
 const PrivateChatPanel: React.FC<PrivateChatPanelProps> = ({
   initialPartnerId,
   initialPartnerName,
   initialPartnerAvatar,
+  initialGroupId,
+  initialGroupName,
+  initialGroupAvatar,
 }) => {
-  const [sessions, setSessions] = useState<ChatSessionResponse[]>([]);
+  const [sessions, setSessions] = useState<ConversationItem[]>([]);
   const [loadingSessions, setLoadingSessions] = useState(true);
   const [activeSession, setActiveSession] = useState<{
-    partnerId: number;
-    partnerName?: string;
-    partnerAvatar?: string;
+    type: 'private' | 'group';
+    targetId: number;
+    title?: string;
+    avatar?: string;
   } | null>(
     initialPartnerId
-      ? { partnerId: initialPartnerId, partnerName: initialPartnerName, partnerAvatar: initialPartnerAvatar }
+      ? { type: 'private', targetId: initialPartnerId, title: initialPartnerName, avatar: initialPartnerAvatar }
+      : initialGroupId
+        ? { type: 'group', targetId: initialGroupId, title: initialGroupName, avatar: initialGroupAvatar }
       : null,
   );
 
-  const { chatMessages } = useChat();
+  const { chatMessages, groupMessages, groupMessagesSent } = useChat();
 
   // 加载会话列表
   const loadSessions = useCallback(async () => {
     setLoadingSessions(true);
     try {
-      const res = await api.getSessionList();
-      setSessions(res.data?.data || []);
+      const [privateRes, groupRes] = await Promise.all([
+        api.getSessionList(),
+        api.getMyGroups(),
+      ]);
+      const privateSessions = (privateRes.data?.data || [])
+        .map(toPrivateConversation)
+        .filter((item): item is ConversationItem => item !== null);
+      const groupSessions = (groupRes.data?.data || [])
+        .map(toGroupConversation)
+        .filter((item): item is ConversationItem => item !== null);
+      setSessions([...privateSessions, ...groupSessions].sort((a, b) => {
+        const aTime = a.lastMessageTime ? new Date(a.lastMessageTime).getTime() : 0;
+        const bTime = b.lastMessageTime ? new Date(b.lastMessageTime).getTime() : 0;
+        return bTime - aTime;
+      }));
     } catch {
       toast.error('加载会话列表失败');
     } finally {
@@ -492,20 +659,48 @@ const PrivateChatPanel: React.FC<PrivateChatPanelProps> = ({
 
   useEffect(() => { loadSessions(); }, [loadSessions]);
 
+  useEffect(() => {
+    if (initialPartnerId) {
+      setActiveSession({
+        type: 'private',
+        targetId: initialPartnerId,
+        title: initialPartnerName,
+        avatar: initialPartnerAvatar,
+      });
+      return;
+    }
+    if (initialGroupId) {
+      setActiveSession({
+        type: 'group',
+        targetId: initialGroupId,
+        title: initialGroupName,
+        avatar: initialGroupAvatar,
+      });
+    }
+  }, [initialGroupAvatar, initialGroupId, initialGroupName, initialPartnerAvatar, initialPartnerId, initialPartnerName]);
+
   // 新消息时刷新会话列表
   useEffect(() => {
-    if (chatMessages.length > 0) {
+    if (chatMessages.length > 0 || groupMessages.length > 0 || groupMessagesSent.length > 0) {
       loadSessions();
     }
-  }, [chatMessages, loadSessions]);
+  }, [chatMessages, groupMessages, groupMessagesSent, loadSessions]);
 
-  const handleSelectSession = (session: ChatSessionResponse) => {
+  const handleSelectSession = (session: ConversationItem) => {
     setActiveSession({
-      partnerId: session.partnerId!,
-      partnerName: session.partnerName,
-      partnerAvatar: session.partnerAvatar,
+      type: session.type,
+      targetId: session.targetId,
+      title: session.title,
+      avatar: session.avatar,
     });
+    if ((session.unreadCount ?? 0) > 0) {
+      setSessions((prev) => prev.map((item) => (
+        item.id === session.id ? { ...item, unreadCount: 0 } : item
+      )));
+    }
   };
+
+  const activeSessionId = activeSession ? `${activeSession.type}:${activeSession.targetId}` : null;
 
   return (
     <div className="flex h-full">
@@ -522,7 +717,7 @@ const PrivateChatPanel: React.FC<PrivateChatPanelProps> = ({
           <SessionList
             sessions={sessions}
             loading={loadingSessions}
-            activePartnerId={activeSession?.partnerId ?? null}
+            activeSessionId={activeSessionId}
             onSelect={handleSelectSession}
           />
         </div>
@@ -530,17 +725,29 @@ const PrivateChatPanel: React.FC<PrivateChatPanelProps> = ({
 
       {/* 聊天窗口（右） */}
       <div className={`flex-1 flex flex-col ${activeSession ? 'flex' : 'hidden lg:flex'}`}>
-        {activeSession ? (
+        {activeSession?.type === 'private' ? (
           <ChatWindow
-            key={activeSession.partnerId}
-            partnerId={activeSession.partnerId}
-            partnerName={activeSession.partnerName}
-            partnerAvatar={activeSession.partnerAvatar}
+            key={`private:${activeSession.targetId}`}
+            partnerId={activeSession.targetId}
+            partnerName={activeSession.title}
+            partnerAvatar={activeSession.avatar}
             onBack={() => setActiveSession(null)}
+          />
+        ) : activeSession?.type === 'group' ? (
+          <GroupChatWindow
+            key={`group:${activeSession.targetId}`}
+            groupId={activeSession.targetId}
+            groupName={activeSession.title}
+            groupAvatar={activeSession.avatar}
+            onBack={() => setActiveSession(null)}
+            onGroupUpdated={loadSessions}
           />
         ) : (
           <div className="flex-1 flex flex-col items-center justify-center text-gray-400">
-            <MessageCircle size={48} className="mb-4 opacity-30" />
+            <div className="mb-4 flex items-center gap-3 opacity-30">
+              <MessageCircle size={42} />
+              <UsersRound size={42} />
+            </div>
             <p className="text-sm">选择一个会话开始聊天</p>
           </div>
         )}

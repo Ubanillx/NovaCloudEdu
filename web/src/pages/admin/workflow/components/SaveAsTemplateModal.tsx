@@ -57,7 +57,7 @@ export const SaveAsTemplateModal: React.FC<SaveAsTemplateModalProps> = ({
             <BookTemplate size={18} className="text-brand-500" />
             <h3 className="text-lg font-bold text-gray-900 dark:text-white">保存为模板</h3>
           </div>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          <button onClick={onClose} aria-label="关闭" className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
             <X size={20} />
           </button>
         </div>

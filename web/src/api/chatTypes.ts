@@ -10,6 +10,7 @@ export interface WsChatMessage {
   receiverId: number;
   content?: string;
   type: MessageType;
+  replyTo?: number;
   createTime?: string;
   isRead?: boolean;
 }
@@ -53,9 +54,13 @@ export type NotificationType =
   | 'FRIEND_REQUEST_RECEIVED'
   | 'FRIEND_REQUEST_HANDLED'
   | 'NEW_FRIEND'
+  | 'FRIEND_REMOVED'
   | 'GROUP_JOIN_REQUEST_RECEIVED'
+  | 'GROUP_JOIN_REQUEST_HANDLED'
   | 'GROUP_INVITED'
   | 'GROUP_REMOVED'
+  | 'GROUP_UPDATED'
+  | 'GROUP_DISSOLVED'
   | 'UNREAD_COUNT_CHANGED'
   | 'SYSTEM_NOTIFICATION';
 

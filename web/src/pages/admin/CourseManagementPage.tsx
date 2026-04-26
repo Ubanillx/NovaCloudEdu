@@ -178,7 +178,7 @@ const CourseFormModal: React.FC<CourseFormModalProps> = ({ isOpen, onClose, onSu
           <h3 className="text-lg font-bold text-gray-900 dark:text-white">
             {isEdit ? '编辑课程' : '新增课程'}
           </h3>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          <button onClick={onClose} aria-label="关闭" className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
             <X size={20} />
           </button>
         </div>
@@ -449,7 +449,7 @@ export const CourseManagementPage: React.FC = () => {
                   <tr key={String(course.id)} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors group">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-4">
-                        <div className="w-16 h-12 rounded-xl bg-gradient-to-br from-brand-50 to-indigo-50 dark:from-gray-800 dark:to-gray-800 border border-gray-100 dark:border-gray-700 overflow-hidden flex-shrink-0">
+                        <div className="w-16 h-12 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 overflow-hidden flex-shrink-0 shadow-sm">
                           {course.coverImage ? (
                             <img src={course.coverImage} alt="" className="w-full h-full object-cover" />
                           ) : (
@@ -506,7 +506,7 @@ export const CourseManagementPage: React.FC = () => {
                       {course.createTime ? new Date(course.createTime).toLocaleDateString() : '-'}
                     </td>
                     <td className="px-6 py-4">
-                      <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="flex items-center gap-2">
                         <button onClick={() => navigate(`/admin/courses/${String(course.id)}`)}
                           className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-all" title="章节管理">
                           <List size={18} />

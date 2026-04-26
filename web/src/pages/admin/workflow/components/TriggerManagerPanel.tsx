@@ -183,7 +183,7 @@ export const TriggerManagerPanel: React.FC<TriggerManagerPanelProps> = ({
             >
               <Plus size={16} />
             </button>
-            <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+            <button onClick={onClose} aria-label="关闭" className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
               <X size={20} />
             </button>
           </div>
@@ -336,7 +336,7 @@ export const TriggerManagerPanel: React.FC<TriggerManagerPanelProps> = ({
                         />
                       )}
                     </div>
-                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="flex items-center gap-1">
                       <button
                         onClick={() => handleToggle(t)}
                         className={`p-1.5 rounded-lg transition-all ${

@@ -21,6 +21,7 @@ public class PrivateMessage {
     private UserId receiverId;
     private String content;
     private MessageType type;
+    private MessageId replyTo;
     private boolean isRead;
     private LocalDateTime createTime;
     private boolean isDelete;
@@ -29,11 +30,19 @@ public class PrivateMessage {
      * 创建新消息
      */
     public static PrivateMessage create(UserId senderId, UserId receiverId, String content, MessageType type) {
+        return create(senderId, receiverId, content, type, null);
+    }
+
+    /**
+     * 创建新消息
+     */
+    public static PrivateMessage create(UserId senderId, UserId receiverId, String content, MessageType type, MessageId replyTo) {
         PrivateMessage message = new PrivateMessage();
         message.senderId = senderId;
         message.receiverId = receiverId;
         message.content = content;
         message.type = type;
+        message.replyTo = replyTo;
         message.isRead = false;
         message.createTime = LocalDateTime.now();
         message.isDelete = false;
@@ -44,7 +53,7 @@ public class PrivateMessage {
      * 从持久化数据重建
      */
     public static PrivateMessage reconstruct(MessageId id, UserId senderId, UserId receiverId,
-                                              String content, MessageType type, boolean isRead,
+                                              String content, MessageType type, MessageId replyTo, boolean isRead,
                                               LocalDateTime createTime, boolean isDelete) {
         PrivateMessage message = new PrivateMessage();
         message.id = id;
@@ -52,6 +61,7 @@ public class PrivateMessage {
         message.receiverId = receiverId;
         message.content = content;
         message.type = type;
+        message.replyTo = replyTo;
         message.isRead = isRead;
         message.createTime = createTime;
         message.isDelete = isDelete;

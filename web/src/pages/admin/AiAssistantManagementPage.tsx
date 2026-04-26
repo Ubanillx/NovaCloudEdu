@@ -33,12 +33,13 @@ import {
   Image as ImageIcon,
 } from 'lucide-react';
 import MarkdownRenderer from '../../components/chat/MarkdownRenderer';
-import { apiClient, AIApi, DefaultApi, Configuration, getToken } from '../../api';
+import { apiClient, AIApi, DefaultApi, MCPApi, Configuration, getToken } from '../../api';
 import type { AiAssistantVO, CreateAiAssistantCommand, UpdateAiAssistantCommand, KnowledgeBaseVO, WorkflowResponse, WorkflowSkillVO } from '../../api/generated/models';
 import { toast, TruncateWithTooltip, ImageUploadArea } from '../../components/ui';
 
 const aiApi = new AIApi(new Configuration(), '', apiClient);
 const defaultApi = new DefaultApi(new Configuration(), '', apiClient);
+const mcpApi = new MCPApi(new Configuration(), '', apiClient);
 
 // 获取当前用户ID（雪花ID，运行时为字符串）
 const getCurrentUserId = (): number => {
@@ -69,6 +70,27 @@ const CATEGORY_OPTIONS = [
   { value: '科学', label: '科学' },
 ];
 
+interface ChatModelOption {
+  modelId: string;
+  provider?: string;
+  model?: string;
+  name?: string;
+  type?: string;
+  enabled?: boolean;
+  isDefault?: boolean;
+  isDefaultVision?: boolean;
+  temperature?: number;
+  topP?: number;
+  maxTokens?: number;
+}
+
+interface ChatProviderOption {
+  provider: string;
+  enabled?: boolean;
+  modelCount?: number;
+  isDefault?: boolean;
+}
+
 // ======================== 表单弹窗组件 ========================
 interface AssistantFormModalProps {
   isOpen: boolean;
@@ -85,6 +107,11 @@ const AssistantFormModal: React.FC<AssistantFormModalProps> = ({ isOpen, onClose
   const [aiAvatarGenerating, setAiAvatarGenerating] = useState(false);
   const [showAiAvatarPanel, setShowAiAvatarPanel] = useState(false);
   const [aiAvatarPrompt, setAiAvatarPrompt] = useState('');
+  const [modelOptions, setModelOptions] = useState<ChatModelOption[]>([]);
+  const [providerOptions, setProviderOptions] = useState<ChatProviderOption[]>([]);
+  const [selectedProvider, setSelectedProvider] = useState('');
+  const [modelsLoading, setModelsLoading] = useState(false);
+  const [providersLoading, setProvidersLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -133,13 +160,116 @@ const AssistantFormModal: React.FC<AssistantFormModalProps> = ({ isOpen, onClose
       });
     }
     setActiveTab('basic');
+    setSelectedProvider(assistant?.modelName?.split('/')[0] || '');
   }, [assistant, isOpen]);
+
+  const applyModelDefaults = useCallback((model: ChatModelOption) => {
+    setFormData(prev => ({
+      ...prev,
+      modelName: model.modelId,
+      temperature: model.temperature != null ? String(model.temperature) : prev.temperature,
+      topP: model.topP != null ? String(model.topP) : prev.topP,
+      maxTokens: model.maxTokens != null ? String(model.maxTokens) : prev.maxTokens,
+    }));
+  }, []);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const fetchProviders = async () => {
+      setProvidersLoading(true);
+      try {
+        const response = await apiClient.get('/api/ai/chat/model-providers');
+        const list = Array.isArray(response.data?.data) ? response.data.data : [];
+        const providers = list
+          .filter((item: any) => item?.provider)
+          .map((item: any) => ({
+            provider: String(item.provider),
+            enabled: item.enabled,
+            modelCount: item.modelCount,
+            isDefault: item.isDefault,
+          })) as ChatProviderOption[];
+        setProviderOptions(providers);
+        setSelectedProvider(prev => prev
+          || providers.find(provider => provider.isDefault)?.provider
+          || providers[0]?.provider
+          || '');
+      } catch (error) {
+        console.error('获取模型供应商失败:', error);
+        toast.error('获取模型供应商失败，请检查后端模型配置');
+      } finally {
+        setProvidersLoading(false);
+      }
+    };
+
+    fetchProviders();
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen || !selectedProvider) return;
+
+    const fetchModels = async () => {
+      setModelsLoading(true);
+      try {
+        const response = await apiClient.get('/api/ai/chat/models', {
+          params: { provider: selectedProvider },
+        });
+        const list = Array.isArray(response.data?.data) ? response.data.data : [];
+        const models = list
+          .filter((item: any) => item?.modelId)
+          .map((item: any) => ({
+            modelId: String(item.modelId),
+            provider: item.provider,
+            model: item.model,
+            type: item.type,
+            enabled: item.enabled,
+            isDefault: item.isDefault,
+            isDefaultVision: item.isDefaultVision,
+            temperature: item.temperature,
+            topP: item.topP,
+            maxTokens: item.maxTokens,
+            name: item.name,
+          })) as ChatModelOption[];
+
+        setModelOptions(models);
+
+        const currentProvider = formData.modelName.split('/')[0];
+        if (!formData.modelName || currentProvider !== selectedProvider) {
+          const defaultModel = models.find(model => model.isDefault)
+            || models.find(model => model.type === 'text')
+            || models[0];
+          if (defaultModel) {
+            applyModelDefaults(defaultModel);
+          }
+        }
+      } catch (error) {
+        console.error('获取模型列表失败:', error);
+        toast.error('获取模型列表失败，请检查后端模型配置');
+      } finally {
+        setModelsLoading(false);
+      }
+    };
+
+    fetchModels();
+  }, [applyModelDefaults, isOpen, selectedProvider]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!formData.name.trim()) {
       toast.warning('请输入助手名称');
+      return;
+    }
+
+    if (!formData.modelName.trim()) {
+      toast.warning('请选择后端已配置的模型');
+      setActiveTab('model');
+      return;
+    }
+
+    if (modelOptions.length > 0 && !modelOptions.some(model => model.modelId === formData.modelName)) {
+      toast.warning('当前模型未在后端启用，请重新选择模型');
+      setActiveTab('model');
       return;
     }
 
@@ -212,6 +342,10 @@ const AssistantFormModal: React.FC<AssistantFormModalProps> = ({ isOpen, onClose
         ? 'bg-brand-600 text-white shadow-sm'
         : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
     }`;
+  const selectedModelMissing = !!formData.modelName
+    && !modelsLoading
+    && modelOptions.length > 0
+    && !modelOptions.some(model => model.modelId === formData.modelName);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -223,7 +357,7 @@ const AssistantFormModal: React.FC<AssistantFormModalProps> = ({ isOpen, onClose
             <Bot size={20} className="text-brand-600" />
             {isEdit ? '编辑 AI 助手' : '新建 AI 助手'}
           </h3>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          <button onClick={onClose} aria-label="关闭" className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
             <X size={20} />
           </button>
         </div>
@@ -403,14 +537,72 @@ const AssistantFormModal: React.FC<AssistantFormModalProps> = ({ isOpen, onClose
           {activeTab === 'model' && (
             <>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">模型名称</label>
-                <input
-                  type="text"
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">模型提供商</label>
+                  <span className="text-xs text-gray-400">
+                    {providersLoading ? '正在读取...' : `${providerOptions.length} 个提供商`}
+                  </span>
+                </div>
+                <select
+                  value={selectedProvider}
+                  onChange={(e) => {
+                    setSelectedProvider(e.target.value);
+                    setFormData(prev => ({ ...prev, modelName: '' }));
+                    setModelOptions([]);
+                  }}
+                  disabled={providersLoading || providerOptions.length === 0}
+                  className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  <option value="">
+                    {providersLoading ? '正在加载提供商...' : '请选择模型提供商'}
+                  </option>
+                  {providerOptions.map(provider => (
+                    <option key={provider.provider} value={provider.provider}>
+                      {provider.provider}{provider.isDefault ? '（默认）' : ''}{provider.modelCount != null ? ` · ${provider.modelCount} 个模型` : ''}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">模型名称</label>
+                  <span className="text-xs text-gray-400">
+                    {modelsLoading ? '正在读取后端配置...' : `${modelOptions.length} 个可用模型`}
+                  </span>
+                </div>
+                <select
                   value={formData.modelName}
-                  onChange={(e) => setFormData(prev => ({ ...prev, modelName: e.target.value }))}
-                  className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all"
-                  placeholder="如: gpt-4o-mini, deepseek-chat"
-                />
+                  onChange={(e) => {
+                    const selected = modelOptions.find(model => model.modelId === e.target.value);
+                    if (selected) {
+                      applyModelDefaults(selected);
+                    } else {
+                      setFormData(prev => ({ ...prev, modelName: e.target.value }));
+                    }
+                  }}
+                  disabled={modelsLoading || modelOptions.length === 0}
+                  className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  <option value="">
+                    {modelsLoading ? '正在加载模型...' : '请选择后端已启用的模型'}
+                  </option>
+                  {selectedModelMissing && (
+                    <option value={formData.modelName}>
+                      {formData.modelName}（当前配置未启用）
+                    </option>
+                  )}
+                  {modelOptions.map(model => (
+                    <option key={model.modelId} value={model.modelId}>
+                      {model.name && model.name !== model.model ? `${model.model} - ${model.name}` : model.modelId}
+                      {model.isDefault ? '（默认）' : ''}{model.type ? ` · ${model.type}` : ''}
+                    </option>
+                  ))}
+                </select>
+                {selectedModelMissing && (
+                  <p className="mt-1.5 text-xs text-amber-600 dark:text-amber-400">
+                    当前助手保存的模型不在后端已启用模型列表中，请重新选择后再保存。
+                  </p>
+                )}
               </div>
               <div className="grid grid-cols-3 gap-4">
                 <div>
@@ -507,11 +699,11 @@ const AssistantDetailModal: React.FC<AssistantDetailModalProps> = ({ isOpen, onC
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-brand-500/20">
+            <div className="w-10 h-10 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 flex items-center justify-center shadow-sm">
               {assistant.avatarUrl ? (
                 <img src={assistant.avatarUrl} alt="" className="w-full h-full rounded-xl object-cover" />
               ) : (
-                <Bot size={20} className="text-white" />
+                <Bot size={20} className="text-brand-600 dark:text-brand-400" />
               )}
             </div>
             <div>
@@ -528,7 +720,7 @@ const AssistantDetailModal: React.FC<AssistantDetailModalProps> = ({ isOpen, onC
               </div>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          <button onClick={onClose} aria-label="关闭" className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
             <X size={20} />
           </button>
         </div>
@@ -660,8 +852,7 @@ const AssistantDetailModal: React.FC<AssistantDetailModalProps> = ({ isOpen, onC
         {/* Footer */}
         <div className="flex items-center justify-end px-6 py-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/50">
           <button
-            onClick={onClose}
-            className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+            onClick={onClose} className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
           >
             关闭
           </button>
@@ -763,7 +954,7 @@ const KnowledgeBaseBindModal: React.FC<KnowledgeBaseBindModalProps> = ({ isOpen,
             <Database size={20} className="text-brand-600" />
             知识库管理
           </h3>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          <button onClick={onClose} aria-label="关闭" className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
             <X size={20} />
           </button>
         </div>
@@ -771,8 +962,8 @@ const KnowledgeBaseBindModal: React.FC<KnowledgeBaseBindModalProps> = ({ isOpen,
         {/* 当前助手信息 */}
         <div className="px-6 py-3 bg-gray-50/50 dark:bg-gray-800/30 border-b border-gray-100 dark:border-gray-800">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-indigo-600 flex items-center justify-center shadow-sm">
-              <Bot size={16} className="text-white" />
+            <div className="w-8 h-8 rounded-lg bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 flex items-center justify-center shadow-sm">
+              <Bot size={16} className="text-brand-600 dark:text-brand-400" />
             </div>
             <div>
               <p className="text-sm font-bold text-gray-900 dark:text-white">{assistant.name}</p>
@@ -857,8 +1048,7 @@ const KnowledgeBaseBindModal: React.FC<KnowledgeBaseBindModalProps> = ({ isOpen,
             绑定知识库后，助手对话时会自动检索相关内容（RAG）
           </p>
           <button
-            onClick={onClose}
-            className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+            onClick={onClose} className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
           >
             完成
           </button>
@@ -979,7 +1169,7 @@ const WorkflowSkillBindModal: React.FC<WorkflowSkillBindModalProps> = ({ isOpen,
             <GitBranch size={20} className="text-purple-600" />
             工作流技能管理
           </h3>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          <button onClick={onClose} aria-label="关闭" className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
             <X size={20} />
           </button>
         </div>
@@ -987,8 +1177,8 @@ const WorkflowSkillBindModal: React.FC<WorkflowSkillBindModalProps> = ({ isOpen,
         {/* 当前助手信息 */}
         <div className="px-6 py-3 bg-gray-50/50 dark:bg-gray-800/30 border-b border-gray-100 dark:border-gray-800">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-indigo-600 flex items-center justify-center shadow-sm">
-              <Bot size={16} className="text-white" />
+            <div className="w-8 h-8 rounded-lg bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 flex items-center justify-center shadow-sm">
+              <Bot size={16} className="text-brand-600 dark:text-brand-400" />
             </div>
             <div>
               <p className="text-sm font-bold text-gray-900 dark:text-white">{assistant.name}</p>
@@ -1143,8 +1333,7 @@ const WorkflowSkillBindModal: React.FC<WorkflowSkillBindModalProps> = ({ isOpen,
             绑定工作流后，AI 助手可自动识别并调用工作流技能
           </p>
           <button
-            onClick={onClose}
-            className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+            onClick={onClose} className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
           >
             完成
           </button>
@@ -1191,9 +1380,10 @@ const McpServerBindModal: React.FC<McpServerBindModalProps> = ({ isOpen, onClose
       setLoading(true);
       try {
         const userId = getCurrentUserId();
-        const res = await apiClient.get(`/api/ai/mcp-servers?userId=${userId}`);
-        if (res.data.code === 0) {
-          setAllServers(res.data.data || []);
+        const res = await mcpApi.mcpServerListByCreator({ userId: userId as unknown as number });
+        const data = res.data as any;
+        if (data.code === 0) {
+          setAllServers(data.data || []);
         }
       } catch (error: any) {
         toast.error(error?.response?.data?.message || '获取 MCP 服务器列表失败');
@@ -1270,7 +1460,7 @@ const McpServerBindModal: React.FC<McpServerBindModalProps> = ({ isOpen, onClose
             <Terminal size={20} className="text-emerald-600" />
             MCP 服务器绑定
           </h3>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          <button onClick={onClose} aria-label="关闭" className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
             <X size={20} />
           </button>
         </div>
@@ -1278,8 +1468,8 @@ const McpServerBindModal: React.FC<McpServerBindModalProps> = ({ isOpen, onClose
         {/* 当前助手信息 */}
         <div className="px-6 py-3 bg-gray-50/50 dark:bg-gray-800/30 border-b border-gray-100 dark:border-gray-800">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-indigo-600 flex items-center justify-center shadow-sm">
-              <Bot size={16} className="text-white" />
+            <div className="w-8 h-8 rounded-lg bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 flex items-center justify-center shadow-sm">
+              <Bot size={16} className="text-brand-600 dark:text-brand-400" />
             </div>
             <div>
               <p className="text-sm font-bold text-gray-900 dark:text-white">{assistant.name}</p>
@@ -1361,8 +1551,7 @@ const McpServerBindModal: React.FC<McpServerBindModalProps> = ({ isOpen, onClose
           </p>
           <div className="flex items-center gap-2">
             <button
-              onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+              onClick={onClose} className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
             >
               取消
             </button>
@@ -1409,8 +1598,11 @@ const TestChatModal: React.FC<TestChatModalProps> = ({ isOpen, onClose, assistan
   }>>([]);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
+  const shouldAutoScrollRef = useRef(true);
+  const [showScrollBtn, setShowScrollBtn] = useState(false);
 
   // 打开时初始化欢迎消息
   useEffect(() => {
@@ -1421,6 +1613,8 @@ const TestChatModal: React.FC<TestChatModalProps> = ({ isOpen, onClose, assistan
       setStreamingContent('');
       setIsLoading(false);
       setSessionId(null);
+      shouldAutoScrollRef.current = true;
+      setShowScrollBtn(false);
       abortControllerRef.current?.abort();
       abortControllerRef.current = null;
       setTimeout(() => inputRef.current?.focus(), 300);
@@ -1435,12 +1629,30 @@ const TestChatModal: React.FC<TestChatModalProps> = ({ isOpen, onClose, assistan
     }
   }, [isOpen]);
 
-  // 自动滚动到底部
-  const scrollToBottom = useCallback(() => {
-    setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 50);
+  const scrollToBottom = useCallback((behavior: ScrollBehavior = 'auto') => {
+    const container = messagesContainerRef.current;
+    if (!container) return;
+    shouldAutoScrollRef.current = true;
+    setShowScrollBtn(false);
+    requestAnimationFrame(() => {
+      container.scrollTo({ top: container.scrollHeight, behavior });
+    });
   }, []);
 
-  useEffect(() => { scrollToBottom(); }, [messages, streamingContent, scrollToBottom]);
+  useEffect(() => {
+    if (shouldAutoScrollRef.current) {
+      scrollToBottom('auto');
+    }
+  }, [messages, streamingContent, ragStatus, ragReferences.length, scrollToBottom]);
+
+  const handleMessagesScroll = useCallback(() => {
+    const container = messagesContainerRef.current;
+    if (!container) return;
+    const distanceFromBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
+    const isNearBottom = distanceFromBottom <= 120;
+    shouldAutoScrollRef.current = isNearBottom;
+    setShowScrollBtn(!isNearBottom);
+  }, []);
 
   const sendMessage = async () => {
     const content = input.trim();
@@ -1448,6 +1660,8 @@ const TestChatModal: React.FC<TestChatModalProps> = ({ isOpen, onClose, assistan
 
     setInput('');
     inputRef.current?.focus();
+    shouldAutoScrollRef.current = true;
+    setShowScrollBtn(false);
 
     const userMsg: ChatMessage = { role: 'user', content };
     setMessages(prev => [...prev, userMsg]);
@@ -1624,6 +1838,8 @@ const TestChatModal: React.FC<TestChatModalProps> = ({ isOpen, onClose, assistan
     setMessages([{ role: 'assistant', content: openingMsg }]);
     setStreamingContent('');
     setSessionId(null);
+    shouldAutoScrollRef.current = true;
+    setShowScrollBtn(false);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -1642,11 +1858,11 @@ const TestChatModal: React.FC<TestChatModalProps> = ({ isOpen, onClose, assistan
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-3 border-b border-gray-100 dark:border-gray-800 flex-shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-brand-500/20">
+            <div className="w-9 h-9 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 flex items-center justify-center shadow-sm">
               {assistant.avatarUrl ? (
                 <img src={assistant.avatarUrl} alt="" className="w-full h-full rounded-xl object-cover" />
               ) : (
-                <Bot size={18} className="text-white" />
+                <Bot size={18} className="text-brand-600 dark:text-brand-400" />
               )}
             </div>
             <div>
@@ -1667,7 +1883,7 @@ const TestChatModal: React.FC<TestChatModalProps> = ({ isOpen, onClose, assistan
             </button>
             <button
               onClick={onClose}
-              className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              aria-label="关闭" className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             >
               <X size={18} />
             </button>
@@ -1700,12 +1916,16 @@ const TestChatModal: React.FC<TestChatModalProps> = ({ isOpen, onClose, assistan
         )}
 
         {/* 消息列表 */}
-        <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4 min-h-0">
+        <div
+          ref={messagesContainerRef}
+          onScroll={handleMessagesScroll}
+          className="flex-1 overflow-y-auto px-5 py-4 space-y-4 min-h-0 relative"
+        >
           {messages.map((msg, index) => (
             <div key={index} className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
               {msg.role === 'assistant' && (
-                <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-brand-500 to-indigo-600 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <Bot size={14} className="text-white" />
+                <div className="w-7 h-7 rounded-lg bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 flex items-center justify-center flex-shrink-0 mt-0.5 shadow-sm">
+                  <Bot size={14} className="text-brand-600 dark:text-brand-400" />
                 </div>
               )}
               <div className={`max-w-[75%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
@@ -1772,8 +1992,8 @@ const TestChatModal: React.FC<TestChatModalProps> = ({ isOpen, onClose, assistan
           )}
           {streamingContent && (
             <div className="flex gap-3 justify-start">
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-brand-500 to-indigo-600 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <Bot size={14} className="text-white animate-pulse" />
+              <div className="w-7 h-7 rounded-lg bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 flex items-center justify-center flex-shrink-0 mt-0.5 shadow-sm">
+                <Bot size={14} className="text-brand-600 dark:text-brand-400 animate-pulse" />
               </div>
               <div className="max-w-[75%] rounded-2xl rounded-tl-md px-4 py-2.5 bg-gray-100 dark:bg-gray-800 text-sm text-gray-800 dark:text-gray-200 leading-relaxed">
                 <MarkdownRenderer
@@ -1786,11 +2006,21 @@ const TestChatModal: React.FC<TestChatModalProps> = ({ isOpen, onClose, assistan
             </div>
           )}
           <div ref={messagesEndRef} />
+          {showScrollBtn && (
+            <button
+              type="button"
+              onClick={() => scrollToBottom('smooth')}
+              className="sticky bottom-2 ml-auto flex h-9 w-9 items-center justify-center rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg text-gray-500 hover:text-brand-500 transition-colors"
+              title="回到底部"
+            >
+              <ChevronDown size={18} />
+            </button>
+          )}
         </div>
 
         {/* 输入区 */}
         <div className="flex-shrink-0 px-5 py-3 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50">
-          <div className="flex items-end gap-2">
+          <div className="flex items-center gap-2">
             <div className="flex-1">
               <textarea
                 ref={inputRef}
@@ -1806,7 +2036,7 @@ const TestChatModal: React.FC<TestChatModalProps> = ({ isOpen, onClose, assistan
             {isLoading ? (
               <button
                 onClick={cancelStream}
-                className="w-10 h-10 flex items-center justify-center bg-red-50 dark:bg-red-900/20 text-red-500 border border-red-200 dark:border-red-800 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors flex-shrink-0"
+                className="w-[42px] h-[42px] flex items-center justify-center bg-red-50 dark:bg-red-900/20 text-red-500 border border-red-200 dark:border-red-800 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors flex-shrink-0"
                 title="停止生成"
               >
                 <Square size={16} />
@@ -1815,7 +2045,8 @@ const TestChatModal: React.FC<TestChatModalProps> = ({ isOpen, onClose, assistan
               <button
                 onClick={sendMessage}
                 disabled={!input.trim()}
-                className="w-10 h-10 flex items-center justify-center bg-brand-600 hover:bg-brand-700 text-white rounded-xl shadow-md shadow-brand-600/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex-shrink-0 active:scale-95"
+                aria-label="发送消息"
+                className="w-[42px] h-[42px] flex items-center justify-center bg-brand-600 hover:bg-brand-700 text-white rounded-xl shadow-md shadow-brand-600/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex-shrink-0 active:scale-95"
               >
                 <Send size={16} />
               </button>
@@ -2022,15 +2253,23 @@ export const AiAssistantManagementPage: React.FC = () => {
       {/* Table */}
       <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden transition-all duration-300">
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse admin-table">
+          <table className="w-full text-left border-collapse admin-table table-fixed">
+            <colgroup>
+              <col className="w-[25%]" />
+              <col className="w-[13%]" />
+              <col className="w-[24%]" />
+              <col className="w-[9%]" />
+              <col className="w-[7%]" />
+              <col className="w-[22%]" />
+            </colgroup>
             <thead>
               <tr className="bg-gray-50/50 dark:bg-gray-800/50 border-b border-gray-100 dark:border-gray-800 transition-colors duration-300">
-                <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">助手信息</th>
-                <th className="px-4 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider w-32">分类 / 标签</th>
-                <th className="px-4 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider w-28">模型</th>
-                <th className="px-4 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider w-24">状态</th>
-                <th className="px-4 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider w-20">统计</th>
-                <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">操作</th>
+                <th className="px-4 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">助手信息</th>
+                <th className="px-4 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">分类 / 标签</th>
+                <th className="px-4 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">模型</th>
+                <th className="px-4 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">状态</th>
+                <th className="px-3 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">统计</th>
+                <th className="px-3 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-right">操作</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50 dark:divide-gray-800">
@@ -2052,25 +2291,25 @@ export const AiAssistantManagementPage: React.FC = () => {
                 assistants.map((assistant) => (
                   <tr key={assistant.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors group">
                     {/* 助手信息 */}
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-brand-50 to-indigo-50 dark:from-gray-800 dark:to-gray-800 p-0.5 border border-gray-100 dark:border-gray-700 flex-shrink-0">
+                    <td className="px-4 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 flex-shrink-0 shadow-sm">
                           {assistant.avatarUrl ? (
                             <img src={assistant.avatarUrl} alt="" className="w-full h-full rounded-[10px] object-cover" />
                           ) : (
-                            <div className="w-full h-full rounded-[10px] flex items-center justify-center bg-white dark:bg-gray-900">
+                            <div className="w-full h-full rounded-[10px] flex items-center justify-center">
                               <Bot size={20} className="text-brand-500" />
                             </div>
                           )}
                         </div>
-                        <div className="min-w-0">
-                          <p className="font-bold text-gray-900 dark:text-white group-hover:text-brand-600 transition-colors">
+                        <div className="min-w-0 flex-1">
+                          <p className="font-bold text-gray-900 dark:text-white group-hover:text-brand-600 transition-colors truncate">
                             {assistant.name}
                           </p>
                           {assistant.description && (
                             <TruncateWithTooltip
                               text={assistant.description}
-                              maxWidth={200}
+                              maxWidth="100%"
                               className="text-xs text-gray-500 dark:text-gray-400"
                             />
                           )}
@@ -2079,7 +2318,7 @@ export const AiAssistantManagementPage: React.FC = () => {
                     </td>
 
                     {/* 分类/标签 */}
-                    <td className="px-4 py-4">
+                    <td className="px-3 py-4">
                       <div className="space-y-1.5">
                         {assistant.category && (
                           <span className="inline-block px-2 py-0.5 bg-brand-50 dark:bg-brand-900/20 text-brand-600 dark:text-brand-400 text-xs font-medium rounded-md">{assistant.category}</span>
@@ -2102,8 +2341,10 @@ export const AiAssistantManagementPage: React.FC = () => {
 
                     {/* 模型 */}
                     <td className="px-4 py-4">
-                      <div className="space-y-1">
-                        <p className="text-sm font-medium text-gray-900 dark:text-white">{assistant.modelName || '默认'}</p>
+                      <div className="space-y-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900 dark:text-white truncate" title={assistant.modelName || '默认'}>
+                          {assistant.modelName || '默认'}
+                        </p>
                         <div className="flex items-center gap-2 text-[10px] text-gray-400">
                           <Thermometer size={10} />
                           <span>T:{assistant.temperature ?? '-'}</span>
@@ -2141,89 +2382,89 @@ export const AiAssistantManagementPage: React.FC = () => {
                     </td>
 
                     {/* 操作 */}
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <td className="px-3 py-4">
+                      <div className="flex flex-wrap items-center justify-end gap-0.5 max-w-[260px] ml-auto">
                         <button
                           onClick={() => { setTestChatAssistant(assistant); setTestChatOpen(true); }}
-                          className="p-2 text-gray-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded-lg transition-all"
+                          className="p-1.5 text-gray-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded-lg transition-all"
                           title="测试对话"
                         >
-                          <PlayCircle size={18} />
+                          <PlayCircle size={16} />
                         </button>
                         <button
                           onClick={() => { setViewingAssistant(assistant); setDetailModalOpen(true); }}
-                          className="p-2 text-gray-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded-lg transition-all"
+                          className="p-1.5 text-gray-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded-lg transition-all"
                           title="查看详情"
                         >
-                          <Eye size={18} />
+                          <Eye size={16} />
                         </button>
                         <button
                           onClick={() => { setKbBindAssistant(assistant); setKbBindOpen(true); }}
-                          className={`p-2 rounded-lg transition-all ${
+                          className={`p-1.5 rounded-lg transition-all ${
                             assistant.knowledgeBases && assistant.knowledgeBases.length > 0
                               ? 'text-brand-500 hover:text-brand-700 hover:bg-brand-50 dark:hover:bg-brand-900/20'
                               : 'text-gray-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-900/20'
                           }`}
                           title={`知识库 (${assistant.knowledgeBases?.length || 0})`}
                         >
-                          <Database size={18} />
+                          <Database size={16} />
                         </button>
                         <button
                           onClick={() => { setWfBindAssistant(assistant); setWfBindOpen(true); }}
-                          className="p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-all"
+                          className="p-1.5 text-gray-400 hover:text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-all"
                           title="工作流技能"
                         >
-                          <GitBranch size={18} />
+                          <GitBranch size={16} />
                         </button>
                         <button
                           onClick={() => { setMcpBindAssistant(assistant); setMcpBindOpen(true); }}
-                          className={`p-2 rounded-lg transition-all ${
+                          className={`p-1.5 rounded-lg transition-all ${
                             assistant.mcpServerIds && assistant.mcpServerIds.length > 0
                               ? 'text-emerald-500 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-900/20'
                               : 'text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20'
                           }`}
                           title={`MCP 服务器 (${assistant.mcpServerIds?.length || 0})`}
                         >
-                          <Terminal size={18} />
+                          <Terminal size={16} />
                         </button>
                         <button
                           onClick={() => { setEditingAssistant(assistant); setModalOpen(true); }}
-                          className="p-2 text-gray-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded-lg transition-all"
+                          className="p-1.5 text-gray-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded-lg transition-all"
                           title="编辑"
                         >
-                          <Edit2 size={18} />
+                          <Edit2 size={16} />
                         </button>
                         {assistant.status !== 'PUBLISHED' && (
                           <button
                             onClick={() => handlePublish(assistant)}
-                            className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-all"
+                            className="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-all"
                             title="发布"
                           >
-                            <Send size={18} />
+                            <Send size={16} />
                           </button>
                         )}
                         {assistant.status === 'PUBLISHED' && (
                           <button
                             onClick={() => handleArchive(assistant)}
-                            className="p-2 text-gray-400 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20 rounded-lg transition-all"
+                            className="p-1.5 text-gray-400 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20 rounded-lg transition-all"
                             title="归档"
                           >
-                            <Archive size={18} />
+                            <Archive size={16} />
                           </button>
                         )}
                         <button
                           onClick={() => handleTogglePublic(assistant)}
-                          className={`p-2 rounded-lg transition-all ${assistant.isPublic ? 'text-green-500 hover:bg-green-50 dark:hover:bg-green-900/20' : 'text-gray-400 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20'}`}
+                          className={`p-1.5 rounded-lg transition-all ${assistant.isPublic ? 'text-green-500 hover:bg-green-50 dark:hover:bg-green-900/20' : 'text-gray-400 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20'}`}
                           title={assistant.isPublic ? '设为私有' : '设为公开'}
                         >
-                          {assistant.isPublic ? <Globe size={18} /> : <Lock size={18} />}
+                          {assistant.isPublic ? <Globe size={16} /> : <Lock size={16} />}
                         </button>
                         <button
                           onClick={() => handleDelete(assistant)}
-                          className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all"
+                          className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all"
                           title="删除"
                         >
-                          <Trash2 size={18} />
+                          <Trash2 size={16} />
                         </button>
                       </div>
                     </td>

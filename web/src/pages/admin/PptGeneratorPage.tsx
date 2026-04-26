@@ -122,7 +122,7 @@ const SessionSidebar: React.FC<SessionSidebarProps> = ({
                     </div>
                     <button
                       onClick={(e) => handleDelete(e, session.id)}
-                      className={`p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity ${
+                      className={`p-1 rounded ${
                         deletingId === session.id
                           ? 'opacity-100'
                           : 'hover:bg-red-50 dark:hover:bg-red-900/20 text-gray-400 hover:text-red-500'
@@ -313,8 +313,8 @@ const PptGeneratorPage: React.FC = () => {
               /* 空状态 */
               <div className="flex items-center justify-center h-full">
                 <div className="text-center px-8 max-w-lg">
-                  <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-brand-500 to-highlight-500 flex items-center justify-center shadow-lg shadow-brand-500/20">
-                    <Sparkles size={40} className="text-white" />
+                  <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 flex items-center justify-center shadow-sm">
+                    <Sparkles size={40} className="text-brand-600 dark:text-brand-400" />
                   </div>
                   <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-2">
                     PPT 生成助手
@@ -351,7 +351,7 @@ const PptGeneratorPage: React.FC = () => {
             {showScrollBtn && (
               <button
                 onClick={() => { userScrolledUpRef.current = false; scrollToBottom(); }}
-                className="absolute bottom-4 right-4 p-2 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all text-gray-500 hover:text-brand-500"
+                className="absolute bottom-4 right-4 p-2 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-sm transition-all text-gray-500 hover:text-brand-500"
               >
                 <ArrowDown size={18} />
               </button>

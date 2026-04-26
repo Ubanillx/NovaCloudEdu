@@ -143,9 +143,9 @@ export const ExamTemplateManagementPage: React.FC = () => {
             </div>
           </div>
         ) : templates.map(tpl => (
-          <div key={String(tpl.id)} className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden group hover:shadow-md transition-all duration-300">
+          <div key={String(tpl.id)} className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden group hover:shadow-sm transition-all duration-300">
             {/* 封面预览区 */}
-            <div className="h-40 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center relative">
+            <div className="h-40 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 flex items-center justify-center relative">
               {tpl.coverUrl ? (
                 <iframe src={tpl.coverUrl} className="w-full h-full border-0 pointer-events-none" title="模板预览" />
               ) : (

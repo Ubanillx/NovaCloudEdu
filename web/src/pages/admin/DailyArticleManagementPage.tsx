@@ -191,7 +191,7 @@ const ArticleFormModal: React.FC<ArticleFormModalProps> = ({ isOpen, onClose, on
           <h3 className="text-lg font-bold text-gray-900 dark:text-white">
             {isEdit ? '编辑文章' : '新增文章'}
           </h3>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          <button onClick={onClose} aria-label="关闭" className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
             <X size={20} />
           </button>
         </div>
@@ -394,7 +394,7 @@ const ArticleDetailModal: React.FC<ArticleDetailModalProps> = ({ isOpen, onClose
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800">
           <h3 className="text-lg font-bold text-gray-900 dark:text-white">文章详情</h3>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          <button onClick={onClose} aria-label="关闭" className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
             <X size={20} />
           </button>
         </div>
@@ -748,7 +748,11 @@ export const DailyArticleManagementPage: React.FC = () => {
             <thead>
               <tr className="bg-gray-50/50 dark:bg-gray-800/50 border-b border-gray-100 dark:border-gray-800 transition-colors duration-300">
                 <th className="px-4 py-4 w-10">
-                  <button onClick={toggleSelectAll} className="text-gray-400 hover:text-brand-600">
+                  <button
+                    onClick={toggleSelectAll}
+                    className="text-gray-400 hover:text-brand-600"
+                    aria-label={selectedIds.size === articles.length && articles.length > 0 ? '取消全选文章' : '全选文章'}
+                  >
                     {selectedIds.size === articles.length && articles.length > 0 ? <CheckSquare size={18} /> : <Square size={18} />}
                   </button>
                 </th>
@@ -789,7 +793,7 @@ export const DailyArticleManagementPage: React.FC = () => {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
-                        <div className="w-14 h-10 rounded-lg bg-gradient-to-br from-brand-50 to-indigo-50 dark:from-gray-800 dark:to-gray-800 flex items-center justify-center border border-gray-100 dark:border-gray-700 overflow-hidden flex-shrink-0">
+                        <div className="w-14 h-10 rounded-lg bg-white dark:bg-gray-900 flex items-center justify-center border border-gray-200 dark:border-gray-700 overflow-hidden flex-shrink-0 shadow-sm">
                           {article.coverImage ? (
                             <img src={article.coverImage} alt={article.title} className="w-full h-full object-cover" />
                           ) : (
@@ -851,7 +855,7 @@ export const DailyArticleManagementPage: React.FC = () => {
                       </div>
                     </td>
                     <td className="px-4 py-3">
-                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="flex items-center gap-1">
                         <button 
                           onClick={() => handleAiProcess(article)}
                           disabled={aiProcessing === article.id}

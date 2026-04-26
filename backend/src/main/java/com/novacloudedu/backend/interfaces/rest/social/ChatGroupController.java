@@ -1,16 +1,25 @@
 package com.novacloudedu.backend.interfaces.rest.social;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.novacloudedu.backend.application.service.ChatGroupApplicationService;
+import com.novacloudedu.backend.application.service.GroupChatApplicationService;
 import com.novacloudedu.backend.common.BaseResponse;
+import com.novacloudedu.backend.common.ErrorCode;
 import com.novacloudedu.backend.common.ResultUtils;
 import com.novacloudedu.backend.domain.social.entity.ChatGroup;
 import com.novacloudedu.backend.domain.social.entity.ChatGroupMember;
 import com.novacloudedu.backend.domain.social.entity.GroupJoinRequest;
+import com.novacloudedu.backend.domain.social.entity.GroupMessage;
 import com.novacloudedu.backend.domain.social.repository.ChatGroupMemberRepository;
-import com.novacloudedu.backend.domain.social.repository.ChatGroupRepository;
+import com.novacloudedu.backend.domain.social.valueobject.InviteMode;
 import com.novacloudedu.backend.domain.social.valueobject.JoinMode;
+import com.novacloudedu.backend.domain.user.entity.User;
+import com.novacloudedu.backend.domain.user.repository.UserRepository;
+import com.novacloudedu.backend.domain.user.valueobject.UserId;
 import com.novacloudedu.backend.interfaces.rest.social.dto.request.*;
 import com.novacloudedu.backend.interfaces.rest.social.dto.response.*;
+import com.novacloudedu.backend.exception.BusinessException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -29,7 +38,11 @@ import java.util.List;
 @Tag(name = "群聊管理", description = "群的创建、加入、审核等功能")
 public class ChatGroupController {
 
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
     private final ChatGroupApplicationService groupService;
+    private final GroupChatApplicationService groupChatService;
+    private final UserRepository userRepository;
 
     // ==================== 群管理 ====================
 
@@ -39,7 +52,13 @@ public class ChatGroupController {
             @AuthenticationPrincipal Long userId,
             @Valid @RequestBody CreateGroupRequest request) {
         ChatGroup group = groupService.createGroup(
-                userId, request.getGroupName(), request.getDescription(), request.getAvatar()
+                userId,
+                request.getGroupName(),
+                request.getDescription(),
+                request.getAvatar(),
+                parseJoinMode(request.getJoinMode()),
+                parseInviteMode(request.getInviteMode()),
+                request.getAnnouncement()
         );
         return ResultUtils.success(GroupResponse.from(group));
     }
@@ -68,7 +87,17 @@ public class ChatGroupController {
             @AuthenticationPrincipal Long userId,
             @PathVariable Long groupId,
             @RequestParam int mode) {
-        groupService.setJoinMode(groupId, userId, JoinMode.fromCode(mode));
+        groupService.setJoinMode(groupId, userId, parseJoinMode(mode));
+        return ResultUtils.success(null);
+    }
+
+    @PutMapping("/{groupId}/invite-mode")
+    @Operation(summary = "设置群邀请模式", description = "0-所有成员可邀请，1-仅管理员可邀请")
+    public BaseResponse<Void> setInviteMode(
+            @AuthenticationPrincipal Long userId,
+            @PathVariable Long groupId,
+            @RequestParam int mode) {
+        groupService.setInviteMode(groupId, userId, parseInviteMode(mode));
         return ResultUtils.success(null);
     }
 
@@ -77,8 +106,8 @@ public class ChatGroupController {
     public BaseResponse<Void> publishAnnouncement(
             @AuthenticationPrincipal Long userId,
             @PathVariable Long groupId,
-            @RequestBody String announcement) {
-        groupService.publishAnnouncement(groupId, userId, announcement);
+            @RequestBody(required = false) String announcement) {
+        groupService.publishAnnouncement(groupId, userId, normalizeTextBody(announcement));
         return ResultUtils.success(null);
     }
 
@@ -187,8 +216,10 @@ public class ChatGroupController {
 
     @GetMapping("/{groupId}/members")
     @Operation(summary = "获取群成员列表")
-    public BaseResponse<List<GroupMemberResponse>> getGroupMembers(@PathVariable Long groupId) {
-        List<ChatGroupMember> members = groupService.getGroupMembers(groupId);
+    public BaseResponse<List<GroupMemberResponse>> getGroupMembers(
+            @AuthenticationPrincipal Long userId,
+            @PathVariable Long groupId) {
+        List<ChatGroupMember> members = groupService.getGroupMembers(groupId, userId);
         List<GroupMemberResponse> responses = members.stream()
                 .map(GroupMemberResponse::from)
                 .toList();
@@ -198,10 +229,11 @@ public class ChatGroupController {
     @GetMapping("/{groupId}/members/page")
     @Operation(summary = "分页获取群成员")
     public BaseResponse<ChatGroupMemberRepository.MemberPage> getGroupMembersPage(
+            @AuthenticationPrincipal Long userId,
             @PathVariable Long groupId,
             @RequestParam(defaultValue = "1") int pageNum,
             @RequestParam(defaultValue = "20") int pageSize) {
-        return ResultUtils.success(groupService.getGroupMembersPage(groupId, pageNum, pageSize));
+        return ResultUtils.success(groupService.getGroupMembersPage(groupId, userId, pageNum, pageSize));
     }
 
     @GetMapping("/my")
@@ -209,17 +241,66 @@ public class ChatGroupController {
     public BaseResponse<List<GroupResponse>> getMyGroups(@AuthenticationPrincipal Long userId) {
         List<ChatGroup> groups = groupService.getUserGroups(userId);
         List<GroupResponse> responses = groups.stream()
-                .map(GroupResponse::from)
+                .map(group -> toMyGroupResponse(group, userId))
                 .toList();
         return ResultUtils.success(responses);
     }
 
+    private GroupResponse toMyGroupResponse(ChatGroup group, Long userId) {
+        GroupResponse response = GroupResponse.from(group);
+        List<GroupMessage> latestMessages = groupChatService.getLatestMessages(group.getId().value(), userId, 1);
+        if (!latestMessages.isEmpty()) {
+            GroupMessage latest = latestMessages.get(0);
+            response.setLastMessageSenderId(latest.getSenderId() != null ? latest.getSenderId().value() : null);
+            response.setLastMessage(latest.getContent());
+            response.setLastMessageType(latest.getType() != null ? latest.getType().getValue() : null);
+            response.setLastMessageTime(latest.getCreateTime());
+            if (latest.getSenderId() != null) {
+                User sender = userRepository.findById(UserId.of(latest.getSenderId().value())).orElse(null);
+                response.setLastMessageSenderName(sender != null ? sender.getUserName() : "未知用户");
+            }
+        }
+        response.setUnreadCount(groupChatService.getUnreadCount(group.getId().value(), userId));
+        return response;
+    }
+
     @GetMapping("/search")
     @Operation(summary = "搜索群")
-    public BaseResponse<ChatGroupRepository.GroupPage> searchGroups(
+    public BaseResponse<GroupPageResponse> searchGroups(
             @RequestParam String keyword,
             @RequestParam(defaultValue = "1") int pageNum,
             @RequestParam(defaultValue = "20") int pageSize) {
-        return ResultUtils.success(groupService.searchGroups(keyword, pageNum, pageSize));
+        return ResultUtils.success(GroupPageResponse.from(groupService.searchGroups(keyword, pageNum, pageSize)));
+    }
+
+    private JoinMode parseJoinMode(Integer mode) {
+        try {
+            return mode == null ? JoinMode.FREE : JoinMode.fromCode(mode);
+        } catch (IllegalArgumentException e) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "加入方式不正确");
+        }
+    }
+
+    private InviteMode parseInviteMode(Integer mode) {
+        try {
+            return mode == null ? InviteMode.ALL : InviteMode.fromCode(mode);
+        } catch (IllegalArgumentException e) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "邀请权限不正确");
+        }
+    }
+
+    private String normalizeTextBody(String body) {
+        if (body == null) {
+            return "";
+        }
+        String trimmed = body.trim();
+        if (trimmed.length() >= 2 && trimmed.startsWith("\"") && trimmed.endsWith("\"")) {
+            try {
+                return OBJECT_MAPPER.readValue(trimmed, String.class);
+            } catch (JsonProcessingException ignored) {
+                return trimmed.substring(1, trimmed.length() - 1);
+            }
+        }
+        return body;
     }
 }

@@ -21,7 +21,7 @@ export interface BatchProcessResult {
     'total'?: number;
     'successIds'?: Array<number>;
     'failedItems'?: Array<FailedItem>;
-    'successCount'?: number;
     'failedCount'?: number;
+    'successCount'?: number;
 }
 

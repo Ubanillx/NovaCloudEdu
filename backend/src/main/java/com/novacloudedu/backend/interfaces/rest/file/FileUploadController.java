@@ -40,7 +40,7 @@ public class FileUploadController {
     @Operation(summary = "上传文件（按业务类型）")
     public BaseResponse<UploadFileResponse> uploadFile(
             @RequestParam("file") @Parameter(description = "文件") MultipartFile file,
-            @PathVariable @Parameter(description = "业务类型：course/cover, course/video, course/material, user/avatar, teacher/avatar, teacher/certificate, system/document, feedback/attachment, general, chat/file, chat/group, chat/ai") String businessType,
+            @PathVariable @Parameter(description = "业务类型：course/cover, course/video, course/material, user/avatar, teacher/avatar, group/avatar, teacher/certificate, system/document, feedback/attachment, general, chat/file, chat/group, chat/ai") String businessType,
             jakarta.servlet.http.HttpServletRequest request,
             Authentication authentication) {
         

@@ -32,6 +32,16 @@ spring:
       connection-timeout: 30000
       max-lifetime: 1800000
 
+  # ---- 数据库增量迁移（Flyway）----
+  # backend/sql 仍用于全新 PostgreSQL 数据卷初始化；db/migration 用于已有数据库的结构升级。
+  flyway:
+    enabled: ${FLYWAY_ENABLED:true}
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    baseline-version: 0
+    validate-on-migrate: true
+    out-of-order: false
+
   # ---- Redis ----
   data:
     redis:
@@ -82,6 +92,12 @@ admin-email:
   enabled: ${ADMIN_EMAIL_ENABLED:true}
   recipients: ${ADMIN_EMAIL_RECIPIENTS:email@ubanillx.cn}
   platform-name: 智云星课
+
+# =================================================================
+# IP 归属地查询（MaxMind GeoLite2 City）
+# =================================================================
+geoip:
+  database-path: ${GEOIP_DATABASE_PATH:classpath:geoip/GeoLite2-City.mmdb}
 
 # =================================================================
 # JWT
@@ -185,7 +201,7 @@ ai:
 
   # ---- 多模型路由（Langchain4j） ----
   chat-models:
-    default-model: ${AI_DEFAULT_MODEL:openrouter/openai/gpt-5.2}
+    default-model: ${AI_DEFAULT_MODEL:deepseek/deepseek-v4-pro}
     default-vision-model: ${AI_DEFAULT_VISION_MODEL:openrouter/google/gemini-3-flash-preview}
     providers:
       dashscope:
@@ -237,7 +253,7 @@ ai:
             temperature: 0.7
             max-tokens: 2000
       deepseek:
-        enabled: ${DEEPSEEK_ENABLED:false}
+        enabled: ${DEEPSEEK_ENABLED:true}
         api-key: ${DEEPSEEK_API_KEY:}
         base-url: ${DEEPSEEK_BASE_URL:https://api.deepseek.com/v1}
         models:
@@ -249,6 +265,11 @@ ai:
             type: text
             temperature: 0.6
             max-tokens: 8000
+          deepseek-v4-pro:
+            type: text
+            temperature: 0.7
+            max-tokens: 128000
+            top-p: 0.8
       moonshot:
         enabled: ${MOONSHOT_ENABLED:false}
         api-key: ${MOONSHOT_API_KEY:}

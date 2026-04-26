@@ -16,8 +16,10 @@ import {
   Globe,
   Loader2
 } from 'lucide-react';
-import { apiClient } from '../../api';
+import { apiClient, Configuration, MCPApi } from '../../api';
 import { toast } from '../../components/ui';
+
+const mcpApi = new MCPApi(new Configuration(), '', apiClient);
 
 interface McpServer {
   id: string;
@@ -92,11 +94,18 @@ const McpFormModal: React.FC<McpFormModalProps> = ({ isOpen, onClose, onSuccess,
     try {
       const body = { name: formData.name, description: formData.description, url: formData.url || '', configJson: formData.configJson };
       if (isEdit && server) {
-        const res = await apiClient.put(`/api/ai/mcp-servers/${server.id}?userId=${userId}`, body);
+        const res = await mcpApi.mcpServerUpdate({
+          id: server.id as unknown as number,
+          userId: userId as unknown as number,
+          requestBody: body as unknown as { [key: string]: object },
+        });
         if (res.data.code === 0) { toast.success('更新成功'); onSuccess(); onClose(); }
         else { toast.error(res.data.message || '更新失败'); }
       } else {
-        const res = await apiClient.post(`/api/ai/mcp-servers?userId=${userId}`, body);
+        const res = await mcpApi.mcpServerCreate({
+          userId: userId as unknown as number,
+          requestBody: body as unknown as { [key: string]: object },
+        });
         if (res.data.code === 0) { toast.success('创建成功'); onSuccess(); onClose(); }
         else { toast.error(res.data.message || '创建失败'); }
       }
@@ -118,7 +127,7 @@ const McpFormModal: React.FC<McpFormModalProps> = ({ isOpen, onClose, onSuccess,
           <h3 className="text-lg font-bold text-gray-900 dark:text-white">
             {isEdit ? '编辑 MCP 服务器' : '新建 MCP 服务器'}
           </h3>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          <button onClick={onClose} aria-label="关闭" className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
             <X size={20} />
           </button>
         </div>
@@ -202,10 +211,11 @@ const ToolsModal: React.FC<ToolsModalProps> = ({ isOpen, onClose, serverId }) =>
   useEffect(() => {
     if (!isOpen || !serverId) return;
     setLoading(true);
-    apiClient.get(`/api/ai/mcp-servers/${serverId}/tools`)
+    mcpApi.mcpServerListTools({ id: serverId as unknown as number })
       .then((res) => {
-        if (res.data.code === 0 && Array.isArray(res.data.data)) {
-          setTools(res.data.data);
+        const data = res.data as any;
+        if (data.code === 0 && Array.isArray(data.data)) {
+          setTools(data.data);
         }
       })
       .catch((e: any) => { toast.error('获取工具列表失败: ' + (e?.response?.data?.message || e.message)); })
@@ -223,7 +233,7 @@ const ToolsModal: React.FC<ToolsModalProps> = ({ isOpen, onClose, serverId }) =>
           <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
             <Wrench size={18} /> 可用工具列表
           </h3>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          <button onClick={onClose} aria-label="关闭" className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
             <X size={20} />
           </button>
         </div>
@@ -289,15 +299,16 @@ export const McpServerManagementPage: React.FC = () => {
     if (!userId) return;
     setLoading(true);
     try {
-      const res = await apiClient.get(`/api/ai/mcp-servers?userId=${userId}`);
-      if (res.data.code === 0 && Array.isArray(res.data.data)) {
-        setServers(res.data.data.map((s: any) => ({
+      const res = await mcpApi.mcpServerListByCreator({ userId: userId as unknown as number });
+      const data = res.data as any;
+      if (data.code === 0 && Array.isArray(data.data)) {
+        setServers(data.data.map((s: any) => ({
           ...s,
           id: String(s.id),
           configJson: s.configJson || '{}',
         })));
       } else {
-        toast.error(res.data.message || '获取列表失败');
+        toast.error(data.message || '获取列表失败');
       }
     } catch (error: any) {
       toast.error(error?.response?.data?.message || '网络错误');
@@ -312,7 +323,10 @@ export const McpServerManagementPage: React.FC = () => {
     if (!window.confirm(`确定要删除 "${server.name}" 吗？此操作不可恢复。`)) return;
     const userId = getUserId();
     try {
-      const res = await apiClient.delete(`/api/ai/mcp-servers/${server.id}?userId=${userId}`);
+      const res = await mcpApi.mcpServerDelete({
+        id: server.id as unknown as number,
+        userId: userId as unknown as number,
+      });
       if (res.data.code === 0) { toast.success('已删除'); fetchServers(); }
       else { toast.error(res.data.message || '删除失败'); }
     } catch (error: any) {
@@ -323,7 +337,11 @@ export const McpServerManagementPage: React.FC = () => {
   const handleToggleEnabled = async (server: McpServer) => {
     const userId = getUserId();
     try {
-      const res = await apiClient.patch(`/api/ai/mcp-servers/${server.id}/enabled?userId=${userId}&enabled=${!server.enabled}`);
+      const res = await mcpApi.mcpServerSetEnabled({
+        id: server.id as unknown as number,
+        userId: userId as unknown as number,
+        enabled: !server.enabled,
+      });
       if (res.data.code === 0) { toast.success(server.enabled ? '已禁用' : '已启用'); fetchServers(); }
       else { toast.error(res.data.message || '操作失败'); }
     } catch (error: any) {
@@ -335,12 +353,13 @@ export const McpServerManagementPage: React.FC = () => {
     setTestingId(server.id);
     setTestResult(null);
     try {
-      const res = await apiClient.post(`/api/ai/mcp-servers/${server.id}/test`);
-      if (res.data.code === 0) {
-        const info = res.data.data;
+      const res = await mcpApi.mcpServerTestConnection({ id: server.id as unknown as number });
+      const data = res.data as any;
+      if (data.code === 0) {
+        const info = data.data || {};
         setTestResult({ id: server.id, ok: true, msg: `连接成功 — ${info.name || ''} ${info.version || ''} (协议 ${info.protocolVersion || ''})` });
       } else {
-        setTestResult({ id: server.id, ok: false, msg: res.data.message || '连接失败' });
+        setTestResult({ id: server.id, ok: false, msg: data.message || '连接失败' });
       }
     } catch (e: any) {
       setTestResult({ id: server.id, ok: false, msg: e?.response?.data?.message || e.message || '连接失败' });
@@ -431,7 +450,7 @@ export const McpServerManagementPage: React.FC = () => {
                     {/* 服务器信息 */}
                     <td className="px-8 py-4 min-w-[320px]">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-50 to-indigo-50 dark:from-gray-800 dark:to-gray-800 flex items-center justify-center border border-gray-100 dark:border-gray-700">
+                        <div className="w-10 h-10 rounded-xl bg-white dark:bg-gray-900 flex items-center justify-center border border-gray-200 dark:border-gray-700 shadow-sm">
                           <Plug2 size={18} className={server.enabled ? 'text-brand-500' : 'text-gray-400'} />
                         </div>
                         <div className="min-w-0 flex-1">
@@ -509,7 +528,7 @@ export const McpServerManagementPage: React.FC = () => {
                     </td>
                     {/* 操作 */}
                     <td className="px-6 py-4">
-                      <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="flex items-center gap-2">
                         <button
                           onClick={() => { setToolsServerId(server.id); setToolsModalOpen(true); }}
                           className="p-2 text-gray-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded-lg transition-all"

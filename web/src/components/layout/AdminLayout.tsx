@@ -47,6 +47,121 @@ interface AdminSiderProps {
   setIsMobileOpen: (open: boolean) => void;
 }
 
+type AdminTooltipState = {
+  content: string;
+  x: number;
+  y: number;
+  placement: 'top' | 'bottom';
+};
+
+const AdminTooltipLayer: React.FC = () => {
+  const [tooltip, setTooltip] = React.useState<AdminTooltipState | null>(null);
+  const activeElementRef = React.useRef<HTMLElement | null>(null);
+
+  React.useEffect(() => {
+    const selector = [
+      '[data-tooltip]',
+      'button[aria-label]',
+      'button[title]',
+      'a[aria-label]',
+      'a[title]',
+      '[role="button"][aria-label]',
+      '[role="button"][title]',
+    ].join(',');
+
+    const restoreNativeTitle = () => {
+      const element = activeElementRef.current;
+      if (element?.dataset.nativeTooltipTitle !== undefined) {
+        element.setAttribute('title', element.dataset.nativeTooltipTitle);
+        delete element.dataset.nativeTooltipTitle;
+      }
+      activeElementRef.current = null;
+    };
+
+    const findTooltipTarget = (target: EventTarget | null) => {
+      if (!(target instanceof Element)) return null;
+      return target.closest<HTMLElement>(selector);
+    };
+
+    const showTooltip = (target: EventTarget | null) => {
+      const element = findTooltipTarget(target);
+      if (!element) return;
+
+      const content =
+        element.dataset.tooltip ||
+        element.getAttribute('aria-label') ||
+        element.getAttribute('title') ||
+        '';
+
+      if (!content.trim()) return;
+
+      if (activeElementRef.current !== element) {
+        restoreNativeTitle();
+      }
+
+      activeElementRef.current = element;
+
+      if (element.hasAttribute('title')) {
+        element.dataset.nativeTooltipTitle = element.getAttribute('title') || '';
+        element.removeAttribute('title');
+      }
+
+      const rect = element.getBoundingClientRect();
+      const placement = rect.top < 48 ? 'bottom' : 'top';
+      setTooltip({
+        content,
+        x: rect.left + rect.width / 2,
+        y: placement === 'top' ? rect.top - 8 : rect.bottom + 8,
+        placement,
+      });
+    };
+
+    const hideTooltip = () => {
+      restoreNativeTitle();
+      setTooltip(null);
+    };
+
+    const handleMouseOver = (event: MouseEvent) => showTooltip(event.target);
+    const handleMouseOut = (event: MouseEvent) => {
+      const element = findTooltipTarget(event.target);
+      if (element && event.relatedTarget instanceof Node && element.contains(event.relatedTarget)) {
+        return;
+      }
+      hideTooltip();
+    };
+    const handleFocusIn = (event: FocusEvent) => showTooltip(event.target);
+    const handleFocusOut = () => hideTooltip();
+
+    document.addEventListener('mouseover', handleMouseOver);
+    document.addEventListener('mouseout', handleMouseOut);
+    document.addEventListener('focusin', handleFocusIn);
+    document.addEventListener('focusout', handleFocusOut);
+
+    return () => {
+      document.removeEventListener('mouseover', handleMouseOver);
+      document.removeEventListener('mouseout', handleMouseOut);
+      document.removeEventListener('focusin', handleFocusIn);
+      document.removeEventListener('focusout', handleFocusOut);
+      restoreNativeTitle();
+    };
+  }, []);
+
+  if (!tooltip) return null;
+
+  return (
+    <div
+      className="fixed z-[9999] pointer-events-none rounded-lg bg-gray-900/95 px-2.5 py-1.5 text-xs font-medium text-white shadow-lg shadow-gray-900/10 dark:bg-white/95 dark:text-gray-900"
+      style={{
+        left: tooltip.x,
+        top: tooltip.y,
+        transform: tooltip.placement === 'top' ? 'translate(-50%, -100%)' : 'translateX(-50%)',
+      }}
+    >
+      {tooltip.content}
+    </div>
+  );
+};
+
 const AdminSider: React.FC<AdminSiderProps> = ({ 
   isCollapsed, 
   isMobileOpen, 
@@ -167,6 +282,7 @@ const AdminSider: React.FC<AdminSiderProps> = ({
               <Link
                 key={item.path}
                 to={item.path}
+                title={isCollapsed ? item.label : undefined}
                 className={`
                   flex items-center gap-3 px-4 py-3.5 rounded-2xl font-medium transition-all duration-300 group
                   ${isActive 
@@ -193,6 +309,7 @@ const AdminSider: React.FC<AdminSiderProps> = ({
         <div className="p-4 space-y-2 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50 transition-colors duration-300">
           <Link
             to="/"
+            title={isCollapsed ? '返回前台' : undefined}
             className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-white dark:hover:bg-gray-800 hover:text-brand-600 dark:hover:text-brand-400 transition-all duration-300 border border-transparent hover:border-gray-200 dark:hover:border-gray-700"
           >
             <Home size={20} className="flex-shrink-0" />
@@ -204,6 +321,7 @@ const AdminSider: React.FC<AdminSiderProps> = ({
           </Link>
           <button
             onClick={handleLogout}
+            aria-label={isCollapsed ? '退出登录' : undefined}
             className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-300 border border-transparent hover:border-red-100 dark:hover:border-red-900/30"
           >
             <LogOut size={20} className="flex-shrink-0" />
@@ -269,6 +387,7 @@ export const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children 
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+      <AdminTooltipLayer />
       {!isFullscreen && (
         <AdminSider 
           isCollapsed={isCollapsed} 
@@ -285,6 +404,7 @@ export const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children 
               <button 
                 className="p-2 -ml-2 text-gray-500 lg:hidden"
                 onClick={() => setIsMobileOpen(true)}
+                aria-label="打开移动端菜单"
               >
                 <Menu size={24} />
               </button>
@@ -319,6 +439,7 @@ export const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children 
               <button
                 onClick={toggleTheme}
                 className="p-2.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:text-brand-600 transition-all hover:scale-105"
+                aria-label={theme === 'dark' ? '切换到浅色模式' : '切换到深色模式'}
               >
                 {theme === 'dark' ? <Sun size={20} className="text-yellow-500" /> : <Moon size={20} className="text-brand-600" />}
               </button>
@@ -340,8 +461,8 @@ export const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children 
                     </div>
                   );
                 })()}
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-indigo-600 p-0.5 shadow-lg shadow-brand-500/20 transition-all duration-300">
-                  <div className="w-full h-full rounded-[10px] bg-white dark:bg-gray-800 flex items-center justify-center overflow-hidden transition-colors duration-300">
+                <div className="w-10 h-10 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 shadow-sm transition-all duration-300">
+                  <div className="w-full h-full rounded-[10px] flex items-center justify-center overflow-hidden transition-colors duration-300">
                     <Users size={20} className="text-brand-600" />
                   </div>
                 </div>
@@ -365,7 +486,8 @@ export const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children 
           >
             <button
               onClick={toggleFullscreen}
-              className={`flex items-center gap-2 px-6 py-2 mt-2 rounded-full bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl shadow-lg border border-gray-200 dark:border-gray-700 text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-brand-600 dark:hover:text-brand-400 hover:shadow-xl transition-all duration-300 ease-in-out ${
+              aria-label="退出全屏"
+              className={`flex items-center gap-2 px-6 py-2 mt-2 rounded-full bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl shadow-lg border border-gray-200 dark:border-gray-700 text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-brand-600 dark:hover:text-brand-400 hover:shadow-sm transition-all duration-300 ease-in-out ${
                 showExitBar
                   ? 'opacity-100 translate-y-0 pointer-events-auto'
                   : 'opacity-0 -translate-y-4 pointer-events-none'

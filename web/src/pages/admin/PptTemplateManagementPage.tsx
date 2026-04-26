@@ -19,6 +19,8 @@ import { toast } from '../../components/ui';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
 const api = new PPTApi(new Configuration(), API_BASE, apiClient);
+const MIN_LOADING_MS = 150;
+const LIST_AREA_MIN_HEIGHT = 'min-h-[376px]';
 
 const parseStatusConfig: Record<string, { label: string; color: string; bgColor: string; icon: React.ReactNode }> = {
   ready:   { label: '可用',     color: 'text-green-600 dark:text-green-400', bgColor: 'bg-green-100 dark:bg-green-900/30', icon: <Check className="w-3.5 h-3.5" /> },
@@ -26,6 +28,35 @@ const parseStatusConfig: Record<string, { label: string; color: string; bgColor:
   pending: { label: '等待解析', color: 'text-yellow-600 dark:text-yellow-400', bgColor: 'bg-yellow-100 dark:bg-yellow-900/30', icon: <Clock className="w-3.5 h-3.5" /> },
   failed:  { label: '解析失败', color: 'text-red-600 dark:text-red-400',    bgColor: 'bg-red-100 dark:bg-red-900/30',    icon: <AlertTriangle className="w-3.5 h-3.5" /> },
 };
+
+const PptTemplateSkeletonGrid: React.FC = () => (
+  <div
+    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"
+    aria-label="模板列表加载中"
+  >
+    {Array.from({ length: 8 }).map((_, index) => (
+      <div
+        key={index}
+        className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm animate-pulse dark:border-gray-800 dark:bg-gray-900"
+      >
+        <div className="aspect-video bg-gray-100 dark:bg-gray-800">
+          <div className="h-full w-full bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900" />
+        </div>
+        <div className="space-y-3 px-4 py-3">
+          <div className="flex items-center justify-between gap-3">
+            <div className="h-4 w-2/3 rounded bg-gray-100 dark:bg-gray-800" />
+            <div className="h-5 w-14 rounded-lg bg-gray-100 dark:bg-gray-800" />
+          </div>
+          <div className="flex items-center justify-between gap-4">
+            <div className="h-3 w-20 rounded bg-gray-100 dark:bg-gray-800" />
+            <div className="h-3 w-16 rounded bg-gray-100 dark:bg-gray-800" />
+          </div>
+          <div className="h-3 w-4/5 rounded bg-gray-100 dark:bg-gray-800" />
+        </div>
+      </div>
+    ))}
+  </div>
+);
 
 const PptTemplateManagementPage: React.FC = () => {
   const [templates, setTemplates] = useState<PptTemplateListResponse[]>([]);
@@ -42,6 +73,7 @@ const PptTemplateManagementPage: React.FC = () => {
 
   const fetchTemplates = useCallback(async () => {
     setLoading(true);
+    const startedAt = Date.now();
     try {
       const res = await api.listTemplates();
       const data = (res.data as any)?.data || [];
@@ -49,6 +81,10 @@ const PptTemplateManagementPage: React.FC = () => {
     } catch (err) {
       toast.error('加载模板列表失败');
     } finally {
+      const elapsed = Date.now() - startedAt;
+      if (elapsed < MIN_LOADING_MS) {
+        await new Promise(resolve => setTimeout(resolve, MIN_LOADING_MS - elapsed));
+      }
       setLoading(false);
     }
   }, []);
@@ -112,7 +148,7 @@ const PptTemplateManagementPage: React.FC = () => {
   const handleRetryParse = async (id: string) => {
     setRetryingId(id);
     try {
-      await apiClient.post(`${API_BASE}/api/ppt/templates/${id}/retry-parse`);
+      await api.retryParsing({ id: id as unknown as number });
       toast.success('已触发重新解析');
       setTimeout(() => fetchTemplates(), 1500);
     } catch {
@@ -137,6 +173,7 @@ const PptTemplateManagementPage: React.FC = () => {
         <div className="flex items-center gap-3">
           <button
             onClick={fetchTemplates}
+            aria-label="刷新模板列表"
             className="p-2.5 bg-gray-50 dark:bg-gray-800/50 hover:bg-brand-50 dark:hover:bg-brand-900/20 text-gray-500 hover:text-brand-600 dark:hover:text-brand-400 rounded-xl transition-all"
           >
             <RefreshCw size={20} className={loading ? 'animate-spin' : ''} />
@@ -168,19 +205,20 @@ const PptTemplateManagementPage: React.FC = () => {
       </div>
 
       {/* Grid */}
-      {loading ? (
-        <div className="flex items-center justify-center h-64">
-          <Loader2 className="w-8 h-8 animate-spin text-brand-500" />
-        </div>
-      ) : filtered.length === 0 ? (
-        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm text-center py-16 transition-all duration-300">
-          <FileText className="w-16 h-16 mx-auto text-gray-300 dark:text-gray-600 mb-4" />
-          <p className="text-lg text-gray-400 mb-2">暂无模板</p>
-          <p className="text-sm text-gray-300 dark:text-gray-500">点击右上角"上传模板"添加第一个模板</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-          {filtered.map(t => {
+      <div className={LIST_AREA_MIN_HEIGHT}>
+        {loading ? (
+          <div aria-busy="true">
+            <PptTemplateSkeletonGrid />
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className={`${LIST_AREA_MIN_HEIGHT} bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm text-center flex flex-col items-center justify-center`}>
+            <FileText className="w-16 h-16 text-gray-300 dark:text-gray-600 mb-4" />
+            <p className="text-lg text-gray-400 mb-2">暂无模板</p>
+            <p className="text-sm text-gray-300 dark:text-gray-500">点击右上角"上传模板"添加第一个模板</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+            {filtered.map(t => {
             const tid = String(t.id);
             const status = t.parseStatus || 'pending';
             const isReady = status === 'ready';
@@ -192,7 +230,7 @@ const PptTemplateManagementPage: React.FC = () => {
                 key={tid}
                 className={`group bg-white dark:bg-gray-900 rounded-2xl border shadow-sm overflow-hidden transition-all duration-300 ${
                   isReady
-                    ? 'border-gray-100 dark:border-gray-800 hover:shadow-lg hover:border-brand-300 dark:hover:border-brand-600'
+                    ? 'border-gray-100 dark:border-gray-800 hover:shadow-sm hover:border-brand-300 dark:hover:border-brand-600'
                     : 'border-gray-200 dark:border-gray-700'
                 }`}
               >
@@ -220,7 +258,7 @@ const PptTemplateManagementPage: React.FC = () => {
                   )}
                   {/* 操作按钮浮层 */}
                   {isReady && (
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-200">
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 flex items-center justify-center gap-2 transition-all duration-200">
                       <button
                         onClick={() => handlePreview(tid)}
                         className="p-2 text-gray-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-900/20 bg-white/90 dark:bg-gray-900/90 rounded-lg transition-all"
@@ -275,9 +313,10 @@ const PptTemplateManagementPage: React.FC = () => {
                 </div>
               </div>
             );
-          })}
-        </div>
-      )}
+            })}
+          </div>
+        )}
+      </div>
 
       {/* Upload Modal */}
       {showUpload && (

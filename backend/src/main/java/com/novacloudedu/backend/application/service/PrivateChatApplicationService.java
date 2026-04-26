@@ -55,12 +55,24 @@ public class PrivateChatApplicationService {
             throw new BusinessException(ErrorCode.FORBIDDEN_ERROR, "只能给好友发送消息");
         }
 
+        MessageId replyTo = null;
+        if (command.replyTo() != null) {
+            PrivateMessage quotedMessage = privateMessageRepository.findById(MessageId.of(command.replyTo()))
+                    .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_ERROR, "引用消息不存在"));
+            boolean sameConversation = quotedMessage.belongsTo(senderId) && quotedMessage.belongsTo(receiverId);
+            if (!sameConversation) {
+                throw new BusinessException(ErrorCode.FORBIDDEN_ERROR, "不能引用当前会话外的消息");
+            }
+            replyTo = quotedMessage.getId();
+        }
+
         // 创建消息
         PrivateMessage message = PrivateMessage.create(
                 senderId,
                 receiverId,
                 command.content(),
-                command.type()
+                command.type(),
+                replyTo
         );
 
         // 保存消息
@@ -77,7 +89,14 @@ public class PrivateChatApplicationService {
         // 发送通知（通知接收者有新消息，接收者通过 HTTP 获取详情）
         User sender = userRepository.findById(senderId).orElse(null);
         String senderName = sender != null ? sender.getUserName() : "未知用户";
-        notificationService.notifyNewPrivateMessage(command.receiverId(), command.senderId(), senderName);
+        notificationService.notifyNewPrivateMessage(
+                command.receiverId(),
+                command.senderId(),
+                senderName,
+                savedMessage.getId().value(),
+                savedMessage.getContent(),
+                savedMessage.getType().getValue()
+        );
 
         return savedMessage;
     }
@@ -136,12 +155,20 @@ public class PrivateChatApplicationService {
                     UserId partnerId = session.getOtherUserId(user);
                     User partner = userMap.get(partnerId.value());
                     int unreadCount = privateMessageRepository.countUnreadMessages(user, partnerId);
+                    PrivateMessage lastMessage = privateMessageRepository.findBetweenUsers(user, partnerId, 1, 1)
+                            .messages()
+                            .stream()
+                            .findFirst()
+                            .orElse(null);
 
                     return new SessionInfo(
                             session.getId().value(),
                             partnerId.value(),
                             partner != null ? partner.getUserName() : "未知用户",
                             partner != null ? partner.getUserAvatar() : null,
+                            lastMessage != null ? lastMessage.getSenderId().value() : null,
+                            lastMessage != null ? lastMessage.getContent() : null,
+                            lastMessage != null ? lastMessage.getType().getValue() : null,
                             session.getLastMessageTime(),
                             unreadCount
                     );
@@ -180,6 +207,9 @@ public class PrivateChatApplicationService {
             Long partnerId,
             String partnerName,
             String partnerAvatar,
+            Long lastMessageSenderId,
+            String lastMessage,
+            String lastMessageType,
             LocalDateTime lastMessageTime,
             int unreadCount
     ) {

@@ -1,30 +1,93 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import DOMPurify from 'dompurify';
 import {
   ArrowLeft, ThumbsUp, Star, MessageCircle, Send,
   Edit3, Trash2, Clock, User, X, TrendingUp,
+  Loader2, MapPin,
 } from 'lucide-react';
 import { apiClient, DefaultApi, Configuration } from '../api';
 import type { PostDetailResponse, CommentResponse, UserPublicResponse } from '../api/generated/models';
 import toast from '../components/ui/Toast';
+import {
+  getLocalIpRegionText,
+  loadStoredIpRegionCache,
+  lookupIpRegions,
+  saveStoredIpRegionCache,
+} from '../utils/ipLocation';
 
 const api = new DefaultApi(new Configuration(), '', apiClient);
 
-const renderMarkdown = (md: string) => {
-  return md
+const getIdKey = (id?: number | string | null) => (id == null ? '' : String(id));
+
+const renderInlineMarkdown = (text: string) => {
+  return text
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-    .replace(/^### (.+)$/gm, '<h3 class="text-base font-bold mt-4 mb-2">$1</h3>')
-    .replace(/^## (.+)$/gm, '<h2 class="text-lg font-bold mt-5 mb-2">$1</h2>')
-    .replace(/^# (.+)$/gm, '<h1 class="text-xl font-bold mt-6 mb-3">$1</h1>')
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    .replace(/`(.+?)`/g, '<code class="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-sm font-mono text-brand-600 dark:text-brand-400">$1</code>')
-    .replace(/^> (.+)$/gm, '<blockquote class="border-l-4 border-gray-200 dark:border-gray-700 pl-4 py-1 my-2 text-gray-500 dark:text-gray-400 italic">$1</blockquote>')
-    .replace(/^- (.+)$/gm, '<li class="ml-4 list-disc">$1</li>')
-    .replace(/^\d+\. (.+)$/gm, '<li class="ml-4 list-decimal">$1</li>')
-    .replace(/!\[(.+?)\]\((.+?)\)/g, '<img src="$2" alt="$1" class="rounded-lg max-w-full my-2" />')
-    .replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2" class="text-brand-600 dark:text-brand-400 underline" target="_blank">$1</a>')
-    .replace(/\n/g, '<br/>');
+    .replace(/`(.+?)`/g, '<code>$1</code>')
+    .replace(/!\[(.*?)\]\((.+?)\)/g, '<img src="$2" alt="$1" />')
+    .replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+};
+
+const renderMarkdown = (md: string) => {
+  const lines = md.split(/\r?\n/);
+  const html: string[] = [];
+  let listType: 'ul' | 'ol' | null = null;
+
+  const closeList = () => {
+    if (listType) {
+      html.push(`</${listType}>`);
+      listType = null;
+    }
+  };
+
+  lines.forEach(line => {
+    const trimmed = line.trim();
+    const unorderedMatch = /^[-*]\s+(.+)$/.exec(trimmed);
+    const orderedMatch = /^\d+\.\s+(.+)$/.exec(trimmed);
+
+    if (!trimmed) {
+      closeList();
+      return;
+    }
+    if (orderedMatch) {
+      if (listType !== 'ol') {
+        closeList();
+        html.push('<ol>');
+        listType = 'ol';
+      }
+      html.push(`<li>${renderInlineMarkdown(orderedMatch[1])}</li>`);
+      return;
+    }
+    if (unorderedMatch) {
+      if (listType !== 'ul') {
+        closeList();
+        html.push('<ul>');
+        listType = 'ul';
+      }
+      html.push(`<li>${renderInlineMarkdown(unorderedMatch[1])}</li>`);
+      return;
+    }
+
+    closeList();
+    if (trimmed.startsWith('### ')) html.push(`<h3>${renderInlineMarkdown(trimmed.slice(4))}</h3>`);
+    else if (trimmed.startsWith('## ')) html.push(`<h2>${renderInlineMarkdown(trimmed.slice(3))}</h2>`);
+    else if (trimmed.startsWith('# ')) html.push(`<h1>${renderInlineMarkdown(trimmed.slice(2))}</h1>`);
+    else if (trimmed.startsWith('> ')) html.push(`<blockquote>${renderInlineMarkdown(trimmed.slice(2))}</blockquote>`);
+    else html.push(`<p>${renderInlineMarkdown(trimmed)}</p>`);
+  });
+
+  closeList();
+  return html.join('');
+};
+
+const renderPostContent = (content: string) => {
+  const hasHtmlTags = /<\/?[a-z][\s\S]*>/i.test(content);
+  const html = hasHtmlTags ? content : renderMarkdown(content);
+  return DOMPurify.sanitize(html, {
+    ADD_ATTR: ['target'],
+  });
 };
 
 const formatTime = (dateStr?: string) => {
@@ -55,7 +118,7 @@ const UserAvatar: React.FC<{ user?: UserPublicResponse | null; size?: 'sm' | 'md
     return <img src={user.userAvatar} alt="" className={`${sizeClass} rounded-xl object-cover ring-2 ring-white dark:ring-gray-800 shadow-sm`} />;
   }
   return (
-    <div className={`${sizeClass} rounded-xl bg-gradient-to-br from-brand-100 to-brand-50 dark:from-brand-900/40 dark:to-brand-800/20 text-brand-600 dark:text-brand-400 flex items-center justify-center shadow-inner`}>
+    <div className={`${sizeClass} rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-brand-600 dark:text-brand-400 flex items-center justify-center shadow-sm`}>
       <User size={iconSize} />
     </div>
   );
@@ -76,14 +139,18 @@ const PostDetailPage: React.FC = () => {
   const [hasMoreComments, setHasMoreComments] = useState(true);
   const [commentText, setCommentText] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [currentUserId, setCurrentUserId] = useState(0);
+  const [currentUserId, setCurrentUserId] = useState<number | string>(0);
   const [currentUserInfo, setCurrentUserInfo] = useState<UserPublicResponse | null>(null);
+  const [isFollowingAuthor, setIsFollowingAuthor] = useState(false);
+  const [isFollowLoading, setIsFollowLoading] = useState(false);
 
   // 用户信息
   const [authorInfo, setAuthorInfo] = useState<UserPublicResponse | null>(null);
   const [commentUserCache, setCommentUserCache] = useState<Record<number, UserPublicResponse>>({});
   const loadingUsers = useRef<Set<number>>(new Set());
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [ipRegionCache, setIpRegionCache] = useState<Record<string, string>>(() => loadStoredIpRegionCache());
+  const loadingIpRegions = useRef<Set<string>>(new Set());
 
   const loadCommentUserInfo = useCallback(async (userId: number) => {
     if (loadingUsers.current.has(userId)) return;
@@ -95,6 +162,33 @@ const PostDetailPage: React.FC = () => {
       }
     } catch { /* silent */ }
   }, []);
+
+  const loadIpRegions = useCallback(async (ips: string[]) => {
+    const pendingIps = Array.from(new Set(ips.map(ip => ip.trim()).filter(Boolean)))
+      .filter(ip => !ipRegionCache[ip] && !loadingIpRegions.current.has(ip));
+    if (pendingIps.length === 0) return;
+
+    pendingIps.forEach(ip => loadingIpRegions.current.add(ip));
+    try {
+      const result = await lookupIpRegions(pendingIps);
+      setIpRegionCache(prev => {
+        const next = { ...prev, ...result };
+        saveStoredIpRegionCache(next);
+        return next;
+      });
+    } catch {
+      setIpRegionCache(prev => {
+        const next = { ...prev };
+        pendingIps.forEach(ip => {
+          next[ip] = getLocalIpRegionText(ip) || '未知地区';
+        });
+        saveStoredIpRegionCache(next);
+        return next;
+      });
+    } finally {
+      pendingIps.forEach(ip => loadingIpRegions.current.delete(ip));
+    }
+  }, [ipRegionCache]);
 
   const loadComments = useCallback(async () => {
     setIsLoadingComments(true);
@@ -113,14 +207,15 @@ const PostDetailPage: React.FC = () => {
     setIsLoading(true);
     try {
       // 获取当前用户
+      let uid = 0 as number | string;
       const userInfoStr = localStorage.getItem('user_info');
       if (userInfoStr) {
         const userInfo = JSON.parse(userInfoStr);
-        const uid = (userInfo?.id ?? 0) as number; // 保持原始值，避免大整数精度丢失
+        uid = (userInfo?.id ?? 0) as number | string; // 保持原始值，避免大整数精度丢失
         setCurrentUserId(uid);
         if (uid) {
           try {
-            const meRes = await api.getUserPublicInfo({ id: uid });
+            const meRes = await api.getUserPublicInfo({ id: uid as number });
             if (meRes.data?.code === 0 && meRes.data.data) {
               setCurrentUserInfo(meRes.data.data);
             }
@@ -135,12 +230,20 @@ const PostDetailPage: React.FC = () => {
         setPost(data);
         setHasThumb(data.hasThumb ?? false);
         setHasFavour(data.hasFavour ?? false);
+        setIsFollowingAuthor(false);
 
         // 加载作者信息
         if (data.userId) {
           const authorRes = await api.getUserPublicInfo({ id: data.userId });
           if (authorRes.data?.code === 0 && authorRes.data.data) {
             setAuthorInfo(authorRes.data.data);
+          }
+
+          if (getIdKey(data.userId) !== getIdKey(uid)) {
+            const followRes = await api.isFollowing({ targetUserId: data.userId });
+            if (followRes.data?.code === 0) {
+              setIsFollowingAuthor(followRes.data.data ?? false);
+            }
           }
         }
       }
@@ -239,9 +342,39 @@ const PostDetailPage: React.FC = () => {
     }
   }, [loadComments]);
 
+  const handleToggleFollowAuthor = useCallback(async () => {
+    if (!post?.userId || isFollowLoading) return;
+    if (getIdKey(post.userId) === getIdKey(currentUserId)) return;
+
+    setIsFollowLoading(true);
+    try {
+      const res = await api.toggleFollow({ targetUserId: post.userId });
+      if (res.data?.code === 0) {
+        const newState = res.data.data ?? !isFollowingAuthor;
+        setIsFollowingAuthor(newState);
+        toast.success(newState ? '关注成功' : '已取消关注');
+      } else {
+        toast.error(res.data?.message || '操作失败');
+      }
+    } catch {
+      toast.error('操作失败');
+    } finally {
+      setIsFollowLoading(false);
+    }
+  }, [currentUserId, isFollowLoading, isFollowingAuthor, post?.userId]);
+
   useEffect(() => {
     if (postId) loadData();
   }, [postId, loadData]);
+
+  useEffect(() => {
+    const ips = [
+      post?.ipAddress,
+      ...comments.map(comment => comment.ipAddress),
+    ].filter((ip): ip is string => Boolean(ip?.trim()));
+
+    void loadIpRegions(ips);
+  }, [post?.ipAddress, comments, loadIpRegions]);
 
   const handleScroll = useCallback(() => {
     const el = scrollRef.current;
@@ -297,7 +430,9 @@ const PostDetailPage: React.FC = () => {
     );
   }
 
-  const isOwner = post.userId === currentUserId && currentUserId !== 0;
+  const isOwner = getIdKey(post.userId) === getIdKey(currentUserId) && currentUserId !== 0;
+  const postIp = post.ipAddress?.trim();
+  const postIpRegionText = postIp ? (ipRegionCache[postIp] || getLocalIpRegionText(postIp) || '查询中') : '';
 
   return (
     <div className="max-w-6xl mx-auto animate-in fade-in duration-500 pb-12 px-4 sm:px-0">
@@ -327,8 +462,8 @@ const PostDetailPage: React.FC = () => {
 
               {/* 内容 */}
               <div
-                className="prose dark:prose-invert max-w-none text-gray-700 dark:text-gray-300 text-sm leading-relaxed mb-6 font-medium opacity-90"
-                dangerouslySetInnerHTML={{ __html: renderMarkdown(post.content || '') }}
+                className="community-rendered-content prose dark:prose-invert max-w-none text-gray-700 dark:text-gray-300 text-sm leading-relaxed mb-6 font-medium opacity-90"
+                dangerouslySetInnerHTML={{ __html: renderPostContent(post.content || '') }}
               />
 
               {/* 标签 */}
@@ -437,6 +572,8 @@ const PostDetailPage: React.FC = () => {
                       loadCommentUserInfo(userId);
                     }
                     const isCommentOwner = comment.userId === currentUserId && currentUserId !== 0;
+                    const commentIp = comment.ipAddress?.trim();
+                    const commentIpRegionText = commentIp ? (ipRegionCache[commentIp] || getLocalIpRegionText(commentIp) || '查询中') : '';
 
                     return (
                       <div key={comment.id} className="px-5 py-4 hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors group">
@@ -452,11 +589,20 @@ const PostDetailPage: React.FC = () => {
                                   <Clock size={9} />
                                   {formatTime(comment.createTime)}
                                 </span>
+                                {commentIpRegionText && (
+                                  <span
+                                    className="text-[11px] font-medium text-gray-400 dark:text-gray-500 inline-flex items-center gap-1 bg-gray-100/50 dark:bg-gray-800/50 px-1.5 py-0.5 rounded"
+                                    title={commentIp ? `IP: ${commentIp}` : undefined}
+                                  >
+                                    <MapPin size={9} />
+                                    IP属地：{commentIpRegionText}
+                                  </span>
+                                )}
                               </div>
                               {isCommentOwner && (
                                 <button
                                   onClick={() => handleDeleteComment(comment.id!)}
-                                  className="opacity-0 group-hover:opacity-100 p-1.5 text-gray-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-lg transition-all"
+                                  className=" p-1.5 text-gray-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-lg transition-all"
                                   title="删除评论"
                                 >
                                   <Trash2 size={14} />
@@ -497,6 +643,15 @@ const PostDetailPage: React.FC = () => {
               <p className="text-xs text-gray-500 dark:text-gray-400 font-medium mb-4">
                 发布于 {formatTime(post.createTime)}
               </p>
+              {postIpRegionText && (
+                <div
+                  className="inline-flex items-center gap-1 text-[11px] text-gray-400 dark:text-gray-500 font-medium mb-4"
+                  title={postIp ? `IP: ${postIp}` : undefined}
+                >
+                  <MapPin size={11} />
+                  IP属地：{postIpRegionText}
+                </div>
+              )}
 
               <div className="flex items-center gap-2 mb-5">
                 {authorInfo?.role && (
@@ -534,8 +689,17 @@ const PostDetailPage: React.FC = () => {
                     </button>
                   </div>
                 ) : (
-                  <button className="w-full py-2 text-sm bg-brand-600 text-white font-bold rounded-xl hover:bg-brand-500 shadow-md shadow-brand-600/20 transition-all active:scale-95">
-                    关注作者
+                  <button
+                    onClick={handleToggleFollowAuthor}
+                    disabled={isFollowLoading || !post.userId}
+                    className={`w-full py-2 text-sm font-bold rounded-xl shadow-md transition-all active:scale-95 disabled:cursor-not-allowed disabled:opacity-70 flex items-center justify-center gap-1.5 ${
+                      isFollowingAuthor
+                        ? 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 shadow-gray-200/40 dark:shadow-black/10'
+                        : 'bg-brand-600 text-white hover:bg-brand-500 shadow-brand-600/20'
+                    }`}
+                  >
+                    {isFollowLoading && <Loader2 size={14} className="animate-spin" />}
+                    {isFollowingAuthor ? '已关注' : '关注作者'}
                   </button>
                 )}
               </div>

@@ -18,5 +18,8 @@ export interface CreateGroupRequest {
     'groupName': string;
     'description'?: string;
     'avatar'?: string;
+    'joinMode'?: number;
+    'inviteMode'?: number;
+    'announcement'?: string;
 }
 

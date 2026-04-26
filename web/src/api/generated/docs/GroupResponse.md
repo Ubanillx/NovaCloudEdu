@@ -18,6 +18,12 @@ Name | Type | Description | Notes
 **joinMode** | **number** |  | [optional] [default to undefined]
 **announcement** | **string** |  | [optional] [default to undefined]
 **announcementTime** | **string** |  | [optional] [default to undefined]
+**lastMessageSenderId** | **number** |  | [optional] [default to undefined]
+**lastMessageSenderName** | **string** |  | [optional] [default to undefined]
+**lastMessage** | **string** |  | [optional] [default to undefined]
+**lastMessageType** | **string** |  | [optional] [default to undefined]
+**lastMessageTime** | **string** |  | [optional] [default to undefined]
+**unreadCount** | **number** |  | [optional] [default to undefined]
 **createTime** | **string** |  | [optional] [default to undefined]
 **mute** | **boolean** |  | [optional] [default to undefined]
 
@@ -40,6 +46,12 @@ const instance: GroupResponse = {
     joinMode,
     announcement,
     announcementTime,
+    lastMessageSenderId,
+    lastMessageSenderName,
+    lastMessage,
+    lastMessageType,
+    lastMessageTime,
+    unreadCount,
     createTime,
     mute,
 };

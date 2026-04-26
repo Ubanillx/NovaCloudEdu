@@ -108,7 +108,7 @@ export const VersionHistoryPanel: React.FC<VersionHistoryPanelProps> = ({
             >
               <Plus size={16} />
             </button>
-            <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+            <button onClick={onClose} aria-label="关闭" className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
               <X size={20} />
             </button>
           </div>
@@ -198,7 +198,7 @@ export const VersionHistoryPanel: React.FC<VersionHistoryPanelProps> = ({
                       <button
                         onClick={() => handleRollback(v.version!)}
                         disabled={rollingBack !== null}
-                        className="opacity-0 group-hover:opacity-100 flex items-center gap-1 px-2.5 py-1.5 text-xs font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 hover:bg-amber-100 dark:hover:bg-amber-900/30 border border-amber-200 dark:border-amber-800 rounded-lg transition-all disabled:opacity-50"
+                        className=" flex items-center gap-1 px-2.5 py-1.5 text-xs font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 hover:bg-amber-100 dark:hover:bg-amber-900/30 border border-amber-200 dark:border-amber-800 rounded-lg transition-all disabled:opacity-50"
                         title={`回滚到 v${v.version}`}
                       >
                         {rollingBack === v.version ? (

@@ -75,7 +75,7 @@ function KpiCard({ icon: Icon, label, value, subValue, current, previous, color 
     pink: 'bg-pink-50 dark:bg-pink-900/20 text-pink-600 dark:text-pink-400',
   };
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-5 shadow-sm hover:shadow-md transition-all duration-300">
+    <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-5 shadow-sm hover:shadow-sm transition-all duration-300">
       <div className="flex items-center justify-between mb-3">
         <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${colorMap[color] || colorMap.brand}`}>
           <Icon size={20} />
