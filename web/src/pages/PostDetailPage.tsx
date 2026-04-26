@@ -4,11 +4,17 @@ import DOMPurify from 'dompurify';
 import {
   ArrowLeft, ThumbsUp, Star, MessageCircle, Send,
   Edit3, Trash2, Clock, User, X, TrendingUp,
-  Loader2,
+  Loader2, MapPin,
 } from 'lucide-react';
 import { apiClient, DefaultApi, Configuration } from '../api';
 import type { PostDetailResponse, CommentResponse, UserPublicResponse } from '../api/generated/models';
 import toast from '../components/ui/Toast';
+import {
+  getLocalIpRegionText,
+  loadStoredIpRegionCache,
+  lookupIpRegions,
+  saveStoredIpRegionCache,
+} from '../utils/ipLocation';
 
 const api = new DefaultApi(new Configuration(), '', apiClient);
 
@@ -143,6 +149,8 @@ const PostDetailPage: React.FC = () => {
   const [commentUserCache, setCommentUserCache] = useState<Record<number, UserPublicResponse>>({});
   const loadingUsers = useRef<Set<number>>(new Set());
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [ipRegionCache, setIpRegionCache] = useState<Record<string, string>>(() => loadStoredIpRegionCache());
+  const loadingIpRegions = useRef<Set<string>>(new Set());
 
   const loadCommentUserInfo = useCallback(async (userId: number) => {
     if (loadingUsers.current.has(userId)) return;
@@ -154,6 +162,33 @@ const PostDetailPage: React.FC = () => {
       }
     } catch { /* silent */ }
   }, []);
+
+  const loadIpRegions = useCallback(async (ips: string[]) => {
+    const pendingIps = Array.from(new Set(ips.map(ip => ip.trim()).filter(Boolean)))
+      .filter(ip => !ipRegionCache[ip] && !loadingIpRegions.current.has(ip));
+    if (pendingIps.length === 0) return;
+
+    pendingIps.forEach(ip => loadingIpRegions.current.add(ip));
+    try {
+      const result = await lookupIpRegions(pendingIps);
+      setIpRegionCache(prev => {
+        const next = { ...prev, ...result };
+        saveStoredIpRegionCache(next);
+        return next;
+      });
+    } catch {
+      setIpRegionCache(prev => {
+        const next = { ...prev };
+        pendingIps.forEach(ip => {
+          next[ip] = getLocalIpRegionText(ip) || '未知地区';
+        });
+        saveStoredIpRegionCache(next);
+        return next;
+      });
+    } finally {
+      pendingIps.forEach(ip => loadingIpRegions.current.delete(ip));
+    }
+  }, [ipRegionCache]);
 
   const loadComments = useCallback(async () => {
     setIsLoadingComments(true);
@@ -332,6 +367,15 @@ const PostDetailPage: React.FC = () => {
     if (postId) loadData();
   }, [postId, loadData]);
 
+  useEffect(() => {
+    const ips = [
+      post?.ipAddress,
+      ...comments.map(comment => comment.ipAddress),
+    ].filter((ip): ip is string => Boolean(ip?.trim()));
+
+    void loadIpRegions(ips);
+  }, [post?.ipAddress, comments, loadIpRegions]);
+
   const handleScroll = useCallback(() => {
     const el = scrollRef.current;
     if (el && el.scrollHeight - el.scrollTop - el.clientHeight < 300) {
@@ -387,6 +431,8 @@ const PostDetailPage: React.FC = () => {
   }
 
   const isOwner = getIdKey(post.userId) === getIdKey(currentUserId) && currentUserId !== 0;
+  const postIp = post.ipAddress?.trim();
+  const postIpRegionText = postIp ? (ipRegionCache[postIp] || getLocalIpRegionText(postIp) || '查询中') : '';
 
   return (
     <div className="max-w-6xl mx-auto animate-in fade-in duration-500 pb-12 px-4 sm:px-0">
@@ -526,6 +572,8 @@ const PostDetailPage: React.FC = () => {
                       loadCommentUserInfo(userId);
                     }
                     const isCommentOwner = comment.userId === currentUserId && currentUserId !== 0;
+                    const commentIp = comment.ipAddress?.trim();
+                    const commentIpRegionText = commentIp ? (ipRegionCache[commentIp] || getLocalIpRegionText(commentIp) || '查询中') : '';
 
                     return (
                       <div key={comment.id} className="px-5 py-4 hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors group">
@@ -541,6 +589,15 @@ const PostDetailPage: React.FC = () => {
                                   <Clock size={9} />
                                   {formatTime(comment.createTime)}
                                 </span>
+                                {commentIpRegionText && (
+                                  <span
+                                    className="text-[11px] font-medium text-gray-400 dark:text-gray-500 inline-flex items-center gap-1 bg-gray-100/50 dark:bg-gray-800/50 px-1.5 py-0.5 rounded"
+                                    title={commentIp ? `IP: ${commentIp}` : undefined}
+                                  >
+                                    <MapPin size={9} />
+                                    IP属地：{commentIpRegionText}
+                                  </span>
+                                )}
                               </div>
                               {isCommentOwner && (
                                 <button
@@ -586,6 +643,15 @@ const PostDetailPage: React.FC = () => {
               <p className="text-xs text-gray-500 dark:text-gray-400 font-medium mb-4">
                 发布于 {formatTime(post.createTime)}
               </p>
+              {postIpRegionText && (
+                <div
+                  className="inline-flex items-center gap-1 text-[11px] text-gray-400 dark:text-gray-500 font-medium mb-4"
+                  title={postIp ? `IP: ${postIp}` : undefined}
+                >
+                  <MapPin size={11} />
+                  IP属地：{postIpRegionText}
+                </div>
+              )}
 
               <div className="flex items-center gap-2 mb-5">
                 {authorInfo?.role && (

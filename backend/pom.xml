@@ -126,6 +126,12 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
         </dependency>
+        <!-- MaxMind GeoIP2 - local MMDB IP geolocation -->
+        <dependency>
+            <groupId>com.maxmind.geoip2</groupId>
+            <artifactId>geoip2</artifactId>
+            <version>4.2.1</version>
+        </dependency>
         <!-- Apache PDFBox - PDF 文本提取 -->
         <dependency>
             <groupId>org.apache.pdfbox</groupId>

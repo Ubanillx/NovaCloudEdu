@@ -2,11 +2,17 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   PenSquare, Search, ThumbsUp, MessageCircle, Star, Clock, TrendingUp,
-  Users, Flame, User, X, ChevronRight,
+  Users, Flame, User, X, ChevronRight, MapPin,
 } from 'lucide-react';
 import { apiClient, DefaultApi, Configuration } from '../api';
 import type { PostResponse, UserPublicResponse } from '../api/generated/models';
 import toast from '../components/ui/Toast';
+import {
+  getLocalIpRegionText,
+  loadStoredIpRegionCache,
+  lookupIpRegions,
+  saveStoredIpRegionCache,
+} from '../utils/ipLocation';
 
 const api = new DefaultApi(new Configuration(), '', apiClient);
 
@@ -25,6 +31,35 @@ const formatTime = (dateStr?: string) => {
   if (days < 7) return `${days}天前`;
   return `${time.getMonth() + 1}月${time.getDate()}日`;
 };
+
+const decodeHtmlEntities = (text: string) => {
+  if (typeof document === 'undefined') return text;
+  const textarea = document.createElement('textarea');
+  textarea.innerHTML = text;
+  return textarea.value;
+};
+
+const stripPostContent = (content?: string) => {
+  if (!content) return '';
+
+  const hasHtmlTags = /<\/?[a-z][\s\S]*>/i.test(content);
+  const plainText = hasHtmlTags
+    ? decodeHtmlEntities(content.replace(/<style[\s\S]*?<\/style>/gi, ' ')
+      .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+      .replace(/<[^>]+>/g, ' '))
+    : content;
+
+  return plainText
+    .replace(/!\[[^\]]*]\([^)]+\)/g, ' ')
+    .replace(/\[([^\]]+)]\([^)]+\)/g, '$1')
+    .replace(/[#*`>_[\]!()-]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+};
+
+const normalizeTags = (tags?: string[]) => (
+  Array.from(new Set((tags || []).map(tag => tag.trim()).filter(Boolean))).slice(0, 3)
+);
 
 // 用户头像组件
 const UserAvatar: React.FC<{ user?: UserPublicResponse | null; size?: 'sm' | 'md' | 'lg' }> = ({ user, size = 'sm' }) => {
@@ -112,6 +147,10 @@ const CirclePage: React.FC = () => {
   const [userInfoCache, setUserInfoCache] = useState<Record<number, UserPublicResponse>>({});
   const loadingUsers = useRef<Set<number>>(new Set());
 
+  // IP 归属地缓存
+  const [ipRegionCache, setIpRegionCache] = useState<Record<string, string>>(() => loadStoredIpRegionCache());
+  const loadingIpRegions = useRef<Set<string>>(new Set());
+
   const loadUserInfo = useCallback(async (userId: number) => {
     if (loadingUsers.current.has(userId)) return;
     loadingUsers.current.add(userId);
@@ -122,6 +161,33 @@ const CirclePage: React.FC = () => {
       }
     } catch { /* silent */ }
   }, []);
+
+  const loadIpRegions = useCallback(async (ips: string[]) => {
+    const pendingIps = Array.from(new Set(ips.map(ip => ip.trim()).filter(Boolean)))
+      .filter(ip => !ipRegionCache[ip] && !loadingIpRegions.current.has(ip));
+    if (pendingIps.length === 0) return;
+
+    pendingIps.forEach(ip => loadingIpRegions.current.add(ip));
+    try {
+      const result = await lookupIpRegions(pendingIps);
+      setIpRegionCache(prev => {
+        const next = { ...prev, ...result };
+        saveStoredIpRegionCache(next);
+        return next;
+      });
+    } catch {
+      setIpRegionCache(prev => {
+        const next = { ...prev };
+        pendingIps.forEach(ip => {
+          next[ip] = getLocalIpRegionText(ip) || '未知地区';
+        });
+        saveStoredIpRegionCache(next);
+        return next;
+      });
+    } finally {
+      pendingIps.forEach(ip => loadingIpRegions.current.delete(ip));
+    }
+  }, [ipRegionCache]);
 
   // ==================== 推荐帖子 ====================
   const loadPosts = useCallback(async () => {
@@ -316,6 +382,16 @@ const CirclePage: React.FC = () => {
     }
   }, [showSearch]);
 
+  useEffect(() => {
+    const ipSet = new Set<string>();
+    [...posts, ...followingPosts, ...topPosts, ...searchResults, ...sidebarTopPosts].forEach(post => {
+      const ip = post.ipAddress?.trim();
+      if (ip) ipSet.add(ip);
+    });
+
+    void loadIpRegions(Array.from(ipSet));
+  }, [posts, followingPosts, topPosts, searchResults, sidebarTopPosts, loadIpRegions]);
+
   // 滚动加载
   const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
     const el = e.currentTarget;
@@ -342,6 +418,10 @@ const CirclePage: React.FC = () => {
     }
     const hasThumb = thumbStatus[post.id!] ?? false;
     const hasFavour = favourStatus[post.id!] ?? false;
+    const excerpt = stripPostContent(post.content).slice(0, 200);
+    const tags = normalizeTags(post.tags);
+    const ip = post.ipAddress?.trim();
+    const ipRegionText = ip ? (ipRegionCache[ip] || getLocalIpRegionText(ip) || '查询中') : '';
 
     return (
       <div
@@ -363,9 +443,13 @@ const CirclePage: React.FC = () => {
                 <Clock size={11} />
                 {formatTime(post.createTime)}
               </span>
-              {post.ipAddress && (
-                <span className="text-[10px] text-gray-300 dark:text-gray-600 font-medium">
-                  IP: {post.ipAddress}
+              {ipRegionText && (
+                <span
+                  className="inline-flex items-center gap-0.5 text-[10px] text-gray-400 dark:text-gray-500 font-medium"
+                  title={post.ipAddress ? `IP: ${post.ipAddress}` : undefined}
+                >
+                  <MapPin size={10} />
+                  IP属地：{ipRegionText}
                 </span>
               )}
             </div>
@@ -378,24 +462,28 @@ const CirclePage: React.FC = () => {
         </h3>
 
         {/* 内容摘要 */}
-        <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed line-clamp-3 mb-3 font-medium opacity-80">
-          {post.content?.replace(/[#*`>\-\[\]!()]/g, '').substring(0, 200)}
-        </p>
+        {excerpt && (
+          <p className="text-sm text-gray-500 dark:text-gray-400 leading-6 line-clamp-3 mb-3 font-medium">
+            {excerpt}
+          </p>
+        )}
 
         {/* 标签 */}
-        {post.tags && post.tags.length > 0 && post.tags.some(t => t) && (
-          <div className="flex flex-wrap gap-1.5 mb-4">
-            {post.tags.filter(t => t).slice(0, 3).map(tag => (
+        {tags.length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-4">
+            {tags.map(tag => (
               <span
                 key={tag}
-                className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-bold bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 border border-gray-100 dark:border-gray-700 hover:bg-brand-50 hover:text-brand-600 hover:border-brand-100 transition-all"
+                className="inline-flex h-6 max-w-full items-center gap-0.5 rounded-full border border-brand-100/70 bg-brand-50/70 px-2.5 text-[11px] font-semibold text-brand-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.55)] transition-colors hover:border-brand-200 hover:bg-brand-100/80 dark:border-brand-800/50 dark:bg-brand-950/30 dark:text-brand-300 dark:hover:bg-brand-900/40"
+                title={`#${tag}`}
                 onClick={(e) => {
                   e.stopPropagation();
                   setSearchKeyword(`#${tag}`);
                   setShowSearch(true);
                 }}
               >
-                #{tag}
+                <span className="text-brand-400 dark:text-brand-500">#</span>
+                <span className="truncate">{tag}</span>
               </span>
             ))}
           </div>
