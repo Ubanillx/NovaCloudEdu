@@ -347,7 +347,7 @@ services:
       - JWT_SECRET=${JWT_SECRET:-NovaCloudEduSecretKey123456789012345678901234567890}
       - REDIS_ADDR=redis:6379
       - REDIS_PASSWORD=${REDIS_PASSWORD:-}
-      - JAVA_BACKEND_URL=http://backend:8080
+      - JAVA_BACKEND_URL=${JAVA_BACKEND_URL:-http://backend:8080}
       - LIVEKIT_URL=${LIVEKIT_URL:-ws://livekit:7880}
       - LIVEKIT_API_KEY=${LIVEKIT_API_KEY:-devkey}
       - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET:-devsecret}
@@ -366,6 +366,8 @@ services:
       start_period: 10s
     networks:
       - nova-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   # SRS 直播媒体服务器
   srs:
