@@ -7,6 +7,12 @@ import {
 import { apiClient, DefaultApi, Configuration } from '../api';
 import type { PostResponse, UserPublicResponse } from '../api/generated/models';
 import toast from '../components/ui/Toast';
+import {
+  getLocalIpRegionText,
+  loadStoredIpRegionCache,
+  lookupIpRegions,
+  saveStoredIpRegionCache,
+} from '../utils/ipLocation';
 
 const api = new DefaultApi(new Configuration(), '', apiClient);
 
@@ -54,37 +60,6 @@ const stripPostContent = (content?: string) => {
 const normalizeTags = (tags?: string[]) => (
   Array.from(new Set((tags || []).map(tag => tag.trim()).filter(Boolean))).slice(0, 3)
 );
-
-type PostWithIpRegion = PostResponse & {
-  ipLocation?: string;
-  ipRegion?: string;
-  ipArea?: string;
-};
-
-const isPrivateIp = (ip: string) => {
-  if (/^(127\.|10\.|192\.168\.)/.test(ip)) return true;
-
-  const match172 = /^172\.(\d{1,3})\./.exec(ip);
-  if (match172) {
-    const second = Number(match172[1]);
-    return second >= 16 && second <= 31;
-  }
-
-  return /^(fc|fd)[0-9a-f]{2}:/i.test(ip) || /^fe80:/i.test(ip);
-};
-
-const getIpRegionText = (post: PostWithIpRegion) => {
-  const region = post.ipLocation || post.ipRegion || post.ipArea;
-  if (region) return region;
-
-  const ip = post.ipAddress?.trim();
-  if (!ip) return '';
-  if (ip === '::1' || ip === '0:0:0:0:0:0:0:1' || ip === '127.0.0.1' || ip === 'localhost') {
-    return '本机';
-  }
-  if (isPrivateIp(ip)) return '内网';
-  return '未知地区';
-};
 
 // 用户头像组件
 const UserAvatar: React.FC<{ user?: UserPublicResponse | null; size?: 'sm' | 'md' | 'lg' }> = ({ user, size = 'sm' }) => {
@@ -172,6 +147,10 @@ const CirclePage: React.FC = () => {
   const [userInfoCache, setUserInfoCache] = useState<Record<number, UserPublicResponse>>({});
   const loadingUsers = useRef<Set<number>>(new Set());
 
+  // IP 归属地缓存
+  const [ipRegionCache, setIpRegionCache] = useState<Record<string, string>>(() => loadStoredIpRegionCache());
+  const loadingIpRegions = useRef<Set<string>>(new Set());
+
   const loadUserInfo = useCallback(async (userId: number) => {
     if (loadingUsers.current.has(userId)) return;
     loadingUsers.current.add(userId);
@@ -182,6 +161,33 @@ const CirclePage: React.FC = () => {
       }
     } catch { /* silent */ }
   }, []);
+
+  const loadIpRegions = useCallback(async (ips: string[]) => {
+    const pendingIps = Array.from(new Set(ips.map(ip => ip.trim()).filter(Boolean)))
+      .filter(ip => !ipRegionCache[ip] && !loadingIpRegions.current.has(ip));
+    if (pendingIps.length === 0) return;
+
+    pendingIps.forEach(ip => loadingIpRegions.current.add(ip));
+    try {
+      const result = await lookupIpRegions(pendingIps);
+      setIpRegionCache(prev => {
+        const next = { ...prev, ...result };
+        saveStoredIpRegionCache(next);
+        return next;
+      });
+    } catch {
+      setIpRegionCache(prev => {
+        const next = { ...prev };
+        pendingIps.forEach(ip => {
+          next[ip] = getLocalIpRegionText(ip) || '未知地区';
+        });
+        saveStoredIpRegionCache(next);
+        return next;
+      });
+    } finally {
+      pendingIps.forEach(ip => loadingIpRegions.current.delete(ip));
+    }
+  }, [ipRegionCache]);
 
   // ==================== 推荐帖子 ====================
   const loadPosts = useCallback(async () => {
@@ -376,6 +382,16 @@ const CirclePage: React.FC = () => {
     }
   }, [showSearch]);
 
+  useEffect(() => {
+    const ipSet = new Set<string>();
+    [...posts, ...followingPosts, ...topPosts, ...searchResults, ...sidebarTopPosts].forEach(post => {
+      const ip = post.ipAddress?.trim();
+      if (ip) ipSet.add(ip);
+    });
+
+    void loadIpRegions(Array.from(ipSet));
+  }, [posts, followingPosts, topPosts, searchResults, sidebarTopPosts, loadIpRegions]);
+
   // 滚动加载
   const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
     const el = e.currentTarget;
@@ -404,7 +420,8 @@ const CirclePage: React.FC = () => {
     const hasFavour = favourStatus[post.id!] ?? false;
     const excerpt = stripPostContent(post.content).slice(0, 200);
     const tags = normalizeTags(post.tags);
-    const ipRegionText = getIpRegionText(post);
+    const ip = post.ipAddress?.trim();
+    const ipRegionText = ip ? (ipRegionCache[ip] || getLocalIpRegionText(ip) || '查询中') : '';
 
     return (
       <div

@@ -4,6 +4,7 @@ api.ts
 api/admin-dashboard-controller-api.ts
 api/aiapi.ts
 api/default-api.ts
+api/ipapi.ts
 api/mcpapi.ts
 api/only-office-api.ts
 api/pptapi.ts
@@ -103,6 +104,7 @@ docs/BaseResponseGroupMessagePageResponse.md
 docs/BaseResponseGroupPage.md
 docs/BaseResponseGroupResponse.md
 docs/BaseResponseInteger.md
+docs/BaseResponseIpLocationResponse.md
 docs/BaseResponseJoinRequestResponse.md
 docs/BaseResponseKnowledgeBaseVO.md
 docs/BaseResponseKnowledgeDocumentVO.md
@@ -178,6 +180,7 @@ docs/BaseResponseLiveRoomResponse.md
 docs/BaseResponseLoginUserResponse.md
 docs/BaseResponseLong.md
 docs/BaseResponseMapStringInteger.md
+docs/BaseResponseMapStringIpLocationResponse.md
 docs/BaseResponseMapStringLong.md
 docs/BaseResponseMapStringMapStringInteger.md
 docs/BaseResponseMapStringObject.md
@@ -244,6 +247,7 @@ docs/BaseResponseWorkflowVersionResponse.md
 docs/BatchAiProcessRequest.md
 docs/BatchBanUserRequest.md
 docs/BatchCreateUserRequest.md
+docs/BatchIpLocationRequest.md
 docs/BatchProcessResult.md
 docs/BatchScrapeRequest.md
 docs/BatchUpdateNodesRequest.md
@@ -364,6 +368,8 @@ docs/GroupPage.md
 docs/GroupResponse.md
 docs/HandleFriendRequestDTO.md
 docs/HandleJoinRequestDTO.md
+docs/IPApi.md
+docs/IpLocationResponse.md
 docs/JoinGroupRequest.md
 docs/JoinRequestResponse.md
 docs/KnowledgeBaseVO.md
@@ -629,6 +635,7 @@ models/base-response-group-message-page-response.ts
 models/base-response-group-page.ts
 models/base-response-group-response.ts
 models/base-response-integer.ts
+models/base-response-ip-location-response.ts
 models/base-response-join-request-response.ts
 models/base-response-knowledge-base-vo.ts
 models/base-response-knowledge-document-vo.ts
@@ -704,6 +711,7 @@ models/base-response-live-room-response.ts
 models/base-response-login-user-response.ts
 models/base-response-long.ts
 models/base-response-map-string-integer.ts
+models/base-response-map-string-ip-location-response.ts
 models/base-response-map-string-long.ts
 models/base-response-map-string-map-string-integer.ts
 models/base-response-map-string-object.ts
@@ -770,6 +778,7 @@ models/base-response-workflow-version-response.ts
 models/batch-ai-process-request.ts
 models/batch-ban-user-request.ts
 models/batch-create-user-request.ts
+models/batch-ip-location-request.ts
 models/batch-process-result.ts
 models/batch-scrape-request.ts
 models/batch-update-nodes-request.ts
@@ -890,6 +899,7 @@ models/group-response.ts
 models/handle-friend-request-dto.ts
 models/handle-join-request-dto.ts
 models/index.ts
+models/ip-location-response.ts
 models/join-group-request.ts
 models/join-request-response.ts
 models/knowledge-base-vo.ts
