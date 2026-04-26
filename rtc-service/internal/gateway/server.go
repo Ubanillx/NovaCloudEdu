@@ -31,11 +31,11 @@ type MessageHandler interface {
 
 // Server WebSocket 网关服务器
 type Server struct {
-	connMgr    *ConnManager
+	connMgr      *ConnManager
 	jwtValidator *auth.JWTValidator
-	redisStore *store.RedisStore
-	handler    MessageHandler
-	logger     *zap.Logger
+	redisStore   *store.RedisStore
+	handler      MessageHandler
+	logger       *zap.Logger
 }
 
 // NewServer 创建 WebSocket 服务器
@@ -104,8 +104,9 @@ func (s *Server) HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 
 	// 消息读取循环
 	defer func() {
-		s.connMgr.Remove(userID)
-		_ = s.redisStore.SetUserOffline(ctx, userID)
+		if s.connMgr.Remove(conn) {
+			_ = s.redisStore.SetUserOffline(ctx, userID)
+		}
 		_ = ws.Close()
 		s.logger.Info("user disconnected", zap.Int64("userId", userID))
 	}()
