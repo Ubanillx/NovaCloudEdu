@@ -127,7 +127,7 @@ const McpFormModal: React.FC<McpFormModalProps> = ({ isOpen, onClose, onSuccess,
           <h3 className="text-lg font-bold text-gray-900 dark:text-white">
             {isEdit ? '编辑 MCP 服务器' : '新建 MCP 服务器'}
           </h3>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          <button onClick={onClose} aria-label="关闭" className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
             <X size={20} />
           </button>
         </div>
@@ -233,7 +233,7 @@ const ToolsModal: React.FC<ToolsModalProps> = ({ isOpen, onClose, serverId }) =>
           <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
             <Wrench size={18} /> 可用工具列表
           </h3>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          <button onClick={onClose} aria-label="关闭" className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
             <X size={20} />
           </button>
         </div>
@@ -450,7 +450,7 @@ export const McpServerManagementPage: React.FC = () => {
                     {/* 服务器信息 */}
                     <td className="px-8 py-4 min-w-[320px]">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-50 to-indigo-50 dark:from-gray-800 dark:to-gray-800 flex items-center justify-center border border-gray-100 dark:border-gray-700">
+                        <div className="w-10 h-10 rounded-xl bg-white dark:bg-gray-900 flex items-center justify-center border border-gray-200 dark:border-gray-700 shadow-sm">
                           <Plug2 size={18} className={server.enabled ? 'text-brand-500' : 'text-gray-400'} />
                         </div>
                         <div className="min-w-0 flex-1">
@@ -528,7 +528,7 @@ export const McpServerManagementPage: React.FC = () => {
                     </td>
                     {/* 操作 */}
                     <td className="px-6 py-4">
-                      <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="flex items-center gap-2">
                         <button
                           onClick={() => { setToolsServerId(server.id); setToolsModalOpen(true); }}
                           className="p-2 text-gray-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded-lg transition-all"

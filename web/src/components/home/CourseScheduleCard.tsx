@@ -229,7 +229,7 @@ export const CourseScheduleCard: React.FC = () => {
                         key={String(course.id)}
                         onClick={() => setSelectedCourse(selectedCourse?.id === course.id ? null : course)}
                         style={{ top: top + 3, height: height - 6, left: 3, right: 3 }}
-                        className={`absolute rounded-lg ${color.bg} border ${color.border} p-1.5 flex flex-col overflow-hidden cursor-pointer hover:shadow-md transition-shadow text-left`}
+                        className={`absolute rounded-lg ${color.bg} border ${color.border} p-1.5 flex flex-col overflow-hidden cursor-pointer hover:shadow-sm transition-shadow text-left`}
                       >
                         <span className={`text-[11px] font-semibold ${color.text} leading-tight line-clamp-2`}>
                           {course.courseName ?? '未命名'}

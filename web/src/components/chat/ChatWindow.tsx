@@ -281,7 +281,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                   <button
                     type="button"
                     onClick={() => setReplyingTo(msg)}
-                    className="self-center p-1.5 rounded-lg text-gray-300 hover:text-brand-500 hover:bg-white dark:hover:bg-gray-800 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-all"
+                    className="self-center p-1.5 rounded-lg text-gray-300 hover:text-brand-500 hover:bg-white dark:hover:bg-gray-800 transition-all"
                     title="引用回复"
                   >
                     <Reply size={14} />

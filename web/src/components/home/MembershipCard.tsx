@@ -122,8 +122,8 @@ export const MembershipCard: React.FC = () => {
       {/* Header */}
       <div className={`${colors.bg} px-5 py-4 flex items-center justify-between`}>
         <div className="flex items-center gap-3">
-          <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${colors.gradient} flex items-center justify-center shadow-lg`}>
-            <Crown size={20} className="text-white" />
+          <div className={`w-10 h-10 rounded-xl bg-white/80 dark:bg-gray-900/70 border ${colors.border} flex items-center justify-center shadow-sm`}>
+            <Crown size={20} className={colors.text} />
           </div>
           <div>
             <div className={`text-sm font-bold ${colors.text}`}>{planLabel}</div>
@@ -141,7 +141,7 @@ export const MembershipCard: React.FC = () => {
         {planCode === 'FREE' && (
           <button
             onClick={() => navigate('/membership')}
-            className="flex items-center gap-1 px-3 py-1.5 text-xs font-bold text-white bg-gradient-to-r from-brand-500 to-brand-600 rounded-lg hover:shadow-lg hover:shadow-brand-500/20 transition-all active:scale-95"
+            className="flex items-center gap-1 px-3 py-1.5 text-xs font-bold text-white bg-gradient-to-r from-brand-500 to-brand-600 rounded-lg hover:shadow-sm hover:shadow-brand-500/20 transition-all active:scale-95"
           >
             <Zap size={14} />
             升级

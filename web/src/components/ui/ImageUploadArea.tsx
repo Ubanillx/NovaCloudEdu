@@ -88,7 +88,7 @@ const ImageUploadArea: React.FC<ImageUploadAreaProps> = ({
             <>
               <img src={value} alt="预览" className="w-full h-full object-cover" />
               <div className="absolute inset-0 bg-black/0 hover:bg-black/40 transition-all group flex items-center justify-center">
-                <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2">
+                <div className=" flex items-center gap-2">
                   <button type="button" onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
                     className="p-2 bg-white/90 text-gray-700 rounded-lg hover:bg-white transition-colors" title="更换图片">
                     <Upload size={18} />

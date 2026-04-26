@@ -52,7 +52,7 @@ const LoopContainerNode: React.FC<NodeProps> = ({ id, data, selected }) => {
 
   const borderClass = selected
     ? 'ring-2 ring-brand-500/30 border-brand-400 dark:border-brand-500 shadow-lg shadow-brand-500/10'
-    : 'border-gray-200 dark:border-gray-700 hover:border-brand-300 dark:hover:border-brand-700 hover:shadow-md';
+    : 'border-gray-200 dark:border-gray-700 hover:border-brand-300 dark:hover:border-brand-700 hover:shadow-sm';
 
   return (
     <div

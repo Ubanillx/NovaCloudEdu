@@ -357,7 +357,7 @@ const AssistantFormModal: React.FC<AssistantFormModalProps> = ({ isOpen, onClose
             <Bot size={20} className="text-brand-600" />
             {isEdit ? '编辑 AI 助手' : '新建 AI 助手'}
           </h3>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          <button onClick={onClose} aria-label="关闭" className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
             <X size={20} />
           </button>
         </div>
@@ -699,11 +699,11 @@ const AssistantDetailModal: React.FC<AssistantDetailModalProps> = ({ isOpen, onC
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-brand-500/20">
+            <div className="w-10 h-10 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 flex items-center justify-center shadow-sm">
               {assistant.avatarUrl ? (
                 <img src={assistant.avatarUrl} alt="" className="w-full h-full rounded-xl object-cover" />
               ) : (
-                <Bot size={20} className="text-white" />
+                <Bot size={20} className="text-brand-600 dark:text-brand-400" />
               )}
             </div>
             <div>
@@ -720,7 +720,7 @@ const AssistantDetailModal: React.FC<AssistantDetailModalProps> = ({ isOpen, onC
               </div>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          <button onClick={onClose} aria-label="关闭" className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
             <X size={20} />
           </button>
         </div>
@@ -852,8 +852,7 @@ const AssistantDetailModal: React.FC<AssistantDetailModalProps> = ({ isOpen, onC
         {/* Footer */}
         <div className="flex items-center justify-end px-6 py-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/50">
           <button
-            onClick={onClose}
-            className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+            onClick={onClose} className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
           >
             关闭
           </button>
@@ -955,7 +954,7 @@ const KnowledgeBaseBindModal: React.FC<KnowledgeBaseBindModalProps> = ({ isOpen,
             <Database size={20} className="text-brand-600" />
             知识库管理
           </h3>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          <button onClick={onClose} aria-label="关闭" className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
             <X size={20} />
           </button>
         </div>
@@ -963,8 +962,8 @@ const KnowledgeBaseBindModal: React.FC<KnowledgeBaseBindModalProps> = ({ isOpen,
         {/* 当前助手信息 */}
         <div className="px-6 py-3 bg-gray-50/50 dark:bg-gray-800/30 border-b border-gray-100 dark:border-gray-800">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-indigo-600 flex items-center justify-center shadow-sm">
-              <Bot size={16} className="text-white" />
+            <div className="w-8 h-8 rounded-lg bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 flex items-center justify-center shadow-sm">
+              <Bot size={16} className="text-brand-600 dark:text-brand-400" />
             </div>
             <div>
               <p className="text-sm font-bold text-gray-900 dark:text-white">{assistant.name}</p>
@@ -1049,8 +1048,7 @@ const KnowledgeBaseBindModal: React.FC<KnowledgeBaseBindModalProps> = ({ isOpen,
             绑定知识库后，助手对话时会自动检索相关内容（RAG）
           </p>
           <button
-            onClick={onClose}
-            className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+            onClick={onClose} className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
           >
             完成
           </button>
@@ -1171,7 +1169,7 @@ const WorkflowSkillBindModal: React.FC<WorkflowSkillBindModalProps> = ({ isOpen,
             <GitBranch size={20} className="text-purple-600" />
             工作流技能管理
           </h3>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          <button onClick={onClose} aria-label="关闭" className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
             <X size={20} />
           </button>
         </div>
@@ -1179,8 +1177,8 @@ const WorkflowSkillBindModal: React.FC<WorkflowSkillBindModalProps> = ({ isOpen,
         {/* 当前助手信息 */}
         <div className="px-6 py-3 bg-gray-50/50 dark:bg-gray-800/30 border-b border-gray-100 dark:border-gray-800">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-indigo-600 flex items-center justify-center shadow-sm">
-              <Bot size={16} className="text-white" />
+            <div className="w-8 h-8 rounded-lg bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 flex items-center justify-center shadow-sm">
+              <Bot size={16} className="text-brand-600 dark:text-brand-400" />
             </div>
             <div>
               <p className="text-sm font-bold text-gray-900 dark:text-white">{assistant.name}</p>
@@ -1335,8 +1333,7 @@ const WorkflowSkillBindModal: React.FC<WorkflowSkillBindModalProps> = ({ isOpen,
             绑定工作流后，AI 助手可自动识别并调用工作流技能
           </p>
           <button
-            onClick={onClose}
-            className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+            onClick={onClose} className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
           >
             完成
           </button>
@@ -1463,7 +1460,7 @@ const McpServerBindModal: React.FC<McpServerBindModalProps> = ({ isOpen, onClose
             <Terminal size={20} className="text-emerald-600" />
             MCP 服务器绑定
           </h3>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          <button onClick={onClose} aria-label="关闭" className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
             <X size={20} />
           </button>
         </div>
@@ -1471,8 +1468,8 @@ const McpServerBindModal: React.FC<McpServerBindModalProps> = ({ isOpen, onClose
         {/* 当前助手信息 */}
         <div className="px-6 py-3 bg-gray-50/50 dark:bg-gray-800/30 border-b border-gray-100 dark:border-gray-800">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-indigo-600 flex items-center justify-center shadow-sm">
-              <Bot size={16} className="text-white" />
+            <div className="w-8 h-8 rounded-lg bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 flex items-center justify-center shadow-sm">
+              <Bot size={16} className="text-brand-600 dark:text-brand-400" />
             </div>
             <div>
               <p className="text-sm font-bold text-gray-900 dark:text-white">{assistant.name}</p>
@@ -1554,8 +1551,7 @@ const McpServerBindModal: React.FC<McpServerBindModalProps> = ({ isOpen, onClose
           </p>
           <div className="flex items-center gap-2">
             <button
-              onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+              onClick={onClose} className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
             >
               取消
             </button>
@@ -1862,11 +1858,11 @@ const TestChatModal: React.FC<TestChatModalProps> = ({ isOpen, onClose, assistan
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-3 border-b border-gray-100 dark:border-gray-800 flex-shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-brand-500/20">
+            <div className="w-9 h-9 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 flex items-center justify-center shadow-sm">
               {assistant.avatarUrl ? (
                 <img src={assistant.avatarUrl} alt="" className="w-full h-full rounded-xl object-cover" />
               ) : (
-                <Bot size={18} className="text-white" />
+                <Bot size={18} className="text-brand-600 dark:text-brand-400" />
               )}
             </div>
             <div>
@@ -1887,7 +1883,7 @@ const TestChatModal: React.FC<TestChatModalProps> = ({ isOpen, onClose, assistan
             </button>
             <button
               onClick={onClose}
-              className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              aria-label="关闭" className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             >
               <X size={18} />
             </button>
@@ -1928,8 +1924,8 @@ const TestChatModal: React.FC<TestChatModalProps> = ({ isOpen, onClose, assistan
           {messages.map((msg, index) => (
             <div key={index} className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
               {msg.role === 'assistant' && (
-                <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-brand-500 to-indigo-600 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <Bot size={14} className="text-white" />
+                <div className="w-7 h-7 rounded-lg bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 flex items-center justify-center flex-shrink-0 mt-0.5 shadow-sm">
+                  <Bot size={14} className="text-brand-600 dark:text-brand-400" />
                 </div>
               )}
               <div className={`max-w-[75%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
@@ -1996,8 +1992,8 @@ const TestChatModal: React.FC<TestChatModalProps> = ({ isOpen, onClose, assistan
           )}
           {streamingContent && (
             <div className="flex gap-3 justify-start">
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-brand-500 to-indigo-600 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <Bot size={14} className="text-white animate-pulse" />
+              <div className="w-7 h-7 rounded-lg bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 flex items-center justify-center flex-shrink-0 mt-0.5 shadow-sm">
+                <Bot size={14} className="text-brand-600 dark:text-brand-400 animate-pulse" />
               </div>
               <div className="max-w-[75%] rounded-2xl rounded-tl-md px-4 py-2.5 bg-gray-100 dark:bg-gray-800 text-sm text-gray-800 dark:text-gray-200 leading-relaxed">
                 <MarkdownRenderer
@@ -2049,6 +2045,7 @@ const TestChatModal: React.FC<TestChatModalProps> = ({ isOpen, onClose, assistan
               <button
                 onClick={sendMessage}
                 disabled={!input.trim()}
+                aria-label="发送消息"
                 className="w-[42px] h-[42px] flex items-center justify-center bg-brand-600 hover:bg-brand-700 text-white rounded-xl shadow-md shadow-brand-600/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex-shrink-0 active:scale-95"
               >
                 <Send size={16} />
@@ -2256,15 +2253,23 @@ export const AiAssistantManagementPage: React.FC = () => {
       {/* Table */}
       <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden transition-all duration-300">
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse admin-table">
+          <table className="w-full text-left border-collapse admin-table table-fixed">
+            <colgroup>
+              <col className="w-[25%]" />
+              <col className="w-[13%]" />
+              <col className="w-[24%]" />
+              <col className="w-[9%]" />
+              <col className="w-[7%]" />
+              <col className="w-[22%]" />
+            </colgroup>
             <thead>
               <tr className="bg-gray-50/50 dark:bg-gray-800/50 border-b border-gray-100 dark:border-gray-800 transition-colors duration-300">
-                <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">助手信息</th>
-                <th className="px-4 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider w-32">分类 / 标签</th>
-                <th className="px-4 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider w-28">模型</th>
-                <th className="px-4 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider w-24">状态</th>
-                <th className="px-4 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider w-20">统计</th>
-                <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">操作</th>
+                <th className="px-4 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">助手信息</th>
+                <th className="px-4 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">分类 / 标签</th>
+                <th className="px-4 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">模型</th>
+                <th className="px-4 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">状态</th>
+                <th className="px-3 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">统计</th>
+                <th className="px-3 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-right">操作</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50 dark:divide-gray-800">
@@ -2286,25 +2291,25 @@ export const AiAssistantManagementPage: React.FC = () => {
                 assistants.map((assistant) => (
                   <tr key={assistant.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors group">
                     {/* 助手信息 */}
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-brand-50 to-indigo-50 dark:from-gray-800 dark:to-gray-800 p-0.5 border border-gray-100 dark:border-gray-700 flex-shrink-0">
+                    <td className="px-4 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 flex-shrink-0 shadow-sm">
                           {assistant.avatarUrl ? (
                             <img src={assistant.avatarUrl} alt="" className="w-full h-full rounded-[10px] object-cover" />
                           ) : (
-                            <div className="w-full h-full rounded-[10px] flex items-center justify-center bg-white dark:bg-gray-900">
+                            <div className="w-full h-full rounded-[10px] flex items-center justify-center">
                               <Bot size={20} className="text-brand-500" />
                             </div>
                           )}
                         </div>
-                        <div className="min-w-0">
-                          <p className="font-bold text-gray-900 dark:text-white group-hover:text-brand-600 transition-colors">
+                        <div className="min-w-0 flex-1">
+                          <p className="font-bold text-gray-900 dark:text-white group-hover:text-brand-600 transition-colors truncate">
                             {assistant.name}
                           </p>
                           {assistant.description && (
                             <TruncateWithTooltip
                               text={assistant.description}
-                              maxWidth={200}
+                              maxWidth="100%"
                               className="text-xs text-gray-500 dark:text-gray-400"
                             />
                           )}
@@ -2313,7 +2318,7 @@ export const AiAssistantManagementPage: React.FC = () => {
                     </td>
 
                     {/* 分类/标签 */}
-                    <td className="px-4 py-4">
+                    <td className="px-3 py-4">
                       <div className="space-y-1.5">
                         {assistant.category && (
                           <span className="inline-block px-2 py-0.5 bg-brand-50 dark:bg-brand-900/20 text-brand-600 dark:text-brand-400 text-xs font-medium rounded-md">{assistant.category}</span>
@@ -2336,8 +2341,10 @@ export const AiAssistantManagementPage: React.FC = () => {
 
                     {/* 模型 */}
                     <td className="px-4 py-4">
-                      <div className="space-y-1">
-                        <p className="text-sm font-medium text-gray-900 dark:text-white">{assistant.modelName || '默认'}</p>
+                      <div className="space-y-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900 dark:text-white truncate" title={assistant.modelName || '默认'}>
+                          {assistant.modelName || '默认'}
+                        </p>
                         <div className="flex items-center gap-2 text-[10px] text-gray-400">
                           <Thermometer size={10} />
                           <span>T:{assistant.temperature ?? '-'}</span>
@@ -2375,89 +2382,89 @@ export const AiAssistantManagementPage: React.FC = () => {
                     </td>
 
                     {/* 操作 */}
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <td className="px-3 py-4">
+                      <div className="flex flex-wrap items-center justify-end gap-0.5 max-w-[260px] ml-auto">
                         <button
                           onClick={() => { setTestChatAssistant(assistant); setTestChatOpen(true); }}
-                          className="p-2 text-gray-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded-lg transition-all"
+                          className="p-1.5 text-gray-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded-lg transition-all"
                           title="测试对话"
                         >
-                          <PlayCircle size={18} />
+                          <PlayCircle size={16} />
                         </button>
                         <button
                           onClick={() => { setViewingAssistant(assistant); setDetailModalOpen(true); }}
-                          className="p-2 text-gray-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded-lg transition-all"
+                          className="p-1.5 text-gray-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded-lg transition-all"
                           title="查看详情"
                         >
-                          <Eye size={18} />
+                          <Eye size={16} />
                         </button>
                         <button
                           onClick={() => { setKbBindAssistant(assistant); setKbBindOpen(true); }}
-                          className={`p-2 rounded-lg transition-all ${
+                          className={`p-1.5 rounded-lg transition-all ${
                             assistant.knowledgeBases && assistant.knowledgeBases.length > 0
                               ? 'text-brand-500 hover:text-brand-700 hover:bg-brand-50 dark:hover:bg-brand-900/20'
                               : 'text-gray-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-900/20'
                           }`}
                           title={`知识库 (${assistant.knowledgeBases?.length || 0})`}
                         >
-                          <Database size={18} />
+                          <Database size={16} />
                         </button>
                         <button
                           onClick={() => { setWfBindAssistant(assistant); setWfBindOpen(true); }}
-                          className="p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-all"
+                          className="p-1.5 text-gray-400 hover:text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-all"
                           title="工作流技能"
                         >
-                          <GitBranch size={18} />
+                          <GitBranch size={16} />
                         </button>
                         <button
                           onClick={() => { setMcpBindAssistant(assistant); setMcpBindOpen(true); }}
-                          className={`p-2 rounded-lg transition-all ${
+                          className={`p-1.5 rounded-lg transition-all ${
                             assistant.mcpServerIds && assistant.mcpServerIds.length > 0
                               ? 'text-emerald-500 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-900/20'
                               : 'text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20'
                           }`}
                           title={`MCP 服务器 (${assistant.mcpServerIds?.length || 0})`}
                         >
-                          <Terminal size={18} />
+                          <Terminal size={16} />
                         </button>
                         <button
                           onClick={() => { setEditingAssistant(assistant); setModalOpen(true); }}
-                          className="p-2 text-gray-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded-lg transition-all"
+                          className="p-1.5 text-gray-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded-lg transition-all"
                           title="编辑"
                         >
-                          <Edit2 size={18} />
+                          <Edit2 size={16} />
                         </button>
                         {assistant.status !== 'PUBLISHED' && (
                           <button
                             onClick={() => handlePublish(assistant)}
-                            className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-all"
+                            className="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-all"
                             title="发布"
                           >
-                            <Send size={18} />
+                            <Send size={16} />
                           </button>
                         )}
                         {assistant.status === 'PUBLISHED' && (
                           <button
                             onClick={() => handleArchive(assistant)}
-                            className="p-2 text-gray-400 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20 rounded-lg transition-all"
+                            className="p-1.5 text-gray-400 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20 rounded-lg transition-all"
                             title="归档"
                           >
-                            <Archive size={18} />
+                            <Archive size={16} />
                           </button>
                         )}
                         <button
                           onClick={() => handleTogglePublic(assistant)}
-                          className={`p-2 rounded-lg transition-all ${assistant.isPublic ? 'text-green-500 hover:bg-green-50 dark:hover:bg-green-900/20' : 'text-gray-400 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20'}`}
+                          className={`p-1.5 rounded-lg transition-all ${assistant.isPublic ? 'text-green-500 hover:bg-green-50 dark:hover:bg-green-900/20' : 'text-gray-400 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20'}`}
                           title={assistant.isPublic ? '设为私有' : '设为公开'}
                         >
-                          {assistant.isPublic ? <Globe size={18} /> : <Lock size={18} />}
+                          {assistant.isPublic ? <Globe size={16} /> : <Lock size={16} />}
                         </button>
                         <button
                           onClick={() => handleDelete(assistant)}
-                          className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all"
+                          className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all"
                           title="删除"
                         >
-                          <Trash2 size={18} />
+                          <Trash2 size={16} />
                         </button>
                       </div>
                     </td>

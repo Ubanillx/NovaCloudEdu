@@ -75,7 +75,7 @@ const UserAvatar: React.FC<{ user?: UserPublicResponse | null; size?: 'sm' | 'md
     return <img src={user.userAvatar} alt="" className={`${sizeClass} rounded-xl object-cover ring-2 ring-white dark:ring-gray-800 shadow-sm`} />;
   }
   return (
-    <div className={`${sizeClass} rounded-xl bg-gradient-to-br from-brand-100 to-brand-50 dark:from-brand-900/40 dark:to-brand-800/20 text-brand-600 dark:text-brand-400 flex items-center justify-center shadow-inner`}>
+    <div className={`${sizeClass} rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-brand-600 dark:text-brand-400 flex items-center justify-center shadow-sm`}>
       <User size={iconSize} />
     </div>
   );
@@ -426,7 +426,7 @@ const CirclePage: React.FC = () => {
     return (
       <div
         key={post.id}
-        className="bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 p-4 hover:shadow-lg dark:hover:shadow-brand-900/10 transition-all duration-300 cursor-pointer group relative overflow-hidden"
+        className="bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 p-4 hover:shadow-sm dark:hover:shadow-brand-900/10 transition-all duration-300 cursor-pointer group relative overflow-hidden"
         onClick={() => navigate(`/circle/post/${post.id}`)}
       >
         <div className="absolute top-0 right-0 w-20 h-20 bg-brand-500/5 rounded-full -mr-10 -mt-10 group-hover:scale-150 transition-transform duration-700" />
@@ -534,15 +534,15 @@ const CirclePage: React.FC = () => {
   // ==================== 渲染热榜卡片 ====================
   const renderTopPostCard = (post: PostResponse, rank: number) => {
     const rankColors = rank <= 3
-      ? ['bg-gradient-to-br from-rose-500 to-rose-600 text-white shadow-lg shadow-rose-500/20', 
-         'bg-gradient-to-br from-orange-400 to-orange-500 text-white shadow-lg shadow-orange-400/20', 
-         'bg-gradient-to-br from-amber-400 to-amber-500 text-white shadow-lg shadow-amber-400/20'][rank - 1]
+      ? ['bg-white dark:bg-gray-900 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800 shadow-sm',
+         'bg-white dark:bg-gray-900 text-orange-600 dark:text-orange-400 border border-orange-200 dark:border-orange-800 shadow-sm',
+         'bg-white dark:bg-gray-900 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800 shadow-sm'][rank - 1]
       : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400';
 
     return (
       <div
         key={post.id}
-        className="flex items-center gap-3 bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 p-3 hover:shadow-md hover:translate-x-0.5 transition-all duration-300 cursor-pointer group"
+        className="flex items-center gap-3 bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 p-3 hover:shadow-sm hover:translate-x-0.5 transition-all duration-300 cursor-pointer group"
         onClick={() => navigate(`/circle/post/${post.id}`)}
       >
         <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-black flex-shrink-0 ${rankColors}`}>

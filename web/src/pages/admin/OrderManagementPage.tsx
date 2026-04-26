@@ -129,7 +129,7 @@ export const OrderManagementPage: React.FC = () => {
           { label: '已过期', count: stats.expiredCount, icon: XCircle, color: 'text-gray-400', bg: 'bg-gray-50 dark:bg-gray-800/50' },
           { label: '已退款', count: stats.refundedCount, icon: RotateCcw, color: 'text-red-500', bg: 'bg-red-50 dark:bg-red-900/10' },
         ].map(({ label, count, icon: Icon, color, bg }) => (
-          <div key={label} className={`${bg} rounded-2xl border border-gray-100 dark:border-gray-800 p-5 shadow-sm transition-all hover:shadow-md`}>
+          <div key={label} className={`${bg} rounded-2xl border border-gray-100 dark:border-gray-800 p-5 shadow-sm transition-all hover:shadow-sm`}>
             <div className="flex items-center justify-between">
               <div className={`p-2 rounded-xl bg-white dark:bg-gray-900 shadow-sm ${color}`}>
                 <Icon size={22} />
@@ -220,10 +220,10 @@ export const OrderManagementPage: React.FC = () => {
                 <tr key={String(o.id)} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors group">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-4">
-                      <div className={`w-12 h-12 rounded-xl bg-gradient-to-br p-0.5 border flex items-center justify-center ${
+                      <div className={`w-12 h-12 rounded-xl bg-white dark:bg-gray-900 border flex items-center justify-center shadow-sm ${
                         (o as any).orderType === 'MEMBERSHIP'
-                          ? 'from-amber-50 to-amber-100 dark:from-amber-900/20 dark:to-amber-900/10 border-amber-200 dark:border-amber-800'
-                          : 'from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-800 border-gray-100 dark:border-gray-700'
+                          ? 'border-amber-200 dark:border-amber-800'
+                          : 'border-gray-200 dark:border-gray-700'
                       }`}>
                         {(o as any).orderType === 'MEMBERSHIP'
                           ? <Crown size={20} className="text-amber-500" />
@@ -284,7 +284,7 @@ export const OrderManagementPage: React.FC = () => {
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="flex items-center gap-2">
                       {o.status === 0 && o.orderNo && (
                         <button
                           onClick={() => handleConfirmPayment(o.orderNo!, (o as any).orderType)}

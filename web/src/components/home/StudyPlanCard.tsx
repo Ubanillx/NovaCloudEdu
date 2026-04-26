@@ -182,7 +182,7 @@ export const StudyPlanCard: React.FC = () => {
                   {/* 删除按钮 */}
                   <button
                     onClick={() => deletePlan(plan.id)}
-                    className="p-1 text-gray-300 dark:text-gray-600 hover:text-red-500 dark:hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all flex-shrink-0"
+                    className="p-1 text-gray-300 dark:text-gray-600 hover:text-red-500 dark:hover:text-red-400 transition-all flex-shrink-0"
                   >
                     <Trash2 size={13} />
                   </button>

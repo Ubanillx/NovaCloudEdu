@@ -214,7 +214,7 @@ const QuestionCard: React.FC<{ question: QuestionGradingItem }> = ({ question })
 
   return (
     <div className={`bg-white dark:bg-gray-900 rounded-2xl border transition-all duration-300 overflow-hidden ${
-      expanded ? 'shadow-lg ring-1 ring-brand-500/10' : 'hover:shadow-md'
+      expanded ? 'shadow-lg ring-1 ring-brand-500/10' : 'hover:shadow-sm'
     } ${
       isCorrect ? 'border-green-100 dark:border-green-900/30' :
       isPartial ? 'border-yellow-100 dark:border-yellow-900/30' :

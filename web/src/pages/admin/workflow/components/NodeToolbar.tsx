@@ -66,7 +66,7 @@ export const NodeToolbar: React.FC<NodeToolbarProps> = ({ className = '' }) => {
                           border transition-all duration-200 text-sm select-none group/card
                           ${disabled
                             ? 'bg-gray-50 dark:bg-gray-800/20 border-gray-100 dark:border-gray-800 opacity-50 cursor-not-allowed'
-                            : 'bg-white dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 cursor-grab active:cursor-grabbing hover:border-brand-300 dark:hover:border-brand-700 hover:shadow-md hover:-translate-y-0.5'
+                            : 'bg-white dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 cursor-grab active:cursor-grabbing hover:border-brand-300 dark:hover:border-brand-700 hover:shadow-sm hover:-translate-y-0.5'
                           }
                         `}
                       >

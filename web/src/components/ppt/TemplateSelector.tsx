@@ -163,7 +163,7 @@ export const TemplateSelector: React.FC<TemplateSelectorProps> = ({ onSelect, on
                         ? 'opacity-60 cursor-not-allowed border-gray-200 dark:border-gray-700'
                         : isSelected
                           ? 'border-brand-500 shadow-lg shadow-brand-500/20'
-                          : 'border-gray-100 dark:border-gray-800 hover:border-brand-300 dark:hover:border-brand-600 hover:shadow-md'
+                          : 'border-gray-100 dark:border-gray-800 hover:border-brand-300 dark:hover:border-brand-600 hover:shadow-sm'
                       }
                     `}
                   >

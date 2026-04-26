@@ -500,7 +500,7 @@ const SearchGroupPanel: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             {results.map((group) => (
               <div
                 key={group.id}
-                className="bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 p-4 shadow-sm hover:shadow-md transition-shadow"
+                className="bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 p-4 shadow-sm hover:shadow-sm transition-shadow"
               >
                 <div className="flex items-center gap-3">
                   <Avatar src={group.avatar} name={group.groupName} icon="group" size="lg" />

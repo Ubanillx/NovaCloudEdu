@@ -148,7 +148,7 @@ const DownloadCard: React.FC<{ url: string; fileName?: string }> = ({ url, fileN
         href={url}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex items-center gap-3 px-4 py-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-2xl border border-emerald-100 dark:border-emerald-800/40 hover:shadow-md transition-all flex-1 min-w-0 group"
+        className="flex items-center gap-3 px-4 py-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-2xl border border-emerald-100 dark:border-emerald-800/40 hover:shadow-sm transition-all flex-1 min-w-0 group"
       >
         <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-800/40 flex items-center justify-center flex-shrink-0">
           <Download size={18} className="text-emerald-600 dark:text-emerald-400" />
@@ -163,7 +163,7 @@ const DownloadCard: React.FC<{ url: string; fileName?: string }> = ({ url, fileN
       </a>
       <button
         onClick={handleEdit}
-        className="flex items-center gap-1.5 px-3 py-3 bg-brand-50 dark:bg-brand-900/20 rounded-2xl border border-brand-100 dark:border-brand-800/40 hover:shadow-md hover:bg-brand-100 dark:hover:bg-brand-900/40 transition-all flex-shrink-0 group"
+        className="flex items-center gap-1.5 px-3 py-3 bg-brand-50 dark:bg-brand-900/20 rounded-2xl border border-brand-100 dark:border-brand-800/40 hover:shadow-sm hover:bg-brand-100 dark:hover:bg-brand-900/40 transition-all flex-shrink-0 group"
         title="在线编辑"
       >
         <ExternalLink size={16} className="text-brand-600 dark:text-brand-400" />

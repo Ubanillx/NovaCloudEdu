@@ -450,7 +450,7 @@ const QuizQuestionCard: React.FC<QuizQuestionCardProps> = ({ q, qi, themeVars, u
   };
 
   return (
-    <div className="rounded-2xl border p-6 space-y-5 transition-all hover:shadow-md" style={{ borderColor: themeVars.border, background: themeVars.card }}>
+    <div className="rounded-2xl border p-6 space-y-5 transition-all hover:shadow-sm" style={{ borderColor: themeVars.border, background: themeVars.card }}>
       <div className="flex items-start gap-4">
         <span className="flex-shrink-0 w-8 h-8 rounded-lg bg-black/5 dark:bg-white/5 flex items-center justify-center text-xs font-black" style={{ color: themeVars.accent }}>
           {String(qi + 1).padStart(2, '0')}

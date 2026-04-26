@@ -131,7 +131,7 @@ const HomePage: React.FC = () => {
           ) : courses.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
               {courses.map((course) => (
-                <div key={String(course.id)} onClick={() => navigate(`/course/${course.id}`)} className="group bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer">
+                <div key={String(course.id)} onClick={() => navigate(`/course/${course.id}`)} className="group bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden hover:shadow-sm transition-all duration-300 cursor-pointer">
                   <div className="relative aspect-video overflow-hidden bg-gray-100 dark:bg-gray-800">
                     {course.coverImage ? (
                       <img src={course.coverImage} alt={course.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />

@@ -339,7 +339,7 @@ const WordCard: React.FC<WordCardProps> = ({
 
   return (
     <div
-      className="group bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 hover:border-brand-200 dark:hover:border-brand-800 hover:shadow-md shadow-sm p-4 transition-all cursor-pointer"
+      className="group bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 hover:border-brand-200 dark:hover:border-brand-800 hover:shadow-sm shadow-sm p-4 transition-all cursor-pointer"
       onClick={onNavigate}
     >
       <div className="flex items-center gap-4">

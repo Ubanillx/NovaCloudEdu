@@ -365,7 +365,7 @@ export const Header: React.FC = () => {
                   className="w-8 h-8 rounded-full object-cover"
                 />
               ) : (
-                <div className="w-8 h-8 bg-gradient-to-tr from-brand-500 to-cyan-500 rounded-full flex items-center justify-center text-white font-bold text-xs">
+                <div className="w-8 h-8 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-full flex items-center justify-center text-brand-600 dark:text-brand-400 font-bold text-xs shadow-sm">
                   {(userInfo.userName || userInfo.userAccount || 'U').charAt(0).toUpperCase()}
                 </div>
               )}

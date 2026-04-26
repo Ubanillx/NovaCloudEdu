@@ -118,7 +118,7 @@ const UserAvatar: React.FC<{ user?: UserPublicResponse | null; size?: 'sm' | 'md
     return <img src={user.userAvatar} alt="" className={`${sizeClass} rounded-xl object-cover ring-2 ring-white dark:ring-gray-800 shadow-sm`} />;
   }
   return (
-    <div className={`${sizeClass} rounded-xl bg-gradient-to-br from-brand-100 to-brand-50 dark:from-brand-900/40 dark:to-brand-800/20 text-brand-600 dark:text-brand-400 flex items-center justify-center shadow-inner`}>
+    <div className={`${sizeClass} rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-brand-600 dark:text-brand-400 flex items-center justify-center shadow-sm`}>
       <User size={iconSize} />
     </div>
   );
@@ -602,7 +602,7 @@ const PostDetailPage: React.FC = () => {
                               {isCommentOwner && (
                                 <button
                                   onClick={() => handleDeleteComment(comment.id!)}
-                                  className="opacity-0 group-hover:opacity-100 p-1.5 text-gray-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-lg transition-all"
+                                  className=" p-1.5 text-gray-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-lg transition-all"
                                   title="删除评论"
                                 >
                                   <Trash2 size={14} />

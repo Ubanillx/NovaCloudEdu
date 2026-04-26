@@ -133,7 +133,7 @@ const Avatar: React.FC<{ src?: string; name?: string; size?: 'sm' | 'md' | 'lg' 
   }
   const initial = name?.[0];
   return (
-    <div className={`${sizeMap[size]} rounded-xl bg-gradient-to-br from-brand-100 to-brand-50 dark:from-brand-900/40 dark:to-brand-800/20 text-brand-600 dark:text-brand-400 flex items-center justify-center shadow-inner`}>
+    <div className={`${sizeMap[size]} rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-brand-600 dark:text-brand-400 flex items-center justify-center shadow-sm`}>
       {initial ? <span className={`font-semibold ${textSize[size]}`}>{initial}</span> : <User size={size === 'sm' ? 16 : 20} />}
     </div>
   );
@@ -516,7 +516,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
                   <button
                     type="button"
                     onClick={() => setReplyingTo(msg)}
-                    className="self-center p-1.5 rounded-lg text-gray-300 hover:text-brand-500 hover:bg-white dark:hover:bg-gray-800 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-all"
+                    className="self-center p-1.5 rounded-lg text-gray-300 hover:text-brand-500 hover:bg-white dark:hover:bg-gray-800 transition-all"
                     title="引用回复"
                   >
                     <Reply size={14} />

@@ -25,6 +25,25 @@ import { toast } from '../../components/ui';
 
 const api = new DefaultApi(new Configuration(), '', apiClient);
 
+const ROLE_OPTIONS = [
+  { value: 'student', label: '学生' },
+  { value: 'teacher', label: '教师' },
+  { value: 'admin', label: '系统管理员' },
+] as const;
+
+const normalizeUserRole = (role?: string) => {
+  const normalized = (role || '').trim().toLowerCase();
+  if (normalized === 'user' || normalized === 'student') return 'student';
+  if (normalized === 'teacher') return 'teacher';
+  if (normalized === 'admin') return 'admin';
+  return normalized || 'student';
+};
+
+const getUserRoleLabel = (role?: string) => {
+  const normalized = normalizeUserRole(role);
+  return ROLE_OPTIONS.find(option => option.value === normalized)?.label || role || '未知角色';
+};
+
 // 用户表单弹窗组件
 interface UserFormModalProps {
   isOpen: boolean;
@@ -43,7 +62,7 @@ const UserFormModal: React.FC<UserFormModalProps> = ({ isOpen, onClose, onSucces
     userPassword: '',
     confirmPassword: '',
     userName: '',
-    role: 'user',
+    role: 'student',
     userPhone: '',
     userEmail: '',
     userGender: 0,
@@ -56,7 +75,7 @@ const UserFormModal: React.FC<UserFormModalProps> = ({ isOpen, onClose, onSucces
         userPassword: '',
         confirmPassword: '',
         userName: user.userName || '',
-        role: user.role || 'user',
+        role: normalizeUserRole(user.role),
         userPhone: user.userPhone || '',
         userEmail: user.userEmail || '',
         userGender: user.userGender || 0,
@@ -67,7 +86,7 @@ const UserFormModal: React.FC<UserFormModalProps> = ({ isOpen, onClose, onSucces
         userPassword: '',
         confirmPassword: '',
         userName: '',
-        role: 'user',
+        role: 'student',
         userPhone: '',
         userEmail: '',
         userGender: 0,
@@ -165,7 +184,7 @@ const UserFormModal: React.FC<UserFormModalProps> = ({ isOpen, onClose, onSucces
           <h3 className="text-lg font-bold text-gray-900 dark:text-white">
             {isEdit ? '编辑用户' : '新增用户'}
           </h3>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          <button onClick={onClose} aria-label="关闭" className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
             <X size={20} />
           </button>
         </div>
@@ -224,9 +243,9 @@ const UserFormModal: React.FC<UserFormModalProps> = ({ isOpen, onClose, onSucces
                 onChange={(e) => setFormData(prev => ({ ...prev, role: e.target.value }))}
                 className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all cursor-pointer"
               >
-                <option value="user">普通用户</option>
-                <option value="teacher">教师</option>
-                <option value="admin">管理员</option>
+                {ROLE_OPTIONS.map(option => (
+                  <option key={option.value} value={option.value}>{option.label}</option>
+                ))}
               </select>
             </div>
           </div>
@@ -395,7 +414,7 @@ export const UserManagementPage: React.FC = () => {
   };
 
   const getRoleBadgeColor = (role: string) => {
-    switch (role?.toLowerCase()) {
+    switch (normalizeUserRole(role)) {
       case 'admin': return 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 border-purple-200 dark:border-purple-800';
       case 'teacher': return 'bg-brand-100 text-brand-700 dark:bg-brand-900/30 dark:text-brand-400 border-brand-200 dark:border-brand-800';
       default: return 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400 border-gray-200 dark:border-gray-700';
@@ -493,9 +512,9 @@ export const UserManagementPage: React.FC = () => {
               className="px-4 py-2.5 bg-gray-50 dark:bg-gray-800/50 border border-transparent focus:border-brand-500/50 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 outline-none cursor-pointer"
             >
               <option value="">所有角色</option>
-              <option value="user">普通用户</option>
-              <option value="teacher">教师</option>
-              <option value="admin">管理员</option>
+              {ROLE_OPTIONS.map(option => (
+                <option key={option.value} value={option.value}>{option.label}</option>
+              ))}
             </select>
             <button 
               type="button"
@@ -548,11 +567,11 @@ export const UserManagementPage: React.FC = () => {
                   <tr key={user.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors group">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-brand-50 to-indigo-50 dark:from-gray-800 dark:to-gray-800 p-0.5 border border-gray-100 dark:border-gray-700">
+                        <div className="w-12 h-12 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 shadow-sm">
                           {user.userAvatar ? (
                             <img src={user.userAvatar} alt="" className="w-full h-full rounded-[10px] object-cover" />
                           ) : (
-                            <div className="w-full h-full rounded-[10px] flex items-center justify-center bg-white dark:bg-gray-900">
+                            <div className="w-full h-full rounded-[10px] flex items-center justify-center">
                               <User size={20} className="text-gray-400" />
                             </div>
                           )}
@@ -579,7 +598,7 @@ export const UserManagementPage: React.FC = () => {
                     </td>
                     <td className="px-6 py-4">
                       <span className={`px-2.5 py-1 rounded-lg text-xs font-bold border ${getRoleBadgeColor(user.role || '')}`}>
-                        {(user.role || 'USER').toUpperCase()}
+                        {getUserRoleLabel(user.role)}
                       </span>
                     </td>
                     <td className="px-6 py-4">
@@ -591,7 +610,7 @@ export const UserManagementPage: React.FC = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="flex items-center gap-2">
                         <button 
                           onClick={() => { setEditingUser(user); setModalOpen(true); }}
                           className="p-2 text-gray-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded-lg transition-all" 

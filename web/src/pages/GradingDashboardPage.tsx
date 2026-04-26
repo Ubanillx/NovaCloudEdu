@@ -156,7 +156,7 @@ const OverviewCard: React.FC<{ icon: React.ReactNode; label: string; value: numb
     red: 'bg-red-500/10 text-red-600 dark:text-red-400 ring-red-500/20',
   };
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-5 shadow-sm hover:shadow-md transition-shadow group relative overflow-hidden">
+    <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-5 shadow-sm hover:shadow-sm transition-shadow group relative overflow-hidden">
       <div className={`absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity`}>
         {icon}
       </div>
@@ -202,7 +202,7 @@ const ScoreTrendChart: React.FC<{ data: ScoreTrendItem[] }> = ({ data }) => {
               </div>
               <div
                 style={{ height: `${Math.max(pct, 8)}%` }}
-                className={`w-full rounded-t-xl transition-all duration-500 group-hover:brightness-110 group-hover:shadow-lg relative overflow-hidden ${
+                className={`w-full rounded-t-xl transition-all duration-500 group-hover:brightness-110 group-hover:shadow-sm relative overflow-hidden ${
                   rate >= 0.8 ? 'bg-gradient-to-t from-green-500 to-green-400' :
                   rate >= 0.6 ? 'bg-gradient-to-t from-yellow-500 to-yellow-400' :
                   'bg-gradient-to-t from-red-500 to-red-400'
@@ -297,7 +297,7 @@ const SubjectProfileCard: React.FC<{ profile: SubjectProfileSummary }> = ({ prof
   const strongPoints = profile.strongPoints ?? [];
 
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-6 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all group overflow-hidden relative">
+    <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-6 shadow-sm hover:shadow-sm hover:-translate-y-0.5 transition-all group overflow-hidden relative">
       {/* 水印背景 */}
       <div className="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">
         <Target size={120} />

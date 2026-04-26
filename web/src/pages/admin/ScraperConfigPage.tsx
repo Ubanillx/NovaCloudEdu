@@ -171,7 +171,7 @@ const ConfigFormModal: React.FC<ConfigFormModalProps> = ({ isOpen, onClose, onSu
           <h3 className="text-lg font-bold text-gray-900 dark:text-white">
             {isEdit ? '编辑抓取配置' : '新增抓取配置'}
           </h3>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          <button onClick={onClose} aria-label="关闭" className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
             <X size={20} />
           </button>
         </div>
@@ -554,7 +554,7 @@ const ExecuteModal: React.FC<ExecuteModalProps> = ({ isOpen, onClose, config, on
       <div className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden animate-in zoom-in-95 duration-200">
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800">
           <h3 className="text-lg font-bold text-gray-900 dark:text-white">执行抓取任务</h3>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          <button onClick={onClose} aria-label="关闭" className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
             <X size={20} />
           </button>
         </div>
@@ -579,8 +579,7 @@ const ExecuteModal: React.FC<ExecuteModalProps> = ({ isOpen, onClose, config, on
         </div>
         <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/50">
           <button
-            onClick={onClose}
-            className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+            onClick={onClose} className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
           >
             取消
           </button>
@@ -789,7 +788,7 @@ export const ScraperConfigPage: React.FC = () => {
                       </button>
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="flex items-center justify-end gap-2">
                         <button
                           onClick={() => {
                             setSelectedConfig(config);

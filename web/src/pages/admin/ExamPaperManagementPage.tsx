@@ -21,6 +21,7 @@ import {
   ZoomIn,
   ZoomOut,
   ArrowLeft,
+  Tag,
 } from 'lucide-react';
 import { apiClient, DefaultApi, Configuration } from '../../api';
 import type {
@@ -31,8 +32,9 @@ import type {
   PaperQuestionResponse,
   QuestionResponse,
 } from '../../api/generated/models';
+import MarkdownRenderer from '../../components/chat/MarkdownRenderer';
 import { toast } from '../../components/ui';
-import { QUESTION_TYPE_OPTIONS, SUBJECT_OPTIONS, getSubjectName } from '../../constants/exam';
+import { QUESTION_TYPE_OPTIONS, SUBJECT_OPTIONS, getQuestionTypeName, getSubjectName } from '../../constants/exam';
 
 const api = new DefaultApi(new Configuration(), '', apiClient);
 
@@ -41,6 +43,321 @@ const SUBJECTS = [{ value: '', label: '全部学科' }, ...SUBJECT_OPTIONS];
 const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
   DRAFT: { label: '草稿', color: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400' },
   PUBLISHED: { label: '已发布', color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' },
+};
+
+const DIFFICULTY_COLORS: Record<number, string> = {
+  1: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+  2: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+  3: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
+  4: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
+  5: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+};
+
+type QuestionOption = {
+  label?: string;
+  text?: string;
+};
+
+const FORMULA_RENDER_CLASS = 'prose prose-sm dark:prose-invert max-w-none leading-relaxed prose-p:my-0 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5 prose-table:my-1 prose-pre:my-2 prose-code:before:content-none prose-code:after:content-none [&_.katex]:text-inherit [&_.katex-display]:my-2 [&_.katex-display]:overflow-x-auto';
+
+const TYPST_SYMBOLS: Record<string, string> = {
+  alpha: '\\alpha',
+  beta: '\\beta',
+  gamma: '\\gamma',
+  delta: '\\delta',
+  theta: '\\theta',
+  lambda: '\\lambda',
+  mu: '\\mu',
+  pi: '\\pi',
+  rho: '\\rho',
+  sigma: '\\sigma',
+  phi: '\\phi',
+  omega: '\\omega',
+  Delta: '\\Delta',
+  triangle: '\\triangle',
+  angle: '\\angle',
+  perp: '\\perp',
+  parallel: '\\parallel',
+  times: '\\times',
+  cdot: '\\cdot',
+  le: '\\le',
+  ge: '\\ge',
+  neq: '\\ne',
+  approx: '\\approx',
+};
+
+const parseQuestionOptions = (options?: string | null): QuestionOption[] => {
+  if (!options?.trim()) return [];
+  try {
+    const parsed = JSON.parse(options);
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .map((item, index) => ({
+        label: typeof item?.label === 'string' && item.label.trim()
+          ? item.label
+          : String.fromCharCode(65 + index),
+        text: typeof item?.text === 'string' ? item.text : '',
+      }))
+      .filter(item => item.text.trim());
+  } catch {
+    return [];
+  }
+};
+
+const findClosingParen = (text: string, openIndex: number) => {
+  let depth = 0;
+  for (let index = openIndex; index < text.length; index += 1) {
+    if (text[index] === '(') depth += 1;
+    if (text[index] === ')') {
+      depth -= 1;
+      if (depth === 0) return index;
+    }
+  }
+  return -1;
+};
+
+const splitTopLevelArgs = (value: string) => {
+  const args: string[] = [];
+  let depth = 0;
+  let start = 0;
+  for (let index = 0; index < value.length; index += 1) {
+    if (value[index] === '(') depth += 1;
+    if (value[index] === ')') depth -= 1;
+    if (value[index] === ',' && depth === 0) {
+      args.push(value.slice(start, index).trim());
+      start = index + 1;
+    }
+  }
+  args.push(value.slice(start).trim());
+  return args;
+};
+
+const replaceTypstCall = (
+  input: string,
+  name: string,
+  replacer: (args: string[]) => string,
+): string => {
+  let output = '';
+  let cursor = 0;
+  const needle = `${name}(`;
+
+  while (cursor < input.length) {
+    const index = input.indexOf(needle, cursor);
+    if (index < 0) {
+      output += input.slice(cursor);
+      break;
+    }
+
+    const before = input[index - 1] || '';
+    if (before === '\\' || /[A-Za-z]/.test(before)) {
+      output += input.slice(cursor, index + needle.length);
+      cursor = index + needle.length;
+      continue;
+    }
+
+    const openIndex = index + name.length;
+    const closeIndex = findClosingParen(input, openIndex);
+    if (closeIndex < 0) {
+      output += input.slice(cursor);
+      break;
+    }
+
+    output += input.slice(cursor, index);
+    const args = splitTopLevelArgs(input.slice(openIndex + 1, closeIndex)).map(convertTypstMath);
+    output += replacer(args);
+    cursor = closeIndex + 1;
+  }
+
+  return output;
+};
+
+const replaceTypstSymbols = (input: string) => {
+  const symbolNames = Object.keys(TYPST_SYMBOLS).sort((a, b) => b.length - a.length);
+  return symbolNames.reduce((value, name) => {
+    const pattern = new RegExp(`(^|[^\\\\A-Za-z])${name}(?![A-Za-z])`, 'g');
+    return value.replace(pattern, (_match, prefix: string) => `${prefix}${TYPST_SYMBOLS[name]}`);
+  }, input);
+};
+
+const convertTypstMath = (input: string): string => {
+  let output = input;
+
+  output = replaceTypstCall(output, 'frac', ([numerator = '', denominator = '']) => `\\frac{${numerator}}{${denominator}}`);
+  output = replaceTypstCall(output, 'sqrt', ([value = '']) => `\\sqrt{${value}}`);
+  output = replaceTypstCall(output, 'atan', ([value = '']) => `\\arctan\\left(${value}\\right)`);
+  ['sin', 'cos', 'tan', 'cot', 'log', 'ln'].forEach((name) => {
+    output = replaceTypstCall(output, name, ([value = '']) => `\\${name}\\left(${value}\\right)`);
+  });
+
+  output = output
+    .replace(/_\(([^)]*)\)/g, '_{$1}')
+    .replace(/\^\(([^)]*)\)/g, '^{$1}')
+    .replace(/\b(sum|prod)_\{([^}]*)\}\^\{?([A-Za-z0-9+\-*/=]+)\}?/g, (_match, op, lower, upper) => `\\${op}_{${lower}}^{${upper}}`)
+    .replace(/\b(sum|prod)_\{([^}]*)\}/g, (_match, op, lower) => `\\${op}_{${lower}}`)
+    .replace(/\b(sum|prod)\^([A-Za-z0-9+\-*/=]+)/g, (_match, op, upper) => `\\${op}^{${upper}}`);
+
+  return replaceTypstSymbols(output);
+};
+
+const normalizeTypstMathForKatex = (content?: string | null) => {
+  if (!content) return '';
+  return content.replace(/\$\$([\s\S]*?)\$\$|\$([^$\n]+)\$/g, (match, blockMath: string, inlineMath: string) => {
+    if (blockMath !== undefined) return `$$${convertTypstMath(blockMath)}$$`;
+    if (inlineMath !== undefined) return `$${convertTypstMath(inlineMath)}$`;
+    return match;
+  });
+};
+
+const QuestionFormulaText: React.FC<{
+  content?: string | null;
+  className?: string;
+}> = ({ content, className = '' }) => {
+  if (!content?.trim()) return null;
+  return (
+    <MarkdownRenderer
+      content={normalizeTypstMathForKatex(content)}
+      className={`${FORMULA_RENDER_CLASS} ${className}`}
+    />
+  );
+};
+
+const QuestionOptionsPreview: React.FC<{
+  options: QuestionOption[];
+  compact?: boolean;
+}> = ({ options, compact = false }) => {
+  const visibleOptions = options.filter(opt => opt.text?.trim());
+  if (visibleOptions.length === 0) return null;
+
+  return (
+    <div className={compact ? 'mt-2 space-y-1.5' : 'space-y-2'}>
+      {visibleOptions.map((opt, index) => (
+        <div key={`${opt.label || index}-${index}`} className="flex items-start gap-2 min-w-0">
+          <span className={`${compact ? 'mt-0.5 w-5 h-5 text-[11px]' : 'mt-0.5 w-6 h-6 text-xs'} flex items-center justify-center rounded-md bg-brand-50 dark:bg-brand-900/20 text-brand-600 dark:text-brand-400 font-bold shrink-0`}>
+            {opt.label || String.fromCharCode(65 + index)}
+          </span>
+          <QuestionFormulaText
+            content={opt.text}
+            className={`min-w-0 flex-1 ${compact ? 'text-xs text-gray-600 dark:text-gray-400' : 'text-sm text-gray-700 dark:text-gray-300'}`}
+          />
+        </div>
+      ))}
+    </div>
+  );
+};
+
+const QuestionInfoTooltip: React.FC<{
+  question: QuestionResponse;
+  children: React.ReactNode;
+}> = ({ question, children }) => {
+  const [visible, setVisible] = useState(false);
+  const [position, setPosition] = useState<{
+    left: number;
+    top: number;
+    width: number;
+    placement: 'top' | 'bottom';
+  }>({ left: 0, top: 0, width: 520, placement: 'bottom' });
+
+  const options = parseQuestionOptions(question.options as string | undefined);
+  const tags = question.knowledgeTags || [];
+  const grade = (question as any).grade as string | undefined;
+
+  const showTooltip = (event: React.MouseEvent<HTMLDivElement> | React.FocusEvent<HTMLDivElement>) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    const width = Math.min(560, window.innerWidth - 24);
+    const left = Math.min(Math.max(12, rect.left), window.innerWidth - width - 12);
+    const placement = rect.top > window.innerHeight * 0.48 ? 'top' : 'bottom';
+
+    setPosition({
+      left,
+      width,
+      placement,
+      top: placement === 'top' ? rect.top - 10 : rect.bottom + 10,
+    });
+    setVisible(true);
+  };
+
+  const hideTooltip = () => setVisible(false);
+
+  return (
+    <>
+      <div
+        tabIndex={0}
+        onMouseEnter={showTooltip}
+        onMouseLeave={hideTooltip}
+        onFocus={showTooltip}
+        onBlur={hideTooltip}
+        className="outline-none focus-visible:ring-2 focus-visible:ring-brand-500/30 rounded-lg"
+      >
+        {children}
+      </div>
+      {visible && (
+        <div
+          className="fixed z-[9999] pointer-events-none rounded-xl border border-gray-200 dark:border-gray-700 bg-white/95 dark:bg-gray-900/95 px-4 py-3 text-sm shadow-2xl shadow-gray-900/15 dark:shadow-black/30 animate-in fade-in zoom-in-95 duration-150"
+          style={{
+            left: position.left,
+            top: position.top,
+            width: position.width,
+            transform: position.placement === 'top' ? 'translateY(-100%)' : undefined,
+          }}
+        >
+          <div className="mb-2 flex flex-wrap items-center gap-1.5">
+            <span className="px-2 py-0.5 rounded-md bg-brand-50 text-brand-700 dark:bg-brand-900/30 dark:text-brand-300 text-xs font-bold">
+              {question.typeDesc || getQuestionTypeName(question.type || '')}
+            </span>
+            <span className="px-2 py-0.5 rounded-md bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300 text-xs font-bold">
+              {question.subjectDesc || getSubjectName(question.subject || '')}
+            </span>
+            <span className={`px-2 py-0.5 rounded-md text-xs font-bold ${DIFFICULTY_COLORS[question.difficulty || 3] || ''}`}>
+              {question.difficultyDesc || `难度${question.difficulty || 3}`}
+            </span>
+            {grade && (
+              <span className="px-2 py-0.5 rounded-md bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300 text-xs font-bold">
+                {grade}
+              </span>
+            )}
+          </div>
+
+          <div className="max-h-[60vh] overflow-hidden space-y-3">
+            <div>
+              <div className="mb-1 text-xs font-semibold text-gray-400 dark:text-gray-500">题干</div>
+              <QuestionFormulaText content={question.content} className="text-sm text-gray-900 dark:text-gray-100" />
+            </div>
+
+            {options.length > 0 && (
+              <div>
+                <div className="mb-1 text-xs font-semibold text-gray-400 dark:text-gray-500">选项</div>
+                <QuestionOptionsPreview options={options} />
+              </div>
+            )}
+
+            {question.answer?.trim() && (
+              <div>
+                <div className="mb-1 text-xs font-semibold text-gray-400 dark:text-gray-500">答案</div>
+                <QuestionFormulaText content={question.answer} className="text-sm text-gray-800 dark:text-gray-200" />
+              </div>
+            )}
+
+            {question.explanation?.trim() && (
+              <div>
+                <div className="mb-1 text-xs font-semibold text-gray-400 dark:text-gray-500">解析</div>
+                <QuestionFormulaText content={question.explanation} className="text-sm text-gray-700 dark:text-gray-300" />
+              </div>
+            )}
+
+            {tags.length > 0 && (
+              <div className="flex flex-wrap gap-1">
+                {tags.map((tag, index) => (
+                  <span key={`${tag}-${index}`} className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400">
+                    <Tag size={10} /> {tag}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </>
+  );
 };
 
 export const ExamPaperManagementPage: React.FC = () => {
@@ -536,7 +853,11 @@ export const ExamPaperManagementPage: React.FC = () => {
                       </button>
                     </div>
                   </div>
-                  {sec.description && <p className="px-3 py-1 text-xs text-gray-500 dark:text-gray-400 italic">{sec.description}</p>}
+                  {sec.description && (
+                    <div className="px-3 py-1">
+                      <QuestionFormulaText content={sec.description} className="text-xs text-gray-500 dark:text-gray-400 italic" />
+                    </div>
+                  )}
 
                   {/* 题目列表 */}
                   <div className="p-2 space-y-1">
@@ -545,16 +866,26 @@ export const ExamPaperManagementPage: React.FC = () => {
                     ) : (sectionQuestions[String(sec.id)] || []).map((pq, qIdx) => {
                       const cachedQ = questionCache[String(pq.questionId)];
                       return (
-                        <div key={String(pq.id)} className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/50 group">
-                          <span className="text-xs text-gray-400 w-5 shrink-0">{qIdx + 1}.</span>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-xs text-gray-700 dark:text-gray-300 truncate">
-                              {cachedQ?.content || `题目 #${pq.questionId}`}
-                            </p>
+                        <div key={String(pq.id)} className="flex items-start gap-2 px-2 py-2.5 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/50 group">
+                          <span className="text-xs text-gray-400 w-5 shrink-0 pt-1">{qIdx + 1}.</span>
+                          <div className="flex-1 min-w-0 cursor-help">
+                            {cachedQ ? (
+                              <QuestionInfoTooltip question={cachedQ}>
+                                <div className="max-h-28 overflow-hidden">
+                                  <QuestionFormulaText
+                                    content={cachedQ.content}
+                                    className="text-sm text-gray-700 dark:text-gray-300"
+                                  />
+                                </div>
+                              </QuestionInfoTooltip>
+                            ) : (
+                              <p className="text-xs text-gray-700 dark:text-gray-300 truncate">题目 #{pq.questionId}</p>
+                            )}
                           </div>
-                          <span className="text-xs font-medium text-brand-600 dark:text-brand-400 shrink-0">{pq.score}分</span>
+                          <span className="text-xs font-medium text-brand-600 dark:text-brand-400 shrink-0 pt-1">{pq.score}分</span>
                           <button onClick={() => handleRemovePaperQuestion(pq.id as unknown as number, sec.id as unknown as number)}
-                            className="p-1 rounded hover:bg-red-50 dark:hover:bg-red-900/20 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition">
+                            title="移除题目"
+                            className="p-1 rounded hover:bg-red-50 dark:hover:bg-red-900/20 text-gray-400 hover:text-red-500 transition mt-0.5">
                             <X size={12} />
                           </button>
                         </div>
@@ -695,12 +1026,11 @@ export const ExamPaperManagementPage: React.FC = () => {
               </div>
             ) : papers.map(p => (
               <div key={String(p.id)}
-                onClick={() => loadEditorPaper(p.id as unknown as number)}
-                className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-5 cursor-pointer shadow-sm hover:shadow-md transition-all duration-300 group hover:border-brand-300 dark:hover:border-brand-700">
+                className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-5 shadow-sm hover:shadow-sm transition-all duration-300 group hover:border-brand-300 dark:hover:border-brand-700">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1.5">
-                      <h3 className="font-bold text-gray-900 dark:text-white truncate group-hover:text-brand-600 transition-colors">{p.title}</h3>
+                      <h3 className="font-bold text-gray-900 dark:text-white truncate">{p.title}</h3>
                       <span className={`px-2.5 py-1 rounded-lg text-xs font-bold border ${p.status === 'PUBLISHED' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border-green-200 dark:border-green-800' : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400 border-gray-200 dark:border-gray-700'}`}>
                         {STATUS_CONFIG[p.status || 'DRAFT']?.label}
                       </span>
@@ -711,7 +1041,11 @@ export const ExamPaperManagementPage: React.FC = () => {
                       {p.durationMin && <span className="flex items-center gap-1"><Clock size={12} /> {p.durationMin}分钟</span>}
                     </div>
                   </div>
-                  <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" onClick={e => e.stopPropagation()}>
+                  <div className="flex items-center gap-1 shrink-0">
+                    <button onClick={() => loadEditorPaper(p.id as unknown as number)} title="进入详情" className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-brand-600 hover:text-brand-700 bg-brand-50 hover:bg-brand-100 dark:bg-brand-900/20 dark:hover:bg-brand-900/30 dark:text-brand-400 rounded-lg transition-all">
+                      <FileText size={16} />
+                      <span>详情</span>
+                    </button>
                     {p.status === 'DRAFT' ? (
                       <button onClick={() => handlePublish(p.id as unknown as number)} title="发布" className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-all"><Send size={16} /></button>
                     ) : (
@@ -933,7 +1267,14 @@ export const ExamPaperManagementPage: React.FC = () => {
                                 <span className="px-1.5 py-0.5 text-[10px] font-bold rounded bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400">{q.subjectDesc}</span>
                               )}
                             </div>
-                            <p className="text-sm text-gray-700 dark:text-gray-300 line-clamp-2">{q.content || '(无题干内容)'}</p>
+                            <QuestionInfoTooltip question={q}>
+                              <div className="max-h-32 overflow-hidden cursor-help">
+                                <QuestionFormulaText
+                                  content={q.content || '(无题干内容)'}
+                                  className="text-sm text-gray-700 dark:text-gray-300"
+                                />
+                              </div>
+                            </QuestionInfoTooltip>
                           </div>
                         </div>
                       </div>

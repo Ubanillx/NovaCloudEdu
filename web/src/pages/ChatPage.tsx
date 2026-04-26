@@ -637,7 +637,7 @@ const ReceivedRequestCard: React.FC<{
   const isPending = request.status === 'pending';
 
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 p-4 shadow-sm hover:shadow-md transition-shadow">
+    <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 p-4 shadow-sm hover:shadow-sm transition-shadow">
       <div className="flex items-center gap-3">
         <Avatar src={request.senderAvatar} name={request.senderName} />
         <div className="flex-1 min-w-0">

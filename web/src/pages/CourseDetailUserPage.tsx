@@ -230,8 +230,8 @@ const CourseDetailUserPage: React.FC = () => {
             {course.coverImage ? (
               <img src={course.coverImage} alt={course.title} className="w-full h-full object-cover" />
             ) : (
-              <div className="w-full h-full bg-gradient-to-br from-brand-600 via-brand-500 to-accent-500 flex items-center justify-center">
-                <BookOpen size={72} className="text-white/30" />
+              <div className="w-full h-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 flex items-center justify-center">
+                <BookOpen size={72} className="text-brand-300 dark:text-brand-600" />
               </div>
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />

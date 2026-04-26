@@ -35,7 +35,7 @@ const IncomingCallModal: React.FC = () => {
         <div className="relative">
           <div className="absolute inset-0 rounded-full bg-brand-400/20 animate-ping" />
           <div className="absolute -inset-2 rounded-full bg-brand-400/10 animate-pulse" />
-          <div className="relative w-20 h-20 rounded-full bg-gradient-to-br from-brand-100 to-brand-50 dark:from-brand-900/40 dark:to-brand-800/20 flex items-center justify-center ring-4 ring-brand-200 dark:ring-brand-800">
+          <div className="relative w-20 h-20 rounded-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 flex items-center justify-center ring-4 ring-brand-200 dark:ring-brand-800 shadow-sm">
             {currentCall.peerAvatar ? (
               <img src={currentCall.peerAvatar} alt="" className="w-20 h-20 rounded-full object-cover" />
             ) : (

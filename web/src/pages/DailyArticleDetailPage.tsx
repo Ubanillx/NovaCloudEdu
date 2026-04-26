@@ -331,7 +331,7 @@ const DailyArticleDetailPage: React.FC = () => {
                 className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all active:scale-95 ml-auto ${
                   chatOpen
                     ? 'bg-brand-600 text-white shadow-lg shadow-brand-600/20'
-                    : 'bg-gradient-to-r from-brand-50 to-accent-50 dark:from-brand-900/20 dark:to-accent-900/20 text-brand-600 dark:text-brand-400 border border-brand-200 dark:border-brand-800 hover:shadow-md'
+                    : 'bg-gradient-to-r from-brand-50 to-accent-50 dark:from-brand-900/20 dark:to-accent-900/20 text-brand-600 dark:text-brand-400 border border-brand-200 dark:border-brand-800 hover:shadow-sm'
                 }`}
               >
                 {chatOpen ? <X size={16} /> : <MessageSquareText size={16} />}

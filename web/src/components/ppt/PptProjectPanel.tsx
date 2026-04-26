@@ -308,7 +308,7 @@ const PptProjectPanel: React.FC<PptProjectPanelProps> = ({
                     <span className="text-sm truncate flex-1">{project.name}</span>
                     <button
                       onClick={(e) => handleDeleteProject(project.id, e)}
-                      className="p-0.5 rounded opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 transition-all"
+                      className="p-0.5 rounded text-gray-400 hover:text-red-500 transition-all"
                     >
                       <Trash2 size={12} />
                     </button>
@@ -324,7 +324,7 @@ const PptProjectPanel: React.FC<PptProjectPanelProps> = ({
                           <span className="text-[10px] text-gray-400 flex-shrink-0">{formatFileSize(doc.fileSize)}</span>
                           <button
                             onClick={() => handleDeleteDocument(project.id, doc.id)}
-                            className="p-0.5 opacity-0 group-hover/doc:opacity-100 text-gray-400 hover:text-red-500 transition-all"
+                            className="p-0.5 text-gray-400 hover:text-red-500 transition-all"
                           >
                             <Trash2 size={10} />
                           </button>

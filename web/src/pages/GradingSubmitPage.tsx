@@ -697,7 +697,7 @@ const GradingSubmitPage: React.FC = () => {
                   )}
                   
                   {/* 悬停操作按钮 */}
-                  <div className="absolute inset-0 bg-black/0 hover:bg-black/40 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
+                  <div className="absolute inset-0 bg-black/0 hover:bg-black/40 transition-all flex items-center justify-center">
                     <button 
                       type="button"
                       onClick={(e) => { e.stopPropagation(); removeImage(img.preview); }}

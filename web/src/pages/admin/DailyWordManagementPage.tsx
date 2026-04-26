@@ -12,7 +12,7 @@ import {
   BookOpen,
   Calendar,
   Volume2,
-  Star,
+  Eye,
   FileText,
   Loader2
 } from 'lucide-react';
@@ -159,7 +159,7 @@ const WordFormModal: React.FC<WordFormModalProps> = ({ isOpen, onClose, onSucces
           <h3 className="text-lg font-bold text-gray-900 dark:text-white">
             {isEdit ? '编辑单词' : '新增单词'}
           </h3>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          <button onClick={onClose} aria-label="关闭" className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
             <X size={20} />
           </button>
         </div>
@@ -356,7 +356,7 @@ const WordDetailModal: React.FC<WordDetailModalProps> = ({ isOpen, onClose, word
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800">
           <h3 className="text-lg font-bold text-gray-900 dark:text-white">单词详情</h3>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          <button onClick={onClose} aria-label="关闭" className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
             <X size={20} />
           </button>
         </div>
@@ -377,7 +377,10 @@ const WordDetailModal: React.FC<WordDetailModalProps> = ({ isOpen, onClose, word
                   <span className="text-xs text-gray-400">美</span>
                   <span className="text-gray-600 dark:text-gray-300">{word.pronunciationUs}</span>
                   {word.audioUrlUs && (
-                    <button className="p-1 text-brand-500 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded">
+                    <button
+                      className="p-1 text-brand-500 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded"
+                      aria-label="播放美式发音"
+                    >
                       <Volume2 size={16} />
                     </button>
                   )}
@@ -388,7 +391,10 @@ const WordDetailModal: React.FC<WordDetailModalProps> = ({ isOpen, onClose, word
                   <span className="text-xs text-gray-400">英</span>
                   <span className="text-gray-600 dark:text-gray-300">{word.pronunciationUk}</span>
                   {word.audioUrlUk && (
-                    <button className="p-1 text-brand-500 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded">
+                    <button
+                      className="p-1 text-brand-500 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded"
+                      aria-label="播放英式发音"
+                    >
                       <Volume2 size={16} />
                     </button>
                   )}
@@ -706,13 +712,13 @@ export const DailyWordManagementPage: React.FC = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="flex items-center gap-2">
                         <button 
                           onClick={() => { setViewingWord(word); setDetailModalOpen(true); }}
                           className="p-2 text-gray-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded-lg transition-all" 
                           title="查看详情"
                         >
-                          <Star size={18} />
+                          <Eye size={18} />
                         </button>
                         <button 
                           onClick={() => { setEditingWord(word); setModalOpen(true); }}

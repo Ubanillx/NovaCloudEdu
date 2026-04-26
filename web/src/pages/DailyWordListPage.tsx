@@ -221,7 +221,7 @@ const DailyWordListPage: React.FC = () => {
           {/* 单词卡片 */}
           <div
             onClick={() => navigate(`/daily-word/${currentWord.id}`)}
-            className="bg-gradient-to-br from-brand-500 to-accent-500 rounded-2xl p-8 text-white cursor-pointer hover:shadow-xl hover:shadow-brand-500/20 transition-all group"
+            className="bg-gradient-to-br from-brand-500 to-accent-500 rounded-2xl p-8 text-white cursor-pointer hover:shadow-sm hover:shadow-brand-500/20 transition-all group"
           >
             {/* 单词 + 发音 */}
             <div className="flex items-start justify-between mb-3">

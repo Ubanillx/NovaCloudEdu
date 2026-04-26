@@ -20,9 +20,10 @@ import {
 import { apiClient, DefaultApi, Configuration } from '../../api';
 import type { 
   PostResponse, 
-  PostDetailResponse
+  PostDetailResponse,
+  UserPublicResponse
 } from '../../api/generated/models';
-import { toast, TruncateWithTooltip } from '../../components/ui';
+import { Avatar, toast, Tooltip, TruncateWithTooltip } from '../../components/ui';
 
 const api = new DefaultApi(new Configuration(), '', apiClient);
 
@@ -34,6 +35,17 @@ const POST_TYPES = [
   { value: 'share', label: '分享' },
   { value: 'announcement', label: '公告' },
 ];
+
+const getPostPreviewText = (content?: string) => {
+  if (!content?.trim()) return '无内容';
+  return content
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/!\[[^\]]*]\([^)]*\)/g, ' ')
+    .replace(/\[([^\]]+)]\([^)]*\)/g, '$1')
+    .replace(/[#>*_`~\-]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim() || '无内容';
+};
 
 // 帖子详情弹窗组件
 interface PostDetailModalProps {
@@ -95,7 +107,7 @@ const PostDetailModal: React.FC<PostDetailModalProps> = ({ isOpen, onClose, post
               <p className="text-xs text-gray-500">#{post?.id}</p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          <button onClick={onClose} aria-label="关闭" className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
             <X size={20} />
           </button>
         </div>
@@ -191,8 +203,7 @@ const PostDetailModal: React.FC<PostDetailModalProps> = ({ isOpen, onClose, post
         {/* Footer */}
         <div className="flex-shrink-0 px-6 py-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/50">
           <button
-            onClick={onClose}
-            className="w-full px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-sm font-medium rounded-xl hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+            onClick={onClose} className="w-full px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-sm font-medium rounded-xl hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
           >
             关闭
           </button>
@@ -212,6 +223,8 @@ export const PostManagementPage: React.FC = () => {
   const [selectedType, setSelectedType] = useState('');
   const [pageNum, setPageNum] = useState(1);
   const [pageSize] = useState(10);
+  const [userInfoCache, setUserInfoCache] = useState<Record<string, UserPublicResponse>>({});
+  const loadingUsersRef = React.useRef<Set<string>>(new Set());
 
   const fetchPosts = useCallback(async () => {
     setLoading(true);
@@ -249,6 +262,28 @@ export const PostManagementPage: React.FC = () => {
   useEffect(() => {
     fetchPosts();
   }, [fetchPosts]);
+
+  const loadUserInfo = useCallback(async (userId: number) => {
+    const key = String(userId);
+    if (userInfoCache[key] || loadingUsersRef.current.has(key)) return;
+    loadingUsersRef.current.add(key);
+    try {
+      const response = await api.getUserPublicInfo({ id: userId });
+      if (response.data?.code === 0 && response.data.data) {
+        setUserInfoCache(prev => ({ ...prev, [key]: response.data.data! }));
+      }
+    } catch {
+      // 管理列表里用户信息加载失败时保留用户ID兜底
+    } finally {
+      loadingUsersRef.current.delete(key);
+    }
+  }, [userInfoCache]);
+
+  useEffect(() => {
+    posts.forEach(post => {
+      if (post.userId) void loadUserInfo(post.userId);
+    });
+  }, [posts, loadUserInfo]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -354,6 +389,13 @@ export const PostManagementPage: React.FC = () => {
       <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden transition-all duration-300">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse admin-table">
+            <colgroup>
+              <col className="w-[36%]" />
+              <col className="w-[13%]" />
+              <col className="w-[18%]" />
+              <col className="w-[22%]" />
+              <col className="w-[11%]" />
+            </colgroup>
             <thead>
               <tr className="bg-gray-50/50 dark:bg-gray-800/50 border-b border-gray-100 dark:border-gray-800 transition-colors duration-300">
                 <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">帖子信息</th>
@@ -379,34 +421,50 @@ export const PostManagementPage: React.FC = () => {
                   </tr>
                 ))
               ) : posts.length > 0 ? (
-                posts.map((item) => (
+                posts.map((item) => {
+                  const user = item.userId ? userInfoCache[String(item.userId)] : undefined;
+                  const userName = user?.userName || `用户${item.userId || ''}`;
+                  const postPreview = getPostPreviewText(item.content);
+
+                  return (
                   <tr key={item.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors group">
-                    <td className="px-6 py-4">
-                      <div className="flex items-start gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-50 to-accent-50 dark:from-gray-800 dark:to-gray-800 flex items-center justify-center flex-shrink-0">
-                          <FileText size={18} className="text-brand-600 dark:text-brand-400" />
-                        </div>
-                        <div className="min-w-0">
-                          <p className="font-bold text-gray-900 dark:text-white group-hover:text-brand-600 transition-colors">
-                            <TruncateWithTooltip text={item.title || '无标题'} maxWidth={200} />
-                          </p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                            <TruncateWithTooltip text={item.content || ''} maxWidth={280} />
-                          </p>
-                          <div className="flex items-center gap-2 mt-1">
-                            <span className="text-xs text-gray-400 flex items-center gap-1">
-                              <User size={12} />
-                              #{item.userId}
+                    <td className="px-6 py-3" style={{ whiteSpace: 'normal', overflow: 'visible' }}>
+                      <div className="flex items-center gap-3">
+                        <Avatar src={user?.userAvatar} name={userName} size="sm" className="flex-shrink-0 !w-8 !h-8 !text-xs" />
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <TruncateWithTooltip
+                              text={item.title || '无标题'}
+                              maxWidth="100%"
+                              className="font-bold text-gray-900 dark:text-white group-hover:text-brand-600 transition-colors"
+                            />
+                            <span className="inline-flex min-w-0 items-center gap-1 text-xs text-gray-400 shrink-0 max-w-[42%]">
+                              <User size={12} className="shrink-0" />
+                              <span className="truncate">{userName}</span>
                             </span>
+                            {item.userId && (
+                              <span className="shrink-0 rounded-md bg-gray-100 px-1.5 py-0.5 font-mono text-[10px] font-medium text-gray-500 dark:bg-gray-800 dark:text-gray-400">
+                                ID {item.userId}
+                              </span>
+                            )}
+                          </div>
+                          <div className="mt-1 flex items-center gap-2 min-w-0">
+                            <div className="min-w-0 flex-1">
+                              <Tooltip content={postPreview} maxWidth={520} position="bottom" className="block w-full min-w-0">
+                                <span className="block truncate text-xs text-gray-500 dark:text-gray-400">
+                                  {postPreview}
+                                </span>
+                              </Tooltip>
+                            </div>
                             {item.tags && item.tags.length > 0 && (
-                              <div className="flex items-center gap-1">
+                              <div className="flex items-center gap-1 shrink-0">
                                 {item.tags.slice(0, 2).map((tag, idx) => (
-                                  <span key={idx} className="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 rounded text-xs">
+                                  <span key={idx} className="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 rounded text-[10px]">
                                     {tag}
                                   </span>
                                 ))}
                                 {item.tags.length > 2 && (
-                                  <span className="text-xs text-gray-400">+{item.tags.length - 2}</span>
+                                  <span className="text-[10px] text-gray-400">+{item.tags.length - 2}</span>
                                 )}
                               </div>
                             )}
@@ -442,7 +500,7 @@ export const PostManagementPage: React.FC = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="flex items-center gap-2">
                         <button 
                           onClick={() => { setSelectedPost(item); setDetailOpen(true); }}
                           className="p-2 text-gray-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded-lg transition-all" 
@@ -460,7 +518,8 @@ export const PostManagementPage: React.FC = () => {
                       </div>
                     </td>
                   </tr>
-                ))
+                  );
+                })
               ) : (
                 <tr>
                   <td colSpan={5} className="px-6 py-12 text-center">

@@ -126,14 +126,14 @@ export const BannerCarousel: React.FC<BannerCarouselProps> = ({ autoPlayInterval
         <>
           <button
             onClick={(e) => { e.stopPropagation(); goPrev(); }}
-            className="absolute left-3 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-white/80 dark:bg-gray-900/80 text-gray-700 dark:text-gray-200 shadow-lg backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-white dark:hover:bg-gray-800 hover:scale-110 active:scale-95"
+            className="absolute left-3 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-white/80 dark:bg-gray-900/80 text-gray-700 dark:text-gray-200 shadow-lg backdrop-blur-sm transition-all duration-300 hover:bg-white dark:hover:bg-gray-800 hover:scale-110 active:scale-95"
             aria-label="上一张"
           >
             <ChevronLeft size={20} />
           </button>
           <button
             onClick={(e) => { e.stopPropagation(); goNext(); }}
-            className="absolute right-3 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-white/80 dark:bg-gray-900/80 text-gray-700 dark:text-gray-200 shadow-lg backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-white dark:hover:bg-gray-800 hover:scale-110 active:scale-95"
+            className="absolute right-3 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-white/80 dark:bg-gray-900/80 text-gray-700 dark:text-gray-200 shadow-lg backdrop-blur-sm transition-all duration-300 hover:bg-white dark:hover:bg-gray-800 hover:scale-110 active:scale-95"
             aria-label="下一张"
           >
             <ChevronRight size={20} />
