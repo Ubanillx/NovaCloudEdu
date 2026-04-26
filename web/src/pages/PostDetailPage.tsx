@@ -4,12 +4,15 @@ import DOMPurify from 'dompurify';
 import {
   ArrowLeft, ThumbsUp, Star, MessageCircle, Send,
   Edit3, Trash2, Clock, User, X, TrendingUp,
+  Loader2,
 } from 'lucide-react';
 import { apiClient, DefaultApi, Configuration } from '../api';
 import type { PostDetailResponse, CommentResponse, UserPublicResponse } from '../api/generated/models';
 import toast from '../components/ui/Toast';
 
 const api = new DefaultApi(new Configuration(), '', apiClient);
+
+const getIdKey = (id?: number | string | null) => (id == null ? '' : String(id));
 
 const renderInlineMarkdown = (text: string) => {
   return text
@@ -130,8 +133,10 @@ const PostDetailPage: React.FC = () => {
   const [hasMoreComments, setHasMoreComments] = useState(true);
   const [commentText, setCommentText] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [currentUserId, setCurrentUserId] = useState(0);
+  const [currentUserId, setCurrentUserId] = useState<number | string>(0);
   const [currentUserInfo, setCurrentUserInfo] = useState<UserPublicResponse | null>(null);
+  const [isFollowingAuthor, setIsFollowingAuthor] = useState(false);
+  const [isFollowLoading, setIsFollowLoading] = useState(false);
 
   // 用户信息
   const [authorInfo, setAuthorInfo] = useState<UserPublicResponse | null>(null);
@@ -167,14 +172,15 @@ const PostDetailPage: React.FC = () => {
     setIsLoading(true);
     try {
       // 获取当前用户
+      let uid = 0 as number | string;
       const userInfoStr = localStorage.getItem('user_info');
       if (userInfoStr) {
         const userInfo = JSON.parse(userInfoStr);
-        const uid = (userInfo?.id ?? 0) as number; // 保持原始值，避免大整数精度丢失
+        uid = (userInfo?.id ?? 0) as number | string; // 保持原始值，避免大整数精度丢失
         setCurrentUserId(uid);
         if (uid) {
           try {
-            const meRes = await api.getUserPublicInfo({ id: uid });
+            const meRes = await api.getUserPublicInfo({ id: uid as number });
             if (meRes.data?.code === 0 && meRes.data.data) {
               setCurrentUserInfo(meRes.data.data);
             }
@@ -189,12 +195,20 @@ const PostDetailPage: React.FC = () => {
         setPost(data);
         setHasThumb(data.hasThumb ?? false);
         setHasFavour(data.hasFavour ?? false);
+        setIsFollowingAuthor(false);
 
         // 加载作者信息
         if (data.userId) {
           const authorRes = await api.getUserPublicInfo({ id: data.userId });
           if (authorRes.data?.code === 0 && authorRes.data.data) {
             setAuthorInfo(authorRes.data.data);
+          }
+
+          if (getIdKey(data.userId) !== getIdKey(uid)) {
+            const followRes = await api.isFollowing({ targetUserId: data.userId });
+            if (followRes.data?.code === 0) {
+              setIsFollowingAuthor(followRes.data.data ?? false);
+            }
           }
         }
       }
@@ -293,6 +307,27 @@ const PostDetailPage: React.FC = () => {
     }
   }, [loadComments]);
 
+  const handleToggleFollowAuthor = useCallback(async () => {
+    if (!post?.userId || isFollowLoading) return;
+    if (getIdKey(post.userId) === getIdKey(currentUserId)) return;
+
+    setIsFollowLoading(true);
+    try {
+      const res = await api.toggleFollow({ targetUserId: post.userId });
+      if (res.data?.code === 0) {
+        const newState = res.data.data ?? !isFollowingAuthor;
+        setIsFollowingAuthor(newState);
+        toast.success(newState ? '关注成功' : '已取消关注');
+      } else {
+        toast.error(res.data?.message || '操作失败');
+      }
+    } catch {
+      toast.error('操作失败');
+    } finally {
+      setIsFollowLoading(false);
+    }
+  }, [currentUserId, isFollowLoading, isFollowingAuthor, post?.userId]);
+
   useEffect(() => {
     if (postId) loadData();
   }, [postId, loadData]);
@@ -351,7 +386,7 @@ const PostDetailPage: React.FC = () => {
     );
   }
 
-  const isOwner = post.userId === currentUserId && currentUserId !== 0;
+  const isOwner = getIdKey(post.userId) === getIdKey(currentUserId) && currentUserId !== 0;
 
   return (
     <div className="max-w-6xl mx-auto animate-in fade-in duration-500 pb-12 px-4 sm:px-0">
@@ -588,8 +623,17 @@ const PostDetailPage: React.FC = () => {
                     </button>
                   </div>
                 ) : (
-                  <button className="w-full py-2 text-sm bg-brand-600 text-white font-bold rounded-xl hover:bg-brand-500 shadow-md shadow-brand-600/20 transition-all active:scale-95">
-                    关注作者
+                  <button
+                    onClick={handleToggleFollowAuthor}
+                    disabled={isFollowLoading || !post.userId}
+                    className={`w-full py-2 text-sm font-bold rounded-xl shadow-md transition-all active:scale-95 disabled:cursor-not-allowed disabled:opacity-70 flex items-center justify-center gap-1.5 ${
+                      isFollowingAuthor
+                        ? 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 shadow-gray-200/40 dark:shadow-black/10'
+                        : 'bg-brand-600 text-white hover:bg-brand-500 shadow-brand-600/20'
+                    }`}
+                  >
+                    {isFollowLoading && <Loader2 size={14} className="animate-spin" />}
+                    {isFollowingAuthor ? '已关注' : '关注作者'}
                   </button>
                 )}
               </div>
