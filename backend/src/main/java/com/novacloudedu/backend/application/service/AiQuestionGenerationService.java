@@ -37,6 +37,8 @@ import java.util.concurrent.Executors;
 @RequiredArgsConstructor
 public class AiQuestionGenerationService {
 
+    private static final int QUESTION_GENERATION_MAX_TOKENS = 128000;
+
     private final LangchainChatService langchainChatService;
     private final QuestionBankApplicationService questionBankApplicationService;
     private final ImageGenerationService imageGenerationService;
@@ -120,37 +122,24 @@ public class AiQuestionGenerationService {
                 String userPrompt = buildSingleQuestionUserPrompt(params, generatedSummaries);
 
                 // 3c. 调用 LLM 生成 1 道题
-                StringBuilder sb = new StringBuilder();
-                final int[] charCount = {0};
-                final long[] lastProgressTime = {System.currentTimeMillis()};
-                final int currentIdx = idx;
-                langchainChatService.streamChatWithParams(
-                        modelId,
-                        List.of(
-                                Map.of("role", "system", "content", systemPrompt),
-                                Map.of("role", "user", "content", userPrompt)
-                        ),
-                        0.7, 0.9, 2000, enableSearch,
-                        token -> {
-                            sb.append(token);
-                            charCount[0] += token.length();
-                            long now = System.currentTimeMillis();
-                            if (now - lastProgressTime[0] >= 2000) {
-                                lastProgressTime[0] = now;
-                                try {
-                                    emitter.send(SseEmitter.event()
-                                            .name("generating")
-                                            .data(Map.of("index", currentIdx, "total", totalCount,
-                                                    "message", "第 " + currentIdx + " 题生成中...已输出 " + charCount[0] + " 字")));
-                                } catch (Exception ignored) {}
-                            }
-                        }
-                );
-                String llmResponse = sb.toString();
+                String llmResponse = streamSingleQuestion(modelId, systemPrompt, userPrompt, enableSearch,
+                        idx, totalCount, emitter);
                 log.info("LLM 第{}题响应长度: {}", idx, llmResponse.length());
 
                 // 3d. 解析 JSON（期望得到 1 道题）
                 List<Map<String, Object>> questions = parseQuestionsFromResponse(llmResponse);
+                if (Boolean.TRUE.equals(params.withDiagram()) && !hasGeometryCode(questions)) {
+                    log.warn("第{}题未返回 geometryCode，按几何绘图要求重试一次", idx);
+                    emitter.send(SseEmitter.event()
+                            .name("generating")
+                            .data(Map.of("index", idx, "total", totalCount,
+                                    "message", "第 " + idx + " 题未生成几何图，正在重试...")));
+                    String retryPrompt = buildGeometryRetryPrompt(userPrompt);
+                    llmResponse = streamSingleQuestion(modelId, systemPrompt, retryPrompt, enableSearch,
+                            idx, totalCount, emitter);
+                    log.info("LLM 第{}题几何重试响应长度: {}", idx, llmResponse.length());
+                    questions = parseQuestionsFromResponse(llmResponse);
+                }
                 if (questions.isEmpty()) {
                     log.warn("第{}题解析失败，跳过", idx);
                     emitter.send(SseEmitter.event()
@@ -163,6 +152,15 @@ public class AiQuestionGenerationService {
                 // 取第一道题（LLM 应该只生成 1 道）
                 Map<String, Object> q = questions.get(0);
                 String content = getStringField(q, "content");
+                String geometryCode = getStringField(q, "geometryCode");
+                if (Boolean.TRUE.equals(params.withDiagram()) && geometryCode == null) {
+                    log.warn("第{}题仍未返回 geometryCode，拒绝保存无图题", idx);
+                    emitter.send(SseEmitter.event()
+                            .name("question_error")
+                            .data(Map.of("index", idx, "total", totalCount,
+                                    "error", "已勾选几何图形，但 AI 未返回 geometryCode，未保存无图题")));
+                    continue;
+                }
 
                 // 3e. 发送预览事件（generating 状态）
                 emitter.send(SseEmitter.event()
@@ -173,14 +171,15 @@ public class AiQuestionGenerationService {
 
                 // 3f. 几何图形渲染（可选）
                 String imageUrl = null;
-                String geometryCode = getStringField(q, "geometryCode");
                 if (geometryCode != null && Boolean.TRUE.equals(params.withDiagram())) {
                     try {
+                        geometryCode = normalizeGeometryCode(geometryCode);
                         byte[] pngBytes = typstCompileService.renderPng(geometryCode);
                         imageUrl = ossService.uploadBytes(pngBytes, ".png", FileBusinessType.EXAM_QUESTION_IMAGE);
                         log.info("几何图形渲染成功: question={}, url={}", idx, imageUrl);
                     } catch (Exception e) {
                         log.warn("几何图形渲染失败: question={}, error={}", idx, e.getMessage());
+                        throw new IllegalStateException("几何图形渲染失败，未保存无图题: " + e.getMessage(), e);
                     }
                 }
 
@@ -243,6 +242,46 @@ public class AiQuestionGenerationService {
                 .name("done")
                 .data(Map.of("total", savedQuestions.size(), "message", "成功生成 " + savedQuestions.size() + " 道题目")));
         emitter.complete();
+    }
+
+    private String streamSingleQuestion(String modelId, String systemPrompt, String userPrompt,
+                                        boolean enableSearch, int index, int total,
+                                        SseEmitter emitter) {
+        StringBuilder sb = new StringBuilder();
+        final int[] charCount = {0};
+        final long[] lastProgressTime = {System.currentTimeMillis()};
+        langchainChatService.streamChatWithParams(
+                modelId,
+                List.of(
+                        Map.of("role", "system", "content", systemPrompt),
+                        Map.of("role", "user", "content", userPrompt)
+                ),
+                0.7, 0.9, QUESTION_GENERATION_MAX_TOKENS, enableSearch,
+                token -> {
+                    sb.append(token);
+                    charCount[0] += token.length();
+                    long now = System.currentTimeMillis();
+                    if (now - lastProgressTime[0] >= 2000) {
+                        lastProgressTime[0] = now;
+                        try {
+                            emitter.send(SseEmitter.event()
+                                    .name("generating")
+                                    .data(Map.of("index", index, "total", total,
+                                            "message", "第 " + index + " 题生成中...已输出 " + charCount[0] + " 字")));
+                        } catch (Exception ignored) {}
+                    }
+                }
+        );
+        return sb.toString();
+    }
+
+    private String buildGeometryRetryPrompt(String originalPrompt) {
+        return originalPrompt + "\n\n【强制重试要求】\n"
+                + "上一轮没有生成几何图。请重新生成 1 道必须依赖几何图形才能作答的题目。\n"
+                + "必须返回 geometryCode 字段，值必须是一个完整的 #cetz.canvas({...}) 代码块。\n"
+                + "题干必须引用图中的点、线、角、圆、坐标轴或立体图形元素。\n"
+                + "不要生成纯文字题、常识题或不需要图形的题。\n"
+                + "仍然只输出纯 JSON 数组，不要输出 markdown 或额外说明。";
     }
 
     // ==================== Prompt 构建 ====================
@@ -325,7 +364,7 @@ public class AiQuestionGenerationService {
         sb.append("    \"knowledgeTags\": [\"知识点1\", \"知识点2\"]");
 
         if (withDiagram) {
-            sb.append(",\n    \"geometryCode\": \"Typst cetz 绘图代码（见下方规范）\"");
+            sb.append(",\n    \"geometryCode\": \"Typst CeTZ 几何绘图代码（见下方规范）\"");
         }
         if (withImage) {
             sb.append(",\n    \"imagePrompt\": \"英文图片描述（用于 AI 生图，仅需配图时提供）\"");
@@ -336,13 +375,19 @@ public class AiQuestionGenerationService {
         // ==================== 几何图形 ====================
         if (withDiagram) {
             sb.append("【几何图形代码规范——重要】\n\n");
-            sb.append("用户已开启几何图形功能。当题目涉及以下内容时，你**必须**提供 geometryCode 字段：\n");
+            sb.append("本系统使用 Typst 的 CeTZ 包（@preview/cetz:0.3.4）作为几何图形专用绘制引擎。\n");
+            sb.append("geometryCode 只允许输出可直接执行的 CeTZ 绘图代码，不要输出 SVG、HTML、Mermaid、TikZ、LaTeX picture 或 ASCII 图。\n");
+            sb.append("渲染环境已预先导入 cetz 包，你只需要返回一个 #cetz.canvas({...}) 块。\n\n");
+            sb.append("【强制要求】用户已开启几何图形功能，本轮每一道题都必须是需要图形辅助理解或作答的题，并且必须提供 geometryCode 字段。\n");
+            sb.append("即使用户没有指定几何主题，也要主动选择适合画图的情境，不要生成纯文字题或不需要图的题。\n");
+            sb.append("题干必须明确引用图中的点、线、角、圆、坐标轴、函数图像或立体图形元素。\n\n");
+            sb.append("可选图形范围：\n");
             sb.append("- 平面几何：三角形、四边形、圆、多边形等\n");
             sb.append("- 立体几何：正方体、长方体、棱柱、棱锥、圆柱、圆锥、球等\n");
             sb.append("- 解析几何：坐标系中的直线、曲线、圆锥曲线等\n");
             sb.append("- 函数图像：需要示意图辅助理解的函数题\n");
             sb.append("- 其他需要图形辅助的题目\n\n");
-            sb.append("geometryCode 必须是可直接在 Typst 中执行的 cetz 绘图代码。\n\n");
+            sb.append("geometryCode 必须是可直接在 Typst 中执行的 CeTZ 代码。\n\n");
             sb.append("示例1 - 平面三角形：\n");
             sb.append("#cetz.canvas({\n");
             sb.append("  import cetz.draw: *\n");
@@ -380,16 +425,18 @@ public class AiQuestionGenerationService {
             sb.append("  set-style(mark: (end: \">\"))\n");
             sb.append("  line((-0.5, 0), (4.5, 0))\n");
             sb.append("  line((0, -0.5), (0, 3.5))\n");
+            sb.append("  set-style(mark: none)\n");
             sb.append("  content((4.7, 0), $x$)\n");
             sb.append("  content((0, 3.8), $y$)\n");
             sb.append("  content((-0.3, -0.3), $O$)\n");
             sb.append("})\n\n");
             sb.append("规则：\n");
-            sb.append("1. 只提供 #cetz.canvas({...}) 块，不要包含 #import 语句\n");
-            sb.append("2. 立体图形使用斜二测画法，用虚线表示被遮挡的棱: line((0, 0), (1, 1.2), stroke: (dash: \"dashed\"))\n");
+            sb.append("1. 只提供 #cetz.canvas({...}) 块，不要包含顶层 #import 语句；canvas 内可以使用 import cetz.draw: *\n");
+            sb.append("2. 立体图形使用二维投影/斜二测画法，用虚线表示被遮挡的棱: line((0, 0), (1, 1.2), stroke: (dash: \"dashed\"))\n");
             sb.append("3. 所有顶点/关键点必须用 content() 标注字母\n");
             sb.append("4. 图形大小适中，坐标值控制在 0~5 范围内\n");
-            sb.append("5. 如果题目不涉及几何图形，则不要提供 geometryCode 字段\n\n");
+            sb.append("5. 不允许使用空字符串作为 mark，例如严禁 mark: \"\"、start: \"\"、end: \"\"；如需取消箭头，使用 set-style(mark: none)\n");
+            sb.append("6. 不允许生成不涉及图形的题；开启几何图形后缺少 geometryCode 会被系统判定为失败\n\n");
         }
 
         // ==================== 题型专用规则 ====================
@@ -542,6 +589,26 @@ public class AiQuestionGenerationService {
     }
 
     // ==================== 工具方法 ====================
+
+    private boolean hasGeometryCode(List<Map<String, Object>> questions) {
+        if (questions == null || questions.isEmpty()) {
+            return false;
+        }
+        return getStringField(questions.get(0), "geometryCode") != null;
+    }
+
+    private String normalizeGeometryCode(String code) {
+        if (code == null) {
+            return null;
+        }
+        return code
+                .replaceAll("mark\\s*:\\s*\"\"", "mark: none")
+                .replaceAll("mark\\s*:\\s*''", "mark: none")
+                .replaceAll("start\\s*:\\s*\"\"", "start: none")
+                .replaceAll("start\\s*:\\s*''", "start: none")
+                .replaceAll("end\\s*:\\s*\"\"", "end: none")
+                .replaceAll("end\\s*:\\s*''", "end: none");
+    }
 
     private String getStringField(Map<String, Object> map, String key) {
         Object val = map.get(key);

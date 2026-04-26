@@ -431,6 +431,7 @@ public class ExamPaperApplicationService {
                 qData.put("type", q.getType().getCode());
                 qData.put("content", q.getContent());
                 qData.put("score", pq.getScore());
+                qData.put("imageUrl", q.getImageUrl());
 
                 // 解析选项
                 if (q.getOptions() != null && !q.getOptions().isBlank()) {
