@@ -201,7 +201,7 @@ ai:
 
   # ---- 多模型路由（Langchain4j） ----
   chat-models:
-    default-model: ${AI_DEFAULT_MODEL:openrouter/openai/gpt-5.2}
+    default-model: ${AI_DEFAULT_MODEL:deepseek/deepseek-v4-pro}
     default-vision-model: ${AI_DEFAULT_VISION_MODEL:openrouter/google/gemini-3-flash-preview}
     providers:
       dashscope:
@@ -253,7 +253,7 @@ ai:
             temperature: 0.7
             max-tokens: 2000
       deepseek:
-        enabled: ${DEEPSEEK_ENABLED:false}
+        enabled: ${DEEPSEEK_ENABLED:true}
         api-key: ${DEEPSEEK_API_KEY:}
         base-url: ${DEEPSEEK_BASE_URL:https://api.deepseek.com/v1}
         models:
@@ -265,6 +265,11 @@ ai:
             type: text
             temperature: 0.6
             max-tokens: 8000
+          deepseek-v4-pro:
+            type: text
+            temperature: 0.7
+            max-tokens: 128000
+            top-p: 0.8
       moonshot:
         enabled: ${MOONSHOT_ENABLED:false}
         api-key: ${MOONSHOT_API_KEY:}

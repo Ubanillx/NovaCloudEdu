@@ -104,6 +104,71 @@
 
 #set par(leading: 0.8em, justify: true)
 
+// ==================== 题目渲染 ====================
+
+#let render-question-options(q) = {
+  if "options" in q and q.options != none and q.options.len() > 0 {
+    v(0.15cm)
+    let labels = ("A", "B", "C", "D", "E", "F")
+    let opt-count = q.options.len()
+    if opt-count <= 2 {
+      grid(
+        columns: (1fr,) * opt-count,
+        row-gutter: 0.3em,
+        ..q.options.enumerate().map(((i, opt)) => {
+          [#labels.at(i). #safe-eval(opt)]
+        })
+      )
+    } else if opt-count <= 4 {
+      grid(
+        columns: (1fr, 1fr),
+        row-gutter: 0.3em,
+        ..q.options.enumerate().map(((i, opt)) => {
+          [#labels.at(i). #safe-eval(opt)]
+        })
+      )
+    } else {
+      for (i, opt) in q.options.enumerate() {
+        [#labels.at(i). #safe-eval(opt) #h(1em)]
+      }
+    }
+  }
+}
+
+#let render-question-image(q) = {
+  if "image_path" in q and q.image_path != none and q.image_path != "" {
+    v(0.2cm)
+    align(left)[#image(q.image_path, width: 34%)]
+    v(0.2cm)
+  }
+}
+
+#let render-answer-space(q) = {
+  if "type" in q {
+    if q.type == "FILL_BLANK" {
+      v(0.3cm)
+    } else if q.type == "SHORT_ANSWER" {
+      v(3cm)
+    } else if q.type == "CALCULATION" {
+      v(5cm)
+    } else if q.type == "ESSAY" {
+      v(7cm)
+    }
+  }
+}
+
+#let render-question(q) = {
+  [
+    *#q.number.* #safe-eval(q.content)#if "type" in q and q.type == "TRUE_FALSE" { [#h(0.5em)（#h(1.2cm)）] }
+  ]
+
+  render-question-image(q)
+  render-question-options(q)
+  render-answer-space(q)
+
+  v(0.4cm)
+}
+
 // ==================== 试卷标题区域 ====================
 
 #align(center)[
@@ -147,40 +212,7 @@
         #v(0.3cm)
 
         #for q in section.questions {
-          [
-            *#q.number.* #safe-eval(q.content)
-          ]
-
-          // 选择题选项
-          if "options" in q and q.options != none and q.options.len() > 0 {
-            v(0.15cm)
-            let labels = ("A", "B", "C", "D", "E", "F")
-            let opt-count = q.options.len()
-            if opt-count <= 4 {
-              grid(
-                columns: (1fr,) * calc.min(opt-count, 4),
-                row-gutter: 0.3em,
-                ..q.options.enumerate().map(((i, opt)) => {
-                  [#labels.at(i). #safe-eval(opt)]
-                })
-              )
-            } else {
-              for (i, opt) in q.options.enumerate() {
-                [#labels.at(i). #safe-eval(opt) #h(1em)]
-              }
-            }
-          }
-
-          // 填空题/简答题留白
-          if "type" in q {
-            if q.type == "FILL_BLANK" {
-              v(0.3cm)
-            } else if q.type == "SHORT_ANSWER" or q.type == "CALCULATION" or q.type == "ESSAY" {
-              v(2cm)
-            }
-          }
-
-          v(0.4cm)
+          render-question(q)
         }
       ]
     }
@@ -195,40 +227,7 @@
       #v(0.3cm)
 
       #for q in section.questions {
-        [
-          *#q.number.* #safe-eval(q.content)
-        ]
-
-        // 选择题选项
-        if "options" in q and q.options != none and q.options.len() > 0 {
-          v(0.15cm)
-          let labels = ("A", "B", "C", "D", "E", "F")
-          let opt-count = q.options.len()
-          if opt-count <= 4 {
-            grid(
-              columns: (1fr,) * calc.min(opt-count, 4),
-              row-gutter: 0.3em,
-              ..q.options.enumerate().map(((i, opt)) => {
-                [#labels.at(i). #safe-eval(opt)]
-              })
-            )
-          } else {
-            for (i, opt) in q.options.enumerate() {
-              [#labels.at(i). #safe-eval(opt) #h(1em)]
-            }
-          }
-        }
-
-        // 填空题/简答题留白
-        if "type" in q {
-          if q.type == "FILL_BLANK" {
-            v(0.3cm)
-          } else if q.type == "SHORT_ANSWER" or q.type == "CALCULATION" or q.type == "ESSAY" {
-            v(2cm)
-          }
-        }
-
-        v(0.4cm)
+        render-question(q)
       }
     ]
   }

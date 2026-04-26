@@ -148,33 +148,51 @@ public class ExamTemplateApplicationService {
                 "sections", List.of(
                         Map.of(
                                 "title", "一、选择题",
-                                "description", "每小题5分，共20分",
+                                "description", "单选题每小题5分，多选题每小题6分",
                                 "questions", List.of(
                                         Map.of("number", 1, "type", "SINGLE_CHOICE",
                                                 "content", "下列哪个选项是正确的？",
                                                 "score", 5,
                                                 "options", List.of("选项A", "选项B", "选项C", "选项D")),
-                                        Map.of("number", 2, "type", "SINGLE_CHOICE",
-                                                "content", "已知 f(x) = 2x + 1，则 f(3) 的值为：",
-                                                "score", 5,
-                                                "options", List.of("5", "6", "7", "8"))
+                                        Map.of("number", 2, "type", "MULTI_CHOICE",
+                                                "content", "下列说法正确的是：",
+                                                "score", 6,
+                                                "options", List.of("选项A", "选项B", "选项C", "选项D"))
                                 )
                         ),
                         Map.of(
-                                "title", "二、填空题",
-                                "description", "每小题10分，共20分",
+                                "title", "二、判断题",
+                                "description", "每小题4分，共8分",
                                 "questions", List.of(
-                                        Map.of("number", 3, "type", "FILL_BLANK",
+                                        Map.of("number", 3, "type", "TRUE_FALSE",
+                                                "content", "地球绕太阳公转一周约为一年。",
+                                                "score", 4),
+                                        Map.of("number", 4, "type", "TRUE_FALSE",
+                                                "content", "所有金属在常温下都是固体。",
+                                                "score", 4)
+                                )
+                        ),
+                        Map.of(
+                                "title", "三、填空题",
+                                "description", "每小题10分，共10分",
+                                "questions", List.of(
+                                        Map.of("number", 5, "type", "FILL_BLANK",
                                                 "content", "地球的自转周期约为______小时。",
                                                 "score", 10)
                                 )
                         ),
                         Map.of(
-                                "title", "三、简答题",
-                                "description", "每小题20分，共60分",
+                                "title", "四、主观题",
+                                "description", "请在题目下方作答",
                                 "questions", List.of(
-                                        Map.of("number", 4, "type", "SHORT_ANSWER",
+                                        Map.of("number", 6, "type", "SHORT_ANSWER",
                                                 "content", "请简述牛顿第三定律的内容及其应用。",
+                                                "score", 12),
+                                        Map.of("number", 7, "type", "CALCULATION",
+                                                "content", "已知物体质量为2kg，加速度为3m/s²，求合力大小。",
+                                                "score", 15),
+                                        Map.of("number", 8, "type", "ESSAY",
+                                                "content", "结合材料，论述科学探究中证据与结论之间的关系。",
                                                 "score", 20)
                                 )
                         )
