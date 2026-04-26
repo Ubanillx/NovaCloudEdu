@@ -318,6 +318,7 @@ All URIs are relative to *http://localhost:8080*
 |[**listAvailableModels**](#listavailablemodels) | **GET** /api/workflows/models | 获取可用模型列表|
 |[**listBooks**](#listbooks) | **GET** /api/books | 获取书籍列表|
 |[**listByUser**](#listbyuser) | **GET** /api/workflows | 获取用户的工作流列表|
+|[**listCategories**](#listcategories) | **GET** /api/daily-word/categories | 获取每日单词分类列表|
 |[**listChapters**](#listchapters) | **GET** /api/course/{courseId}/chapter | 获取课程的章节列表|
 |[**listClasses**](#listclasses) | **GET** /api/classes/list | 获取班级列表|
 |[**listCourses**](#listcourses) | **GET** /api/course/list | 获取课程列表|
@@ -16831,6 +16832,50 @@ const { status, data } = await apiInstance.listByUser(
 ### Return type
 
 **BaseResponseListWorkflowResponse**
+
+### Authorization
+
+[Bearer Token](../README.md#Bearer Token)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**400** | Bad Request |  -  |
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **listCategories**
+> BaseResponseListString listCategories()
+
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+const { status, data } = await apiInstance.listCategories();
+```
+
+### Parameters
+This endpoint does not have any parameters.
+
+
+### Return type
+
+**BaseResponseListString**
 
 ### Authorization
 

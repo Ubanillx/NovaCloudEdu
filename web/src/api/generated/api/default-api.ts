@@ -13336,6 +13336,40 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
+         * @summary 获取每日单词分类列表
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listCategories: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/daily-word/categories`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer Token required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary 获取课程的章节列表
          * @param {number} courseId 课程ID
          * @param {*} [options] Override http request option.
@@ -24510,6 +24544,18 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary 获取每日单词分类列表
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async listCategories(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseResponseListString>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listCategories(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.listCategories']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @summary 获取课程的章节列表
          * @param {number} courseId 课程ID
          * @param {*} [options] Override http request option.
@@ -29870,6 +29916,15 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
+         * @summary 获取每日单词分类列表
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listCategories(options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListString> {
+            return localVarFp.listCategories(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary 获取课程的章节列表
          * @param {DefaultApiListChaptersRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
@@ -34295,6 +34350,14 @@ export interface DefaultApiInterface {
      * @throws {RequiredError}
      */
     listByUser(requestParameters: DefaultApiListByUserRequest, options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListWorkflowResponse>;
+
+    /**
+     * 
+     * @summary 获取每日单词分类列表
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    listCategories(options?: RawAxiosRequestConfig): AxiosPromise<BaseResponseListString>;
 
     /**
      * 
@@ -43504,6 +43567,16 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public listByUser(requestParameters: DefaultApiListByUserRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).listByUser(requestParameters.userId, requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary 获取每日单词分类列表
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public listCategories(options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).listCategories(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

@@ -125,16 +125,15 @@ public class DailyWordController {
             @RequestParam(defaultValue = "1") @Parameter(description = "页码") int page,
             @RequestParam(defaultValue = "10") @Parameter(description = "每页数量") int size) {
 
-        DailyWordPage wordPage;
-        if (category != null && !category.isEmpty()) {
-            wordPage = getDailyWordQuery.executeByCategoryPaged(category, page, size);
-        } else if (difficulty != null) {
-            wordPage = getDailyWordQuery.executeByDifficultyPaged(difficulty, page, size);
-        } else {
-            wordPage = getDailyWordQuery.executeListPaged(page, size);
-        }
+        DailyWordPage wordPage = getDailyWordQuery.executePaged(category, difficulty, page, size);
 
         return ResultUtils.success(assembler.toDailyWordPageResponse(wordPage));
+    }
+
+    @GetMapping("/categories")
+    @Operation(summary = "获取每日单词分类列表")
+    public BaseResponse<List<String>> listCategories() {
+        return ResultUtils.success(getDailyWordQuery.executeCategories());
     }
 
     @GetMapping("/search")

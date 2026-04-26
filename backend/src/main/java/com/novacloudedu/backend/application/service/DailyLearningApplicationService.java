@@ -1,6 +1,7 @@
 package com.novacloudedu.backend.application.service;
 
 import com.novacloudedu.backend.application.dailylearning.command.*;
+import com.novacloudedu.backend.application.dailylearning.query.GetDailyWordQuery;
 import com.novacloudedu.backend.application.recommendation.service.GraphDataSyncService;
 import com.novacloudedu.backend.domain.dailylearning.entity.DailyArticle;
 import com.novacloudedu.backend.domain.dailylearning.entity.DailyWord;
@@ -43,6 +44,7 @@ public class DailyLearningApplicationService {
     private final UserWordBookRepository userWordBookRepository;
     private final GraphDataSyncService graphDataSyncService;
     private final ApplicationEventPublisher eventPublisher;
+    private final GetDailyWordQuery getDailyWordQuery;
 
     // ==================== 每日文章管理 ====================
 
@@ -163,6 +165,7 @@ public class DailyLearningApplicationService {
                 command.notes(), command.publishDate(), adminId
         );
         dailyWordRepository.save(dailyWord);
+        getDailyWordQuery.evictCategoryCache();
         log.info("每日单词创建成功: wordId={}", dailyWord.getId().value());
         return dailyWord.getId().value();
     }
@@ -177,12 +180,14 @@ public class DailyLearningApplicationService {
                 Difficulty.fromCode(command.difficulty()), command.category(),
                 command.notes(), command.publishDate());
         dailyWordRepository.save(dailyWord);
+        getDailyWordQuery.evictCategoryCache();
         log.info("每日单词更新成功: wordId={}", command.wordId());
     }
 
     @Transactional
     public void deleteDailyWord(Long wordId) {
         dailyWordRepository.deleteById(DailyWordId.of(wordId));
+        getDailyWordQuery.evictCategoryCache();
         log.info("每日单词删除成功: wordId={}", wordId);
     }
 
