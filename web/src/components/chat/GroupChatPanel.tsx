@@ -4,18 +4,89 @@ import {
   Users, UserPlus, Check
 } from 'lucide-react';
 import { apiClient, DefaultApi, Configuration } from '../../api';
-import type { GroupResponse, FriendResponse } from '../../api/generated/models';
+import type { GroupResponse, FriendResponse, CreateGroupRequest } from '../../api/generated/models';
 import toast from '../ui/Toast';
 import { Avatar } from '../ui/Avatar';
+import AvatarUploadField from '../ui/AvatarUploadField';
 import GroupChatWindow from './GroupChatWindow';
 
 const api = new DefaultApi(new Configuration(), '', apiClient);
+
+const JOIN_MODE_OPTIONS = [
+  { value: 0, label: '自由加入' },
+  { value: 1, label: '需审批' },
+  { value: 2, label: '禁止加入' },
+] as const;
+
+const INVITE_MODE_OPTIONS = [
+  { value: 0, label: '所有成员' },
+  { value: 1, label: '仅管理员' },
+] as const;
+
+const getJoinActionLabel = (joinMode?: number) => {
+  if (joinMode === 0) return '加入群聊';
+  if (joinMode === 2) return '禁止加入';
+  return '申请加入';
+};
+
+type SearchGroupPage = {
+  groups?: unknown[];
+  list?: unknown[];
+  records?: unknown[];
+};
+
+type LongLike = number | string | { value?: number | string } | null | undefined;
+
+const toNumberId = (value: LongLike): number | undefined => {
+  const raw = value && typeof value === 'object' ? value.value : value;
+  if (typeof raw === 'number' && Number.isFinite(raw)) return raw;
+  if (typeof raw === 'string' && raw.trim()) {
+    const parsed = Number(raw);
+    return Number.isFinite(parsed) ? parsed : undefined;
+  }
+  return undefined;
+};
+
+const normalizeGroupResponse = (raw: unknown): GroupResponse | null => {
+  if (!raw || typeof raw !== 'object') return null;
+
+  const source = raw as Record<string, unknown>;
+  const id = toNumberId(source.id as LongLike);
+  if (id === undefined) return null;
+
+  return {
+    ...(source as GroupResponse),
+    id,
+    ownerId: toNumberId(source.ownerId as LongLike),
+    classId: toNumberId(source.classId as LongLike),
+    maxMembers: toNumberId(source.maxMembers as LongLike),
+    memberCount: toNumberId(source.memberCount as LongLike),
+    inviteMode: toNumberId(source.inviteMode as LongLike),
+    joinMode: toNumberId(source.joinMode as LongLike),
+  };
+};
+
+const extractGroupResults = (data: unknown): GroupResponse[] => {
+  const groups = Array.isArray(data)
+    ? data
+    : data && typeof data === 'object'
+      ? (data as SearchGroupPage).groups || (data as SearchGroupPage).list || (data as SearchGroupPage).records || []
+      : [];
+
+  return groups
+    .map(normalizeGroupResponse)
+    .filter((group): group is GroupResponse => group !== null);
+};
 
 // ============ 创建群聊面板 ============
 
 const CreateGroupPanel: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const [groupName, setGroupName] = useState('');
+  const [avatar, setAvatar] = useState('');
   const [description, setDescription] = useState('');
+  const [announcement, setAnnouncement] = useState('');
+  const [joinMode, setJoinMode] = useState(0);
+  const [inviteMode, setInviteMode] = useState(0);
   const [creating, setCreating] = useState(false);
 
   // 好友列表（用于邀请成员）
@@ -56,8 +127,12 @@ const CreateGroupPanel: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       const res = await api.createGroup({
         createGroupRequest: {
           groupName: groupName.trim(),
+          avatar: avatar.trim() || undefined,
           description: description.trim() || undefined,
-        },
+          joinMode,
+          inviteMode,
+          announcement: announcement.trim() || undefined,
+        } as CreateGroupRequest & { joinMode?: number; inviteMode?: number; announcement?: string },
       });
       const groupId = res.data?.data?.id;
 
@@ -125,6 +200,14 @@ const CreateGroupPanel: React.FC<{ onBack: () => void }> = ({ onBack }) => {
               className="w-full px-3 py-2 text-sm bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 dark:focus:ring-brand-900/30 transition-all"
             />
           </div>
+          <AvatarUploadField
+            label="群头像（可选）"
+            value={avatar}
+            onChange={setAvatar}
+            name={groupName}
+            icon="group"
+            businessType="group/avatar"
+          />
           <div>
             <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5">
               群简介（可选）
@@ -135,6 +218,61 @@ const CreateGroupPanel: React.FC<{ onBack: () => void }> = ({ onBack }) => {
               onChange={(e) => setDescription(e.target.value)}
               maxLength={200}
               rows={3}
+              className="w-full px-3 py-2 text-sm bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 dark:focus:ring-brand-900/30 transition-all resize-none"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5">
+              加入方式
+            </label>
+            <div className="grid grid-cols-3 gap-2">
+              {JOIN_MODE_OPTIONS.map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => setJoinMode(option.value)}
+                  className={`px-3 py-2 text-xs font-medium rounded-lg border transition-all active:scale-[0.98] ${
+                    joinMode === option.value
+                      ? 'bg-brand-50 dark:bg-brand-900/20 border-brand-300 dark:border-brand-700 text-brand-700 dark:text-brand-300'
+                      : 'bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800'
+                  }`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5">
+              邀请权限
+            </label>
+            <div className="grid grid-cols-2 gap-2">
+              {INVITE_MODE_OPTIONS.map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => setInviteMode(option.value)}
+                  className={`px-3 py-2 text-xs font-medium rounded-lg border transition-all active:scale-[0.98] ${
+                    inviteMode === option.value
+                      ? 'bg-brand-50 dark:bg-brand-900/20 border-brand-300 dark:border-brand-700 text-brand-700 dark:text-brand-300'
+                      : 'bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800'
+                  }`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5">
+              群公告（可选）
+            </label>
+            <textarea
+              placeholder="群规则、学习安排或入群须知"
+              value={announcement}
+              onChange={(e) => setAnnouncement(e.target.value)}
+              maxLength={512}
+              rows={2}
               className="w-full px-3 py-2 text-sm bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 dark:focus:ring-brand-900/30 transition-all resize-none"
             />
           </div>
@@ -201,7 +339,7 @@ const CreateGroupPanel: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
 const SearchGroupPanel: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const [keyword, setKeyword] = useState('');
-  const [searchType, setSearchType] = useState<'name' | 'id'>('name');
+  const [searchType, setSearchType] = useState<'name' | 'number'>('name');
   const [results, setResults] = useState<GroupResponse[]>([]);
   const [searching, setSearching] = useState(false);
   const [applyingTo, setApplyingTo] = useState<Set<number>>(new Set());
@@ -211,27 +349,8 @@ const SearchGroupPanel: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     if (!trimmed) return;
     setSearching(true);
     try {
-      if (searchType === 'id') {
-        const groupId = parseInt(trimmed, 10);
-        if (isNaN(groupId)) {
-          toast.warning('请输入有效的群ID');
-          setSearching(false);
-          return;
-        }
-        const res = await api.getGroupInfo({ groupId });
-        setResults(res.data?.data ? [res.data.data] : []);
-      } else {
-        const res = await api.searchGroups({ keyword: trimmed, pageNum: 1, pageSize: 20 });
-        const data = res.data?.data;
-        if (data && Array.isArray(data)) {
-          setResults(data);
-        } else if (data && typeof data === 'object' && 'groups' in data) {
-          const groups = (data as { groups?: GroupResponse[] }).groups || [];
-          setResults(groups);
-        } else {
-          setResults([]);
-        }
-      }
+      const res = await api.searchGroups({ keyword: trimmed, pageNum: 1, pageSize: 20 });
+      setResults(extractGroupResults(res.data?.data));
     } catch {
       toast.error('搜索失败');
     } finally {
@@ -242,8 +361,13 @@ const SearchGroupPanel: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const handleApply = async (groupId: number) => {
     setApplyingTo((prev) => new Set(prev).add(groupId));
     try {
-      await api.applyToJoin({ groupId });
-      toast.success('申请已发送');
+      const res = await api.applyToJoin({ groupId });
+      if (res.data?.data) {
+        toast.success('申请已发送');
+      } else {
+        toast.success('已加入群聊');
+        onBack();
+      }
     } catch {
       toast.error('申请失败');
     } finally {
@@ -274,7 +398,7 @@ const SearchGroupPanel: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         <div className="flex gap-2">
           {[
             { key: 'name' as const, label: '按名称' },
-            { key: 'id' as const, label: '按群ID' },
+            { key: 'number' as const, label: '按群号' },
           ].map((opt) => (
             <button
               key={opt.key}
@@ -294,8 +418,9 @@ const SearchGroupPanel: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           <div className="relative flex-1">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
-              type={searchType === 'id' ? 'number' : 'text'}
-              placeholder={searchType === 'id' ? '输入群ID' : '输入群名称'}
+              type="text"
+              inputMode={searchType === 'number' ? 'numeric' : 'text'}
+              placeholder={searchType === 'number' ? '输入群号' : '输入群名称'}
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && !e.nativeEvent.isComposing && handleSearch()}
@@ -317,7 +442,7 @@ const SearchGroupPanel: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         {results.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-gray-400">
             <Globe size={48} className="mb-3 opacity-40" />
-            <p className="text-sm">{searchType === 'id' ? '输入群ID搜索' : '输入群名称搜索'}</p>
+            <p className="text-sm">{searchType === 'number' ? '输入群号搜索' : '输入群名称搜索'}</p>
           </div>
         ) : (
           <div className="p-4 space-y-3">
@@ -333,7 +458,7 @@ const SearchGroupPanel: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                       {group.groupName || '未知群聊'}
                     </p>
                     <div className="flex items-center gap-3 text-xs text-gray-400 mt-0.5">
-                      <span>ID: {group.id}</span>
+                      <span>群号: {group.groupNumber || group.id}</span>
                       <span className="flex items-center gap-0.5">
                         <Users size={11} />
                         {group.memberCount || 0} 人
@@ -347,7 +472,7 @@ const SearchGroupPanel: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                   </div>
                   <button
                     onClick={() => handleApply(group.id!)}
-                    disabled={applyingTo.has(group.id!)}
+                    disabled={applyingTo.has(group.id!) || group.joinMode === 2}
                     className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-white bg-brand-500 hover:bg-brand-600 disabled:opacity-50 rounded-lg transition-colors whitespace-nowrap"
                   >
                     {applyingTo.has(group.id!) ? (
@@ -355,7 +480,7 @@ const SearchGroupPanel: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                     ) : (
                       <>
                         <UserPlus size={14} />
-                        申请加入
+                        {getJoinActionLabel(group.joinMode)}
                       </>
                     )}
                   </button>
@@ -494,6 +619,7 @@ const GroupChatPanel: React.FC = () => {
             groupName={activeGroup.groupName}
             groupAvatar={activeGroup.avatar}
             onBack={() => setActiveGroupId(null)}
+            onGroupUpdated={loadGroups}
           />
         ) : (
           <div className="flex-1 flex flex-col items-center justify-center text-gray-400">

@@ -20,7 +20,7 @@ interface ChatContextValue {
   disconnect: () => void;
 
   // 私聊
-  sendPrivateMessage: (receiverId: number, content: string, type?: string) => void;
+  sendPrivateMessage: (receiverId: number, content: string, type?: string, replyTo?: number) => void;
   markAsRead: (senderId: number) => void;
   chatMessages: WsChatMessage[];
   clearChatMessages: () => void;
@@ -154,8 +154,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     wsRef.current.disconnect();
   }, []);
 
-  const sendPrivateMessage = useCallback((receiverId: number, content: string, type = 'TEXT') => {
-    wsRef.current.sendPrivateMessage(receiverId, content, type);
+  const sendPrivateMessage = useCallback((receiverId: number, content: string, type = 'TEXT', replyTo?: number) => {
+    wsRef.current.sendPrivateMessage(receiverId, content, type, replyTo);
   }, []);
 
   const markAsRead = useCallback((senderId: number) => {

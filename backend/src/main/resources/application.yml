@@ -32,6 +32,16 @@ spring:
       connection-timeout: 30000
       max-lifetime: 1800000
 
+  # ---- 数据库增量迁移（Flyway）----
+  # backend/sql 仍用于全新 PostgreSQL 数据卷初始化；db/migration 用于已有数据库的结构升级。
+  flyway:
+    enabled: ${FLYWAY_ENABLED:true}
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    baseline-version: 0
+    validate-on-migrate: true
+    out-of-order: false
+
   # ---- Redis ----
   data:
     redis:

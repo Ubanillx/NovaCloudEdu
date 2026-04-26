@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   ArrowLeft, Send, User, Loader2, MessageCircle, Check, CheckCheck,
-  Image, Paperclip, Upload, Phone, Video,
+  Image, Paperclip, Upload, Phone, Video, Reply,
 } from 'lucide-react';
 import { apiClient, DefaultApi, Configuration } from '../../api';
 import type { ChatSessionResponse, ChatMessageResponse } from '../../api/generated/models';
@@ -9,6 +9,7 @@ import { useChat } from '../../context/ChatContext';
 import { useRtc } from '../../context/RtcContext';
 import toast from '../ui/Toast';
 import { MessageBubble } from './MessageContent';
+import { ReplyComposerBar, ReplyPreview } from './MessageReply';
 import { useChatUpload } from './useChatUpload';
 
 const api = new DefaultApi(new Configuration(), '', apiClient);
@@ -146,13 +147,18 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   const [loading, setLoading] = useState(true);
   const [inputValue, setInputValue] = useState('');
   const [sending, setSending] = useState(false);
+  const [replyingTo, setReplyingTo] = useState<ChatMessageResponse | null>(null);
+  const [highlightedMessageId, setHighlightedMessageId] = useState<number | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const messageRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const currentUserId = useRef<string>(getCurrentUserId());
 
   // 上传功能
   const handleUploadSend = useCallback((content: string, type: string) => {
     const userInfo = (() => { try { return JSON.parse(localStorage.getItem('user_info') || '{}'); } catch { return {}; } })();
+    const replyTo = replyingTo?.messageId;
+    setReplyingTo(null);
     const optimisticMsg: ChatMessageResponse = {
       messageId: Date.now(),
       senderId: -1,
@@ -161,12 +167,13 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
       receiverId: partnerId,
       content,
       type,
+      replyTo,
       createTime: new Date().toISOString(),
       read: false,
     };
     setMessages((prev) => [...prev, optimisticMsg]);
-    sendPrivateMessage(partnerId, content, type);
-  }, [partnerId, sendPrivateMessage]);
+    sendPrivateMessage(partnerId, content, type, replyTo);
+  }, [partnerId, replyingTo, sendPrivateMessage]);
 
   const {
     uploading, isDragging, imageInputRef, fileInputRef,
@@ -211,6 +218,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
         receiverId: latest.receiverId,
         content: latest.content,
         type: latest.type,
+        replyTo: latest.replyTo,
         createTime: latest.createTime,
         read: latest.isRead,
       };
@@ -267,6 +275,8 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
 
     setSending(true);
     setInputValue('');
+    const replyTo = replyingTo?.messageId;
+    setReplyingTo(null);
 
     // 乐观更新（senderId 用 -1 作为占位标记，后续 WebSocket 回传时替换）
     const userInfo = (() => { try { return JSON.parse(localStorage.getItem('user_info') || '{}'); } catch { return {}; } })();
@@ -278,13 +288,14 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
       receiverId: partnerId,
       content,
       type: 'TEXT',
+      replyTo,
       createTime: new Date().toISOString(),
       read: false,
     };
     setMessages((prev) => [...prev, optimisticMsg]);
 
     try {
-      sendPrivateMessage(partnerId, content, 'TEXT');
+      sendPrivateMessage(partnerId, content, 'TEXT', replyTo);
     } catch {
       toast.error('发送失败');
     } finally {
@@ -295,6 +306,21 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   // 判断是否是自己发送的消息（ID 转字符串比较，避免大整数精度丢失）
   const isSelf = (msg: ChatMessageResponse) =>
     msg.senderId === -1 || (currentUserId.current !== '' && String(msg.senderId) === currentUserId.current);
+
+  const findReplyMessage = (replyTo?: number) =>
+    replyTo ? messages.find((msg) => String(msg.messageId) === String(replyTo)) || null : null;
+
+  const scrollToMessage = (messageId?: number) => {
+    if (!messageId) return;
+    const node = messageRefs.current[String(messageId)];
+    if (!node) {
+      toast.info('引用的消息不在当前记录中');
+      return;
+    }
+    node.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setHighlightedMessageId(messageId);
+    window.setTimeout(() => setHighlightedMessageId((current) => (current === messageId ? null : current)), 1400);
+  };
 
   return (
     <div className="flex flex-col h-full">
@@ -362,7 +388,12 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
             return (
               <div
                 key={msg.messageId}
-                className={`flex gap-2 ${self ? 'flex-row-reverse' : ''}`}
+                ref={(node) => { if (msg.messageId) messageRefs.current[String(msg.messageId)] = node; }}
+                className={`group flex gap-2 rounded-2xl transition-shadow ${self ? 'flex-row-reverse' : ''} ${
+                  highlightedMessageId && String(highlightedMessageId) === String(msg.messageId)
+                    ? 'ring-2 ring-brand-300 ring-offset-2 ring-offset-gray-50 dark:ring-offset-gray-950'
+                    : ''
+                }`}
               >
                 <Avatar
                   src={self ? (msg.senderAvatar || undefined) : (msg.senderAvatar || partnerAvatar)}
@@ -370,7 +401,20 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
                   size="sm"
                 />
                 <div className={`max-w-[70%] ${self ? 'items-end' : 'items-start'} flex flex-col`}>
-                  <MessageBubble content={msg.content || ''} type={msg.type || 'TEXT'} isSelf={self} />
+                  <MessageBubble
+                    content={msg.content || ''}
+                    type={msg.type || 'TEXT'}
+                    isSelf={self}
+                    replyPreview={msg.replyTo ? (
+                      <ReplyPreview
+                        message={findReplyMessage(msg.replyTo)}
+                        fallbackName={partnerName}
+                        isSelf={self}
+                        embedded
+                        onClick={() => scrollToMessage(msg.replyTo)}
+                      />
+                    ) : undefined}
+                  />
                   <div className={`flex items-center gap-1 mt-1 ${self ? 'flex-row-reverse' : ''}`}>
                     <span className="text-[10px] text-gray-400">
                       {formatMessageTime(msg.createTime)}
@@ -384,6 +428,16 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
                     )}
                   </div>
                 </div>
+                {msg.messageId && msg.senderId !== -1 && (
+                  <button
+                    type="button"
+                    onClick={() => setReplyingTo(msg)}
+                    className="self-center p-1.5 rounded-lg text-gray-300 hover:text-brand-500 hover:bg-white dark:hover:bg-gray-800 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-all"
+                    title="引用回复"
+                  >
+                    <Reply size={14} />
+                  </button>
+                )}
               </div>
             );
           })
@@ -405,6 +459,13 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
 
       {/* 输入栏 */}
       <div className="px-4 py-3 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
+        {replyingTo && (
+          <ReplyComposerBar
+            message={replyingTo}
+            fallbackName={partnerName}
+            onCancel={() => setReplyingTo(null)}
+          />
+        )}
         <div className="flex items-center gap-1.5">
           {/* 图片按钮 */}
           <button

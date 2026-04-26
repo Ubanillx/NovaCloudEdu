@@ -421,6 +421,7 @@ interface MessageBubbleProps {
   content: string;
   type: string;
   isSelf: boolean;
+  replyPreview?: React.ReactNode;
 }
 
 /**
@@ -429,22 +430,58 @@ interface MessageBubbleProps {
  * - FILE：显示文件卡片，无气泡
  * - TEXT/AUDIO/VIDEO：包裹在聊天气泡中
  */
-export const MessageBubble: React.FC<MessageBubbleProps> = ({ content, type, isSelf }) => {
+export const MessageBubble: React.FC<MessageBubbleProps> = ({ content, type, isSelf, replyPreview }) => {
   const upperType = (type || 'TEXT').toUpperCase();
 
   // 图片消息：不需要气泡
   if (upperType === 'IMAGE') {
-    return <ImageMessage content={content} />;
+    if (!replyPreview) return <ImageMessage content={content} />;
+    return (
+      <div
+        className={`max-w-[260px] overflow-hidden rounded-2xl p-2 shadow-sm ${
+          isSelf
+            ? 'bg-brand-500 text-white rounded-tr-sm'
+            : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-tl-sm border border-gray-100 dark:border-gray-800'
+        }`}
+      >
+        {replyPreview}
+        <ImageMessage content={content} />
+      </div>
+    );
   }
 
   // 文件消息：自带卡片样式，不需要气泡
   if (upperType === 'FILE') {
-    return <FileMessage content={content} isSelf={isSelf} />;
+    if (!replyPreview) return <FileMessage content={content} isSelf={isSelf} />;
+    return (
+      <div
+        className={`max-w-[280px] rounded-2xl p-2 shadow-sm ${
+          isSelf
+            ? 'bg-brand-500 text-white rounded-tr-sm'
+            : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-tl-sm border border-gray-100 dark:border-gray-800'
+        }`}
+      >
+        {replyPreview}
+        <FileMessage content={content} isSelf={isSelf} />
+      </div>
+    );
   }
 
   // 通话消息：自带卡片样式，不需要气泡
   if (upperType === 'CALL') {
-    return <CallMessage content={content} isSelf={isSelf} />;
+    if (!replyPreview) return <CallMessage content={content} isSelf={isSelf} />;
+    return (
+      <div
+        className={`rounded-2xl p-2 shadow-sm ${
+          isSelf
+            ? 'bg-brand-500 text-white rounded-tr-sm'
+            : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-tl-sm border border-gray-100 dark:border-gray-800'
+        }`}
+      >
+        {replyPreview}
+        <CallMessage content={content} isSelf={isSelf} />
+      </div>
+    );
   }
 
   // 其他消息（TEXT/AUDIO/VIDEO）：包裹气泡
@@ -459,12 +496,13 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ content, type, isS
 
   return (
     <div
-      className={`px-4 py-2.5 shadow-sm ${
+      className={`min-w-0 max-w-full px-4 py-2.5 shadow-sm ${
         isSelf
           ? 'bg-brand-500 text-white rounded-2xl rounded-tr-sm'
           : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-2xl rounded-tl-sm border border-gray-100 dark:border-gray-800'
       }`}
     >
+      {replyPreview}
       {inner}
     </div>
   );

@@ -65,7 +65,15 @@ public class GroupChatApplicationService {
         }
 
         // 创建消息
-        GroupMessageId replyTo = replyToId != null ? GroupMessageId.of(replyToId) : null;
+        GroupMessageId replyTo = null;
+        if (replyToId != null) {
+            GroupMessage quotedMessage = messageRepository.findById(GroupMessageId.of(replyToId))
+                    .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_ERROR, "引用消息不存在"));
+            if (!quotedMessage.getGroupId().equals(groupIdVo)) {
+                throw new BusinessException(ErrorCode.FORBIDDEN_ERROR, "不能引用当前群聊外的消息");
+            }
+            replyTo = quotedMessage.getId();
+        }
         GroupMessage message = GroupMessage.createUserMessage(groupIdVo, senderIdVo, content, type, replyTo);
 
         // 保存消息

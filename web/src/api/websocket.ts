@@ -282,14 +282,19 @@ class WebSocketService {
 
   // ============ 发送消息 ============
 
-  sendPrivateMessage(receiverId: number, content: string, type: string = 'TEXT'): void {
+  sendPrivateMessage(receiverId: number, content: string, type: string = 'TEXT', replyTo?: number): void {
     if (!this.client?.connected) {
       console.warn('[WS] 未连接，无法发送私聊消息');
       return;
     }
     this.client.publish({
       destination: '/app/chat.send',
-      body: JSON.stringify({ receiverId, content, type }),
+      body: JSON.stringify({
+        receiverId,
+        content,
+        type,
+        ...(replyTo != null && { replyTo }),
+      }),
     });
   }
 

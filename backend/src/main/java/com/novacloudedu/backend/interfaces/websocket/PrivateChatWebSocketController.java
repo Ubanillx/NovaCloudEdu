@@ -56,7 +56,8 @@ public class PrivateChatWebSocketController {
                     senderId,
                     chatMessage.getReceiverId(),
                     chatMessage.getContent(),
-                    MessageType.fromValue(chatMessage.getType())
+                    MessageType.fromValue(chatMessage.getType()),
+                    chatMessage.getReplyTo()
             );
 
             PrivateMessage message = privateChatApplicationService.sendMessage(command);
@@ -70,6 +71,7 @@ public class PrivateChatWebSocketController {
                     .receiverId(chatMessage.getReceiverId())
                     .content(chatMessage.getContent())
                     .type(chatMessage.getType())
+                    .replyTo(chatMessage.getReplyTo())
                     .createTime(message.getCreateTime())
                     .isRead(false)
                     .build();

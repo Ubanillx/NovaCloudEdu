@@ -9,6 +9,7 @@ public record SendPrivateMessageCommand(
         Long senderId,
         Long receiverId,
         String content,
-        MessageType type
+        MessageType type,
+        Long replyTo
 ) {
 }

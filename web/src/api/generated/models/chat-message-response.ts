@@ -22,7 +22,7 @@ export interface ChatMessageResponse {
     'receiverId'?: number;
     'content'?: string;
     'type'?: string;
+    'replyTo'?: number;
     'createTime'?: string;
     'read'?: boolean;
 }
-

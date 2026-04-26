@@ -10,6 +10,7 @@ export interface WsChatMessage {
   receiverId: number;
   content?: string;
   type: MessageType;
+  replyTo?: number;
   createTime?: string;
   isRead?: boolean;
 }

@@ -52,6 +52,11 @@ public class ChatMessageResponse {
     private String type;
 
     /**
+     * 回复的消息ID
+     */
+    private Long replyTo;
+
+    /**
      * 发送时间
      */
     private LocalDateTime createTime;

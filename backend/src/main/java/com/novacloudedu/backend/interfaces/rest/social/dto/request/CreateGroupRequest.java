@@ -19,4 +19,17 @@ public class CreateGroupRequest {
 
     @Size(max = 1024, message = "头像URL最长1024字符")
     private String avatar;
+
+    /**
+     * 加入方式：0-自由加入，1-需审批，2-禁止加入
+     */
+    private Integer joinMode;
+
+    /**
+     * 邀请权限：0-所有成员可邀请，1-仅管理员可邀请
+     */
+    private Integer inviteMode;
+
+    @Size(max = 512, message = "群公告最长512字符")
+    private String announcement;
 }

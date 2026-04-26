@@ -180,6 +180,7 @@ public class PrivateChatController {
                 .receiverId(message.getReceiverId().value())
                 .content(message.getContent())
                 .type(message.getType().getValue())
+                .replyTo(message.getReplyTo() != null ? message.getReplyTo().value() : null)
                 .createTime(message.getCreateTime())
                 .isRead(message.isRead())
                 .build();

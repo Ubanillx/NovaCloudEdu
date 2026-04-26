@@ -22,4 +22,9 @@ public class ChatMessageDTO {
      * 消息类型：text/image/file/audio/video
      */
     private String type = "text";
+
+    /**
+     * 回复的消息ID（可选）
+     */
+    private Long replyTo;
 }

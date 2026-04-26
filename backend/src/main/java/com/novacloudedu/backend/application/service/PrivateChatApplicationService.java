@@ -55,12 +55,24 @@ public class PrivateChatApplicationService {
             throw new BusinessException(ErrorCode.FORBIDDEN_ERROR, "只能给好友发送消息");
         }
 
+        MessageId replyTo = null;
+        if (command.replyTo() != null) {
+            PrivateMessage quotedMessage = privateMessageRepository.findById(MessageId.of(command.replyTo()))
+                    .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_ERROR, "引用消息不存在"));
+            boolean sameConversation = quotedMessage.belongsTo(senderId) && quotedMessage.belongsTo(receiverId);
+            if (!sameConversation) {
+                throw new BusinessException(ErrorCode.FORBIDDEN_ERROR, "不能引用当前会话外的消息");
+            }
+            replyTo = quotedMessage.getId();
+        }
+
         // 创建消息
         PrivateMessage message = PrivateMessage.create(
                 senderId,
                 receiverId,
                 command.content(),
-                command.type()
+                command.type(),
+                replyTo
         );
 
         // 保存消息

@@ -668,7 +668,8 @@ resources/
 ├── application.yml                  # 公共配置（JWT/MyBatis-Plus/SpringDoc）
 ├── application-dev.example.yml      # 开发环境配置模板（★ 复制为 application-dev.yml 使用）
 ├── application-dev.yml              # 开发环境配置（gitignore，不提交）
-└── application-prod.yml             # 生产环境配置
+├── application-prod.yml             # 生产环境配置
+└── db/migration/                    # Flyway 增量迁移脚本（启动自动执行）
 ```
 
 ## SQL 脚本
@@ -707,6 +708,19 @@ sql/
 ├── 96_grading_add_mode_title.sql    # 批改模式和标题字段
 └── 99_seed_data.sql                 # 种子数据
 ```
+
+### 数据库迁移
+
+`backend/sql/*.sql` 用于全新 PostgreSQL 数据卷的完整初始化；已有数据库的结构变更由 Flyway 自动迁移完成。
+
+新增字段或索引时按这个流程处理：
+
+1. 先修改对应的 `backend/sql/*.sql`，保证新库初始化就是最新结构。
+2. 再在 `src/main/resources/db/migration/` 新增迁移脚本，命名格式为 `VyyyyMMddHHmm__description.sql`。
+3. 迁移脚本尽量幂等，例如 `ADD COLUMN IF NOT EXISTS`、`CREATE INDEX IF NOT EXISTS`。
+4. 后端重启时会自动执行尚未执行过的迁移，并记录到 `flyway_schema_history`。
+
+已执行过的迁移文件不要再改；如果需要修正，新增下一条迁移。
 
 ---
 

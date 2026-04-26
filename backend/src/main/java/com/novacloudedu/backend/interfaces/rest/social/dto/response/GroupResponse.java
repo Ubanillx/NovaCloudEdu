@@ -1,5 +1,7 @@
 package com.novacloudedu.backend.interfaces.rest.social.dto.response;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.novacloudedu.backend.domain.social.entity.ChatGroup;
 import lombok.Data;
 
@@ -10,6 +12,8 @@ import java.time.LocalDateTime;
  */
 @Data
 public class GroupResponse {
+
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private Long id;
     private String groupNumber; // 群号
@@ -41,9 +45,24 @@ public class GroupResponse {
         response.setInviteMode(group.getInviteMode().getCode());
         response.setJoinMode(group.getJoinMode().getCode());
         response.setMute(group.isMute());
-        response.setAnnouncement(group.getAnnouncement());
+        response.setAnnouncement(normalizeAnnouncement(group.getAnnouncement()));
         response.setAnnouncementTime(group.getAnnouncementTime());
         response.setCreateTime(group.getCreateTime());
         return response;
+    }
+
+    private static String normalizeAnnouncement(String announcement) {
+        if (announcement == null) {
+            return null;
+        }
+        String trimmed = announcement.trim();
+        if (trimmed.length() >= 2 && trimmed.startsWith("\"") && trimmed.endsWith("\"")) {
+            try {
+                return OBJECT_MAPPER.readValue(trimmed, String.class);
+            } catch (JsonProcessingException ignored) {
+                return trimmed.substring(1, trimmed.length() - 1);
+            }
+        }
+        return announcement;
     }
 }
