@@ -710,6 +710,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const shouldAutoScrollRef = useRef(true);
   const [showScrollBtn, setShowScrollBtn] = useState(false);
   const [pendingImages, setPendingImages] = useState<File[]>([]);
   const [pendingDocs, setPendingDocs] = useState<File[]>([]);
@@ -718,16 +719,20 @@ const ChatArea: React.FC<ChatAreaProps> = ({
   const docInputRef = useRef<HTMLInputElement>(null);
   const voiceBaseInputRef = useRef('');
 
-  const scrollToBottom = useCallback(() => {
+  const scrollToBottom = useCallback((behavior: ScrollBehavior = 'auto') => {
     const container = messagesContainerRef.current;
     if (container) {
-      container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+      shouldAutoScrollRef.current = true;
+      setShowScrollBtn(false);
+      container.scrollTo({ top: container.scrollHeight, behavior });
     }
   }, []);
 
-  // 自动滚动
+  // 贴近底部时自动跟随流式输出；用户上拉后暂停自动滚动
   useEffect(() => {
-    scrollToBottom();
+    if (shouldAutoScrollRef.current) {
+      scrollToBottom('auto');
+    }
   }, [messages, streamingContent, scrollToBottom]);
 
   // 检测是否需要显示滚动按钮
@@ -736,7 +741,10 @@ const ChatArea: React.FC<ChatAreaProps> = ({
     if (!container) return;
     const handleScroll = () => {
       const { scrollTop, scrollHeight, clientHeight } = container;
-      setShowScrollBtn(scrollHeight - scrollTop - clientHeight > 100);
+      const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
+      const isNearBottom = distanceFromBottom <= 120;
+      shouldAutoScrollRef.current = isNearBottom;
+      setShowScrollBtn(!isNearBottom);
     };
     container.addEventListener('scroll', handleScroll);
     return () => container.removeEventListener('scroll', handleScroll);
@@ -757,6 +765,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
 
     setInput('');
     if (textareaRef.current) textareaRef.current.style.height = 'auto';
+    shouldAutoScrollRef.current = true;
 
     // 上传附件
     let imageUrls: string[] | undefined;
@@ -1035,7 +1044,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
         {/* 滚动到底部按钮 */}
         {showScrollBtn && (
           <button
-            onClick={scrollToBottom}
+            onClick={() => scrollToBottom('smooth')}
             className="absolute bottom-4 right-4 p-2 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all text-gray-500 hover:text-brand-500"
           >
             <ArrowDown size={18} />

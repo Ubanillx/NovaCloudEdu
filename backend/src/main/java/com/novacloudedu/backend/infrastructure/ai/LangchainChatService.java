@@ -298,6 +298,14 @@ public class LangchainChatService {
         return chatModelFactory.listAvailableModels();
     }
 
+    public List<Map<String, Object>> listAvailableModels(String provider) {
+        return chatModelFactory.listAvailableModels(provider);
+    }
+
+    public List<Map<String, Object>> listAvailableProviders() {
+        return chatModelFactory.listAvailableProviders();
+    }
+
     /**
      * 获取全量模型列表（含未启用的，标注状态）
      */

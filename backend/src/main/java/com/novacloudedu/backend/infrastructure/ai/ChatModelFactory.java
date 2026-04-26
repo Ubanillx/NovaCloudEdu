@@ -4,6 +4,8 @@ import com.novacloudedu.backend.config.ChatModelProperties;
 import com.novacloudedu.backend.config.ChatModelProperties.ModelConfig;
 import com.novacloudedu.backend.config.ChatModelProperties.ProviderAndModel;
 import com.novacloudedu.backend.config.ChatModelProperties.ProviderConfig;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.chat.StreamingChatModel;
 import dev.langchain4j.community.model.dashscope.QwenChatModel;
@@ -16,11 +18,18 @@ import dev.langchain4j.community.model.zhipu.ZhipuAiChatModel;
 import dev.langchain4j.community.model.zhipu.ZhipuAiStreamingChatModel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Comparator;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -40,11 +49,16 @@ import java.util.stream.Collectors;
 public class ChatModelFactory {
 
     private final ChatModelProperties properties;
+    private final RestTemplate restTemplate;
+    private final ObjectMapper objectMapper;
 
     /** 流式模型实例缓存 */
     private final Map<String, StreamingChatModel> modelCache = new ConcurrentHashMap<>();
     /** 非流式模型实例缓存（用于 tool calling） */
     private final Map<String, ChatModel> chatModelCache = new ConcurrentHashMap<>();
+    private volatile List<Map<String, Object>> openRouterModelCache = List.of();
+    private volatile long openRouterModelCacheAt = 0L;
+    private static final long OPENROUTER_MODEL_CACHE_TTL_MS = 10 * 60 * 1000L;
 
     /**
      * 获取流式聊天模型（带缓存）
@@ -76,6 +90,35 @@ public class ChatModelFactory {
         return listAllModels(true);
     }
 
+    public List<Map<String, Object>> listAvailableModels(String providerName) {
+        return listAllModels(true).stream()
+                .filter(model -> providerName == null || providerName.isBlank()
+                        || providerName.equals(model.get("provider")))
+                .collect(Collectors.toList());
+    }
+
+    public List<Map<String, Object>> listAvailableProviders() {
+        Map<String, Long> modelCounts = listAllModels(true).stream()
+                .collect(Collectors.groupingBy(
+                        model -> String.valueOf(model.get("provider")),
+                        LinkedHashMap::new,
+                        Collectors.counting()
+                ));
+
+        return properties.getProviders().entrySet().stream()
+                .filter(e -> e.getValue().isEnabled())
+                .map(e -> {
+                    Map<String, Object> info = new LinkedHashMap<>();
+                    info.put("provider", e.getKey());
+                    info.put("enabled", e.getValue().isEnabled());
+                    info.put("modelCount", modelCounts.getOrDefault(e.getKey(), 0L));
+                    info.put("isDefault", properties.getDefaultModel() != null
+                            && properties.getDefaultModel().startsWith(e.getKey() + "/"));
+                    return info;
+                })
+                .collect(Collectors.toList());
+    }
+
     /**
      * 获取全量模型列表（包含所有供应商，标注启用状态和默认标记）
      */
@@ -85,20 +128,147 @@ public class ChatModelFactory {
 
         return properties.getProviders().entrySet().stream()
                 .filter(e -> !enabledOnly || e.getValue().isEnabled())
-                .flatMap(provider -> provider.getValue().getModels().entrySet().stream()
-                        .map(model -> {
-                            String modelId = provider.getKey() + "/" + model.getKey();
-                            Map<String, Object> info = new LinkedHashMap<>();
-                            info.put("modelId", modelId);
-                            info.put("provider", provider.getKey());
-                            info.put("model", model.getKey());
-                            info.put("type", model.getValue().getType());
-                            info.put("enabled", provider.getValue().isEnabled());
-                            info.put("isDefault", modelId.equals(defaultModel));
-                            info.put("isDefaultVision", modelId.equals(defaultVision));
-                            return info;
-                        }))
+                .flatMap(provider -> {
+                    if ("openrouter".equals(provider.getKey()) && provider.getValue().isEnabled()) {
+                        return listOpenRouterModels(provider.getValue(), defaultModel, defaultVision).stream();
+                    }
+                    return listConfiguredModels(provider.getKey(), provider.getValue(), defaultModel, defaultVision).stream();
+                })
                 .collect(Collectors.toList());
+    }
+
+    private List<Map<String, Object>> listConfiguredModels(String providerName, ProviderConfig providerConfig,
+                                                           String defaultModel, String defaultVision) {
+        return providerConfig.getModels().entrySet().stream()
+                .map(model -> buildModelInfo(
+                        providerName,
+                        model.getKey(),
+                        model.getKey(),
+                        model.getValue(),
+                        providerConfig.isEnabled(),
+                        defaultModel,
+                        defaultVision,
+                        null,
+                        null
+                ))
+                .collect(Collectors.toList());
+    }
+
+    private List<Map<String, Object>> listOpenRouterModels(ProviderConfig providerConfig,
+                                                           String defaultModel, String defaultVision) {
+        List<Map<String, Object>> dynamicModels = fetchOpenRouterModels(providerConfig, defaultModel, defaultVision);
+        if (!dynamicModels.isEmpty()) {
+            return dynamicModels;
+        }
+        return listConfiguredModels("openrouter", providerConfig, defaultModel, defaultVision);
+    }
+
+    private List<Map<String, Object>> fetchOpenRouterModels(ProviderConfig providerConfig,
+                                                            String defaultModel, String defaultVision) {
+        long now = System.currentTimeMillis();
+        if (!openRouterModelCache.isEmpty() && now - openRouterModelCacheAt < OPENROUTER_MODEL_CACHE_TTL_MS) {
+            return openRouterModelCache;
+        }
+
+        try {
+            String baseUrl = providerConfig.getBaseUrl() != null && !providerConfig.getBaseUrl().isBlank()
+                    ? providerConfig.getBaseUrl()
+                    : "https://openrouter.ai/api/v1";
+            String url = baseUrl.replaceAll("/+$", "") + "/models?output_modalities=text";
+
+            HttpHeaders headers = new HttpHeaders();
+            if (providerConfig.getApiKey() != null && !providerConfig.getApiKey().isBlank()) {
+                headers.setBearerAuth(providerConfig.getApiKey());
+            }
+
+            ResponseEntity<String> response = restTemplate.exchange(
+                    url, HttpMethod.GET, new HttpEntity<>(headers), String.class);
+            JsonNode data = objectMapper.readTree(response.getBody()).path("data");
+            if (!data.isArray()) {
+                return openRouterModelCache;
+            }
+
+            Map<String, ModelConfig> configuredModels = providerConfig.getModels();
+            List<Map<String, Object>> models = new ArrayList<>();
+            for (JsonNode node : data) {
+                String model = node.path("id").asText("");
+                if (model.isBlank()) {
+                    continue;
+                }
+                ModelConfig configured = configuredModels.get(model);
+                ModelConfig defaults = configured != null ? configured : new ModelConfig();
+                String type = inferOpenRouterModelType(node, defaults);
+                Integer maxTokens = configured != null && configured.getMaxTokens() != null
+                        ? configured.getMaxTokens()
+                        : openRouterMaxTokens(node);
+                Map<String, Object> info = buildModelInfo(
+                        "openrouter",
+                        model,
+                        node.path("name").asText(model),
+                        defaults,
+                        true,
+                        defaultModel,
+                        defaultVision,
+                        node.path("context_length").isNumber() ? node.path("context_length").asInt() : null,
+                        maxTokens
+                );
+                info.put("type", type);
+                info.put("source", configured != null ? "configured+openrouter" : "openrouter");
+                info.put("description", node.path("description").asText(null));
+                models.add(info);
+            }
+
+            models.sort(Comparator.comparing(model -> String.valueOf(model.get("modelId"))));
+            openRouterModelCache = models;
+            openRouterModelCacheAt = now;
+            return models;
+        } catch (Exception e) {
+            log.warn("获取 OpenRouter 模型列表失败，回退到本地配置: {}", e.getMessage());
+            return openRouterModelCache;
+        }
+    }
+
+    private String inferOpenRouterModelType(JsonNode node, ModelConfig defaults) {
+        JsonNode inputs = node.path("architecture").path("input_modalities");
+        if (inputs.isArray()) {
+            for (JsonNode input : inputs) {
+                if ("image".equalsIgnoreCase(input.asText())) {
+                    return "vision";
+                }
+            }
+        }
+        return defaults.getType() != null ? defaults.getType() : "text";
+    }
+
+    private Integer openRouterMaxTokens(JsonNode node) {
+        JsonNode maxCompletion = node.path("top_provider").path("max_completion_tokens");
+        if (maxCompletion.isNumber() && maxCompletion.asInt() > 0) {
+            return Math.min(maxCompletion.asInt(), 8000);
+        }
+        return 2000;
+    }
+
+    private Map<String, Object> buildModelInfo(String providerName, String model, String displayName,
+                                               ModelConfig config, boolean enabled,
+                                               String defaultModel, String defaultVision,
+                                               Integer contextLength, Integer maxTokensOverride) {
+        String modelId = providerName + "/" + model;
+        Map<String, Object> info = new LinkedHashMap<>();
+        info.put("modelId", modelId);
+        info.put("provider", providerName);
+        info.put("model", model);
+        info.put("name", displayName);
+        info.put("type", config.getType());
+        info.put("enabled", enabled);
+        info.put("isDefault", modelId.equals(defaultModel));
+        info.put("isDefaultVision", modelId.equals(defaultVision));
+        info.put("temperature", config.getTemperature());
+        info.put("topP", config.getTopP());
+        info.put("maxTokens", maxTokensOverride != null ? maxTokensOverride : config.getMaxTokens());
+        if (contextLength != null) {
+            info.put("contextLength", contextLength);
+        }
+        return info;
     }
 
     /**

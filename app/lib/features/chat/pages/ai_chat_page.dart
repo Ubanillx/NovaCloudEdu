@@ -46,6 +46,9 @@ class _AiChatPageState extends State<AiChatPage> {
   String _streamingContent = '';
   int? _currentSessionId;
   String _title = '';
+  bool _shouldAutoScroll = true;
+  bool _showScrollToBottom = false;
+  static const double _autoScrollThreshold = 120;
 
   // 文生图状态追踪
   List<ImageGeneration> _imageGenerations = [];
@@ -73,6 +76,7 @@ class _AiChatPageState extends State<AiChatPage> {
     // 如果有智慧体信息，优先使用智慧体名称
     _title = widget.assistantName ?? widget.title;
     _currentSessionId = widget.sessionId;
+    _scrollController.addListener(_handleScroll);
     _initSession();
   }
 
@@ -87,7 +91,7 @@ class _AiChatPageState extends State<AiChatPage> {
           _title = widget.assistantName ?? session.title ?? widget.title;
           _isInitializing = false;
         });
-        _scrollToBottom();
+        _scrollToBottom(force: true);
         return;
       }
     }
@@ -114,20 +118,45 @@ class _AiChatPageState extends State<AiChatPage> {
   void dispose() {
     _chatService.dispose();
     _inputController.dispose();
+    _scrollController.removeListener(_handleScroll);
     _scrollController.dispose();
     _focusNode.dispose();
     super.dispose();
   }
 
-  void _scrollToBottom() {
+  void _handleScroll() {
+    if (!_scrollController.hasClients) return;
+    final distanceFromBottom = _scrollController.position.maxScrollExtent - _scrollController.position.pixels;
+    final isNearBottom = distanceFromBottom <= _autoScrollThreshold;
+    if (_shouldAutoScroll != isNearBottom || _showScrollToBottom != !isNearBottom) {
+      setState(() {
+        _shouldAutoScroll = isNearBottom;
+        _showScrollToBottom = !isNearBottom;
+      });
+    }
+  }
+
+  void _scrollToBottom({bool force = false}) {
+    if (!force && !_shouldAutoScroll) return;
+    if (force) {
+      _shouldAutoScroll = true;
+      if (_showScrollToBottom && mounted) {
+        setState(() => _showScrollToBottom = false);
+      }
+    }
     if (_scrollController.hasClients) {
       Future.delayed(const Duration(milliseconds: 100), () {
-        if (_scrollController.hasClients) {
-          _scrollController.animateTo(
-            _scrollController.position.maxScrollExtent,
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeOut,
-          );
+        if (_scrollController.hasClients && (force || _shouldAutoScroll)) {
+          final target = _scrollController.position.maxScrollExtent;
+          if (force) {
+            _scrollController.animateTo(
+              target,
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeOut,
+            );
+          } else {
+            _scrollController.jumpTo(target);
+          }
         }
       });
     }
@@ -284,7 +313,7 @@ class _AiChatPageState extends State<AiChatPage> {
       _videoGenerations = [];
       _videoResultsMap.clear();
     });
-    _scrollToBottom();
+    _scrollToBottom(force: true);
 
     setState(() => _isUploading = true);
 
@@ -829,33 +858,50 @@ class _AiChatPageState extends State<AiChatPage> {
       return _buildEmptyState(colors);
     }
 
-    return ListView.builder(
-      controller: _scrollController,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-      itemCount: itemCount,
-      physics: const BouncingScrollPhysics(),
-      itemBuilder: (context, index) {
-        // 正常消息
-        if (index < _messages.length) {
-          return _buildMessageItem(_messages[index], colors);
-        }
-        // 流式消息
-        if (hasStreaming && index == _messages.length) {
-          return _buildMessageItem(
-            AiChatMessage(
-              role: 'assistant',
-              content: _streamingContent,
-              isStreaming: true,
+    return Stack(
+      children: [
+        ListView.builder(
+          controller: _scrollController,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+          itemCount: itemCount,
+          physics: const BouncingScrollPhysics(),
+          itemBuilder: (context, index) {
+            // 正常消息
+            if (index < _messages.length) {
+              return _buildMessageItem(_messages[index], colors);
+            }
+            // 流式消息
+            if (hasStreaming && index == _messages.length) {
+              return _buildMessageItem(
+                AiChatMessage(
+                  role: 'assistant',
+                  content: _streamingContent,
+                  isStreaming: true,
+                ),
+                colors,
+              );
+            }
+            // 生成卡片（图片 + 视频）
+            if (hasGenCards) {
+              return _buildGenerationCards(colors);
+            }
+            return const SizedBox.shrink();
+          },
+        ),
+        if (_showScrollToBottom)
+          Positioned(
+            right: 16,
+            bottom: 16,
+            child: FloatingActionButton.small(
+              heroTag: 'ai-chat-scroll-bottom',
+              backgroundColor: colors.surface,
+              foregroundColor: AppTheme.brand,
+              elevation: 4,
+              onPressed: () => _scrollToBottom(force: true),
+              child: const Icon(Icons.keyboard_arrow_down),
             ),
-            colors,
-          );
-        }
-        // 生成卡片（图片 + 视频）
-        if (hasGenCards) {
-          return _buildGenerationCards(colors);
-        }
-        return const SizedBox.shrink();
-      },
+          ),
+      ],
     );
   }
 

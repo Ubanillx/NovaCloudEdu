@@ -147,8 +147,15 @@ public class AiChatController {
 
     @GetMapping("/chat/models")
     @Operation(summary = "获取可用模型列表", description = "仅返回已启用的模型，前端用于模型选择下拉框")
-    public BaseResponse<List<Map<String, Object>>> listModels() {
-        return ResultUtils.success(langchainChatService.listAvailableModels());
+    public BaseResponse<List<Map<String, Object>>> listModels(
+            @RequestParam(required = false) @Parameter(description = "模型供应商") String provider) {
+        return ResultUtils.success(langchainChatService.listAvailableModels(provider));
+    }
+
+    @GetMapping("/chat/model-providers")
+    @Operation(summary = "获取可用模型供应商列表", description = "仅返回已启用的模型供应商")
+    public BaseResponse<List<Map<String, Object>>> listModelProviders() {
+        return ResultUtils.success(langchainChatService.listAvailableProviders());
     }
 
     @GetMapping("/chat/models/all")
