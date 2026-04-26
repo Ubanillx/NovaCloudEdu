@@ -13,6 +13,7 @@ import {
   lookupIpRegions,
   saveStoredIpRegionCache,
 } from '../utils/ipLocation';
+import { getPostTypeLabel } from '../constants/postTypes';
 
 const api = new DefaultApi(new Configuration(), '', apiClient);
 
@@ -420,6 +421,7 @@ const CirclePage: React.FC = () => {
     const hasFavour = favourStatus[post.id!] ?? false;
     const excerpt = stripPostContent(post.content).slice(0, 200);
     const tags = normalizeTags(post.tags);
+    const postTypeLabel = getPostTypeLabel(post.postType);
     const ip = post.ipAddress?.trim();
     const ipRegionText = ip ? (ipRegionCache[ip] || getLocalIpRegionText(ip) || '查询中') : '';
 
@@ -439,6 +441,11 @@ const CirclePage: React.FC = () => {
               {user?.userName || `用户${post.userId || ''}`}
             </p>
             <div className="flex items-center gap-2 mt-0.5">
+              {postTypeLabel && (
+                <span className="rounded-md bg-emerald-50 px-1.5 py-0.5 text-[10px] font-bold text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-300">
+                  {postTypeLabel}
+                </span>
+              )}
               <span className="text-[11px] font-medium text-gray-400 dark:text-gray-500 flex items-center gap-1">
                 <Clock size={11} />
                 {formatTime(post.createTime)}

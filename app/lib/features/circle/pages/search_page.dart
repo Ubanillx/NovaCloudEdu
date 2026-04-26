@@ -7,6 +7,7 @@ import '../../../widgets/cards/app_card.dart';
 import '../../../widgets/common/empty_widget.dart';
 import '../../../widgets/common/loading_widget.dart';
 import '../../../widgets/common/skeleton_widgets.dart';
+import '../constants/post_types.dart';
 import '../services/post_service.dart';
 import 'post_detail_page.dart';
 import 'user_profile_page.dart';
@@ -19,7 +20,8 @@ class SearchPage extends StatefulWidget {
   State<SearchPage> createState() => _SearchPageState();
 }
 
-class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateMixin {
+class _SearchPageState extends State<SearchPage>
+    with SingleTickerProviderStateMixin {
   final PostService _postService = PostService();
   final DefaultApi _api = ApiClient.instance.defaultApi;
   final TextEditingController _searchController = TextEditingController();
@@ -138,10 +140,12 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
 
     try {
       final response = await _api.searchUsers(
-        searchUserRequestDTO: SearchUserRequestDTO((b) => b
-          ..keyword = _keyword
-          ..pageNum = 1
-          ..pageSize = 20),
+        searchUserRequestDTO: SearchUserRequestDTO(
+          (b) => b
+            ..keyword = _keyword
+            ..pageNum = 1
+            ..pageSize = 20,
+        ),
       );
       if (response.data?.data?.records != null) {
         setState(() {
@@ -166,8 +170,9 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
           final index = _posts.indexWhere((p) => p.id == postId);
           if (index != -1) {
             final oldPost = _posts[index];
-            _posts[index] = oldPost.rebuild((b) => b
-              ..thumbNum = (b.thumbNum ?? 0) + (result ? 1 : -1));
+            _posts[index] = oldPost.rebuild(
+              (b) => b..thumbNum = (b.thumbNum ?? 0) + (result ? 1 : -1),
+            );
           }
         });
       }
@@ -187,8 +192,9 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
           final index = _posts.indexWhere((p) => p.id == postId);
           if (index != -1) {
             final oldPost = _posts[index];
-            _posts[index] = oldPost.rebuild((b) => b
-              ..favourNum = (b.favourNum ?? 0) + (result ? 1 : -1));
+            _posts[index] = oldPost.rebuild(
+              (b) => b..favourNum = (b.favourNum ?? 0) + (result ? 1 : -1),
+            );
           }
         });
       }
@@ -216,7 +222,10 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
         foregroundColor: context.colors.textPrimary,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(PhosphorIcons.caretLeft(), color: context.colors.textPrimary),
+          icon: Icon(
+            PhosphorIcons.caretLeft(),
+            color: context.colors.textPrimary,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
         titleSpacing: 0,
@@ -238,7 +247,11 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
       ),
       child: Row(
         children: [
-          Icon(PhosphorIcons.magnifyingGlass(), size: 20, color: colors.textTertiary),
+          Icon(
+            PhosphorIcons.magnifyingGlass(),
+            size: 20,
+            color: colors.textTertiary,
+          ),
           const SizedBox(width: 8),
           Expanded(
             child: TextField(
@@ -259,7 +272,11 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
           if (_searchController.text.isNotEmpty)
             GestureDetector(
               onTap: _clearSearch,
-              child: Icon(PhosphorIcons.x(), size: 18, color: colors.textTertiary),
+              child: Icon(
+                PhosphorIcons.x(),
+                size: 18,
+                color: colors.textTertiary,
+              ),
             ),
         ],
       ),
@@ -272,7 +289,11 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(PhosphorIcons.magnifyingGlass(), size: 64, color: colors.textTertiary),
+          Icon(
+            PhosphorIcons.magnifyingGlass(),
+            size: 64,
+            color: colors.textTertiary,
+          ),
           const SizedBox(height: 16),
           Text(
             '搜索帖子或用户',
@@ -308,10 +329,7 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
         SliverFillRemaining(
           child: TabBarView(
             controller: _tabController,
-            children: [
-              _buildPostResults(),
-              _buildUserResults(),
-            ],
+            children: [_buildPostResults(), _buildUserResults()],
           ),
         ),
       ],
@@ -330,7 +348,8 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
     return NotificationListener<ScrollNotification>(
       onNotification: (notification) {
         if (notification is ScrollEndNotification &&
-            notification.metrics.pixels >= notification.metrics.maxScrollExtent - 200) {
+            notification.metrics.pixels >=
+                notification.metrics.maxScrollExtent - 200) {
           _loadMorePosts();
         }
         return false;
@@ -371,6 +390,7 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
     final isDark = context.isDarkMode;
     final hasThumb = _thumbStatus[post.id] ?? false;
     final hasFavour = _favourStatus[post.id] ?? false;
+    final postTypeLabel = getPostTypeLabel(post.postType);
 
     final userId = post.userId;
     final cachedInfo = userId != null ? _userInfoCache[userId] : null;
@@ -389,10 +409,8 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => PostDetailPage(
-              postId: post.id!,
-              initialPost: post,
-            ),
+            builder: (context) =>
+                PostDetailPage(postId: post.id!, initialPost: post),
           ),
         );
       },
@@ -405,7 +423,8 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
           // 用户信息
           Row(
             children: [
-              cachedInfo?.userAvatar != null && cachedInfo!.userAvatar!.isNotEmpty
+              cachedInfo?.userAvatar != null &&
+                      cachedInfo!.userAvatar!.isNotEmpty
                   ? CircleAvatar(
                       radius: 18,
                       backgroundImage: NetworkImage(cachedInfo.userAvatar!),
@@ -413,8 +432,14 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
                     )
                   : CircleAvatar(
                       radius: 18,
-                      backgroundColor: AppTheme.brand.withOpacity(isDark ? 0.2 : 0.1),
-                      child: Icon(PhosphorIcons.user(), size: 20, color: AppTheme.brand),
+                      backgroundColor: AppTheme.brand.withOpacity(
+                        isDark ? 0.2 : 0.1,
+                      ),
+                      child: Icon(
+                        PhosphorIcons.user(),
+                        size: 20,
+                        color: AppTheme.brand,
+                      ),
                     ),
               const SizedBox(width: 10),
               Expanded(
@@ -429,12 +454,39 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
                         color: colors.textPrimary,
                       ),
                     ),
-                    Text(
-                      _formatTime(post.createTime),
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: colors.textTertiary,
-                      ),
+                    Row(
+                      children: [
+                        if (postTypeLabel.isNotEmpty) ...[
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppTheme.brand.withOpacity(
+                                isDark ? 0.16 : 0.08,
+                              ),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              postTypeLabel,
+                              style: const TextStyle(
+                                fontSize: 10,
+                                color: AppTheme.brand,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                        ],
+                        Text(
+                          _formatTime(post.createTime),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: colors.textTertiary,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -466,7 +518,9 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
             maxLines: 3,
             overflow: TextOverflow.ellipsis,
           ),
-          if (post.tags != null && post.tags!.isNotEmpty && post.tags!.any((t) => t.isNotEmpty)) ...[
+          if (post.tags != null &&
+              post.tags!.isNotEmpty &&
+              post.tags!.any((t) => t.isNotEmpty)) ...[
             const SizedBox(height: 12),
             Wrap(
               spacing: 8,
@@ -474,20 +528,25 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
               children: post.tags!
                   .where((t) => t.isNotEmpty)
                   .take(3)
-                  .map((tag) => Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: AppTheme.brand.withOpacity(isDark ? 0.15 : 0.08),
-                          borderRadius: BorderRadius.circular(12),
+                  .map(
+                    (tag) => Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppTheme.brand.withOpacity(isDark ? 0.15 : 0.08),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        '#$tag',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: AppTheme.brand,
                         ),
-                        child: Text(
-                          '#$tag',
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: AppTheme.brand,
-                          ),
-                        ),
-                      ))
+                      ),
+                    ),
+                  )
                   .toList(),
             ),
           ],
@@ -496,7 +555,9 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
           Row(
             children: [
               _buildActionButton(
-                icon: hasThumb ? PhosphorIcons.thumbsUp(PhosphorIconsStyle.fill) : PhosphorIcons.thumbsUp(),
+                icon: hasThumb
+                    ? PhosphorIcons.thumbsUp(PhosphorIconsStyle.fill)
+                    : PhosphorIcons.thumbsUp(),
                 count: post.thumbNum ?? 0,
                 isActive: hasThumb,
                 activeColor: AppTheme.brand,
@@ -509,7 +570,9 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
               ),
               const SizedBox(width: 24),
               _buildActionButton(
-                icon: hasFavour ? PhosphorIcons.star(PhosphorIconsStyle.fill) : PhosphorIcons.star(),
+                icon: hasFavour
+                    ? PhosphorIcons.star(PhosphorIconsStyle.fill)
+                    : PhosphorIcons.star(),
                 count: post.favourNum ?? 0,
                 isActive: hasFavour,
                 activeColor: colors.warning,
@@ -586,9 +649,7 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => UserProfilePage(
-              userId: user.userId!,
-            ),
+            builder: (context) => UserProfilePage(userId: user.userId!),
           ),
         );
       },
@@ -600,7 +661,8 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
           CircleAvatar(
             radius: 24,
             backgroundColor: AppTheme.brand.withOpacity(0.1),
-            backgroundImage: (user.userAvatar != null && user.userAvatar!.isNotEmpty)
+            backgroundImage:
+                (user.userAvatar != null && user.userAvatar!.isNotEmpty)
                 ? NetworkImage(user.userAvatar!)
                 : null,
             child: (user.userAvatar == null || user.userAvatar!.isEmpty)
@@ -620,14 +682,12 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
                     color: colors.textPrimary,
                   ),
                 ),
-                if (user.userProfile != null && user.userProfile!.isNotEmpty) ...[
+                if (user.userProfile != null &&
+                    user.userProfile!.isNotEmpty) ...[
                   const SizedBox(height: 4),
                   Text(
                     user.userProfile!,
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: colors.textSecondary,
-                    ),
+                    style: TextStyle(fontSize: 13, color: colors.textSecondary),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),

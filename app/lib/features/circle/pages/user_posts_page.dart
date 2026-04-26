@@ -3,6 +3,7 @@ import 'package:nova_api/nova_api.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../../config/app_theme.dart';
 import '../../../widgets/common/skeleton_widgets.dart';
+import '../constants/post_types.dart';
 import '../services/post_service.dart';
 import 'post_detail_page.dart';
 
@@ -11,11 +12,7 @@ class UserPostsPage extends StatefulWidget {
   final int userId;
   final String? userName;
 
-  const UserPostsPage({
-    super.key,
-    required this.userId,
-    this.userName,
-  });
+  const UserPostsPage({super.key, required this.userId, this.userName});
 
   @override
   State<UserPostsPage> createState() => _UserPostsPageState();
@@ -41,9 +38,9 @@ class _UserPostsPageState extends State<UserPostsPage> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('加载失败: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('加载失败: $e')));
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -74,10 +71,7 @@ class _UserPostsPageState extends State<UserPostsPage> {
             ),
             Text(
               '的帖子',
-              style: TextStyle(
-                color: Colors.grey[500],
-                fontSize: 12,
-              ),
+              style: TextStyle(color: Colors.grey[500], fontSize: 12),
             ),
           ],
         ),
@@ -86,15 +80,15 @@ class _UserPostsPageState extends State<UserPostsPage> {
       body: _isLoading
           ? const PostListSkeleton()
           : _posts.isEmpty
-              ? _buildEmptyState()
-              : RefreshIndicator(
-                  onRefresh: _loadPosts,
-                  child: ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: _posts.length,
-                    itemBuilder: (context, index) => _buildPostItem(_posts[index]),
-                  ),
-                ),
+          ? _buildEmptyState()
+          : RefreshIndicator(
+              onRefresh: _loadPosts,
+              child: ListView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: _posts.length,
+                itemBuilder: (context, index) => _buildPostItem(_posts[index]),
+              ),
+            ),
     );
   }
 
@@ -107,10 +101,7 @@ class _UserPostsPageState extends State<UserPostsPage> {
           const SizedBox(height: 16),
           Text(
             '该用户暂无公开帖子',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey[500],
-            ),
+            style: TextStyle(fontSize: 16, color: Colors.grey[500]),
           ),
         ],
       ),
@@ -118,15 +109,14 @@ class _UserPostsPageState extends State<UserPostsPage> {
   }
 
   Widget _buildPostItem(PostResponse post) {
+    final postTypeLabel = getPostTypeLabel(post.postType);
     return GestureDetector(
       onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => PostDetailPage(
-              postId: post.id!,
-              initialPost: post,
-            ),
+            builder: (context) =>
+                PostDetailPage(postId: post.id!, initialPost: post),
           ),
         ).then((_) => _loadPosts());
       },
@@ -142,10 +132,7 @@ class _UserPostsPageState extends State<UserPostsPage> {
           children: [
             Text(
               post.title ?? '',
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
@@ -167,34 +154,68 @@ class _UserPostsPageState extends State<UserPostsPage> {
                 runSpacing: 6,
                 children: post.tags!
                     .take(3)
-                    .map((tag) => Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: AppTheme.brand.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(10),
+                    .map(
+                      (tag) => Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppTheme.brand.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text(
+                          '#$tag',
+                          style: const TextStyle(
+                            fontSize: 11,
+                            color: AppTheme.brand,
                           ),
-                          child: Text(
-                            '#$tag',
-                            style: const TextStyle(
-                              fontSize: 11,
-                              color: AppTheme.brand,
-                            ),
-                          ),
-                        ))
+                        ),
+                      ),
+                    )
                     .toList(),
               ),
             ],
             const SizedBox(height: 12),
             Row(
               children: [
-                Icon(PhosphorIcons.thumbsUp(), size: 14, color: Colors.grey[400]),
+                if (postTypeLabel.isNotEmpty) ...[
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppTheme.brand.withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      postTypeLabel,
+                      style: const TextStyle(
+                        fontSize: 10,
+                        color: AppTheme.brand,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                ],
+                Icon(
+                  PhosphorIcons.thumbsUp(),
+                  size: 14,
+                  color: Colors.grey[400],
+                ),
                 const SizedBox(width: 4),
                 Text(
                   '${post.thumbNum ?? 0}',
                   style: TextStyle(fontSize: 12, color: Colors.grey[500]),
                 ),
                 const SizedBox(width: 16),
-                Icon(PhosphorIcons.chatTeardropText(), size: 14, color: Colors.grey[400]),
+                Icon(
+                  PhosphorIcons.chatTeardropText(),
+                  size: 14,
+                  color: Colors.grey[400],
+                ),
                 const SizedBox(width: 4),
                 Text(
                   '${post.commentNum ?? 0}',

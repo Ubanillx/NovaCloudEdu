@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { apiClient, DefaultApi, Configuration } from '../api';
 import toast from '../components/ui/Toast';
+import { POST_TYPE_OPTIONS, getPostTypeLabel } from '../constants/postTypes';
 
 const api = new DefaultApi(new Configuration(), '', apiClient);
 
@@ -61,6 +62,7 @@ const PostEditPage: React.FC = () => {
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
+  const [postType, setPostType] = useState('');
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -116,6 +118,7 @@ const PostEditPage: React.FC = () => {
             const nextContent = data.content || '';
             setTitle(data.title || '');
             setContent(nextContent);
+            setPostType(data.postType || '');
             setTags(data.tags?.filter(t => t) || []);
             editor?.commands.setContent(nextContent);
           }
@@ -206,6 +209,10 @@ const PostEditPage: React.FC = () => {
       toast.warning('请输入标题');
       return;
     }
+    if (!postType) {
+      toast.warning('请选择帖子类型');
+      return;
+    }
     if (!text && !html.includes('<img')) {
       toast.warning('请输入内容');
       return;
@@ -216,7 +223,7 @@ const PostEditPage: React.FC = () => {
       if (isEdit && postId) {
         const res = await api.updatePost({
           postId,
-          updatePostRequest: { title: title.trim(), content: html, tags },
+          updatePostRequest: { title: title.trim(), content: html, tags, postType },
         });
         if (res.data?.code === 0) {
           toast.success('更新成功');
@@ -224,7 +231,7 @@ const PostEditPage: React.FC = () => {
         }
       } else {
         const res = await api.createPost({
-          createPostRequest: { title: title.trim(), content: html, tags, postType: 'normal' },
+          createPostRequest: { title: title.trim(), content: html, tags, postType },
         });
         if (res.data?.code === 0) {
           toast.success('发布成功');
@@ -236,7 +243,7 @@ const PostEditPage: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [editor, title, tags, isEdit, postId, navigate]);
+  }, [editor, title, postType, tags, isEdit, postId, navigate]);
 
   if (isLoadingPost) {
     return (
@@ -288,6 +295,30 @@ const PostEditPage: React.FC = () => {
             maxLength={100}
             className="w-full text-2xl sm:text-3xl font-black text-gray-900 dark:text-white placeholder-gray-300 dark:placeholder-gray-700 bg-transparent border-none outline-none tracking-tight"
           />
+        </div>
+
+        <div className="px-5 sm:px-8 pt-5">
+          <label className="mb-2 block text-sm font-bold text-gray-700 dark:text-gray-300">
+            帖子类型 <span className="text-rose-500">*</span>
+          </label>
+          <select
+            value={postType}
+            onChange={e => setPostType(e.target.value)}
+            required
+            className="w-full rounded-xl border border-gray-100 bg-gray-50/80 px-4 py-3 text-sm font-semibold text-gray-700 outline-none transition-all focus:border-brand-400 focus:bg-white dark:border-gray-800 dark:bg-gray-800/50 dark:text-gray-200 dark:focus:border-brand-500"
+          >
+            <option value="">请选择帖子类型</option>
+            {POST_TYPE_OPTIONS.map(option => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+          {postType && (
+            <p className="mt-2 text-xs font-medium text-gray-400 dark:text-gray-500">
+              当前选择：{getPostTypeLabel(postType)}
+            </p>
+          )}
         </div>
 
         <div className="px-5 sm:px-8 py-4 flex items-center gap-3 flex-wrap">

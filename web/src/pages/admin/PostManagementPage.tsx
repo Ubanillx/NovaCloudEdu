@@ -24,17 +24,9 @@ import type {
   UserPublicResponse
 } from '../../api/generated/models';
 import { Avatar, toast, Tooltip, TruncateWithTooltip } from '../../components/ui';
+import { POST_TYPE_FILTER_OPTIONS, getPostTypeLabel } from '../../constants/postTypes';
 
 const api = new DefaultApi(new Configuration(), '', apiClient);
-
-// 帖子类型配置
-const POST_TYPES = [
-  { value: '', label: '全部类型' },
-  { value: 'discussion', label: '讨论' },
-  { value: 'question', label: '提问' },
-  { value: 'share', label: '分享' },
-  { value: 'announcement', label: '公告' },
-];
 
 const getPostPreviewText = (content?: string) => {
   if (!content?.trim()) return '无内容';
@@ -126,7 +118,7 @@ const PostDetailModal: React.FC<PostDetailModalProps> = ({ isOpen, onClose, post
                   <h4 className="font-bold text-gray-900 dark:text-white text-xl">{detail.title}</h4>
                   <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
                     <span className="px-2 py-0.5 bg-brand-50 dark:bg-brand-900/20 text-brand-600 dark:text-brand-400 rounded-lg text-xs font-medium">
-                      {POST_TYPES.find(t => t.value === detail.postType)?.label || detail.postType || '帖子'}
+                      {getPostTypeLabel(detail.postType) || '帖子'}
                     </span>
                     <span className="flex items-center gap-1">
                       <User size={14} />
@@ -323,10 +315,6 @@ export const PostManagementPage: React.FC = () => {
     });
   };
 
-  const getTypeLabel = (type?: string) => {
-    return POST_TYPES.find(t => t.value === type)?.label || type || '-';
-  };
-
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
       {/* Page Header */}
@@ -364,7 +352,7 @@ export const PostManagementPage: React.FC = () => {
               onChange={(e) => { setSelectedType(e.target.value); setPageNum(1); }}
               className="px-4 py-2.5 bg-gray-50 dark:bg-gray-800/50 border border-transparent focus:border-brand-500/50 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 outline-none cursor-pointer"
             >
-              {POST_TYPES.map(opt => (
+              {POST_TYPE_FILTER_OPTIONS.map(opt => (
                 <option key={opt.value} value={opt.value}>{opt.label}</option>
               ))}
             </select>
@@ -474,7 +462,7 @@ export const PostManagementPage: React.FC = () => {
                     </td>
                     <td className="px-6 py-4">
                       <span className="px-2.5 py-1 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 rounded-lg text-xs font-medium">
-                        {getTypeLabel(item.postType)}
+                        {getPostTypeLabel(item.postType) || '-'}
                       </span>
                     </td>
                     <td className="px-6 py-4">

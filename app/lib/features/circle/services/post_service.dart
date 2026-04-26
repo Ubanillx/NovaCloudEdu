@@ -94,15 +94,17 @@ class PostService {
     required String title,
     required String content,
     List<String>? tags,
-    String postType = 'normal',
+    required String postType,
   }) async {
     try {
       final response = await _api.createPost(
-        createPostRequest: CreatePostRequest((b) => b
-          ..title = title
-          ..content = content
-          ..tags.replace(tags ?? [])
-          ..postType = postType),
+        createPostRequest: CreatePostRequest(
+          (b) => b
+            ..title = title
+            ..content = content
+            ..tags.replace(tags ?? [])
+            ..postType = postType,
+        ),
       );
       return response.data?.data;
     } catch (e) {
@@ -325,7 +327,7 @@ class PostService {
 
   /// 批量获取用户公开信息（缓存优化）
   final Map<int, UserPublicResponse> _userInfoCache = {};
-  
+
   Future<UserPublicResponse?> getCachedUserPublicInfo(int userId) async {
     if (_userInfoCache.containsKey(userId)) {
       return _userInfoCache[userId];

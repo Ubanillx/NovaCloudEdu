@@ -6,6 +6,7 @@ import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import '../../../config/app_theme.dart';
 import '../../../services/file_upload_service.dart';
 import '../../../widgets/toast/nova_message.dart';
+import '../constants/post_types.dart';
 import '../services/post_service.dart';
 
 /// 发布/编辑帖子页面
@@ -13,11 +14,7 @@ class PostEditPage extends StatefulWidget {
   final int? postId;
   final PostDetailResponse? post;
 
-  const PostEditPage({
-    super.key,
-    this.postId,
-    this.post,
-  });
+  const PostEditPage({super.key, this.postId, this.post});
 
   @override
   State<PostEditPage> createState() => _PostEditPageState();
@@ -30,6 +27,7 @@ class _PostEditPageState extends State<PostEditPage> {
   final TextEditingController _contentController = TextEditingController();
   final TextEditingController _tagController = TextEditingController();
   final List<String> _tags = [];
+  String _selectedPostType = '';
   bool _isLoading = false;
   bool _isUploading = false;
   bool _isPreviewMode = false;
@@ -46,6 +44,7 @@ class _PostEditPageState extends State<PostEditPage> {
       if (widget.post!.tags != null) {
         _tags.addAll(widget.post!.tags!.toList());
       }
+      _selectedPostType = widget.post!.postType ?? '';
     }
   }
 
@@ -92,7 +91,8 @@ class _PostEditPageState extends State<PostEditPage> {
   void _onEmojiSelected(Emoji emoji) {
     final currentText = _contentController.text;
     final selection = _contentController.selection;
-    final newText = currentText.substring(0, selection.baseOffset) +
+    final newText =
+        currentText.substring(0, selection.baseOffset) +
         emoji.emoji +
         currentText.substring(selection.extentOffset);
     _contentController.text = newText;
@@ -153,11 +153,14 @@ class _PostEditPageState extends State<PostEditPage> {
   Future<void> _uploadImage(dynamic file) async {
     setState(() => _isUploading = true);
     try {
-      final markdownLink = await _fileUploadService.uploadImageForMarkdown(file);
+      final markdownLink = await _fileUploadService.uploadImageForMarkdown(
+        file,
+      );
       if (markdownLink != null && mounted) {
         final currentText = _contentController.text;
         final selection = _contentController.selection;
-        final newText = '${currentText.substring(0, selection.baseOffset)}\n$markdownLink\n${currentText.substring(selection.extentOffset)}';
+        final newText =
+            '${currentText.substring(0, selection.baseOffset)}\n$markdownLink\n${currentText.substring(selection.extentOffset)}';
         _contentController.text = newText;
         _contentController.selection = TextSelection.collapsed(
           offset: selection.baseOffset + markdownLink.length + 2,
@@ -182,11 +185,15 @@ class _PostEditPageState extends State<PostEditPage> {
       NovaMessage.warning(context, '请输入内容');
       return;
     }
+    if (_selectedPostType.isEmpty) {
+      NovaMessage.warning(context, '请选择帖子类型');
+      return;
+    }
 
     // 微博风格：内容第一行作为标题，如果没有换行则取前20字
     final lines = content.split('\n');
-    final title = lines.first.length > 20 
-        ? '${lines.first.substring(0, 20)}...' 
+    final title = lines.first.length > 20
+        ? '${lines.first.substring(0, 20)}...'
         : lines.first;
 
     setState(() => _isLoading = true);
@@ -198,7 +205,7 @@ class _PostEditPageState extends State<PostEditPage> {
           title: title,
           content: content,
           tags: _tags,
-          postType: 'share', // 微博风格统一用分享类型
+          postType: _selectedPostType,
         );
         if (success && mounted) {
           NovaMessage.success(context, '更新成功');
@@ -209,7 +216,7 @@ class _PostEditPageState extends State<PostEditPage> {
           title: title,
           content: content,
           tags: _tags,
-          postType: 'share', // 微博风格统一用分享类型
+          postType: _selectedPostType,
         );
         if (post != null && mounted) {
           NovaMessage.success(context, '发布成功');
@@ -237,10 +244,7 @@ class _PostEditPageState extends State<PostEditPage> {
           onPressed: () => Navigator.pop(context),
           child: Text(
             '取消',
-            style: TextStyle(
-              color: colors.textPrimary,
-              fontSize: 16,
-            ),
+            style: TextStyle(color: colors.textPrimary, fontSize: 16),
           ),
         ),
         leadingWidth: 80,
@@ -264,7 +268,10 @@ class _PostEditPageState extends State<PostEditPage> {
               child: GestureDetector(
                 onTap: _isLoading ? null : _submit,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: _isLoading ? colors.textTertiary : AppTheme.brand,
                     borderRadius: BorderRadius.circular(20),
@@ -275,7 +282,9 @@ class _PostEditPageState extends State<PostEditPage> {
                           height: 16,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.white,
+                            ),
                           ),
                         )
                       : Text(
@@ -303,7 +312,7 @@ class _PostEditPageState extends State<PostEditPage> {
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             padding: EdgeInsets.symmetric(
-              horizontal: 16, 
+              horizontal: 16,
               vertical: _showEmojiPicker ? 8 : 12,
             ),
             decoration: BoxDecoration(
@@ -329,7 +338,9 @@ class _PostEditPageState extends State<PostEditPage> {
                 ),
                 const Spacer(),
                 _buildIconButton(
-                  icon: _isFullscreen ? PhosphorIcons.cornersIn() : PhosphorIcons.cornersOut(),
+                  icon: _isFullscreen
+                      ? PhosphorIcons.cornersIn()
+                      : PhosphorIcons.cornersOut(),
                   onTap: () {
                     setState(() {
                       _isFullscreen = !_isFullscreen;
@@ -393,6 +404,8 @@ class _PostEditPageState extends State<PostEditPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          _buildPostTypeCard(),
+          const SizedBox(height: 16),
           // 内容输入卡片
           Container(
             padding: const EdgeInsets.all(16),
@@ -446,11 +459,17 @@ class _PostEditPageState extends State<PostEditPage> {
                         controller: _tagController,
                         decoration: InputDecoration(
                           hintText: '添加标签话题 (${_tags.length}/5)',
-                          hintStyle: TextStyle(fontSize: 14, color: colors.textTertiary),
+                          hintStyle: TextStyle(
+                            fontSize: 14,
+                            color: colors.textTertiary,
+                          ),
                           border: InputBorder.none,
                           contentPadding: EdgeInsets.zero,
                         ),
-                        style: TextStyle(fontSize: 14, color: colors.textPrimary),
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: colors.textPrimary,
+                        ),
                         onSubmitted: (_) => _addTag(),
                         textInputAction: TextInputAction.done,
                       ),
@@ -459,7 +478,10 @@ class _PostEditPageState extends State<PostEditPage> {
                       GestureDetector(
                         onTap: _addTag,
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
                           decoration: BoxDecoration(
                             color: AppTheme.brand,
                             borderRadius: BorderRadius.circular(12),
@@ -485,6 +507,141 @@ class _PostEditPageState extends State<PostEditPage> {
     );
   }
 
+  Widget _buildPostTypeCard() {
+    final colors = context.colors;
+    final label = getPostTypeLabel(_selectedPostType);
+
+    return GestureDetector(
+      onTap: _showPostTypeSheet,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: colors.surface,
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.03),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Icon(PhosphorIcons.tag(), size: 20, color: AppTheme.brand),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '帖子类型',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: colors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    label.isEmpty ? '请选择帖子类型' : label,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: label.isEmpty
+                          ? colors.textTertiary
+                          : AppTheme.brand,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              PhosphorIcons.caretRight(),
+              size: 18,
+              color: colors.textTertiary,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showPostTypeSheet() {
+    final colors = context.colors;
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: colors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 36,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: colors.border,
+                    borderRadius: BorderRadius.circular(99),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                '选择帖子类型',
+                style: TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w700,
+                  color: colors.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Flexible(
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: postTypeOptions.length,
+                  itemBuilder: (context, index) {
+                    final option = postTypeOptions[index];
+                    final selected = option.value == _selectedPostType;
+                    return ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(
+                        option.label,
+                        style: TextStyle(
+                          color: colors.textPrimary,
+                          fontWeight: selected
+                              ? FontWeight.w700
+                              : FontWeight.w500,
+                        ),
+                      ),
+                      trailing: selected
+                          ? Icon(
+                              PhosphorIcons.checkCircle(
+                                PhosphorIconsStyle.fill,
+                              ),
+                              color: AppTheme.brand,
+                            )
+                          : null,
+                      onTap: () {
+                        setState(() => _selectedPostType = option.value);
+                        Navigator.pop(context);
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildTagChip(String tag) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -506,11 +663,7 @@ class _PostEditPageState extends State<PostEditPage> {
           const SizedBox(width: 4),
           GestureDetector(
             onTap: () => _removeTag(tag),
-            child: Icon(
-              PhosphorIcons.x(),
-              size: 12,
-              color: AppTheme.brand,
-            ),
+            child: Icon(PhosphorIcons.x(), size: 12, color: AppTheme.brand),
           ),
         ],
       ),
@@ -545,7 +698,7 @@ class _PostEditPageState extends State<PostEditPage> {
     final colors = context.colors;
     // 计算最小高度：行数 * 行高(16 * 1.6)
     final minHeight = minLines * 16.0 * 1.6;
-    
+
     if (_isPreviewMode) {
       // Markdown 预览
       final content = _contentController.text.isEmpty
@@ -553,10 +706,7 @@ class _PostEditPageState extends State<PostEditPage> {
               width: double.infinity,
               child: Text(
                 '暂无内容',
-                style: TextStyle(
-                  color: colors.textTertiary,
-                  fontSize: 16,
-                ),
+                style: TextStyle(color: colors.textTertiary, fontSize: 16),
               ),
             )
           : MarkdownWidget(
@@ -565,30 +715,41 @@ class _PostEditPageState extends State<PostEditPage> {
               shrinkWrap: true,
               config: MarkdownConfig(
                 configs: [
-                  PConfig(textStyle: TextStyle(fontSize: 16, height: 1.6, color: colors.textPrimary)),
-                  ImgConfig(builder: (url, attributes) {
-                    return ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Image.network(
-                        url,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: colors.surfaceVariant,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Icon(PhosphorIcons.imageBroken(), color: colors.textTertiary),
-                          );
-                        },
-                      ),
-                    );
-                  }),
+                  PConfig(
+                    textStyle: TextStyle(
+                      fontSize: 16,
+                      height: 1.6,
+                      color: colors.textPrimary,
+                    ),
+                  ),
+                  ImgConfig(
+                    builder: (url, attributes) {
+                      return ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.network(
+                          url,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: colors.surfaceVariant,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Icon(
+                                PhosphorIcons.imageBroken(),
+                                color: colors.textTertiary,
+                              ),
+                            );
+                          },
+                        ),
+                      );
+                    },
+                  ),
                 ],
               ),
             );
-      
+
       if (expanded) {
         return SingleChildScrollView(
           child: ConstrainedBox(
@@ -611,17 +772,10 @@ class _PostEditPageState extends State<PostEditPage> {
         maxLength: 2000,
         expands: expanded,
         textAlignVertical: expanded ? TextAlignVertical.top : null,
-        style: TextStyle(
-          fontSize: 16,
-          height: 1.6,
-          color: colors.textPrimary,
-        ),
+        style: TextStyle(fontSize: 16, height: 1.6, color: colors.textPrimary),
         decoration: InputDecoration(
           hintText: '分享新鲜事...',
-          hintStyle: TextStyle(
-            color: colors.textTertiary,
-            fontSize: 16,
-          ),
+          hintStyle: TextStyle(color: colors.textTertiary, fontSize: 16),
           border: InputBorder.none,
           contentPadding: EdgeInsets.zero,
           counterText: '',

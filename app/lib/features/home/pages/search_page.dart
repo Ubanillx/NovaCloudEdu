@@ -19,6 +19,7 @@ import '../../profile/pages/settings_page.dart';
 import '../../profile/pages/feedback_page.dart';
 import '../../profile/pages/study_plan_page.dart';
 import '../../profile/pages/checkin_ranking_page.dart';
+import '../../circle/constants/post_types.dart';
 import '../daily_word/pages/daily_word_page.dart';
 import '../daily_word/pages/word_book_page.dart';
 import '../daily_article/pages/daily_article_page.dart';
@@ -120,7 +121,8 @@ class _SearchPageState extends State<SearchPage> {
         description: '智能问答、知识讲解',
         icon: PhosphorIcons.sparkle(),
         keywords: ['AI', '助手', '智能', '问答', '聊天', 'chat', 'assistant'],
-        builder: () => const AiChatPage(title: 'AI 学习助手', assistantName: 'AI 学习助手'),
+        builder: () =>
+            const AiChatPage(title: 'AI 学习助手', assistantName: 'AI 学习助手'),
       ),
       _LocalPageEntry(
         name: '智慧体列表',
@@ -306,9 +308,9 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   void _navigateToLocalPage(_LocalPageEntry page) {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => page.builder()),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => page.builder()));
   }
 
   void _navigateToSearchResult(SearchResultDTO result) {
@@ -319,24 +321,22 @@ class _SearchPageState extends State<SearchPage> {
       case 'course':
         if (id > 0) {
           Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) => CourseDetailPage(courseId: id),
-            ),
+            MaterialPageRoute(builder: (_) => CourseDetailPage(courseId: id)),
           );
         }
         break;
       case 'book':
       case 'chapter':
         // 跳转到课程中心（可后续扩展为图书详情页）
-        Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const CoursePage()),
-        );
+        Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (_) => const CoursePage()));
         break;
       case 'post':
         // 跳转到学习圈
-        Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const CirclePage()),
-        );
+        Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (_) => const CirclePage()));
         break;
       default:
         break;
@@ -395,7 +395,9 @@ class _SearchPageState extends State<SearchPage> {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(context.isDarkMode ? 0.2 : 0.05),
+                    color: Colors.black.withOpacity(
+                      context.isDarkMode ? 0.2 : 0.05,
+                    ),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -406,15 +408,27 @@ class _SearchPageState extends State<SearchPage> {
                   controller: _controller,
                   focusNode: _focusNode,
                   textAlignVertical: TextAlignVertical.center,
-                  style: TextStyle(color: colors.textPrimary, fontSize: 15, fontWeight: FontWeight.w500),
+                  style: TextStyle(
+                    color: colors.textPrimary,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
+                  ),
                   onChanged: _onQueryChanged,
                   onSubmitted: (_) {
                     if (_query.isNotEmpty) _searchApi();
                   },
                   decoration: InputDecoration(
                     hintText: '搜索页面、课程、图书、帖子...',
-                    hintStyle: TextStyle(color: colors.textTertiary, fontSize: 15, fontWeight: FontWeight.w400),
-                    prefixIcon: Icon(PhosphorIcons.magnifyingGlass(), color: colors.textTertiary, size: 20),
+                    hintStyle: TextStyle(
+                      color: colors.textTertiary,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w400,
+                    ),
+                    prefixIcon: Icon(
+                      PhosphorIcons.magnifyingGlass(),
+                      color: colors.textTertiary,
+                      size: 20,
+                    ),
                     suffixIcon: _query.isNotEmpty
                         ? GestureDetector(
                             onTap: () {
@@ -438,8 +452,14 @@ class _SearchPageState extends State<SearchPage> {
                     border: InputBorder.none,
                     contentPadding: EdgeInsets.zero,
                     isCollapsed: true,
-                    prefixIconConstraints: const BoxConstraints(minWidth: 48, minHeight: 48),
-                    suffixIconConstraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+                    prefixIconConstraints: const BoxConstraints(
+                      minWidth: 48,
+                      minHeight: 48,
+                    ),
+                    suffixIconConstraints: const BoxConstraints(
+                      minWidth: 44,
+                      minHeight: 44,
+                    ),
                   ),
                 ),
               ),
@@ -482,8 +502,8 @@ class _SearchPageState extends State<SearchPage> {
               decoration: BoxDecoration(
                 color: isSelected ? AppTheme.brand : colors.surfaceVariant,
                 borderRadius: BorderRadius.circular(20),
-                border: isSelected 
-                    ? null 
+                border: isSelected
+                    ? null
                     : Border.all(color: colors.border, width: 1),
               ),
               child: Text(
@@ -571,7 +591,11 @@ class _SearchPageState extends State<SearchPage> {
         children: [
           Row(
             children: [
-              Icon(PhosphorIcons.squaresFour(), size: 20, color: AppTheme.brand),
+              Icon(
+                PhosphorIcons.squaresFour(),
+                size: 20,
+                color: AppTheme.brand,
+              ),
               const SizedBox(width: 8),
               Text(
                 '快捷入口',
@@ -618,7 +642,7 @@ class _SearchPageState extends State<SearchPage> {
                     Text(
                       page.name,
                       style: TextStyle(
-                        fontSize: 12, 
+                        fontSize: 12,
                         fontWeight: FontWeight.w500,
                         color: colors.textSecondary,
                       ),
@@ -666,17 +690,18 @@ class _SearchPageState extends State<SearchPage> {
           const SizedBox(height: 8),
           Text(
             '换个关键词试试，或浏览下方快捷入口',
-            style: TextStyle(
-              fontSize: 14,
-              color: colors.textTertiary,
-            ),
+            style: TextStyle(fontSize: 14, color: colors.textTertiary),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildSectionTitle(String title, PhosphorIconData icon, AppColors colors) {
+  Widget _buildSectionTitle(
+    String title,
+    PhosphorIconData icon,
+    AppColors colors,
+  ) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
       child: Row(
@@ -696,7 +721,10 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
-  Widget _buildSuggestionItem(SearchSuggestionDTO suggestion, AppColors colors) {
+  Widget _buildSuggestionItem(
+    SearchSuggestionDTO suggestion,
+    AppColors colors,
+  ) {
     return GestureDetector(
       onTap: () => _onSuggestionTap(suggestion),
       child: Container(
@@ -837,11 +865,19 @@ class _SearchPageState extends State<SearchPage> {
                       result.coverUrl!,
                       fit: BoxFit.cover,
                       errorBuilder: (_, __, ___) => Center(
-                        child: Icon(PhosphorIcons.fileText(), size: 28, color: colors.textTertiary),
+                        child: Icon(
+                          PhosphorIcons.fileText(),
+                          size: 28,
+                          color: colors.textTertiary,
+                        ),
                       ),
                     )
                   : Center(
-                      child: Icon(PhosphorIcons.fileText(), size: 28, color: colors.textTertiary),
+                      child: Icon(
+                        PhosphorIcons.fileText(),
+                        size: 28,
+                        color: colors.textTertiary,
+                      ),
                     ),
             ),
             const SizedBox(width: 14),
@@ -855,7 +891,11 @@ class _SearchPageState extends State<SearchPage> {
                     children: [
                       _buildChip(fileType, fileTypeColor.$1, fileTypeColor.$2),
                       const SizedBox(width: 6),
-                      _buildChip('书籍', AppTheme.brand.withOpacity(0.1), AppTheme.brand),
+                      _buildChip(
+                        '书籍',
+                        AppTheme.brand.withOpacity(0.1),
+                        AppTheme.brand,
+                      ),
                     ],
                   ),
                   const SizedBox(height: 8),
@@ -882,7 +922,8 @@ class _SearchPageState extends State<SearchPage> {
                     ),
                   ],
                   // 章节数
-                  if (result.totalChapters != null && result.totalChapters! > 0) ...[
+                  if (result.totalChapters != null &&
+                      result.totalChapters! > 0) ...[
                     const SizedBox(height: 6),
                     Text(
                       '${result.totalChapters} 章',
@@ -915,8 +956,13 @@ class _SearchPageState extends State<SearchPage> {
             // 标签 + 来源
             Row(
               children: [
-                _buildChip('章节', const Color(0xFFFFF8E1), const Color(0xFFFF8F00)),
-                if (result.bookTitle != null && result.bookTitle!.isNotEmpty) ...[
+                _buildChip(
+                  '章节',
+                  const Color(0xFFFFF8E1),
+                  const Color(0xFFFF8F00),
+                ),
+                if (result.bookTitle != null &&
+                    result.bookTitle!.isNotEmpty) ...[
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
@@ -978,15 +1024,16 @@ class _SearchPageState extends State<SearchPage> {
             // 标签 + 帖子类型
             Row(
               children: [
-                _buildChip('帖子', const Color(0xFFE8F5E9), const Color(0xFF43A047)),
+                _buildChip(
+                  '帖子',
+                  const Color(0xFFE8F5E9),
+                  const Color(0xFF43A047),
+                ),
                 if (result.postType != null && result.postType!.isNotEmpty) ...[
                   const SizedBox(width: 8),
                   Text(
-                    result.postType!,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: colors.textTertiary,
-                    ),
+                    getPostTypeLabel(result.postType),
+                    style: TextStyle(fontSize: 12, color: colors.textTertiary),
                   ),
                 ],
               ],
@@ -1023,34 +1070,53 @@ class _SearchPageState extends State<SearchPage> {
               children: [
                 // 标签
                 if (result.tags != null && result.tags!.isNotEmpty)
-                  ...result.tags!.take(3).map((tag) => Padding(
-                    padding: const EdgeInsets.only(right: 6),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: colors.surfaceVariant,
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        tag,
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: colors.textTertiary,
+                  ...result.tags!
+                      .take(3)
+                      .map(
+                        (tag) => Padding(
+                          padding: const EdgeInsets.only(right: 6),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 3,
+                            ),
+                            decoration: BoxDecoration(
+                              color: colors.surfaceVariant,
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              tag,
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: colors.textTertiary,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                  )),
                 const Spacer(),
                 // 互动数据
                 if (result.thumbNum != null)
-                  _buildStatItem(PhosphorIcons.thumbsUp(), '${result.thumbNum}', colors),
+                  _buildStatItem(
+                    PhosphorIcons.thumbsUp(),
+                    '${result.thumbNum}',
+                    colors,
+                  ),
                 if (result.commentNum != null) ...[
                   const SizedBox(width: 12),
-                  _buildStatItem(PhosphorIcons.chatCircle(), '${result.commentNum}', colors),
+                  _buildStatItem(
+                    PhosphorIcons.chatCircle(),
+                    '${result.commentNum}',
+                    colors,
+                  ),
                 ],
                 if (result.favourNum != null) ...[
                   const SizedBox(width: 12),
-                  _buildStatItem(PhosphorIcons.bookmarkSimple(), '${result.favourNum}', colors),
+                  _buildStatItem(
+                    PhosphorIcons.bookmarkSimple(),
+                    '${result.favourNum}',
+                    colors,
+                  ),
                 ],
               ],
             ),
@@ -1100,7 +1166,11 @@ class _SearchPageState extends State<SearchPage> {
                 ],
               ),
             ),
-            Icon(PhosphorIcons.caretRight(), size: 18, color: colors.iconSecondary),
+            Icon(
+              PhosphorIcons.caretRight(),
+              size: 18,
+              color: colors.iconSecondary,
+            ),
           ],
         ),
       ),
@@ -1149,10 +1219,7 @@ class _SearchPageState extends State<SearchPage> {
       children: [
         Icon(icon, size: 13, color: colors.textTertiary),
         const SizedBox(width: 3),
-        Text(
-          count,
-          style: TextStyle(fontSize: 11, color: colors.textTertiary),
-        ),
+        Text(count, style: TextStyle(fontSize: 11, color: colors.textTertiary)),
       ],
     );
   }
@@ -1172,7 +1239,6 @@ class _SearchPageState extends State<SearchPage> {
         return (const Color(0xFFE1F5FE), const Color(0xFF039BE5));
     }
   }
-
 }
 
 class _TypeFilter {
