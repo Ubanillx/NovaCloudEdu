@@ -14,7 +14,15 @@ import type {
   RtcErrorData,
 } from './rtcTypes';
 
-const RTC_WS_URL = import.meta.env.VITE_RTC_WS_URL || 'ws://localhost:8300';
+const resolveDefaultRtcWsUrl = () => {
+  if (typeof window !== 'undefined') {
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    return `${protocol}//${window.location.host}/rtc`;
+  }
+  return 'ws://localhost:8300';
+};
+
+const RTC_WS_URL = import.meta.env.VITE_RTC_WS_URL || resolveDefaultRtcWsUrl();
 
 /**
  * RTC 信令服务 - 原生 WebSocket

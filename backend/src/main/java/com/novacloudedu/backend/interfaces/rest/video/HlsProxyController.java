@@ -9,9 +9,15 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -30,6 +36,7 @@ public class HlsProxyController {
 
     private final HlsProxyService hlsProxyService;
     private final VideoPlayTokenService tokenService;
+    private final RestTemplate restTemplate;
 
     /**
      * 获取带 Token 的 HLS m3u8 播放内容
@@ -91,6 +98,65 @@ public class HlsProxyController {
         log.debug("HLS流已分发, sectionId={}, userId={}", sectionId, userId);
     }
 
+    @GetMapping("/hls/{sectionId}/segments/{fileName:.+}")
+    @Operation(summary = "代理HLS视频分片", description = "同域代理 ts 分片，避免浏览器直接跨域请求 OSS/CDN。")
+    public void proxySegment(
+            @PathVariable @Parameter(description = "小节ID") Long sectionId,
+            @PathVariable @Parameter(description = "分片文件名") String fileName,
+            @RequestParam @Parameter(description = "一次性流访问令牌") String token,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException {
+
+        Long userId = tokenService.validateStreamToken(token, sectionId);
+        if (userId == null) {
+            log.warn("视频分片请求被拒绝: token无效或已过期, sectionId={}, fileName={}", sectionId, fileName);
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            response.getWriter().write("token无效或已过期");
+            return;
+        }
+
+        String presignedUrl = hlsProxyService.getSegmentPresignedUrl(sectionId, fileName);
+        if (presignedUrl == null) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            response.getWriter().write("分片不存在");
+            return;
+        }
+
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            String range = request.getHeader(HttpHeaders.RANGE);
+            if (range != null && !range.isBlank()) {
+                headers.set(HttpHeaders.RANGE, range);
+            }
+
+            ResponseEntity<byte[]> ossResponse = restTemplate.exchange(
+                    URI.create(presignedUrl),
+                    HttpMethod.GET,
+                    new HttpEntity<>(headers),
+                    byte[].class
+            );
+
+            response.setStatus(ossResponse.getStatusCode().value());
+
+            HttpHeaders ossHeaders = ossResponse.getHeaders();
+            copyHeaderIfPresent(ossHeaders, response, HttpHeaders.CONTENT_TYPE);
+            copyHeaderIfPresent(ossHeaders, response, HttpHeaders.CONTENT_LENGTH);
+            copyHeaderIfPresent(ossHeaders, response, HttpHeaders.CONTENT_RANGE);
+            copyHeaderIfPresent(ossHeaders, response, HttpHeaders.ACCEPT_RANGES);
+            response.setHeader(HttpHeaders.CACHE_CONTROL, "public, max-age=3600");
+
+            byte[] body = ossResponse.getBody();
+            if (body != null) {
+                response.getOutputStream().write(body);
+            }
+            response.getOutputStream().flush();
+        } catch (Exception e) {
+            log.warn("代理视频分片失败: sectionId={}, fileName={}, error={}", sectionId, fileName, e.getMessage());
+            response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
+            response.getWriter().write("分片代理失败");
+        }
+    }
+
     private String resolveRequestBaseUrl(HttpServletRequest request) {
         String forwardedProto = request.getHeader("X-Forwarded-Proto");
         String forwardedHost = request.getHeader("X-Forwarded-Host");
@@ -108,5 +174,12 @@ public class HlsProxyController {
                 || ("https".equalsIgnoreCase(scheme) && port == 443);
         String host = request.getServerName();
         return defaultPort ? (scheme + "://" + host) : (scheme + "://" + host + ":" + port);
+    }
+
+    private void copyHeaderIfPresent(HttpHeaders source, HttpServletResponse target, String headerName) {
+        String value = source.getFirst(headerName);
+        if (value != null && !value.isBlank()) {
+            target.setHeader(headerName, value);
+        }
     }
 }

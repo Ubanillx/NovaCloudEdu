@@ -537,6 +537,8 @@ server:
   base-url: ${SERVER_BASE_URL:http://localhost:8080}
 
 video:
+  hls:
+    proxy-segments: ${VIDEO_HLS_PROXY_SEGMENTS:false}
   transcode:
     ffmpeg-path: ${FFMPEG_PATH:ffmpeg}
     hls-time: ${HLS_TIME:10}

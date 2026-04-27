@@ -47,6 +47,8 @@ const CourseLessonPage: React.FC = () => {
   const [expandedChapters, setExpandedChapters] = useState<Set<string>>(new Set());
   const [completedSections, setCompletedSections] = useState<Set<string>>(new Set());
   const [initialSeek, setInitialSeek] = useState(0);
+  const [playbackUrl, setPlaybackUrl] = useState('');
+  const [playbackUrlLoading, setPlaybackUrlLoading] = useState(false);
   const lastSaveRef = useRef<number>(0);
 
   const currentSectionId = searchParams.get('section') || '';
@@ -102,6 +104,52 @@ const CourseLessonPage: React.FC = () => {
   const currentItem = currentIndex >= 0 ? flatList[currentIndex] : null;
   const currentSection = currentItem?.section;
   const currentChapter = currentItem?.chapter;
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const resolvePlaybackUrl = async () => {
+      if (!currentSection?.id) {
+        setPlaybackUrl('');
+        setPlaybackUrlLoading(false);
+        return;
+      }
+
+      if (currentSection.hlsUrl) {
+        setPlaybackUrlLoading(true);
+        try {
+          const res = await api.getStreamToken({ sectionId: currentSection.id });
+          const token = Array.isArray(res.data.data) ? res.data.data[0] : res.data.data;
+
+          if (!cancelled && token) {
+            const proxiedUrl = new URL(`/api/video/hls/${currentSection.id}?token=${encodeURIComponent(String(token))}`, window.location.origin);
+            setPlaybackUrl(proxiedUrl.toString());
+          } else if (!cancelled) {
+            setPlaybackUrl('');
+          }
+        } catch {
+          if (!cancelled) {
+            setPlaybackUrl('');
+            toast.error('视频播放地址获取失败');
+          }
+        } finally {
+          if (!cancelled) {
+            setPlaybackUrlLoading(false);
+          }
+        }
+        return;
+      }
+
+      setPlaybackUrl(currentSection.videoUrl || '');
+      setPlaybackUrlLoading(false);
+    };
+
+    resolvePlaybackUrl();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [currentSection?.hlsUrl, currentSection?.id, currentSection?.videoUrl]);
 
   // 如果没有指定 section 且已加载结构，自动选择第一个
   useEffect(() => {
@@ -180,7 +228,7 @@ const CourseLessonPage: React.FC = () => {
   };
 
   // 获取视频 URL
-  const videoUrl = currentSection?.hlsUrl || currentSection?.videoUrl || '';
+  const videoUrl = playbackUrl;
 
   // 完成进度百分比
   const completionPercent = flatList.length > 0 ? Math.round((completedSections.size / flatList.length) * 100) : 0;
@@ -244,7 +292,14 @@ const CourseLessonPage: React.FC = () => {
         <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
           {/* 播放器 */}
           <div className="flex-1 bg-black flex items-center justify-center min-h-0">
-            {videoUrl ? (
+            {playbackUrlLoading ? (
+              <div className="w-full h-full flex items-center justify-center bg-gradient-to-b from-gray-900 to-gray-950">
+                <div className="text-center text-gray-400">
+                  <div className="w-8 h-8 border-2 border-brand-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+                  <p className="text-sm">正在准备视频...</p>
+                </div>
+              </div>
+            ) : videoUrl ? (
               <ArtPlayerWrapper
                 key={videoUrl}
                 url={videoUrl}

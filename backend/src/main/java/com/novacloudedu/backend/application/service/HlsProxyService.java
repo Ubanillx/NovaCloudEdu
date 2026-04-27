@@ -33,6 +33,9 @@ public class HlsProxyService {
     @Value("${server.base-url:http://localhost:8080}")
     private String serverBaseUrl;
 
+    @Value("${video.hls.proxy-segments:false}")
+    private boolean proxySegments;
+
     /**
      * 获取带 token 的 HLS m3u8 流（供播放器直接使用）
      * 内部自动生成并附加 token
@@ -54,26 +57,32 @@ public class HlsProxyService {
         // 2. 如果视频未加密或无 keyId，直接返回原始 m3u8 URL（使用预签名）
         if (keyId == null || keyId.isBlank()) {
             log.debug("视频未加密, 直接返回预签名m3u8, sectionId={}", sectionId);
-            return generatePresignedM3u8(hlsUrl);
+            return generatePresignedM3u8(sectionId, hlsUrl, requestBaseUrl, null);
         }
 
-        // 3. 生成播放令牌（使用真实的 keyId）
-        String token = tokenService.generateToken(userId, keyId);
+        // 3. 生成播放令牌（用于 key URI）
+        String keyToken = tokenService.generateToken(userId, keyId);
 
-        // 4. 下载原始 m3u8 内容
+        // 5. 下载原始 m3u8 内容
         String originalM3u8 = downloadM3u8(hlsUrl);
         if (originalM3u8 == null) {
             log.error("下载m3u8失败, sectionId={}, hlsUrl={}", sectionId, hlsUrl);
             return null;
         }
 
-        // 5. 替换 key URI：附加 token 参数
+        // 6. 替换 key URI：附加 token 参数
         // 原始格式: #EXT-X-KEY:METHOD=AES-128,URI="https://host/api/video/key?keyId=xxx"
         // 修改为:   #EXT-X-KEY:METHOD=AES-128,URI="https://host/api/video/key?keyId=xxx&token=yyy"
-        String modifiedM3u8 = modifyKeyUri(originalM3u8, keyId, token, requestBaseUrl);
+        String modifiedM3u8 = modifyKeyUri(originalM3u8, keyId, keyToken, requestBaseUrl);
 
-        // 6. 替换相对路径为预签名绝对路径
-        modifiedM3u8 = makeAbsoluteUrlsWithPresign(modifiedM3u8, hlsUrl);
+        if (proxySegments) {
+            // 降级方案：通过同域后端代理 ts 分片，绕过 CDN/OSS 跨域问题
+            String streamToken = tokenService.generateStreamToken(userId, sectionId);
+            modifiedM3u8 = makeSegmentUrlsWithProxy(modifiedM3u8, sectionId, requestBaseUrl, streamToken);
+        } else {
+            // 默认方案：分片继续走 CDN/OSS，减轻后端带宽和内存压力
+            modifiedM3u8 = makeSegmentUrlsDirect(modifiedM3u8, hlsUrl);
+        }
 
         log.debug("m3u8流生成成功, sectionId={}, userId={}, keyId={}", sectionId, userId, keyId);
         return modifiedM3u8;
@@ -104,7 +113,7 @@ public class HlsProxyService {
         // 2. 如果视频未加密或无 keyId，直接返回原始 m3u8 URL（使用预签名）
         if (keyId == null || keyId.isBlank()) {
             log.debug("视频未加密, 直接返回预签名URL, sectionId={}", sectionId);
-            return generatePresignedM3u8(hlsUrl);
+            return generatePresignedM3u8(sectionId, hlsUrl, serverBaseUrl, null);
         }
 
         // 3. 下载原始 m3u8 内容
@@ -117,8 +126,11 @@ public class HlsProxyService {
         // 4. 替换 key URI：将 keyId 参数附加到 key 请求 URL
         String modifiedM3u8 = modifyKeyUri(originalM3u8, keyId, token, serverBaseUrl);
 
-        // 5. 替换相对路径为绝对路径（如果有）
-        modifiedM3u8 = makeAbsoluteUrlsWithPresign(modifiedM3u8, hlsUrl);
+        if (proxySegments) {
+            modifiedM3u8 = makeSegmentUrlsWithProxy(modifiedM3u8, sectionId, serverBaseUrl, token);
+        } else {
+            modifiedM3u8 = makeSegmentUrlsDirect(modifiedM3u8, hlsUrl);
+        }
 
         log.debug("m3u8代理成功, sectionId={}, token={}", sectionId, token);
         return modifiedM3u8;
@@ -128,15 +140,17 @@ public class HlsProxyService {
      * 生成预签名的 m3u8 内容
      * 将 m3u8 中的所有相对 ts 路径替换为预签名绝对路径
      */
-    private String generatePresignedM3u8(String hlsUrl) {
+    private String generatePresignedM3u8(Long sectionId, String hlsUrl, String requestBaseUrl, String token) {
         try {
             // downloadM3u8 内部已经处理预签名，直接传原始 OSS URL
             String m3u8Content = downloadM3u8(hlsUrl);
             if (m3u8Content == null) {
                 return null;
             }
-            // 替换 ts 相对路径为预签名绝对路径
-            return makeAbsoluteUrlsWithPresign(m3u8Content, hlsUrl);
+            if (proxySegments) {
+                return makeSegmentUrlsWithProxy(m3u8Content, sectionId, requestBaseUrl, token);
+            }
+            return makeSegmentUrlsDirect(m3u8Content, hlsUrl);
         } catch (Exception e) {
             log.warn("生成预签名m3u8失败: {}", e.getMessage());
             return null;
@@ -192,17 +206,37 @@ public class HlsProxyService {
     /**
      * 将 m3u8 中的相对 URL 转换为预签名的绝对 URL
      */
-    private String makeAbsoluteUrlsWithPresign(String m3u8Content, String baseHlsUrl) {
-        // 提取基础 URL 路径（去掉文件名）
-        String basePath = baseHlsUrl.substring(0, baseHlsUrl.lastIndexOf('/') + 1);
-
+    private String makeSegmentUrlsWithProxy(String m3u8Content, Long sectionId, String requestBaseUrl, String token) {
+        String baseUrl = normalizeBaseUrl(requestBaseUrl);
         // 处理相对路径行（以 seg_ 开头的 ts 切片）
         String[] lines = m3u8Content.split("\n");
         StringBuilder result = new StringBuilder();
         for (String line : lines) {
             String trimmed = line.trim();
             if (trimmed.startsWith("seg_") && trimmed.endsWith(".ts")) {
-                // ts 切片在 OSS 上已设为公开读，直接拼接绝对路径
+                result.append(baseUrl)
+                        .append("/api/video/hls/")
+                        .append(sectionId)
+                        .append("/segments/")
+                        .append(trimmed);
+                if (token != null && !token.isBlank()) {
+                    result.append("?token=").append(token);
+                }
+            } else {
+                result.append(line);
+            }
+            result.append("\n");
+        }
+        return result.toString();
+    }
+
+    private String makeSegmentUrlsDirect(String m3u8Content, String hlsUrl) {
+        String basePath = hlsUrl.substring(0, hlsUrl.lastIndexOf('/') + 1);
+        String[] lines = m3u8Content.split("\n");
+        StringBuilder result = new StringBuilder();
+        for (String line : lines) {
+            String trimmed = line.trim();
+            if (trimmed.startsWith("seg_") && trimmed.endsWith(".ts")) {
                 result.append(basePath).append(trimmed);
             } else {
                 result.append(line);
@@ -210,5 +244,25 @@ public class HlsProxyService {
             result.append("\n");
         }
         return result.toString();
+    }
+
+    public String getSegmentPresignedUrl(Long sectionId, String fileName) {
+        if (sectionId == null || fileName == null || fileName.isBlank()) {
+            return null;
+        }
+        if (!fileName.matches("^seg_[A-Za-z0-9_-]+\\.ts$")) {
+            log.warn("非法的分片文件名: sectionId={}, fileName={}", sectionId, fileName);
+            return null;
+        }
+
+        CourseSection section = sectionRepository.findById(SectionId.of(sectionId)).orElse(null);
+        if (section == null || section.getHlsUrl() == null || section.getHlsUrl().isBlank()) {
+            return null;
+        }
+
+        String hlsUrl = section.getHlsUrl();
+        String basePath = hlsUrl.substring(0, hlsUrl.lastIndexOf('/') + 1);
+        String segmentUrl = basePath + fileName;
+        return ossService.generatePresignedUrl(segmentUrl, 3600);
     }
 }

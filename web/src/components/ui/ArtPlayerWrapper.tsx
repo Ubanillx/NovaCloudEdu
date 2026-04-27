@@ -71,20 +71,20 @@ const ArtPlayerWrapper: React.FC<ArtPlayerWrapperProps> = ({
         preload: 'metadata',
         crossOrigin: 'anonymous',
       },
-      customType: isHls
-        ? {
-            m3u8: (video: HTMLVideoElement, hlsUrl: string) => {
-              if (Hls.isSupported()) {
-                const hls = new Hls();
-                hls.loadSource(hlsUrl);
-                hls.attachMedia(video);
-              } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                video.src = hlsUrl;
-              }
-            },
-          }
-        : undefined,
-      type: isHls ? 'm3u8' : undefined,
+      ...(isHls ? {
+        customType: {
+          m3u8: (video: HTMLVideoElement, hlsUrl: string) => {
+            if (Hls.isSupported()) {
+              const hls = new Hls();
+              hls.loadSource(hlsUrl);
+              hls.attachMedia(video);
+            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+              video.src = hlsUrl;
+            }
+          },
+        },
+        type: 'm3u8' as const,
+      } : {}),
       ...(thumbnails ? {
         thumbnails: {
           url: thumbnails.url,
